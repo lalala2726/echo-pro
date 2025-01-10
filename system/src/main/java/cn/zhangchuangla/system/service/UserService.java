@@ -1,8 +1,11 @@
 package cn.zhangchuangla.system.service;
 
-/**
- * @author Chuang
- * 
- * created on 2025/1/11 03:04
- */public class UserService {
+import cn.zhangchuangla.app.model.entity.system.User;
+import cn.zhangchuangla.app.model.request.system.UserRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+public interface UserService extends IService<User> {
+
+    Page<User> UserList(UserRequest request);
 }

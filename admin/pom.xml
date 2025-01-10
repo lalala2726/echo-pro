@@ -8,22 +8,19 @@
         <artifactId>person-app-backend</artifactId>
         <version>1.0</version>
     </parent>
-    <artifactId>framework</artifactId>
+
+    <artifactId>admin</artifactId>
     <version>1.0</version>
 
-    <description>framework核心</description>
-
     <dependencies>
-        <!-- SpringBoot Web容器 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>cn.zhangchuangla.app</groupId>
+            <artifactId>framework</artifactId>
         </dependency>
 
-        <!-- SpringBoot 拦截器 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <groupId>cn.zhangchuangla.app</groupId>
+            <artifactId>system</artifactId>
         </dependency>
     </dependencies>
 
