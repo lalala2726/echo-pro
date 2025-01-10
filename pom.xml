@@ -24,7 +24,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.2.1</spring.boot.version>
-        <mybatis.plus.version>3.5.4.1</mybatis.plus.version>
+        <mybatis.plus.version>3.5.8</mybatis.plus.version>
         <mysql.version>8.0.33</mysql.version>
         <fastjson.version>2.0.53</fastjson.version>
         <lombok.version>1.18.30</lombok.version>
@@ -79,32 +79,19 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
 
             <!-- MyBatis-Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
             <!-- MySQL -->
             <dependency>
-                <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-j</artifactId>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-
-            <!-- JWT -->
-            <dependency>
-                <groupId>com.auth0</groupId>
-                <artifactId>java-jwt</artifactId>
-                <version>${jwt.version}</version>
             </dependency>
 
             <!-- FastJSON -->

@@ -1,7 +1,9 @@
 package cn.zhangchuangla.admin;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Chuang
@@ -9,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * created on 2025/1/11 03:18
  */
 @SpringBootApplication
+@MapperScan("cn.zhangchuangla.**.mapper")
+@ComponentScan(basePackages = "cn.zhangchuangla.**")
 public class AdminApplication {
 
     public static void main(String[] args) {

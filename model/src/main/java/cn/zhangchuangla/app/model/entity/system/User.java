@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-@TableName(value = "user")
+@TableName(value = "sys_user")
 @Data
 public class User {
 

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.app.model.vo.system;
 
-import cn.zhangchuangla.common.model.vo.BaseVO;
+import cn.zhangchuangla.app.model.base.BaseVO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

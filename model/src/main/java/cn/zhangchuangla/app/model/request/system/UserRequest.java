@@ -1,6 +1,6 @@
 package cn.zhangchuangla.app.model.request.system;
 
-import cn.zhangchuangla.common.model.request.BaseRequest;
+import cn.zhangchuangla.app.model.base.BaseRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

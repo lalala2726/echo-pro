@@ -8,6 +8,8 @@ import cn.zhangchuangla.system.service.UserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
  * created on 2025/1/11 03:18
  */
 @RestController
+@RequestMapping("/admin/user")
 public class UserController {
 
     @Resource
@@ -29,6 +32,7 @@ public class UserController {
      * @param request 请求参数
      * @return 用户列表
      */
+    @GetMapping("/list")
     public AjaxResult list(UserRequest request) {
         Page<User> userPage = userService.UserList(request);
         ArrayList<UserVo> listVos = new ArrayList<>();
