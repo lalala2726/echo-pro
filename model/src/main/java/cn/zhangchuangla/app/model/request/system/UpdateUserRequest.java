@@ -1,9 +1,6 @@
 package cn.zhangchuangla.app.model.request.system;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 public class UpdateUserRequest {

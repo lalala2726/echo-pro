@@ -8,20 +8,22 @@ import cn.zhangchuangla.app.model.vo.system.UserVo;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.service.UserService;
+import cn.zhangchuangla.common.utils.ValidationUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @author Chuang
- * <p>
- * created on 2025/1/11 03:18
+ * 用户管理控制器
  */
 @RestController
 @RequestMapping("/admin/user")
+@Validated
 public class UserController {
 
     @Resource
@@ -36,90 +38,100 @@ public class UserController {
     @GetMapping("/list")
     public AjaxResult list(UserRequest request) {
         Page<User> userPage = userService.UserList(request);
-        ArrayList<UserVo> listVos = new ArrayList<>();
-        userPage.getRecords().forEach(user -> {
-            UserVo userVo = new UserVo();
-            BeanUtils.copyProperties(user, userVo);
-            listVos.add(userVo);
-        });
-        return AjaxResult.table(userPage, listVos);
+        List<UserVo> userVos = userPage.getRecords().stream()
+                .map(user -> {
+                    UserVo userVo = new UserVo();
+                    BeanUtils.copyProperties(user, userVo);
+                    return userVo;
+                }).collect(Collectors.toList());
+        return AjaxResult.table(userPage, userVos);
     }
 
     /**
-     * 新增用户, 返回新增用户ID
+     * 新增用户
+     *
      * @param request 新增用户请求参数
-     * @return 新增成功返回用户主键,失败返回-1
+     * @return 新增成功返回用户主键,失败返回错误信息
      */
     @PostMapping
-    public AjaxResult addUserInfo(@RequestBody AddUserRequest request){
-        if (request == null){
-            return AjaxResult.error("请求参数为空");
+    public AjaxResult addUserInfo(@RequestBody @Validated AddUserRequest request) {
+        String validationError = validateUserRequest(request);
+        if (validationError != null) {
+            return getError(validationError);
         }
-        //检验手机号是否合法
-        if (request.getPhone() != null && !request.getPhone().matches("^1[3-9]\\d{9}$")) {
-            return AjaxResult.error("手机号不合法");
-        }
-        //用户名必须大于5位小于16位
-        if (request.getUsername() == null || request.getUsername().length() < 5 || request.getUsername().length() > 16) {
-            return AjaxResult.error("用户名不合法");
-        }
-        //检验邮箱是否合法
-        if (request.getEmail() != null && !request.getEmail().matches("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$")) {
-            return AjaxResult.error("邮箱不合法");
-        }
-        //密码必须大于6位小于16位
-        if (request.getPassword() == null || request.getPassword().length() < 6 || request.getPassword().length() > 16) {
-            return AjaxResult.error("密码不合法");
-        }
+
         if (userService.isUsernameExist(request.getUsername())) {
             return AjaxResult.error("用户名已存在");
         }
-        if (request.getEmail() != null && userService.isEmailExist(request.getEmail())) {
+        if (userService.isEmailExist(request.getEmail())) {
             return AjaxResult.error("邮箱已存在");
         }
-        if (request.getPassword() != null &&userService.isPhoneExist(request.getPhone())) {
+        if (userService.isPhoneExist(request.getPhone())) {
             return AjaxResult.error("手机号已存在");
         }
+
         return AjaxResult.toSuccess(userService.addUserInfo(request));
+    }
+
+    private AjaxResult getError(String validationError) {
+        return AjaxResult.error(validationError);
     }
 
     /**
      * 删除用户
+     *
      * @param id 用户ID
-     * @return 删除成功返回true,失败返回false
+     * @return 删除结果
      */
     @DeleteMapping("/{id}")
-    public AjaxResult deleteUser(@PathVariable("id") Long id){
-        if (id == null){
+    public AjaxResult deleteUser(@PathVariable("id") Long id) {
+        if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
         return AjaxResult.isSuccess(userService.removeById(id));
     }
 
-
     /**
      * 修改用户信息
-     * @param request 修改用户信息
-     * @return 修改成功返回true,失败返回false
+     *
+     * @param request 修改用户请求
+     * @return 修改结果
      */
     @PutMapping
-    public AjaxResult updateUserInfoById(@RequestBody UpdateUserRequest request){
-        if (request.getId() == null || request.getUsername() == null){
-            return AjaxResult.error(ResponseCode.PARAM_ERROR, "用户ID不能为空或不能小于0!");
+    public AjaxResult updateUserInfoById(@RequestBody @Validated UpdateUserRequest request) {
+        if (request.getId() == null) {
+            return AjaxResult.error(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
+
+        String validationError = validateUserRequest(request);
+        if (validationError != null) {
+            return AjaxResult.error(validationError);
+        }
+
+        if (userService.isUsernameExist(request.getUsername())) {
+            return AjaxResult.error("用户名已存在");
+        }
+        if (userService.isEmailExist(request.getEmail())) {
+            return AjaxResult.error("邮箱已存在");
+        }
+        if (userService.isPhoneExist(request.getPhone())) {
+            return AjaxResult.error("手机号已存在");
+        }
+
         User user = new User();
         BeanUtils.copyProperties(request, user);
         return AjaxResult.isSuccess(userService.updateById(user));
     }
 
     /**
-     * 根据ID查询用户信息
+     * 查询用户信息
+     *
      * @param id 用户ID
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    public AjaxResult getUserInfoById(@PathVariable("id") Long id){
-        if (id == null){
+    public AjaxResult getUserInfoById(@PathVariable("id") Long id) {
+        if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
         User user = userService.getById(id);
@@ -128,4 +140,27 @@ public class UserController {
         return AjaxResult.success(userVo);
     }
 
+    /**
+     * 用户请求参数校验
+     *
+     * @param request 请求对象
+     * @return 错误信息或null
+     */
+    private String validateUserRequest(Object request) {
+        if (request instanceof AddUserRequest addUserRequest) {
+            if (!ValidationUtil.isPhoneValid(addUserRequest.getPhone())) {
+                return "手机号不合法";
+            }
+            if (!ValidationUtil.isUsernameValid(addUserRequest.getUsername())) {
+                return "用户名必须在5到16位之间";
+            }
+            if (!ValidationUtil.isEmailValid(addUserRequest.getEmail())) {
+                return "邮箱格式不合法";
+            }
+            if (!ValidationUtil.isPasswordValid(addUserRequest.getPassword())) {
+                return "密码必须在6到16位之间";
+            }
+        }
+        return null;
+    }
 }
