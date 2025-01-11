@@ -9,6 +9,9 @@
         <result property="username" column="username"/>
         <result property="password" column="password"/>
         <result property="nickName" column="nick_name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
         <result property="email" column="email"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>

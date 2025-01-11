@@ -33,6 +33,13 @@ public class UserRequest extends BaseRequest {
      */
     private String phone;
 
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+
     /**
      * 状态
      */
@@ -52,6 +59,5 @@ public class UserRequest extends BaseRequest {
      * 修改人
      */
     private String updateBy;
-
 
 }

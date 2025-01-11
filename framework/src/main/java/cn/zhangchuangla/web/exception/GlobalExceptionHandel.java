@@ -1,0 +1,61 @@
+package cn.zhangchuangla.web.exception;
+
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.result.AjaxResult;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * 全局异常处理
+ *
+ * @author Chuang
+ * <p>
+ * created on 2025/1/11 10:10
+ */
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandel {
+
+
+    /**
+     * 业务异常
+     */
+    @ExceptionHandler(ServiceException.class)
+    public AjaxResult serviceExceptionHandel(ServiceException exception){
+        log.error("业务异常：{}",exception.toString());
+        return AjaxResult.error(exception.getMessage());
+    }
+
+    /**
+     * 请求方法不支持
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public AjaxResult httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception){
+        log.error("请求方法不支持：{}",exception.toString());
+        return AjaxResult.error(ResponseCode.NOT_SUPPORT);
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public AjaxResult illegalArgumentExceptionHandel(IllegalArgumentException exception){
+        log.error("参数异常：{}",exception.toString());
+        return AjaxResult.error(ResponseCode.PARAM_ERROR,"请求参数非法!");
+    }
+
+    /**
+     * 系统异常
+     */
+    @ExceptionHandler(Exception.class)
+    public AjaxResult exceptionHandel(Exception exception){
+        log.error("系统异常：{}",exception.toString());
+        return AjaxResult.error(ResponseCode.SERVER_ERROR);
+    }
+
+
+
+}

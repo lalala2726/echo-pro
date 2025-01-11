@@ -178,7 +178,17 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
      * @param val 参数
      * @return AjaxResult
      */
-    public static AjaxResult toSuccess(int val) {
+    public static AjaxResult toSuccess(Long val) {
+        if (val < 0) return AjaxResult.error(ResponseCode.ERROR);
+        return new AjaxResult(ResponseCode.SUCCESS);
+    }
+    /**
+     * 判断是否成功
+     *
+     * @param val 参数
+     * @return AjaxResult
+     */
+    public static AjaxResult toSuccess(Integer val) {
         if (val < 0) return AjaxResult.error(ResponseCode.ERROR);
         return new AjaxResult(ResponseCode.SUCCESS);
     }
@@ -218,7 +228,19 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
         ajaxResult.put(CODE_TAG, code);
         ajaxResult.put(TIME_TAG, getCurrentTime());
         return ajaxResult;
+    }
 
+    /**
+     * 错误返回（带消息和响应码）
+     * @param responseCode 状态码
+     * @param message 错误信息
+     */
+    public static AjaxResult error(ResponseCode responseCode, String message) {
+        AjaxResult ajaxResult = new AjaxResult();
+        ajaxResult.put(MSG_TAG, message);
+        ajaxResult.put(CODE_TAG, responseCode.getCode());
+        ajaxResult.put(TIME_TAG, getCurrentTime());
+        return ajaxResult;
     }
 
     /**

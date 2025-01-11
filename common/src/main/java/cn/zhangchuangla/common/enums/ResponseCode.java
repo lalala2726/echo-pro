@@ -17,7 +17,7 @@ public enum ResponseCode {
     // endregion
 
     //region 请求相关错误状态
-    PARAM_ERROR(400, "参数错误!请检查您的参数"),          // 当请求参数有误或缺失时的响应
+    PARAM_ERROR(400, "参数错误!"),          // 当请求参数有误或缺失时的响应
     PARAM_NOT_NULL(1009, "参数不能为空"),               // 当参数不能为空时的响应
     PARAM_ERROR_TOO_LARGE(40000, "请求参数过大"),        // 当请求参数过于庞大时的响应
     PARAM_ERROR_ZERO(40001, "参数不能小于0"),            // 当请求参数为0时的响应

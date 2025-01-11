@@ -1,5 +1,7 @@
 package cn.zhangchuangla.app.model.entity.system;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -12,6 +14,7 @@ public class User {
     /**
      * ID
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -28,6 +31,21 @@ public class User {
      * 昵称
      */
     private String nickName;
+
+    /**
+     * 头像
+     */
+    private String avatar;
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 手机号
+     */
+    private String phone;
 
     /**
      * 邮箱

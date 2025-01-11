@@ -1,10 +1,13 @@
-create table user
+create table sys_user
 (
     id          bigint auto_increment primary key comment '主键',
     username    varchar(255) not null comment '用户名',
-    password    varchar(255) not null comment '密码',
-    nick_name   varchar(255) not null comment '昵称',
-    email       varchar(255) not null comment '邮箱',
+    password    varchar(255)  comment '密码',
+    nick_name   varchar(255)comment '昵称',
+    email       varchar(255) comment '邮箱',
+    phone       varchar(255)  comment '手机号',
+    gender      tinyint  default 0    comment '性别',
+    avatar      varchar(255)  comment '头像',
     create_time timestamp default current_timestamp comment '创建时间',
     update_time timestamp default current_timestamp on update current_timestamp comment '更新时间',
     create_by   varchar(255) comment '创建人',
@@ -13,3 +16,5 @@ create table user
     status      tinyint   default 0 comment '状态',
     remark      varchar(255) comment '备注'
 ) comment '用户表';
+
+drop table sys_user;
