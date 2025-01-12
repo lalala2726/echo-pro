@@ -61,14 +61,15 @@
                 </ModuleInfoGo>
               </list>
             </option>
+            <option name="needsComment" value="true" />
             <option name="needsModel" value="true" />
             <option name="relativePackage" value="domain" />
             <option name="superClass" value="" />
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="User" />
-                  <option name="tableName" value="user" />
+                  <option name="className" value="SysPermissions" />
+                  <option name="tableName" value="sys_permissions" />
                 </TableUIInfo>
               </list>
             </option>

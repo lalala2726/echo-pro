@@ -1,19 +1,19 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.app.model.entity.system.User;
+import cn.zhangchuangla.app.model.entity.system.SysUser;
 import cn.zhangchuangla.app.model.request.system.AddUserRequest;
 import cn.zhangchuangla.app.model.request.system.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-public interface UserService extends IService<User> {
+public interface UserService extends IService<SysUser> {
 
     /**
      * 用户列表
      * @param request 请求参数
      * @return 分页数据
      */
-    Page<User> UserList(UserRequest request);
+    Page<SysUser> UserList(UserRequest request);
 
 
     /**

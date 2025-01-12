@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.model.entity;
+package cn.zhangchuangla.app.model.base;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -40,6 +40,11 @@ public class BaseEntity implements Serializable {
      */
     @TableLogic
     private String isDelete;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 
 }

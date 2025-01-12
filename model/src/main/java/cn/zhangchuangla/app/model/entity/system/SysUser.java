@@ -1,15 +1,16 @@
 package cn.zhangchuangla.app.model.entity.system;
 
+import cn.zhangchuangla.app.model.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_user")
 @Data
-public class User {
+public class SysUser extends BaseEntity {
 
     /**
      * ID
@@ -53,37 +54,9 @@ public class User {
     private String email;
 
     /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
-    /**
-     * 删除状态
-     */
-    private Integer isDeleted;
-
-    /**
      * 状态
      */
     private Integer status;
 
-    /**
-     * 备注
-     */
-    private String remark;
+
 }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.app.model.entity.system.User;
+import cn.zhangchuangla.app.model.entity.system.SysUser;
 import cn.zhangchuangla.app.model.request.system.AddUserRequest;
 import cn.zhangchuangla.app.model.request.system.UserRequest;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -14,7 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User>
+public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser>
         implements UserService {
 
     /**
@@ -23,37 +23,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return 分页数据
      */
     @Override
-    public Page<User> UserList(UserRequest request) {
-        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public Page<SysUser> UserList(UserRequest request) {
+        LambdaQueryWrapper<SysUser> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
         //根据用户名模糊查询
         userLambdaQueryWrapper.like(request.getUsername() != null && !request.getUsername().isEmpty(),
-                User::getUsername, request.getUsername());
+                SysUser::getUsername, request.getUsername());
         //根据昵称模糊查询
         userLambdaQueryWrapper.like(request.getNickName() != null && !request.getNickName().isEmpty(),
-                User::getNickName, request.getNickName());
+                SysUser::getNickName, request.getNickName());
         //根据邮箱模糊查询
         userLambdaQueryWrapper.like(request.getEmail() != null && !request.getEmail().isEmpty(),
-                User::getEmail, request.getEmail());
+                SysUser::getEmail, request.getEmail());
         //根据备注模糊查询
         userLambdaQueryWrapper.like(request.getRemark() != null && !request.getRemark().isEmpty(),
-                User::getRemark, request.getRemark());
+                SysUser::getRemark, request.getRemark());
         //根据手机号精准查询
         userLambdaQueryWrapper.eq(request.getPhone() != null && !request.getPhone().isEmpty(),
-                User::getPhone, request.getPhone());
+                SysUser::getPhone, request.getPhone());
         //根据邮箱精准查询
         userLambdaQueryWrapper.eq(request.getEmail() != null && !request.getEmail().isEmpty(),
-                User::getEmail, request.getEmail());
+                SysUser::getEmail, request.getEmail());
         //根据状态精准查询
         userLambdaQueryWrapper.eq(request.getStatus() != null,
-                User::getStatus, request.getStatus());
+                SysUser::getStatus, request.getStatus());
         //根据性别精准查询
-        userLambdaQueryWrapper.eq(request.getGender() != null, User::getGender,request.getGender());
+        userLambdaQueryWrapper.eq(request.getGender() != null, SysUser::getGender,request.getGender());
         //根据创建人模糊查询
         userLambdaQueryWrapper.like(request.getCreateBy() != null && !request.getCreateBy().isEmpty(),
-                User::getCreateBy, request.getCreateBy());
+                SysUser::getCreateBy, request.getCreateBy());
         //根据修改人模糊查询
         userLambdaQueryWrapper.eq(request.getUpdateBy() != null && !request.getUpdateBy().isEmpty(),
-                User::getUpdateBy, request.getUpdateBy());
+                SysUser::getUpdateBy, request.getUpdateBy());
 
         return this.page(new Page<>(request.getPageNum(), request.getPageSize()), userLambdaQueryWrapper);
     }
@@ -68,12 +68,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (request == null){
             throw new ServiceException(ResponseCode.PARAM_ERROR);
         }
-        User user = new User();
-        BeanUtils.copyProperties(request, user);
-        if (!save(user)) {
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
+        if (!save(sysUser)) {
             return -1L;
         }
-       return user.getId();
+       return sysUser.getId();
     }
 
     /**
@@ -86,7 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (username == null){
             throw new ServiceException(ResponseCode.PARAM_ERROR,"用户名不能为空!");
         }
-        return this.count(new LambdaQueryWrapper<User>().eq(User::getUsername, username)) > 0;
+        return this.count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username)) > 0;
     }
 
     /**
@@ -99,7 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (email == null){
             throw new ServiceException(ResponseCode.PARAM_ERROR,"邮箱不能为空!");
         }
-        return this.count(new LambdaQueryWrapper<User>().eq(User::getEmail, email)) > 0;
+        return this.count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email)) > 0;
     }
 
     /**
@@ -112,7 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (phone == null){
             throw new ServiceException(ResponseCode.PARAM_ERROR,"手机号不能为空!");
         }
-        return this.count(new LambdaQueryWrapper<User>().eq(User::getPhone, phone)) > 0;
+        return this.count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhone, phone)) > 0;
     }
 }
 

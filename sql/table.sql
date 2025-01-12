@@ -2,19 +2,42 @@ create table sys_user
 (
     id          bigint auto_increment primary key comment '主键',
     username    varchar(255) not null comment '用户名',
-    password    varchar(255)  comment '密码',
-    nick_name   varchar(255)comment '昵称',
+    password    varchar(255) comment '密码',
+    nick_name   varchar(255) comment '昵称',
     email       varchar(255) comment '邮箱',
-    phone       varchar(255)  comment '手机号',
-    gender      tinyint  default 0    comment '性别',
-    avatar      varchar(255)  comment '头像',
+    phone       varchar(255) comment '手机号',
+    gender      tinyint   default 0 comment '性别',
+    avatar      varchar(255) comment '头像',
+    status      tinyint   default 0 comment '状态',
     create_time timestamp default current_timestamp comment '创建时间',
     update_time timestamp default current_timestamp on update current_timestamp comment '更新时间',
     create_by   varchar(255) comment '创建人',
     update_by   varchar(255) comment '更新人',
     is_deleted  tinyint   default 0 comment '是否删除',
-    status      tinyint   default 0 comment '状态',
     remark      varchar(255) comment '备注'
 ) comment '用户表';
 
-drop table sys_user;
+CREATE TABLE sys_role
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY comment '主键',
+    name        VARCHAR(50) NOT NULL UNIQUE comment '角色名',
+    create_time timestamp default current_timestamp comment '创建时间',
+    update_time timestamp default current_timestamp on update current_timestamp comment '更新时间',
+    create_by   varchar(255) comment '创建人',
+    update_by   varchar(255) comment '更新人',
+    is_deleted  tinyint   default 0 comment '是否删除',
+    remark      varchar(255) comment '备注'
+) comment '角色表';
+
+CREATE TABLE sys_permissions
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY, -- 权限ID
+    name        VARCHAR(100) NOT NULL UNIQUE,      -- 权限名
+    create_time timestamp default current_timestamp comment '创建时间',
+    update_time timestamp default current_timestamp on update current_timestamp comment '更新时间',
+    create_by   varchar(255) comment '创建人',
+    update_by   varchar(255) comment '更新人',
+    is_deleted  tinyint   default 0 comment '是否删除',
+    remark      varchar(255) comment '备注'
+) comment '权限表';
+

@@ -30,6 +30,7 @@
         <lombok.version>1.18.30</lombok.version>
         <hutool.version>5.8.25</hutool.version>
         <jwt.version>4.4.0</jwt.version>
+        <sa-token.version>1.39.0</sa-token.version>
     </properties>
 
     <dependencies>
@@ -50,6 +51,7 @@
     </dependencies>
 
     <dependencyManagement>
+
         <dependencies>
             <!-- Spring Boot BOM -->
             <dependency>
@@ -67,6 +69,7 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
@@ -78,6 +81,14 @@
                 <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+
+            <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+
 
 
             <!-- MyBatis-Plus -->

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
-import cn.zhangchuangla.app.model.entity.system.User;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.zhangchuangla.app.model.entity.system.SysUser;
 import cn.zhangchuangla.app.model.request.system.AddUserRequest;
 import cn.zhangchuangla.app.model.request.system.UpdateUserRequest;
 import cn.zhangchuangla.app.model.request.system.UserRequest;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/admin/user")
-@Validated
+@SaCheckLogin
 public class UserController {
 
     @Resource
@@ -37,11 +38,11 @@ public class UserController {
      */
     @GetMapping("/list")
     public AjaxResult list(UserRequest request) {
-        Page<User> userPage = userService.UserList(request);
+        Page<SysUser> userPage = userService.UserList(request);
         List<UserVo> userVos = userPage.getRecords().stream()
-                .map(user -> {
+                .map(sysUser -> {
                     UserVo userVo = new UserVo();
-                    BeanUtils.copyProperties(user, userVo);
+                    BeanUtils.copyProperties(sysUser, userVo);
                     return userVo;
                 }).collect(Collectors.toList());
         return AjaxResult.table(userPage, userVos);
@@ -118,9 +119,9 @@ public class UserController {
             return AjaxResult.error("手机号已存在");
         }
 
-        User user = new User();
-        BeanUtils.copyProperties(request, user);
-        return AjaxResult.isSuccess(userService.updateById(user));
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
+        return AjaxResult.isSuccess(userService.updateById(sysUser));
     }
 
     /**
@@ -134,9 +135,9 @@ public class UserController {
         if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
-        User user = userService.getById(id);
+        SysUser sysUser = userService.getById(id);
         UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(user, userVo);
+        BeanUtils.copyProperties(sysUser, userVo);
         return AjaxResult.success(userVo);
     }
 

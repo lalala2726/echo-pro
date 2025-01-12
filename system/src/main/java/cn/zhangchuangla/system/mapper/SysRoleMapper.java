@@ -1,12 +1,12 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.app.model.entity.system.SysUser;
+import cn.zhangchuangla.app.model.entity.system.SysRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
 * @author zhangchuang
 */
-public interface UserMapper extends BaseMapper<SysUser> {
+public interface SysRoleMapper extends BaseMapper<SysRole> {
 
 }
 
