@@ -1,6 +1,6 @@
 package cn.zhangchuangla.app.model.request.system;
 
-import cn.zhangchuangla.app.model.base.BaseRequest;
+import cn.zhangchuangla.app.model.base.BasePageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserRequest extends BaseRequest {
+public class UserRequest extends BasePageRequest {
 
     /**
      * 用户名

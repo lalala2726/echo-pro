@@ -8,7 +8,7 @@ import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserVo extends BaseVO {
+public class SysUserVo extends BaseVO {
 
     /**
      * ID

@@ -1,10 +1,8 @@
-package cn.zhangchuangla.app.model.entity.system;
+package cn.zhangchuangla.app.model.vo.system;
 
-import cn.zhangchuangla.app.model.base.BaseEntity;
+import cn.zhangchuangla.app.model.base.BaseVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,9 +10,8 @@ import lombok.EqualsAndHashCode;
  * 角色表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value ="sys_role")
 @Data
-public class SysRole extends BaseEntity {
+public class SysRoleVo extends BaseVO {
     /**
      * 主键
      */

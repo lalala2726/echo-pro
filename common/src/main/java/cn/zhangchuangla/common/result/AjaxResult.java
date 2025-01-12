@@ -158,6 +158,9 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
      * @return 返回分页的列表信息
      */
     public static <T> AjaxResult table(Page<T> page) {
+        if (page == null){
+            return AjaxResult.error(ResponseCode.ERROR, "分页对象为空");
+        }
         return getAjaxResult(page, page.getTotal(), page.getSize(), page.getCurrent(), page);
     }
 

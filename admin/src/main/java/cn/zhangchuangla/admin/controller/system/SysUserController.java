@@ -5,9 +5,10 @@ import cn.zhangchuangla.app.model.entity.system.SysUser;
 import cn.zhangchuangla.app.model.request.system.AddUserRequest;
 import cn.zhangchuangla.app.model.request.system.UpdateUserRequest;
 import cn.zhangchuangla.app.model.request.system.UserRequest;
-import cn.zhangchuangla.app.model.vo.system.UserVo;
+import cn.zhangchuangla.app.model.vo.system.SysUserVo;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.system.service.UserService;
 import cn.zhangchuangla.common.utils.ValidationUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin/user")
 @SaCheckLogin
-public class UserController {
+public class SysUserController {
 
     @Resource
     private UserService userService;
@@ -38,14 +39,15 @@ public class UserController {
      */
     @GetMapping("/list")
     public AjaxResult list(UserRequest request) {
+        PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = userService.UserList(request);
-        List<UserVo> userVos = userPage.getRecords().stream()
+        List<SysUserVo> sysUserVos = userPage.getRecords().stream()
                 .map(sysUser -> {
-                    UserVo userVo = new UserVo();
-                    BeanUtils.copyProperties(sysUser, userVo);
-                    return userVo;
+                    SysUserVo sysUserVo = new SysUserVo();
+                    BeanUtils.copyProperties(sysUser, sysUserVo);
+                    return sysUserVo;
                 }).collect(Collectors.toList());
-        return AjaxResult.table(userPage, userVos);
+        return AjaxResult.table(userPage, sysUserVos);
     }
 
     /**
@@ -136,9 +138,9 @@ public class UserController {
             return AjaxResult.error("用户ID为空");
         }
         SysUser sysUser = userService.getById(id);
-        UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(sysUser, userVo);
-        return AjaxResult.success(userVo);
+        SysUserVo sysUserVo = new SysUserVo();
+        BeanUtils.copyProperties(sysUser, sysUserVo);
+        return AjaxResult.success(sysUserVo);
     }
 
     /**

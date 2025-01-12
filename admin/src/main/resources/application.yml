@@ -9,11 +9,17 @@ spring:
     username: root
     password: zhangchuang2726
 
-#开启日志Mybatis-plus日志
+    #开启日志Mybatis-plus日志
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: com.zhangchuang.**.entity
+  global-config:
+    db-config:
+      logic-delete-field: is_deleted  # 全局逻辑删除字段名
+      logic-delete-value: 1         # 逻辑已删除值
+      logic-not-delete-value: 0     # 逻辑未删除值
+
 
 sa-token:
   # token 名称（同时也是 cookie 名称）
