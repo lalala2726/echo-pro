@@ -27,6 +27,7 @@
             <groupId>cn.zhangchuangla.app</groupId>
             <artifactId>system</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>
