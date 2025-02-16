@@ -20,7 +20,6 @@ public class SysUserVo extends BaseVO {
      */
     private String username;
 
-
     /**
      * 昵称
      */

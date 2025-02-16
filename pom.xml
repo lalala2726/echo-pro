@@ -5,14 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.zhangchuangla.app</groupId>
-    <artifactId>person-app-backend</artifactId>
+    <artifactId>app-backend</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>admin</module>
         <module>common</module>
         <module>framework</module>
-        <module>accounting</module>
         <module>system</module>
         <module>model</module>
     </modules>
@@ -31,6 +30,7 @@
         <hutool.version>5.8.25</hutool.version>
         <jwt.version>4.4.0</jwt.version>
         <sa-token.version>1.39.0</sa-token.version>
+        <aliyun.oss.version>3.17.4</aliyun.oss.version>
     </properties>
 
     <dependencies>
@@ -89,7 +89,12 @@
                 <version>${sa-token.version}</version>
             </dependency>
 
-
+            <!-- 阿里云OSS -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun.oss.version}</version>
+            </dependency>
 
             <!-- MyBatis-Plus -->
             <dependency>
