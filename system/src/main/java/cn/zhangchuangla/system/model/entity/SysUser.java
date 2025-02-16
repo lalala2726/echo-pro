@@ -1,6 +1,6 @@
-package cn.zhangchuangla.app.model.entity.system;
+package cn.zhangchuangla.system.model.entity;
 
-import cn.zhangchuangla.app.model.base.BaseEntity;
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

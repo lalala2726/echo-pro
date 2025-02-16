@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.app.model.entity.system.SysUser;
-import cn.zhangchuangla.app.model.request.system.AddUserRequest;
-import cn.zhangchuangla.app.model.request.system.UserRequest;
+import cn.zhangchuangla.system.model.entity.SysUser;
+import cn.zhangchuangla.system.model.request.AddUserRequest;
+import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.UserMapper;

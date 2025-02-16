@@ -1,19 +1,17 @@
-package cn.zhangchuangla.app.model.vo.system;
+package cn.zhangchuangla.system.model.request;
 
-import cn.zhangchuangla.app.model.base.BaseVO;
+import cn.zhangchuangla.common.base.BasePageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
+/**
+ * @author Chuang
+ * <p>
+ * created on 2025/1/11 03:59
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysUserVo extends BaseVO {
-
-    /**
-     * ID
-     */
-    private Long id;
+public class UserRequest extends BasePageRequest {
 
     /**
      * 用户名
@@ -31,24 +29,15 @@ public class SysUserVo extends BaseVO {
     private String email;
 
     /**
-     * 创建时间
+     * 手机号
      */
-    private Date createTime;
+    private String phone;
+
 
     /**
-     * 更新时间
+     * 性别
      */
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
+    private Integer gender;
 
 
     /**
@@ -60,4 +49,15 @@ public class SysUserVo extends BaseVO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 创建人
+     */
+    private String createBy;
+
+    /**
+     * 修改人
+     */
+    private String updateBy;
+
 }

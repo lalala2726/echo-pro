@@ -1,4 +1,4 @@
-package cn.zhangchuangla.app.model.base;
+package cn.zhangchuangla.common.base;
 
 import lombok.Data;
 

@@ -10,6 +10,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
+        <option value="$PROJECT_DIR$/model/pom.xml" />
       </set>
     </option>
   </component>

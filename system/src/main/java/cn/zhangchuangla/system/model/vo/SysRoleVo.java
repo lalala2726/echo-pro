@@ -1,6 +1,6 @@
-package cn.zhangchuangla.app.model.vo.system;
+package cn.zhangchuangla.system.model.vo;
 
-import cn.zhangchuangla.app.model.base.BaseVO;
+import cn.zhangchuangla.common.base.BaseVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
