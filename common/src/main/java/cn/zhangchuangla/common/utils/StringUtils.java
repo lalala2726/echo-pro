@@ -6,7 +6,7 @@ package cn.zhangchuangla.common.utils;
  * @author Chuang
  * created on 2025/1/12 11:23
  */
-public class StrUtil {
+public class StringUtils {
 
     /**
      * 检查传入的字符串中是否有一个为null或空字符串

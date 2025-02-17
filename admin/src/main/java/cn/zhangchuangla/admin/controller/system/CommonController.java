@@ -2,11 +2,11 @@ package cn.zhangchuangla.admin.controller.system;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.MinioConfig;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.service.OssService;
-import jakarta.annotation.Resource;
+import cn.zhangchuangla.system.service.AliyunOssFileService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,13 +28,16 @@ import static cn.dev33.satoken.SaManager.log;
 @RestController
 public class CommonController {
 
-    private final OssService ossService;
+    private final AliyunOssFileService aliyunOssFileService;
 
     private final AppConfig appConfig;
 
-    public CommonController(OssService ossService, AppConfig appConfig) {
-        this.ossService = ossService;
+    private final MinioConfig minioConfig;
+
+    public CommonController(AliyunOssFileService aliyunOssFileService, AppConfig appConfig, MinioConfig minioConfig) {
+        this.aliyunOssFileService = aliyunOssFileService;
         this.appConfig = appConfig;
+        this.minioConfig = minioConfig;
     }
 
     /**
@@ -44,10 +47,12 @@ public class CommonController {
      */
     @PostMapping("/upload")
     public AjaxResult upload(@RequestParam("file") MultipartFile file) {
-        String fileUrl;
+        String fileUrl = null;
         if (appConfig.getUploadPath() == null) {
-            fileUrl = ossService.upload(file);
-        } else {
+            fileUrl = aliyunOssFileService.upload(file);
+        } else if (minioConfig.getEndpoint() != null) {
+            return null;
+        } else if (!appConfig.getUploadPath().isBlank()) {
             fileUrl = localUploadFile(file);
         }
         AjaxResult ajax = new AjaxResult();

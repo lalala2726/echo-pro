@@ -1,9 +1,8 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.result.AjaxResult;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface OssService {
+public interface AliyunOssFileService {
 
     /**
      * 阿里云OSS文件上传

@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.OSSConfig;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.system.service.OssService;
+import cn.zhangchuangla.system.service.AliyunOssFileService;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -21,13 +21,13 @@ import java.util.UUID;
 import static cn.dev33.satoken.SaManager.log;
 
 @Service
-public class OssServiceImpl implements OssService {
+public class AliyunOssFileServiceImpl implements AliyunOssFileService {
 
     private final OSSConfig ossConfig;
 
     private final AppConfig appConfig;
 
-    public OssServiceImpl(OSSConfig ossConfig, AppConfig appConfig) {
+    public AliyunOssFileServiceImpl(OSSConfig ossConfig, AppConfig appConfig) {
         this.ossConfig = ossConfig;
         this.appConfig = appConfig;
     }
