@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.app.model.entity.system.SysPermissions;
+import cn.zhangchuangla.system.model.entity.SysPermissions;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

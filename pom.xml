@@ -13,7 +13,6 @@
         <module>common</module>
         <module>framework</module>
         <module>system</module>
-        <module>model</module>
     </modules>
     <!-- 这里可以统一管理 Java 版本、Spring Boot 版本等 -->
     <properties>
@@ -31,6 +30,7 @@
         <jwt.version>4.4.0</jwt.version>
         <sa-token.version>1.39.0</sa-token.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
+        <minio.version>8.5.12</minio.version>
     </properties>
 
     <dependencies>
@@ -126,20 +126,14 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>model</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>framework</artifactId>
                 <version>${app.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accounting</artifactId>
-                <version>${app.version}</version>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
 
             <dependency>

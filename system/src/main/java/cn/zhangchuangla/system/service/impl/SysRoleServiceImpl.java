@@ -1,10 +1,10 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.app.model.request.system.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.SysRoleQueryRequest;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.zhangchuangla.app.model.entity.system.SysRole;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import org.springframework.stereotype.Service;

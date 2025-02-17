@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.app.model.entity.system.SysRole;
-import cn.zhangchuangla.app.model.request.system.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.model.request.SysRoleQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 

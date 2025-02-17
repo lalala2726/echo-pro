@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.app.model.entity.system.SysRole;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
