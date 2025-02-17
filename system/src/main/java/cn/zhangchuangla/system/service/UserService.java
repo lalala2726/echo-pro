@@ -10,6 +10,7 @@ public interface UserService extends IService<SysUser> {
 
     /**
      * 用户列表
+     *
      * @param request 请求参数
      * @return 分页数据
      */
@@ -18,6 +19,7 @@ public interface UserService extends IService<SysUser> {
 
     /**
      * 新增用户
+     *
      * @param request 请求参数
      * @return 用户主键
      */
@@ -25,6 +27,7 @@ public interface UserService extends IService<SysUser> {
 
     /**
      * 判断用户名是否存在
+     *
      * @param username 用户名
      * @return true存在 false不存在
      */
@@ -32,6 +35,7 @@ public interface UserService extends IService<SysUser> {
 
     /**
      * 判断邮箱是否存在
+     *
      * @param email 邮箱
      * @return true存在 false不存在
      */
@@ -39,6 +43,7 @@ public interface UserService extends IService<SysUser> {
 
     /**
      * 判断手机号是否存在
+     *
      * @param phone 手机号
      * @return true存在 false不存在
      */

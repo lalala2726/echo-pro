@@ -4,12 +4,14 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import lombok.Getter;
 
 /**
+ * 配置文件异常
+ *
  * @author Chuang
  * <p>
  * created on 2025/1/11 10:04
  */
 @Getter
-public final class FileException extends RuntimeException {
+public final class ProFileException extends RuntimeException {
 
     /**
      * 状态码
@@ -17,18 +19,23 @@ public final class FileException extends RuntimeException {
     private final Integer code;
 
 
-    public FileException(ResponseCode responseCode, String message) {
+    public ProFileException(ResponseCode responseCode, String message) {
         super(message);
         this.code = responseCode.getCode();
     }
 
-    public FileException(ResponseCode responseCode) {
+    public ProFileException(ResponseCode responseCode) {
         super(responseCode.getMessage());
         this.code = responseCode.getCode();
     }
 
-    public FileException(String message) {
+    public ProFileException(String message) {
         super(message);
+        this.code = ResponseCode.PROFILE_ERROR.getCode();
+    }
+
+    public ProFileException() {
+        super(ResponseCode.PROFILE_ERROR.getMessage());
         this.code = ResponseCode.PROFILE_ERROR.getCode();
     }
 

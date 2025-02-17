@@ -1,16 +1,16 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.PageUtils;
+import cn.zhangchuangla.common.utils.ValidationUtil;
 import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.system.model.vo.SysUserVo;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.system.service.UserService;
-import cn.zhangchuangla.common.utils.ValidationUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +54,7 @@ public class SysUserController {
      * 新增用户
      *
      * @param request 新增用户请求参数
-     * @return 新增成功返回用户主键,失败返回错误信息
+     * @return 新增成功返回用户主键, 失败返回错误信息
      */
     @PostMapping
     public AjaxResult addUserInfo(@RequestBody @Validated AddUserRequest request) {

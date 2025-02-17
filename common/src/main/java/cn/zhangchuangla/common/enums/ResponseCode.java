@@ -64,7 +64,8 @@ public enum ResponseCode {
     NOT_EXIST(502, "不存在"),                           // 当请求的资源不存在时的响应
     NOT_ALLOW(503, "不允许"),
     FileNameIsNull(40008, "文件名不能为空"),
-    FileUploadFailed(40009, "文件上传失败");                          // 当操作不被允许时的响应
+    FileUploadFailed(40009, "文件上传失败"),                         // 当操作不被允许时的响应
+    PROFILE_ERROR(40010, "配置文件错误");               // 当配置文件错误时的响应
 
     // endregion
 

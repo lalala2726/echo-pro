@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 @Data
 public class AjaxResult extends HashMap<String, Object> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -158,7 +160,7 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
      * @return 返回分页的列表信息
      */
     public static <T> AjaxResult table(Page<T> page) {
-        if (page == null){
+        if (page == null) {
             return AjaxResult.error(ResponseCode.ERROR, "分页对象为空");
         }
         return getAjaxResult(page, page.getTotal(), page.getSize(), page.getCurrent(), page);
@@ -185,6 +187,7 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
         if (val < 0) return AjaxResult.error(ResponseCode.ERROR);
         return new AjaxResult(ResponseCode.SUCCESS);
     }
+
     /**
      * 判断是否成功
      *
@@ -235,8 +238,9 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
 
     /**
      * 错误返回（带消息和响应码）
+     *
      * @param responseCode 状态码
-     * @param message 错误信息
+     * @param message      错误信息
      */
     public static AjaxResult error(ResponseCode responseCode, String message) {
         AjaxResult ajaxResult = new AjaxResult();

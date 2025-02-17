@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * 角色表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value ="sys_role")
+@TableName(value = "sys_role")
 @Data
 public class SysRole extends BaseEntity {
     /**

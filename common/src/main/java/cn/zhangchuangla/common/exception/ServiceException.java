@@ -9,7 +9,7 @@ import lombok.Getter;
  * created on 2025/1/11 10:04
  */
 @Getter
-public final class ServiceException extends RuntimeException{
+public final class ServiceException extends RuntimeException {
 
     /**
      * 状态码
@@ -17,12 +17,12 @@ public final class ServiceException extends RuntimeException{
     private final Integer code;
 
 
-    public ServiceException(ResponseCode responseCode, String message){
+    public ServiceException(ResponseCode responseCode, String message) {
         super(message);
         this.code = responseCode.getCode();
     }
 
-    public ServiceException(ResponseCode responseCode){
+    public ServiceException(ResponseCode responseCode) {
         super(responseCode.getMessage());
         this.code = responseCode.getCode();
     }

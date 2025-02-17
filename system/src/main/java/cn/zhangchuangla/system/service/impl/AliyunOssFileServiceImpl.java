@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.OSSConfig;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
@@ -25,12 +24,10 @@ public class AliyunOssFileServiceImpl implements AliyunOssFileService {
 
     private final OSSConfig ossConfig;
 
-    private final AppConfig appConfig;
-
-    public AliyunOssFileServiceImpl(OSSConfig ossConfig, AppConfig appConfig) {
+    public AliyunOssFileServiceImpl(OSSConfig ossConfig) {
         this.ossConfig = ossConfig;
-        this.appConfig = appConfig;
     }
+
 
     /**
      * 阿里云OSS文件上传
@@ -48,7 +45,7 @@ public class AliyunOssFileServiceImpl implements AliyunOssFileService {
         String endPoint = ossConfig.getEndPoint();
         String accessKeyId = ossConfig.getAccessKeyId();
         String accessKeySecret = ossConfig.getAccessKeySecret();
-        String fileDomain = appConfig.getFileDomain();
+        String fileDomain = ossConfig.getFileDomain();
 
         // 创建 OSS 客户端
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);

@@ -11,11 +11,11 @@ import lombok.EqualsAndHashCode;
  * 权限表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value ="sys_permissions")
+@TableName(value = "sys_permissions")
 @Data
 public class SysPermissions extends BaseEntity {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
     private Long id;

@@ -6,7 +6,6 @@ public interface AliyunOssFileService {
 
     /**
      * 阿里云OSS文件上传
-     *
      */
-    String  upload(MultipartFile file);
+    String upload(MultipartFile file);
 }

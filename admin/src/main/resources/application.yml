@@ -42,13 +42,4 @@ sa-token:
 
 # 阿里云OSS配置
 
-app:
-  config:
-    # 上传文件访问路径
-    file-domain: https://bed.oss.zhangchuangla.cn/
 
-minio:
-  endpoint: http://
-  access-key: minioadmin
-  secret-key: minioadmin
-  bucket-name: drawingbed

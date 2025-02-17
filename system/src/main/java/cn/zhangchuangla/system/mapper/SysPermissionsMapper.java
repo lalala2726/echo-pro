@@ -4,8 +4,8 @@ import cn.zhangchuangla.system.model.entity.SysPermissions;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
-* @author zhangchuang
-*/
+ * @author zhangchuang
+ */
 public interface SysPermissionsMapper extends BaseMapper<SysPermissions> {
 
 }
