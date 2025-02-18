@@ -10,6 +10,11 @@ import org.springframework.context.annotation.Configuration;
 public class MinioConfig {
 
     /**
+     * Minio文件访问域名
+     */
+    private String fileDomain;
+
+    /**
      * minio服务地址
      */
     private String endpoint;

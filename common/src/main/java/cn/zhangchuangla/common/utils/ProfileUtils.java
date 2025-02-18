@@ -2,7 +2,7 @@ package cn.zhangchuangla.common.utils;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
-import cn.zhangchuangla.common.config.OSSConfig;
+import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.exception.ProFileException;
 
 /**
@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.exception.ProFileException;
  * <p>
  * created on 2025/2/17 22:00
  */
-public class ProFileUtils {
+public class ProfileUtils {
 
 
     /**
@@ -50,23 +50,23 @@ public class ProFileUtils {
     /**
      * 检查阿里云OSS文件上传配置
      *
-     * @param ossConfig OSS配置
+     * @param aliyunOssConfig OSS配置
      * @return 通过代表true
      */
-    public static boolean checkAliyunOssFileUploadProperties(OSSConfig ossConfig) {
-        if (ossConfig.getEndPoint().isEmpty()) {
+    public static boolean checkAliyunOssFileUploadProperties(AliyunOSSConfig aliyunOssConfig) {
+        if (aliyunOssConfig.getEndPoint().isEmpty()) {
             throw new ProFileException("OSS地址为空");
         }
-        if (ossConfig.getAccessKeyId().isEmpty()) {
+        if (aliyunOssConfig.getAccessKeyId().isEmpty()) {
             throw new ProFileException("OSS AccessKey为空");
         }
-        if (ossConfig.getAccessKeySecret().isEmpty()) {
+        if (aliyunOssConfig.getAccessKeySecret().isEmpty()) {
             throw new ProFileException("OSS SecretKey为空");
         }
-        if (ossConfig.getBucketName().isEmpty()) {
+        if (aliyunOssConfig.getBucketName().isEmpty()) {
             throw new ProFileException("OSS BucketName为空");
         }
-        if (ossConfig.getFileDomain().isEmpty()) {
+        if (aliyunOssConfig.getFileDomain().isEmpty()) {
             throw new ProFileException("OSS FileDomain为空");
         }
         return true;

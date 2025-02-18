@@ -1,11 +1,11 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.utils.ProFileUtils;
+import cn.zhangchuangla.common.utils.ProfileUtils;
 import cn.zhangchuangla.system.service.LocalFileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,12 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import static cn.dev33.satoken.SaManager.log;
 
 /**
  * @author zhangchuang
  * Created on 2025/2/17 15:41
  */
+@Slf4j
 @Service
 public class LocalFileServiceImpl implements LocalFileService {
 
@@ -33,13 +33,18 @@ public class LocalFileServiceImpl implements LocalFileService {
         this.appConfig = appConfig;
     }
 
+    /**
+     * 本地文件上传
+     *
+     * @param multipartFile 文件
+     * @return 返回资源路径
+     */
     @Override
     public String uploadFile(MultipartFile multipartFile) {
-        if (!ProFileUtils.checkLoadFileUploadProperties(appConfig)) {
+        if (!ProfileUtils.checkLoadFileUploadProperties(appConfig)) {
             throw new FileException("本地上传路径未配置");
         }
         String uploadPath = appConfig.getUploadPath();
-        String userId = StpUtil.getLoginId().toString();
         String originalFileName = multipartFile.getOriginalFilename();
 
         try {
@@ -55,9 +60,8 @@ public class LocalFileServiceImpl implements LocalFileService {
             String yearMonthDir = yearMonthFormat.format(new Date());
 
             // 生成新的文件名，包含目录结构
-            String uuidFileName = String.format("%s/%s_%s_%s%s",
+            String uuidFileName = String.format("%s/%s_%s_%s",
                     yearMonthDir,
-                    userId,
                     System.currentTimeMillis(),
                     UUID.randomUUID().toString().substring(0, 8),
                     fileExtension);
@@ -71,7 +75,7 @@ public class LocalFileServiceImpl implements LocalFileService {
 
             return "/static/" + uuidFileName;
         } catch (IOException e) {
-            log.error("文件上传失败：{}", e.getMessage());
+            log.error("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed);
         }
     }

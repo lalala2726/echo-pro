@@ -1,6 +1,5 @@
 package cn.zhangchuangla.admin.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/admin/user")
-@SaCheckLogin
 public class SysUserController {
 
     @Resource

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.web.exception;
 
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -57,11 +56,6 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
-    @ExceptionHandler(NotLoginException.class)
-    public AjaxResult notLoginExceptionHandel(NotLoginException exception) {
-        log.error("未登录异常：{}", exception.toString());
-        return AjaxResult.error(ResponseCode.NOT_LOGIN);
-    }
 
     /**
      * 系统异常
