@@ -27,7 +27,7 @@ public class CommonController {
      */
     @PostMapping("/upload")
     public AjaxResult upload(@RequestParam("file") MultipartFile file) {
-        String fileUrl = fileService.specifyUploadFile(file, FileUploadMethod.ALIYUN_OSS);
+        String fileUrl = fileService.specifyUploadFile(file, FileUploadMethod.MINIO);
         AjaxResult ajax = new AjaxResult();
         ajax.put("url", fileUrl);
         return ajax;
