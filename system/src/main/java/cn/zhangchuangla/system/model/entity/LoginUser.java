@@ -16,11 +16,11 @@ import java.util.List;
 @Data
 public class LoginUser implements UserDetails {
 
+    private SysUser sysUser;
+
     public LoginUser(SysUser sysUser) {
         this.sysUser = sysUser;
     }
-
-    private SysUser sysUser;
 
     /**
      * 权限信息

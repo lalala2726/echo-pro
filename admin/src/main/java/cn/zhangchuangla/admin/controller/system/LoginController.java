@@ -54,7 +54,6 @@ public class LoginController {
         String login = loginService.login(loginRequest);
         AjaxResult ajax = new AjaxResult();
         ajax.put("token", login);
-        
 
 
         return ajax;

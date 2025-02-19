@@ -17,5 +17,5 @@ public class TokenService {
         this.tokenConfig = tokenConfig;
     }
 
-    
+
 }
