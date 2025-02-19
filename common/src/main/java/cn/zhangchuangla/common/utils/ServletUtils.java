@@ -1,5 +1,7 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.zhangchuangla.common.entity.ClientInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +45,11 @@ public class ServletUtils {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
+    }
+
+    public static ClientInfo parseClientInfo(HttpServletRequest request) {
+        //获取客户端IP地址,数据形式为：127.0.0.1:8080
+        String ip = request.getRemoteAddr();
     }
 
 

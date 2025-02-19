@@ -5,6 +5,8 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.LoginUser;
 import cn.zhangchuangla.system.model.request.LoginRequest;
 import cn.zhangchuangla.system.service.LoginService;
+import cn.zhangchuangla.system.service.SysLoginLogService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,9 +28,12 @@ public class LoginController {
 
     private final RedisCache redisCache;
 
-    public LoginController(LoginService loginService, RedisCache redisCache) {
+    private final SysLoginLogService sysLoginLogService;
+
+    public LoginController(LoginService loginService, RedisCache redisCache, SysLoginLogService sysLoginLogService) {
         this.loginService = loginService;
         this.redisCache = redisCache;
+        this.sysLoginLogService = sysLoginLogService;
     }
 
     /**
@@ -38,17 +43,20 @@ public class LoginController {
      * @return token
      */
     @PostMapping("/login")
-    public AjaxResult login(@RequestBody LoginRequest request) {
+    public AjaxResult login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
-        if (request.getUsername() == null) {
+        if (loginRequest.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
         }
-        if (request.getPassword() == null) {
+        if (loginRequest.getPassword() == null) {
             return AjaxResult.error("密码不能为空");
         }
-        String login = loginService.login(request);
+        String login = loginService.login(loginRequest);
         AjaxResult ajax = new AjaxResult();
         ajax.put("token", login);
+        
+
+
         return ajax;
     }
 

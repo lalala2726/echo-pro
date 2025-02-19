@@ -33,6 +33,7 @@
         <minio.version>8.5.12</minio.version>
         <reids.version>3.4.0</reids.version>
         <alibaba.fastjson.version>1.2.50</alibaba.fastjson.version>
+        <okhttp.version>4.12.0</okhttp.version>
     </properties>
 
     <dependencies>
@@ -53,6 +54,7 @@
     </dependencies>
 
     <dependencyManagement>
+
 
         <dependencies>
             <!-- Spring Boot BOM -->
@@ -82,6 +84,13 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jwt.version}</version>
+            </dependency>
+
+            <!-- OkHttp客户端 -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
 
             <dependency>

@@ -12,10 +12,10 @@ public interface LoginService {
     /**
      * 登录
      *
-     * @param request 请求参数
+     * @param loginRequest 请求参数
      * @return 令牌
      */
-    String login(LoginRequest request);
+    String login(LoginRequest loginRequest);
 
 }
 
