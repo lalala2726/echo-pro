@@ -9,7 +9,7 @@ import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.system.model.vo.SysUserVo;
-import cn.zhangchuangla.system.service.UserService;
+import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class SysUserController {
 
     @Resource
-    private UserService userService;
+    private SysUserService sysUserService;
 
     /**
      * 用户列表
@@ -38,7 +38,7 @@ public class SysUserController {
     @GetMapping("/list")
     public AjaxResult list(UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
-        Page<SysUser> userPage = userService.UserList(request);
+        Page<SysUser> userPage = sysUserService.UserList(request);
         List<SysUserVo> sysUserVos = userPage.getRecords().stream()
                 .map(sysUser -> {
                     SysUserVo sysUserVo = new SysUserVo();
@@ -61,17 +61,17 @@ public class SysUserController {
             return getError(validationError);
         }
 
-        if (userService.isUsernameExist(request.getUsername())) {
+        if (sysUserService.isUsernameExist(request.getUsername())) {
             return AjaxResult.error("用户名已存在");
         }
-        if (userService.isEmailExist(request.getEmail())) {
+        if (sysUserService.isEmailExist(request.getEmail())) {
             return AjaxResult.error("邮箱已存在");
         }
-        if (userService.isPhoneExist(request.getPhone())) {
+        if (sysUserService.isPhoneExist(request.getPhone())) {
             return AjaxResult.error("手机号已存在");
         }
 
-        return AjaxResult.toSuccess(userService.addUserInfo(request));
+        return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
     }
 
     private AjaxResult getError(String validationError) {
@@ -89,7 +89,7 @@ public class SysUserController {
         if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
-        return AjaxResult.isSuccess(userService.removeById(id));
+        return AjaxResult.isSuccess(sysUserService.removeById(id));
     }
 
     /**
@@ -109,19 +109,19 @@ public class SysUserController {
             return AjaxResult.error(validationError);
         }
 
-        if (userService.isUsernameExist(request.getUsername())) {
+        if (sysUserService.isUsernameExist(request.getUsername())) {
             return AjaxResult.error("用户名已存在");
         }
-        if (userService.isEmailExist(request.getEmail())) {
+        if (sysUserService.isEmailExist(request.getEmail())) {
             return AjaxResult.error("邮箱已存在");
         }
-        if (userService.isPhoneExist(request.getPhone())) {
+        if (sysUserService.isPhoneExist(request.getPhone())) {
             return AjaxResult.error("手机号已存在");
         }
 
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(request, sysUser);
-        return AjaxResult.isSuccess(userService.updateById(sysUser));
+        return AjaxResult.isSuccess(sysUserService.updateById(sysUser));
     }
 
     /**
@@ -135,7 +135,7 @@ public class SysUserController {
         if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
-        SysUser sysUser = userService.getById(id);
+        SysUser sysUser = sysUserService.getById(id);
         SysUserVo sysUserVo = new SysUserVo();
         BeanUtils.copyProperties(sysUser, sysUserVo);
         return AjaxResult.success(sysUserVo);

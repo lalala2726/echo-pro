@@ -13,6 +13,7 @@
     <version>1.0</version>
 
     <dependencies>
+
         <dependency>
             <groupId>cn.zhangchuangla.app</groupId>
             <artifactId>framework</artifactId>

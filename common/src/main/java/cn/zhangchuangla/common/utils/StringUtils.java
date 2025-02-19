@@ -1,12 +1,31 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.hutool.core.text.StrFormatter;
+
+import static java.util.Objects.isNull;
+
 /**
  * 字符串工具类，提供常见的字符串操作方法
  *
- * @author Chuang
+ * @author Ruoyi
  * created on 2025/1/12 11:23
  */
 public class StringUtils {
+
+    /**
+     * 空字符串
+     */
+    private static final String NULL_STR = "";
+
+    /**
+     * 下划线
+     */
+    private static final char SEPARATOR = '_';
+
+    /**
+     * 星号
+     */
+    private static final char ASTERISK = '*';
 
     /**
      * 检查传入的字符串中是否有一个为null或空字符串
@@ -156,6 +175,16 @@ public class StringUtils {
     }
 
     /**
+     * * 判断一个对象数组是否为空
+     *
+     * @param objects 要判断的对象数组
+     *                * @return true：为空 false：非空
+     */
+    public static boolean isEmpty(Object[] objects) {
+        return isNull(objects) || (objects.length == 0);
+    }
+
+    /**
      * 判断字符串是否以某个后缀结尾（支持null安全）
      *
      * @param str    字符串
@@ -167,5 +196,35 @@ public class StringUtils {
             return false;
         }
         return str.endsWith(suffix);
+    }
+
+    /**
+     * * 判断一个字符串是否为空串
+     *
+     * @param str String
+     * @return true：为空 false：非空
+     */
+    public static boolean isEmpty(String str) {
+        return isNull(str) || NULL_STR.equals(str.trim());
+    }
+
+    /**
+     * 格式化文本, {} 表示占位符<br>
+     * 此方法只是简单将占位符 {} 按照顺序替换为参数<br>
+     * 如果想输出 {} 使用 \\转义 { 即可，如果想输出 {} 之前的 \ 使用双转义符 \\\\ 即可<br>
+     * 例：<br>
+     * 通常使用：format("this is {} for {}", "a", "b") -> this is a for b<br>
+     * 转义{}： format("this is \\{} for {}", "a", "b") -> this is \{} for a<br>
+     * 转义\： format("this is \\\\{} for {}", "a", "b") -> this is \a for b<br>
+     *
+     * @param template 文本模板，被替换的部分用 {} 表示
+     * @param params   参数值
+     * @return 格式化后的文本
+     */
+    public static String format(String template, Object... params) {
+        if (isEmpty(params) || isEmpty(template)) {
+            return template;
+        }
+        return StrFormatter.format(template, params);
     }
 }

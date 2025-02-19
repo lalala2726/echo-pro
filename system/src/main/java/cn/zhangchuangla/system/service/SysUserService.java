@@ -6,7 +6,7 @@ import cn.zhangchuangla.system.model.request.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-public interface UserService extends IService<SysUser> {
+public interface SysUserService extends IService<SysUser> {
 
     /**
      * 用户列表
@@ -48,4 +48,12 @@ public interface UserService extends IService<SysUser> {
      * @return true存在 false不存在
      */
     boolean isPhoneExist(String phone);
+
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return 返回用户信息
+     */
+    SysUser getSysUserByUsername(String username);
 }

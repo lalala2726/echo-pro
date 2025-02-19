@@ -6,7 +6,7 @@ import cn.zhangchuangla.system.mapper.UserMapper;
 import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
-import cn.zhangchuangla.system.service.UserService;
+import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,8 +14,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser>
-        implements UserService {
+public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser>
+        implements SysUserService {
 
     /**
      * 进行条件查询
@@ -118,6 +118,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser>
             throw new ServiceException(ResponseCode.PARAM_ERROR, "手机号不能为空!");
         }
         return this.count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhone, phone)) > 0;
+    }
+
+    /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    @Override
+    public SysUser getSysUserByUsername(String username) {
+        LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        sysUserLambdaQueryWrapper.eq(username != null && !username.isEmpty(), SysUser::getUsername, username);
+        return getOne(sysUserLambdaQueryWrapper);
     }
 }
 
