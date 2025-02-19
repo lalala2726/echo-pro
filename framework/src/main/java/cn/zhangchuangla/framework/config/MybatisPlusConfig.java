@@ -1,4 +1,4 @@
-package cn.zhangchuangla.config;
+package cn.zhangchuangla.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

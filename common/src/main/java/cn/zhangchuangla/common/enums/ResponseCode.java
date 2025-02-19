@@ -65,7 +65,11 @@ public enum ResponseCode {
     NOT_ALLOW(503, "不允许"),
     FileNameIsNull(40008, "文件名不能为空"),
     FileUploadFailed(40009, "文件上传失败"),                         // 当操作不被允许时的响应
-    PROFILE_ERROR(40010, "配置文件错误");               // 当配置文件错误时的响应
+    PROFILE_ERROR(40010, "配置文件错误"),
+    AUTHORIZED(40011, "认证授权失败"),
+    USERNAME_FORMAT_ERROR(40012, "用户名不合法"),
+    PASSWORD_FORMAT_ERROR(40012, "密码不合法"),
+    LOGIN_ERROR(40013, "登录失败");               // 当配置文件错误时的响应
 
     // endregion
 

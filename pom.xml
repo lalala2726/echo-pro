@@ -27,10 +27,12 @@
         <fastjson.version>2.0.53</fastjson.version>
         <lombok.version>1.18.30</lombok.version>
         <hutool.version>5.8.25</hutool.version>
-        <jwt.version>4.4.0</jwt.version>
+        <jwt.version>0.9.0</jwt.version>
         <sa-token.version>1.39.0</sa-token.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <minio.version>8.5.12</minio.version>
+        <reids.version>3.4.0</reids.version>
+        <alibaba.fastjson.version>1.2.50</alibaba.fastjson.version>
     </properties>
 
     <dependencies>
@@ -69,6 +71,18 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
+            <!-- Spring Security -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <!-- Token生成与解析-->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -81,6 +95,14 @@
                 <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${reids.version}</version>
+            </dependency>
+
 
             <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
             <dependency>
@@ -112,9 +134,9 @@
 
             <!-- FastJSON -->
             <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${alibaba.fastjson.version}</version>
             </dependency>
 
             <!-- 项目模块依赖 -->

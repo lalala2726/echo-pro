@@ -16,6 +16,11 @@ public class ParamException extends RuntimeException {
         this.code = ResponseCode.PARAM_ERROR.getCode();
     }
 
+    public ParamException(ResponseCode responseCode) {
+        super(responseCode.getMessage());
+        this.code = responseCode.getCode();
+    }
+
     public ParamException(Integer code, String message) {
         super(message);
         this.code = code;

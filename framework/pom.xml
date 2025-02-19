@@ -28,6 +28,7 @@
             <version>${spring.boot.version}</version>
         </dependency>
 
+
         <!-- 引入common模块，而不是system模块 -->
         <dependency>
             <groupId>cn.zhangchuangla.app</groupId>

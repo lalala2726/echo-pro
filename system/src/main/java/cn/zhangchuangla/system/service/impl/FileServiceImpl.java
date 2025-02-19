@@ -2,9 +2,9 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
-import cn.zhangchuangla.common.config.OSSConfig;
+import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.enums.FileUploadMethod;
-import cn.zhangchuangla.common.utils.ProFileUtils;
+import cn.zhangchuangla.common.utils.ProfileUtils;
 import cn.zhangchuangla.system.service.AliyunOssFileService;
 import cn.zhangchuangla.system.service.FileService;
 import cn.zhangchuangla.system.service.LocalFileService;
@@ -24,7 +24,7 @@ public class FileServiceImpl implements FileService {
 
     private final MinioConfig minioConfig;
 
-    private final OSSConfig ossConfig;
+    private final AliyunOSSConfig aliyunOssConfig;
 
     private final LocalFileService localFileService;
 
@@ -32,10 +32,10 @@ public class FileServiceImpl implements FileService {
 
     private final AliyunOssFileService aliyunOssFileService;
 
-    public FileServiceImpl(AppConfig appConfig, MinioConfig minioConfig, OSSConfig ossConfig, LocalFileService localFileService, MinioFileService minioFileService, AliyunOssFileService aliyunOssFileService) {
+    public FileServiceImpl(AppConfig appConfig, MinioConfig minioConfig, AliyunOSSConfig aliyunOssConfig, LocalFileService localFileService, MinioFileService minioFileService, AliyunOssFileService aliyunOssFileService) {
         this.appConfig = appConfig;
         this.minioConfig = minioConfig;
-        this.ossConfig = ossConfig;
+        this.aliyunOssConfig = aliyunOssConfig;
         this.localFileService = localFileService;
         this.minioFileService = minioFileService;
         this.aliyunOssFileService = aliyunOssFileService;
@@ -50,13 +50,13 @@ public class FileServiceImpl implements FileService {
     @Override
     public String autoUploadFile(MultipartFile file) {
         // 本地上传
-        if (ProFileUtils.checkLoadFileUploadProperties(appConfig)) {
+        if (ProfileUtils.checkLoadFileUploadProperties(appConfig)) {
             return localFileService.uploadFile(file);
             // Minio上传
-        } else if (ProFileUtils.checkMinioFileUploadProperties(minioConfig)) {
+        } else if (ProfileUtils.checkMinioFileUploadProperties(minioConfig)) {
             return minioFileService.uploadFile(file);
             // 阿里云OSS上传
-        } else if (ProFileUtils.checkAliyunOssFileUploadProperties(ossConfig)) {
+        } else if (ProfileUtils.checkAliyunOssFileUploadProperties(aliyunOssConfig)) {
             return aliyunOssFileService.upload(file);
         }
         return null;

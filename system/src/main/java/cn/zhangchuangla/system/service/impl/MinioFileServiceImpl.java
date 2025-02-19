@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.utils.FileUtils;
@@ -26,12 +25,9 @@ public class MinioFileServiceImpl implements MinioFileService {
 
     private final MinioConfig minioConfig;
 
-    private final AppConfig appConfig;
 
-
-    public MinioFileServiceImpl(MinioConfig minioConfig, AppConfig appConfig) {
+    public MinioFileServiceImpl(MinioConfig minioConfig) {
         this.minioConfig = minioConfig;
-        this.appConfig = appConfig;
     }
 
 
@@ -48,9 +44,7 @@ public class MinioFileServiceImpl implements MinioFileService {
         String accessKey = minioConfig.getAccessKey();
         String secretKey = minioConfig.getSecretKey();
         String bucketName = minioConfig.getBucketName();
-        log.info("Minio配置信息: endpoint={}, accessKey={}, secretKey={}, bucketName={}", endpoint, accessKey, secretKey, bucketName);
-        //todo 待配置域名等信息
-        String fileDomain = appConfig.getFileDomain();
+        String fileDomain = minioConfig.getFileDomain();
 
         try {
             // 创建Minio客户端
@@ -77,7 +71,7 @@ public class MinioFileServiceImpl implements MinioFileService {
                             .build());
 
             // 返回文件的访问路径
-            return endpoint + "/" + bucketName + "/" + objectName;
+            return fileDomain + "/" + objectName;
         } catch (Exception e) {
             log.error("文件上传失败: {}", e.getMessage());
             throw new FileException("文件上传失败");

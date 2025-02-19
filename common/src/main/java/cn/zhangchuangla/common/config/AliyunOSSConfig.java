@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "aliyun.oss")
 @Configuration
 @Data
-public class OSSConfig {
+public class AliyunOSSConfig {
 
     /**
      * 文件访问域名
@@ -36,5 +36,6 @@ public class OSSConfig {
      * bucketName
      */
     private String bucketName;
+
 
 }

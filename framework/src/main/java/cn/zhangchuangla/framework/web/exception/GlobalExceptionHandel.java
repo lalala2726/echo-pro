@@ -1,11 +1,12 @@
-package cn.zhangchuangla.web.exception;
+package cn.zhangchuangla.framework.web.exception;
 
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.AuthenticationException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -57,11 +58,21 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
-    @ExceptionHandler(NotLoginException.class)
-    public AjaxResult notLoginExceptionHandel(NotLoginException exception) {
-        log.error("未登录异常：{}", exception.toString());
-        return AjaxResult.error(ResponseCode.NOT_LOGIN);
+    /**
+     * 认证异常
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public AjaxResult authenticationExceptionHandel(AuthenticationException exception) {
+        log.error("认证异常：{}", exception.toString());
+        return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public AjaxResult InternalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
+        log.error("认证失败：{}", exception.toString());
+        return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
+    }
+
 
     /**
      * 系统异常
