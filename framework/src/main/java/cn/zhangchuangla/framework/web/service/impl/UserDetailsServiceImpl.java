@@ -1,7 +1,7 @@
-package cn.zhangchuangla.system.service.impl;
+package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.exception.LoginException;
-import cn.zhangchuangla.system.model.entity.LoginUser;
+import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;

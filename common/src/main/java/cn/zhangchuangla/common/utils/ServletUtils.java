@@ -47,10 +47,6 @@ public class ServletUtils {
         }
     }
 
-    public static ClientInfo parseClientInfo(HttpServletRequest request) {
-        //获取客户端IP地址,数据形式为：127.0.0.1:8080
-        String ip = request.getRemoteAddr();
-    }
 
 
 }

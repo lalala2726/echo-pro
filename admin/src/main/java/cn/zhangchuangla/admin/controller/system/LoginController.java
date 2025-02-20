@@ -1,11 +1,11 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.model.entity.LoginUser;
-import cn.zhangchuangla.system.model.request.LoginRequest;
-import cn.zhangchuangla.system.service.LoginService;
-import cn.zhangchuangla.system.service.SysLoginLogService;
+import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.framework.model.request.LoginRequest;
+import cn.zhangchuangla.framework.web.service.SysLoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -24,16 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
 
-    private final LoginService loginService;
-
     private final RedisCache redisCache;
 
-    private final SysLoginLogService sysLoginLogService;
+    private final SysLoginService sysLoginService;
 
-    public LoginController(LoginService loginService, RedisCache redisCache, SysLoginLogService sysLoginLogService) {
-        this.loginService = loginService;
+
+    public LoginController(RedisCache redisCache, SysLoginService sysLoginService) {
         this.redisCache = redisCache;
-        this.sysLoginLogService = sysLoginLogService;
+        this.sysLoginService = sysLoginService;
     }
 
     /**
@@ -51,14 +49,15 @@ public class LoginController {
         if (loginRequest.getPassword() == null) {
             return AjaxResult.error("密码不能为空");
         }
-        String login = loginService.login(loginRequest);
+        String login = sysLoginService.login(loginRequest);
         AjaxResult ajax = new AjaxResult();
-        ajax.put("token", login);
-
-
+        ajax.put(SystemConstant.TOKEN, login);
         return ajax;
     }
 
+    /**
+     * 退出登录
+     */
     @PostMapping("/logout")
     public AjaxResult logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
