@@ -75,7 +75,7 @@ public class SysRoleController {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色名称不能为空");
         }
         SysRole sysRole = new SysRole();
-        sysRole.setName(name);
+        sysRole.setRoleName(name);
         if (sysRoleService.save(sysRole)) {
             return AjaxResult.success("添加成功");
         }

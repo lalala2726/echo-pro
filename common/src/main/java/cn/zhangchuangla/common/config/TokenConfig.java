@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "token")
 public class TokenConfig {
 
+
     /**
      * token标识符
      */

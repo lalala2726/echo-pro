@@ -79,7 +79,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(Exception.class)
     public AjaxResult exceptionHandel(Exception exception) {
-        log.error("系统异常：{}", exception.toString());
+        log.error("系统异常", exception);
         return AjaxResult.error(ResponseCode.SERVER_ERROR);
     }
 

@@ -15,6 +15,8 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import cn.zhangchuangla.framework.security.annotation.RequiresPermissions;
+import cn.zhangchuangla.framework.security.annotation.RequiresRoles;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +32,12 @@ public class SysUserController {
     private SysUserService sysUserService;
 
     /**
-     * 用户列表
-     *
-     * @param request 请求参数
-     * @return 用户列表
+     * 获取用户列表
+     * 需要特定权限才能访问
      */
+    @RequiresPermissions("user:view")
     @GetMapping("/list")
-    public AjaxResult list(UserRequest request) {
+    public AjaxResult getUserListByQuery(UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<SysUserVo> sysUserVos = userPage.getRecords().stream()
@@ -49,13 +50,12 @@ public class SysUserController {
     }
 
     /**
-     * 新增用户
-     *
-     * @param request 新增用户请求参数
-     * @return 新增成功返回用户主键, 失败返回错误信息
+     * 添加用户
+     * 需要特定角色才能访问
      */
-    @PostMapping
-    public AjaxResult addUserInfo(@RequestBody @Validated AddUserRequest request) {
+    @RequiresRoles("admin")
+    @PostMapping("/add")
+    public AjaxResult addUser(@RequestBody @Validated AddUserRequest request) {
         String validationError = validateUserRequest(request);
         if (validationError != null) {
             return getError(validationError);
@@ -72,10 +72,6 @@ public class SysUserController {
         }
 
         return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
-    }
-
-    private AjaxResult getError(String validationError) {
-        return AjaxResult.error(validationError);
     }
 
     /**
@@ -163,5 +159,9 @@ public class SysUserController {
             }
         }
         return null;
+    }
+
+    private AjaxResult getError(String validationError) {
+        return AjaxResult.error(validationError);
     }
 }

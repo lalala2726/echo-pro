@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.model.entity;
 import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,7 @@ public class SysUser extends BaseEntity {
      * ID
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Long userId;
 
     /**
      * 用户名
@@ -57,6 +58,12 @@ public class SysUser extends BaseEntity {
      * 状态
      */
     private Integer status;
+
+    /**
+     * 逻辑删除
+     */
+    @TableLogic
+    private String isDeleted;
 
 
 }

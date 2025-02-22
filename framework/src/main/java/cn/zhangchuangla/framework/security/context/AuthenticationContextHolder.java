@@ -1,20 +1,20 @@
 package cn.zhangchuangla.framework.security.context;
 
 import org.springframework.security.core.Authentication;
+import cn.zhangchuangla.framework.model.entity.LoginUser;
 
 /**
  * 身份验证信息
- *
- * @author ruoyi
+ * 用于存储当前用户的身份信息
  */
 public class AuthenticationContextHolder {
-    private static final ThreadLocal<Authentication> contextHolder = new ThreadLocal<>();
+    private static final ThreadLocal<LoginUser> contextHolder = new ThreadLocal<>();
 
-    public static Authentication getContext() {
+    public static LoginUser getContext() {
         return contextHolder.get();
     }
 
-    public static void setContext(Authentication context) {
+    public static void setContext(LoginUser context) {
         contextHolder.set(context);
     }
 

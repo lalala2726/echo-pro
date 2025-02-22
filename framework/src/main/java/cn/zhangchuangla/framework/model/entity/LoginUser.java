@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Chuang
@@ -19,46 +20,69 @@ import java.util.List;
 @Data
 public class LoginUser implements UserDetails, Serializable {
 
-
     @Serial
-    private static final long serialVersionUID = -6937134946293978207L;
+    private static final long serialVersionUID = 1L;
+
+    public LoginUser(SysUser sysUser) {
+        this.sysUser = sysUser;
+    }
+
     /**
      * 用户ID
      */
     public Long userId;
+
+    /**
+     * 用户信息
+     */
+
     private SysUser sysUser;
+
     /**
      * 用户名
      */
     private String username;
+
     /**
      * 登录IP地址
      */
     private String ipAddress;
+
     /**
      * 登录token
      */
     private String token;
+
     /**
      * 登录时间
      */
     private Date loginTime;
+
     /**
      * 过期时间
      */
     private Date expireTime;
+
     /**
      * 浏览器信息
      */
     private String browser;
+
     /**
      * 操作系统信息
      */
     private String os;
 
-    public LoginUser(SysUser sysUser) {
-        this.sysUser = sysUser;
-    }
+    /**
+     * 角色信息
+     */
+    private List<String> roles = new ArrayList<>();
+
+    /**
+     * 权限信息
+     */
+    private List<String> permissions = new ArrayList<>();
+
 
     /**
      * 权限信息
@@ -67,7 +91,9 @@ public class LoginUser implements UserDetails, Serializable {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return permissions.stream()
+                .map(permission -> (GrantedAuthority) () -> permission)
+                .toList();
     }
 
     /**

@@ -36,12 +36,6 @@ public class BaseEntity implements Serializable {
     private String updateBy;
 
     /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private String isDeleted;
-
-    /**
      * 备注
      */
     private String remark;

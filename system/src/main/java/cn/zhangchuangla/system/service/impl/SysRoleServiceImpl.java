@@ -26,7 +26,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public Page<SysRole> RoleList(SysRoleQueryRequest request) {
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
                 .like(request.getName() != null && !request.getName().isEmpty(),
-                        SysRole::getName, request.getName());
+                        SysRole::getRoleName, request.getName());
 
         return page(new Page<>(request.getPageNum(), request.getPageSize()), roleLambdaQueryWrapper);
     }

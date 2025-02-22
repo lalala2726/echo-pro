@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 /**
  * @author Chuang
  * <p>
@@ -49,10 +51,10 @@ public class LoginController {
         if (loginRequest.getPassword() == null) {
             return AjaxResult.error("密码不能为空");
         }
-        String login = sysLoginService.login(loginRequest);
-        AjaxResult ajax = new AjaxResult();
-        ajax.put(SystemConstant.TOKEN, login);
-        return ajax;
+        String token = sysLoginService.login(loginRequest);
+        HashMap<String, String> map = new HashMap<>();
+        map.put(SystemConstant.TOKEN, token);
+        return AjaxResult.success(map);
     }
 
     /**
@@ -62,7 +64,7 @@ public class LoginController {
     public AjaxResult logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        Long id = loginUser.getSysUser().getId();
+        Long id = loginUser.getSysUser().getUserId();
         redisCache.deleteObject("login:" + id);
         return AjaxResult.success();
     }

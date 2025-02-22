@@ -18,12 +18,17 @@ public class SysPermissions extends BaseEntity {
      *
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long permissionId;
 
     /**
      * 权限名称
      */
-    private String name;
+    private String permissionName;
+
+    /**
+     * 权限标识
+     */
+    private String permissionKey;
 
 
 }

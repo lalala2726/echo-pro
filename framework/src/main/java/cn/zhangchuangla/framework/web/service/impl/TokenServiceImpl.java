@@ -1,10 +1,17 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.config.TokenConfig;
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.AuthenticationException;
+import cn.zhangchuangla.common.exception.ProFileException;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.web.service.TokenService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,13 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Token服务
- *
+ * Token服务实现类
+ * 该类负责生成、解析和验证JWT token。
+ * 
  * @author Chuang
  */
 @Slf4j
@@ -28,13 +38,14 @@ import java.util.Map;
 public class TokenServiceImpl implements TokenService {
 
     private final TokenConfig tokenConfig;
-
     private final SecretKey key;
+    private final RedisCache redisCache;
 
-    public TokenServiceImpl(TokenConfig tokenConfig) {
+    public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
         this.tokenConfig = tokenConfig;
-        // 使用SignatureAlgorithm.HS256生成一个安全的密钥
-        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        // 从配置文件中读取密钥字符串并转换为SecretKey
+        this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.redisCache = redisCache;
     }
 
     /**
@@ -81,6 +92,7 @@ public class TokenServiceImpl implements TokenService {
             Claims claims = parseToken(token);
             return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
+            log.error("验证Token失败", e);
             return false;
         }
     }
@@ -121,7 +133,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 获取登录用户信息
      *
-     * @param request 令牌
+     * @param request 请求
      * @return 登录用户信息
      */
     @Override
@@ -133,7 +145,18 @@ public class TokenServiceImpl implements TokenService {
         Claims claims = parseToken(token);
         String userId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
         log.info("从Token中获取用户ID：{}", userId);
-        return null;
+        // 根据userId获取并返回LoginUser对象
+        return getLoginUserById(userId);
+    }
+
+    private LoginUser getLoginUserById(String userId) {
+        // 从 Redis 中获取缓存对象，类型可能是 JSONObject
+        Object cacheObject = redisCache.getCacheObject(RedisKeyConstant.LOGIN_TOKEN_KEY + userId);
+        if (cacheObject == null) {
+            throw new AuthenticationException(ResponseCode.USER_NOT_LOGIN);
+        }
+        // 如果返回的是 JSONObject，可以使用 JSON.toJavaObject 进行转换
+        return JSON.parseObject(JSON.toJSONString(cacheObject), LoginUser.class);
     }
 
     /**
@@ -148,3 +171,6 @@ public class TokenServiceImpl implements TokenService {
         return request.getHeader(header);
     }
 }
+
+
+
