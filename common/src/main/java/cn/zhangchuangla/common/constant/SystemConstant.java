@@ -27,7 +27,15 @@ public class SystemConstant {
      */
     public static final String CODE = "code";
 
+    /**
+     * 时间
+     */
     public static final String TIME = "TIME";
+
+    /**
+     * 令牌前缀
+     */
+    public static final String LOGIN_USER_KEY = "login_user_key";
 
 
 }

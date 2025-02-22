@@ -1,6 +1,8 @@
 package cn.zhangchuangla.framework.web.service;
 
+import cn.zhangchuangla.framework.model.entity.LoginUser;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Chuang
@@ -47,4 +49,21 @@ public interface TokenService {
      * @return Claims对象
      */
     Claims parseToken(String token);
+
+
+    /**
+     * 获取登录用户信息
+     *
+     * @param request 请求
+     * @return 返回登录用户信息
+     */
+    LoginUser getLoginUser(HttpServletRequest request);
+
+    /**
+     * 获取Token
+     *
+     * @param request 请求
+     * @return 返回token
+     */
+    String getToken(HttpServletRequest request);
 }

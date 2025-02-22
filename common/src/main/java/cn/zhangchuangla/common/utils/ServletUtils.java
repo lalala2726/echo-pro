@@ -1,7 +1,5 @@
 package cn.zhangchuangla.common.utils;
 
-import cn.zhangchuangla.common.entity.ClientInfo;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +44,6 @@ public class ServletUtils {
             }
         }
     }
-
 
 
 }

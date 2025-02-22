@@ -69,7 +69,10 @@ public enum ResponseCode {
     AUTHORIZED(40011, "认证授权失败"),
     USERNAME_FORMAT_ERROR(40012, "用户名不合法"),
     PASSWORD_FORMAT_ERROR(40012, "密码不合法"),
-    LOGIN_ERROR(40013, "登录失败");               // 当配置文件错误时的响应
+    LOGIN_ERROR(40013, "登录失败"),
+    TOKEN_EXPIRED(40014, "凭证已过期,请重新登录"),
+    TOKEN_EXPIRE(40015, "会话已过期,请重新登录"),
+    TOKEN_MISS(40016, "缺少令牌");               // 当配置文件错误时的响应
 
     // endregion
 

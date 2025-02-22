@@ -13,6 +13,13 @@ spring:
     password: zhangchuang2726
 
     #开启日志Mybatis-plus日志
+  data:
+    redis:
+      host: 192.168.1.110
+      port: 6379
+      password: zhangchuang2726
+      database: 8
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -23,23 +30,28 @@ mybatis-plus:
       logic-delete-value: 1         # 逻辑已删除值
       logic-not-delete-value: 0     # 逻辑未删除值
 
-
-sa-token:
-  # token 名称（同时也是 cookie 名称）
-  token-name: Authorization
-  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
-  timeout: 2592000
-  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
-  active-timeout: -1
-  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
-  is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
-  is-share: true
-  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
-  token-style: uuid
-  # 是否输出操作日志
-  is-log: true
-
 # 阿里云OSS配置
+aliyun:
+  oss:
+    file-domain: https://bed.oss.zhangchuangla.cn/
+    end-point: oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5tSFwfMsPQwsr8Q3pbUA
+    access-key-secret: DMu2VMrBrKZADqrDLXZgdXVJLUQiOM
+    bucket-name: chuang-drawingbed
 
-
+#Minio 文件上传
+minio:
+  fileDomain: http://bed.data-center.zhangchuangla.cn/
+  endpoint: http://192.168.1.120:9000/
+  accessKey: cwytEbLXyBo2Tul2C9OZ
+  secretKey: UGGQUnHCjjooNlrZZfO1WCNEB1OvCriYOWX47Oi5
+  bucketName: bed
+app:
+  config:
+    upload-path: /Users/zhangchuang/DevelopFileUpload
+    ip-address-enable: true
+    strictLoginEnable: true
+token:
+  expire: 30
+  secret: zhangchuang2726
+  header: Authorization
