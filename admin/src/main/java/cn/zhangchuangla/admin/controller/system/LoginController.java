@@ -1,10 +1,12 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.model.entity.LoginUser;
-import cn.zhangchuangla.system.model.request.LoginRequest;
-import cn.zhangchuangla.system.service.LoginService;
+import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.framework.model.request.LoginRequest;
+import cn.zhangchuangla.framework.web.service.SysLoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,13 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
 
-    private final LoginService loginService;
-
     private final RedisCache redisCache;
 
-    public LoginController(LoginService loginService, RedisCache redisCache) {
-        this.loginService = loginService;
+    private final SysLoginService sysLoginService;
+
+
+    public LoginController(RedisCache redisCache, SysLoginService sysLoginService) {
         this.redisCache = redisCache;
+        this.sysLoginService = sysLoginService;
     }
 
     /**
@@ -38,20 +41,23 @@ public class LoginController {
      * @return token
      */
     @PostMapping("/login")
-    public AjaxResult login(@RequestBody LoginRequest request) {
+    public AjaxResult login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
-        if (request.getUsername() == null) {
+        if (loginRequest.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
         }
-        if (request.getPassword() == null) {
+        if (loginRequest.getPassword() == null) {
             return AjaxResult.error("密码不能为空");
         }
-        String login = loginService.login(request);
+        String login = sysLoginService.login(loginRequest);
         AjaxResult ajax = new AjaxResult();
-        ajax.put("token", login);
+        ajax.put(SystemConstant.TOKEN, login);
         return ajax;
     }
 
+    /**
+     * 退出登录
+     */
     @PostMapping("/logout")
     public AjaxResult logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

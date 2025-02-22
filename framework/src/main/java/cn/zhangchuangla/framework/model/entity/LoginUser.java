@@ -1,11 +1,14 @@
-package cn.zhangchuangla.system.model.entity;
+package cn.zhangchuangla.framework.model.entity;
 
-import cn.zhangchuangla.common.exception.AuthenticationException;
+import cn.zhangchuangla.system.model.entity.SysUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,13 +17,48 @@ import java.util.List;
  * created on 2025/2/19 13:50
  */
 @Data
-public class LoginUser implements UserDetails {
+public class LoginUser implements UserDetails, Serializable {
+
+
+    @Serial
+    private static final long serialVersionUID = -6937134946293978207L;
+    /**
+     * 用户ID
+     */
+    public Long userId;
+    private SysUser sysUser;
+    /**
+     * 用户名
+     */
+    private String username;
+    /**
+     * 登录IP地址
+     */
+    private String ipAddress;
+    /**
+     * 登录token
+     */
+    private String token;
+    /**
+     * 登录时间
+     */
+    private Date loginTime;
+    /**
+     * 过期时间
+     */
+    private Date expireTime;
+    /**
+     * 浏览器信息
+     */
+    private String browser;
+    /**
+     * 操作系统信息
+     */
+    private String os;
 
     public LoginUser(SysUser sysUser) {
         this.sysUser = sysUser;
     }
-
-    private SysUser sysUser;
 
     /**
      * 权限信息
@@ -59,9 +97,6 @@ public class LoginUser implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        if (!sysUser.getStatus().equals(1)) {
-            throw new AuthenticationException("账户已过期，请联系管理员");
-        }
         return true;
     }
 
@@ -72,9 +107,6 @@ public class LoginUser implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        if (sysUser.getStatus() != 0) {
-            throw new AuthenticationException("账户已被锁定，请联系管理员");
-        }
         return true;
     }
 
@@ -85,9 +117,6 @@ public class LoginUser implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        if (!sysUser.getStatus().equals(1)) {
-            throw new AuthenticationException("凭证已过期，请重新登录");
-        }
         return true;
     }
 
@@ -98,9 +127,6 @@ public class LoginUser implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        if (!sysUser.getStatus().equals(1)) {
-            throw new AuthenticationException("账户已被禁用，请联系管理员");
-        }
         return true;
     }
 }

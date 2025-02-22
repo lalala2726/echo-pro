@@ -1,8 +1,8 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
-import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.exception.ProFileException;
 
 /**

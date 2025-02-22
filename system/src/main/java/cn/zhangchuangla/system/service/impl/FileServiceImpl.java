@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
-import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.enums.FileUploadMethod;
 import cn.zhangchuangla.common.utils.ProfileUtils;
 import cn.zhangchuangla.system.service.AliyunOssFileService;

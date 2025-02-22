@@ -9,6 +9,7 @@ public interface LocalFileService {
 
     /**
      * 本地文件上传
+     *
      * @param file 文件
      * @return 返回资源地址
      */

@@ -18,4 +18,16 @@ public class AppConfig {
      */
     private String uploadPath;
 
+
+    /**
+     * 是否开启ip地址解析
+     */
+    private boolean ipAddressEnable;
+
+    /**
+     * 是否开始登录严格模式
+     */
+    private boolean strictLoginEnable;
+
+
 }

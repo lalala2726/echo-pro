@@ -1,9 +1,9 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.framework.security.filter.JwtAuthenticationTokenFilter;
+import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,17 +25,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+
+    private final AuthenticationEntryPointImpl authenticationEntryPoint;
+
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
+
+    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
     }
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 // 禁用 CSRF
                 .csrf(AbstractHttpConfigurer::disable)
                 // 禁用HTTP响应标头
@@ -43,6 +48,8 @@ public class SecurityConfig {
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(authenticationEntryPoint))
                 // 基于token，所以不需要session
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -50,13 +57,13 @@ public class SecurityConfig {
                 // 过滤请求
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register").permitAll()  // 明确允许登录和注册接口
-                        .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()
+                        .requestMatchers("/").permitAll()
+                        //静态资源允许访问
                         .anyRequest().authenticated()
                 )
                 // 添加JWT filter
-                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     /**
