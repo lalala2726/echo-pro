@@ -36,10 +36,10 @@ public class SecurityAspect {
             throw new SecurityException("用户未登录或会话已过期");
         }
 
-        List<String> permissions = loginUser.getPermissions(); // 获取当前用户的权限
-        if (!permissions.contains(requiresPermissions.value())) {
-            throw new SecurityException("没有权限访问该资源");
-        }
+//        List<String> permissions = loginUser.getPermissions(); // 获取当前用户的权限
+//        if (!permissions.contains(requiresPermissions.value())) {
+//            throw new SecurityException("没有权限访问该资源");
+//        }
 
         return joinPoint.proceed(); // 继续执行方法
     }
@@ -55,11 +55,11 @@ public class SecurityAspect {
             throw new SecurityException("用户未登录");
         }
 
-        List<String> roles = loginUser.getRoles(); // 获取当前用户的角色
-        if (!roles.contains(requiresRoles.value())) {
-            throw new SecurityException("没有角色访问该资源");
-        }
+//        List<String> roles = loginUser.getRoles(); // 获取当前用户的角色
+//        if (!roles.contains(requiresRoles.value())) {
+//            throw new SecurityException("没有角色访问该资源");
+//        }
 
         return joinPoint.proceed(); // 继续执行方法
     }
-} 
+}

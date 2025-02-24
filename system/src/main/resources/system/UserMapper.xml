@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysUser">
-        <id property="id" column="id"/>
+        <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
         <result property="nickName" column="nick_name"/>

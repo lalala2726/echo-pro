@@ -3,6 +3,8 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.system.model.request.RegisterRequest;
 
 /**
+ * 注册服务
+ *
  * @author Chuang
  * <p>
  * created on 2025/2/19 15:02

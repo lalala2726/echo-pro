@@ -46,32 +46,36 @@ CREATE TABLE sys_permissions
     remark           varchar(255) comment '备注'
 ) comment '权限表';
 
+
+drop table sys_user_role;
+
 # 用户角色表
 create table sys_user_role
 (
-    user_id     bigint comment '用户id',
-    role_id     bigint comment '角色id',
-    create_time timestamp default current_timestamp comment '创建时间',
-    update_time timestamp default current_timestamp on update current_timestamp comment '更新时间',
-    create_by   varchar(255) comment '创建人',
-    update_by   varchar(255) comment '更新人',
-    remark      varchar(255) comment '备注',
-    primary key (user_id, role_id),
+    user_role_id bigint auto_increment primary key comment '主键',
+    user_id      bigint comment '用户id',
+    role_id      bigint comment '角色id',
+    create_time  timestamp default current_timestamp comment '创建时间',
+    update_time  timestamp default current_timestamp on update current_timestamp comment '更新时间',
+    create_by    varchar(255) comment '创建人',
+    update_by    varchar(255) comment '更新人',
+    remark       varchar(255) comment '备注',
     foreign key (user_id) references sys_user (user_id),
     foreign key (role_id) references sys_role (role_id)
 ) comment '用户角色表';
 
+
 # 角色权限表
 create table sys_role_permissions
 (
-    role_id       bigint comment '角色id',
-    permission_id bigint comment '权限id',
-    create_time   timestamp default current_timestamp comment '创建时间',
-    update_time   timestamp default current_timestamp on update current_timestamp comment '更新时间',
-    create_by     varchar(255) comment '创建人',
-    update_by     varchar(255) comment '更新人',
-    remark        varchar(255) comment '备注',
-    primary key (role_id, permission_id),
+    role_permission_id bigint auto_increment primary key comment '主键',
+    role_id            bigint comment '角色id',
+    permission_id      bigint comment '权限id',
+    create_time        timestamp default current_timestamp comment '创建时间',
+    update_time        timestamp default current_timestamp on update current_timestamp comment '更新时间',
+    create_by          varchar(255) comment '创建人',
+    update_by          varchar(255) comment '更新人',
+    remark             varchar(255) comment '备注',
     foreign key (role_id) references sys_role (role_id),
     foreign key (permission_id) references sys_permissions (permission_id)
 ) comment '角色权限表';

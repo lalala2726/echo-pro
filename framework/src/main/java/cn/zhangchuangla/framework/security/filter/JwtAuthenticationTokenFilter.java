@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.io.IOException;
 /**
  * Token认证拦截器
  * 该拦截器用于验证请求中的JWT token，并将用户信息设置到Spring Security的上下文中。
- * 
+ *
  * @author Chuang
  * created on 2025/2/19 17:47
  */
@@ -44,7 +45,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * @throws IOException      io异常
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 获取token
         String token = tokenService.getToken(request);
         log.info("获取到的token: {}", token);
@@ -56,8 +57,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             log.info("获取到的用户信息: {}", loginUser);
 
             // 创建认证对象并设置到SecurityContext中
-            UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("用户已认证: {}", loginUser.getUsername());
         } else {

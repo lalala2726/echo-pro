@@ -16,7 +16,7 @@ public class SysUser extends BaseEntity {
     /**
      * ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
     /**

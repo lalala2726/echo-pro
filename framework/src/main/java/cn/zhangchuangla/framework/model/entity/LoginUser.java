@@ -1,16 +1,19 @@
 package cn.zhangchuangla.framework.model.entity;
 
+import cn.zhangchuangla.system.model.entity.SysPermissions;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysUser;
+import cn.zhangchuangla.system.model.entity.SysUserRole;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * @author Chuang
@@ -76,24 +79,17 @@ public class LoginUser implements UserDetails, Serializable {
     /**
      * 角色信息
      */
-    private List<String> roles = new ArrayList<>();
+    private List<SysRole> roles = new ArrayList<>();
 
     /**
      * 权限信息
      */
-    private List<String> permissions = new ArrayList<>();
+    private List<SysPermissions> permissions = new ArrayList<>();
 
 
-    /**
-     * 权限信息
-     *
-     * @return 权限信息
-     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return permissions.stream()
-                .map(permission -> (GrantedAuthority) () -> permission)
-                .toList();
+        return List.of();
     }
 
     /**

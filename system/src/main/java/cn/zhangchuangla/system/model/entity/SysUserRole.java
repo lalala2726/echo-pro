@@ -1,34 +1,41 @@
 package cn.zhangchuangla.system.model.entity;
 
 import cn.zhangchuangla.common.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
- * 权限表
+ * 用户角色表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_permissions")
+@TableName(value = "sys_user_role")
 @Data
-public class SysPermissions extends BaseEntity {
-    /**
-     *
-     */
-    @TableId(type = IdType.AUTO)
-    private Long permissionId;
+public class SysUserRole extends BaseEntity {
+
 
     /**
-     * 权限名称
+     * 主键
      */
-    private String permissionsName;
+    @TableId
+    private Long userRoleId;
 
     /**
-     * 权限标识
+     * 用户id
      */
-    private String permissionsKey;
+    private Long userId;
 
+    /**
+     * 角色id
+     */
+    private Long roleId;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
 }
