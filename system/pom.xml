@@ -19,12 +19,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>cn.zhangchuangla.app</groupId>
-            <artifactId>model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- no more than 2.3.3-->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>

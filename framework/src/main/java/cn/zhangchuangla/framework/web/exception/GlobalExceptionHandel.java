@@ -1,12 +1,13 @@
 package cn.zhangchuangla.framework.web.exception;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.AuthenticationException;
+import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -61,16 +62,28 @@ public class GlobalExceptionHandel {
     /**
      * 认证异常
      */
-    @ExceptionHandler(AuthenticationException.class)
-    public AjaxResult authenticationExceptionHandel(AuthenticationException exception) {
+    @ExceptionHandler(AccountException.class)
+    public AjaxResult accountExceptionExceptionHandel(AccountException exception) {
         log.error("认证异常：{}", exception.toString());
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }
 
+    /**
+     * 认证失败
+     */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public AjaxResult InternalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
-        log.error("认证失败：{}", exception.toString());
+        log.error("认证失败:", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
+    }
+
+    /**
+     * 账号被锁定
+     */
+    @ExceptionHandler(LockedException.class)
+    public AjaxResult lockedExceptionHandel(LockedException exception) {
+        log.error("账号被锁定:", exception);
+        return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
 

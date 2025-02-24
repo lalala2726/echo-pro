@@ -2,16 +2,14 @@ package cn.zhangchuangla.framework.security.aspect;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.security.annotation.RequiresPermissions;
 import cn.zhangchuangla.framework.security.annotation.RequiresRoles;
 import cn.zhangchuangla.framework.security.context.AuthenticationContextHolder;
-import cn.zhangchuangla.framework.model.entity.LoginUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 安全切面
@@ -28,6 +26,14 @@ public class SecurityAspect {
     }
 
 
+    /**
+     * 校验权限
+     *
+     * @param joinPoint           切点
+     * @param requiresPermissions 权限注解
+     * @return Object
+     * @throws Throwable 异常
+     */
     @Around("@annotation(requiresPermissions)")
     public Object checkPermissions(ProceedingJoinPoint joinPoint, RequiresPermissions requiresPermissions) throws Throwable {
         LoginUser loginUser = AuthenticationContextHolder.getContext();
@@ -35,12 +41,6 @@ public class SecurityAspect {
                 .getUserId())) {
             throw new SecurityException("用户未登录或会话已过期");
         }
-
-//        List<String> permissions = loginUser.getPermissions(); // 获取当前用户的权限
-//        if (!permissions.contains(requiresPermissions.value())) {
-//            throw new SecurityException("没有权限访问该资源");
-//        }
-
         return joinPoint.proceed(); // 继续执行方法
     }
 
@@ -48,6 +48,14 @@ public class SecurityAspect {
         return redisCache.getCacheObject(RedisKeyConstant.LOGIN_TOKEN_KEY + userId) != null;
     }
 
+    /**
+     * 校验角色
+     *
+     * @param joinPoint     切点
+     * @param requiresRoles 角色注解
+     * @return Object
+     * @throws Throwable 异常
+     */
     @Around("@annotation(requiresRoles)")
     public Object checkRoles(ProceedingJoinPoint joinPoint, RequiresRoles requiresRoles) throws Throwable {
         LoginUser loginUser = AuthenticationContextHolder.getContext();

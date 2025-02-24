@@ -51,7 +51,7 @@ public class LoginController {
         if (loginRequest.getPassword() == null) {
             return AjaxResult.error("密码不能为空");
         }
-        String token = sysLoginService.login(loginRequest);
+        String token = sysLoginService.login(loginRequest, request);
         HashMap<String, String> map = new HashMap<>();
         map.put(SystemConstant.TOKEN, token);
         return AjaxResult.success(map);

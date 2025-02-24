@@ -9,6 +9,7 @@ package cn.zhangchuangla.common.core.redis;
  * @since 2024/9/22
  */
 
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -87,8 +88,6 @@ public class RedisCache {
 
     /**
      * 删除单个对象
-     *
-     * @param key
      */
     public boolean deleteObject(final String key) {
         return redisTemplate.delete(key);
@@ -227,5 +226,16 @@ public class RedisCache {
      */
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
+    }
+
+
+    /**
+     * 判断缓存中是否有对应的value
+     *
+     * @param key 键
+     * @return true=存在；false=不存在
+     */
+    public boolean hasKey(String key) {
+        return redisTemplate.hasKey(RedisKeyConstant.LOGIN_TOKEN_KEY + key);
     }
 }

@@ -2,6 +2,8 @@ package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.framework.security.filter.JwtAuthenticationTokenFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
+import cn.zhangchuangla.framework.security.handel.LogoutSuccessHandlerImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,22 +22,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * 安全配置类
  * 该类配置了Spring Security的相关设置，包括认证、授权和过滤器链。
- * 
+ *
  * @author Chuang
  * created on 2025/2/19 01:13
  */
+@Slf4j
 @Configuration
-@EnableMethodSecurity
+@EnableMethodSecurity()
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private final LogoutSuccessHandlerImpl logoutSuccessHandler;
 
-    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
+    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, LogoutSuccessHandlerImpl logoutSuccessHandler) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
     @Bean
@@ -55,13 +60,15 @@ public class SecurityConfig {
                 )
                 // 过滤请求
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register").permitAll()  // 明确允许登录和注册接口
+                        .requestMatchers("/login", "/register", "/logout").permitAll()  // 明确允许登录和注册接口
                         .requestMatchers("/").permitAll()
                         //静态资源允许访问
                         .anyRequest().authenticated()
                 )
                 // 添加JWT filter
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                // 添加退出登录filter
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
                 .build();
     }
 

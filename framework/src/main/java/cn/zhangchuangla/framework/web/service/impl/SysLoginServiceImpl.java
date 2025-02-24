@@ -1,10 +1,7 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import cn.zhangchuangla.common.config.TokenConfig;
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.AuthenticationException;
+import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
@@ -13,6 +10,7 @@ import cn.zhangchuangla.system.model.entity.SysPermissions;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 登录服务实现类
@@ -34,50 +31,47 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SysLoginServiceImpl implements SysLoginService {
 
-    private final TokenConfig tokenConfig;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final RedisCache redisCache;
     private final SysRoleService sysRoleService;
     private final SysPermissionsService sysPermissionsService;
 
-    public SysLoginServiceImpl(TokenConfig tokenConfig, AuthenticationManager authenticationManager, TokenService tokenService, RedisCache redisCache, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService) {
-        this.tokenConfig = tokenConfig;
+    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
-        this.redisCache = redisCache;
         this.sysRoleService = sysRoleService;
         this.sysPermissionsService = sysPermissionsService;
     }
 
+
     /**
      * 实现登录逻辑
      *
-     * @param request 请求参数
+     * @param requestParams 请求参数
      * @return 令牌
      */
     @Override
-    public String login(LoginRequest request) {
+    public String login(LoginRequest requestParams, HttpServletRequest httpServletRequest) {
+        //fixme 登录前校验
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+                new UsernamePasswordAuthenticationToken(requestParams.getUsername(), requestParams.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+        //todo 密码错误次数校验
         if (Objects.isNull(authenticate)) {
-            throw new AuthenticationException(ResponseCode.LOGIN_ERROR, "账号或密码错误");
+            throw new AccountException(ResponseCode.LOGIN_ERROR, "账号或密码错误");
         }
         //获取用户信息
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+        loginUser.setUserId(loginUser.getSysUser().getUserId());
         //设置角色和权限
         List<SysRole> roles = sysRoleService.getRoleListByUserId(loginUser.getSysUser().getUserId());
-        loginUser.setRoles(roles); //获取用户角色
+        loginUser.setRoles(roles);
         //获取用户权限
         List<SysPermissions> permissions = sysPermissionsService.getPermissionsByUserId(loginUser.getSysUser().getUserId());
         loginUser.setPermissions(permissions);
-        String userId = loginUser.getSysUser().getUserId().toString();
         //生成token
         log.info("登录用户信息:{}", loginUser);
-        String token = tokenService.createToken(userId);
-        redisCache.setCacheObject(RedisKeyConstant.LOGIN_TOKEN_KEY + userId, loginUser, tokenConfig.getExpire(), TimeUnit.MINUTES);
-        return token;
+        return tokenService.createToken(loginUser, httpServletRequest);
     }
 
 

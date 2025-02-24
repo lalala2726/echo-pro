@@ -26,7 +26,6 @@
         <mysql.version>8.0.33</mysql.version>
         <fastjson.version>2.0.53</fastjson.version>
         <lombok.version>1.18.30</lombok.version>
-        <hutool.version>5.8.25</hutool.version>
         <jwt.version>0.9.0</jwt.version>
         <sa-token.version>1.39.0</sa-token.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
@@ -44,13 +43,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <optional>true</optional>
-        </dependency>
-
-        <!-- Hutool工具包 -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 

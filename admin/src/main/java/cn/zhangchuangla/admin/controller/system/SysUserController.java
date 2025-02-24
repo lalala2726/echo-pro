@@ -4,6 +4,8 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ValidationUtil;
+import cn.zhangchuangla.framework.security.annotation.RequiresPermissions;
+import cn.zhangchuangla.framework.security.annotation.RequiresRoles;
 import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UpdateUserRequest;
@@ -15,8 +17,6 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import cn.zhangchuangla.framework.security.annotation.RequiresPermissions;
-import cn.zhangchuangla.framework.security.annotation.RequiresRoles;
 
 import java.util.List;
 import java.util.stream.Collectors;

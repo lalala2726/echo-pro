@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.security.filter;
 
-import cn.zhangchuangla.common.config.TokenConfig;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import jakarta.servlet.FilterChain;
@@ -27,13 +26,12 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    private final TokenConfig tokenConfig;
     private final TokenService tokenService;
 
-    public JwtAuthenticationTokenFilter(TokenConfig tokenConfig, TokenService tokenService) {
-        this.tokenConfig = tokenConfig;
+    public JwtAuthenticationTokenFilter(TokenService tokenService) {
         this.tokenService = tokenService;
     }
+
 
     /**
      * 拦截请求，判断请求头中是否包含token，并且验证token是否正确
@@ -48,10 +46,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 获取token
         String token = tokenService.getToken(request);
-        log.info("获取到的token: {}", token);
-
         // 验证token是否存在且有效
-        if (token != null && tokenService.validateToken(token)) {
+        if (token != null) {
             // 获取用户信息
             LoginUser loginUser = tokenService.getLoginUser(request);
             log.info("获取到的用户信息: {}", loginUser);
@@ -60,6 +56,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            tokenService.validateToken(loginUser);
             log.info("用户已认证: {}", loginUser.getUsername());
         } else {
             log.warn("无效的token或token不存在");

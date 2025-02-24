@@ -227,4 +227,16 @@ public class StringUtils {
         }
         return StrFormatter.format(template, params);
     }
+
+    /**
+     * 判断对象是否为空
+     *
+     * @param object 对象
+     * @return false：为空 true：非空
+     */
+    public static boolean isNotNull(Object object) {
+        return !isNull(object);
+    }
+
+
 }

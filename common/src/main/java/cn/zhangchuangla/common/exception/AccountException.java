@@ -11,7 +11,7 @@ import lombok.Getter;
  * created on 2025/1/11 10:04
  */
 @Getter
-public final class AuthenticationException extends RuntimeException {
+public final class AccountException extends RuntimeException {
 
     /**
      * 状态码
@@ -19,17 +19,17 @@ public final class AuthenticationException extends RuntimeException {
     private final Integer code;
 
 
-    public AuthenticationException(ResponseCode responseCode, String message) {
+    public AccountException(ResponseCode responseCode, String message) {
         super(message);
         this.code = responseCode.getCode();
     }
 
-    public AuthenticationException(ResponseCode responseCode) {
+    public AccountException(ResponseCode responseCode) {
         super(responseCode.getMessage());
         this.code = responseCode.getCode();
     }
 
-    public AuthenticationException(String message) {
+    public AccountException(String message) {
         super(message);
         this.code = ResponseCode.AUTHORIZED.getCode();
     }

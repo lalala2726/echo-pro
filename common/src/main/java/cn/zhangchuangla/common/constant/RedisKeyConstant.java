@@ -7,8 +7,9 @@ package cn.zhangchuangla.common.constant;
  */
 public class RedisKeyConstant {
 
-    public static final String LOGIN_USER = "login_user:";
 
-
+    /**
+     * Redis登录用户前缀
+     */
     public static final String LOGIN_TOKEN_KEY = "login_token_key:";
 }

@@ -66,7 +66,8 @@ public enum ResponseCode {
     NOT_ALLOW(503, "不允许"),
     FileNameIsNull(40008, "文件名不能为空"),
     FileUploadFailed(40009, "文件上传失败"),             // 文件上传失败
-    PROFILE_ERROR(40010, "配置文件错误");                // 配置文件错误
+    PROFILE_ERROR(40010, "配置文件错误"),
+    ACCOUNT_LOCKED(10002, "账号被锁定");                // 配置文件错误
     // endregion
 
 
@@ -100,4 +101,4 @@ public enum ResponseCode {
         return null; // 如果找不到匹配的状态码，返回 null
     }
 
-    }
+}

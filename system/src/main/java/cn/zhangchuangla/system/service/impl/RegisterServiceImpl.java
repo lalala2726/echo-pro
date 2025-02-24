@@ -25,6 +25,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     /**
      * 注册用户
+     *
      * @param request 请求参数
      * @return 用户ID
      */

@@ -17,7 +17,7 @@ import java.io.Serializable;
 /**
  * 认证失败处理类
  * 该类用于处理认证失败的情况，返回相应的错误信息。
- * 
+ *
  * @author Chuang
  * created on 2025/2/19 17:18
  */

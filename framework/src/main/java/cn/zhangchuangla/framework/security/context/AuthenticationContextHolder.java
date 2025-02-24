@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.security.context;
 
-import org.springframework.security.core.Authentication;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 
 /**

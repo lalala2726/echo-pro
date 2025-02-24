@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.framework.model.request.LoginRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Chuang
@@ -15,5 +16,5 @@ public interface SysLoginService {
      * @param loginRequest 登录参数
      * @return 返回token
      */
-    String login(LoginRequest loginRequest);
+    String login(LoginRequest loginRequest, HttpServletRequest request);
 }
