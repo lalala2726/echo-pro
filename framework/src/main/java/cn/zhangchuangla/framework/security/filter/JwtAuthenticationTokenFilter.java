@@ -58,8 +58,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             tokenService.validateToken(loginUser);
             log.info("用户已认证: {}", loginUser.getUsername());
-        } else {
-            log.warn("无效的token或token不存在");
         }
 
         // 继续执行过滤器链

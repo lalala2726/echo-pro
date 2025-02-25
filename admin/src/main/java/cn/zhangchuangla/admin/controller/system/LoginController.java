@@ -6,6 +6,9 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -23,6 +26,7 @@ import java.util.HashMap;
  */
 @RestController
 @Slf4j
+@Tag(name = "登录接口")
 public class LoginController {
 
 
@@ -43,7 +47,10 @@ public class LoginController {
      * @return token
      */
     @PostMapping("/login")
-    public AjaxResult login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    @Operation(summary = "登录")
+    public AjaxResult login(@Parameter(name = "登录参数", required = true)
+                            @RequestBody LoginRequest loginRequest,
+                            @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
         if (loginRequest.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
@@ -61,6 +68,7 @@ public class LoginController {
      * 退出登录
      */
     @PostMapping("/logout")
+    @Operation(summary = "退出登录")
     public AjaxResult logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();

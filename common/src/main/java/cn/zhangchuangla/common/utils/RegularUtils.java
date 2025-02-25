@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * 验证工具类，提供常见的验证方法
  */
-public class ValidationUtil {
+public class RegularUtils {
 
     // 手机号正则
     private static final String PHONE_REGEX = "^1[3-9]\\d{9}$";

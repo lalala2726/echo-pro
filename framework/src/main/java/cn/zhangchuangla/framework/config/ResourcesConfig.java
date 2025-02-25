@@ -31,5 +31,16 @@ public class ResourcesConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("classpath:/META-INF/resources/static/**")
                 .addResourceLocations("classpath:/META-INF/resources/static/");
+
+
+        // 添加静态资源映射规则
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        //配置 knife4j 的静态资源请求映射地址
+        registry.addResourceHandler("/doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
+
+
 }

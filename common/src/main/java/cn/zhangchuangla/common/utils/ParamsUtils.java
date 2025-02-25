@@ -57,5 +57,31 @@ public class ParamsUtils {
         }
     }
 
+    /**
+     * 参数不能为空
+     *
+     * @param params 参数
+     */
+    public static void paramsNotIsNullOrBlank(String... params) {
+        for (String param : params) {
+            if (param == null || param.isEmpty()) {
+                throw new ParamException(ResponseCode.PARAM_ERROR, "参数不能为空");
+            }
+        }
+    }
+
+    /**
+     * 参数不能为空
+     *
+     * @param message 提示信息
+     * @param params  参数
+     */
+    public static void paramsNotIsNullOrBlank(String message, String... params) {
+        for (String param : params) {
+            if (param == null || param.isEmpty()) {
+                throw new ParamException(ResponseCode.PARAM_ERROR, message);
+            }
+        }
+    }
 
 }

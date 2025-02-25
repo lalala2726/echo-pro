@@ -4,6 +4,9 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.request.RegisterRequest;
 import cn.zhangchuangla.system.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * created on 2025/2/19 14:59
  */
 @RestController
+@Tag(name = "注册接口")
 public class RegisterController {
 
     private final RegisterService registerService;
@@ -33,7 +37,9 @@ public class RegisterController {
      * @return 返回结果
      */
     @PostMapping("/register")
-    public AjaxResult register(@RequestBody RegisterRequest request) {
+    @Operation(summary = "注册")
+    public AjaxResult register(@Parameter(name = "注册参数", required = true)
+                               @RequestBody RegisterRequest request) {
         if (request.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
         }

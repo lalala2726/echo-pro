@@ -2,6 +2,9 @@ package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.utils.RegularUtils;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
@@ -52,6 +55,8 @@ public class SysLoginServiceImpl implements SysLoginService {
      */
     @Override
     public String login(LoginRequest requestParams, HttpServletRequest httpServletRequest) {
+
+        loginParamsCheck(requestParams);
         //fixme 登录前校验
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(requestParams.getUsername(), requestParams.getPassword());
@@ -72,6 +77,26 @@ public class SysLoginServiceImpl implements SysLoginService {
         //生成token
         log.info("登录用户信息:{}", loginUser);
         return tokenService.createToken(loginUser, httpServletRequest);
+    }
+
+    /**
+     * 登录参数校验
+     *
+     * @param requestParams 参数
+     */
+    private void loginParamsCheck(LoginRequest requestParams) {
+        if (StringUtils.isEmpty(requestParams.getUsername())) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户名不能为空");
+        }
+        if (StringUtils.isEmpty(requestParams.getPassword())) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "密码不能为空");
+        }
+        if (!RegularUtils.isUsernameValid(requestParams.getUsername())) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户名格式错误");
+        }
+        if (!RegularUtils.isPasswordValid(requestParams.getPassword())) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "密码格式错误");
+        }
     }
 
 
