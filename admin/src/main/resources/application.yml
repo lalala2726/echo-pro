@@ -52,6 +52,10 @@ app:
     ip-address-enable: true
     strictLoginEnable: true
 token:
-  expire: 30
-  secret: zhangchuang2726
+  expire: 300000
+  secret: zhangchuang2726zhangchuang2726zhangchuang2726
   header: Authorization
+user:
+  password:
+    lock-time: 3
+    max-retry-count: 5

@@ -10,13 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
  * created on 2025/2/20 10:47
  */
 public interface TokenService {
-    /**
-     * 创建Token
-     *
-     * @param userId 用户ID
-     * @return token字符串
-     */
-    String createToken(String userId);
+
+    String createToken(LoginUser loginUser, HttpServletRequest request);
 
     /**
      * 从Token中获取用户ID
@@ -27,12 +22,11 @@ public interface TokenService {
     String getUserIdFromToken(String token);
 
     /**
-     * 验证Token是否有效
+     * 验证Token
      *
-     * @param token Token字符串
-     * @return 是否有效
+     * @param loginUser 登录用户
      */
-    boolean validateToken(String token);
+    void validateToken(LoginUser loginUser);
 
     /**
      * 刷新Token

@@ -75,7 +75,7 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser>
         if (!save(sysUser)) {
             return -1L;
         }
-        return sysUser.getId();
+        return sysUser.getUserId();
     }
 
     /**

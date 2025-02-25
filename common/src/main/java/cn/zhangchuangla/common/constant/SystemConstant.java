@@ -37,5 +37,15 @@ public class SystemConstant {
      */
     public static final String LOGIN_USER_KEY = "login_user_key";
 
+    /**
+     * 账号封禁
+     */
+    public static final Integer ACCOUNT_LOCK_KEY = 1;
+
+    /**
+     * 账号正常
+     */
+    public static final Integer ACCOUNT_UNLOCK_KEY = 0;
+
 
 }

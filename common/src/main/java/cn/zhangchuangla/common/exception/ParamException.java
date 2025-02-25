@@ -26,5 +26,10 @@ public class ParamException extends RuntimeException {
         this.code = code;
     }
 
+    public ParamException(ResponseCode responseCode, String message) {
+        super(message);
+        this.code = responseCode.getCode();
+    }
+
 
 }

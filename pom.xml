@@ -26,7 +26,6 @@
         <mysql.version>8.0.33</mysql.version>
         <fastjson.version>2.0.53</fastjson.version>
         <lombok.version>1.18.30</lombok.version>
-        <hutool.version>5.8.25</hutool.version>
         <jwt.version>0.9.0</jwt.version>
         <sa-token.version>1.39.0</sa-token.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
@@ -34,6 +33,8 @@
         <reids.version>3.4.0</reids.version>
         <alibaba.fastjson.version>1.2.50</alibaba.fastjson.version>
         <okhttp.version>4.12.0</okhttp.version>
+        <spring.security.version>5.6.0</spring.security.version>
+        <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
     </properties>
 
     <dependencies>
@@ -43,13 +44,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <optional>true</optional>
-        </dependency>
-
-        <!-- Hutool工具包 -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 
@@ -72,13 +66,6 @@
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
-
-            <!-- Spring Security -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
             <!-- Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -97,6 +84,14 @@
                 <version>0.11.5</version>
                 <scope>runtime</scope>
             </dependency>
+
+            <!-- https://doc.xiaominfo.com/docs/quick-start -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${openapi.knife4j.version}</version>
+            </dependency>
+
 
             <!-- OkHttp客户端 -->
             <dependency>
@@ -122,14 +117,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>${reids.version}</version>
-            </dependency>
-
-
-            <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
             </dependency>
 
             <!-- 阿里云OSS -->
@@ -160,6 +147,12 @@
                 <version>${alibaba.fastjson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+
             <!-- 项目模块依赖 -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -171,12 +164,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>framework</artifactId>
                 <version>${app.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>${minio.version}</version>
             </dependency>
 
             <dependency>

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.framework.model.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -13,11 +14,13 @@ public class LoginRequest {
     /**
      * 用户名
      */
+    @Schema(description = "用户名")
     private String username;
 
     /**
      * 密码
      */
+    @Schema(description = "密码")
     private String password;
 
 }

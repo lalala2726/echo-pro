@@ -3,7 +3,7 @@ package cn.zhangchuangla.admin.controller.system;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
-import cn.zhangchuangla.common.utils.ValidationUtil;
+import cn.zhangchuangla.common.utils.RegularUtils;
 import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UpdateUserRequest;
@@ -11,6 +11,9 @@ import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.system.model.vo.SysUserVo;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 /**
  * 用户管理控制器
  */
+@Tag(name = "用户管理接口")
 @RestController
 @RequestMapping("/admin/user")
 public class SysUserController {
@@ -30,13 +34,12 @@ public class SysUserController {
     private SysUserService sysUserService;
 
     /**
-     * 用户列表
-     *
-     * @param request 请求参数
-     * @return 用户列表
+     * 获取用户列表
+     * 需要特定权限才能访问
      */
     @GetMapping("/list")
-    public AjaxResult list(UserRequest request) {
+    @Operation(summary = "获取用户列表")
+    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<SysUserVo> sysUserVos = userPage.getRecords().stream()
@@ -49,13 +52,13 @@ public class SysUserController {
     }
 
     /**
-     * 新增用户
-     *
-     * @param request 新增用户请求参数
-     * @return 新增成功返回用户主键, 失败返回错误信息
+     * 添加用户
+     * 需要特定角色才能访问
      */
-    @PostMapping
-    public AjaxResult addUserInfo(@RequestBody @Validated AddUserRequest request) {
+    @PostMapping("/add")
+    @Operation(summary = "添加用户")
+    public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
+                              @RequestBody @Validated AddUserRequest request) {
         String validationError = validateUserRequest(request);
         if (validationError != null) {
             return getError(validationError);
@@ -74,10 +77,6 @@ public class SysUserController {
         return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
     }
 
-    private AjaxResult getError(String validationError) {
-        return AjaxResult.error(validationError);
-    }
-
     /**
      * 删除用户
      *
@@ -85,7 +84,9 @@ public class SysUserController {
      * @return 删除结果
      */
     @DeleteMapping("/{id}")
-    public AjaxResult deleteUser(@PathVariable("id") Long id) {
+    @Operation(summary = "删除用户")
+    public AjaxResult deleteUser(@Parameter(name = "用户ID", required = true)
+                                 @PathVariable("id") Long id) {
         if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
@@ -99,7 +100,9 @@ public class SysUserController {
      * @return 修改结果
      */
     @PutMapping
-    public AjaxResult updateUserInfoById(@RequestBody @Validated UpdateUserRequest request) {
+    @Operation(summary = "修改用户信息")
+    public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
+                                         @RequestBody @Validated UpdateUserRequest request) {
         if (request.getId() == null) {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
@@ -131,7 +134,9 @@ public class SysUserController {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    public AjaxResult getUserInfoById(@PathVariable("id") Long id) {
+    @Operation(summary = "根据id获取用户信息")
+    public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
+                                      @PathVariable("id") Long id) {
         if (id == null) {
             return AjaxResult.error("用户ID为空");
         }
@@ -149,19 +154,23 @@ public class SysUserController {
      */
     private String validateUserRequest(Object request) {
         if (request instanceof AddUserRequest addUserRequest) {
-            if (!ValidationUtil.isPhoneValid(addUserRequest.getPhone())) {
+            if (!RegularUtils.isPhoneValid(addUserRequest.getPhone())) {
                 return "手机号不合法";
             }
-            if (!ValidationUtil.isUsernameValid(addUserRequest.getUsername())) {
+            if (!RegularUtils.isUsernameValid(addUserRequest.getUsername())) {
                 return "用户名必须在5到16位之间";
             }
-            if (!ValidationUtil.isEmailValid(addUserRequest.getEmail())) {
+            if (!RegularUtils.isEmailValid(addUserRequest.getEmail())) {
                 return "邮箱格式不合法";
             }
-            if (!ValidationUtil.isPasswordValid(addUserRequest.getPassword())) {
+            if (!RegularUtils.isPasswordValid(addUserRequest.getPassword())) {
                 return "密码必须在6到16位之间";
             }
         }
         return null;
+    }
+
+    private AjaxResult getError(String validationError) {
+        return AjaxResult.error(validationError);
     }
 }

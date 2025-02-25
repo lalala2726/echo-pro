@@ -3,24 +3,28 @@ package cn.zhangchuangla.system.model.vo;
 import cn.zhangchuangla.common.base.BaseVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 角色表
+ * 角色VO
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(name = "角色VO", description = "返回前端展示的数据")
 public class SysRoleVo extends BaseVO {
     /**
      * 主键
      */
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 角色名
      */
+    @Schema(description = "角色名")
     private String name;
 
 

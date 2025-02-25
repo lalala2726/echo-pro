@@ -23,10 +23,17 @@ public class RegisterServiceImpl implements RegisterService {
         this.sysUserService = sysUserService;
     }
 
+    /**
+     * 注册用户
+     *
+     * @param request 请求参数
+     * @return 用户ID
+     */
     public Long register(RegisterRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new ParamException(ResponseCode.PARAM_ERROR);
         }
+        //fixme 这边需要完善
         // 加密密码
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -39,6 +46,6 @@ public class RegisterServiceImpl implements RegisterService {
 
         sysUserService.save(user);
 
-        return user.getId();
+        return user.getUserId();
     }
 }
