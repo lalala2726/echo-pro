@@ -1,5 +1,6 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
+import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.exception.ParamException;
@@ -13,6 +14,7 @@ import cn.zhangchuangla.framework.web.service.SysPasswordService;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
 import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.service.SysLoginLogService;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,13 +43,15 @@ public class SysLoginServiceImpl implements SysLoginService {
     private final SysRoleService sysRoleService;
     private final SysPermissionsService sysPermissionsService;
     private final SysPasswordService sysPasswordService;
+    private final SysLoginLogService sysLoginLogService;
 
-    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService, SysPasswordService sysPasswordService) {
+    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService, SysPasswordService sysPasswordService, SysLoginLogService sysLoginLogService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.sysRoleService = sysRoleService;
         this.sysPermissionsService = sysPermissionsService;
         this.sysPasswordService = sysPasswordService;
+        this.sysLoginLogService = sysLoginLogService;
     }
 
     /**
@@ -70,6 +74,8 @@ public class SysLoginServiceImpl implements SysLoginService {
         } catch (AuthenticationException e) {
             log.error("用户名或密码错误: {}", requestParams.getUsername());
             sysPasswordService.PasswordErrorCount(requestParams.getUsername());
+            //记录登录失败日志
+            sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_FAIL);
             throw new AccountException(ResponseCode.PASSWORD_FORMAT_ERROR, "用户名或密码错误");
         } finally {
             AuthenticationContextHolder.clearContext();
@@ -87,8 +93,9 @@ public class SysLoginServiceImpl implements SysLoginService {
         List<SysPermissions> permissions = sysPermissionsService.getPermissionsByUserId(loginUser.getSysUser().getUserId());
         loginUser.setPermissions(permissions);
 
-        // 生成token
         log.info("登录用户信息: {}", loginUser);
+        //记录登录成功日志
+        sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_SUCCESS);
         return tokenService.createToken(loginUser, httpServletRequest);
     }
 

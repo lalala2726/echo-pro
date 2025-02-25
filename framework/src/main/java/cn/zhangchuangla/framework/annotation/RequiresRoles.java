@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.security.annotation;
+package cn.zhangchuangla.framework.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,11 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 自定义权限注解
- * 用于标记需要特定权限的方法
+ * 自定义角色注解
+ * 用于标记需要特定角色的方法
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresPermissions {
-    String value(); // 权限标识
-} 
+public @interface RequiresRoles {
+    String value(); // 角色标识
+}

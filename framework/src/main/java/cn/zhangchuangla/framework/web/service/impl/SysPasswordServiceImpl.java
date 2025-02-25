@@ -45,7 +45,7 @@ public class SysPasswordServiceImpl implements SysPasswordService {
         }
         Long keyExpire = redisCache.getKeyExpire(key);
         if (retryCount >= maxRetryCount) {
-            throw new AccountException(ResponseCode.ACCOUNT_LOCKED, "账号已被锁定,请在" + keyExpire + "重新尝试");
+            throw new AccountException(ResponseCode.ACCOUNT_LOCKED, "账号已被锁定,请在" + keyExpire + "秒后重新尝试");
         }
 
         redisCache.setCacheObject(key, ++retryCount, passwordConfig.getLockTime(), TimeUnit.MINUTES);

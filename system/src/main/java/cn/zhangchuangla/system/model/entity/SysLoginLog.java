@@ -24,10 +24,17 @@ public class SysLoginLog {
     private Long id;
 
     /**
-     * 用户id
+     * 用户名
      */
-    @Schema(description = "用户id")
-    private Long userId;
+    @Schema(description = "用户名")
+    private String username;
+
+    /**
+     * 账号状态
+     */
+    @Schema(description = "登录状态")
+    private Integer status;
+
 
     /**
      * ip

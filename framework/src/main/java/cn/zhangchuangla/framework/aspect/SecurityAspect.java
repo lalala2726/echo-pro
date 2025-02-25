@@ -1,10 +1,10 @@
-package cn.zhangchuangla.framework.security.aspect;
+package cn.zhangchuangla.framework.aspect;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.framework.model.entity.LoginUser;
-import cn.zhangchuangla.framework.security.annotation.RequiresPermissions;
-import cn.zhangchuangla.framework.security.annotation.RequiresRoles;
+import cn.zhangchuangla.framework.annotation.RequiresPermissions;
+import cn.zhangchuangla.framework.annotation.RequiresRoles;
 import cn.zhangchuangla.framework.security.context.AuthenticationContextHolder;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

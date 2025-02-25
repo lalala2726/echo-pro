@@ -81,10 +81,13 @@ create table sys_role_permissions
 ) comment '角色权限表';
 
 
+drop table sys_operation_log;
+
 CREATE TABLE sys_operation_log
 (
     log_id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id        BIGINT NOT NULL COMMENT '操作用户',
+    user_id        BIGINT      NOT NULL COMMENT '用户ID',
+    user_name      VARCHAR(50) NOT NULL COMMENT '用户名',
     module         VARCHAR(50) COMMENT '操作模块',
     operation_type VARCHAR(20) COMMENT '操作类型（CREATE/UPDATE/DELETE）',
     request_url    VARCHAR(512) COMMENT '请求地址',
@@ -95,3 +98,23 @@ CREATE TABLE sys_operation_log
     cost_time      BIGINT COMMENT '耗时（毫秒）',
     create_time    DATETIME(6) COMMENT '操作时间'
 ) COMMENT '操作日志表';
+
+drop table sys_login_log;
+
+CREATE TABLE sys_login_log
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    username    varchar(256) NOT NULL COMMENT '用户名',
+    status      TINYINT      NOT NULL COMMENT '登录状态（0成功 1失败）',
+    ip          VARCHAR(255) COMMENT '登录IP',
+    address     VARCHAR(255) COMMENT 'IP归属地',
+    browser     VARCHAR(255) COMMENT '浏览器',
+    os          VARCHAR(255) COMMENT '操作系统',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by   VARCHAR(100) COMMENT '创建人',
+    update_by   VARCHAR(100) COMMENT '更新人',
+    is_deleted  INT      DEFAULT 0 COMMENT '是否删除',
+    remark      TEXT COMMENT '备注'
+) COMMENT ='系统登录日志';
+
