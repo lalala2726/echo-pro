@@ -55,3 +55,7 @@ token:
   expire: 300000
   secret: zhangchuang2726zhangchuang2726zhangchuang2726
   header: Authorization
+user:
+  password:
+    lock-time: 3
+    max-retry-count: 5

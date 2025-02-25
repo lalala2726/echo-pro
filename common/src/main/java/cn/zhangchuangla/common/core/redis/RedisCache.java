@@ -238,4 +238,13 @@ public class RedisCache {
     public boolean hasKey(String key) {
         return redisTemplate.hasKey(RedisKeyConstant.LOGIN_TOKEN_KEY + key);
     }
+
+    /**
+     * 获取指定key的过期时间
+     *
+     * @param key key
+     */
+    public Long getKeyExpire(String key) {
+        return redisTemplate.getExpire(key);
+    }
 }

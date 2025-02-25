@@ -2,6 +2,7 @@ package cn.zhangchuangla.framework.web.exception;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public AjaxResult illegalArgumentExceptionHandel(IllegalArgumentException exception) {
-        log.error("参数异常：{}", exception.toString());
+        log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
@@ -86,6 +87,11 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
+    @ExceptionHandler(ParamException.class)
+    public AjaxResult paramExceptionHandel(ParamException exception) {
+        log.error("参数异常:", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
+    }
 
     /**
      * 系统异常
@@ -93,7 +99,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(Exception.class)
     public AjaxResult exceptionHandel(Exception exception) {
         log.error("系统异常", exception);
-        return AjaxResult.error(ResponseCode.SERVER_ERROR);
+        return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
     }
 
 
