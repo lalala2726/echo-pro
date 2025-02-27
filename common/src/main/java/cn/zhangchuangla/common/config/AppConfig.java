@@ -18,7 +18,6 @@ public class AppConfig {
      */
     private String uploadPath;
 
-
     /**
      * 是否开启ip地址解析
      */

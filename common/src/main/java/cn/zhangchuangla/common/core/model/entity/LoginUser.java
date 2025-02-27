@@ -1,6 +1,7 @@
 package cn.zhangchuangla.common.core.model.entity;
 
 import cn.zhangchuangla.common.constant.SystemConstant;
+import com.alibaba.fastjson.annotation.JSONField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,8 @@ public class LoginUser implements UserDetails, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    public LoginUser() {
+    }
 
     public LoginUser(SysUser sysUser, Set<String> permissions) {
         this.sysUser = sysUser;
@@ -46,13 +49,11 @@ public class LoginUser implements UserDetails, Serializable {
      */
     private Set<String> permissions;
 
-
     /**
      * 用户ID
      */
     @Schema(description = "用户ID")
     public Long userId;
-
 
     /**
      * 用户名
@@ -90,6 +91,7 @@ public class LoginUser implements UserDetails, Serializable {
     private String os;
 
 
+    @JSONField(serialize = false, deserialize = false)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

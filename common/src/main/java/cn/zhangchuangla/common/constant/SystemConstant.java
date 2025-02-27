@@ -68,4 +68,14 @@ public class SystemConstant {
      * 所有权限标识
      */
     public static final String ALL_PERMISSION = "*:*:*";
+
+    /**
+     * JWT用户名标识
+     */
+    public static final String USERNAME = "username";
+
+    /**
+     * 冒号
+     */
+    public static final String COLON = ":";
 }
