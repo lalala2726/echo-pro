@@ -1,0 +1,37 @@
+package cn.zhangchuangla.common.exception;
+
+import cn.zhangchuangla.common.enums.ResponseCode;
+import lombok.Getter;
+
+/**
+ * 授权认证异常
+ *
+ * @author Chuang
+ * <p>
+ * created on 2025/1/11 10:04
+ */
+@Getter
+public final class PermissionException extends RuntimeException {
+
+    /**
+     * 状态码
+     */
+    private final Integer code;
+
+
+    public PermissionException(ResponseCode responseCode, String message) {
+        super(message);
+        this.code = responseCode.getCode();
+    }
+
+    public PermissionException(ResponseCode responseCode) {
+        super(responseCode.getMessage());
+        this.code = responseCode.getCode();
+    }
+
+    public PermissionException(String message) {
+        super(message);
+        this.code = ResponseCode.AUTHORIZED.getCode();
+    }
+
+}

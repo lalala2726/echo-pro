@@ -62,4 +62,10 @@ public class SystemConstant {
      * 系统创建
      */
     public static final String SYSTEM_CREATE = "系统自动创建";
+
+
+    /**
+     * 所有权限标识
+     */
+    public static final String ALL_PERMISSION = "*:*:*";
 }

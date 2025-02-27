@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 权限服务接口
@@ -12,23 +12,20 @@ import java.util.List;
  */
 public interface SysPermissionsService extends IService<SysPermissions> {
 
+    /**
+     * 根据角色名称查询权限集合
+     *
+     * @param roleName 角色名称
+     * @return 返回角色权限集合
+     */
+    Set<String> getPermissionsByRoleName(String roleName);
+
 
     /**
-     * 根据角色id获取权限
+     * 根据用户id查询权限集合
      *
-     * @param roleId 角色ID
-     * @return 返回角色对应的权限
+     * @param id 用户ID
+     * @return 返回用户权限集合
      */
-    List<SysPermissions> getPermissionsByRoleId(Long roleId);
-
-
-    /**
-     * 根据用户id获取权限
-     *
-     * @param userId 用户ID
-     * @return 返回用户对应的权限
-     */
-    List<SysPermissions> getPermissionsByUserId(Long userId);
-
-
+    Set<String> getPermissionsByUserId(Long id);
 }

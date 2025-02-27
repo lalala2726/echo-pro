@@ -7,12 +7,44 @@
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysPermissions">
         <id property="permissionId" column="permission_id"/>
         <result property="permissionsName" column="permissions_name"/>
-        <result property="permissionsKey" column="permission_key"/>
+        <result property="permissionsKey" column="permissions_key"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="createBy" column="create_by"/>
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
+
+    <select id="getPermissionsListByRoleName" resultMap="BaseResultMap">
+        SELECT permissions.permission_id    AS permission_id,
+               permissions.permissions_name AS permissions_name,
+               permissions.permissions_key  AS permissions_key,
+               permissions.create_time      AS create_time,
+               permissions.update_time      AS update_time,
+               permissions.create_by        AS create_by,
+               permissions.update_by        AS update_by,
+               permissions.remark           AS remark
+        FROM sys_permissions permissions
+                 JOIN sys_role_permissions role_permissions
+                      ON permissions.permission_id = role_permissions.permission_id
+                 JOIN sys_role ON role_permissions.role_id = sys_role.role_id
+        WHERE sys_role.role_key = #{roleName}
+    </select>
+
+    <select id="getPermissionsByUserId" resultMap="BaseResultMap">
+        SELECT permissions.permission_id    AS permission_id,
+               permissions.permissions_name AS permissions_name,
+               permissions.permissions_key  AS permissions_key,
+               permissions.create_time      AS create_time,
+               permissions.update_time      AS update_time,
+               permissions.create_by        AS create_by,
+               permissions.update_by        AS update_by,
+               permissions.remark           AS remark
+        FROM sys_permissions permissions
+                 JOIN sys_user_role role_permissions
+                 join sys_role_permissions on permissions.permission_id = sys_role_permissions.permission_id
+                 join sys_user_role
+        where sys_user_role.user_id = #{userId}
+    </select>
 
 </mapper>

@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.RegularUtils;
-import cn.zhangchuangla.system.model.entity.SysUser;
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;

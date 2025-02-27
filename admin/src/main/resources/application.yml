@@ -8,22 +8,22 @@ spring:
       max-request-size: 1024MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.1.110:3306/person_app?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/person_app?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username: root
     password: zhangchuang2726
 
     #开启日志Mybatis-plus日志
   data:
     redis:
-      host: 192.168.1.110
+      host: localhost
       port: 6379
-      password: zhangchuang2726
-      database: 8
+      database: 0
 
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: com.zhangchuang.**.entity
+  mapper-locations: classpath*:system/*Mapper.xml
   global-config:
     db-config:
       logic-delete-field: is_deleted  # 全局逻辑删除字段名

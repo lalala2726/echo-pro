@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.security.context;
 
-import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 
 /**
  * 身份验证信息

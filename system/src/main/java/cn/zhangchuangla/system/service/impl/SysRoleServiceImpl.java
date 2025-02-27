@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author zhangchuang
@@ -68,6 +70,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         }
 
         return null;
+    }
+
+    /**
+     * 根据用户id获取角色列表
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    @Override
+    public Set<String> getUserRoleSet(Long userId) {
+        List<SysRole> roleListByUserId = getRoleListByUserId(userId);
+        return roleListByUserId.stream()
+                .map(SysRole::getRoleKey)
+                .collect(Collectors.toSet());
     }
 }
 

@@ -34,6 +34,4 @@ public class SysPermissions extends BaseEntity {
      */
     @Schema(description = "权限标识")
     private String permissionsKey;
-
-
 }

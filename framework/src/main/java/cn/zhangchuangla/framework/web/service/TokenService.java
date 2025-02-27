@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 

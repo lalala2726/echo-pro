@@ -1,22 +1,18 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.utils.RegularUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.security.context.AuthenticationContextHolder;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
 import cn.zhangchuangla.framework.web.service.SysPasswordService;
 import cn.zhangchuangla.framework.web.service.TokenService;
-import cn.zhangchuangla.system.model.entity.SysPermissions;
-import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.service.SysLoginLogService;
-import cn.zhangchuangla.system.service.SysPermissionsService;
-import cn.zhangchuangla.system.service.SysRoleService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,8 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 登录服务实现类
@@ -40,19 +34,16 @@ public class SysLoginServiceImpl implements SysLoginService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final SysRoleService sysRoleService;
-    private final SysPermissionsService sysPermissionsService;
     private final SysPasswordService sysPasswordService;
     private final SysLoginLogService sysLoginLogService;
 
-    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService, SysPasswordService sysPasswordService, SysLoginLogService sysLoginLogService) {
+    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysPasswordService sysPasswordService, SysLoginLogService sysLoginLogService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
-        this.sysRoleService = sysRoleService;
-        this.sysPermissionsService = sysPermissionsService;
         this.sysPasswordService = sysPasswordService;
         this.sysLoginLogService = sysLoginLogService;
     }
+
 
     /**
      * 实现登录逻辑
@@ -72,7 +63,7 @@ public class SysLoginServiceImpl implements SysLoginService {
                     new UsernamePasswordAuthenticationToken(requestParams.getUsername(), requestParams.getPassword());
             authenticate = authenticationManager.authenticate(authenticationToken);
         } catch (AuthenticationException e) {
-            log.error("用户名或密码错误: {}", requestParams.getUsername());
+            log.warn("用户名:{},密码错误!", requestParams.getUsername());
             sysPasswordService.PasswordErrorCount(requestParams.getUsername());
             //记录登录失败日志
             sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_FAIL);
@@ -80,19 +71,10 @@ public class SysLoginServiceImpl implements SysLoginService {
         } finally {
             AuthenticationContextHolder.clearContext();
         }
-
         // 获取用户信息
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-        loginUser.setUserId(loginUser.getSysUser().getUserId());
-
-        // 设置角色和权限
-        List<SysRole> roles = sysRoleService.getRoleListByUserId(loginUser.getSysUser().getUserId());
-        loginUser.setRoles(roles);
-
-        // 获取用户权限
-        List<SysPermissions> permissions = sysPermissionsService.getPermissionsByUserId(loginUser.getSysUser().getUserId());
-        loginUser.setPermissions(permissions);
-
+        Long userId = loginUser.getSysUser().getUserId();
+        loginUser.setUserId(userId);
         log.info("登录用户信息: {}", loginUser);
         //记录登录成功日志
         sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_SUCCESS);

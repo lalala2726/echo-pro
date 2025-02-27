@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
@@ -162,13 +162,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public LoginUser getLoginUser(HttpServletRequest request) {
         String token = getToken(request);
-        if (StringUtils.isBlank(token)) {
-            return null;
+        if (!StringUtils.isBlank(token)) {
+            try {
+                Claims claims = parseToken(token);
+                String sessionId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
+                return getLoginUserByToken(sessionId);
+            } catch (Exception e) {
+                    log.warn("获取用户信息失败: {}", e.getMessage());
+            }
         }
-        Claims claims = parseToken(token);
-        String sessionId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
-        // 根据userId获取并返回LoginUser对象
-        return getLoginUserByToken(sessionId);
+        return null;
     }
 
     private LoginUser getLoginUserByToken(String sessionId) {
@@ -190,6 +193,9 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String getToken(HttpServletRequest request) {
         String header = tokenConfig.getHeader();
+        if (StringUtils.isBlank(header)) {
+            return null;
+        }
         return request.getHeader(header);
     }
 }
