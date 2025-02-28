@@ -25,7 +25,7 @@ public class CommonController {
     }
 
     /**
-     * oss上传文件
+     * 通用上传文件
      *
      * @return 文件路径
      */

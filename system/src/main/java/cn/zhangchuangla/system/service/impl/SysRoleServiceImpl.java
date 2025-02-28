@@ -31,6 +31,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         this.sysUserRoleService = sysUserRoleService;
     }
 
+
     /**
      * 角色列表
      *
@@ -79,12 +80,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @return 角色列表
      */
     @Override
-    public Set<String> getUserRoleSet(Long userId) {
+    public Set<String> getUserRoleSetByUserId(Long userId) {
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
         return roleListByUserId.stream()
                 .map(SysRole::getRoleKey)
                 .collect(Collectors.toSet());
     }
+
 }
 
 

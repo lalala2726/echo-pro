@@ -37,5 +37,5 @@ public interface SysRoleService extends IService<SysRole> {
      * @param userId 用户ID
      * @return 返回Set集合
      */
-    Set<String> getUserRoleSet(Long userId);
+    Set<String> getUserRoleSetByUserId(Long userId);
 }

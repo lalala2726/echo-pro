@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 /**
- * //todo 更改用户信息后需要刷新缓存,防止取消了用户的权限,还能继续操作
+ * 当后续因为业务需求改变需要接入到微服务架构,这边建议使用Redis单独存储角色和权限信息,从而实现权限实时刷新
  *
  * @author Chuang
  * <p>
@@ -65,6 +65,7 @@ public class SysRoleController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:get')")
     public AjaxResult getRoleInfoById(@Parameter(name = "角色ID", required = true)
                                       @PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
@@ -78,12 +79,15 @@ public class SysRoleController {
 
     /**
      * 删除角色信息
+     * <p>
+     * //todo 当删除用户信息时,如果角色已经分配将无法进行删除,当删除成功后需要进行角色关系表的同步删除
      *
      * @param id 角色ID
      * @return 删除结果
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:delete')")
     public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return AjaxResult.success("删除成功");
@@ -99,6 +103,7 @@ public class SysRoleController {
      */
     @PostMapping
     @Operation(summary = "添加角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:add')")
     public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
                                   @RequestBody String name) {
         if (name == null || name.isEmpty()) {
@@ -114,12 +119,15 @@ public class SysRoleController {
 
     /**
      * 修改角色信息
+     * <p>
+     * //todo 当修改用户信息需要将角色关系表中数据进行同步
      *
      * @param sysRoleVo 修改角色信息
      * @return 修改结果
      */
     @PutMapping
     @Operation(summary = "修改角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:update')")
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
                                      @RequestBody SysRoleVo sysRoleVo) {
         if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {

@@ -70,32 +70,24 @@ public class PermissionAuth {
     }
 
     /**
-     * 判断当前用户是否是指定的用户
+     * 要求当前权限必须是包含指定角色
      *
-     * @param username 需要匹配的用户名
+     * @param role 需要匹配的角色
      * @return true - 是指定用户，false - 不是指定用户
      */
-    public boolean isSpecificUser(String username) {
-        if (StringUtils.isBlank(username)) {
+    public boolean isSpecificRole(String role) {
+        if (StringUtils.isBlank(role)) {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
         if (loginUser == null) {
             return false;
         }
-        boolean isMatch = username.equals(loginUser.getUsername());
-        log.debug("校验当前用户 [{}] 是否为 [{}] 结果: {}", loginUser.getUsername(), username, isMatch);
-        return isMatch;
-    }
-
-    /**
-     * 判断当前用户是否不是指定的用户
-     *
-     * @param username 需要匹配的用户名
-     * @return true - 不是指定用户，false - 是指定用户
-     */
-    public boolean isNotSpecificUser(String username) {
-        return !isSpecificUser(username);
+        Set<String> roles = loginUser.getRoles();
+        for (String loginUserRole : roles) {
+            return role.equals(loginUserRole);
+        }
+        return false;
     }
 
     /**
