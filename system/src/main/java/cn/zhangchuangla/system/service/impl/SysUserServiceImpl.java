@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.system.mapper.UserMapper;
+import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
@@ -15,8 +15,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser>
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         implements SysUserService {
+
 
     /**
      * 进行条件查询
@@ -26,38 +27,9 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser>
      */
     @Override
     public Page<SysUser> UserList(UserRequest request) {
-        LambdaQueryWrapper<SysUser> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        //根据用户名模糊查询
-        userLambdaQueryWrapper.like(request.getUsername() != null && !request.getUsername().isEmpty(),
-                SysUser::getUsername, request.getUsername());
-        //根据昵称模糊查询
-        userLambdaQueryWrapper.like(request.getNickName() != null && !request.getNickName().isEmpty(),
-                SysUser::getNickName, request.getNickName());
-        //根据邮箱模糊查询
-        userLambdaQueryWrapper.like(request.getEmail() != null && !request.getEmail().isEmpty(),
-                SysUser::getEmail, request.getEmail());
-        //根据备注模糊查询
-        userLambdaQueryWrapper.like(request.getRemark() != null && !request.getRemark().isEmpty(),
-                SysUser::getRemark, request.getRemark());
-        //根据手机号精准查询
-        userLambdaQueryWrapper.eq(request.getPhone() != null && !request.getPhone().isEmpty(),
-                SysUser::getPhone, request.getPhone());
-        //根据邮箱精准查询
-        userLambdaQueryWrapper.eq(request.getEmail() != null && !request.getEmail().isEmpty(),
-                SysUser::getEmail, request.getEmail());
-        //根据状态精准查询
-        userLambdaQueryWrapper.eq(request.getStatus() != null,
-                SysUser::getStatus, request.getStatus());
-        //根据性别精准查询
-        userLambdaQueryWrapper.eq(request.getGender() != null, SysUser::getGender, request.getGender());
-        //根据创建人模糊查询
-        userLambdaQueryWrapper.like(request.getCreateBy() != null && !request.getCreateBy().isEmpty(),
-                SysUser::getCreateBy, request.getCreateBy());
-        //根据修改人模糊查询
-        userLambdaQueryWrapper.eq(request.getUpdateBy() != null && !request.getUpdateBy().isEmpty(),
-                SysUser::getUpdateBy, request.getUpdateBy());
 
-        return this.page(new Page<>(request.getPageNum(), request.getPageSize()), userLambdaQueryWrapper);
+        //fixme 采用更加简介明了的学法，如果超3次查询语句，就直接使用Mybatis原生的查询语句
+        return this.page(new Page<>(request.getPageNum(), request.getPageSize()));
     }
 
     /**

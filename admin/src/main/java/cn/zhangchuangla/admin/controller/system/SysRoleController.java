@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * created on 2025/1/12 10:55
  */
 @RestController
-@RequestMapping("/admin/role")
+@RequestMapping("/system/role")
 @Tag(name = "角色接口")
 public class SysRoleController {
 
