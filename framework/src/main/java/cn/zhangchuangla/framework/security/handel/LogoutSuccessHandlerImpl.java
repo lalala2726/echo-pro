@@ -47,8 +47,11 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (StringUtils.isNotNull(loginUser)) {
             String sessionId = loginUser.getSessionId();
+            Long userId = loginUser.getUserId();
             //删除用户缓存记录
             redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
+            //删除用户权限缓存
+            redisCache.deleteObject(RedisKeyConstant.PASSWORD_ERROR_COUNT + userId);
         }
         ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.success()));
     }

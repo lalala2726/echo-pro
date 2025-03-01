@@ -41,13 +41,13 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public AjaxResult httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
-        log.debug("请求方法不支持：{}", exception.toString());
+        log.error("请求方法不支持", exception);
         return AjaxResult.error(ResponseCode.NOT_SUPPORT);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public AjaxResult noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
-        log.debug("资源不存在：{}", exception.toString());
+        log.error("资源不存在：{}", exception.toString());
         String message = String.format("资源不存在: %s", request.getRequestURI());
         return AjaxResult.error(ResponseCode.NOT_FOUND, message);
     }
@@ -57,7 +57,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public AjaxResult illegalArgumentExceptionHandel(IllegalArgumentException exception) {
-        log.debug("请求参数非法: ", exception);
+        log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(AccountException.class)
     public AjaxResult accountExceptionExceptionHandel(AccountException exception) {
-        log.debug("认证异常", exception);
+        log.error("认证异常", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }
 
@@ -75,7 +75,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public AjaxResult InternalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
-        log.debug("认证失败:", exception);
+        log.error("认证失败:", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }
 
@@ -84,19 +84,19 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(LockedException.class)
     public AjaxResult lockedExceptionHandel(LockedException exception) {
-        log.debug("账号被锁定:", exception);
+        log.error("账号被锁定:", exception);
         return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
     @ExceptionHandler(ParamException.class)
     public AjaxResult paramExceptionHandel(ParamException exception) {
-        log.debug("参数异常:", exception);
+        log.error("参数异常:", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult accessDeniedExceptionHandel(AccessDeniedException exception) {
-        log.debug("权限不足:", exception);
+        log.error("权限不足:{}", exception.getMessage());
         return AjaxResult.error(ResponseCode.ACCESS_DENIED);
     }
 
@@ -105,7 +105,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(Exception.class)
     public AjaxResult exceptionHandel(Exception exception) {
-        log.debug("系统异常", exception);
+        log.error("系统异常", exception);
         return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
     }
 

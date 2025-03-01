@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.security.context.PermissionContextHolder;
+import cn.zhangchuangla.system.service.SysPermissionsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,12 @@ import java.util.Set;
 @Service("auth")
 public class PermissionAuth {
 
+    private final SysPermissionsService sysPermissionsService;
+
+    public PermissionAuth(SysPermissionsService sysPermissionsService) {
+        this.sysPermissionsService = sysPermissionsService;
+    }
+
     /**
      * 判断当前用户是否拥有指定的权限
      *
@@ -34,12 +41,8 @@ public class PermissionAuth {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (loginUser == null) {
-            return false;
-        }
-        log.info("用户 [{}] 权限校验开始，校验权限: {}", loginUser.getUsername(), permission);
+        Set<String> permissions = sysPermissionsService.getPermissionsByUserId(loginUser.getUserId());
         PermissionContextHolder.setContext(permission);
-        Set<String> permissions = loginUser.getPermissions();
         log.info("用户 [{}] 权限信息: {}", loginUser.getUsername(), permissions);
         log.debug("权限信息:{}", permissions);
         return isAllow(permissions, permission);
@@ -59,7 +62,8 @@ public class PermissionAuth {
         if (loginUser == null) {
             return false;
         }
-        Set<String> userPermissions = loginUser.getPermissions();
+        Long userId = loginUser.getUserId();
+        Set<String> userPermissions = sysPermissionsService.getPermissionsByUserId(userId);
         for (String permission : permissions) {
             if (userPermissions.contains(permission)) {
                 log.debug("用户 [{}] 至少拥有权限 [{}]，返回 true", loginUser.getUsername(), permission);
