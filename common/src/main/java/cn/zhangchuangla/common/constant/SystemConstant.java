@@ -47,5 +47,40 @@ public class SystemConstant {
      */
     public static final Integer ACCOUNT_UNLOCK_KEY = 0;
 
+    /**
+     * 登录成功
+     */
+    public static final Integer LOGIN_SUCCESS = 0;
 
+    /**
+     * 登录失败
+     */
+    public static final Integer LOGIN_FAIL = 1;
+
+
+    /**
+     * 系统创建
+     */
+    public static final String SYSTEM_CREATE = "系统自动创建";
+
+
+    /**
+     * 所有权限标识
+     */
+    public static final String ALL_PERMISSION = "*:*:*";
+
+    /**
+     * JWT用户名标识
+     */
+    public static final String USERNAME = "username";
+
+    /**
+     * 冒号
+     */
+    public static final String COLON = ":";
+
+    /**
+     * 用户权限缓存过期时间
+     */
+    public static final long CACHE_USER_PERMISSIONS_EXPIRE = 15;
 }

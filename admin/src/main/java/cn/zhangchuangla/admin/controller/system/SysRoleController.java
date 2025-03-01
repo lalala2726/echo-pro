@@ -13,11 +13,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 
 /**
+ * //todo 更改用户信息后需要刷新缓存,防止取消了用户的权限,还能继续操作
+ *
  * @author Chuang
  * <p>
  * created on 2025/1/12 10:55
@@ -30,14 +33,17 @@ public class SysRoleController {
     @Resource
     private SysRoleService sysRoleService;
 
+
     /**
      * 角色列表
      *
      * @param request 请求参数
      * @return 分页列表
      */
+
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
+    @PreAuthorize("@auth.hasPermission('system:role:list')")
     public AjaxResult list(@Parameter(name = "角色查询参数") SysRoleQueryRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysRole> page = sysRoleService.RoleList(request);
@@ -116,7 +122,7 @@ public class SysRoleController {
     @Operation(summary = "修改角色信息")
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
                                      @RequestBody SysRoleVo sysRoleVo) {
-        if (sysRoleVo == null || sysRoleVo.getId() == null) {
+        if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }
         SysRole sysRole = new SysRole();

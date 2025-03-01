@@ -17,4 +17,9 @@ public class RedisKeyConstant {
      * 用户登录密码错误次数前缀
      */
     public static final String PASSWORD_ERROR_COUNT = "password_error_count:";
+
+    /**
+     * 用户权限前缀
+     */
+    public static final String USER_PERMISSIONS = "user_permissions:";
 }

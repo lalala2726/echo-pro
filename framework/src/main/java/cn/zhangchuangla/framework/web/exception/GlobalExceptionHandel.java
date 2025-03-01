@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -40,7 +41,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public AjaxResult httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
-        log.error("请求方法不支持：{}", exception.toString());
+        log.error("请求方法不支持", exception);
         return AjaxResult.error(ResponseCode.NOT_SUPPORT);
     }
 
@@ -65,7 +66,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(AccountException.class)
     public AjaxResult accountExceptionExceptionHandel(AccountException exception) {
-        log.error("认证异常：{}", exception.toString());
+        log.error("认证异常", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }
 
@@ -91,6 +92,12 @@ public class GlobalExceptionHandel {
     public AjaxResult paramExceptionHandel(ParamException exception) {
         log.error("参数异常:", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public AjaxResult accessDeniedExceptionHandel(AccessDeniedException exception) {
+        log.error("权限不足:{}", exception.getMessage());
+        return AjaxResult.error(ResponseCode.ACCESS_DENIED);
     }
 
     /**

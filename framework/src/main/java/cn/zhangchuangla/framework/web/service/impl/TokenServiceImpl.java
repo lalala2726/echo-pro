@@ -1,13 +1,16 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
+import cn.zhangchuangla.common.config.LoginConfig;
 import cn.zhangchuangla.common.config.TokenConfig;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.framework.model.entity.LoginUser;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Token服务实现类
@@ -44,27 +48,43 @@ public class TokenServiceImpl implements TokenService {
 
     public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
         this.tokenConfig = tokenConfig;
-        // 从配置文件中读取密钥字符串并转换为SecretKey
-        this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));// 从配置文件中读取密钥字符串并转换为SecretKey
         this.redisCache = redisCache;
     }
 
+    private final ReentrantLock lock = new ReentrantLock();
+
+    /**
+     * 创建token
+     *
+     * @param loginUser 用户信息
+     * @param request   请求
+     * @return 返回创建的token
+     */
     @Override
     public String createToken(LoginUser loginUser, HttpServletRequest request) {
-        Map<String, Object> claims = new HashMap<>();
+        // 开始生成 token 并将用户信息存储在 Redis 中
         String uuid = UUID.randomUUID().toString();
+        Map<String, Object> claims = new HashMap<>();
         loginUser.setSessionId(uuid);
         claims.put(SystemConstant.LOGIN_USER_KEY, uuid);
-
         setUserAgent(loginUser, request);
+        // 将用户信息存储到 Redis 中
         refreshToken(loginUser);
-
+        // 返回 Token
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(key)
                 .compact();
     }
 
+
+    /**
+     * 获取登录设备基本信息
+     *
+     * @param loginUser 登录用户信息
+     * @param request   请求
+     */
     public void setUserAgent(LoginUser loginUser, HttpServletRequest request) {
         String ip = request.getRemoteAddr();//获取浏览器
         String header = request.getHeader("User-Agent");
@@ -75,7 +95,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
+     * 如果是新会话时候将用户基本信息存入到Redis中,如果是旧会话就重新刷新Token
      *
      * @param loginUser 登录信息
      */
@@ -89,8 +109,14 @@ public class TokenServiceImpl implements TokenService {
         redisCache.setCacheObject(userKey, loginUser, expire, TimeUnit.MINUTES);
     }
 
-    private String getTokenKey(String uuid) {
-        return RedisKeyConstant.LOGIN_TOKEN_KEY + uuid;
+    /**
+     * 根据uuid获取登录用户信息
+     *
+     * @param session  登录用户会话ID
+     * @return 登录用户信息
+     */
+    private String getTokenKey(String session) {
+        return RedisKeyConstant.LOGIN_TOKEN_KEY + session;
     }
 
     /**
@@ -162,13 +188,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public LoginUser getLoginUser(HttpServletRequest request) {
         String token = getToken(request);
-        if (StringUtils.isBlank(token)) {
-            return null;
+        if (!StringUtils.isBlank(token)) {
+            try {
+                Claims claims = parseToken(token);
+                String sessionId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
+                return getLoginUserByToken(sessionId);
+            } catch (Exception e) {
+                log.warn("获取用户信息失败:", e);
+            }
         }
-        Claims claims = parseToken(token);
-        String sessionId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
-        // 根据userId获取并返回LoginUser对象
-        return getLoginUserByToken(sessionId);
+        return null;
     }
 
     private LoginUser getLoginUserByToken(String sessionId) {
@@ -190,6 +219,9 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String getToken(HttpServletRequest request) {
         String header = tokenConfig.getHeader();
+        if (StringUtils.isBlank(header)) {
+            return null;
+        }
         return request.getHeader(header);
     }
 }

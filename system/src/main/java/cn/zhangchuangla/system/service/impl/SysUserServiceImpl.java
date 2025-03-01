@@ -2,8 +2,9 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.UserMapper;
-import cn.zhangchuangla.system.model.entity.SysUser;
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -131,6 +132,23 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser>
         LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysUserLambdaQueryWrapper.eq(username != null && !username.isEmpty(), SysUser::getUsername, username);
         return getOne(sysUserLambdaQueryWrapper);
+    }
+
+    /**
+     * 根据用户ID获取用户信息
+     *
+     * @param userId 用户ID
+     * @return 用户信息
+     */
+    @Override
+    public SysUser getUserInfoByUserId(Long userId) {
+        ParamsUtils.minValidParam(userId, "用户ID不能为空");
+        LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, userId);
+        SysUser one = getOne(sysUserLambdaQueryWrapper);
+        if (one == null) {
+            throw new ServiceException(ResponseCode.USER_NOT_EXIST);
+        }
+        return one;
     }
 }
 

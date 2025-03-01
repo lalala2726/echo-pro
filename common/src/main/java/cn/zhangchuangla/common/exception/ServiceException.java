@@ -27,4 +27,9 @@ public final class ServiceException extends RuntimeException {
         this.code = responseCode.getCode();
     }
 
+    public ServiceException(String message) {
+        super(message);
+        this.code = ResponseCode.ERROR.getCode();
+    }
+
 }

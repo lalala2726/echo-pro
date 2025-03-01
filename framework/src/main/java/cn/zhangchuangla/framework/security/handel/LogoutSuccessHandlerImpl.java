@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ServletUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.framework.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.ServletException;
@@ -47,12 +47,12 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (StringUtils.isNotNull(loginUser)) {
             String sessionId = loginUser.getSessionId();
+            Long userId = loginUser.getUserId();
             //删除用户缓存记录
             redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
-            //记录用户退出日志
-            //todo 记录用户退出日志
+            //删除用户权限缓存
+            redisCache.deleteObject(RedisKeyConstant.PASSWORD_ERROR_COUNT + userId);
         }
-        //删除在Redis中存放的token
         ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.success()));
     }
 }

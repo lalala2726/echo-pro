@@ -1,3 +1,13 @@
+app:
+  config:
+    name: 后台管理系统
+    author: zhangchuang
+    version: alpha 0.1
+    description: 基本后台管理系统，采用SpringBoot3+SpringSecurity+MybatisPlus+Redis+MySQL+Minio等技术栈开发
+    copyright: Copyright © 2024-2025 zhangchuang All Rights Reserved.
+    upload-path: /Users/zhangchuang/DevelopFileUpload
+    ip-address-enable: false
+    strictLoginEnable: false
 #开发环境数据库文件
 server:
   port: 8080
@@ -17,13 +27,14 @@ spring:
     redis:
       host: 192.168.1.110
       port: 6379
+      database: 0
       password: zhangchuang2726
-      database: 8
 
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: com.zhangchuang.**.entity
+  mapper-locations: classpath*:system/*Mapper.xml
   global-config:
     db-config:
       logic-delete-field: is_deleted  # 全局逻辑删除字段名
@@ -46,11 +57,6 @@ minio:
   accessKey: cwytEbLXyBo2Tul2C9OZ
   secretKey: UGGQUnHCjjooNlrZZfO1WCNEB1OvCriYOWX47Oi5
   bucketName: bed
-app:
-  config:
-    upload-path: /Users/zhangchuang/DevelopFileUpload
-    ip-address-enable: true
-    strictLoginEnable: true
 token:
   expire: 300000
   secret: zhangchuang2726zhangchuang2726zhangchuang2726
@@ -59,3 +65,6 @@ user:
   password:
     lock-time: 3
     max-retry-count: 5
+  login:
+    #最大登录会话数,0代表不限制,过大的会话数会影响登录性能
+    max-login-session: 0

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.system.model.entity.SysUser;
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -56,4 +56,12 @@ public interface SysUserService extends IService<SysUser> {
      * @return 返回用户信息
      */
     SysUser getSysUserByUsername(String username);
+
+    /**
+     * 根据用户ID查询用户信息
+     *
+     * @param userId 用户ID
+     * @return 用户信息
+     */
+    SysUser getUserInfoByUserId(Long userId);
 }

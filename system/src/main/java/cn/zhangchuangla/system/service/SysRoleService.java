@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author zhangchuang
@@ -28,4 +29,13 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 角色列表
      */
     List<SysRole> getRoleListByUserId(Long userId);
+
+
+    /**
+     * 根据用户id获取角色
+     *
+     * @param userId 用户ID
+     * @return 返回Set集合
+     */
+    Set<String> getUserRoleSet(Long userId);
 }

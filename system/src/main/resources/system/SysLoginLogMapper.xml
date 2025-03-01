@@ -6,7 +6,8 @@
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysLoginLog">
         <id property="id" column="id"/>
-        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="status" column="status"/>
         <result property="ip" column="ip"/>
         <result property="address" column="address"/>
         <result property="browser" column="browser"/>

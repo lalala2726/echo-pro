@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/logout").permitAll()  // 明确允许登录和注册接口
                         .requestMatchers("/").permitAll()  // 允许所有请求，包括根路径和所有子路径
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**").permitAll()  // Swagger相关资源
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**").permitAll()  // Swagger相关资源
                         // 静态资源允许访问
                         .requestMatchers("/static/**", "/profile/**", "/**.html", "/**.css", "/**.js", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()  // 其他请求需要认证

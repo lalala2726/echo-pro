@@ -41,6 +41,4 @@ public class SysRole extends BaseEntity {
      */
     @Schema(description = "显示顺序")
     private Integer roleSort;
-
-
 }

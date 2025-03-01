@@ -25,7 +25,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public List<SysUserRole> getUserRoleByUserId(Long userId) {
-        ParamsUtils.paramNotIsZeroOrBlank(userId, "用户ID不能小于等于零");
+        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
         LambdaQueryWrapper<SysUserRole> sysUserRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysUserRoleLambdaQueryWrapper.eq(SysUserRole::getUserId, userId);
         return list(sysUserRoleLambdaQueryWrapper);

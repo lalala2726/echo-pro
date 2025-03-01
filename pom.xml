@@ -35,6 +35,7 @@
         <okhttp.version>4.12.0</okhttp.version>
         <spring.security.version>5.6.0</spring.security.version>
         <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
+
     </properties>
 
     <dependencies>
@@ -59,7 +60,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
             <!-- Spring Boot Starters -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

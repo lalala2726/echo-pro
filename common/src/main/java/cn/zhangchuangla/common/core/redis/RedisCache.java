@@ -1,24 +1,20 @@
 package cn.zhangchuangla.common.core.redis;
 
-/**
- * 来源:https://juejin.cn/post/7434486457035505699
- *
- * @author db
- * @version 1.0
- * @description RedisCache
- * @since 2024/9/22
- */
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.RedisKeyCommands;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 @Component
 public class RedisCache {
@@ -29,6 +25,7 @@ public class RedisCache {
     public RedisCache(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
+
 
     /**
      * 缓存基本的对象，Integer、String、实体类等
@@ -51,6 +48,18 @@ public class RedisCache {
     public <T> void setCacheObject(final String key, final T value, final Long timeout, final TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
+
+    /**
+     * 缓存基本的对象，Integer、String、实体类等
+     *
+     * @param key     key
+     * @param value   value
+     * @param timeout 超时时间
+     */
+    public <T> void setCacheObject(final String key, final T value, final Long timeout) {
+        redisTemplate.opsForValue().set(key, value, timeout);
+    }
+
 
     /**
      * 设置有效时间
@@ -85,6 +94,139 @@ public class RedisCache {
         ValueOperations<String, T> operation = redisTemplate.opsForValue();
         return operation.get(key);
     }
+
+
+    /**
+     * 根据前缀从Redis中获取字段（Keys）
+     *
+     * @param keyPrefix Redis 的Key前缀（如 "user:"）
+     * @param limit     限制返回的字段数量
+     * @param <T>       返回值的泛型
+     * @return 返回符合条件的字段和值
+     */
+    @Deprecated
+    public <T> Map<String, T> fetchFieldsByPrefix(final String keyPrefix, final int limit) {
+        log.info("Fetching fields from Redis with prefix: {} and limit: {}", keyPrefix, limit);
+        Map<String, T> result = new HashMap<>();
+
+        // 使用 Redis scan 避免全量 keys 查询
+        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(limit).build();
+
+        // 使用 RedisTemplate 执行 scan 操作
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            RedisKeyCommands keyCommands = connection.keyCommands();
+            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
+                while (cursor.hasNext()) {
+                    byte[] keyBytes = cursor.next();
+                    String key = new String(keyBytes);
+                    Object value = redisTemplate.opsForValue().get(key);
+
+                    if (value != null) {
+                        result.put(key, (T) value);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Error while fetching fields from Redis", e);
+            }
+            return null;
+        });
+        return result;
+    }
+
+    /**
+     * 根据前缀统计 Redis 中的键数量
+     *
+     * @param keyPrefix Redis 键前缀（如 "user:"）
+     * @return 匹配的键数量
+     */
+    @Deprecated
+    public long countKeysByPrefix(final String keyPrefix) {
+        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(1000).build();
+
+        // 使用 RedisTemplate 执行 scan 操作并统计键数量
+        Long count = (Long) redisTemplate.execute((RedisCallback<Long>) connection -> {
+            RedisKeyCommands keyCommands = connection.keyCommands();
+            AtomicInteger counter = new AtomicInteger();
+
+            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
+                while (cursor.hasNext()) {
+                    cursor.next();
+                    counter.incrementAndGet();
+                }
+            } catch (Exception e) {
+                log.error("Error while counting keys from Redis", e);
+            }
+            return (long) counter.get();
+        });
+        if (count == null) {
+            throw new RuntimeException("无法正常执行本次操作!");
+        }
+        return count;
+    }
+
+    /**
+     * 获取Redis中指定前缀的最早登录信息
+     *
+     * @param keyPrefix Redis 的Key前缀（如 "user:"）
+     * @return 返回符合条件的字段和值
+     */
+    @Deprecated()
+    @SuppressWarnings("unchecked")
+    public String fetchAndDeleteEarliestLoginByPrefix(final String keyPrefix) {
+        log.info("开始扫描最早登录的前缀信息:{}", keyPrefix);
+        HashMap<String, LoginUser> loginUserHashMap = new HashMap<>();
+        // 使用 Redis scan 避免全量 keys 查询
+        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(1000).build();
+
+        // 使用 RedisTemplate 执行 scan 操作
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            RedisKeyCommands keyCommands = connection.keyCommands();
+            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
+                while (cursor.hasNext()) {
+                    byte[] keyBytes = cursor.next();
+                    String key = new String(keyBytes);
+                    Object object = redisTemplate.opsForValue().get(key);
+                    if (object != null) {
+                        LoginUser loginUser = convertToLoginUser(object);
+                        if (loginUser != null) {
+                            loginUserHashMap.put(key, loginUser);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("从Redis中获取字段出错", e);
+            }
+            return null;
+        });
+        // 找到最早的登录用户
+        String earliestKey = loginUserHashMap.entrySet().stream()
+                .min(Comparator.comparingLong(entry -> entry.getValue().getLoginTime()))
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        if (earliestKey != null) {
+            loginUserHashMap.remove(earliestKey);
+        }
+        return earliestKey;
+    }
+
+    /**
+     * 将 Redis 值转换为 LoginUser 对象
+     *
+     * @param value Redis 值
+     * @return LoginUser
+     */
+    private LoginUser convertToLoginUser(Object value) {
+        if (value instanceof LoginUser) {
+            return (LoginUser) value;
+        } else if (value instanceof JSONObject) {
+            return ((JSONObject) value).toJavaObject(LoginUser.class);
+        } else if (value instanceof String) {
+            return JSON.parseObject((String) value, LoginUser.class);
+        }
+        return null;
+    }
+
 
     /**
      * 删除单个对象
@@ -247,4 +389,5 @@ public class RedisCache {
     public Long getKeyExpire(String key) {
         return redisTemplate.getExpire(key);
     }
+
 }

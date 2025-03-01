@@ -13,11 +13,37 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class AppConfig {
 
+
+    /**
+     * 系统名称
+     */
+    private String name;
+
+    /**
+     * 系统版本
+     */
+    private String version;
+
+    /**
+     * 系统作者
+     */
+    private String author;
+
+    /**
+     * 系统描述
+     */
+    private String description;
+
+    /**
+     * 系统版权
+     */
+    private String copyright;
+
+
     /**
      * 本地上传路径
      */
     private String uploadPath;
-
 
     /**
      * 是否开启ip地址解析

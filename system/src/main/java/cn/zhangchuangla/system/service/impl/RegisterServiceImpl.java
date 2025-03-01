@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.system.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.RegisterRequest;
 import cn.zhangchuangla.system.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -33,19 +33,16 @@ public class RegisterServiceImpl implements RegisterService {
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new ParamException(ResponseCode.PARAM_ERROR);
         }
-        //fixme 这边需要完善
-        // 加密密码
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
+        //fixme 优化注册流程
         // 创建用户对象
         SysUser user = new SysUser();
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
         user.setCreateTime(new Date());
         user.setStatus(0); // 0-正常 1-停用
-
         sysUserService.save(user);
-
         return user.getUserId();
     }
 }
