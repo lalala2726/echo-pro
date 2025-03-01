@@ -1,3 +1,13 @@
+app:
+  config:
+    name: 后台管理系统
+    author: zhangchuang
+    version: alpha 0.1
+    description: 基本后台管理系统，采用SpringBoot3+SpringSecurity+MybatisPlus+Redis+MySQL+Minio等技术栈开发
+    copyright: Copyright © 2024-2025 zhangchuang All Rights Reserved.
+    upload-path: /Users/zhangchuang/DevelopFileUpload
+    ip-address-enable: false
+    strictLoginEnable: false
 #开发环境数据库文件
 server:
   port: 8080
@@ -8,16 +18,17 @@ spring:
       max-request-size: 1024MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/person_app?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://192.168.1.110:3306/person_app?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username: root
     password: zhangchuang2726
 
     #开启日志Mybatis-plus日志
   data:
     redis:
-      host: localhost
+      host: 192.168.1.110
       port: 6379
       database: 0
+      password: zhangchuang2726
 
 mybatis-plus:
   configuration:
@@ -46,11 +57,6 @@ minio:
   accessKey: cwytEbLXyBo2Tul2C9OZ
   secretKey: UGGQUnHCjjooNlrZZfO1WCNEB1OvCriYOWX47Oi5
   bucketName: bed
-app:
-  config:
-    upload-path: /Users/zhangchuang/DevelopFileUpload
-    ip-address-enable: true
-    strictLoginEnable: true
 token:
   expire: 300000
   secret: zhangchuang2726zhangchuang2726zhangchuang2726

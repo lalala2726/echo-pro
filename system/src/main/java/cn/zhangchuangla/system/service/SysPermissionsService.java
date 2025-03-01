@@ -28,4 +28,11 @@ public interface SysPermissionsService extends IService<SysPermissions> {
      * @return 返回用户权限集合
      */
     Set<String> getPermissionsByUserId(Long id);
+
+    /**
+     * 保存用户权限到Redis
+     *
+     * @param userId      用户ID
+     */
+    void saveUserPermissionsToRedis(Long userId, final long expireTime);
 }

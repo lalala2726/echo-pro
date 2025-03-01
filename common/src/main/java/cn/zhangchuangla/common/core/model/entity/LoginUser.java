@@ -28,11 +28,7 @@ public class LoginUser implements UserDetails, Serializable {
 
     public LoginUser() {
     }
-
-    public LoginUser(SysUser sysUser, Set<String> permissions) {
-        this.sysUser = sysUser;
-        this.permissions = permissions;
-    }
+    
 
     public LoginUser(SysUser sysUser) {
         this.sysUser = sysUser;
@@ -44,10 +40,6 @@ public class LoginUser implements UserDetails, Serializable {
      */
     private SysUser sysUser;
 
-    /**
-     * 权限信息
-     */
-    private Set<String> permissions;
 
     /**
      * 用户ID

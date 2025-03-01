@@ -2,17 +2,22 @@ package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
+import cn.zhangchuangla.system.model.vo.UserInfoVo;
+import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,13 +35,13 @@ import java.util.HashMap;
 public class LoginController {
 
 
-    private final RedisCache redisCache;
-
     private final SysLoginService sysLoginService;
 
-    public LoginController(RedisCache redisCache, SysLoginService sysLoginService) {
-        this.redisCache = redisCache;
+    private final SysUserService sysUserService;
+
+    public LoginController(SysLoginService sysLoginService, SysUserService sysUserService) {
         this.sysLoginService = sysLoginService;
+        this.sysUserService = sysUserService;
     }
 
 
@@ -64,16 +69,21 @@ public class LoginController {
         return AjaxResult.success(map);
     }
 
+
     /**
-     * 退出登录
+     * 获取用户信息
+     *
+     * @return 用户信息
      */
-    @PostMapping("/logout")
-    @Operation(summary = "退出登录")
-    public AjaxResult logout() {
+    @GetMapping("/getUserInfo")
+    @Operation(summary = "获取用户信息")
+    public AjaxResult getInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        Long id = loginUser.getSysUser().getUserId();
-        redisCache.deleteObject("login:" + id);
-        return AjaxResult.success();
+        SysUser sysUser = sysUserService.getUserInfoByUserId(loginUser.getUserId());
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(sysUser, userInfoVo);
+        return AjaxResult.success(userInfoVo);
     }
+
 }

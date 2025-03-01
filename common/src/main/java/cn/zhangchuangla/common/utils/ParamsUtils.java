@@ -18,7 +18,7 @@ public class ParamsUtils {
      *
      * @param param 参数
      */
-    public static void paramNotIsZeroOrBlank(Integer param, String message) {
+    public static void minValidParam(Integer param, String message) {
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }
@@ -29,7 +29,7 @@ public class ParamsUtils {
      *
      * @param param 参数
      */
-    public static void paramNotIsZeroOrBlank(Long param, String message) {
+    public static void minValidParam(Long param, String message) {
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }
@@ -40,7 +40,7 @@ public class ParamsUtils {
      *
      * @param param 参数
      */
-    public static void paramNotIsZeroOrBlank(Integer param) {
+    public static void minValidParam(Integer param) {
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "参数不能为小于等于零");
         }
@@ -51,7 +51,7 @@ public class ParamsUtils {
      *
      * @param param 参数
      */
-    public static void paramNotIsZeroOrBlank(Long param) {
+    public static void minValidParam(Long param) {
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "参数不能为小于等于零");
         }

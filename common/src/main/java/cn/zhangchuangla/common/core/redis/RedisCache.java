@@ -50,6 +50,18 @@ public class RedisCache {
     }
 
     /**
+     * 缓存基本的对象，Integer、String、实体类等
+     *
+     * @param key     key
+     * @param value   value
+     * @param timeout 超时时间
+     */
+    public <T> void setCacheObject(final String key, final T value, final Long timeout) {
+        redisTemplate.opsForValue().set(key, value, timeout);
+    }
+
+
+    /**
      * 设置有效时间
      *
      * @param key     Redis键
@@ -92,6 +104,7 @@ public class RedisCache {
      * @param <T>       返回值的泛型
      * @return 返回符合条件的字段和值
      */
+    @Deprecated
     public <T> Map<String, T> fetchFieldsByPrefix(final String keyPrefix, final int limit) {
         log.info("Fetching fields from Redis with prefix: {} and limit: {}", keyPrefix, limit);
         Map<String, T> result = new HashMap<>();
@@ -126,6 +139,7 @@ public class RedisCache {
      * @param keyPrefix Redis 键前缀（如 "user:"）
      * @return 匹配的键数量
      */
+    @Deprecated
     public long countKeysByPrefix(final String keyPrefix) {
         ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(1000).build();
 

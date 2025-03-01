@@ -78,4 +78,9 @@ public class SystemConstant {
      * 冒号
      */
     public static final String COLON = ":";
+
+    /**
+     * 用户权限缓存过期时间
+     */
+    public static final long CACHE_USER_PERMISSIONS_EXPIRE = 15;
 }

@@ -1,7 +1,10 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -11,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Chuang
@@ -22,11 +26,9 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final SysUserService sysUserService;
-    private final SysPermissionsService sysPermissionsService;
 
-    public UserDetailsServiceImpl(SysUserService sysUserService, SysPermissionsService sysPermissionsService) {
+    public UserDetailsServiceImpl(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
-        this.sysPermissionsService = sysPermissionsService;
     }
 
 
@@ -43,8 +45,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.error("用户名:{},不存在", username);
             throw new LoginException("账号或者密码错误");
         }
-        Set<String> permissions = sysPermissionsService.getPermissionsByUserId(sysUser.getUserId());
-        return new LoginUser(sysUser, permissions);
+        return new LoginUser(sysUser);
     }
 
+
 }
+

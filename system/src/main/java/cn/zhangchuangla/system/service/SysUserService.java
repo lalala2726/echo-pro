@@ -56,4 +56,12 @@ public interface SysUserService extends IService<SysUser> {
      * @return 返回用户信息
      */
     SysUser getSysUserByUsername(String username);
+
+    /**
+     * 根据用户ID查询用户信息
+     *
+     * @param userId 用户ID
+     * @return 用户信息
+     */
+    SysUser getUserInfoByUserId(Long userId);
 }
