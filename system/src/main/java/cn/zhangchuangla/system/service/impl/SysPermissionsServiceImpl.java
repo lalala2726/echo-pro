@@ -94,7 +94,7 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
             userPermissions.setPermissions(permissions);
             redisCache.setCacheObject(RedisKeyConstant.USER_PERMISSIONS + userId, userPermissions, expireTime, TimeUnit.DAYS);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("保存用户权限到Redis失败", e);
         }
     }
 }

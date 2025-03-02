@@ -13,22 +13,33 @@
     <version>1.0</version>
 
     <dependencies>
-
         <dependency>
-            <groupId>cn.zhangchuangla.app</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>framework</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>cn.zhangchuangla.app</groupId>
-            <artifactId>common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.zhangchuangla.app</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>system</artifactId>
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

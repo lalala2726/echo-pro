@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = "欢迎页")
 @RestController
-@RequestMapping("/")
 public class AppController {
 
     private final AppConfig appConfig;
@@ -26,7 +24,7 @@ public class AppController {
     /**
      * 欢迎页
      */
-    @GetMapping
+    @GetMapping("/")
     @Schema(name = "欢迎页")
     public AjaxResult getAppConfig() {
         String name = appConfig.getName();

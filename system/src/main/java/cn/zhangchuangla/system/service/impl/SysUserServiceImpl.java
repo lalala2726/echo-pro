@@ -1,22 +1,30 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
-import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.AddUserRequest;
 import cn.zhangchuangla.system.model.request.UserRequest;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         implements SysUserService {
+
+    private final SysUserMapper sysUserMapper;
+
+    public SysUserServiceImpl(SysUserMapper sysUserMapper) {
+        this.sysUserMapper = sysUserMapper;
+    }
 
 
     /**
@@ -27,9 +35,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public Page<SysUser> UserList(UserRequest request) {
-
-        //fixme 采用更加简介明了的学法，如果超3次查询语句，就直接使用Mybatis原生的查询语句
-        return this.page(new Page<>(request.getPageNum(), request.getPageSize()));
+        Page<SysUser> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
+        log.info("查询参数: {}", request);
+        return sysUserMapper.UserList(sysUserPage, request);
     }
 
     /**
@@ -103,7 +111,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public SysUser getSysUserByUsername(String username) {
         LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysUserLambdaQueryWrapper.eq(username != null && !username.isEmpty(), SysUser::getUsername, username);
-        return getOne(sysUserLambdaQueryWrapper);
+        SysUser user = getOne(sysUserLambdaQueryWrapper);
+        if (user == null) {
+            throw new ServiceException(ResponseCode.USER_NOT_EXIST);
+        }
+        return user;
     }
 
     /**

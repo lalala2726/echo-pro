@@ -65,16 +65,24 @@ public class SysLoginServiceImpl implements SysLoginService {
         } catch (AuthenticationException e) {
             log.warn("用户名:{},密码错误!", requestParams.getUsername());
             sysPasswordService.PasswordErrorCount(requestParams.getUsername());
-            //记录登录失败日志
             sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_FAIL);
             throw new AccountException(ResponseCode.PASSWORD_FORMAT_ERROR, "用户名或密码错误");
+        } catch (Exception e) {
+            log.warn("服务器发生异常:", e);
         } finally {
             AuthenticationContextHolder.clearContext();
         }
         // 获取用户信息
-        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-        Long userId = loginUser.getSysUser().getUserId();
-        loginUser.setUserId(userId);
+        LoginUser loginUser = null;
+        if (authenticate != null) {
+            loginUser = (LoginUser) authenticate.getPrincipal();
+        }
+        //fixme 将基本的信息提取出来后传入LoginUser中
+        Long userId = null;
+        if (loginUser != null) {
+            userId = loginUser.getSysUser().getUserId();
+            loginUser.setUserId(userId);
+        }
         log.info("登录用户信息: {}", loginUser);
         //记录登录成功日志
         sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_SUCCESS);

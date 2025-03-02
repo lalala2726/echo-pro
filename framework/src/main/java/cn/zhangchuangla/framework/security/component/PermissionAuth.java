@@ -87,10 +87,6 @@ public class PermissionAuth {
         if (loginUser == null) {
             return false;
         }
-        Set<String> roles = loginUser.getRoles();
-        for (String loginUserRole : roles) {
-            return role.equals(loginUserRole);
-        }
         return false;
     }
 

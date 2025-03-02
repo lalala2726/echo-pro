@@ -65,7 +65,7 @@ public class GlobalExceptionHandel {
      * 认证异常
      */
     @ExceptionHandler(AccountException.class)
-    public AjaxResult accountExceptionExceptionHandel(AccountException exception) {
+    public AjaxResult accountExceptionExceptionHandel(Exception exception) {
         log.error("认证异常", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysUserMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.model.entity.SysUser">
+        <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+    <select id="UserList" resultMap="BaseResultMap">
+        select * from sys_user
+        <where>
+            <if test="user != null">
+                <if test="user.username != null and user.username != ''">
+                    and username like concat('%', #{user.username}, '%')
+                </if>
+                <if test="user.nickName != null and user.nickName != ''">
+                    and nick_name like concat('%', #{user.nickName}, '%')
+                </if>
+                <if test="user.email != null and user.email != ''">
+                    and email like concat('%', #{user.email}, '%')
+                </if>
+                <if test="user.phone != null and user.phone != ''">
+                    and phone like concat('%', #{user.phone}, '%')
+                </if>
+                <if test="user.gender != null">
+                    and gender = #{user.gender}
+                </if>
+                <if test="user.status != null">
+                    and status = #{user.status}
+                </if>
+                <if test="user.remark != null and user.remark != ''">
+                    and remark like concat('%', #{user.remark}, '%')
+                </if>
+            </if>
+            and is_deleted = 0
+        </where>
+    </select>
+</mapper>

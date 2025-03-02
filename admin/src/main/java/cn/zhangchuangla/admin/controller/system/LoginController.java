@@ -3,7 +3,6 @@ package cn.zhangchuangla.admin.controller.system;
 import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysLoginService;

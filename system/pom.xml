@@ -14,9 +14,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.zhangchuangla.app</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- no more than 2.3.3-->

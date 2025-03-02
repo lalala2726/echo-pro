@@ -30,8 +30,8 @@
         <sa-token.version>1.39.0</sa-token.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <minio.version>8.5.12</minio.version>
-        <reids.version>3.4.0</reids.version>
-        <alibaba.fastjson.version>1.2.50</alibaba.fastjson.version>
+        <redis.version>3.2.1</redis.version>
+        <alibaba.fastjson.version>${fastjson.version}</alibaba.fastjson.version>
         <okhttp.version>4.12.0</okhttp.version>
         <spring.security.version>5.6.0</spring.security.version>
         <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
@@ -116,7 +116,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${reids.version}</version>
+                <version>${redis.version}</version>
             </dependency>
 
             <!-- 阿里云OSS -->
@@ -174,21 +174,4 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
