@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
-import cn.zhangchuangla.system.model.request.AddUserRequest;
-import cn.zhangchuangla.system.model.request.UserRequest;
+import cn.zhangchuangla.system.model.request.user.AddUserRequest;
+import cn.zhangchuangla.system.model.request.user.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 

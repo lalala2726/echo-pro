@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.request;
+package cn.zhangchuangla.system.model.request.role;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

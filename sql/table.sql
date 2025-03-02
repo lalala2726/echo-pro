@@ -99,8 +99,8 @@ CREATE TABLE sys_operation_log
     create_time    DATETIME(6) COMMENT '操作时间'
 ) COMMENT '操作日志表';
 
-drop table sys_login_log;
 
+#系统登录日志
 CREATE TABLE sys_login_log
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
@@ -117,4 +117,33 @@ CREATE TABLE sys_login_log
     is_deleted  INT      DEFAULT 0 COMMENT '是否删除',
     remark      TEXT COMMENT '备注'
 ) COMMENT ='系统登录日志';
+
+-- 字典表 (存储字典的分类)
+CREATE TABLE dictionary
+(
+    id          INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+    name        VARCHAR(100) unique NOT NULL COMMENT '字典名称',
+    description VARCHAR(255) DEFAULT NULL COMMENT '描述',
+    create_time DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by   VARCHAR(100) COMMENT '创建人',
+    update_by   VARCHAR(100) COMMENT '更新人',
+    remark      TEXT COMMENT '备注'
+) comment '字典表';
+
+-- 字典值表 (存储具体的字典项)
+CREATE TABLE dictionary_item
+(
+    id            INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+    dictionary_id VARCHAR(50)  NOT NULL COMMENT '字典编码',
+    item_key      VARCHAR(50)  NOT NULL COMMENT '字典项键',
+    item_value    VARCHAR(100) NOT NULL COMMENT '字典项值',
+    sort_order    INT        DEFAULT 0 COMMENT '排序',
+    status        TINYINT(1) DEFAULT 0 COMMENT '状态 (0: 启用, 1: 禁用)',
+    create_time   DATETIME   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time   DATETIME   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by     VARCHAR(100) COMMENT '创建人',
+    update_by     VARCHAR(100) COMMENT '更新人',
+    remark        TEXT COMMENT '备注'
+) comment '字典值表';
 

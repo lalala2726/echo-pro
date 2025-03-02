@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
-import cn.zhangchuangla.system.model.request.UserRequest;
+import cn.zhangchuangla.system.model.request.user.UserRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;

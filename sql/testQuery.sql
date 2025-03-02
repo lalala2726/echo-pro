@@ -13,6 +13,4 @@ FROM sys_permissions permissions
               ON role_permissions.role_id = sys_role.role_id
 WHERE sys_role.role_key = 'admin';
 
-delete
-from sys_user
-where user_id >= 6;
+update sys_user set is_deleted = 0 where 1=1;

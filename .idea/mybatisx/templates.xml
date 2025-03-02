@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysUserRole" />
-                  <option name="tableName" value="sys_user_role" />
+                  <option name="className" value="DictionaryItem" />
+                  <option name="tableName" value="dictionary_item" />
                 </TableUIInfo>
               </list>
             </option>
