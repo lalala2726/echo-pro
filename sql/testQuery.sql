@@ -11,4 +11,8 @@ FROM sys_permissions permissions
               ON permissions.permission_id = role_permissions.permission_id
          JOIN sys_role
               ON role_permissions.role_id = sys_role.role_id
-WHERE sys_role.role_key = 'admin'
+WHERE sys_role.role_key = 'admin';
+
+delete
+from sys_user
+where user_id >= 6;

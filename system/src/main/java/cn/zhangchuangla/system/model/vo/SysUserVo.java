@@ -17,7 +17,7 @@ public class SysUserVo extends BaseVO {
      * ID
      */
     @Schema(description = "用户ID")
-    private Long id;
+    private Long userId;
 
     /**
      * 用户名

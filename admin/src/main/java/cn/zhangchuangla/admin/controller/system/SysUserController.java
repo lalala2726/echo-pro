@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Tag(name = "用户管理接口")
 @RestController
-@RequestMapping("/admin/user")
+@RequestMapping("/system/user")
 public class SysUserController {
 
     @Resource
