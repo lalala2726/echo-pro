@@ -15,4 +15,17 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
+    <select id="getDictionaryList" resultMap="BaseResultMap">
+        select *
+        from dictionary
+        <where>
+            <if test="request.name != null and  request.name != ''">
+                and `name` like concat('%',#{request.name},'%')
+            </if>
+            <if test="request.description != null and request.description != ''">
+                and `description` like concat('%',#{request.description},'%')
+            </if>
+        </where>
+    </select>
+
 </mapper>

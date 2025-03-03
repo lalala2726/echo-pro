@@ -36,7 +36,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     @Override
     public Page<SysUser> UserList(UserRequest request) {
         Page<SysUser> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
-        log.info("查询参数: {}", request);
         return sysUserMapper.UserList(sysUserPage, request);
     }
 

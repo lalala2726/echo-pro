@@ -1,16 +1,17 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.Dictionary;
+import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 /**
-* @author zhangchuang
-* @description 针对表【dictionary(字典表)】的数据库操作Mapper
-* @createDate 2025-03-02 23:02:05
-* @Entity cn.zhangchuangla.system.model.entity.Dictionary
-*/
+ * @author zhangchuang
+ */
 public interface DictionaryMapper extends BaseMapper<Dictionary> {
 
+    Page<Dictionary> getDictionaryList(Page<Dictionary> dictionaryPage, @Param("request") DictionaryRequest request);
 }
 
 

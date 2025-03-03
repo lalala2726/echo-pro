@@ -1,10 +1,10 @@
-package cn.zhangchuangla.system.service.impl;
+package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.system.model.request.RegisterRequest;
-import cn.zhangchuangla.system.service.RegisterService;
+import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo;
+package cn.zhangchuangla.system.model.vo.user;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

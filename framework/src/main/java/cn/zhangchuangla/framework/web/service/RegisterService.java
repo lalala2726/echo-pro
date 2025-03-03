@@ -1,6 +1,7 @@
-package cn.zhangchuangla.system.service;
+package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.system.model.request.RegisterRequest;
+
+import cn.zhangchuangla.framework.model.request.RegisterRequest;
 
 /**
  * 注册服务

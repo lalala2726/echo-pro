@@ -2,7 +2,7 @@ package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
-import cn.zhangchuangla.system.service.RegisterService;
+import cn.zhangchuangla.framework.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

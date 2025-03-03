@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo;
+package cn.zhangchuangla.system.model.vo.permission;
 
 import cn.zhangchuangla.common.base.BaseVO;
 import com.baomidou.mybatisplus.annotation.IdType;

@@ -1,14 +1,15 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
+import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.RegularUtils;
-import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
-import cn.zhangchuangla.system.model.vo.SysUserVo;
+import cn.zhangchuangla.system.model.vo.permission.SysUserVo;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,25 +56,11 @@ public class SysUserController {
      * 添加用户
      * 需要特定角色才能访问
      */
-    @PostMapping("/add")
+    @PostMapping()
     @Operation(summary = "添加用户")
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @RequestBody @Validated AddUserRequest request) {
-        String validationError = validateUserRequest(request);
-        if (validationError != null) {
-            return getError(validationError);
-        }
-
-        if (sysUserService.isUsernameExist(request.getUsername())) {
-            return AjaxResult.error("用户名已存在");
-        }
-        if (sysUserService.isEmailExist(request.getEmail())) {
-            return AjaxResult.error("邮箱已存在");
-        }
-        if (sysUserService.isPhoneExist(request.getPhone())) {
-            return AjaxResult.error("手机号已存在");
-        }
-
+        ParamsUtils.objectIsNull(request, "参数不能为空!");
         return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
     }
 

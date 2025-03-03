@@ -4,6 +4,8 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 /**
  * @author Chuang
  * <p>
@@ -31,6 +33,17 @@ public class ParamsUtils {
      */
     public static void minValidParam(Long param, String message) {
         if (param <= 0) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, message);
+        }
+    }
+
+    /**
+     * 参数不能为空和小于等于0
+     *
+     * @param param 参数
+     */
+    public static void minValidParam(List<Long> param, String message) {
+        if (param == null || param.isEmpty() || param.stream().anyMatch(p -> p <= 0)) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }
     }
@@ -69,6 +82,18 @@ public class ParamsUtils {
             if (param == null || param.isEmpty()) {
                 throw new ParamException(ResponseCode.PARAM_ERROR, message);
             }
+        }
+    }
+
+    /**
+     * 对象不能为空
+     *
+     * @param object  对象
+     * @param message 错误提示信息
+     */
+    public static void objectIsNull(Object object, String message) {
+        if (object == null) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }
     }
 

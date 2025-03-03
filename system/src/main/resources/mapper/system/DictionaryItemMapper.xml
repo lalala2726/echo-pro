@@ -17,5 +17,41 @@
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
+    <delete id="deleteDictionaryItem">
+        delete from dictionary_item
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="dictionaryItemList" resultMap="BaseResultMap">
+        select *
+        from dictionary_item
+        <where>
+            <if test="request.dictionaryId != null">
+                AND dictionary_id = #{dictionaryId}
+            </if>
+            <if test="request.itemKey != null and request.itemKey != ''">
+                AND item_key LIKE CONCAT('%', #{itemKey}, '%')
+            </if>
+            <if test="request.itemValue != null and request.itemValue != ''">
+                AND item_value LIKE CONCAT('%', #{itemValue}, '%')
+            </if>
+            <if test="request.status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="dictionaryItemService" resultMap="BaseResultMap">
+        select dictionary_item.dictionary_id,
+               dictionary_item.item_key,
+               dictionary_item.item_value,
+               dictionary_item.create_by,
+               dictionary_item.update_by,
+               dictionary_item.remark
+        from dictionary_item
+                 join dictionary d on d.id = dictionary_item.dictionary_id
+        where d.name = #{dictionaryName}
+    </select>
 
 </mapper>
