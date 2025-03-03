@@ -14,9 +14,8 @@ FROM sys_permissions permissions
 WHERE sys_role.role_key = 'admin';
 
 update sys_user
-set is_deleted = 0
+set status = 0
 where 1 = 1;
 
 
-SELECT COUNT(*) AS total
-FROM dictionary
+

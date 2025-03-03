@@ -7,20 +7,15 @@ import lombok.Data;
  * 修改用户信息参数, 用于修改用户时使用
  */
 @Data
-@Schema(name = "修改用户信息参数", description = "用于修改用户时")
+@Schema(name = "修改用户请求类", description = "用于修改用户时")
 public class UpdateUserRequest {
 
     /**
      * ID
      */
     @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long id;
+    private Long userId;
 
-    /**
-     * 用户名
-     */
-    @Schema(description = "用户名")
-    private String username;
 
     /**
      * 头像

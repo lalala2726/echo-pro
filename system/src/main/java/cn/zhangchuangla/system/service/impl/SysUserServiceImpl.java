@@ -4,8 +4,10 @@ import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
+import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,6 +16,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -132,6 +138,41 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             throw new ServiceException(ResponseCode.USER_NOT_EXIST);
         }
         return one;
+    }
+
+    /**
+     * 删除用户信息
+     *
+     * @param ids 用户ID集合
+     */
+    @Override
+    @Transactional
+    public void deleteUserById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
+        }
+        Long userId = SecurityUtils.getUserId();
+        ids.forEach(id -> {
+            if (Objects.equals(id, userId)) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "不能删除自己");
+            }
+        });
+        removeByIds(ids);
+    }
+
+    /**
+     * 修改用户信息
+     *
+     * @param request 请求参数
+     * @return true修改成功，false修改失败
+     */
+    @Override
+    public boolean updateUserInfoById(UpdateUserRequest request) {
+        ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
+        return update(sysUser, eq);
     }
 }
 

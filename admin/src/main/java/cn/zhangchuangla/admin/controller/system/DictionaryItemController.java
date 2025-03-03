@@ -37,6 +37,8 @@ public class DictionaryItemController {
         this.dictionaryItemService = dictionaryItemService;
     }
 
+    //todo 数据表设置一个显示样式,用于前端的显示
+
     @Operation(summary = "字典值列表")
     @GetMapping("/list")
     public AjaxResult list(DictionaryItemRequest request) {

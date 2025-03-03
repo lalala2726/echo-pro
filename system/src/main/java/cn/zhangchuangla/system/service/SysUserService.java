@@ -2,9 +2,12 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
+import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 public interface SysUserService extends IService<SysUser> {
 
@@ -64,4 +67,19 @@ public interface SysUserService extends IService<SysUser> {
      * @return 用户信息
      */
     SysUser getUserInfoByUserId(Long userId);
+
+    /**
+     * 根据用户ID删除用户
+     *
+     * @param ids 用户ID集合
+     */
+    void deleteUserById(List<Long> ids);
+
+    /**
+     * 修改用户信息
+     *
+     * @param request 请求参数
+     * @return 返回修改结果
+     */
+    boolean updateUserInfoById(UpdateUserRequest request);
 }

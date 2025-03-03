@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo.permission;
+package cn.zhangchuangla.system.model.vo.user;
 
 import cn.zhangchuangla.common.base.BaseVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -32,6 +32,12 @@ public class SysUserVo extends BaseVO {
     private String nickName;
 
     /**
+     * 性别
+     */
+    @Schema(description = "性别")
+    private String gender;
+
+    /**
      * 邮箱
      */
     @Schema(description = "邮箱")
@@ -50,6 +56,12 @@ public class SysUserVo extends BaseVO {
     @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * 手机号
+     */
+    @Schema(description = "手机号")
+    private String phone;
 
     /**
      * 创建人

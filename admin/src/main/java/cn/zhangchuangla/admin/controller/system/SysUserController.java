@@ -1,7 +1,6 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
-import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -9,7 +8,7 @@ import cn.zhangchuangla.common.utils.RegularUtils;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
-import cn.zhangchuangla.system.model.vo.permission.SysUserVo;
+import cn.zhangchuangla.system.model.vo.user.SysUserVo;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,17 +66,19 @@ public class SysUserController {
     /**
      * 删除用户
      *
-     * @param id 用户ID
+     * @param ids 用户ID
      * @return 删除结果
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{ids}")
     @Operation(summary = "删除用户")
-    public AjaxResult deleteUser(@Parameter(name = "用户ID", required = true)
-                                 @PathVariable("id") Long id) {
-        if (id == null) {
-            return AjaxResult.error("用户ID为空");
-        }
-        return AjaxResult.isSuccess(sysUserService.removeById(id));
+    public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
+                                     @PathVariable("ids") List<Long> ids) {
+        ParamsUtils.objectIsNull(ids, "用户ID不能为空!");
+        ids.forEach(id -> {
+            ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
+        });
+        sysUserService.deleteUserById(ids);
+        return AjaxResult.success();
     }
 
     /**
@@ -89,29 +90,15 @@ public class SysUserController {
     @PutMapping
     @Operation(summary = "修改用户信息")
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
-                                         @RequestBody @Validated UpdateUserRequest request) {
-        if (request.getId() == null) {
-            return AjaxResult.error(ResponseCode.PARAM_ERROR, "用户ID不能为空");
-        }
-
+                                         @RequestBody UpdateUserRequest request) {
+        ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0!");
         String validationError = validateUserRequest(request);
         if (validationError != null) {
             return AjaxResult.error(validationError);
         }
-
-        if (sysUserService.isUsernameExist(request.getUsername())) {
-            return AjaxResult.error("用户名已存在");
-        }
-        if (sysUserService.isEmailExist(request.getEmail())) {
-            return AjaxResult.error("邮箱已存在");
-        }
-        if (sysUserService.isPhoneExist(request.getPhone())) {
-            return AjaxResult.error("手机号已存在");
-        }
-
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
-        return AjaxResult.isSuccess(sysUserService.updateById(sysUser));
+        //fixme 修改用户从数据库检验参数时候,要排除当前用户的邮箱和手机号,否则会报重复错误
+        boolean result = sysUserService.updateUserInfoById(request);
+        return AjaxResult.isSuccess(result);
     }
 
     /**
