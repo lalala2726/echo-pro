@@ -117,10 +117,9 @@ public class SysUserController {
             boolean passwordValid = RegularUtils.isPasswordValid(request.getPassword());
             ParamsUtils.isParamValid(passwordValid, "密码格式不正确!");
         }
-
         //业务逻辑
-        boolean result = sysUserService.updateUserInfoById(request);
-        return AjaxResult.isSuccess(result);
+        sysUserService.updateUserInfoById(request);
+        return AjaxResult.success();
     }
 
     /**
