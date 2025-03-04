@@ -80,7 +80,6 @@ public class SysRoleController {
     /**
      * 删除角色信息
      * <p>
-     * //todo 当删除用户信息时,如果角色已经分配将无法进行删除,当删除成功后需要进行角色关系表的同步删除
      *
      * @param id 角色ID
      * @return 删除结果

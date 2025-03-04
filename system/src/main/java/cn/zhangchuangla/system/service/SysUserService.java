@@ -97,7 +97,6 @@ public interface SysUserService extends IService<SysUser> {
      * 修改用户信息
      *
      * @param request 请求参数
-     * @return 返回修改结果
      */
-    boolean updateUserInfoById(UpdateUserRequest request);
+    void updateUserInfoById(UpdateUserRequest request);
 }

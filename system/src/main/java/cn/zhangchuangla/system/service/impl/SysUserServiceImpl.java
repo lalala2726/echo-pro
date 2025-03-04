@@ -204,7 +204,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateUserInfoById(UpdateUserRequest request) {
+    public void updateUserInfoById(UpdateUserRequest request) {
         //todo 当前用户不可以删除和更改自己的角色信息,包括管理员
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
@@ -214,11 +214,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(request, sysUser);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
-        boolean updateUserResult = update(sysUser, eq);
+        update(sysUser, eq);
         //修改用户角色
         //1.删除角色所关联的全部角色信息
         Long userId = request.getUserId();
-        boolean deleteRoles = sysUserRoleService.deleteUserRoleAssociation(userId);
+        if (userId != null) {
+            sysUserRoleService.deleteUserRoleAssociation(userId);
+        }
         //2.添加新的角色信息
         if (roles != null && !roles.isEmpty()) {
             roles.stream().distinct().forEach(role -> {
@@ -226,7 +228,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             });
             sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
         }
-        return updateUserResult && deleteRoles;
     }
 }
 
