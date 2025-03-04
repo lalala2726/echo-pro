@@ -21,4 +21,21 @@ public interface SysUserRoleService extends IService<SysUserRole> {
     List<SysUserRole> getUserRoleByUserId(Long userId);
 
 
+    /**
+     * 删除用户角色关联角色信息
+     *
+     * @param userId 用户ID
+     * @return 是否成功
+     */
+    boolean deleteUserRoleAssociation(Long userId);
+
+
+    /**
+     * 添加用户角色关联,使用此方法前请先调用removeUserRoleAssociation方法删除用户角色关联
+     *
+     * @param roleId 角色ID列表
+     * @param userId 用户ID
+     */
+    boolean addUserRoleAssociation(List<Long> roleId, Long userId);
+
 }

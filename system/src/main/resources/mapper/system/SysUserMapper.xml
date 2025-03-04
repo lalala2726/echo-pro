@@ -52,4 +52,16 @@
             and is_deleted = 0
         </where>
     </select>
+    <select id="countOtherUserEmails" resultType="java.lang.Integer">
+        select count(*)
+        from sys_user
+        where email = #{email}
+          and user_id != #{userId}
+    </select>
+    <select id="isPhoneExist" resultType="java.lang.Integer">
+        select count(*)
+        from sys_user
+        where phone = #{phone}
+          and user_id != #{userId}
+    </select>
 </mapper>

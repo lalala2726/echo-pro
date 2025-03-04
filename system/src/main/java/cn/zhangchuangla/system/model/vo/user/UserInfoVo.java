@@ -1,9 +1,10 @@
 package cn.zhangchuangla.system.model.vo.user;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author zhangchuang
@@ -16,9 +17,15 @@ public class UserInfoVo {
     /**
      * ID
      */
-    @TableId(value = "user_id", type = IdType.AUTO)
     @Schema(description = "用户ID")
     private Long userId;
+
+
+    /**
+     * 角色列表
+     */
+    @Schema(description = "角色")
+    private List<SysRole> roles;
 
     /**
      * 用户名

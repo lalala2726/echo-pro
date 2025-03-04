@@ -1,7 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
@@ -31,6 +30,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         this.sysUserRoleService = sysUserRoleService;
     }
 
+    //todo 添加一个根据用户ID获取当前用户所拥有的角色,每个用户角色都会缓存到Redis和用户Id进行绑定,方便后续撤销等操作
 
     /**
      * 角色列表
@@ -55,9 +55,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
-        if (userId <= 0) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于于零");
-        }
+        //todo 将角色信息缓存到数据中,当用户角色信息发生变化时，更新缓存
+        ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
         ArrayList<Long> roleIds = new ArrayList<>();
         LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         List<SysUserRole> userRoleList = sysUserRoleService.getUserRoleByUserId(userId);
@@ -81,11 +80,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public Set<String> getUserRoleSetByUserId(Long userId) {
+        ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
         return roleListByUserId.stream()
                 .map(SysRole::getRoleKey)
                 .collect(Collectors.toSet());
     }
+
 
 }
 

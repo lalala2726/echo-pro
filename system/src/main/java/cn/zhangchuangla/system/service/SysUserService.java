@@ -45,12 +45,30 @@ public interface SysUserService extends IService<SysUser> {
     boolean isEmailExist(String email);
 
     /**
+     * 判断邮箱是否存在
+     *
+     * @param email  邮箱
+     * @param userId 排除的用户ID
+     * @return 返回邮箱是否已经存在
+     */
+    boolean isEmailExist(String email, Long userId);
+
+    /**
      * 判断手机号是否存在
      *
      * @param phone 手机号
      * @return true存在 false不存在
      */
     boolean isPhoneExist(String phone);
+
+    /**
+     * 判断手机号是否存在
+     *
+     * @param phone  手机号
+     * @param userId 排除的用户ID
+     * @return 返回邮箱是否已经存在
+     */
+    boolean isPhoneExist(String phone, Long userId);
 
     /**
      * 根据用户名查询用户信息

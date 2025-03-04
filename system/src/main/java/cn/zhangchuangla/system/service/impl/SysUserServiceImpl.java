@@ -9,6 +9,7 @@ import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,10 +28,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         implements SysUserService {
 
     private final SysUserMapper sysUserMapper;
+    private final SysUserRoleService sysUserRoleService;
 
-    public SysUserServiceImpl(SysUserMapper sysUserMapper) {
+    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService) {
         this.sysUserMapper = sysUserMapper;
+        this.sysUserRoleService = sysUserRoleService;
     }
+
+    //todo 在修改用户角色信息会有不确定会操作失败,下一步计划打印详细的日志方便进行排查
 
 
     /**
@@ -93,6 +98,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     }
 
     /**
+     * 判断邮箱是否存在
+     *
+     * @param email  邮箱
+     * @param userId 排除的用户ID
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean isEmailExist(String email, Long userId) {
+        ParamsUtils.paramsNotIsNullOrBlank("邮箱不能为空", email);
+        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
+        Integer count = sysUserMapper.countOtherUserEmails(email, userId);
+        return count > 0;
+    }
+
+    /**
      * 判断手机号是否存在
      *
      * @param phone 手机号
@@ -104,6 +124,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             throw new ServiceException(ResponseCode.PARAM_ERROR, "手机号不能为空!");
         }
         return this.count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhone, phone)) > 0;
+    }
+
+    /**
+     * 判断手机号是否存在
+     *
+     * @param phone  手机号
+     * @param userId 排除的用户ID
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean isPhoneExist(String phone, Long userId) {
+        ParamsUtils.paramsNotIsNullOrBlank("手机号不能为空", phone);
+        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
+        Integer count = sysUserMapper.isPhoneExist(phone, userId);
+        return count > 0;
     }
 
     /**
@@ -166,13 +201,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @param request 请求参数
      * @return true修改成功，false修改失败
      */
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserInfoById(UpdateUserRequest request) {
+        //todo 当前用户不可以删除和更改自己的角色信息,包括管理员
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
+        List<Long> roles = request.getRoles();
+        //去除重复的角色ID,并校验角色ID
+
+        //修改用户信息
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(request, sysUser);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
-        return update(sysUser, eq);
+        boolean updateUserResult = update(sysUser, eq);
+        //修改用户角色
+        //1.删除角色所关联的全部角色信息
+        Long userId = request.getUserId();
+        boolean deleteRoles = sysUserRoleService.deleteUserRoleAssociation(userId);
+        //2.添加新的角色信息
+        if (roles != null && !roles.isEmpty()) {
+            roles.stream().distinct().forEach(role -> {
+                ParamsUtils.minValidParam(role, "角色ID不能小于等于0");
+            });
+            sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
+        }
+        return updateUserResult && deleteRoles;
     }
 }
 

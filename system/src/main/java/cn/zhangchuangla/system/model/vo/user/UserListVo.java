@@ -11,7 +11,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "用户VO", description = "返回前端展示的数据")
-public class SysUserVo extends BaseVO {
+public class UserListVo extends BaseVO {
 
     /**
      * ID

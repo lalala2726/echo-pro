@@ -3,6 +3,7 @@ package cn.zhangchuangla.admin.controller.system;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
+import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.vo.permission.SysRoleVo;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/system/role")
 @Tag(name = "角色接口")
+@Anonymous
 public class SysRoleController {
 
     @Resource
@@ -43,7 +44,6 @@ public class SysRoleController {
 
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
-    @PreAuthorize("@auth.hasPermission('system:role:list')")
     public AjaxResult list(@Parameter(name = "角色查询参数") SysRoleQueryRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysRole> page = sysRoleService.RoleList(request);
@@ -57,6 +57,7 @@ public class SysRoleController {
         return AjaxResult.table(page, sysRoleVos);
     }
 
+
     /**
      * 根据id获取角色信息
      *
@@ -65,7 +66,6 @@ public class SysRoleController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:get')")
     public AjaxResult getRoleInfoById(@Parameter(name = "角色ID", required = true)
                                       @PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
@@ -87,7 +87,6 @@ public class SysRoleController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:delete')")
     public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return AjaxResult.success("删除成功");
@@ -103,7 +102,6 @@ public class SysRoleController {
      */
     @PostMapping
     @Operation(summary = "添加角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:add')")
     public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
                                   @RequestBody String name) {
         if (name == null || name.isEmpty()) {
@@ -127,7 +125,6 @@ public class SysRoleController {
      */
     @PutMapping
     @Operation(summary = "修改角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:update')")
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
                                      @RequestBody SysRoleVo sysRoleVo) {
         if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {

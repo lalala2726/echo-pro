@@ -20,5 +20,6 @@
         </value>
       </option>
     </inspection_tool>
+    <inspection_tool class="TodoComment" enabled="true" level="WARNING" enabled_by_default="true" />
   </profile>
 </component>

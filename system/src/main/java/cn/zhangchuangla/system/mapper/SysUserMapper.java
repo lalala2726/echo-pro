@@ -20,6 +20,22 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      */
     Page<SysUser> UserList(Page<SysUser> page, @Param("user") UserRequest request);
 
+    /**
+     * 查询指定用户以外的指定邮箱数量
+     *
+     * @param email  邮箱
+     * @param userId 需要排除的用户ID
+     * @return 返回数量
+     */
+    Integer countOtherUserEmails(@Param("email") String email,@Param("userId") Long userId);
+
+    /**
+     * 查询指定用户以外的指定手机号数量
+     * @param phone 手机号
+     * @param userId 需要排除的用户ID
+     * @return 返回数量
+     */
+    Integer isPhoneExist(@Param("phone") String phone,@Param("userId") Long userId);
 }
 
 

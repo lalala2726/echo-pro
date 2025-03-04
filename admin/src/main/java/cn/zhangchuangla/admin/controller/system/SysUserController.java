@@ -5,16 +5,18 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.RegularUtils;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
-import cn.zhangchuangla.system.model.vo.user.SysUserVo;
+import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
+import cn.zhangchuangla.system.model.vo.user.UserListVo;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +32,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/system/user")
 public class SysUserController {
 
-    @Resource
-    private SysUserService sysUserService;
+    private final SysUserService sysUserService;
+    private final SysRoleService sysRoleService;
+
+    public SysUserController(SysUserService sysUserService, SysRoleService sysRoleService) {
+        this.sysUserService = sysUserService;
+        this.sysRoleService = sysRoleService;
+    }
 
     /**
      * 获取用户列表
@@ -42,13 +49,13 @@ public class SysUserController {
     public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
-        List<SysUserVo> sysUserVos = userPage.getRecords().stream()
+        List<UserListVo> userListVos = userPage.getRecords().stream()
                 .map(sysUser -> {
-                    SysUserVo sysUserVo = new SysUserVo();
-                    BeanUtils.copyProperties(sysUser, sysUserVo);
-                    return sysUserVo;
+                    UserListVo userListVo = new UserListVo();
+                    BeanUtils.copyProperties(sysUser, userListVo);
+                    return userListVo;
                 }).collect(Collectors.toList());
-        return AjaxResult.table(userPage, sysUserVos);
+        return AjaxResult.table(userPage, userListVos);
     }
 
     /**
@@ -91,12 +98,27 @@ public class SysUserController {
     @Operation(summary = "修改用户信息")
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
                                          @RequestBody UpdateUserRequest request) {
+
+//        参数校验
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0!");
-        String validationError = validateUserRequest(request);
-        if (validationError != null) {
-            return AjaxResult.error(validationError);
+        if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+            boolean phoneValid = RegularUtils.isPhoneValid(request.getPhone());
+            ParamsUtils.isParamValid(phoneValid, "手机号格式不正确!");
+            boolean phoneExist = sysUserService.isPhoneExist(request.getPhone(), request.getUserId());
+            ParamsUtils.isParamValid(!phoneExist, "手机号已存在!");
         }
-        //fixme 修改用户从数据库检验参数时候,要排除当前用户的邮箱和手机号,否则会报重复错误
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            boolean emailValid = RegularUtils.isEmailValid(request.getEmail());
+            ParamsUtils.isParamValid(emailValid, "邮箱格式不正确!");
+            boolean emailExist = sysUserService.isEmailExist(request.getEmail(), request.getUserId());
+            ParamsUtils.isParamValid(!emailExist, "邮箱已存在!");
+        }
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            boolean passwordValid = RegularUtils.isPasswordValid(request.getPassword());
+            ParamsUtils.isParamValid(passwordValid, "密码格式不正确!");
+        }
+
+        //业务逻辑
         boolean result = sysUserService.updateUserInfoById(request);
         return AjaxResult.isSuccess(result);
     }
@@ -111,40 +133,14 @@ public class SysUserController {
     @Operation(summary = "根据id获取用户信息")
     public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
                                       @PathVariable("id") Long id) {
-        if (id == null) {
-            return AjaxResult.error("用户ID为空");
-        }
-        SysUser sysUser = sysUserService.getById(id);
-        SysUserVo sysUserVo = new SysUserVo();
-        BeanUtils.copyProperties(sysUser, sysUserVo);
-        return AjaxResult.success(sysUserVo);
+        ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
+        SysUser sysUser = sysUserService.getUserInfoByUserId(id);
+        Long userId = sysUser.getUserId();
+        List<SysRole> roleList = sysRoleService.getRoleListByUserId(userId);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setRoles(roleList);
+        BeanUtils.copyProperties(sysUser, userInfoVo);
+        return AjaxResult.success(userInfoVo);
     }
 
-    /**
-     * 用户请求参数校验
-     *
-     * @param request 请求对象
-     * @return 错误信息或null
-     */
-    private String validateUserRequest(Object request) {
-        if (request instanceof AddUserRequest addUserRequest) {
-            if (!RegularUtils.isPhoneValid(addUserRequest.getPhone())) {
-                return "手机号不合法";
-            }
-            if (!RegularUtils.isUsernameValid(addUserRequest.getUsername())) {
-                return "用户名必须在5到16位之间";
-            }
-            if (!RegularUtils.isEmailValid(addUserRequest.getEmail())) {
-                return "邮箱格式不合法";
-            }
-            if (!RegularUtils.isPasswordValid(addUserRequest.getPassword())) {
-                return "密码必须在6到16位之间";
-            }
-        }
-        return null;
-    }
-
-    private AjaxResult getError(String validationError) {
-        return AjaxResult.error(validationError);
-    }
 }
