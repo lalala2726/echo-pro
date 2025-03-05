@@ -27,15 +27,25 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @param userId 需要排除的用户ID
      * @return 返回数量
      */
-    Integer countOtherUserEmails(@Param("email") String email,@Param("userId") Long userId);
+    Integer countOtherUserEmails(@Param("email") String email, @Param("userId") Long userId);
 
     /**
      * 查询指定用户以外的指定手机号数量
-     * @param phone 手机号
+     *
+     * @param phone  手机号
      * @param userId 需要排除的用户ID
      * @return 返回数量
      */
-    Integer isPhoneExist(@Param("phone") String phone,@Param("userId") Long userId);
+    Integer isPhoneExist(@Param("phone") String phone, @Param("userId") Long userId);
+
+
+    /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 返回用户信息
+     */
+    SysUser getUserInfoByUsername(@Param("username") String username);
 }
 
 

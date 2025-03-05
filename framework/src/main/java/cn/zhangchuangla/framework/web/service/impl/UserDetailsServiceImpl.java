@@ -40,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) {
-        SysUser sysUser = sysUserService.getSysUserByUsername(username);
+        SysUser sysUser = sysUserService.getUserInfoByUsername(username);
         if (sysUser == null) {
             log.error("用户名:{},不存在", username);
             throw new LoginException("账号或者密码错误");

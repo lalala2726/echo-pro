@@ -149,9 +149,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public SysUser getSysUserByUsername(String username) {
-        LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        sysUserLambdaQueryWrapper.eq(username != null && !username.isEmpty(), SysUser::getUsername, username);
-        SysUser user = getOne(sysUserLambdaQueryWrapper);
+        ParamsUtils.paramsNotIsNullOrBlank("用户名不能为空", username);
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
+        SysUser user = getOne(eq);
+        log.info("从数据库找到的用户:{}", user);
         if (user == null) {
             throw new ServiceException(ResponseCode.USER_NOT_EXIST);
         }
@@ -215,6 +216,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         BeanUtils.copyProperties(request, sysUser);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
         update(sysUser, eq);
+
+
         //修改用户角色
         //1.删除角色所关联的全部角色信息
         Long userId = request.getUserId();
@@ -228,6 +231,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             });
             sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
         }
+    }
+
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return 返回用户信息
+     */
+    @Override
+    public SysUser getUserInfoByUsername(String username) {
+        ParamsUtils.paramsNotIsNullOrBlank("用户名不能为空", username);
+        return sysUserMapper.getUserInfoByUsername(username);
     }
 }
 

@@ -28,12 +28,11 @@ public class LoginUser implements UserDetails, Serializable {
 
     public LoginUser() {
     }
-    
+
 
     public LoginUser(SysUser sysUser) {
         this.sysUser = sysUser;
     }
-
 
     /**
      * 用户信息
@@ -44,7 +43,6 @@ public class LoginUser implements UserDetails, Serializable {
     /**
      * 用户ID
      */
-    @Schema(description = "用户ID")
     public Long userId;
 
     /**

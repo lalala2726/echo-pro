@@ -39,6 +39,12 @@ public class DictionaryItemController {
 
     //todo 数据表设置一个显示样式,用于前端的显示
 
+    /**
+     * 字典值列表
+     *
+     * @param request 请求参数
+     * @return 字典值列表
+     */
     @Operation(summary = "字典值列表")
     @GetMapping("/list")
     public AjaxResult list(DictionaryItemRequest request) {
@@ -52,6 +58,13 @@ public class DictionaryItemController {
         return AjaxResult.table(page, dictionaryItemListVos);
     }
 
+    /**
+     * 根据字典名称获取字典值
+     *
+     * @param dictionaryName 字典名称
+     * @return 字典值列表
+     */
+    @Operation(summary = "根据字典名称获取字典值")
     @GetMapping("/type/{dictionaryName}")
     public AjaxResult getDictionaryItemByDictionaryName(@PathVariable("dictionaryName") String dictionaryName) {
         ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空", dictionaryName);
@@ -78,6 +91,12 @@ public class DictionaryItemController {
         return AjaxResult.isSuccess(result);
     }
 
+    /**
+     * 根据ID获取字典项详情
+     *
+     * @param id 字典值ID
+     * @return 字典值详情
+     */
     @Operation(summary = "字典值详情")
     @GetMapping("/{id}")
     public AjaxResult getDictionaryItemById(@PathVariable("id") Long id) {
@@ -88,6 +107,12 @@ public class DictionaryItemController {
         return AjaxResult.success(dictionaryItemVo);
     }
 
+    /**
+     * 修改字典值
+     *
+     * @param request 请求参数
+     * @return 返回结果
+     */
     @Operation(summary = "修改字典值")
     @PutMapping
     public AjaxResult updateDictionaryItem(UpdateDictionaryItemRequest request) {
@@ -100,6 +125,12 @@ public class DictionaryItemController {
         return AjaxResult.success(result);
     }
 
+    /**
+     * 删除字典值,支持批量删除
+     *
+     * @param ids 字典值ID
+     * @return 返回结果
+     */
     @Operation(summary = "删除字典值")
     @DeleteMapping("/{id}")
     public AjaxResult deleteDictionaryItem(@PathVariable("id") List<Long> ids) {

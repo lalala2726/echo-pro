@@ -63,10 +63,11 @@ public class SysLoginServiceImpl implements SysLoginService {
                     new UsernamePasswordAuthenticationToken(requestParams.getUsername(), requestParams.getPassword());
             authenticate = authenticationManager.authenticate(authenticationToken);
         } catch (AuthenticationException e) {
-            log.warn("用户名:{},密码错误!", requestParams.getUsername());
+            log.warn("登录失败:", e);
+            log.info("用户名[{}],登录失败", requestParams.getUsername());
             sysPasswordService.PasswordErrorCount(requestParams.getUsername());
             sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_FAIL);
-            throw new AccountException(ResponseCode.PASSWORD_FORMAT_ERROR, "用户名或密码错误");
+            throw new AccountException(ResponseCode.LOGIN_ERROR, e.getMessage());
         } catch (Exception e) {
             log.warn("服务器发生异常:", e);
         } finally {
