@@ -1,8 +1,6 @@
-package cn.zhangchuangla.system.model.request.dictionary;
+package cn.zhangchuangla.system.model.vo.dictionary;
 
-import cn.zhangchuangla.common.base.BasePageRequest;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import cn.zhangchuangla.common.base.BaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,8 +10,8 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "字典值查询参数", description = "字典值查询参数请求类")
-public class DictionaryItemRequest extends BasePageRequest {
+@Schema(name = "字典项详细视图")
+public class DictionaryDataVo extends BaseVO {
 
     /**
      * 主键
@@ -21,11 +19,6 @@ public class DictionaryItemRequest extends BasePageRequest {
     @Schema(description = "主键")
     private Long id;
 
-    /**
-     * 字典编码
-     */
-    @Schema(description = "字典编码")
-    private Long dictionaryId;
 
     /**
      * 字典项键

@@ -82,6 +82,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public Set<String> getUserRoleSetByUserId(Long userId) {
         ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
+        if (roleListByUserId == null){
+            return null;
+        }
         return roleListByUserId.stream()
                 .map(SysRole::getRoleKey)
                 .collect(Collectors.toSet());

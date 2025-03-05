@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "添加字段项请求类")
-public class AddDictionaryItemRequest {
+public class AddDictionaryDataRequest {
 
 
     /**

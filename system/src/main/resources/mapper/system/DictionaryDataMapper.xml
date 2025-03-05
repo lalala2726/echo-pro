@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.system.mapper.DictionaryItemMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.DictionaryItem">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.DictionaryData">
         <id property="id" column="id"/>
         <result property="dictionaryId" column="dictionary_id"/>
         <result property="itemKey" column="item_key"/>
@@ -18,7 +18,7 @@
         <result property="remark" column="remark"/>
     </resultMap>
     <delete id="deleteDictionaryItem">
-        delete from dictionary_item
+        delete from dictionary_data
         where id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -26,7 +26,7 @@
     </delete>
     <select id="dictionaryItemList" resultMap="BaseResultMap">
         select *
-        from dictionary_item
+        from dictionary_data
         <where>
             <if test="request.dictionaryId != null">
                 AND dictionary_id = #{dictionaryId}
@@ -42,15 +42,15 @@
             </if>
         </where>
     </select>
-    <select id="dictionaryItemService" resultMap="BaseResultMap">
-        select dictionary_item.dictionary_id,
-               dictionary_item.item_key,
-               dictionary_item.item_value,
-               dictionary_item.create_by,
-               dictionary_item.update_by,
-               dictionary_item.remark
-        from dictionary_item
-                 join dictionary d on d.id = dictionary_item.dictionary_id
+    <select id="dictionaryDataService" resultMap="BaseResultMap">
+        select dictionary_data.dictionary_id,
+               dictionary_data.item_key,
+               dictionary_data.item_value,
+               dictionary_data.create_by,
+               dictionary_data.update_by,
+               dictionary_data.remark
+        from dictionary_data
+                 join dictionary d on d.id = dictionary_data.dictionary_id
         where d.name = #{dictionaryName}
     </select>
 

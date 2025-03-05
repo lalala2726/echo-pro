@@ -98,8 +98,8 @@ public class SysUserController {
     @Operation(summary = "修改用户信息")
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
                                          @RequestBody UpdateUserRequest request) {
-
-//        参数校验
+        sysUserService.isAllowUpdate(request.getUserId());
+        //参数校验
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0!");
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
             boolean phoneValid = RegularUtils.isPhoneValid(request.getPhone());

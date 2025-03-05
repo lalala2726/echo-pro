@@ -31,6 +31,12 @@ public class Dictionary extends BaseEntity {
     private String name;
 
     /**
+     * 字典状态
+     */
+    @Schema(description = "字典状态")
+    private Integer status;
+
+    /**
      * 描述
      */
     @Schema(description = "描述")

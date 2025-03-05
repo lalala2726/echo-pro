@@ -33,7 +33,7 @@ public class ParamsUtils {
      */
     public static void minValidParam(Long param, String message) {
         if (param == null) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL);
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL,message);
         }
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);

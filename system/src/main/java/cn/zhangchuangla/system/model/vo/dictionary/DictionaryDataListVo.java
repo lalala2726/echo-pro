@@ -10,8 +10,8 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "字典项详细视图")
-public class DictionaryItemVo extends BaseVO {
+@Schema(name = "字典值视图", description = "字典值视图")
+public class DictionaryDataListVo extends BaseVO {
 
     /**
      * 主键
@@ -19,6 +19,11 @@ public class DictionaryItemVo extends BaseVO {
     @Schema(description = "主键")
     private Long id;
 
+    /**
+     * 字典编码
+     */
+    @Schema(description = "字典编码")
+    private Long dictionaryId;
 
     /**
      * 字典项键
@@ -32,11 +37,6 @@ public class DictionaryItemVo extends BaseVO {
     @Schema(description = "字典项值")
     private String itemValue;
 
-    /**
-     * 排序
-     */
-    @Schema(description = "排序")
-    private Integer sortOrder;
 
     /**
      * 状态 (0: 启用, 1: 禁用)

@@ -32,6 +32,7 @@ public class DictionaryController {
 
 
     private final DictionaryService dictionaryService;
+
     public DictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
@@ -107,8 +108,8 @@ public class DictionaryController {
      * @return 操作结果
      */
     @Operation(summary = "删除字典")
-    @DeleteMapping("/{id}")
-    public AjaxResult deleteDictionary(@PathVariable("id") List<Long> ids) {
+    @DeleteMapping("/{ids}")
+    public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ParamsUtils.minValidParam(ids, "字典ID不能小于等于零!");
         dictionaryService.deleteDictionary(ids);
         return AjaxResult.success();

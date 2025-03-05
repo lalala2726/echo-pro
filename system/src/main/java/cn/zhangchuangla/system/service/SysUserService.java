@@ -103,8 +103,16 @@ public interface SysUserService extends IService<SysUser> {
 
     /**
      * 根据用户名获取用户信息
+     *
      * @param username 用户名
      * @return 返回用户信息
      */
     SysUser getUserInfoByUsername(String username);
+
+    /**
+     * 判断是否允许修改
+     *
+     * @param userId 用户ID
+     */
+    void isAllowUpdate(Long userId);
 }

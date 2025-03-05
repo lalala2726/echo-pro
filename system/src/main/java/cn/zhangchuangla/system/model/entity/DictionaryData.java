@@ -12,10 +12,10 @@ import lombok.EqualsAndHashCode;
  * 字典值表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "dictionary_item")
+@TableName(value = "dictionary_data")
 @Data
 @Schema(name = "字典值表", description = "字典值表")
-public class DictionaryItem extends BaseEntity {
+public class DictionaryData extends BaseEntity {
 
     /**
      * 主键

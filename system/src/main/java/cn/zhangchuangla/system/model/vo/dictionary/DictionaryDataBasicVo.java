@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.request.dictionary;
+package cn.zhangchuangla.system.model.vo.dictionary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,14 +7,15 @@ import lombok.Data;
  * 字典值表
  */
 @Data
-@Schema(name = "修改字典项请求类")
-public class UpdateDictionaryItemRequest {
+@Schema(name = "基本视图", description = "基本视图响应对象")
+public class DictionaryDataBasicVo {
 
     /**
      * 主键
      */
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "主键")
     private Long id;
+
 
     /**
      * 字典项键

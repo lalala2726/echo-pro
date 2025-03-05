@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.SystemRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -9,6 +10,7 @@ import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -29,10 +32,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
+    private final SysRoleService sysRoleService;
 
-    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService) {
+    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService, SysRoleService sysRoleService) {
         this.sysUserMapper = sysUserMapper;
         this.sysUserRoleService = sysUserRoleService;
+        this.sysRoleService = sysRoleService;
     }
 
     //todo 在修改用户角色信息会有不确定会操作失败,下一步计划打印详细的日志方便进行排查
@@ -200,13 +205,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * 修改用户信息
      *
      * @param request 请求参数
-     * @return true修改成功，false修改失败
      */
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserInfoById(UpdateUserRequest request) {
-        //todo 当前用户不可以删除和更改自己的角色信息,包括管理员
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
         //去除重复的角色ID,并校验角色ID
@@ -243,6 +246,25 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public SysUser getUserInfoByUsername(String username) {
         ParamsUtils.paramsNotIsNullOrBlank("用户名不能为空", username);
         return sysUserMapper.getUserInfoByUsername(username);
+    }
+
+    /**
+     * 判断是否允许修改
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    public void isAllowUpdate(Long userId) {
+        ParamsUtils.minValidParam(userId, "用户ID不能小于等于0");
+        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
+        if (roleSet != null) {
+            roleSet.forEach(role -> {
+                if (SystemRolesConstant.ADMIN.equals(role)) {
+                    throw new ServiceException(ResponseCode.OPERATION_ERROR, "不能修改管理员信息");
+                }
+            });
+        }
+
     }
 }
 

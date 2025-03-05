@@ -132,7 +132,7 @@ CREATE TABLE dictionary
 ) comment '字典表';
 
 -- 字典值表 (存储具体的字典项)
-CREATE TABLE dictionary_item
+CREATE TABLE dictionary_data
 (
     id            INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
     dictionary_id VARCHAR(50)  NOT NULL COMMENT '字典编码',
