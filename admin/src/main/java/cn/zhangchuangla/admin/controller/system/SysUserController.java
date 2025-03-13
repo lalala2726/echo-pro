@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.common.utils.RegularUtils;
+import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  */
 @Tag(name = "用户管理接口")
 @RestController
+@Anonymous
 @RequestMapping("/system/user")
 public class SysUserController {
 
@@ -46,7 +47,7 @@ public class SysUserController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
-    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") UserRequest request) {
+    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<UserListVo> userListVos = userPage.getRecords().stream()
@@ -65,7 +66,7 @@ public class SysUserController {
     @PostMapping()
     @Operation(summary = "添加用户")
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
-                              @RequestBody @Validated AddUserRequest request) {
+                              @Validated @RequestBody AddUserRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
     }
@@ -96,26 +97,17 @@ public class SysUserController {
      */
     @PutMapping
     @Operation(summary = "修改用户信息")
-    public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
-                                         @RequestBody UpdateUserRequest request) {
+    public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息")
+                                         @Validated @RequestBody UpdateUserRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         //参数校验
-        ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0!");
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-            boolean phoneValid = RegularUtils.isPhoneValid(request.getPhone());
-            ParamsUtils.isParamValid(phoneValid, "手机号格式不正确!");
             boolean phoneExist = sysUserService.isPhoneExist(request.getPhone(), request.getUserId());
-            ParamsUtils.isParamValid(!phoneExist, "手机号已存在!");
+            ParamsUtils.isParamValid(phoneExist, "手机号已存在!");
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            boolean emailValid = RegularUtils.isEmailValid(request.getEmail());
-            ParamsUtils.isParamValid(emailValid, "邮箱格式不正确!");
             boolean emailExist = sysUserService.isEmailExist(request.getEmail(), request.getUserId());
-            ParamsUtils.isParamValid(!emailExist, "邮箱已存在!");
-        }
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            boolean passwordValid = RegularUtils.isPasswordValid(request.getPassword());
-            ParamsUtils.isParamValid(passwordValid, "密码格式不正确!");
+            ParamsUtils.isParamValid(emailExist, "邮箱已存在!");
         }
         //业务逻辑
         sysUserService.updateUserInfoById(request);

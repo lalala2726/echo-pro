@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.request.role;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -14,6 +16,8 @@ public class SysRoleUpdateRequest {
      * 主键
      */
     @Schema(description = "角色ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "主键不能为空")
+    @Min(value = 1L, message = "主键不能小于1")
     private Long id;
 
     /**

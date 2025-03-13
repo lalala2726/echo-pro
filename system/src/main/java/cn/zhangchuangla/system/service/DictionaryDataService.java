@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
@@ -30,13 +31,6 @@ public interface DictionaryDataService extends IService<DictionaryData> {
      */
     long getCountByDictionaryId(Long dictionaryId);
 
-    /**
-     * 字典值列表
-     *
-     * @param request 请求参数
-     * @return 返回分页列表
-     */
-    Page<DictionaryData> dictionaryDataList(DictionaryDataRequest request);
 
     /**
      * 根据字典名称获取字典值
@@ -76,4 +70,12 @@ public interface DictionaryDataService extends IService<DictionaryData> {
      * @param ids 字典项ID
      */
     void deleteDictionaryData(List<Long> ids);
+
+    /**
+     * 根据字典名称获取字典项
+     *
+     * @param id 字典ID
+     * @return 返回获取的字典项
+     */
+    Page<DictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request);
 }

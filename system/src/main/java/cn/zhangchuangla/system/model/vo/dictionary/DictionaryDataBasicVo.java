@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.vo.dictionary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 /**
@@ -21,13 +22,13 @@ public class DictionaryDataBasicVo {
      * 字典项键
      */
     @Schema(description = "字典项键")
-    private String itemKey;
+    private String dataKey;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值")
-    private String itemValue;
+    private String dataValue;
 
     /**
      * 排序

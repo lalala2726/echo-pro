@@ -47,6 +47,19 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
         return dictionaryMapper.getDictionaryList(dictionaryPage, request);
     }
 
+    /**
+     * 根据字典名称查询字典是否存在, 如果当前字典名称存在, 则返回true，否则返回false
+     *
+     * @param id 当前字典id
+     * @return 如果当前字典名称存在, 则返回true，否则返回false
+     */
+    @Override
+    public boolean isNameExistExceptCurrent(Long id, String name) {
+        Long count = dictionaryMapper.getDictionaryCountExcludeCurrentId(id, name);
+        log.info("count:{}", count);
+        return count > 0;
+    }
+
 
     /**
      * 根据字典名称查询字典是否存在

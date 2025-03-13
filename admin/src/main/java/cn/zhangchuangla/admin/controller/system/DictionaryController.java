@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class DictionaryController {
      */
     @Operation(summary = "字典列表")
     @GetMapping("/list")
-    public AjaxResult list(DictionaryRequest request) {
+    public AjaxResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
         ArrayList<DictionaryListVo> dictionaryListVos = new ArrayList<>();
         list.getRecords().forEach(item -> {
@@ -64,8 +65,7 @@ public class DictionaryController {
      */
     @Operation(summary = "新增字典")
     @PostMapping
-    public AjaxResult addDictionary(@RequestBody AddDictionaryRequest request) {
-        ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空!", request.getName());
+    public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
         ParamsUtils.isParamValid(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
         return AjaxResult.success();
@@ -95,8 +95,10 @@ public class DictionaryController {
      */
     @Operation(summary = "修改字典")
     @PutMapping
-    public AjaxResult updateDictionary(UpdateDictionaryRequest request) {
+    public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         ParamsUtils.minValidParam(request.getId(), "字典ID不能小于等于零!");
+        boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
+        ParamsUtils.isParamValid(current, "字典名称已存在!");
         boolean result = dictionaryService.updateDictionaryById(request);
         return AjaxResult.isSuccess(result);
     }

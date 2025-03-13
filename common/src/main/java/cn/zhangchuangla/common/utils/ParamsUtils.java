@@ -33,7 +33,7 @@ public class ParamsUtils {
      */
     public static void minValidParam(Long param, String message) {
         if (param == null) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL,message);
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, message);
         }
         if (param <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
@@ -103,11 +103,11 @@ public class ParamsUtils {
     /**
      * 通常用于从数据库查询数据时，判断查询结果是否通过
      *
-     * @param val     true为通过，false不通过
+     * @param val     true为不通过
      * @param message 错误提示信息
      */
     public static void isParamValid(boolean val, String message) {
-        if (!val) {
+        if (val) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }
     }

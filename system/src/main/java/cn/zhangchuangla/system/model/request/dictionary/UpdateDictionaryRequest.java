@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.model.request.dictionary;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -14,7 +14,8 @@ public class UpdateDictionaryRequest {
     /**
      * 主键
      */
-    @TableId(type = IdType.AUTO)
+    @NotBlank(message = "主键不能为空")
+    @Min(value = 1L, message = "主键不能小于1")
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
@@ -29,4 +30,10 @@ public class UpdateDictionaryRequest {
      */
     @Schema(description = "描述")
     private String description;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 }

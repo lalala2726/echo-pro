@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,14 +34,15 @@ public class UserRequest extends BasePageRequest {
      * 邮箱
      */
     @Schema(description = "邮箱")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机号
      */
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     @Schema(description = "手机号")
     private String phone;
-
 
     /**
      * 性别

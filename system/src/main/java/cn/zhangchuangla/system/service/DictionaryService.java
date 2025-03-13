@@ -60,4 +60,12 @@ public interface DictionaryService extends IService<Dictionary> {
      * @return 返回分页列表
      */
     Page<Dictionary> getDictionaryList(DictionaryRequest request);
+
+    /**
+     * 根据字典名称查询字典是否存在, 不包含当前字典
+     *
+     * @param id 当前字典id
+     * @return 存在返回true，否则返回false
+     */
+    boolean isNameExistExceptCurrent(Long id, String name);
 }

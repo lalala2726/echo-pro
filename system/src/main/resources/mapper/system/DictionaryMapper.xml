@@ -26,7 +26,16 @@
             <if test="request.description != null and request.description != ''">
                 and `description` like concat('%',#{request.description},'%')
             </if>
+            <if test="request.status != null">
+                and `status` = #{request.status}
+            </if>
         </where>
+    </select>
+    <select id="getDictionaryCountExcludeCurrentId" resultType="java.lang.Long">
+        select count(*)
+        from dictionary
+        where name = #{dictName}
+          and id != #{id}
     </select>
 
 </mapper>

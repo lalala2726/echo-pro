@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,25 +38,25 @@ public class DictionaryDataController {
         this.dictionaryDataService = dictionaryDataService;
     }
 
-    //todo 数据表设置一个显示样式,用于前端的显示
 
     /**
-     * 字典值列表
+     * 根据字典ID获取字典值
      *
+     * @param id      字典ID
      * @param request 请求参数
-     * @return 字典值列表
+     * @return 返回字典值分页参数
      */
-    @Operation(summary = "字典值列表")
-    @GetMapping("/list")
-    public AjaxResult list(DictionaryDataRequest request) {
-        Page<DictionaryData> page = dictionaryDataService.dictionaryDataList(request);
+    @GetMapping("/dictId/{id}")
+    public AjaxResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
+        ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
         ArrayList<DictionaryDataListVo> dictionaryDataListVos = new ArrayList<>();
-        page.getRecords().forEach(item -> {
+        Page<DictionaryData> dictionaryDataPage = dictionaryDataService.getDictDataByDictionaryName(id, request);
+        dictionaryDataPage.getRecords().forEach(item -> {
             DictionaryDataListVo dictionaryDataListVo = new DictionaryDataListVo();
             BeanUtils.copyProperties(item, dictionaryDataListVo);
             dictionaryDataListVos.add(dictionaryDataListVo);
         });
-        return AjaxResult.table(page, dictionaryDataListVos);
+        return AjaxResult.table(dictionaryDataPage, dictionaryDataListVos);
     }
 
     /**
@@ -78,14 +79,18 @@ public class DictionaryDataController {
         return AjaxResult.success(dictionaryDataBasicVos);
     }
 
+    /**
+     * 添加字典值
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
     @Operation(summary = "添加字典值")
     @PostMapping
-    public AjaxResult addDictionaryData(@RequestBody AddDictionaryDataRequest request) {
+    public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         ParamsUtils.minValidParam(request.getDictionaryId(), "字典ID不能小于等于零!");
-        ParamsUtils.paramsNotIsNullOrBlank("字典项键不能为空", request.getItemKey());
-        ParamsUtils.paramsNotIsNullOrBlank("字典项值不能为空", request.getItemValue());
-        boolean isExits = dictionaryDataService.noDuplicateKeys(request.getItemKey());
+        boolean isExits = dictionaryDataService.noDuplicateKeys(request.getDataKey());
         ParamsUtils.isParamValid(isExits, "字典项键已存在!");
         boolean result = dictionaryDataService.addDictionaryData(request);
         return AjaxResult.isSuccess(result);
@@ -115,11 +120,9 @@ public class DictionaryDataController {
      */
     @Operation(summary = "修改字典值")
     @PutMapping
-    public AjaxResult updateDictionaryData(UpdateDictionaryDataRequest request) {
+    public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
-        ParamsUtils.paramsNotIsNullOrBlank("字典项键不能为空", request.getItemKey());
-        ParamsUtils.paramsNotIsNullOrBlank("字典项值不能为空", request.getItemValue());
-        boolean isExist = dictionaryDataService.noDuplicateKeys(request.getItemKey());
+        boolean isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
         ParamsUtils.isParamValid(isExist, "字典项键已存在!");
         boolean result = dictionaryDataService.updateDictionaryData(request);
         return AjaxResult.success(result);

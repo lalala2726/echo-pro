@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.system.mapper.DictionaryItemMapper;
+import cn.zhangchuangla.system.mapper.DictionaryDataMapper;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
@@ -10,6 +10,7 @@ import cn.zhangchuangla.system.service.DictionaryDataService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +20,14 @@ import java.util.List;
  * @author zhangchuang
  */
 @Service
-public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper, DictionaryData>
+@Slf4j
+public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper, DictionaryData>
         implements DictionaryDataService {
 
-    private final DictionaryItemMapper dictionaryItemMapper;
+    private final DictionaryDataMapper dictionaryDataMapper;
 
-    public DictionaryDataServiceImpl(DictionaryItemMapper dictionaryItemMapper) {
-        this.dictionaryItemMapper = dictionaryItemMapper;
+    public DictionaryDataServiceImpl(DictionaryDataMapper dictionaryDataMapper) {
+        this.dictionaryDataMapper = dictionaryDataMapper;
     }
 
     /**
@@ -38,11 +40,11 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper,
     public boolean noDuplicateKeys(String itemKey) {
         ParamsUtils.paramsNotIsNullOrBlank("字典项键不能为空", itemKey);
         LambdaQueryWrapper<DictionaryData> queryWrapper = new LambdaQueryWrapper<DictionaryData>()
-                .eq(DictionaryData::getItemKey, itemKey);
+                .eq(DictionaryData::getDataKey, itemKey);
         DictionaryData dictionaryData = getOne(queryWrapper);
         LambdaQueryWrapper<DictionaryData> eq = new LambdaQueryWrapper<DictionaryData>()
                 .eq(DictionaryData::getDictionaryId, dictionaryData.getDictionaryId())
-                .eq(DictionaryData::getItemKey, itemKey);
+                .eq(DictionaryData::getDataKey, itemKey);
         return count(eq) > 0;
     }
 
@@ -59,17 +61,6 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper,
         return count(eq);
     }
 
-    /**
-     * 字典值列表
-     *
-     * @param request 请求参数
-     * @return 返回分页列表
-     */
-    @Override
-    public Page<DictionaryData> dictionaryDataList(DictionaryDataRequest request) {
-        Page<DictionaryData> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return dictionaryItemMapper.dictionaryItemList(page, request);
-    }
 
     /**
      * 根据字典名称获取字典值
@@ -80,7 +71,7 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper,
     @Override
     public List<DictionaryData> getDictionaryDataByIdDictName(String dictionaryName) {
         ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空", dictionaryName);
-        return dictionaryItemMapper.dictionaryDataService(dictionaryName);
+        return dictionaryDataMapper.dictionaryDataService(dictionaryName);
     }
 
     /**
@@ -117,8 +108,11 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper,
      */
     @Override
     public boolean updateDictionaryData(UpdateDictionaryDataRequest request) {
-        LambdaQueryWrapper<DictionaryData> eq = new LambdaQueryWrapper<DictionaryData>().eq(DictionaryData::getId, request.getId());
-        return update(eq);
+        DictionaryData dictionaryData = new DictionaryData();
+        BeanUtils.copyProperties(request, dictionaryData);
+        log.info("更新字典项:{}", dictionaryData);
+        int result = dictionaryDataMapper.updateDictionaryDataByDictName(dictionaryData, request.getDictName());
+        return result > 0;
     }
 
     /**
@@ -128,7 +122,20 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryItemMapper,
      */
     @Override
     public void deleteDictionaryData(List<Long> ids) {
-        dictionaryItemMapper.deleteDictionaryItem(ids);
+        dictionaryDataMapper.deleteDictionaryItem(ids);
+    }
+
+    /**
+     * 根据字典名称获取字典项
+     *
+     * @param id 字典ID
+     * @return 字典项
+     */
+    @Override
+    public Page<DictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request) {
+        ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
+        Page<DictionaryData> dictionaryDataPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return dictionaryDataMapper.getDictDataByDictionaryName(dictionaryDataPage, id, request);
     }
 }
 

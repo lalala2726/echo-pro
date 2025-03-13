@@ -29,8 +29,20 @@ public class DictionaryVo extends BaseVO {
     private String name;
 
     /**
+     * 字典状态
+     */
+    @Schema(description = "字典状态")
+    private Integer status;
+
+    /**
      * 描述
      */
     @Schema(description = "描述")
     private String description;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 }

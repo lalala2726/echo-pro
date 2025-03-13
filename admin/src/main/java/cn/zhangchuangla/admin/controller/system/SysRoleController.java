@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class SysRoleController {
 
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
-    public AjaxResult list(@Parameter(name = "角色查询参数") SysRoleQueryRequest request) {
+    public AjaxResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysRole> page = sysRoleService.RoleList(request);
         ArrayList<SysRoleVo> sysRoleVos = new ArrayList<>();
@@ -125,7 +126,7 @@ public class SysRoleController {
     @PutMapping
     @Operation(summary = "修改角色信息")
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
-                                     @RequestBody SysRoleVo sysRoleVo) {
+                                         @Validated @RequestBody SysRoleVo sysRoleVo) {
         if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }

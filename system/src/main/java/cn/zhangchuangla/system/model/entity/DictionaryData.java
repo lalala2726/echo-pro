@@ -34,13 +34,13 @@ public class DictionaryData extends BaseEntity {
      * 字典项键
      */
     @Schema(description = "字典项键")
-    private String itemKey;
+    private String dataKey;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值")
-    private String itemValue;
+    private String dataValue;
 
     /**
      * 排序
@@ -53,5 +53,11 @@ public class DictionaryData extends BaseEntity {
      */
     @Schema(description = "状态 (0: 启用, 1: 禁用)")
     private Integer status;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 
 }

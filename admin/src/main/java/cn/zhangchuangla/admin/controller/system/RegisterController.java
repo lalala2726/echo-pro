@@ -7,6 +7,7 @@ import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class RegisterController {
     @PostMapping("/register")
     @Operation(summary = "注册")
     public AjaxResult register(@Parameter(name = "注册参数", required = true)
-                               @RequestBody RegisterRequest request) {
+                               @Validated @RequestBody RegisterRequest request) {
         if (request.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
         }

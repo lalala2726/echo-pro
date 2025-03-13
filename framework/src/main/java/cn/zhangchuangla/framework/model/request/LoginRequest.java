@@ -1,6 +1,9 @@
 package cn.zhangchuangla.framework.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -14,12 +17,19 @@ public class LoginRequest {
     /**
      * 用户名
      */
+    @NotBlank(message = "用户名不能为空!")
+    @Size(min = 5, max = 20, message = "用户名长度在5-20位之间!")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]{5,20}$", message = "用户名只能是字母、数字、下划线、减号!")
+
     @Schema(description = "用户名")
     private String username;
 
     /**
      * 密码
      */
+    @NotBlank(message = "密码不能为空!")
+    @Size(min = 8, max = 20, message = "密码长度在8-20位之间!")
+    @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+-]{8,20}$", message = "密码格式不正确!")
     @Schema(description = "密码")
     private String password;
 

@@ -4,9 +4,6 @@ import cn.zhangchuangla.common.constant.SystemConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
-import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.utils.RegularUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.security.context.AuthenticationContextHolder;
 import cn.zhangchuangla.framework.web.service.SysLoginService;
@@ -55,7 +52,6 @@ public class SysLoginServiceImpl implements SysLoginService {
     public String login(LoginRequest requestParams, HttpServletRequest httpServletRequest) {
         //fixme 临时关闭, 校验登录参数
 
-//        loginParamsCheck(requestParams);
 
         Authentication authenticate = null;
         try {
@@ -88,30 +84,6 @@ public class SysLoginServiceImpl implements SysLoginService {
         //记录登录成功日志
         sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SystemConstant.LOGIN_SUCCESS);
         return tokenService.createToken(loginUser, httpServletRequest);
-    }
-
-    /**
-     * 登录参数校验
-     *
-     * @param requestParams 参数
-     */
-    private void loginParamsCheck(LoginRequest requestParams) {
-        if (StringUtils.isEmpty(requestParams.getUsername())) {
-            log.warn("用户名不能为空");
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户名不能为空");
-        }
-        if (StringUtils.isEmpty(requestParams.getPassword())) {
-            log.warn("密码不能为空");
-            throw new ParamException(ResponseCode.PARAM_ERROR, "密码不能为空");
-        }
-        if (!RegularUtils.isUsernameValid(requestParams.getUsername())) {
-            log.warn("用户名格式错误: {}", requestParams.getUsername());
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户名格式错误");
-        }
-        if (!RegularUtils.isPasswordValid(requestParams.getPassword())) {
-            log.warn("密码格式错误");
-            throw new ParamException(ResponseCode.PARAM_ERROR, "密码格式错误");
-        }
     }
 }
 

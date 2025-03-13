@@ -26,4 +26,7 @@ from sys_user
 where user_id > 19;
 
 
+update dictionary set status = 0 where 1=1
+
+
 
