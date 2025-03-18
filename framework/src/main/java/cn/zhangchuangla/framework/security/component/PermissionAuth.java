@@ -1,13 +1,16 @@
 package cn.zhangchuangla.framework.security.component;
 
 import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.constant.SystemRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.security.context.PermissionContextHolder;
 import cn.zhangchuangla.system.service.SysPermissionsService;
+import cn.zhangchuangla.system.service.SysRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
@@ -25,9 +28,11 @@ import java.util.Set;
 public class PermissionAuth {
 
     private final SysPermissionsService sysPermissionsService;
+    private final SysRoleService sysRoleService;
 
-    public PermissionAuth(SysPermissionsService sysPermissionsService) {
+    public PermissionAuth(SysPermissionsService sysPermissionsService, SysRoleService sysRoleService) {
         this.sysPermissionsService = sysPermissionsService;
+        this.sysRoleService = sysRoleService;
     }
 
     /**
@@ -37,14 +42,17 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     public boolean hasPermission(String permission) {
-        if (StringUtils.isBlank(permission)) {
+        if (isAdmin() || StringUtils.isBlank(permission)) {
+            return true;
+        }
+        LoginUser loginUser = getLoginUser();
+        if (loginUser == null) {
+            log.warn("未找到登录用户信息，无法进行权限校验");
             return false;
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
         Set<String> permissions = sysPermissionsService.getPermissionsByUserId(loginUser.getUserId());
         PermissionContextHolder.setContext(permission);
-        log.info("用户 [{}] 权限信息: {}", loginUser.getUsername(), permissions);
-        log.debug("权限信息:{}", permissions);
+        log.info("用户 [{}] 权限校验: 权限标识 [{}]，用户权限：{}", loginUser.getUsername(), permission, permissions);
         return isAllow(permissions, permission);
     }
 
@@ -55,18 +63,18 @@ public class PermissionAuth {
      * @return true - 至少拥有一个权限，false - 一个都没有
      */
     public boolean hasAnyPermission(String... permissions) {
-        if (permissions == null || permissions.length == 0) {
-            return false;
+        if (isAdmin() || permissions == null || permissions.length == 0) {
+            return true;
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
+        LoginUser loginUser = getLoginUser();
         if (loginUser == null) {
+            log.warn("未找到登录用户信息，无法进行多权限校验");
             return false;
         }
-        Long userId = loginUser.getUserId();
-        Set<String> userPermissions = sysPermissionsService.getPermissionsByUserId(userId);
+        Set<String> userPermissions = sysPermissionsService.getPermissionsByUserId(loginUser.getUserId());
         for (String permission : permissions) {
-            if (userPermissions.contains(permission)) {
-                log.debug("用户 [{}] 至少拥有权限 [{}]，返回 true", loginUser.getUsername(), permission);
+            if (userPermissions.contains(StringUtils.trim(permission))) {
+                log.debug("用户 [{}] 拥有权限 [{}]，返回 true", loginUser.getUsername(), permission);
                 return true;
             }
         }
@@ -74,20 +82,24 @@ public class PermissionAuth {
     }
 
     /**
-     * 要求当前权限必须是包含指定角色
+     * 判断当前用户是否拥有指定角色
      *
-     * @param role 需要匹配的角色
-     * @return true - 是指定用户，false - 不是指定用户
+     * @param role 需要匹配的角色标识
+     * @return true - 角色匹配，false - 角色不匹配
      */
     public boolean isSpecificRole(String role) {
-        if (StringUtils.isBlank(role)) {
-            return false;
+        if (isAdmin() || StringUtils.isBlank(role)) {
+            return true;
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
+        LoginUser loginUser = getLoginUser();
         if (loginUser == null) {
+            log.warn("未找到登录用户信息，无法进行角色校验");
             return false;
         }
-        return false;
+        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(loginUser.getUserId());
+        boolean hasRole = roleSet.contains(role);
+        log.debug("用户 [{}] 角色校验 [{}]，匹配结果：{}", loginUser.getUsername(), role, hasRole);
+        return hasRole;
     }
 
     /**
@@ -97,7 +109,27 @@ public class PermissionAuth {
      * @param permission  需要校验的权限标识符
      * @return true - 拥有该权限，false - 没有该权限
      */
-    public boolean isAllow(Set<String> permissions, String permission) {
+    private boolean isAllow(Set<String> permissions, String permission) {
         return permissions.contains(SystemConstant.ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
+    }
+
+    /**
+     * 判断当前用户是否是管理员
+     *
+     * @return true - 是管理员，false - 不是管理员
+     */
+    private boolean isAdmin() {
+        Long userId = SecurityUtils.getUserId();
+        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
+        return !CollectionUtils.isEmpty(roleSet) && roleSet.contains(SystemRolesConstant.ADMIN);
+    }
+
+    /**
+     * 获取当前登录用户
+     *
+     * @return 登录用户对象，如果不存在返回 null
+     */
+    private LoginUser getLoginUser() {
+        return SecurityUtils.getLoginUser();
     }
 }

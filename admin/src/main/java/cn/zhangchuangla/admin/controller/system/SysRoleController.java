@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class SysRoleController {
 
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
+    @PreAuthorize("@auth.hasPermission('system:role:list')")
     public AjaxResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysRole> page = sysRoleService.RoleList(request);
@@ -67,6 +69,7 @@ public class SysRoleController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:info')")
     public AjaxResult getRoleInfoById(@Parameter(name = "角色ID", required = true)
                                       @PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
@@ -87,6 +90,7 @@ public class SysRoleController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:delete')")
     public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return AjaxResult.success("删除成功");
@@ -102,9 +106,10 @@ public class SysRoleController {
      */
     @PostMapping
     @Operation(summary = "添加角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:add')")
     public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
                                   @RequestBody String name) {
-        if (name == null || name.isEmpty()) {
+        if (name == null) {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色名称不能为空");
         }
         SysRole sysRole = new SysRole();
@@ -125,8 +130,9 @@ public class SysRoleController {
      */
     @PutMapping
     @Operation(summary = "修改角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:update')")
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
-                                         @Validated @RequestBody SysRoleVo sysRoleVo) {
+                                     @Validated @RequestBody SysRoleVo sysRoleVo) {
         if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {
             return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }

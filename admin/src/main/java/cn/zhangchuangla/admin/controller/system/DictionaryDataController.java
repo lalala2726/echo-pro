@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,8 @@ public class DictionaryDataController {
      * @return 返回字典值分页参数
      */
     @GetMapping("/dictId/{id}")
+    @Operation(summary = "根据字典名称获取字典值")
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
     public AjaxResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
         ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
         ArrayList<DictionaryDataListVo> dictionaryDataListVos = new ArrayList<>();
@@ -67,6 +70,7 @@ public class DictionaryDataController {
      */
     @Operation(summary = "根据字典名称获取字典值")
     @GetMapping("/dictName/{dictionaryName}")
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
     public AjaxResult getDictionaryDataByDictionaryName(@PathVariable("dictionaryName") String dictionaryName) {
         ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空", dictionaryName);
         List<DictionaryData> result = dictionaryDataService.getDictionaryDataByIdDictName(dictionaryName);
@@ -87,11 +91,12 @@ public class DictionaryDataController {
      */
     @Operation(summary = "添加字典值")
     @PostMapping
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         ParamsUtils.minValidParam(request.getDictionaryId(), "字典ID不能小于等于零!");
         boolean isExits = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        ParamsUtils.isParamValid(isExits, "字典项键已存在!");
+        ParamsUtils.isNotParamValid(isExits, "字典项键已存在!");
         boolean result = dictionaryDataService.addDictionaryData(request);
         return AjaxResult.isSuccess(result);
     }
@@ -104,6 +109,7 @@ public class DictionaryDataController {
      */
     @Operation(summary = "字典值详情")
     @GetMapping("/{id}")
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:info')")
     public AjaxResult getDictionaryItemById(@PathVariable("id") Long id) {
         ParamsUtils.minValidParam(id, "字典值ID不能小于等于零!");
         DictionaryData dictionaryData = dictionaryDataService.getDictionaryById(id);
@@ -120,10 +126,11 @@ public class DictionaryDataController {
      */
     @Operation(summary = "修改字典值")
     @PutMapping
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:update')")
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         boolean isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        ParamsUtils.isParamValid(isExist, "字典项键已存在!");
+        ParamsUtils.isNotParamValid(isExist, "字典项键已存在!");
         boolean result = dictionaryDataService.updateDictionaryData(request);
         return AjaxResult.success(result);
     }
@@ -136,6 +143,7 @@ public class DictionaryDataController {
      */
     @Operation(summary = "删除字典值")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@auth.hasPermission('system:dictionary-data:delete')")
     public AjaxResult deleteDictionaryData(@PathVariable("id") List<Long> ids) {
         ParamsUtils.objectIsNull(ids, "字典值ID不能为空!");
         ids.forEach(id -> {

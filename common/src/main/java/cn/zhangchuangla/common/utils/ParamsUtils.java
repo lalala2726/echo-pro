@@ -106,7 +106,7 @@ public class ParamsUtils {
      * @param val     true为不通过
      * @param message 错误提示信息
      */
-    public static void isParamValid(boolean val, String message) {
+    public static void isNotParamValid(boolean val, String message) {
         if (val) {
             throw new ParamException(ResponseCode.PARAM_ERROR, message);
         }

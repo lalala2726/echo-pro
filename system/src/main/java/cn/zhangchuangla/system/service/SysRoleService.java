@@ -39,6 +39,4 @@ public interface SysRoleService extends IService<SysRole> {
      */
     Set<String> getUserRoleSetByUserId(Long userId);
 
-
-
 }
