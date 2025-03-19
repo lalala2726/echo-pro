@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;

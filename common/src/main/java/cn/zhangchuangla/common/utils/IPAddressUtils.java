@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils.ip;
+package cn.zhangchuangla.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 

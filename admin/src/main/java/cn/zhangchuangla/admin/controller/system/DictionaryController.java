@@ -69,7 +69,7 @@ public class DictionaryController {
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
-        ParamsUtils.isNotParamValid(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
+        ParamsUtils.paramCheck(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
         return AjaxResult.success();
     }
@@ -103,7 +103,7 @@ public class DictionaryController {
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         ParamsUtils.minValidParam(request.getId(), "字典ID不能小于等于零!");
         boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
-        ParamsUtils.isNotParamValid(current, "字典名称已存在!");
+        ParamsUtils.paramCheck(current, "字典名称已存在!");
         boolean result = dictionaryService.updateDictionaryById(request);
         return AjaxResult.isSuccess(result);
     }

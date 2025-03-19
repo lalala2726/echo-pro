@@ -1,7 +1,6 @@
 package cn.zhangchuangla.system.model.vo.dictionary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 /**

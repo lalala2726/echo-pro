@@ -96,7 +96,7 @@ public class DictionaryDataController {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         ParamsUtils.minValidParam(request.getDictionaryId(), "字典ID不能小于等于零!");
         boolean isExits = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        ParamsUtils.isNotParamValid(isExits, "字典项键已存在!");
+        ParamsUtils.paramCheck(isExits, "字典项键已存在!");
         boolean result = dictionaryDataService.addDictionaryData(request);
         return AjaxResult.isSuccess(result);
     }
@@ -130,7 +130,7 @@ public class DictionaryDataController {
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         boolean isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        ParamsUtils.isNotParamValid(isExist, "字典项键已存在!");
+        ParamsUtils.paramCheck(isExist, "字典项键已存在!");
         boolean result = dictionaryDataService.updateDictionaryData(request);
         return AjaxResult.success(result);
     }

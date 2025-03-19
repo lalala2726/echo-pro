@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.SystemRolesConstant;
+import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -259,7 +259,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
         if (roleSet != null) {
             roleSet.forEach(role -> {
-                if (SystemRolesConstant.ADMIN.equals(role)) {
+                if (SysRolesConstant.ADMIN.equals(role)) {
                     throw new ServiceException(ResponseCode.OPERATION_ERROR, "不能修改管理员信息");
                 }
             });

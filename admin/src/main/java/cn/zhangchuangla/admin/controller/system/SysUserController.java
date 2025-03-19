@@ -108,11 +108,11 @@ public class SysUserController {
         //参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
             boolean phoneExist = sysUserService.isPhoneExist(request.getPhone(), request.getUserId());
-            ParamsUtils.isNotParamValid(phoneExist, "手机号已存在!");
+            ParamsUtils.paramCheck(phoneExist, "手机号已存在!");
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()) {
             boolean emailExist = sysUserService.isEmailExist(request.getEmail(), request.getUserId());
-            ParamsUtils.isNotParamValid(emailExist, "邮箱已存在!");
+            ParamsUtils.paramCheck(emailExist, "邮箱已存在!");
         }
         //业务逻辑
         sysUserService.updateUserInfoById(request);

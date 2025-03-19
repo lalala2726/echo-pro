@@ -59,21 +59,21 @@ public class SecurityConfig {
         // 获取所有标记了@Anonymous注解的接口
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         Set<String> anonymousUrls = new HashSet<>();
-        
+
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
             HandlerMethod handlerMethod = entry.getValue();
-            
+
             // 获取方法上的@Anonymous注解
             Anonymous methodAnonymous = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), Anonymous.class);
             // 获取类上的@Anonymous注解
             Anonymous classAnonymous = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Anonymous.class);
-            
+
             if (methodAnonymous != null || classAnonymous != null) {
                 Set<String> patterns = entry.getKey().getPatternValues();
                 anonymousUrls.addAll(patterns);
             }
         }
-        
+
         return http
                 // 禁用 CSRF
                 .csrf(AbstractHttpConfigurer::disable)

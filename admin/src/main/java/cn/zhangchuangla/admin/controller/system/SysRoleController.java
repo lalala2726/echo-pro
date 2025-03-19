@@ -1,10 +1,14 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
+import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.vo.permission.SysRoleVo;
 import cn.zhangchuangla.system.service.SysRoleService;
@@ -13,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +32,7 @@ import java.util.ArrayList;
  * <p>
  * created on 2025/1/12 10:55
  */
+@Slf4j
 @RestController
 @RequestMapping("/system/role")
 @Tag(name = "角色接口")
@@ -56,7 +62,6 @@ public class SysRoleController {
             BeanUtils.copyProperties(sysRole, sysRoleVo);
             sysRoleVos.add(sysRoleVo);
         });
-
         return AjaxResult.table(page, sysRoleVos);
     }
 
@@ -101,23 +106,21 @@ public class SysRoleController {
     /**
      * 添加角色信息
      *
-     * @param name 角色名称
      * @return 添加结果
      */
     @PostMapping
     @Operation(summary = "添加角色信息")
+    @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@auth.hasPermission('system:role:add')")
     public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
-                                  @RequestBody String name) {
-        if (name == null) {
-            return AjaxResult.error(ResponseCode.PARAM_ERROR, "角色名称不能为空");
-        }
-        SysRole sysRole = new SysRole();
-        sysRole.setRoleName(name);
-        if (sysRoleService.save(sysRole)) {
-            return AjaxResult.success("添加成功");
-        }
-        return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "添加失败");
+                                  @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
+        boolean roleNameExist = sysRoleService.isRoleNameExist(roleAddRequest.getRoleName());
+        ParamsUtils.paramCheck(roleNameExist, "角色名已存在");
+        boolean roleKeyExist = sysRoleService.isRoleKeyExist(roleAddRequest.getRoleKey());
+        ParamsUtils.paramCheck(roleKeyExist, "角色权限字符串已存在");
+        sysRoleService.addRoleInfo(roleAddRequest);
+        return AjaxResult.success();
+
     }
 
     /**

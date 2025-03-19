@@ -41,13 +41,11 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      * 删除用户角色关联角色信息
      *
      * @param userId 用户ID
-     * @return 操作结果
      */
     @Override
-    public boolean deleteUserRoleAssociation(Long userId) {
+    public void deleteUserRoleAssociation(Long userId) {
         ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
         int result = sysUserRoleMapper.deleteUserRoleByUserId(userId);
-        return result > 0;
     }
 
     /**
@@ -55,10 +53,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      *
      * @param roleId 角色ID列表
      * @param userId 用户ID
-     * @return 操作结果
      */
     @Override
-    public boolean addUserRoleAssociation(List<Long> roleId, Long userId) {
+    public void addUserRoleAssociation(List<Long> roleId, Long userId) {
         ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
         roleId.forEach(role -> {
             ParamsUtils.minValidParam(role, "角色ID不能小于等于零");
@@ -69,7 +66,6 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
             sysUserRole.setUserId(userId);
             save(sysUserRole);
         });
-        return true;
     }
 }
 

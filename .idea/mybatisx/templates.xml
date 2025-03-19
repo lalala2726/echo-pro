@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="DictionaryItem" />
-                  <option name="tableName" value="dictionary_item" />
+                  <option name="className" value="SysOperationLog" />
+                  <option name="tableName" value="sys_operation_log" />
                 </TableUIInfo>
               </list>
             </option>

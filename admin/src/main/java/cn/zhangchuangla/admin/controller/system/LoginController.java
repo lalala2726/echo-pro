@@ -1,6 +1,6 @@
 package cn.zhangchuangla.admin.controller.system;
 
-import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.constant.SysConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -59,7 +59,7 @@ public class LoginController {
         log.info("登录请求参数：{}", request);
         String token = sysLoginService.login(loginRequest, request);
         HashMap<String, String> map = new HashMap<>();
-        map.put(SystemConstant.TOKEN, token);
+        map.put(SysConstant.TOKEN, token);
         return AjaxResult.success(map);
     }
 

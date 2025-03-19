@@ -1,6 +1,5 @@
 package cn.zhangchuangla.common.core.model.entity;
 
-import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import lombok.Data;
 
 import java.io.Serial;

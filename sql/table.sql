@@ -83,6 +83,7 @@ create table sys_role_permissions
 
 drop table sys_operation_log;
 
+# 操作日志表
 CREATE TABLE sys_operation_log
 (
     log_id         BIGINT AUTO_INCREMENT PRIMARY KEY,

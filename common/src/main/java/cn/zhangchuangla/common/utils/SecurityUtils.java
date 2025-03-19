@@ -1,6 +1,9 @@
 package cn.zhangchuangla.common.utils;
 
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.exception.ServiceException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -10,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * <p>
  * created on 2025/2/26 22:16
  */
+@Slf4j
 public class SecurityUtils {
 
     /**
@@ -18,7 +22,19 @@ public class SecurityUtils {
      * @return LoginUser
      */
     public static LoginUser getLoginUser() {
-        return (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            return (LoginUser) getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            log.error("获取用户信息失败", e);
+            throw new ServiceException("获取用户信息失败");
+        }
+    }
+
+    /**
+     * 获取Authentication
+     */
+    public static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     /**

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils.http;
+package cn.zhangchuangla.common.utils;
 
 import okhttp3.*;
 import okio.BufferedSink;
