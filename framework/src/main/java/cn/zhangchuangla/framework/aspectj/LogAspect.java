@@ -137,16 +137,14 @@ public class LogAspect {
                 sysOperationLog.setResultCode(HttpStatusConstant.INTERNAL_SERVER_ERROR); // HTTP 500 代表服务器内部错误
                 sysOperationLog.setErrorMsg(exception.getMessage());
             } else {
-                // 记录成功的返回结果
+                // 记录成功地返回结果
                 sysOperationLog.setResultCode(HttpStatusConstant.SUCCESS); // HTTP 200 代表成功
                 if (controllerLog.isSaveResponseData() && jsonResult != null) {
-                    sysOperationLog.setParams(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
+                    sysOperationLog.setOperationResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
                 }
             }
-
             // 设置创建时间
             sysOperationLog.setCreateTime(new Date());
-
             // 将日志存储到数据库
             sysOperationLogService.save(sysOperationLog);
 

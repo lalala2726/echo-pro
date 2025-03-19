@@ -1,6 +1,8 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -68,6 +70,7 @@ public class SysUserController {
     @PostMapping()
     @Operation(summary = "添加用户")
     @PreAuthorize("@auth.hasPermission('system:user:add')")
+    @Log(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @Validated @RequestBody AddUserRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
@@ -83,6 +86,7 @@ public class SysUserController {
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除用户")
     @PreAuthorize("@auth.hasPermission('system:user:info')")
+    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
                                      @PathVariable("ids") List<Long> ids) {
         ParamsUtils.objectIsNull(ids, "用户ID不能为空!");
@@ -102,6 +106,7 @@ public class SysUserController {
     @PutMapping
     @Operation(summary = "修改用户信息")
     @PreAuthorize("@auth.hasPermission('system:user:update')")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息")
                                          @Validated @RequestBody UpdateUserRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());

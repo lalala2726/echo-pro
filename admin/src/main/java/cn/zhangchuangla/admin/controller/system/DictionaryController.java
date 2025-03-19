@@ -1,5 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
@@ -68,6 +70,7 @@ public class DictionaryController {
     @Operation(summary = "新增字典")
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
+    @Log(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
         ParamsUtils.paramCheck(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
@@ -100,6 +103,7 @@ public class DictionaryController {
     @Operation(summary = "修改字典")
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
+    @Log(title = "字典管理", businessType = BusinessType.UPDATE, isSaveResponseData = true)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         ParamsUtils.minValidParam(request.getId(), "字典ID不能小于等于零!");
         boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
@@ -117,6 +121,7 @@ public class DictionaryController {
     @Operation(summary = "删除字典")
     @DeleteMapping("/{ids}")
     @PreAuthorize("@auth.hasPermission('system:dictionary:delete')")
+    @Log(title = "字典管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ParamsUtils.minValidParam(ids, "字典ID不能小于等于零!");
         dictionaryService.deleteDictionary(ids);

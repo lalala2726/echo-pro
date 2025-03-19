@@ -1,5 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
@@ -92,6 +94,7 @@ public class DictionaryDataController {
     @Operation(summary = "添加字典值")
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
+    @Log(title = "字典值管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         ParamsUtils.minValidParam(request.getDictionaryId(), "字典ID不能小于等于零!");
@@ -127,6 +130,7 @@ public class DictionaryDataController {
     @Operation(summary = "修改字典值")
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:update')")
+    @Log(title = "字典值管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         boolean isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
@@ -144,6 +148,7 @@ public class DictionaryDataController {
     @Operation(summary = "删除字典值")
     @DeleteMapping("/{id}")
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:delete')")
+    @Log(title = "字典值管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionaryData(@PathVariable("id") List<Long> ids) {
         ParamsUtils.objectIsNull(ids, "字典值ID不能为空!");
         ids.forEach(id -> {

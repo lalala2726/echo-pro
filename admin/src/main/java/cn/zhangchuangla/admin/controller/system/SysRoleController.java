@@ -96,31 +96,12 @@ public class SysRoleController {
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:delete')")
+    @Log(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return AjaxResult.success("删除成功");
         }
         return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "删除失败");
-    }
-
-    /**
-     * 添加角色信息
-     *
-     * @return 添加结果
-     */
-    @PostMapping
-    @Operation(summary = "添加角色信息")
-    @Log(title = "角色管理", businessType = BusinessType.INSERT)
-    @PreAuthorize("@auth.hasPermission('system:role:add')")
-    public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
-                                  @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
-        boolean roleNameExist = sysRoleService.isRoleNameExist(roleAddRequest.getRoleName());
-        ParamsUtils.paramCheck(roleNameExist, "角色名已存在");
-        boolean roleKeyExist = sysRoleService.isRoleKeyExist(roleAddRequest.getRoleKey());
-        ParamsUtils.paramCheck(roleKeyExist, "角色权限字符串已存在");
-        sysRoleService.addRoleInfo(roleAddRequest);
-        return AjaxResult.success();
-
     }
 
     /**
@@ -134,6 +115,7 @@ public class SysRoleController {
     @PutMapping
     @Operation(summary = "修改角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:update')")
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
                                      @Validated @RequestBody SysRoleVo sysRoleVo) {
         if (sysRoleVo == null || sysRoleVo.getRoleId() == null) {
@@ -145,6 +127,26 @@ public class SysRoleController {
             return AjaxResult.success("修改成功");
         }
         return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "修改失败");
+    }
+
+    /**
+     * 添加角色信息
+     *
+     * @return 添加结果
+     */
+    @PostMapping
+    @Operation(summary = "添加角色信息")
+    @PreAuthorize("@auth.hasPermission('system:role:add')")
+    @Log(title = "角色管理", businessType = BusinessType.INSERT)
+    public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
+                                  @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
+        boolean roleNameExist = sysRoleService.isRoleNameExist(roleAddRequest.getRoleName());
+        ParamsUtils.paramCheck(roleNameExist, "角色名已存在");
+        boolean roleKeyExist = sysRoleService.isRoleKeyExist(roleAddRequest.getRoleKey());
+        ParamsUtils.paramCheck(roleKeyExist, "角色权限字符串已存在");
+        sysRoleService.addRoleInfo(roleAddRequest);
+        return AjaxResult.success();
+
     }
 
 }

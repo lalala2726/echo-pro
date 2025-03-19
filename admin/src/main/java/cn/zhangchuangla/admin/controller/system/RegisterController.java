@@ -1,5 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.web.service.RegisterService;
@@ -39,6 +41,7 @@ public class RegisterController {
      */
     @PostMapping("/register")
     @Operation(summary = "注册")
+    @Log(title = "用户注册", businessType = BusinessType.REGISTER, isSaveRequestData = false)
     public AjaxResult register(@Parameter(name = "注册参数", required = true)
                                @Validated @RequestBody RegisterRequest request) {
         if (request.getUsername() == null) {

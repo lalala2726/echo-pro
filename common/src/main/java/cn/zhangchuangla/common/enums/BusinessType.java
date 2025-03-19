@@ -50,4 +50,24 @@ public enum BusinessType {
      * 清空数据
      */
     CLEAN,
+
+    /**
+     * 登录
+     */
+    LOGIN,
+
+    /**
+     * 退出
+     */
+    LOGOUT,
+
+    /**
+     * 注册
+     */
+    REGISTER,
+
+    /**
+     * 密码重置
+     */
+    RESET_PWD,
 }

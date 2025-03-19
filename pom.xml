@@ -35,7 +35,7 @@
         <okhttp.version>4.12.0</okhttp.version>
         <spring.security.version>5.6.0</spring.security.version>
         <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
-        <ua-parser.version>1.6.1</ua-parser.version>
+        <eu.bitwalker.version>1.21</eu.bitwalker.version>
 
     </properties>
 
@@ -73,12 +73,20 @@
                 <artifactId>jjwt-api</artifactId>
                 <version>0.11.5</version>
             </dependency>
+            <!-- 获取客户端信息 -->
+            <!-- https://mvnrepository.com/artifact/eu.bitwalker/UserAgentUtils -->
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${eu.bitwalker.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-impl</artifactId>
