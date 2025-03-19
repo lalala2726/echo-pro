@@ -219,8 +219,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         BeanUtils.copyProperties(request, sysUser);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
         update(sysUser, eq);
-
-
         //修改用户角色
         //1.删除角色所关联的全部角色信息
         Long userId = request.getUserId();
@@ -234,37 +232,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             });
             sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
         }
-    }
-
-    /**
-     * 根据用户名查询用户信息
-     *
-     * @param username 用户名
-     * @return 返回用户信息
-     */
-    @Override
-    public SysUser getUserInfoByUsername(String username) {
-        ParamsUtils.paramsNotIsNullOrBlank("用户名不能为空", username);
-        return sysUserMapper.getUserInfoByUsername(username);
-    }
-
-    /**
-     * 判断是否允许修改
-     *
-     * @param userId 用户ID
-     */
-    @Override
-    public void isAllowUpdate(Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于0");
-        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
-        if (roleSet != null) {
-            roleSet.forEach(role -> {
-                if (SysRolesConstant.ADMIN.equals(role)) {
-                    throw new ServiceException(ResponseCode.OPERATION_ERROR, "不能修改管理员信息");
-                }
-            });
-        }
-
     }
 }
 
