@@ -1,9 +1,6 @@
-package cn.zhangchuangla.system.model.entity;
+package cn.zhangchuangla.system.model.vo.dictionary;
 
-import cn.zhangchuangla.common.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import cn.zhangchuangla.common.base.BaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,35 +9,28 @@ import lombok.EqualsAndHashCode;
  * 字典值表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "dictionary_item")
 @Data
-@Schema(name = "字典值表", description = "字典值表")
-public class DictionaryItem extends BaseEntity {
+@Schema(name = "字典项详细视图")
+public class DictionaryDataVo extends BaseVO {
 
     /**
      * 主键
      */
-    @TableId(type = IdType.AUTO)
     @Schema(description = "主键")
     private Long id;
 
-    /**
-     * 字典编码
-     */
-    @Schema(description = "字典编码")
-    private Long dictionaryId;
 
     /**
      * 字典项键
      */
     @Schema(description = "字典项键")
-    private String itemKey;
+    private String dataKey;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值")
-    private String itemValue;
+    private String dataValue;
 
     /**
      * 排序
@@ -53,5 +43,11 @@ public class DictionaryItem extends BaseEntity {
      */
     @Schema(description = "状态 (0: 启用, 1: 禁用)")
     private Integer status;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 
 }

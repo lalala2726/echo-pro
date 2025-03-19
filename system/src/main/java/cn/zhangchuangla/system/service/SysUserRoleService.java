@@ -25,9 +25,8 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      * 删除用户角色关联角色信息
      *
      * @param userId 用户ID
-     * @return 是否成功
      */
-    boolean deleteUserRoleAssociation(Long userId);
+    void deleteUserRoleAssociation(Long userId);
 
 
     /**
@@ -36,6 +35,6 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      * @param roleId 角色ID列表
      * @param userId 用户ID
      */
-    boolean addUserRoleAssociation(List<Long> roleId, Long userId);
+    void addUserRoleAssociation(List<Long> roleId, Long userId);
 
 }

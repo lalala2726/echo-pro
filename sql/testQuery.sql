@@ -18,4 +18,18 @@ set status = 0
 where 1 = 1;
 
 
+select *
+from sys_user
+where username = 'zhangchuang';
+
+delete
+from sys_user
+where user_id > 19;
+
+
+update dictionary
+set status = 0
+where 1 = 1
+
+
 

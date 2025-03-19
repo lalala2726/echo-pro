@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>登录测试</title>
     <!-- 引入完整版的 jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -12,9 +12,11 @@
         body {
             background-color: #f8f9fa;
         }
+
         .login-container {
             margin-top: 100px;
         }
+
         .response-box {
             margin-top: 20px;
             padding: 20px;
@@ -36,13 +38,15 @@
                     <form id="loginForm">
                         <div class="form-group">
                             <label for="username">用户名</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="用户名" required>
+                            <input class="form-control" id="username" name="username" placeholder="用户名" required
+                                   type="text">
                         </div>
                         <div class="form-group">
                             <label for="password">密码</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="密码" required>
+                            <input class="form-control" id="password" name="password" placeholder="密码" required
+                                   type="password">
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">登录</button>
+                        <button class="btn btn-primary btn-block" type="submit">登录</button>
                     </form>
                 </div>
             </div>
@@ -62,8 +66,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#loginForm').on('submit', function(event) {
+    $(document).ready(function () {
+        $('#loginForm').on('submit', function (event) {
             event.preventDefault();  // 防止表单默认提交
 
             // 获取表单数据
@@ -71,20 +75,20 @@
             var password = $('#password').val();
 
             // 显示请求数据（调试用）
-            $('#requestData').text(JSON.stringify({ username: username, password: password }, null, 2));
+            $('#requestData').text(JSON.stringify({username: username, password: password}, null, 2));
 
             // 发送 AJAX 请求
             $.ajax({
                 url: '/login',  // 替换成实际的后端接口
                 type: 'POST',
                 contentType: 'application/json',  // 确保使用 JSON 格式
-                data: JSON.stringify({ username: username, password: password }),
-                success: function(response) {
+                data: JSON.stringify({username: username, password: password}),
+                success: function (response) {
                     // 显示返回的结果
                     $('#responseBox').show();
                     $('#responseData').text(JSON.stringify(response, null, 2));
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     // 错误处理，展示错误信息
                     $('#responseBox').show();
                     $('#responseData').text('发生错误: ' + error + '\n响应内容: ' + xhr.responseText);

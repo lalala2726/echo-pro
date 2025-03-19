@@ -1,5 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.web.service.RegisterService;
@@ -7,6 +9,7 @@ import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +41,9 @@ public class RegisterController {
      */
     @PostMapping("/register")
     @Operation(summary = "注册")
+    @Log(title = "用户注册", businessType = BusinessType.REGISTER, isSaveRequestData = false)
     public AjaxResult register(@Parameter(name = "注册参数", required = true)
-                               @RequestBody RegisterRequest request) {
+                               @Validated @RequestBody RegisterRequest request) {
         if (request.getUsername() == null) {
             return AjaxResult.error("用户名不能为空");
         }

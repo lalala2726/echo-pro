@@ -5,7 +5,7 @@ package cn.zhangchuangla.common.constant;
  * <p>
  * created on 2025/2/19 22:30
  */
-public class SystemConstant {
+public class SysConstant {
 
     /**
      * 令牌

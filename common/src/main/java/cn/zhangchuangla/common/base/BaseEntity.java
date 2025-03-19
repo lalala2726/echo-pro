@@ -1,6 +1,5 @@
 package cn.zhangchuangla.common.base;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -18,14 +17,12 @@ public class BaseEntity implements Serializable {
      * 创建时间
      */
     @Schema(name = "创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * 删除时间
      */
     @Schema(name = "删除时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     /**

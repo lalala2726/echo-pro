@@ -32,7 +32,7 @@ public interface SysPermissionsService extends IService<SysPermissions> {
     /**
      * 保存用户权限到Redis
      *
-     * @param userId      用户ID
+     * @param userId 用户ID
      */
     void saveUserPermissionsToRedis(Long userId, final long expireTime);
 }

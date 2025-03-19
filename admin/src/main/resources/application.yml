@@ -21,8 +21,6 @@ spring:
     url: jdbc:mysql://localhost:3306/person_app?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: zhangchuang2726
-
-    #开启日志Mybatis-plus日志
   data:
     redis:
       host: localhost
@@ -31,8 +29,8 @@ spring:
       password: zhangchuang2726
 
 mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #  configuration:
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: cn.zhangchuangla.**.entity
   mapper-locations:
     - classpath*:mapper/**/**.xml

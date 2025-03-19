@@ -65,6 +65,12 @@ public class UserInfoVo {
     private String email;
 
     /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
+
+    /**
      * 状态
      */
     @Schema(description = "状态")

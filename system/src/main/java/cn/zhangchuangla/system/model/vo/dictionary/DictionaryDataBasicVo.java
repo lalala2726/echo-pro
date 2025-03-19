@@ -1,17 +1,14 @@
 package cn.zhangchuangla.system.model.vo.dictionary;
 
-import cn.zhangchuangla.common.base.BaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 字典值表
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "字典项详细视图")
-public class DictionaryItemVo extends BaseVO {
+@Schema(name = "基本视图", description = "基本视图响应对象")
+public class DictionaryDataBasicVo {
 
     /**
      * 主键
@@ -24,13 +21,13 @@ public class DictionaryItemVo extends BaseVO {
      * 字典项键
      */
     @Schema(description = "字典项键")
-    private String itemKey;
+    private String dataKey;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值")
-    private String itemValue;
+    private String dataValue;
 
     /**
      * 排序

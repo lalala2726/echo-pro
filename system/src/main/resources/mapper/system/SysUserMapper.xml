@@ -64,4 +64,10 @@
         where phone = #{phone}
           and user_id != #{userId}
     </select>
+    <select id="getUserInfoByUsername" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        where username = #{username}
+          and is_deleted = 0
+    </select>
 </mapper>

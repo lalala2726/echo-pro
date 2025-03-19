@@ -1,5 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
@@ -14,6 +16,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,6 +36,7 @@ public class DictionaryController {
 
 
     private final DictionaryService dictionaryService;
+
     public DictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
@@ -44,7 +49,8 @@ public class DictionaryController {
      */
     @Operation(summary = "字典列表")
     @GetMapping("/list")
-    public AjaxResult list(DictionaryRequest request) {
+    @PreAuthorize("@auth.hasPermission('system:dictionary:list')")
+    public AjaxResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
         ArrayList<DictionaryListVo> dictionaryListVos = new ArrayList<>();
         list.getRecords().forEach(item -> {
@@ -63,9 +69,10 @@ public class DictionaryController {
      */
     @Operation(summary = "新增字典")
     @PostMapping
-    public AjaxResult addDictionary(@RequestBody AddDictionaryRequest request) {
-        ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空!", request.getName());
-        ParamsUtils.isParamValid(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
+    @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
+    @Log(title = "字典管理", businessType = BusinessType.INSERT)
+    public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
+        ParamsUtils.paramCheck(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
         return AjaxResult.success();
     }
@@ -78,6 +85,7 @@ public class DictionaryController {
      */
     @Operation(summary = "字典详情")
     @GetMapping("/{id}")
+    @PreAuthorize("@auth.hasPermission('system:dictionary:info')")
     public AjaxResult getDictionaryById(@PathVariable("id") Long id) {
         ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
@@ -94,8 +102,12 @@ public class DictionaryController {
      */
     @Operation(summary = "修改字典")
     @PutMapping
-    public AjaxResult updateDictionary(UpdateDictionaryRequest request) {
+    @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
+    @Log(title = "字典管理", businessType = BusinessType.UPDATE, isSaveResponseData = true)
+    public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         ParamsUtils.minValidParam(request.getId(), "字典ID不能小于等于零!");
+        boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
+        ParamsUtils.paramCheck(current, "字典名称已存在!");
         boolean result = dictionaryService.updateDictionaryById(request);
         return AjaxResult.isSuccess(result);
     }
@@ -107,8 +119,10 @@ public class DictionaryController {
      * @return 操作结果
      */
     @Operation(summary = "删除字典")
-    @DeleteMapping("/{id}")
-    public AjaxResult deleteDictionary(@PathVariable("id") List<Long> ids) {
+    @DeleteMapping("/{ids}")
+    @PreAuthorize("@auth.hasPermission('system:dictionary:delete')")
+    @Log(title = "字典管理", businessType = BusinessType.DELETE)
+    public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ParamsUtils.minValidParam(ids, "字典ID不能小于等于零!");
         dictionaryService.deleteDictionary(ids);
         return AjaxResult.success();

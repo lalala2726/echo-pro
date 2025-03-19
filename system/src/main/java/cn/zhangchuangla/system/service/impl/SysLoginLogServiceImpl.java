@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.constant.SysConstant;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.service.SysLoginLogService;
@@ -33,7 +33,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
         sysLoginLog.setAddress(httpServletRequest.getRemoteAddr());
         sysLoginLog.setBrowser(httpServletRequest.getHeader("User-Agent"));
         sysLoginLog.setOs(httpServletRequest.getHeader("sec-ch-ua-platform"));
-        sysLoginLog.setCreateBy(SystemConstant.SYSTEM_CREATE);
+        sysLoginLog.setCreateBy(SysConstant.SYSTEM_CREATE);
         save(sysLoginLog);
     }
 }

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.request.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class UpdateUserRequest {
      * ID
      */
     @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "用户ID不能为空")
     private Long userId;
 
     /**

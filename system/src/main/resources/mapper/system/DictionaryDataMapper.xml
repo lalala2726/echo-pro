@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.system.mapper.DictionaryDataMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.DictionaryData">
+        <id property="id" column="id"/>
+        <result property="dictionaryId" column="dictionary_id"/>
+        <result property="dataKey" column="data_key"/>
+        <result property="dataValue" column="data_value"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+    <update id="updateDictionaryDataByDictName"
+            parameterType="cn.zhangchuangla.system.model.vo.dictionary.DictionaryDataListVo">
+        update dictionary_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="request.dataKey != null and request.dataKey != ''">
+                data_key = #{request.dataKey},
+            </if>
+            <if test="request.dataValue != null and request.dataValue != ''">
+                data_value = #{request.dataValue},
+            </if>
+            <if test="request.sortOrder != null">
+                sort_order = #{request.sortOrder},
+            </if>
+            <if test="request.status != null">
+                `status` = #{request.status},
+            </if>
+            <if test="request.createBy != null">
+                create_by = #{request.createBy},
+            </if>
+            <if test="request.updateBy != null">
+                update_by = #{request.updateBy},
+            </if>
+            <if test="request.remark != null">
+                remark = #{request.remark},
+            </if>
+        </trim>
+        where dictionary_id = (
+        select id from dictionary where name = #{dictName}
+        )
+    </update>
+
+    <delete id="deleteDictionaryItem">
+        delete from dictionary_data
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="dictionaryDataService" resultMap="BaseResultMap">
+        select dictionary_data.dictionary_id,
+               dictionary_data.data_key,
+               dictionary_data.data_value,
+               dictionary_data.create_by,
+               dictionary_data.update_by,
+               dictionary_data.remark
+        from dictionary_data
+                 join dictionary d on d.id = dictionary_data.dictionary_id
+        where d.name = #{dictionaryName}
+    </select>
+    <select id="getDictDataByDictionaryName" resultMap="BaseResultMap">
+        select *
+        from dictionary_data
+        join dictionary on dictionary_data.dictionary_id = dictionary.id
+        where dictionary_data.dictionary_id = #{dictionaryId}
+        <where>
+            <if test="request.dataKey != null and request.dataKey != ''">
+                AND dictionary_data.data_key LIKE CONCAT('%', #{request.dataKey}, '%')
+            </if>
+            <if test="request.dataValue != null and request.dataValue != ''">
+                AND dictionary_data.data_value LIKE CONCAT('%', #{request.dataValue}, '%')
+            </if>
+            <if test="request.status != null">
+                AND dictionary_data.status = #{request.status}
+            </if>
+        </where>
+        order by dictionary_data.sort_order
+    </select>
+
+</mapper>

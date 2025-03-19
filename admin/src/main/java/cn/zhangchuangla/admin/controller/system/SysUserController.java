@@ -1,10 +1,12 @@
 package cn.zhangchuangla.admin.controller.system;
 
+import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.common.utils.RegularUtils;
+import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
  */
 @Tag(name = "用户管理接口")
 @RestController
+@Anonymous
 @RequestMapping("/system/user")
 public class SysUserController {
 
@@ -46,7 +50,8 @@ public class SysUserController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
-    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") UserRequest request) {
+    @PreAuthorize("@auth.hasPermission('system:user:list')")
+    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<UserListVo> userListVos = userPage.getRecords().stream()
@@ -64,8 +69,10 @@ public class SysUserController {
      */
     @PostMapping()
     @Operation(summary = "添加用户")
+    @PreAuthorize("@auth.hasPermission('system:user:add')")
+    @Log(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
-                              @RequestBody @Validated AddUserRequest request) {
+                              @Validated @RequestBody AddUserRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
         return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
     }
@@ -78,6 +85,8 @@ public class SysUserController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除用户")
+    @PreAuthorize("@auth.hasPermission('system:user:info')")
+    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
                                      @PathVariable("ids") List<Long> ids) {
         ParamsUtils.objectIsNull(ids, "用户ID不能为空!");
@@ -96,26 +105,19 @@ public class SysUserController {
      */
     @PutMapping
     @Operation(summary = "修改用户信息")
-    public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息", required = true, description = "其中用户ID是必填项,其他参数是修改后的结果")
-                                         @RequestBody UpdateUserRequest request) {
-
-//        参数校验
-        ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0!");
+    @PreAuthorize("@auth.hasPermission('system:user:update')")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息")
+                                         @Validated @RequestBody UpdateUserRequest request) {
+        sysUserService.isAllowUpdate(request.getUserId());
+        //参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-            boolean phoneValid = RegularUtils.isPhoneValid(request.getPhone());
-            ParamsUtils.isParamValid(phoneValid, "手机号格式不正确!");
             boolean phoneExist = sysUserService.isPhoneExist(request.getPhone(), request.getUserId());
-            ParamsUtils.isParamValid(!phoneExist, "手机号已存在!");
+            ParamsUtils.paramCheck(phoneExist, "手机号已存在!");
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            boolean emailValid = RegularUtils.isEmailValid(request.getEmail());
-            ParamsUtils.isParamValid(emailValid, "邮箱格式不正确!");
             boolean emailExist = sysUserService.isEmailExist(request.getEmail(), request.getUserId());
-            ParamsUtils.isParamValid(!emailExist, "邮箱已存在!");
-        }
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            boolean passwordValid = RegularUtils.isPasswordValid(request.getPassword());
-            ParamsUtils.isParamValid(passwordValid, "密码格式不正确!");
+            ParamsUtils.paramCheck(emailExist, "邮箱已存在!");
         }
         //业务逻辑
         sysUserService.updateUserInfoById(request);
@@ -130,6 +132,7 @@ public class SysUserController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取用户信息")
+    @PreAuthorize("@auth.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
                                       @PathVariable("id") Long id) {
         ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");

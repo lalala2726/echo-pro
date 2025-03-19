@@ -1,6 +1,6 @@
 package cn.zhangchuangla.admin.controller.system;
 
-import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.constant.SysConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,18 +54,12 @@ public class LoginController {
     @PostMapping("/login")
     @Operation(summary = "登录")
     public AjaxResult login(@Parameter(name = "登录参数", required = true)
-                            @RequestBody LoginRequest loginRequest,
+                            @Validated @RequestBody LoginRequest loginRequest,
                             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
-        if (loginRequest.getUsername() == null) {
-            return AjaxResult.error("用户名不能为空");
-        }
-        if (loginRequest.getPassword() == null) {
-            return AjaxResult.error("密码不能为空");
-        }
         String token = sysLoginService.login(loginRequest, request);
         HashMap<String, String> map = new HashMap<>();
-        map.put(SystemConstant.TOKEN, token);
+        map.put(SysConstant.TOKEN, token);
         return AjaxResult.success(map);
     }
 

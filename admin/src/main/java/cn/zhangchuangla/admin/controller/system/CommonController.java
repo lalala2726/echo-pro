@@ -39,6 +39,4 @@ public class CommonController {
         ajax.put("url", fileUrl);
         return ajax;
     }
-
-
 }

@@ -1,15 +1,12 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import cn.zhangchuangla.common.config.LoginConfig;
 import cn.zhangchuangla.common.config.TokenConfig;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.constant.SystemConstant;
+import cn.zhangchuangla.common.constant.SysConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
-import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.web.service.TokenService;
 import com.alibaba.fastjson.JSON;
@@ -45,14 +42,13 @@ public class TokenServiceImpl implements TokenService {
     private final TokenConfig tokenConfig;
     private final SecretKey key;
     private final RedisCache redisCache;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
         this.tokenConfig = tokenConfig;
         this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));// 从配置文件中读取密钥字符串并转换为SecretKey
         this.redisCache = redisCache;
     }
-
-    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * 创建token
@@ -67,7 +63,7 @@ public class TokenServiceImpl implements TokenService {
         String uuid = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
         loginUser.setSessionId(uuid);
-        claims.put(SystemConstant.LOGIN_USER_KEY, uuid);
+        claims.put(SysConstant.LOGIN_USER_KEY, uuid);
         setUserAgent(loginUser, request);
         // 将用户信息存储到 Redis 中
         refreshToken(loginUser);
@@ -86,7 +82,8 @@ public class TokenServiceImpl implements TokenService {
      * @param request   请求
      */
     public void setUserAgent(LoginUser loginUser, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();//获取浏览器
+        String ip = request.getRemoteAddr();
+        //获取浏览器
         String header = request.getHeader("User-Agent");
         String os = request.getHeader("sec-ch-ua-platform");
         loginUser.setIpAddress(ip);
@@ -112,7 +109,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 根据uuid获取登录用户信息
      *
-     * @param session  登录用户会话ID
+     * @param session 登录用户会话ID
      * @return 登录用户信息
      */
     private String getTokenKey(String session) {
@@ -191,7 +188,7 @@ public class TokenServiceImpl implements TokenService {
         if (!StringUtils.isBlank(token)) {
             try {
                 Claims claims = parseToken(token);
-                String sessionId = (String) claims.get(SystemConstant.LOGIN_USER_KEY);
+                String sessionId = (String) claims.get(SysConstant.LOGIN_USER_KEY);
                 return getLoginUserByToken(sessionId);
             } catch (Exception e) {
                 log.warn("获取用户信息失败:", e);

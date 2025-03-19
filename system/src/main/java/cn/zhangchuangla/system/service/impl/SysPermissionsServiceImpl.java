@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper, SysPermissions>
         implements SysPermissionsService {
 
+    private final static long permissionExpireTime = 15;
     private final SysPermissionsMapper sysPermissionsMapper;
     private final RedisCache redisCache;
-    private final static long permissionExpireTime = 15;
 
     public SysPermissionsServiceImpl(SysPermissionsMapper sysPermissionsMapper, RedisCache redisCache) {
         this.sysPermissionsMapper = sysPermissionsMapper;

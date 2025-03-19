@@ -83,6 +83,7 @@ create table sys_role_permissions
 
 drop table sys_operation_log;
 
+# 操作日志表
 CREATE TABLE sys_operation_log
 (
     log_id         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -132,7 +133,7 @@ CREATE TABLE dictionary
 ) comment '字典表';
 
 -- 字典值表 (存储具体的字典项)
-CREATE TABLE dictionary_item
+CREATE TABLE dictionary_data
 (
     id            INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
     dictionary_id VARCHAR(50)  NOT NULL COMMENT '字典编码',

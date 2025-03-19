@@ -11,9 +11,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.Objects;
 
 /**
  * 全局异常处理
@@ -98,6 +101,15 @@ public class GlobalExceptionHandel {
     public AjaxResult accessDeniedExceptionHandel(AccessDeniedException exception) {
         log.error("权限不足:{}", exception.getMessage());
         return AjaxResult.error(ResponseCode.ACCESS_DENIED);
+    }
+
+    /**
+     * 参数校验失败
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public AjaxResult methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
+        log.error("参数校验失败:", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
     /**

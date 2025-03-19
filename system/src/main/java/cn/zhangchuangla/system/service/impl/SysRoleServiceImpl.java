@@ -3,16 +3,15 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
-import cn.zhangchuangla.system.model.entity.SysUserRole;
+import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.service.SysRoleService;
-import cn.zhangchuangla.system.service.SysUserRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,10 +23,10 @@ import java.util.stream.Collectors;
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         implements SysRoleService {
 
-    private final SysUserRoleService sysUserRoleService;
+    private final SysRoleMapper sysRoleMapper;
 
-    public SysRoleServiceImpl(SysUserRoleService sysUserRoleService) {
-        this.sysUserRoleService = sysUserRoleService;
+    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper) {
+        this.sysRoleMapper = sysRoleMapper;
     }
 
     //todo 添加一个根据用户ID获取当前用户所拥有的角色,每个用户角色都会缓存到Redis和用户Id进行绑定,方便后续撤销等操作
@@ -56,20 +55,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
         //todo 将角色信息缓存到数据中,当用户角色信息发生变化时，更新缓存
-        ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
-        ArrayList<Long> roleIds = new ArrayList<>();
-        LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<SysUserRole> userRoleList = sysUserRoleService.getUserRoleByUserId(userId);
-        userRoleList.forEach(sysUserRole -> {
-            Long roleId = sysUserRole.getRoleId();
-            roleIds.add(roleId);
-        });
-        if (!roleIds.isEmpty()) {
-            sysRoleLambdaQueryWrapper.in(SysRole::getRoleId, roleIds);
-            return list(sysRoleLambdaQueryWrapper);
-        }
-
-        return null;
+        return sysRoleMapper.getRoleListByUserId(userId);
     }
 
     /**
@@ -82,9 +68,56 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public Set<String> getUserRoleSetByUserId(Long userId) {
         ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
+        if (roleListByUserId == null) {
+            return null;
+        }
         return roleListByUserId.stream()
                 .map(SysRole::getRoleKey)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 添加学生信息
+     *
+     * @param roleAddRequest 请求参数
+     */
+    @Override
+    public void addRoleInfo(SysRoleAddRequest roleAddRequest) {
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(roleAddRequest, sysRole);
+        save(sysRole);
+    }
+
+    /**
+     * 判断角色名称是否存在
+     *
+     * @param roleName 角色名称
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean isRoleNameExist(String roleName) {
+        if (roleName != null && !roleName.isEmpty()) {
+            LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            sysRoleLambdaQueryWrapper.eq(SysRole::getRoleName, roleName);
+            return count(sysRoleLambdaQueryWrapper) > 0;
+        }
+        return false;
+    }
+
+    /**
+     * 判断角色权限字符串是否存在
+     *
+     * @param roleKey 角色权限字符串
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean isRoleKeyExist(String roleKey) {
+        if (roleKey != null && !roleKey.isEmpty()) {
+            LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            sysRoleLambdaQueryWrapper.eq(SysRole::getRoleKey, roleKey);
+            return count(sysRoleLambdaQueryWrapper) > 0;
+        }
+        return false;
     }
 
 

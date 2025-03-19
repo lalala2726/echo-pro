@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * created on 2025/2/26 19:22
  */
 @Component("systemRolesConstant")
-public class SystemRolesConstant {
+public class SysRolesConstant {
 
     /**
      * 超级管理员
@@ -29,4 +29,9 @@ public class SystemRolesConstant {
      * 访客
      */
     public static final String GUEST = "guest";
+
+    /**
+     * 匿名
+     */
+    public static final String ANONYMOUS = "anonymous";
 }
