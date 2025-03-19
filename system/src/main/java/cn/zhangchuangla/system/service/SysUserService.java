@@ -6,6 +6,7 @@ import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -99,4 +100,18 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      */
     void updateUserInfoById(UpdateUserRequest request);
+
+
+    /**
+     * 根据用户名查询用户信息
+     * @param username 用户名
+     * @return 返回用户信息
+     */
+    SysUser getUserInfoByUsername(String username);
+
+    /**
+     * 判断用户是否允许修改
+     * @param userId 用户ID
+     */
+    void isAllowUpdate(@NotBlank(message = "用户ID不能为空") Long userId);
 }

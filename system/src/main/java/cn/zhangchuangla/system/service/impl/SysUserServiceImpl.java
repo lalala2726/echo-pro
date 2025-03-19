@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -231,6 +230,39 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
                 ParamsUtils.minValidParam(role, "角色ID不能小于等于0");
             });
             sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
+        }
+    }
+
+    /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    @Override
+    public SysUser getUserInfoByUsername(String username) {
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
+        if (sysUserMapper.getUserInfoByUsername(username) != null) {
+            return sysUserMapper.getUserInfoByUsername(username);
+        }
+        return null;
+    }
+
+    /**
+     * 如果是修改当前用户信息或者是修改超级管理员的信息，则不允许修改
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    public void isAllowUpdate(Long userId) {
+        if (userId == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
+        }
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        boolean admin = loginUser.getSysUser().isAdmin();
+        Long currentId = loginUser.getUserId();
+        if (admin || Objects.equals(currentId, userId)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
         }
     }
 }

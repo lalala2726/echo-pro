@@ -78,4 +78,12 @@ public class SysUser extends BaseEntity {
     private String isDeleted;
 
 
+    /**
+     * 是否是管理员
+     */
+    public boolean isAdmin() {
+        return this.userId == 1L;
+    }
+
+
 }
