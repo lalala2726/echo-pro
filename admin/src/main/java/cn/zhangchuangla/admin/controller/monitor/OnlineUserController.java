@@ -12,7 +12,9 @@ import cn.zhangchuangla.system.model.entity.OnlineUser;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +74,7 @@ public class OnlineUserController {
     @Operation(summary = "强制退出登录")
     @Log(title = "在线用户管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@auth.hasPermission('monitor:online-user:delete')")
-    public AjaxResult forceLogout(@PathVariable("sessionId") String sessionId) {
+    public AjaxResult forceLogout(@PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
         if (sessionId == null) {
             return AjaxResult.error(ResponseCode.PARAM_NOT_NULL);
         }
