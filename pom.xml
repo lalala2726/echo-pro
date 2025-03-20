@@ -178,6 +178,7 @@
                 <version>${alibaba.fastjson.version}</version>
             </dependency>
 
+            <!-- minio -->
             <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
