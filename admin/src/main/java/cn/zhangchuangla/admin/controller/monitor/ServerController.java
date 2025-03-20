@@ -3,7 +3,7 @@ package cn.zhangchuangla.admin.controller.monitor;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.model.entity.Server;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ public class ServerController {
      * @return AjaxResult
      */
     @GetMapping
-    @Schema(description = "服务器信息")
+    @Operation(summary = "服务器信息")
     public AjaxResult getInfo() {
         Server server = new Server();
         server.copyInfo();

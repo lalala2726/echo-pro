@@ -1,6 +1,8 @@
 package cn.zhangchuangla.common.utils;
 
-import cn.zhangchuangla.common.exception.ParamException;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import java.util.List;
 
 /**
  * @author Chuang
@@ -9,15 +11,23 @@ import cn.zhangchuangla.common.exception.ParamException;
  */
 public class PageUtils {
 
+
     /**
-     * 合法性校验
+     * 通用分页封装方法
+     *
+     * @param pageNum  当前页码
+     * @param pageSize 每页大小
+     * @param total    总记录数
+     * @param data     具体数据集合
+     * @param <T>      数据类型
+     * @return 分页后的 Page 对象
      */
-    public static void checkPageParams(Long pageNum, Long pageSize) {
-        if (pageNum == null || pageNum < 1) {
-            throw new ParamException("pageNum参数不合法");
-        }
-        if (pageSize == null || pageSize < 1) {
-            throw new ParamException("pageSize参数不合法");
-        }
+    public static <T> Page<T> getPage(Long pageNum, Long pageSize, Integer total, List<T> data) {
+        Page<T> page = new Page<>();
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+        page.setTotal(total);
+        page.setRecords(data);
+        return page;
     }
 }

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -22,14 +21,15 @@ public class RedisConfig {
      * @param connectionFactory Redis连接工厂
      * @return RedisTemplate
      */
-    @Bean
     @Primary
+    @Bean
     @SuppressWarnings(value = {"unchecked", "rawtypes"})
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        FastJsonRedisSerializer serializer = new FastJsonRedisSerializer(Object.class);
+        // 创建FastJson2JsonRedisSerializer序列化器，用于处理值序列化
+        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
 
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         template.setKeySerializer(new StringRedisSerializer());
@@ -39,8 +39,10 @@ public class RedisConfig {
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(serializer);
 
+        // 重要：设置默认的序列化器，确保所有操作都使用相同的序列化规则
+        template.setDefaultSerializer(serializer);
+
         template.afterPropertiesSet();
         return template;
     }
-
 }

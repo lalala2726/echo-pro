@@ -104,6 +104,7 @@ public interface SysUserService extends IService<SysUser> {
 
     /**
      * 根据用户名查询用户信息
+     *
      * @param username 用户名
      * @return 返回用户信息
      */
@@ -111,6 +112,7 @@ public interface SysUserService extends IService<SysUser> {
 
     /**
      * 判断用户是否允许修改
+     *
      * @param userId 用户ID
      */
     void isAllowUpdate(@NotBlank(message = "用户ID不能为空") Long userId);

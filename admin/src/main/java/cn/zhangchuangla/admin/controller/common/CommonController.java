@@ -1,4 +1,4 @@
-package cn.zhangchuangla.admin.controller.system;
+package cn.zhangchuangla.admin.controller.common;
 
 import cn.zhangchuangla.common.enums.FileUploadMethod;
 import cn.zhangchuangla.common.result.AjaxResult;

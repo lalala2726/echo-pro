@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -54,7 +53,6 @@ public class SysRoleController {
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@auth.hasPermission('system:role:list')")
     public AjaxResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
-        PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysRole> page = sysRoleService.RoleList(request);
         ArrayList<SysRoleVo> sysRoleVos = new ArrayList<>();
         page.getRecords().forEach(sysRole -> {

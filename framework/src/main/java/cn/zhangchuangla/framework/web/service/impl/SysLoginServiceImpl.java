@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import cn.zhangchuangla.common.constant.SysConstant;
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
@@ -50,19 +50,16 @@ public class SysLoginServiceImpl implements SysLoginService {
      */
     @Override
     public String login(LoginRequest requestParams, HttpServletRequest httpServletRequest) {
-        //fixme 临时关闭, 校验登录参数
-
-
         Authentication authenticate = null;
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(requestParams.getUsername(), requestParams.getPassword());
             authenticate = authenticationManager.authenticate(authenticationToken);
         } catch (AuthenticationException e) {
-            log.warn("登录失败:", e);
+            log.error("登录失败:", e);
             log.info("用户名[{}],登录失败", requestParams.getUsername());
             sysPasswordService.PasswordErrorCount(requestParams.getUsername());
-            sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SysConstant.LOGIN_FAIL);
+            sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, Constants.LOGIN_FAIL);
             throw new AccountException(ResponseCode.LOGIN_ERROR, e.getMessage());
         } catch (Exception e) {
             log.warn("服务器发生异常:", e);
@@ -74,7 +71,6 @@ public class SysLoginServiceImpl implements SysLoginService {
         if (authenticate != null) {
             loginUser = (LoginUser) authenticate.getPrincipal();
         }
-        //fixme 将基本的信息提取出来后传入LoginUser中
         Long userId = null;
         if (loginUser != null) {
             userId = loginUser.getSysUser().getUserId();
@@ -82,7 +78,7 @@ public class SysLoginServiceImpl implements SysLoginService {
         }
         log.info("登录用户信息: {}", loginUser);
         //记录登录成功日志
-        sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, SysConstant.LOGIN_SUCCESS);
+        sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, Constants.LOGIN_SUCCESS);
         return tokenService.createToken(loginUser, httpServletRequest);
     }
 }

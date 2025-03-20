@@ -1,15 +1,16 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.zhangchuangla.common.config.TokenConfig;
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.constant.SysConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.utils.ClientUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.framework.web.service.TokenService;
-import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -63,7 +64,7 @@ public class TokenServiceImpl implements TokenService {
         String uuid = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
         loginUser.setSessionId(uuid);
-        claims.put(SysConstant.LOGIN_USER_KEY, uuid);
+        claims.put(Constants.LOGIN_USER_KEY, uuid);
         setUserAgent(loginUser, request);
         // 将用户信息存储到 Redis 中
         refreshToken(loginUser);
@@ -82,13 +83,14 @@ public class TokenServiceImpl implements TokenService {
      * @param request   请求
      */
     public void setUserAgent(LoginUser loginUser, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        //获取浏览器
-        String header = request.getHeader("User-Agent");
-        String os = request.getHeader("sec-ch-ua-platform");
-        loginUser.setIpAddress(ip);
-        loginUser.setOs(os);
-        loginUser.setBrowser(header);
+        String clientIp = ClientUtils.getClientIp(request);
+        String userAgent = UserAgentUtils.getUserAgent(request);
+        loginUser.setBrowser(UserAgentUtils.getBrowserName(userAgent));
+        loginUser.setOs(UserAgentUtils.getOsName(userAgent));
+        if (!clientIp.isBlank()) {
+            loginUser.setIp(clientIp);
+            loginUser.setAddress(ClientUtils.getAddressByIp(clientIp));
+        }
     }
 
     /**
@@ -188,7 +190,7 @@ public class TokenServiceImpl implements TokenService {
         if (!StringUtils.isBlank(token)) {
             try {
                 Claims claims = parseToken(token);
-                String sessionId = (String) claims.get(SysConstant.LOGIN_USER_KEY);
+                String sessionId = (String) claims.get(Constants.LOGIN_USER_KEY);
                 return getLoginUserByToken(sessionId);
             } catch (Exception e) {
                 log.warn("获取用户信息失败:", e);
@@ -197,14 +199,34 @@ public class TokenServiceImpl implements TokenService {
         return null;
     }
 
+    /**
+     * 根据会话ID获取登录用户信息
+     *
+     * @param sessionId 会话ID
+     * @return 返回登录用户信息
+     */
     private LoginUser getLoginUserByToken(String sessionId) {
-        // 从 Redis 中获取缓存对象，类型可能是 JSONObject
-        Object cacheObject = redisCache.getCacheObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
-        if (cacheObject == null) {
+        try {
+            String redisKey = RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId;
+            Object cacheObject = redisCache.getCacheObject(redisKey);
+
+            LoginUser loginUser = null;
+            // 处理可能的类型转换问题
+            if (cacheObject instanceof LoginUser) {
+                loginUser = (LoginUser) cacheObject;
+            } else if (cacheObject != null) {
+                // 如果不是LoginUser类型但有值，尝试使用FastJson2进行转换
+                loginUser = com.alibaba.fastjson2.JSON.to(LoginUser.class, cacheObject);
+            }
+
+            if (loginUser == null) {
+                throw new AccountException(ResponseCode.USER_NOT_LOGIN);
+            }
+            return loginUser;
+        } catch (Exception e) {
+            log.error("获取用户失败: {}", e.getMessage(), e);
             throw new AccountException(ResponseCode.USER_NOT_LOGIN);
         }
-        // 如果返回的是 JSONObject，可以使用 JSON.toJavaObject 进行转换
-        return JSON.parseObject(JSON.toJSONString(cacheObject), LoginUser.class);
     }
 
     /**
