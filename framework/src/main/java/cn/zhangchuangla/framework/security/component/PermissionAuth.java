@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.security.component;
 
-import cn.zhangchuangla.common.constant.SysConstant;
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.utils.SecurityUtils;
@@ -110,7 +110,7 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     private boolean isAllow(Set<String> permissions, String permission) {
-        return permissions.contains(SysConstant.ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
+        return permissions.contains(Constants.ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
     }
 
     /**

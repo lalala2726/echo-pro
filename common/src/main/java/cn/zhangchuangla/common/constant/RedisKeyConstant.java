@@ -7,7 +7,6 @@ package cn.zhangchuangla.common.constant;
  */
 public class RedisKeyConstant {
 
-
     /**
      * Redis登录用户前缀
      */

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.common.utils;
 
 // ...existing imports...
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -12,7 +13,7 @@ public class ServletUtils {
 
     /**
      * 获取客户端真实IP地址
-     * 
+     *
      * @param request HTTP请求对象
      * @return 客户端IP地址
      */
@@ -20,7 +21,7 @@ public class ServletUtils {
         if (request == null) {
             return "unknown";
         }
-        
+
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
@@ -37,12 +38,12 @@ public class ServletUtils {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        
+
         // 对于通过多个代理的情况，第一个IP为客户端真实IP，多个IP以','分隔
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }
-        
+
         return ip;
     }
 

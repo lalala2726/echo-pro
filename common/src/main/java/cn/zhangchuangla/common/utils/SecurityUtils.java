@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 
 /**
  * 安全工具类
@@ -55,7 +54,6 @@ public class SecurityUtils {
     public static Long getUserId() {
         return getLoginUser().getUserId();
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.model.entity;
 
-import cn.zhangchuangla.common.constant.SysConstant;
+import cn.zhangchuangla.common.constant.Constants;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,39 +22,53 @@ public class LoginUser implements UserDetails, Serializable {
 
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -5777762905473897401L;
+
     /**
      * 用户ID
      */
     public Long userId;
+
     /**
      * 用户信息
      */
     private SysUser sysUser;
+
     /**
      * 用户名
      */
     private String username;
+
     /**
      * 登录IP地址
      */
-    private String ipAddress;
+    private String ip;
+
+    /**
+     * 登录地点
+     */
+    private String address;
+
     /**
      * 会话ID
      */
     private String sessionId;
+
     /**
      * 登录时间
      */
     private long loginTime;
+
     /**
      * 过期时间
      */
     private long expireTime;
+
     /**
      * 浏览器信息
      */
     private String browser;
+
     /**
      * 操作系统信息
      */
@@ -67,6 +81,7 @@ public class LoginUser implements UserDetails, Serializable {
         this.sysUser = sysUser;
     }
 
+    //此方法不会被序列化
     @JSONField(serialize = false, deserialize = false)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -110,7 +125,7 @@ public class LoginUser implements UserDetails, Serializable {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return Objects.equals(sysUser.getStatus(), SysConstant.ACCOUNT_UNLOCK_KEY);
+        return Objects.equals(sysUser.getStatus(), Constants.ACCOUNT_UNLOCK_KEY);
     }
 
     /**

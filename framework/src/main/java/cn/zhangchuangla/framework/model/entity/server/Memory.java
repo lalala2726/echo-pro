@@ -31,31 +31,31 @@ public class Memory {
      */
     @Schema(description = "剩余内存(GB)")
     private double free;
-    
+
     /**
      * 内存使用率
      */
     @Schema(description = "内存使用率")
     private String usage;
-    
+
     /**
      * 交换内存总量(GB)
      */
     @Schema(description = "交换内存总量(GB)")
     private double swapTotal;
-    
+
     /**
      * 已用交换内存(GB)
      */
     @Schema(description = "已用交换内存(GB)")
     private double swapUsed;
-    
+
     /**
      * 剩余交换内存(GB)
      */
     @Schema(description = "剩余交换内存(GB)")
     private double swapFree;
-    
+
     /**
      * 交换内存使用率
      */

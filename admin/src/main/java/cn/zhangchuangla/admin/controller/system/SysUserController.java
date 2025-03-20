@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -52,7 +51,6 @@ public class SysUserController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@auth.hasPermission('system:user:list')")
     public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
-        PageUtils.checkPageParams(request.getPageNum(), request.getPageSize());
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<UserListVo> userListVos = userPage.getRecords().stream()
                 .map(sysUser -> {

@@ -163,7 +163,16 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
         if (page == null) {
             return AjaxResult.error(ResponseCode.ERROR, "分页对象为空");
         }
-        return getAjaxResult(page, page.getTotal(), page.getSize(), page.getCurrent(), page);
+        AjaxResult ajaxResult = new AjaxResult();
+        ajaxResult.put("code", ResponseCode.SUCCESS.getCode());
+        ajaxResult.put("message", ResponseCode.SUCCESS.getMessage());
+        ajaxResult.put("data", page.getRecords());
+        ajaxResult.put("pageNum", page.getCurrent());
+        ajaxResult.put("pageSize", page.getSize());
+        ajaxResult.put("total", page.getTotal());
+        ajaxResult.put("time", getCurrentTime());
+        ajaxResult.put("currentTime", System.currentTimeMillis());
+        return ajaxResult;
     }
 
     /**

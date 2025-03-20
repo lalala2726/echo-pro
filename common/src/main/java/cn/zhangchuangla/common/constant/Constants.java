@@ -5,7 +5,9 @@ package cn.zhangchuangla.common.constant;
  * <p>
  * created on 2025/2/19 22:30
  */
-public class SysConstant {
+public class Constants {
+
+    public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
 
     /**
      * 令牌
