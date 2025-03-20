@@ -12,15 +12,12 @@ app:
 server:
   port: 8080
 spring:
+  profiles:
+    active: druid
   servlet:
     multipart:
       max-file-size: 1024MB
       max-request-size: 1024MB
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/person_app?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: zhangchuang2726
   data:
     redis:
       host: localhost

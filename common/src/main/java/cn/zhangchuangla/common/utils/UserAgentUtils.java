@@ -29,7 +29,7 @@ public class UserAgentUtils {
      * @return User-Agent 字符串
      */
     public static String getUserAgent(HttpServletRequest request) {
-        return ClientUtils.getUserAgent(request);
+        return IPUtils.getUserAgent(request);
     }
 
     /**

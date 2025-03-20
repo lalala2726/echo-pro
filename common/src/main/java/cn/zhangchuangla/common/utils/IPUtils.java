@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  * @version 1.0
  * @since 2025/3/19 15:11
  */
-public class ClientUtils {
+public class IPUtils {
 
     /**
      * 获取客户端真实 IP 地址
