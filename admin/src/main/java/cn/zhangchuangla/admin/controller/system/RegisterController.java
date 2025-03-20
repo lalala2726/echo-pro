@@ -1,6 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Tag(name = "注册接口")
-public class RegisterController {
+public class RegisterController extends BaseController {
 
     private final RegisterService registerService;
 
@@ -45,17 +46,17 @@ public class RegisterController {
     public AjaxResult register(@Parameter(name = "注册参数", required = true)
                                @Validated @RequestBody RegisterRequest request) {
         if (request.getUsername() == null) {
-            return AjaxResult.error("用户名不能为空");
+            return error("用户名不能为空");
         }
         if (request.getPassword() == null) {
-            return AjaxResult.error("密码不能为空");
+            return error("密码不能为空");
         }
         if (sysUserService.isUsernameExist(request.getUsername())) {
-            return AjaxResult.error("用户名已存在");
+            return error("用户名已存在");
         }
 
         Long userId = registerService.register(request);
-        return AjaxResult.success(userId);
+        return success(userId);
     }
 
 }

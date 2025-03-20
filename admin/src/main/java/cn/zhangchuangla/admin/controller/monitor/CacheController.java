@@ -1,5 +1,6 @@
 package cn.zhangchuangla.admin.controller.monitor;
 
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 @Anonymous
 @RequestMapping("/monitor/cache")
-public class CacheController {
+public class CacheController extends BaseController {
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -46,7 +47,7 @@ public class CacheController {
         result.put("dbSize", dbSize);
         result.put("commandStats", buildCommandStats(commandStats));
 
-        return AjaxResult.success(result);
+        return success(result);
     }
 
     /**

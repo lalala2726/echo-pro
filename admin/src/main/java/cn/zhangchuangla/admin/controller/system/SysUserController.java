@@ -1,7 +1,9 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @Anonymous
 @RequestMapping("/system/user")
-public class SysUserController {
+public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
@@ -50,7 +52,7 @@ public class SysUserController {
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@auth.hasPermission('system:user:list')")
-    public AjaxResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
+    public TableDataResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         Page<SysUser> userPage = sysUserService.UserList(request);
         List<UserListVo> userListVos = userPage.getRecords().stream()
                 .map(sysUser -> {
@@ -58,7 +60,7 @@ public class SysUserController {
                     BeanUtils.copyProperties(sysUser, userListVo);
                     return userListVo;
                 }).collect(Collectors.toList());
-        return AjaxResult.table(userPage, userListVos);
+        return getTableData(userPage, userListVos);
     }
 
     /**
@@ -72,7 +74,8 @@ public class SysUserController {
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @Validated @RequestBody AddUserRequest request) {
         ParamsUtils.objectIsNull(request, "参数不能为空!");
-        return AjaxResult.toSuccess(sysUserService.addUserInfo(request));
+        Long result = sysUserService.addUserInfo(request);
+        return toAjax(result);
     }
 
     /**
@@ -92,7 +95,7 @@ public class SysUserController {
             ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
         });
         sysUserService.deleteUserById(ids);
-        return AjaxResult.success();
+        return success();
     }
 
     /**
@@ -119,7 +122,7 @@ public class SysUserController {
         }
         //业务逻辑
         sysUserService.updateUserInfoById(request);
-        return AjaxResult.success();
+        return success();
     }
 
     /**
@@ -140,7 +143,7 @@ public class SysUserController {
         UserInfoVo userInfoVo = new UserInfoVo();
         userInfoVo.setRoles(roleList);
         BeanUtils.copyProperties(sysUser, userInfoVo);
-        return AjaxResult.success(userInfoVo);
+        return success();
     }
 
 }

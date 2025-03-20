@@ -1,6 +1,8 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -33,7 +35,7 @@ import java.util.List;
 @RestController
 @Anonymous
 @RequestMapping("/system/dictionary/data")
-public class DictionaryDataController {
+public class DictionaryDataController extends BaseController {
 
     private final DictionaryDataService dictionaryDataService;
 
@@ -52,7 +54,7 @@ public class DictionaryDataController {
     @GetMapping("/dictId/{id}")
     @Operation(summary = "根据字典名称获取字典值")
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
-    public AjaxResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
+    public TableDataResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
         ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
         ArrayList<DictionaryDataListVo> dictionaryDataListVos = new ArrayList<>();
         Page<DictionaryData> dictionaryDataPage = dictionaryDataService.getDictDataByDictionaryName(id, request);
@@ -61,7 +63,7 @@ public class DictionaryDataController {
             BeanUtils.copyProperties(item, dictionaryDataListVo);
             dictionaryDataListVos.add(dictionaryDataListVo);
         });
-        return AjaxResult.table(dictionaryDataPage, dictionaryDataListVos);
+        return getTableData(dictionaryDataPage, dictionaryDataListVos);
     }
 
     /**
@@ -82,7 +84,7 @@ public class DictionaryDataController {
             BeanUtils.copyProperties(item, dictionaryDataBasicVo);
             dictionaryDataBasicVos.add(dictionaryDataBasicVo);
         });
-        return AjaxResult.success(dictionaryDataBasicVos);
+        return success(dictionaryDataBasicVos);
     }
 
     /**
@@ -101,7 +103,7 @@ public class DictionaryDataController {
         boolean isExits = dictionaryDataService.noDuplicateKeys(request.getDataKey());
         ParamsUtils.paramCheck(isExits, "字典项键已存在!");
         boolean result = dictionaryDataService.addDictionaryData(request);
-        return AjaxResult.isSuccess(result);
+        return toAjax(result);
     }
 
     /**
@@ -118,7 +120,7 @@ public class DictionaryDataController {
         DictionaryData dictionaryData = dictionaryDataService.getDictionaryById(id);
         DictionaryDataVo dictionaryDataVo = new DictionaryDataVo();
         BeanUtils.copyProperties(dictionaryData, dictionaryDataVo);
-        return AjaxResult.success(dictionaryDataVo);
+        return success(dictionaryDataVo);
     }
 
     /**
@@ -136,7 +138,7 @@ public class DictionaryDataController {
         boolean isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
         ParamsUtils.paramCheck(isExist, "字典项键已存在!");
         boolean result = dictionaryDataService.updateDictionaryData(request);
-        return AjaxResult.success(result);
+        return success(result);
     }
 
     /**
@@ -155,7 +157,7 @@ public class DictionaryDataController {
             ParamsUtils.minValidParam(id, "字典值ID不能小于等于零!");
         });
         dictionaryDataService.deleteDictionaryData(ids);
-        return AjaxResult.success();
+        return success();
     }
 
 

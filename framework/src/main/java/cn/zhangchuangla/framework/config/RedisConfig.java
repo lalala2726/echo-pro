@@ -30,7 +30,7 @@ public class RedisConfig {
 
         // 创建FastJson2JsonRedisSerializer序列化器，用于处理值序列化
         FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
-        
+
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(serializer);
@@ -41,7 +41,7 @@ public class RedisConfig {
 
         // 重要：设置默认的序列化器，确保所有操作都使用相同的序列化规则
         template.setDefaultSerializer(serializer);
-        
+
         template.afterPropertiesSet();
         return template;
     }

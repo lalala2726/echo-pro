@@ -1,6 +1,9 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.constant.SystemMessageConstant;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -32,7 +35,7 @@ import java.util.List;
 @RestController
 @Anonymous
 @RequestMapping("/system/dictionary")
-public class DictionaryController {
+public class DictionaryController extends BaseController {
 
 
     private final DictionaryService dictionaryService;
@@ -50,7 +53,7 @@ public class DictionaryController {
     @Operation(summary = "字典列表")
     @GetMapping("/list")
     @PreAuthorize("@auth.hasPermission('system:dictionary:list')")
-    public AjaxResult list(@Validated DictionaryRequest request) {
+    public TableDataResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
         ArrayList<DictionaryListVo> dictionaryListVos = new ArrayList<>();
         list.getRecords().forEach(item -> {
@@ -58,7 +61,7 @@ public class DictionaryController {
             BeanUtils.copyProperties(item, dictionaryListVo);
             dictionaryListVos.add(dictionaryListVo);
         });
-        return AjaxResult.table(list, dictionaryListVos);
+        return getTableData(list, dictionaryListVos);
     }
 
     /**
@@ -74,7 +77,7 @@ public class DictionaryController {
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
         ParamsUtils.paramCheck(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
-        return AjaxResult.success();
+        return success(SystemMessageConstant.ADD_SUCCESS);
     }
 
     /**
@@ -91,7 +94,7 @@ public class DictionaryController {
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         DictionaryVo dictionaryVo = new DictionaryVo();
         BeanUtils.copyProperties(dictionary, dictionaryVo);
-        return AjaxResult.success(dictionaryVo);
+        return success(dictionaryVo);
     }
 
     /**
@@ -109,7 +112,7 @@ public class DictionaryController {
         boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
         ParamsUtils.paramCheck(current, "字典名称已存在!");
         boolean result = dictionaryService.updateDictionaryById(request);
-        return AjaxResult.isSuccess(result);
+        return toAjax(result);
     }
 
     /**
@@ -125,7 +128,7 @@ public class DictionaryController {
     public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ParamsUtils.minValidParam(ids, "字典ID不能小于等于零!");
         dictionaryService.deleteDictionary(ids);
-        return AjaxResult.success();
+        return success();
     }
 
 
