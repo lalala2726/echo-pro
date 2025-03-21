@@ -70,4 +70,9 @@ public enum BusinessType {
      * 密码重置
      */
     RESET_PWD,
+
+    /**
+     * 刷新
+     */
+    REFRESH,
 }

@@ -60,8 +60,8 @@ public class AliyunOSSConfigEntity implements Serializable {
     /**
      * 域名
      */
-    @Schema(description = "访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "域名不能为空")
-    private String bucketDomain;
+    private String fileDomain;
 
 }

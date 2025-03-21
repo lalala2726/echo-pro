@@ -3,6 +3,7 @@ package cn.zhangchuangla.framework.web.exception;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
@@ -110,6 +111,15 @@ public class GlobalExceptionHandel {
     public AjaxResult methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
         log.error("参数校验失败:", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+    }
+
+    /**
+     * 配置文件异常
+     */
+    @ExceptionHandler(ProfileException.class)
+    public AjaxResult profileExceptionHandel(ProfileException exception) {
+        log.error("配置异常:", exception);
+        return AjaxResult.error(ResponseCode.PROFILE_ERROR, exception.getMessage());
     }
 
     /**

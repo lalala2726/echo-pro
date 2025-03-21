@@ -5,7 +5,6 @@ app:
     version: alpha 0.1
     description: 基本后台管理系统，采用SpringBoot3+SpringSecurity+MybatisPlus+Redis+MySQL+Minio等技术栈开发
     copyright: Copyright © 2024-2025 zhangchuang All Rights Reserved.
-    upload-path: /Users/zhangchuang/DevelopFileUpload
     ip-address-enable: false
     strictLoginEnable: false
 #开发环境数据库文件
@@ -20,7 +19,7 @@ spring:
       max-request-size: 1024MB
   data:
     redis:
-      host: localhost
+      host: 192.168.1.110
       port: 6379
       database: 0
       password: zhangchuang2726
