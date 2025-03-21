@@ -21,4 +21,35 @@ public class RedisKeyConstant {
      * 用户权限前缀
      */
     public static final String USER_PERMISSIONS = "user_permissions:";
+
+    /**
+     * 系统配置
+     */
+    public static final String SYSTEM_CONFIG = "system_config:";
+
+
+    /**
+     * 文件上传服务选择
+     */
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT = SYSTEM_CONFIG + "file_upload_service_select";
+
+    /**
+     * 本地文件上传服务选择
+     */
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":local";
+
+    /**
+     * 阿里云文件上传服务选择
+     */
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_MINIO = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":minio";
+
+    /**
+     * 阿里云OSS
+     */
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_ALIYUN = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":oss";
+
+    /**
+     * 默认文件上传服务选择
+     */
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":default";
 }

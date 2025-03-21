@@ -85,4 +85,22 @@ public class Constants {
      * 用户权限缓存过期时间
      */
     public static final long CACHE_USER_PERMISSIONS_EXPIRE = 15;
+
+
+    /**
+     * 本地文件上传
+     */
+    public static final String LOCAL_FILE_UPLOAD = "local";
+
+    /**
+     * 阿里云OSS上传
+     */
+    public static final String MINIO_FILE_UPLOAD = "minio";
+
+    /**
+     * 阿里云OSS上传
+     */
+    public static final String ALIYUN_OSS_FILE_UPLOAD = "aliyun";
 }
+
+
