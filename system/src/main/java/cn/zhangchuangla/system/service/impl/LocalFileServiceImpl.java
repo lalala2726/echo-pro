@@ -1,9 +1,11 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.core.redis.ConfigCacheService;
+import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.utils.ProfileUtils;
 import cn.zhangchuangla.system.service.LocalFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 
 /**
@@ -28,9 +31,11 @@ import java.util.UUID;
 public class LocalFileServiceImpl implements LocalFileService {
 
     private final AppConfig appConfig;
+    private final ConfigCacheService configCacheService;
 
-    public LocalFileServiceImpl(AppConfig appConfig) {
+    public LocalFileServiceImpl(AppConfig appConfig, ConfigCacheService configCacheService) {
         this.appConfig = appConfig;
+        this.configCacheService = configCacheService;
     }
 
     /**
@@ -41,10 +46,8 @@ public class LocalFileServiceImpl implements LocalFileService {
      */
     @Override
     public String uploadFile(MultipartFile multipartFile) {
-        if (!ProfileUtils.checkLoadFileUploadProperties(appConfig)) {
-            throw new FileException("本地上传路径未配置");
-        }
-        String uploadPath = appConfig.getUploadPath();
+        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
+        String uploadPath = localFileConfig.getUploadPath();
         String originalFileName = multipartFile.getOriginalFilename();
 
         try {
@@ -54,26 +57,27 @@ public class LocalFileServiceImpl implements LocalFileService {
             }
             String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-
             // 生成年月格式的目录
             SimpleDateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
             String yearMonthDir = yearMonthFormat.format(new Date());
 
-            // 生成新的文件名，包含目录结构
-            String uuidFileName = String.format("%s/%s_%s_%s",
-                    yearMonthDir,
+            // 生成新的文件名
+            String uuidFileName = String.format("%s%s",
                     System.currentTimeMillis(),
-                    UUID.randomUUID().toString().substring(0, 8),
-                    fileExtension);
+                    UUID.randomUUID().toString().substring(0, 8));
 
-            // 设置目标路径
-            Path path = Paths.get(uploadPath + File.separator + uuidFileName);
+            // 只保留小写字母和数字
+            Pattern pattern = Pattern.compile("[^a-z0-9]");
+            uuidFileName = pattern.matcher(uuidFileName).replaceAll("");
+
+            // 设置目标路径，包含年月目录
+            Path path = Paths.get(uploadPath + File.separator + yearMonthDir + File.separator + uuidFileName + fileExtension);
             // 创建目录，如果不存在则创建
             Files.createDirectories(path.getParent());
             // 将文件保存到目标路径
             multipartFile.transferTo(path.toFile());
 
-            return "/static/" + uuidFileName;
+            return Constants.RESOURCE_PREFIX + "/" + yearMonthDir + "/" + uuidFileName + fileExtension;
         } catch (IOException e) {
             log.error("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed);

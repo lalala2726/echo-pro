@@ -86,6 +86,10 @@ public class Constants {
      */
     public static final long CACHE_USER_PERMISSIONS_EXPIRE = 15;
 
+    /**
+     * 资源映射路径 前缀
+     */
+    public static final String RESOURCE_PREFIX = "/profile";
 
     /**
      * 本地文件上传

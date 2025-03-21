@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
@@ -11,14 +12,12 @@ import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.DefaultFileUploadEnum;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.system.model.request.DefaultFileConfigRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Chuang
@@ -31,9 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FileController extends BaseController {
 
     private final RedisCache redisCache;
+    private final ConfigCacheService configCacheService;
 
-    public FileController(RedisCache redisCache) {
+    public FileController(RedisCache redisCache, ConfigCacheService configCacheService) {
         this.redisCache = redisCache;
+        this.configCacheService = configCacheService;
     }
 
 
@@ -93,12 +94,28 @@ public class FileController extends BaseController {
     @Log(title = "文件管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "更新默认文件上传配置")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
-    public AjaxResult updateDefaultFileConfig(@RequestBody @Validated DefaultFileUploadEnum request) {
-        String name = request.getName();
-        if (name.isBlank()) {
+    public AjaxResult updateDefaultFileConfig(@RequestBody DefaultFileConfigRequest request) {
+        if (request.getFileUploadType().isBlank()) {
             return error("默认文件上传配置不能为空");
         }
-        redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, request.getName());
+        DefaultFileUploadEnum defaultFileUploadEnum = DefaultFileUploadEnum.getByName(request.getFileUploadType());
+        if (defaultFileUploadEnum == null) {
+            return error("默认文件上传配置错误");
+        }
+        // 存储枚举的name值，比如"local", "minio", "oss"
+        redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, defaultFileUploadEnum.getName());
         return success(SystemMessageConstant.UPDATE_SUCCESS);
+    }
+
+    /**
+     * 刷新配置缓存
+     */
+    @PostMapping("/config/refresh")
+    @Log(title = "文件管理", businessType = BusinessType.UPDATE)
+    @Operation(summary = "刷新文件配置缓存")
+    @PreAuthorize("@auth.hasPermission('system:file:config')")
+    public AjaxResult refreshConfig() {
+        configCacheService.refreshAllConfigs();
+        return success("配置刷新成功");
     }
 }
