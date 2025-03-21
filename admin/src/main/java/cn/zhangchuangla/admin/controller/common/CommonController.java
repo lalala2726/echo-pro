@@ -1,8 +1,10 @@
 package cn.zhangchuangla.admin.controller.common;
 
-import cn.zhangchuangla.common.enums.FileUploadMethod;
+import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.core.redis.ConfigCacheService;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.service.FileService;
+import cn.zhangchuangla.system.service.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,14 +20,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class CommonController {
 
 
-    private final FileService fileService;
+    private final FileUploadService fileUploadService;
+    private final ConfigCacheService configCacheService;
 
-    public CommonController(FileService fileService) {
-        this.fileService = fileService;
+    public CommonController(FileUploadService fileUploadService, ConfigCacheService configCacheService) {
+        this.fileUploadService = fileUploadService;
+        this.configCacheService = configCacheService;
     }
 
+
     /**
-     * 通用上传文件
+     * 根据配置文件选择上传文件方式进行上传文件
      *
      * @return 文件路径
      */
@@ -34,7 +39,13 @@ public class CommonController {
     public AjaxResult upload(@Parameter(name = "文件", required = true, description = "需要上传的文件参数")
                              @RequestParam("file")
                              MultipartFile file) {
-        String fileUrl = fileService.specifyUploadFile(file, FileUploadMethod.LOCAL);
+        String defaultFileUploadType = configCacheService.getDefaultFileUploadType();
+        String fileUrl = switch (defaultFileUploadType) {
+            case Constants.MINIO_FILE_UPLOAD -> fileUploadService.MinioFileUpload(file);
+            case Constants.ALIYUN_OSS_FILE_UPLOAD -> fileUploadService.AliyunOssFileUpload(file);
+            case Constants.LOCAL_FILE_UPLOAD -> fileUploadService.localFileUpload(file);
+            default -> throw new ProfileException("无法选择上传方式，请检查文件上传配置信息");
+        };
         AjaxResult ajax = new AjaxResult();
         ajax.put("url", fileUrl);
         return ajax;

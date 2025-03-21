@@ -30,9 +30,10 @@ public class ResourcesConfig implements WebMvcConfigurer {
 
         // 本地文件上传路径
         LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
-        String filePath = localFileConfig.getUploadPath();
-        registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                .addResourceLocations("file:" + filePath + "/");
+        if (localFileConfig != null) {
+            registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
+                    .addResourceLocations("file:" + localFileConfig.getUploadPath());
+        }
 
 
         // 添加静态资源映射规则

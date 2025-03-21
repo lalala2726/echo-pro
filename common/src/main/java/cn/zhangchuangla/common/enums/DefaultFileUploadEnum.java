@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.enums;
 
+import cn.zhangchuangla.common.constant.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -15,20 +16,20 @@ public enum DefaultFileUploadEnum {
     /**
      * 本地
      */
-    @Schema(description = "本地")
-    LOCAL("local"),
+    @Schema(description = "本地上传")
+    LOCAL(Constants.LOCAL_FILE_UPLOAD),
 
     /**
      * minio
      */
     @Schema(description = "minio")
-    MINIO("minio"),
+    MINIO(Constants.MINIO_FILE_UPLOAD),
 
     /**
      * 阿里云
      */
-    @Schema(description = "阿里云")
-        ALIYUN("oss");
+    @Schema(description = "阿里云OSS")
+    ALIYUN(Constants.ALIYUN_OSS_FILE_UPLOAD);
 
     private final String name;
 

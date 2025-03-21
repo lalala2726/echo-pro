@@ -1,110 +1,79 @@
 package cn.zhangchuangla.common.constant;
 
 /**
+ * 系统常量类
+ *
  * @author Chuang
  * <p>
  * created on 2025/2/19 22:30
  */
 public class Constants {
 
+    /**
+     * ==========================
+     * ✅ JSON 序列化白名单
+     * ==========================
+     */
     public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
 
     /**
-     * 令牌
+     * ==========================
+     * ✅ Token 相关
+     * ==========================
      */
     public static final String TOKEN = "token";
-
-    /**
-     * 消息
-     */
-    public static final String MESSAGE = "message";
-
-    /**
-     * 数据
-     */
-    public static final String DATA = "data";
-
-    /**
-     * 状态码
-     */
-    public static final String CODE = "code";
-
-    /**
-     * 时间
-     */
-    public static final String TIME = "TIME";
-
-    /**
-     * 令牌前缀
-     */
     public static final String LOGIN_USER_KEY = "login_user_key";
-
-    /**
-     * 账号封禁
-     */
-    public static final Integer ACCOUNT_LOCK_KEY = 1;
-
-    /**
-     * 账号正常
-     */
-    public static final Integer ACCOUNT_UNLOCK_KEY = 0;
-
-    /**
-     * 登录成功
-     */
-    public static final Integer LOGIN_SUCCESS = 0;
-
-    /**
-     * 登录失败
-     */
-    public static final Integer LOGIN_FAIL = 1;
-
-
-    /**
-     * 系统创建
-     */
-    public static final String SYSTEM_CREATE = "系统自动创建";
-
-
-    /**
-     * 所有权限标识
-     */
-    public static final String ALL_PERMISSION = "*:*:*";
-
-    /**
-     * JWT用户名标识
-     */
     public static final String USERNAME = "username";
-
-    /**
-     * 冒号
-     */
     public static final String COLON = ":";
 
     /**
-     * 用户权限缓存过期时间
+     * ==========================
+     * ✅ 响应信息
+     * ==========================
      */
-    public static final long CACHE_USER_PERMISSIONS_EXPIRE = 15;
+    public static final String MESSAGE = "message";
+    public static final String DATA = "data";
+    public static final String CODE = "code";
+    public static final String TIME = "TIME";
 
     /**
-     * 资源映射路径 前缀
+     * ==========================
+     * ✅ 账号状态
+     * ==========================
      */
+    public static final Integer ACCOUNT_LOCK_KEY = 1;    // 账号封禁
+    public static final Integer ACCOUNT_UNLOCK_KEY = 0;  // 账号正常
+
+    /**
+     * ==========================
+     * ✅ 登录状态
+     * ==========================
+     */
+    public static final Integer LOGIN_SUCCESS = 0;  // 登录成功
+    public static final Integer LOGIN_FAIL = 1;     // 登录失败
+
+    /**
+     * ==========================
+     * ✅ 系统相关
+     * ==========================
+     */
+    public static final String SYSTEM_CREATE = "系统自动创建";
     public static final String RESOURCE_PREFIX = "/profile";
+    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15;  // 用户权限缓存过期时间（分钟）
 
     /**
-     * 本地文件上传
+     * ==========================
+     * ✅ 权限相关
+     * ==========================
      */
-    public static final String LOCAL_FILE_UPLOAD = "local";
+    public static final String ALL_PERMISSION = "*:*:*";  // 拥有所有权限
 
     /**
-     * 阿里云OSS上传
+     * ==========================
+     * ✅ 文件上传方式
+     * ==========================
      */
-    public static final String MINIO_FILE_UPLOAD = "minio";
-
-    /**
-     * 阿里云OSS上传
-     */
-    public static final String ALIYUN_OSS_FILE_UPLOAD = "aliyun";
+    public static final String LOCAL_FILE_UPLOAD = "local";        // 本地文件上传
+    public static final String MINIO_FILE_UPLOAD = "minio";        // Minio 上传
+    public static final String ALIYUN_OSS_FILE_UPLOAD = "oss";     // 阿里云 OSS 上传
 }
-
-

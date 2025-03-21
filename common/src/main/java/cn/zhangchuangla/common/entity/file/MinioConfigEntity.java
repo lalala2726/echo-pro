@@ -51,11 +51,11 @@ public class MinioConfigEntity implements Serializable {
     private String bucketName;
 
     /**
-     * 存储桶域名
+     * 文件访问域名
      */
-    @Schema(description = "存储桶域名", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "存储桶域名不能为空")
-    private String bucketUrl;
+    @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "文件访问域名不能为空")
+    private String fileDomain;
 
     /**
      * 存储桶区域

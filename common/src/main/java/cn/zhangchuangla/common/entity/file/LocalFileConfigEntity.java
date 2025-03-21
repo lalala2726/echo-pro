@@ -13,6 +13,10 @@ import lombok.Data;
 @Schema(description = "本地文件配置实体类")
 public class LocalFileConfigEntity {
 
+    public LocalFileConfigEntity(String uploadPath) {
+        this.uploadPath = uploadPath;
+    }
+
     /**
      * 文件上传路径
      */
@@ -20,9 +24,4 @@ public class LocalFileConfigEntity {
     @NotBlank(message = "文件上传路径不能为空")
     private String uploadPath;
 
-    /**
-     * 文件访问域名
-     */
-    @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String domain;
 }
