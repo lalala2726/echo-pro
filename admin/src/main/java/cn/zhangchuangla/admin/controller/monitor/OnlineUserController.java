@@ -2,7 +2,9 @@ package cn.zhangchuangla.admin.controller.monitor;
 
 import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -32,7 +34,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/monitor/online")
 @Tag(name = "在线用户管理")
-public class OnlineUserController {
+public class OnlineUserController extends BaseController {
 
     private final RedisCache redisCache;
 
@@ -50,7 +52,7 @@ public class OnlineUserController {
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@auth.hasPermission('monitor:online-user:list')")
-    public AjaxResult onlineUserList(OnlineUserListRequest request) {
+    public TableDataResult onlineUserList(OnlineUserListRequest request) {
         Collection<String> keys = redisCache.keys(RedisKeyConstant.LOGIN_TOKEN_KEY + "*");
         ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
         keys.forEach(key -> {
@@ -60,7 +62,7 @@ public class OnlineUserController {
             onlineUsers.add(onlineUser);
         });
         Page<OnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineUsers.size(), onlineUsers);
-        return AjaxResult.table(page);
+        return getTableData(page);
     }
 
 
@@ -76,9 +78,9 @@ public class OnlineUserController {
     @PreAuthorize("@auth.hasPermission('monitor:online-user:delete')")
     public AjaxResult forceLogout(@PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
         if (sessionId == null) {
-            return AjaxResult.error(ResponseCode.PARAM_NOT_NULL);
+            return error(ResponseCode.PARAM_NOT_NULL);
         }
         redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
-        return AjaxResult.success();
+        return success();
     }
 }

@@ -37,6 +37,8 @@
         <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
         <eu.bitwalker.version>1.21</eu.bitwalker.version>
         <oshi.version>6.6.6</oshi.version>
+        <alibaba.druid.starter.version>1.2.19</alibaba.druid.starter.version>
+
 
     </properties>
 
@@ -122,6 +124,13 @@
                 <version>${oshi.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${alibaba.druid.starter.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
@@ -169,6 +178,7 @@
                 <version>${alibaba.fastjson.version}</version>
             </dependency>
 
+            <!-- minio -->
             <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>

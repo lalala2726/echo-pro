@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
-import cn.zhangchuangla.common.utils.ClientUtils;
+import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.ServletUtils;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
@@ -120,7 +120,7 @@ public class LogAspect {
             HttpServletRequest request = ServletUtils.getRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
-            sysOperationLog.setOperationIp(ClientUtils.getClientIp(request));
+            sysOperationLog.setOperationIp(IPUtils.getClientIp(request));
             sysOperationLog.setRequestMethod(request.getMethod());
 
             // 计算方法执行耗时

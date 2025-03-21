@@ -1,0 +1,48 @@
+package cn.zhangchuangla.common.enums;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+
+/**
+ * @author Chuang
+ * <p>
+ * created on 2025/3/21 20:27
+ */
+@Getter
+@Schema(description = "默认文件上传枚举")
+public enum DefaultFileUploadEnum {
+
+    /**
+     * 本地
+     */
+    @Schema(description = "本地")
+    LOCAL("local"),
+
+    /**
+     * minio
+     */
+    @Schema(description = "minio")
+    MINIO("minio"),
+
+    /**
+     * 阿里云
+     */
+    @Schema(description = "阿里云")
+        ALIYUN("oss");
+
+    private final String name;
+
+    DefaultFileUploadEnum(String name) {
+        this.name = name;
+    }
+
+    public static DefaultFileUploadEnum getByName(String name) {
+        for (DefaultFileUploadEnum value : values()) {
+            if (value.getName().equals(name)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+}

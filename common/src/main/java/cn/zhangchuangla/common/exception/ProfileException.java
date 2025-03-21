@@ -11,7 +11,7 @@ import lombok.Getter;
  * created on 2025/1/11 10:04
  */
 @Getter
-public final class ProFileException extends RuntimeException {
+public final class ProfileException extends RuntimeException {
 
     /**
      * 状态码
@@ -19,22 +19,22 @@ public final class ProFileException extends RuntimeException {
     private final Integer code;
 
 
-    public ProFileException(ResponseCode responseCode, String message) {
+    public ProfileException(ResponseCode responseCode, String message) {
         super(message);
         this.code = responseCode.getCode();
     }
 
-    public ProFileException(ResponseCode responseCode) {
+    public ProfileException(ResponseCode responseCode) {
         super(responseCode.getMessage());
         this.code = responseCode.getCode();
     }
 
-    public ProFileException(String message) {
+    public ProfileException(String message) {
         super(message);
         this.code = ResponseCode.PROFILE_ERROR.getCode();
     }
 
-    public ProFileException() {
+    public ProfileException() {
         super(ResponseCode.PROFILE_ERROR.getMessage());
         this.code = ResponseCode.PROFILE_ERROR.getCode();
     }

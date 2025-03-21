@@ -1,6 +1,7 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 @RestController
 @Slf4j
 @Tag(name = "登录接口")
-public class LoginController {
+public class LoginController extends BaseController {
 
 
     private final SysLoginService sysLoginService;
@@ -58,9 +59,9 @@ public class LoginController {
                             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
         String token = sysLoginService.login(loginRequest, request);
-        HashMap<String, String> map = new HashMap<>();
-        map.put(Constants.TOKEN, token);
-        return AjaxResult.success(map);
+        HashMap<String, String> result = new HashMap<>();
+        result.put(Constants.TOKEN, token);
+        return success(result);
     }
 
 

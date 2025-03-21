@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
-import cn.zhangchuangla.common.utils.ClientUtils;
+import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.framework.web.service.TokenService;
@@ -83,13 +83,17 @@ public class TokenServiceImpl implements TokenService {
      * @param request   请求
      */
     public void setUserAgent(LoginUser loginUser, HttpServletRequest request) {
-        String clientIp = ClientUtils.getClientIp(request);
         String userAgent = UserAgentUtils.getUserAgent(request);
-        loginUser.setBrowser(UserAgentUtils.getBrowserName(userAgent));
-        loginUser.setOs(UserAgentUtils.getOsName(userAgent));
-        if (!clientIp.isBlank()) {
+        if (StringUtils.isNotBlank(userAgent)) {
+            String browserName = UserAgentUtils.getBrowserName(userAgent);
+            loginUser.setBrowser(browserName);
+            loginUser.setOs(UserAgentUtils.getOsName(userAgent));
+        }
+        String clientIp = IPUtils.getClientIp(request);
+        if (StringUtils.isNotBlank(clientIp)) {
+            String addressByIp = IPUtils.getAddressByIp(clientIp);
             loginUser.setIp(clientIp);
-            loginUser.setAddress(ClientUtils.getAddressByIp(clientIp));
+            loginUser.setAddress(addressByIp);
         }
     }
 

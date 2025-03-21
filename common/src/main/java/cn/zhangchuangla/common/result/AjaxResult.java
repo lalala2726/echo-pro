@@ -153,27 +153,6 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
         return ajaxResult;
     }
 
-    /**
-     * 表格返回
-     *
-     * @param page 分页对象
-     * @return 返回分页的列表信息
-     */
-    public static <T> AjaxResult table(Page<T> page) {
-        if (page == null) {
-            return AjaxResult.error(ResponseCode.ERROR, "分页对象为空");
-        }
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put("code", ResponseCode.SUCCESS.getCode());
-        ajaxResult.put("message", ResponseCode.SUCCESS.getMessage());
-        ajaxResult.put("data", page.getRecords());
-        ajaxResult.put("pageNum", page.getCurrent());
-        ajaxResult.put("pageSize", page.getSize());
-        ajaxResult.put("total", page.getTotal());
-        ajaxResult.put("time", getCurrentTime());
-        ajaxResult.put("currentTime", System.currentTimeMillis());
-        return ajaxResult;
-    }
 
     /**
      * 判断是否成功
@@ -228,6 +207,15 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
      */
     public static AjaxResult error(ResponseCode code) {
         return new AjaxResult(code);
+    }
+
+    /**
+     * 失败返回（不带消息）
+     *
+     * @return AjaxResult
+     */
+    public static AjaxResult error() {
+        return new AjaxResult(ResponseCode.ERROR);
     }
 
     /**

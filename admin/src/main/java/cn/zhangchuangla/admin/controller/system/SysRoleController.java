@@ -1,6 +1,9 @@
 package cn.zhangchuangla.admin.controller.system;
 
 import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.constant.SystemMessageConstant;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -36,7 +39,7 @@ import java.util.ArrayList;
 @RequestMapping("/system/role")
 @Tag(name = "角色接口")
 @Anonymous
-public class SysRoleController {
+public class SysRoleController extends BaseController {
 
     @Resource
     private SysRoleService sysRoleService;
@@ -52,7 +55,7 @@ public class SysRoleController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@auth.hasPermission('system:role:list')")
-    public AjaxResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
+    public TableDataResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
         ArrayList<SysRoleVo> sysRoleVos = new ArrayList<>();
         page.getRecords().forEach(sysRole -> {
@@ -60,7 +63,7 @@ public class SysRoleController {
             BeanUtils.copyProperties(sysRole, sysRoleVo);
             sysRoleVos.add(sysRoleVo);
         });
-        return AjaxResult.table(page, sysRoleVos);
+        return getTableData(page, sysRoleVos);
     }
 
 
@@ -81,7 +84,7 @@ public class SysRoleController {
         }
         SysRoleVo sysRoleVo = new SysRoleVo();
         BeanUtils.copyProperties(sysRole, sysRoleVo);
-        return AjaxResult.success(sysRoleVo);
+        return success(sysRoleVo);
     }
 
     /**
@@ -97,9 +100,9 @@ public class SysRoleController {
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
-            return AjaxResult.success("删除成功");
+            return success(SystemMessageConstant.DELETE_SUCCESS);
         }
-        return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "删除失败");
+        return error(SystemMessageConstant.DELETE_FAIL);
     }
 
     /**
@@ -122,9 +125,9 @@ public class SysRoleController {
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(sysRoleVo, sysRole);
         if (sysRoleService.updateById(sysRole)) {
-            return AjaxResult.success("修改成功");
+            return success(SystemMessageConstant.UPDATE_SUCCESS);
         }
-        return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "修改失败");
+        return error(SystemMessageConstant.UPDATE_FAIL);
     }
 
     /**
@@ -144,7 +147,6 @@ public class SysRoleController {
         ParamsUtils.paramCheck(roleKeyExist, "角色权限字符串已存在");
         sysRoleService.addRoleInfo(roleAddRequest);
         return AjaxResult.success();
-
     }
 
 }

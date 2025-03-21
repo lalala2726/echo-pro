@@ -1,6 +1,8 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.core.redis.ConfigCacheService;
+import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,10 +15,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer {
 
-    private final AppConfig appConfig;
+    private final ConfigCacheService configCacheService;
 
-    public ResourcesConfig(AppConfig appConfig) {
-        this.appConfig = appConfig;
+    public ResourcesConfig(ConfigCacheService configCacheService) {
+        this.configCacheService = configCacheService;
     }
 
 
@@ -25,10 +27,15 @@ public class ResourcesConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String filePath = appConfig.getUploadPath();
-        registry.addResourceHandler("/static/**")
+
+        // 本地文件上传路径
+        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
+        String filePath = localFileConfig.getUploadPath();
+        registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
                 .addResourceLocations("file:" + filePath + "/");
 
+
+        // 添加静态资源映射规则
         registry.addResourceHandler("classpath:/META-INF/resources/static/**")
                 .addResourceLocations("classpath:/META-INF/resources/static/");
 

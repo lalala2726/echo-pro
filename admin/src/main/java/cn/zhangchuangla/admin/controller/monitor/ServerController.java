@@ -1,5 +1,6 @@
 package cn.zhangchuangla.admin.controller.monitor;
 
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.model.entity.Server;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/monitor/server")
 @Anonymous
 @Tag(name = "服务器监控")
-public class ServerController {
+public class ServerController extends BaseController {
     /**
      * 服务器信息
      *
@@ -28,6 +29,6 @@ public class ServerController {
     public AjaxResult getInfo() {
         Server server = new Server();
         server.copyInfo();
-        return AjaxResult.success(server);
+        return success(server);
     }
 }
