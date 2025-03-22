@@ -56,6 +56,7 @@ public class ConfigCacheService {
      * <p>
      * 优先从Redis中加载文件上传配置信息，如果无法从redis中加载或者Redis中没有配置,则从AppConfig中获取本地文件上传访问路径，并将本地文件上传访问路径保存到Redis中。
      * </p>
+     *
      * @throws ProfileException 当配置验证失败时抛出
      */
     private void loadFileUploadConfigs() throws ProfileException {
@@ -65,7 +66,7 @@ public class ConfigCacheService {
             loadLocalFileConfig();
             return;
         }
-        
+
         switch (defaultType) {
             case Constants.LOCAL_FILE_UPLOAD:
                 LocalFileConfigEntity localFileConfig = redisCache.getCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL);
@@ -92,25 +93,26 @@ public class ConfigCacheService {
                 log.error("无法识别的默认文件上传类型: {}", defaultType);
                 throw new ProfileException("无法识别的默认文件上传类型: " + defaultType);
         }
-        
+
         log.info("文件上传配置信息加载成功");
     }
 
     /**
      * 从本地配置文件加载本地文件上传配置,并保存到Redis中
+     *
      * @throws ProfileException 当本地配置验证失败时抛出
      */
     private void loadLocalFileConfig() throws ProfileException {
         log.info("从本地配置文件加载本地文件上传配置");
         String uploadPath = appConfig.getUploadPath();
         ProfileUtils.checkLocalPropertiesLoadFileUpload(appConfig);
-        
+
         configCache.put(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, Constants.LOCAL_FILE_UPLOAD);
         configCache.put(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL, new LocalFileConfigEntity(uploadPath));
-        
+
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, Constants.LOCAL_FILE_UPLOAD);
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL, new LocalFileConfigEntity(uploadPath));
-        
+
         log.info("本地文件上传配置加载成功！");
     }
 
@@ -175,6 +177,7 @@ public class ConfigCacheService {
 
     /**
      * 刷新所有配置 (用于初始化后的主动刷新，会向上抛出异常)
+     *
      * @throws ProfileException 当配置验证失败时抛出
      */
     public void refreshAllConfigs() throws ProfileException {
@@ -183,9 +186,10 @@ public class ConfigCacheService {
         // 其他配置刷新...
         log.info("所有配置刷新完成");
     }
-    
+
     /**
      * 专门用于刷新配置的方法，不做任何异常处理，让异常直接向上抛出
+     *
      * @throws ProfileException 当配置验证失败时抛出
      */
     private void refreshFileUploadConfigs() throws ProfileException {
@@ -194,7 +198,7 @@ public class ConfigCacheService {
         if (defaultType == null) {
             throw new ProfileException("未找到默认文件上传配置");
         }
-        
+
         switch (defaultType) {
             case Constants.LOCAL_FILE_UPLOAD:
                 LocalFileConfigEntity localFileConfig = redisCache.getCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL);

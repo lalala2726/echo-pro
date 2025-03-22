@@ -148,3 +148,26 @@ CREATE TABLE dictionary_data
     remark        TEXT COMMENT '备注'
 ) comment '字典值表';
 
+create table file_upload_record
+(
+    `id`                 bigint(20) primary key auto_increment NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `file_name`          varchar(255)                          NOT NULL COMMENT '文件名称',
+    `original_file_name` varchar(255)                          NOT NULL COMMENT '原始文件名',
+    `file_path`          varchar(500)                          NOT NULL COMMENT '文件存储路径',
+    `file_url`           varchar(500)                          NOT NULL COMMENT '文件访问URL',
+    `file_size`          bigint(20)                            NOT NULL COMMENT '文件大小(字节)',
+    `file_type`          varchar(100)                          NOT NULL COMMENT '文件类型/MIME类型',
+    `file_extension`     varchar(20)                           NOT NULL COMMENT '文件扩展名',
+    `storage_type`       varchar(20)                           NOT NULL COMMENT '存储类型(LOCAL/MINIO/ALIYUN_OSS)',
+    `bucket_name`        varchar(100)                                   DEFAULT NULL COMMENT '存储桶名称(OSS/MINIO使用)',
+    `md5`                varchar(32)                                    DEFAULT NULL COMMENT '文件MD5值',
+    `uploader_id`        varchar(50)                           NOT NULL COMMENT '上传者ID',
+    `uploader_name`      varchar(100)                                   DEFAULT NULL COMMENT '上传者名称',
+    `upload_time`        datetime                              NOT NULL COMMENT '上传时间',
+    `is_deleted`         tinyint(1)                            NOT NULL DEFAULT '0' COMMENT '是否删除(0-未删除,1-已删除)',
+    create_time          DATETIME                                       DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time          DATETIME                                       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by            VARCHAR(100) COMMENT '创建人',
+    update_by            VARCHAR(100) COMMENT '更新人',
+    remark               TEXT COMMENT '备注'
+) comment '文件上传记录表';

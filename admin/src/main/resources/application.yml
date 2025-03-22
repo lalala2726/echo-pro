@@ -48,7 +48,7 @@ aliyun:
 
 #Minio 文件上传
 minio:
-  fileDomain: http://bed.data-center.zhangchuangla.cn/
+  fileDomain: https://bed.data-center.zhangchuangla.cn/
   endpoint: http://192.168.1.120:9000/
   accessKey: cwytEbLXyBo2Tul2C9OZ
   secretKey: UGGQUnHCjjooNlrZZfO1WCNEB1OvCriYOWX47Oi5
