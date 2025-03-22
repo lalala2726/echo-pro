@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.response;
+package cn.zhangchuangla.common.result;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

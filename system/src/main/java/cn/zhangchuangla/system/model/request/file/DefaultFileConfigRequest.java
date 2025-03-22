@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.request;
+package cn.zhangchuangla.system.model.request.file;
 
 import lombok.Data;
 

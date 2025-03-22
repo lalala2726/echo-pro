@@ -2,8 +2,11 @@ package cn.zhangchuangla.common.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -15,7 +18,7 @@ import java.util.UUID;
  * <p>
  * created on 2025/2/18 15:27
  */
-public class FileUtils {
+public class FileOperationUtils {
     /**
      * 校验文件有效性
      */
@@ -104,5 +107,21 @@ public class FileUtils {
         } else {
             return originalFilename + "_compressed";
         }
+    }
+
+
+    /**
+     * 删除文件
+     *
+     * @param root     文件根目录
+     * @param filePath 文件路径
+     * @throws IOException 文件删除失败
+     */
+    public static void deleteFile(String root, String filePath) throws IOException {
+        if (root == null || filePath == null) {
+            throw new ServiceException(ResponseCode.PARAM_NOT_NULL, "root和filePath不能为空！");
+        }
+        String fullPath = root + filePath;
+        FileUtils.delete(new File(fullPath));
     }
 }

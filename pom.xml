@@ -51,6 +51,7 @@
         <oshi.version>6.6.6</oshi.version>
         <alibaba.fastjson.version>2.0.53</alibaba.fastjson.version>
         <alibaba.druid.starter.version>1.2.19</alibaba.druid.starter.version>
+        <apache.commons-io.version>2.18.0</apache.commons-io.version>
     </properties>
 
     <dependencies>
@@ -178,7 +179,12 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
-
+            <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${apache.commons-io.version}</version>
+            </dependency>
             <!-- ===================== 项目模块依赖 ===================== -->
             <dependency>
                 <groupId>${project.groupId}</groupId>

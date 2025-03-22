@@ -4,14 +4,14 @@ import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.common.utils.URLUtils;
-import cn.zhangchuangla.system.mapper.FileUploadRecordMapper;
-import cn.zhangchuangla.system.model.entity.FileUploadRecord;
-import cn.zhangchuangla.system.model.request.file.FileUploadRecordRequest;
-import cn.zhangchuangla.system.service.FileUploadRecordService;
+import cn.zhangchuangla.system.mapper.FileManagementMapper;
+import cn.zhangchuangla.system.model.entity.FileManagement;
+import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
+import cn.zhangchuangla.system.service.FileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +20,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zhangchuang
  */
 @Service
 @Slf4j
-public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMapper, FileUploadRecord>
-        implements FileUploadRecordService {
+public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper, FileManagement>
+        implements FileManagementService {
 
     private final ConfigCacheService configCacheService;
-    private final FileUploadRecordMapper fileUploadRecordMapper;
+    private final FileManagementMapper fileManagementMapper;
 
-
-    public FileUploadRecordServiceImpl(ConfigCacheService configCacheService, FileUploadRecordMapper fileUploadRecordMapper) {
+    public FileManagementServiceImpl(ConfigCacheService configCacheService, FileManagementMapper fileManagementMapper) {
         this.configCacheService = configCacheService;
-        this.fileUploadRecordMapper = fileUploadRecordMapper;
+        this.fileManagementMapper = fileManagementMapper;
     }
-
 
     /**
      * 保存文件信息到数据库
@@ -71,7 +70,7 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
             String fileExtension = URLUtils.extractExtensionFromUrl(fileUrl);
             if (StringUtils.isBlank(fileExtension) && originalFileName != null) {
                 // 如果从URL无法提取到扩展名，则从原始文件名中提取
-                fileExtension = FileUtils.getFileExtension(originalFileName);
+                fileExtension = FileOperationUtils.getFileExtension(originalFileName);
             }
 
             // 从URL中提取文件名
@@ -82,7 +81,7 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
 
             // 计算文件MD5值
             byte[] bytes = file.getBytes();
-            String md5 = FileUtils.calculateMD5(bytes);
+            String md5 = FileOperationUtils.calculateMD5(bytes);
 
             // 获取当前用户信息
             Long userId = SecurityUtils.getUserId();
@@ -97,7 +96,7 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
             }
 
             // 创建文件记录
-            FileUploadRecord record = new FileUploadRecord();
+            FileManagement record = new FileManagement();
             record.setFileName(fileName);
             record.setOriginalFileName(originalFileName);
             record.setFilePath(filePath);
@@ -137,9 +136,26 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
      * @return 文件列表分页结果
      */
     @Override
-    public Page<FileUploadRecord> fileList(FileUploadRecordRequest request) {
-        Page<FileUploadRecord> page = page(new Page<>(request.getPageNum(), request.getPageSize()));
-        return fileUploadRecordMapper.fileList(page, request);
+    public Page<FileManagement> fileList(FileManagementListRequest request) {
+        Page<FileManagement> page = page(new Page<>(request.getPageNum(), request.getPageSize()));
+        return fileManagementMapper.fileList(page, request);
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param ids 文件ID集合
+     */
+    @Override
+    public void deleteFile(List<Long> ids) {
+        ids.forEach(id -> {
+            FileManagement file = getById(id);
+        });
+    }
+
+
+    private void deleteFileLocal(FileManagement fileManagement) {
+
     }
 
 

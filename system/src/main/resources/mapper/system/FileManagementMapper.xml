@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.FileUploadRecordMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.FileManagementMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.FileUploadRecord">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.FileManagement">
         <id property="id" column="id"/>
         <result property="fileName" column="file_name"/>
         <result property="originalFileName" column="original_file_name"/>
@@ -29,6 +29,6 @@
     </resultMap>
     <select id="fileList" resultMap="BaseResultMap">
         select *
-        from file_upload_record
+        from file_management
     </select>
 </mapper>

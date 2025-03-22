@@ -12,7 +12,8 @@ import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.DefaultFileUploadEnum;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.model.request.DefaultFileConfigRequest;
+import cn.zhangchuangla.common.utils.PathUtils;
+import cn.zhangchuangla.system.model.request.file.DefaultFileConfigRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +28,14 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/system/file")
-@Tag(name = "文件管理")
-public class FileController extends BaseController {
+@RequestMapping("/system/file/config")
+@Tag(name = "文件配置")
+public class FileConfigController extends BaseController {
 
     private final RedisCache redisCache;
     private final ConfigCacheService configCacheService;
 
-    public FileController(RedisCache redisCache, ConfigCacheService configCacheService) {
+    public FileConfigController(RedisCache redisCache, ConfigCacheService configCacheService) {
         this.redisCache = redisCache;
         this.configCacheService = configCacheService;
     }
@@ -79,9 +80,27 @@ public class FileController extends BaseController {
     @Log(title = "文件管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "更新本地文件上传配置")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
-    public AjaxResult updateLocalFileConfig(@RequestBody @Validated LocalFileConfigEntity request) {
+    public AjaxResult updateLocalFileConfig(@RequestBody LocalFileConfigEntity request) {
+        String uploadPath = request.getUploadPath();
+        log.info("接收前端的地址: {}", uploadPath);
+
+        //  1. 校验路径
+        if (PathUtils.isLinuxPath(uploadPath)) {
+            log.info("Linux 系统路径，直接上传...");
+        } else if (PathUtils.isWindowsPath(uploadPath)) {
+            //  2. 处理 Windows 路径
+            uploadPath = PathUtils.processWindowsPath(uploadPath);
+            request.setUploadPath(uploadPath);
+            log.info("处理后的 Windows 地址: {}", uploadPath);
+        } else {
+            log.error("不支持的路径格式: {}", uploadPath);
+            return AjaxResult.error("路径格式不正确，请检查！");
+        }
+
+        // 3. 保存到 Redis
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL, request);
-        return success(SystemMessageConstant.UPDATE_SUCCESS);
+        log.info("配置已保存至 Redis");
+        return AjaxResult.success(SystemMessageConstant.UPDATE_SUCCESS);
     }
 
     /**
@@ -122,5 +141,45 @@ public class FileController extends BaseController {
         // 现在ProfileException会被正常抛出并由全局异常处理器捕获
         configCacheService.refreshAllConfigs();
         return success("配置刷新成功");
+    }
+
+
+    /**
+     * 获取本地文件上传配置
+     *
+     * @return 本地文件上传配置
+     */
+    @GetMapping("/config/local")
+    @Operation(summary = "获取本地文件上传配置")
+    @PreAuthorize("@auth.hasPermission('system:file:config')")
+    public AjaxResult getLocalFileConfig() {
+        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
+        return AjaxResult.success(localFileConfig);
+    }
+
+    /**
+     * 获取Minio文件上传配置
+     *
+     * @return Minio文件上传配置
+     */
+    @GetMapping("/config/minio")
+    @Operation(summary = "获取Minio文件上传配置")
+    @PreAuthorize("@auth.hasPermission('system:file:config')")
+    public AjaxResult getMinioConfig() {
+        MinioConfigEntity minioConfig = configCacheService.getMinioConfig();
+        return AjaxResult.success(minioConfig);
+    }
+
+    /**
+     * 获取阿里云OSS文件上传配置
+     *
+     * @return 阿里云OSS文件上传配置
+     */
+    @GetMapping("/config/oss")
+    @Operation(summary = "获取阿里云OSS文件上传配置")
+    @PreAuthorize("@auth.hasPermission('system:file:config')")
+    public AjaxResult getAliyunOSSConfig() {
+        AliyunOSSConfigEntity aliyunOSSConfig = configCacheService.getAliyunOSSConfig();
+        return AjaxResult.success(aliyunOSSConfig);
     }
 }
