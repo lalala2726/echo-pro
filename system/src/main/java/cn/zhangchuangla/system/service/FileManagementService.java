@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.entity.file.FileInfo;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,12 +17,6 @@ public interface FileManagementService extends IService<cn.zhangchuangla.system.
 
 
     /**
-     * 保存文件信息到数据库中
-     */
-    void saveFileInfo(String fileUrl, String compressedUrl, MultipartFile file, String storageType);
-
-
-    /**
      * 获取文件列表
      *
      * @return 文件列表
@@ -35,4 +30,5 @@ public interface FileManagementService extends IService<cn.zhangchuangla.system.
      */
     void deleteFile(List<Long> ids);
 
+    void saveFileRecord(String fileUrl, String compressedUrl, FileInfo fileInfo, String storageType);
 }

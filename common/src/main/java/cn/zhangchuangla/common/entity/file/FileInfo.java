@@ -2,7 +2,7 @@ package cn.zhangchuangla.common.entity.file;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.utils.FileOperationUtils;
+import cn.zhangchuangla.common.utils.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -67,7 +67,7 @@ public class FileInfo {
         }
 
         //获取文件Md5值
-        String md5 = FileOperationUtils.calculateMD5(file.getBytes());
+        String md5 = FileUtils.calculateMD5(file.getBytes());
         return new FileInfo(
                 originalFilename,
                 file.getContentType(),
