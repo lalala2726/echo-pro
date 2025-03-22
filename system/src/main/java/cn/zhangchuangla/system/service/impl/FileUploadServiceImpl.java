@@ -66,21 +66,29 @@ public class FileUploadServiceImpl implements FileUploadService {
             log.error("文件上传失败：文件为空或无效");
             throw new FileException(ResponseCode.FileNameIsNull);
         }
+
         AliyunOSSConfigEntity aliyunOSSConfig = configCacheService.getAliyunOSSConfig();
+
         // 获取 OSS 配置
         String bucketName = aliyunOSSConfig.getBucketName();
         String endPoint = aliyunOSSConfig.getEndpoint();
         String accessKeyId = aliyunOSSConfig.getAccessKeyId();
         String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
         String fileDomain = aliyunOSSConfig.getFileDomain();
+        String bucketPath = aliyunOSSConfig.getBucketPath();
 
         // 创建 OSS 客户端
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
 
         // 生成存储路径
-        String folder = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String fileName = FileUtils.generateUUID() + FileUtils.getFileExtension(file.getOriginalFilename());
-        String uploadFileName = folder + "/" + fileName;
+
+        // 拼接完整路径：bucketPath/日期路径/文件名
+        // 确保 bucketPath 格式正确，避免多余的斜杠
+        String normalizedBucketPath = normalizePath(bucketPath);
+        String uploadPath = normalizedBucketPath.isEmpty() ? datePath : normalizedBucketPath + "/" + datePath;
+        String uploadFileName = uploadPath + "/" + fileName;
 
         // 配置文件元数据（确保浏览器可直接预览）
         ObjectMetadata metadata = new ObjectMetadata();
@@ -90,14 +98,41 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         // 执行上传
         try (InputStream inputStream = file.getInputStream()) {
+            log.info("开始上传文件到阿里云OSS，存储路径: {}", uploadFileName);
             PutObjectResult result = ossClient.putObject(bucketName, uploadFileName, inputStream, metadata);
-            return result != null ? fileDomain + uploadFileName : null;
+
+            String fileUrl = fileDomain + uploadFileName;
+            log.info("文件上传成功，访问地址: {}", fileUrl);
+
+            return result != null ? fileUrl : null;
         } catch (IOException e) {
-            log.error("文件上传失败: {}", e.getMessage());
+            log.error("文件上传失败: {}", e.getMessage(), e);
             return null;
         } finally {
             ossClient.shutdown();
         }
+    }
+
+    /**
+     * 规范化路径格式
+     * - 去除开头和结尾的斜杠
+     * - 处理空值情况
+     */
+    private String normalizePath(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            return "";
+        }
+
+        // 去除开头和结尾的斜杠
+        String normalizedPath = path.trim();
+        if (normalizedPath.startsWith("/")) {
+            normalizedPath = normalizedPath.substring(1);
+        }
+        if (normalizedPath.endsWith("/")) {
+            normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
+        }
+
+        return normalizedPath;
     }
 
     /**

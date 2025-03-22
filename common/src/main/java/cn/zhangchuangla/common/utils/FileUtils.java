@@ -1,7 +1,11 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
@@ -53,4 +57,34 @@ public class FileUtils {
         return System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
     }
 
+    /**
+     * 计算文件的MD5值
+     *
+     * @param fileBytes 文件字节数组
+     * @return 返回MD5值
+     */
+    public static String calculateMD5(byte[] fileBytes) {
+        if (fileBytes == null) {
+            throw new ServiceException(ResponseCode.PARAM_NOT_NULL, "文件不能为空！");
+        }
+        try {
+            // 获取MD5算法的MessageDigest实例
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 计算MD5摘要
+            byte[] digest = md.digest(fileBytes);
+            // 将byte数组转换为十六进制字符串
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                // 将每个byte转为两位十六进制数
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    sb.append('0');
+                }
+                sb.append(hex);
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new ServiceException(ResponseCode.SYSTEM_ERROR, "计算MD5值失败：" + e.getMessage());
+        }
+    }
 }
