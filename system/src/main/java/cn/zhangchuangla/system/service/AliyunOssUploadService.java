@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * @author zhangchuang
@@ -8,5 +9,5 @@ import java.io.IOException;
  */
 public interface AliyunOssUploadService {
 
-    String aliyunOssUploadBytes(byte[] data, String fileName, String contentType) throws IOException;
+    HashMap<String, String> aliyunOssUploadBytes(byte[] data, String fileName, String contentType) throws IOException;
 }

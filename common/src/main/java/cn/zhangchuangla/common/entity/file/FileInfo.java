@@ -49,6 +49,7 @@ public class FileInfo {
      */
     private String md5;
 
+
     /**
      * 从MultipartFile创建FileInfo对象
      *

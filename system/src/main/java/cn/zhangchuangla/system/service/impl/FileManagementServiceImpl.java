@@ -8,7 +8,10 @@ import cn.zhangchuangla.common.utils.URLUtils;
 import cn.zhangchuangla.system.mapper.FileManagementMapper;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
+import cn.zhangchuangla.system.service.AliyunOssUploadService;
 import cn.zhangchuangla.system.service.FileManagementService;
+import cn.zhangchuangla.system.service.LocalFileUploadService;
+import cn.zhangchuangla.system.service.MinioFileUploadService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +30,16 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
 
     private final ConfigCacheService configCacheService;
     private final FileManagementMapper fileManagementMapper;
+    private final LocalFileUploadService localFileUploadService;
+    private final AliyunOssUploadService aliyunOssUploadService;
+    private final MinioFileUploadService minioFileUploadService;
 
-    public FileManagementServiceImpl(ConfigCacheService configCacheService, FileManagementMapper fileManagementMapper) {
+    public FileManagementServiceImpl(ConfigCacheService configCacheService, FileManagementMapper fileManagementMapper, LocalFileUploadService localFileUploadService, AliyunOssUploadService aliyunOssUploadService, MinioFileUploadService minioFileUploadService) {
         this.configCacheService = configCacheService;
         this.fileManagementMapper = fileManagementMapper;
+        this.localFileUploadService = localFileUploadService;
+        this.aliyunOssUploadService = aliyunOssUploadService;
+        this.minioFileUploadService = minioFileUploadService;
     }
 
 
@@ -55,13 +64,38 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
     public void deleteFile(List<Long> ids) {
         ids.forEach(id -> {
             FileManagement file = getById(id);
+            deleteFileByFileIdWithStorageType(file);
         });
     }
 
 
+    public void deleteFileByFileIdWithStorageType(FileManagement fileManagement) {
 
+        switch (fileManagement.getStorageType()) {
+            case Constants.MINIO_FILE_UPLOAD:
+                minioFileUploadService.deleteFileByFileId(fileManagement);
+                break;
+            case Constants.ALIYUN_OSS_FILE_UPLOAD:
+                break;
+            case Constants.LOCAL_FILE_UPLOAD:
+                localFileUploadService.deleteFileByFileId(fileManagement);
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    /**
+     * 保存文件记录到数据库中
+     *
+     * @param fileUrl       原始文件URL
+     * @param compressedUrl 压缩后URL
+     * @param fileInfo      文件信息
+     * @param storageType   存储类型
+     */
     @Override
-    public void saveFileRecord(String fileUrl, String compressedUrl, FileInfo fileInfo, String storageType) {
+    public void saveFileRecord(String fileUrl, String compressedUrl, FileInfo fileInfo, String storageType, String relativeFileLocation) {
         try {
             // 获取当前用户信息
             Long userId = SecurityUtils.getUserId();
@@ -81,8 +115,8 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
             // 创建文件记录
             FileManagement record = new FileManagement();
             record.setFileName(fileInfo.getOriginalFilename());
+            record.setRelativeFileLocation(relativeFileLocation);
             record.setOriginalFileName(fileInfo.getOriginalFilename());
-            record.setFilePath(filePath);
             record.setFileUrl(fileUrl);
             record.setFileSize(fileInfo.getSize());
             record.setFileType(fileInfo.getContentType());

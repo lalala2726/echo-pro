@@ -1,8 +1,12 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.service.MinioFileUploadService;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 
 /**
  * @author zhangchuang
@@ -33,7 +38,7 @@ public class MinioFileUploadServiceImpl implements MinioFileUploadService {
 
 
     @Override
-    public String minioUploadBytes(byte[] data, String fileName, String contentType) {
+    public HashMap<String, String> minioUploadBytes(byte[] data, String fileName, String contentType) {
         MinioConfigEntity minioConfig = configCacheService.getMinioConfig();
         String endpoint = minioConfig.getEndpoint();
         String accessKey = minioConfig.getAccessKey();
@@ -41,6 +46,7 @@ public class MinioFileUploadServiceImpl implements MinioFileUploadService {
         String bucketName = minioConfig.getBucketName();
         String fileDomain = minioConfig.getFileDomain();
 
+        HashMap<String, String> result = new HashMap<>();
         try {
             // 创建Minio客户端
             MinioClient minioClient = MinioClient.builder()
@@ -73,11 +79,21 @@ public class MinioFileUploadServiceImpl implements MinioFileUploadService {
                             .build()
             );
 
+            String relativeFileLocation = "/" + objectName;
             // 返回文件URL
-            return fileDomain + "/" + objectName;
+            String fileUrl = fileDomain + relativeFileLocation;
+            result.put(Constants.FILE_URL, fileUrl);
+            result.put(Constants.RELATIVE_FILE_LOCATION, relativeFileLocation);
+            return result;
         } catch (Exception e) {
-            log.error("MinIO上传失败: {}", e.getMessage(), e);
+            log.warn("文件上传失败", e);
+            throw new FileException(ResponseCode.FileUploadFailed);
         }
-        return endpoint;
+    }
+
+
+    @Override
+    public void deleteFileByFileId(FileManagement fileManagement) {
+
     }
 }

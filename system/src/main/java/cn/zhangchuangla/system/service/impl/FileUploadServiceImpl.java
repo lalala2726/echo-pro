@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * 文件上传服务实现类
@@ -42,7 +43,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
 
-
     /**
      * 文件上传到阿里云OSS
      *
@@ -58,7 +58,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
                     fileInfo.getContentType()
-            );
+            ).get(Constants.FILE_URL);
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FileUploadFailed);
@@ -80,7 +80,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
                     fileInfo.getContentType()
-            );
+            ).get(Constants.FILE_URL);
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FileUploadFailed);
@@ -101,7 +101,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             return localFileUploadService.localUploadBytes(
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename()
-            );
+            ).get(Constants.FILE_URL);
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FileUploadFailed);
@@ -137,13 +137,13 @@ public class FileUploadServiceImpl implements FileUploadService {
             result.setImage(isImage);
 
             // 上传原始文件
-            String originalUrl = uploadByteArray(
+            HashMap<String, String> originalResult = uploadByteArray(
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
                     fileInfo.getContentType(),
                     storageType
             );
-            result.setOriginalUrl(originalUrl);
+            result.setOriginalUrl(originalResult.get(Constants.FILE_URL));
 
             // 如果是图片文件，进行压缩处理
             if (isImage) {
@@ -158,26 +158,25 @@ public class FileUploadServiceImpl implements FileUploadService {
                 String compressedFileName = FileUtils.generateCompressedFileName(fileInfo.getOriginalFilename());
 
                 // 直接上传压缩后的字节数组
-                String compressedUrl = uploadByteArray(
+                HashMap<String, String> stringHashMap = uploadByteArray(
                         compressedBytes,
                         compressedFileName,
                         fileInfo.getContentType(),
                         storageType
                 );
-
-                result.setCompressedUrl(compressedUrl);
-
+                result.setCompressedUrl(stringHashMap.get(Constants.FILE_URL));
             }
-
-            // 保存原始文件记录
+            // 保存文件信息到数据库中
             if (fileManagementService != null) {
                 fileManagementService.saveFileRecord(
-                        originalUrl,
+                        originalResult.get(Constants.FILE_URL),
                         result.getCompressedUrl(),
                         fileInfo,
-                        storageType
+                        storageType,
+                        originalResult.get(Constants.RELATIVE_FILE_LOCATION)
                 );
             }
+
 
             return result;
         } catch (IOException e) {
@@ -195,7 +194,7 @@ public class FileUploadServiceImpl implements FileUploadService {
      * @param contentType 文件类型
      * @param storageType 存储类型
      */
-    private String uploadByteArray(byte[] data, String fileName, String contentType, String storageType) throws IOException {
+    private HashMap<String, String> uploadByteArray(byte[] data, String fileName, String contentType, String storageType) throws IOException {
         if (Constants.LOCAL_FILE_UPLOAD.equals(storageType)) {
             return localFileUploadService.localUploadBytes(data, fileName);
         } else if (Constants.MINIO_FILE_UPLOAD.equals(storageType)) {

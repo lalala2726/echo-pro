@@ -6,7 +6,6 @@ import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,5 +29,13 @@ public interface FileManagementService extends IService<cn.zhangchuangla.system.
      */
     void deleteFile(List<Long> ids);
 
-    void saveFileRecord(String fileUrl, String compressedUrl, FileInfo fileInfo, String storageType);
+    /**
+     * 保存文件记录
+     *
+     * @param originalUrl   原始文件URL
+     * @param compressedUrl 压缩后URL
+     * @param fileInfo      文件信息
+     * @param storageType   存储类型
+     */
+    void saveFileRecord(String originalUrl, String compressedUrl, FileInfo fileInfo, String storageType,String relativeFileLocation);
 }

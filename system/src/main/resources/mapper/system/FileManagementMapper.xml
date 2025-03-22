@@ -8,7 +8,7 @@
         <id property="id" column="id"/>
         <result property="fileName" column="file_name"/>
         <result property="originalFileName" column="original_file_name"/>
-        <result property="filePath" column="file_path"/>
+        <result property="relativeFileLocation" column="relative_file_location"/>
         <result property="fileUrl" column="file_url"/>
         <result property="previewImage" column="preview_image"/>
         <result property="fileSize" column="file_size"/>
@@ -27,6 +27,7 @@
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
+
     <select id="fileList" resultMap="BaseResultMap">
         select *
         from file_management

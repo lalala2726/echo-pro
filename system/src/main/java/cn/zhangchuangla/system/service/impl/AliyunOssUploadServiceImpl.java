@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
@@ -14,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 
 /**
  * @author zhangchuang
@@ -30,7 +32,7 @@ public class AliyunOssUploadServiceImpl implements AliyunOssUploadService {
     }
 
     @Override
-    public String aliyunOssUploadBytes(byte[] data, String fileName, String contentType) throws IOException {
+    public HashMap<String, String> aliyunOssUploadBytes(byte[] data, String fileName, String contentType) throws IOException {
         AliyunOSSConfigEntity aliyunOSSConfig = configCacheService.getAliyunOSSConfig();
 
         // 获取OSS配置
@@ -44,6 +46,7 @@ public class AliyunOssUploadServiceImpl implements AliyunOssUploadService {
         // 创建OSS客户端
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
 
+        HashMap<String, String> result = new HashMap<>();
         try {
             // 生成存储路径
             String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -69,7 +72,10 @@ public class AliyunOssUploadServiceImpl implements AliyunOssUploadService {
             ossClient.putObject(bucketName, uploadFileName, new ByteArrayInputStream(data), metadata);
 
             // 返回文件URL
-            return fileDomain + uploadFileName;
+            String fileUrl = fileDomain + uploadFileName;
+            result.put(Constants.FILE_URL, fileUrl);
+            result.put(Constants.RELATIVE_FILE_LOCATION, uploadFileName);
+            return result;
         } finally {
             ossClient.shutdown();
         }

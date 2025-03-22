@@ -1,6 +1,9 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.system.model.entity.FileManagement;
+
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * @author zhangchuang
@@ -9,5 +12,8 @@ import java.io.IOException;
 public interface LocalFileUploadService {
 
 
-    String localUploadBytes(byte[] data, String fileName) throws IOException;
+    HashMap<String,String> localUploadBytes(byte[] data, String fileName) throws IOException;
+
+
+    void deleteFileByFileId(FileManagement fileManagement);
 }

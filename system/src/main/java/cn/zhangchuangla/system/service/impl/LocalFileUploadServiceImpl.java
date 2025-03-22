@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.service.LocalFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,7 @@ public class LocalFileUploadServiceImpl implements LocalFileUploadService {
     }
 
     @Override
-    public String localUploadBytes(byte[] data, String fileName) throws IOException {
+    public HashMap<String, String> localUploadBytes(byte[] data, String fileName) throws IOException {
         LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
         String uploadPath = localFileConfig.getUploadPath();
 
@@ -63,7 +65,18 @@ public class LocalFileUploadServiceImpl implements LocalFileUploadService {
 
         // 写入文件
         Files.write(filePath, data);
+        String relativeFileLocation = "/" + yearMonthDir + "/" + uuidFileName + fileExtension;
+        //拼接文件URL
+        String fileUrl = Constants.RESOURCE_PREFIX + relativeFileLocation;
 
-        return Constants.RESOURCE_PREFIX + "/" + yearMonthDir + "/" + uuidFileName + fileExtension;
+        HashMap<String, String> result = new HashMap<>();
+        result.put(Constants.FILE_URL, fileUrl);
+        result.put(Constants.RELATIVE_FILE_LOCATION, relativeFileLocation);
+        return result;
+    }
+
+    @Override
+    public void deleteFileByFileId(FileManagement fileManagement) {
+
     }
 }

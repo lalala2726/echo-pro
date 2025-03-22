@@ -30,9 +30,9 @@ public class FileManagement {
     private String originalFileName;
 
     /**
-     * 文件存储路径
+     * 文件相对路径
      */
-    private String filePath;
+    private String relativeFileLocation;
 
     /**
      * 文件访问URL

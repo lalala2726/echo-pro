@@ -60,4 +60,5 @@ public class FileUploadResult {
      */
     @Schema(description = "压缩后文件大小(字节)")
     private long compressedSize;
+
 }
