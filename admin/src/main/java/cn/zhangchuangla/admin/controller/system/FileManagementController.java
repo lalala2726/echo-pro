@@ -4,6 +4,8 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
@@ -68,5 +70,22 @@ public class FileManagementController extends BaseController {
     public AjaxResult deleteFile(@PathVariable("ids") List<Long> ids) {
         fileManagementService.deleteFile(ids);
         return success();
+    }
+
+    /**
+     * 根据文件id获取文件信息
+     *
+     * @param id 文件id
+     * @return 文件信息
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "获取文件信息", description = "根据文件id获取文件信息")
+    @PreAuthorize("@auth.hasPermission('system:file:management:info')")
+    public AjaxResult getFileById(@PathVariable("id") Long id) {
+        if (id == null) {
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "文件ID不能为空！");
+        }
+        FileManagement fileManagement = fileManagementService.getFileById(id);
+        return success(fileManagement);
     }
 }

@@ -37,7 +37,7 @@ public class FileInfo {
     /**
      * 文件内容
      */
-    private byte[] content;
+    private byte[] data;
 
     /**
      * 文件扩展名

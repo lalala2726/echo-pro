@@ -32,7 +32,12 @@ public class FileManagement {
     /**
      * 文件相对路径
      */
-    private String relativeFileLocation;
+    private String originalRelativeFileLocation;
+
+    /**
+     * 预言文件相对路径
+     */
+    private String previewRelativeFileLocation;
 
     /**
      * 文件访问URL

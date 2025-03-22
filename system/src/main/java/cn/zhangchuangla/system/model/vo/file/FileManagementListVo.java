@@ -15,6 +15,8 @@ import java.util.Date;
 @Schema(description = "文件列表VO")
 public class FileManagementListVo extends BaseVO {
 
+    @Schema(description = "文件ID")
+    private Long id;
 
     /**
      * 文件名称

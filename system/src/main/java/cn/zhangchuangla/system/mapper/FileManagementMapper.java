@@ -18,7 +18,7 @@ public interface FileManagementMapper extends BaseMapper<cn.zhangchuangla.system
      * @param request 请求参数
      * @return 结果
      */
-     Page<FileManagement> fileList(Page<FileManagement> page, @Param("request") FileManagementListRequest request);
+    Page<FileManagement> fileList(Page<FileManagement> page, @Param("request") FileManagementListRequest request);
 }
 
 

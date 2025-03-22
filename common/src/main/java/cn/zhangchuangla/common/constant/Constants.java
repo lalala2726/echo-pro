@@ -80,4 +80,9 @@ public class Constants {
     public static final String FILE_URL = "fileUrl";
     public static final String COMPRESSED_URL = "compressedUrl";
     public static final String RELATIVE_FILE_LOCATION = "relativeFileLocation";
+
+    public static final String FILE_PREVIEW_FOLDER = "preview";
+
+
+    public static final String FILE_ORIGINAL_FOLDER = "original";
 }
