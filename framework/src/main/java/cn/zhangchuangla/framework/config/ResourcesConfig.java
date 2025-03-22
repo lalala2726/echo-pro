@@ -3,6 +3,8 @@ package cn.zhangchuangla.framework.config;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * created on 2025/2/19 02:15
  */
 @Configuration
+@Slf4j
 public class ResourcesConfig implements WebMvcConfigurer {
 
     private final ConfigCacheService configCacheService;
@@ -26,13 +29,14 @@ public class ResourcesConfig implements WebMvcConfigurer {
      * 配置静态资源访问路径
      */
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
 
         // 本地文件上传路径
         LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
         if (localFileConfig != null) {
+            log.info("静态资源加载映射：{}", localFileConfig.getUploadPath());
             registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                    .addResourceLocations("file:" + localFileConfig.getUploadPath());
+                    .addResourceLocations("file:" + localFileConfig.getUploadPath() + "/");
         }
 
 

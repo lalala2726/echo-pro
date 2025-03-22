@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.response;
+package cn.zhangchuangla.common.result;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -60,4 +60,5 @@ public class FileUploadResult {
      */
     @Schema(description = "压缩后文件大小(字节)")
     private long compressedSize;
+
 }

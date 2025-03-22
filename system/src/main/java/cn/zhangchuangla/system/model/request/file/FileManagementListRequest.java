@@ -3,15 +3,17 @@ package cn.zhangchuangla.system.model.request.file;
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
 /**
  * 文件上传记录表
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "文件管理请求类")
-public class FileUploadRecordRequest extends BasePageRequest {
+public class FileManagementListRequest extends BasePageRequest {
 
 
     /**

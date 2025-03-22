@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.system.model.response.FileUploadResult;
+import cn.zhangchuangla.common.result.FileUploadResult;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
