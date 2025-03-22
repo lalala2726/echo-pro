@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.entity.file.FileInfo;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -23,9 +24,6 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -59,46 +54,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     private final ConfigCacheService configCacheService;
     private final FileManagementService fileManagementService;
 
-    /**
-     * 文件信息内部类，用于存储从MultipartFile中提取的信息
-     * 避免多次读取MultipartFile导致的失效问题
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class FileInfo {
-        private String originalFilename;
-        private String contentType;
-        private long size;
-        private byte[] content;
-        private String fileExtension;
-
-        /**
-         * 从MultipartFile创建FileInfo对象
-         * @param file MultipartFile对象
-         * @return FileInfo对象
-         * @throws IOException 如果读取文件失败
-         */
-        public static FileInfo fromMultipartFile(MultipartFile file) throws IOException {
-            if (file == null || file.isEmpty()) {
-                throw new FileException(ResponseCode.FileNameIsNull);
-            }
-
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-
-            return new FileInfo(
-                    originalFilename,
-                    file.getContentType(),
-                    file.getSize(),
-                    file.getBytes(), // 立即读取文件内容到内存
-                    fileExtension
-            );
-        }
-    }
 
     @Autowired
     public FileUploadServiceImpl(ConfigCacheService configCacheService, FileManagementService fileManagementService) {
@@ -120,7 +75,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             return aliyunOssUploadBytes(
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
-                    fileInfo.getContentType()
+                    fileInfo.getContentType(),
+                    false
             );
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
@@ -142,7 +98,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             return minioUploadBytes(
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
-                    fileInfo.getContentType()
+                    fileInfo.getContentType(),
+                    false
             );
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
@@ -164,7 +121,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             return localUploadBytes(
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
-                    fileInfo.getContentType()
+                    false
             );
         } catch (IOException e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
@@ -205,7 +162,8 @@ public class FileUploadServiceImpl implements FileUploadService {
                     fileInfo.getContent(),
                     fileInfo.getOriginalFilename(),
                     fileInfo.getContentType(),
-                    storageType
+                    storageType,
+                    false
             );
             result.setOriginalUrl(originalUrl);
 
@@ -226,21 +184,12 @@ public class FileUploadServiceImpl implements FileUploadService {
                         compressedBytes,
                         compressedFileName,
                         fileInfo.getContentType(),
-                        storageType
+                        storageType,
+                        true
                 );
 
                 result.setCompressedUrl(compressedUrl);
 
-                // 保存压缩文件记录
-                if (fileManagementService != null) {
-                    saveCompressedFileRecord(
-                            compressedUrl,
-                            compressedFileName,
-                            fileInfo.getContentType(),
-                            compressedBytes.length,
-                            storageType
-                    );
-                }
             }
 
             // 保存原始文件记录
@@ -261,7 +210,12 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     /**
-     * 保存原始文件记录
+     * 保存文件记录到数据库中
+     *
+     * @param fileUrl       原始文件URL
+     * @param compressedUrl 压缩文件URL
+     * @param fileInfo      文件信息
+     * @param storageType   存储位置
      */
     private void saveFileRecord(String fileUrl, String compressedUrl, FileInfo fileInfo, String storageType) {
         try {
@@ -292,6 +246,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             record.setStorageType(storageType);
             record.setBucketName(bucketName);
             record.setUploaderId(userId);
+            record.setMd5(fileInfo.getMd5());
             record.setUploaderName(userName);
             record.setCreateBy(Constants.SYSTEM_CREATE);
             record.setUploadTime(new Date());
@@ -304,27 +259,6 @@ public class FileUploadServiceImpl implements FileUploadService {
         }
     }
 
-    /**
-     * 根据存储类型上传文件
-     *
-     * @param file        文件
-     * @param storageType 存储类型
-     * @return 文件URL
-     */
-    private String uploadFile(MultipartFile file, String storageType) {
-        try {
-            FileInfo fileInfo = FileInfo.fromMultipartFile(file);
-            return uploadByteArray(
-                    fileInfo.getContent(),
-                    fileInfo.getOriginalFilename(),
-                    fileInfo.getContentType(),
-                    storageType
-            );
-        } catch (IOException e) {
-            log.error("文件上传失败: {}", e.getMessage(), e);
-            throw new ServiceException(ResponseCode.SYSTEM_ERROR, "文件上传失败: " + e.getMessage());
-        }
-    }
 
     /**
      * 上传字节数组
@@ -334,25 +268,39 @@ public class FileUploadServiceImpl implements FileUploadService {
      * @param contentType 文件类型
      * @param storageType 存储类型
      */
-    private String uploadByteArray(byte[] data, String fileName, String contentType, String storageType) throws IOException {
+    private String uploadByteArray(byte[] data, String fileName, String contentType, String storageType, boolean isCompressed) throws IOException {
         if (Constants.LOCAL_FILE_UPLOAD.equals(storageType)) {
-            return localUploadBytes(data, fileName, contentType);
+            return localUploadBytes(data, fileName, isCompressed);
         } else if (Constants.MINIO_FILE_UPLOAD.equals(storageType)) {
-            return minioUploadBytes(data, fileName, contentType);
+            return minioUploadBytes(data, fileName, contentType, isCompressed);
         } else if (Constants.ALIYUN_OSS_FILE_UPLOAD.equals(storageType)) {
-            return aliyunOssUploadBytes(data, fileName, contentType);
+            return aliyunOssUploadBytes(data, fileName, contentType, isCompressed);
         } else {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "不支持的存储类型: " + storageType);
         }
     }
 
     /**
-     * 本地上传字节数组
+     * 文件路径结果类
+     *
+     * @param relativePath 相对路径（不含文件名）
+     * @param fileName     文件名（含扩展名）
      */
-    private String localUploadBytes(byte[] data, String fileName, String contentType) throws IOException {
-        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
-        String uploadPath = localFileConfig.getUploadPath();
+    private record FilePathResult(String relativePath, String fileName) {
 
+        public String getFullRelativePath() {
+            return relativePath + "/" + fileName;
+        }
+    }
+
+    /**
+     * 生成文件存储路径和文件名
+     *
+     * @param fileName     原始文件名
+     * @param isCompressed 是否为压缩资源
+     * @return 包含路径信息的对象
+     */
+    private FilePathResult generateFilePath(String fileName, boolean isCompressed) {
         // 生成年月格式的目录
         SimpleDateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
         String yearMonthDir = yearMonthFormat.format(new Date());
@@ -371,9 +319,31 @@ public class FileUploadServiceImpl implements FileUploadService {
         Pattern pattern = Pattern.compile("[^a-z0-9]");
         uuidFileName = pattern.matcher(uuidFileName).replaceAll("");
 
-        // 设置目标路径，包含年月目录
-        Path directory = Paths.get(uploadPath + File.separator + yearMonthDir);
-        Path filePath = directory.resolve(uuidFileName + fileExtension);
+        // 根据压缩状态确定子目录
+        String subDir = isCompressed ? "compressed" : "original";
+
+        // 构建完整文件名
+        String finalFileName = uuidFileName + fileExtension;
+
+        // 构建相对路径
+        String relativePath = yearMonthDir + "/" + subDir;
+
+        return new FilePathResult(relativePath, finalFileName);
+    }
+
+    /**
+     * 本地上传字节数组
+     */
+    private String localUploadBytes(byte[] data, String fileName, boolean isCompressed) throws IOException {
+        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
+        String uploadPath = localFileConfig.getUploadPath();
+
+        // 使用提取的方法生成文件路径
+        FilePathResult pathResult = generateFilePath(fileName, isCompressed);
+
+        // 设置目标路径
+        Path directory = Paths.get(uploadPath + File.separator + pathResult.relativePath().replace("/", File.separator));
+        Path filePath = directory.resolve(pathResult.fileName());
 
         // 创建目录，如果不存在则创建
         Files.createDirectories(directory);
@@ -381,13 +351,13 @@ public class FileUploadServiceImpl implements FileUploadService {
         // 写入文件
         Files.write(filePath, data);
 
-        return Constants.RESOURCE_PREFIX + "/" + yearMonthDir + "/" + uuidFileName + fileExtension;
+        return Constants.RESOURCE_PREFIX + "/" + pathResult.getFullRelativePath();
     }
 
     /**
      * MinIO上传字节数组
      */
-    private String minioUploadBytes(byte[] data, String fileName, String contentType) throws IOException {
+    private String minioUploadBytes(byte[] data, String fileName, String contentType, boolean isCompressed) throws IOException {
         MinioConfigEntity minioConfig = configCacheService.getMinioConfig();
         String endpoint = minioConfig.getEndpoint();
         String accessKey = minioConfig.getAccessKey();
@@ -408,14 +378,11 @@ public class FileUploadServiceImpl implements FileUploadService {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            // 生成存储路径
-            String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));
-            String objectName = datePath + "/" + FileOperationUtils.generateUUID();
+            // 使用提取的方法生成文件路径
+            FilePathResult pathResult = generateFilePath(fileName, isCompressed);
 
-            // 如果有扩展名，添加扩展名
-            if (fileName.contains(".")) {
-                objectName += fileName.substring(fileName.lastIndexOf("."));
-            }
+            // 构建对象名
+            String objectName = pathResult.getFullRelativePath();
 
             // 上传文件
             minioClient.putObject(
@@ -438,7 +405,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     /**
      * 阿里云OSS上传字节数组
      */
-    private String aliyunOssUploadBytes(byte[] data, String fileName, String contentType) throws IOException {
+    private String aliyunOssUploadBytes(byte[] data, String fileName, String contentType, boolean isCompressed) throws IOException {
         AliyunOSSConfigEntity aliyunOSSConfig = configCacheService.getAliyunOSSConfig();
 
         // 获取OSS配置
@@ -453,19 +420,15 @@ public class FileUploadServiceImpl implements FileUploadService {
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
 
         try {
-            // 生成存储路径
-            String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-            String fileNameWithExt = FileOperationUtils.generateUUID();
-
-            // 如果有扩展名，添加扩展名
-            if (fileName.contains(".")) {
-                fileNameWithExt += fileName.substring(fileName.lastIndexOf("."));
-            }
+            // 使用提取的方法生成文件路径
+            FilePathResult pathResult = generateFilePath(fileName, isCompressed);
 
             // 拼接完整路径
             String normalizedBucketPath = normalizePath(bucketPath);
-            String uploadPath = normalizedBucketPath.isEmpty() ? datePath : normalizedBucketPath + "/" + datePath;
-            String uploadFileName = uploadPath + "/" + fileNameWithExt;
+            String uploadPath = normalizedBucketPath.isEmpty() ?
+                    pathResult.relativePath() :
+                    normalizedBucketPath + "/" + pathResult.relativePath();
+            String uploadFileName = uploadPath + "/" + pathResult.fileName();
 
             // 设置元数据
             ObjectMetadata metadata = new ObjectMetadata();
@@ -480,56 +443,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             return fileDomain + uploadFileName;
         } finally {
             ossClient.shutdown();
-        }
-    }
-
-    /**
-     * 保存压缩文件记录
-     */
-    private void saveCompressedFileRecord(String fileUrl, String fileName, String contentType,
-                                          long fileSize, String storageType) {
-        try {
-            // 获取当前用户信息
-            Long userId = SecurityUtils.getUserId();
-            String userName = SecurityUtils.getUsername();
-
-            // 从URL中提取路径
-            String filePath = URLUtils.extractPathFromUrl(fileUrl);
-
-            // 从URL中提取文件扩展名
-            String fileExtension = URLUtils.extractExtensionFromUrl(fileUrl);
-
-            // 获取存储桶名称（仅对MinIO和OSS有效）
-            String bucketName = null;
-            if (Constants.MINIO_FILE_UPLOAD.equals(storageType)) {
-                bucketName = configCacheService.getMinioConfig().getBucketName();
-            } else if (Constants.ALIYUN_OSS_FILE_UPLOAD.equals(storageType)) {
-                bucketName = configCacheService.getAliyunOSSConfig().getBucketName();
-            }
-
-            // 创建文件记录
-            FileManagement record = new FileManagement();
-            record.setFileName(fileName);
-            record.setOriginalFileName(fileName);
-            record.setFilePath(filePath);
-            record.setFileUrl(fileUrl);
-            record.setFileSize(fileSize);
-            record.setFileType(contentType);
-            record.setFileExtension(fileExtension);
-            record.setStorageType(storageType);
-            record.setBucketName(bucketName);
-            record.setUploaderId(userId);
-            record.setUploaderName(userName);
-            record.setCreateBy(Constants.SYSTEM_CREATE);
-            record.setUploadTime(new Date());
-
-            fileManagementService.save(record);
-
-            log.info("压缩文件信息保存成功 - 文件名: {}, 大小: {}, 存储类型: {}, 访问URL: {}",
-                    fileName, fileSize, storageType, fileUrl);
-        } catch (Exception e) {
-            log.error("保存压缩文件记录失败: {}", e.getMessage(), e);
-            // 不抛出异常，避免影响上传流程
         }
     }
 

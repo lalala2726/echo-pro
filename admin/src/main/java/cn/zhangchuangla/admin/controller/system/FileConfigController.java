@@ -52,6 +52,7 @@ public class FileConfigController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateMinioConfig(@RequestBody @Validated MinioConfigEntity request) {
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_MINIO, request);
+        configCacheService.refreshAllConfigs();
         return success(SystemMessageConstant.UPDATE_SUCCESS);
     }
 
@@ -67,6 +68,7 @@ public class FileConfigController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateAliyunOSSConfig(@RequestBody @Validated AliyunOSSConfigEntity request) {
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_ALIYUN, request);
+        configCacheService.refreshAllConfigs();
         return success(SystemMessageConstant.UPDATE_SUCCESS);
     }
 
@@ -100,6 +102,7 @@ public class FileConfigController extends BaseController {
         // 3. 保存到 Redis
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL, request);
         log.info("配置已保存至 Redis");
+        configCacheService.refreshAllConfigs();
         return AjaxResult.success(SystemMessageConstant.UPDATE_SUCCESS);
     }
 
@@ -125,6 +128,7 @@ public class FileConfigController extends BaseController {
 
         if (defaultFileUploadEnum != null) {
             redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, defaultFileUploadEnum.getName());
+            configCacheService.refreshAllConfigs();
             return success(SystemMessageConstant.UPDATE_SUCCESS);
         }
         return error(SystemMessageConstant.UPDATE_FAIL);
@@ -135,7 +139,7 @@ public class FileConfigController extends BaseController {
      */
     @PostMapping("/config/refresh")
     @Log(title = "文件管理", businessType = BusinessType.REFRESH)
-    @Operation(summary = "刷新文件配置缓存", description = "刷新文件配置缓存，每次修改配置后都需要刷新缓存，否则修改后的配置不会生效")
+    @Operation(summary = "刷新文件配置缓存", description = "当修改文件配置时无法正常指定选择的配置，可以先执行次接口尝试重新刷新尝试")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult refreshConfig() {
         // 现在ProfileException会被正常抛出并由全局异常处理器捕获
