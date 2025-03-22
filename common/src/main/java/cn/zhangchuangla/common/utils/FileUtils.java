@@ -87,4 +87,22 @@ public class FileUtils {
             throw new ServiceException(ResponseCode.SYSTEM_ERROR, "计算MD5值失败：" + e.getMessage());
         }
     }
+
+    /**
+     * 生成压缩文件名
+     */
+    public static String generateCompressedFileName(String originalFilename) {
+        if (originalFilename == null || originalFilename.isEmpty()) {
+            return "compressed_" + UUID.randomUUID().toString() + ".jpg";
+        }
+
+        int lastDotIndex = originalFilename.lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            String nameWithoutExt = originalFilename.substring(0, lastDotIndex);
+            String extension = originalFilename.substring(lastDotIndex);
+            return nameWithoutExt + "_compressed" + extension;
+        } else {
+            return originalFilename + "_compressed";
+        }
+    }
 }

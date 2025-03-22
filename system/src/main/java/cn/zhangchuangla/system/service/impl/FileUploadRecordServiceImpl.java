@@ -7,17 +7,18 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.common.utils.URLUtils;
 import cn.zhangchuangla.system.mapper.FileUploadRecordMapper;
 import cn.zhangchuangla.system.model.entity.FileUploadRecord;
+import cn.zhangchuangla.system.model.request.file.FileUploadRecordRequest;
 import cn.zhangchuangla.system.service.FileUploadRecordService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 
 /**
@@ -29,9 +30,12 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
         implements FileUploadRecordService {
 
     private final ConfigCacheService configCacheService;
+    private final FileUploadRecordMapper fileUploadRecordMapper;
 
-    public FileUploadRecordServiceImpl(ConfigCacheService configCacheService) {
+
+    public FileUploadRecordServiceImpl(ConfigCacheService configCacheService, FileUploadRecordMapper fileUploadRecordMapper) {
         this.configCacheService = configCacheService;
+        this.fileUploadRecordMapper = fileUploadRecordMapper;
     }
 
 
@@ -42,10 +46,9 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
      * @param fileUrl     文件访问URL
      * @param file        上传的文件对象
      * @param storageType 存储类型(LOCAL/MINIO/ALIYUN_OSS)
-     * @return 是否保存成功
      */
     @Override
-    public boolean saveFileInfo(String fileUrl, MultipartFile file, String storageType) {
+    public void saveFileInfo(String fileUrl, String compressedUrl, MultipartFile file, String storageType) {
         if (file == null) {
             throw new ServiceException(ResponseCode.PARAM_NOT_NULL, "文件不能为空！");
         }
@@ -65,17 +68,17 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
             long fileSize = file.getSize();
 
             // 从URL中提取文件扩展名
-            String fileExtension = extractExtensionFromUrl(fileUrl);
+            String fileExtension = URLUtils.extractExtensionFromUrl(fileUrl);
             if (StringUtils.isBlank(fileExtension) && originalFileName != null) {
                 // 如果从URL无法提取到扩展名，则从原始文件名中提取
                 fileExtension = FileUtils.getFileExtension(originalFileName);
             }
 
             // 从URL中提取文件名
-            String fileName = extractFilenameFromUrl(fileUrl);
+            String fileName = URLUtils.extractFilenameFromUrl(fileUrl);
 
             // 从URL中提取路径
-            String filePath = extractPathFromUrl(fileUrl);
+            String filePath = URLUtils.extractPathFromUrl(fileUrl);
 
             // 计算文件MD5值
             byte[] bytes = file.getBytes();
@@ -101,6 +104,7 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
             record.setFileUrl(fileUrl);
             record.setFileSize(fileSize);
             record.setFileType(contentType);
+            record.setPreviewImage(compressedUrl);
             record.setFileExtension(fileExtension);
             record.setStorageType(storageType);
             record.setBucketName(bucketName);
@@ -117,7 +121,6 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
             log.info("文件信息保存成功 - 文件名: {}, 大小: {}, MD5: {}, 存储类型: {}, 访问URL: {}",
                     originalFileName, fileSize, md5, storageType, fileUrl);
 
-            return save;
         } catch (IOException e) {
             log.error("读取文件内容失败: {}", e.getMessage(), e);
             throw new ServiceException(ResponseCode.SYSTEM_ERROR, "读取文件内容失败: " + e.getMessage());
@@ -128,99 +131,18 @@ public class FileUploadRecordServiceImpl extends ServiceImpl<FileUploadRecordMap
     }
 
     /**
-     * 从URL中提取文件扩展名
+     * 文件列表
      *
-     * @param url 文件URL
-     * @return 文件扩展名（带点，如 .jpg）
+     * @param request 文件列表请求参数
+     * @return 文件列表分页结果
      */
-    private String extractExtensionFromUrl(String url) {
-        if (StringUtils.isBlank(url)) {
-            return "";
-        }
-
-        // 移除URL参数
-        String cleanUrl = url;
-        int queryIndex = cleanUrl.indexOf('?');
-        if (queryIndex > 0) {
-            cleanUrl = cleanUrl.substring(0, queryIndex);
-        }
-
-        // 获取最后一个点之后的内容作为扩展名
-        int lastDotIndex = cleanUrl.lastIndexOf('.');
-        if (lastDotIndex > 0) {
-            return cleanUrl.substring(lastDotIndex);
-        }
-
-        return "";
+    @Override
+    public Page<FileUploadRecord> fileList(FileUploadRecordRequest request) {
+        Page<FileUploadRecord> page = page(new Page<>(request.getPageNum(), request.getPageSize()));
+        return fileUploadRecordMapper.fileList(page, request);
     }
 
-    /**
-     * 从URL中提取文件名
-     *
-     * @param url 文件URL
-     * @return 文件名
-     */
-    private String extractFilenameFromUrl(String url) {
-        if (StringUtils.isBlank(url)) {
-            return "";
-        }
 
-        // 移除URL参数
-        String cleanUrl = url;
-        int queryIndex = cleanUrl.indexOf('?');
-        if (queryIndex > 0) {
-            cleanUrl = cleanUrl.substring(0, queryIndex);
-        }
-
-        // 获取最后一个斜杠之后的内容作为文件名
-        int lastSlashIndex = cleanUrl.lastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < cleanUrl.length() - 1) {
-            return cleanUrl.substring(lastSlashIndex + 1);
-        }
-
-        return cleanUrl;
-    }
-
-    /**
-     * 从URL中提取文件路径
-     *
-     * @param url 文件URL
-     * @return 文件路径
-     */
-    private String extractPathFromUrl(String url) {
-        if (StringUtils.isBlank(url)) {
-            return "";
-        }
-
-        try {
-            URL parsedUrl = new URL(url);
-            String path = parsedUrl.getPath();
-
-            // 如果路径为空，则返回空字符串
-            if (StringUtils.isBlank(path)) {
-                return "";
-            }
-
-            // 删除开头的斜杠
-            if (path.startsWith("/")) {
-                path = path.substring(1);
-            }
-
-            return path;
-        } catch (MalformedURLException e) {
-            // 如果URL格式不正确，尝试简单提取
-            int protocolIndex = url.indexOf("://");
-            if (protocolIndex > 0) {
-                String remaining = url.substring(protocolIndex + 3);
-                int pathStartIndex = remaining.indexOf('/');
-                if (pathStartIndex >= 0) {
-                    return remaining.substring(pathStartIndex + 1);
-                }
-            }
-
-            return "";
-        }
-    }
 }
 
 

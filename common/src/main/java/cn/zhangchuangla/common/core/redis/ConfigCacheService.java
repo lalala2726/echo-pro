@@ -68,7 +68,6 @@ public class ConfigCacheService {
         }
 
         switch (defaultType) {
-            //todo 文件访问路径和文件上传路径必须规划范，比如如果用户只加了域名没有加https://前缀，系统会自动补全https://，所以这里需要做一下处理
             case Constants.LOCAL_FILE_UPLOAD:
                 LocalFileConfigEntity localFileConfig = redisCache.getCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL);
                 ProfileUtils.checkCachePropertiesLocalFileUpload(localFileConfig);

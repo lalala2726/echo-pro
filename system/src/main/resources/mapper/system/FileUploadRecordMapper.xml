@@ -10,6 +10,7 @@
         <result property="originalFileName" column="original_file_name"/>
         <result property="filePath" column="file_path"/>
         <result property="fileUrl" column="file_url"/>
+        <result property="previewImage" column="preview_image"/>
         <result property="fileSize" column="file_size"/>
         <result property="fileType" column="file_type"/>
         <result property="fileExtension" column="file_extension"/>
@@ -26,4 +27,8 @@
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
+    <select id="fileList" resultMap="BaseResultMap">
+        select *
+        from file_upload_record
+    </select>
 </mapper>

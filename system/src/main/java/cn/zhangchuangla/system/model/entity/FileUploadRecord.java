@@ -3,13 +3,14 @@ package cn.zhangchuangla.system.model.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 文件上传记录表
  */
-@TableName(value ="file_upload_record")
+@TableName(value = "file_upload_record")
 @Data
 public class FileUploadRecord {
     /**
@@ -37,6 +38,11 @@ public class FileUploadRecord {
      * 文件访问URL
      */
     private String fileUrl;
+
+    /**
+     * 预览图片
+     */
+    private String previewImage;
 
     /**
      * 文件大小(字节)
