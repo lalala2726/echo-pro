@@ -1,7 +1,7 @@
 # 数据源配置
 spring:
   datasource:
-    url: jdbc:mysql://192.168.1.110:3306/person_app?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/person_app?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
     password: zhangchuang2726
     type: com.alibaba.druid.pool.DruidDataSource
@@ -35,11 +35,11 @@ spring:
       statViewServlet:
         enabled: true
         # 设置白名单，不填则允许所有访问
-        allow:
+        allow: 127.0.0.1
         url-pattern: /druid/*
         # 控制台管理用户名和密码
-        login-username: ruoyi
-        login-password: 123456
+        login-username: zhangchuang
+        login-password: zhangchuang2726
       filter:
         stat:
           enabled: true

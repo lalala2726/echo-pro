@@ -79,9 +79,9 @@ public class SysUser extends BaseEntity {
 
 
     /**
-     * 是否是管理员
+     * 是否为超级管理员
      */
-    public boolean isAdmin() {
+    public boolean isSuperAdmin() {
         return this.userId == 1L;
     }
 

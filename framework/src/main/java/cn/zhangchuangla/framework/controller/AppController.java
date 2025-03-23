@@ -2,6 +2,7 @@ package cn.zhangchuangla.framework.controller;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.framework.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = "欢迎页")
 @RestController
+@Anonymous
 public class AppController {
 
     private final AppConfig appConfig;

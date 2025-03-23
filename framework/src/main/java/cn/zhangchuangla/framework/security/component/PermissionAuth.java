@@ -3,6 +3,7 @@ package cn.zhangchuangla.framework.security.component;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.security.context.PermissionContextHolder;
@@ -42,7 +43,7 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     public boolean hasPermission(String permission) {
-        if (isAdmin() || StringUtils.isBlank(permission)) {
+        if (isSuperAdmin() || isAdmin() || StringUtils.isBlank(permission)) {
             return true;
         }
         LoginUser loginUser = getLoginUser();
@@ -63,7 +64,7 @@ public class PermissionAuth {
      * @return true - 至少拥有一个权限，false - 一个都没有
      */
     public boolean hasAnyPermission(String... permissions) {
-        if (isAdmin() || permissions == null || permissions.length == 0) {
+        if (isSuperAdmin() || isSuperAdmin() || permissions == null || permissions.length == 0) {
             return true;
         }
         LoginUser loginUser = getLoginUser();
@@ -88,7 +89,7 @@ public class PermissionAuth {
      * @return true - 角色匹配，false - 角色不匹配
      */
     public boolean isSpecificRole(String role) {
-        if (isAdmin() || StringUtils.isBlank(role)) {
+        if (isSuperAdmin() || isSuperAdmin() || StringUtils.isBlank(role)) {
             return true;
         }
         LoginUser loginUser = getLoginUser();
@@ -122,6 +123,16 @@ public class PermissionAuth {
         Long userId = SecurityUtils.getUserId();
         Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
         return !CollectionUtils.isEmpty(roleSet) && roleSet.contains(SysRolesConstant.ADMIN);
+    }
+
+    /**
+     * 判断当前用户是否是超级管理员
+     *
+     * @return true - 是超级管理员，false - 不是超级管理员
+     */
+    private boolean isSuperAdmin() {
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        return sysUser.isSuperAdmin();
     }
 
     /**
