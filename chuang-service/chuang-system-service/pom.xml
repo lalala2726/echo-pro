@@ -14,7 +14,7 @@
 
     <dependencies>
         <!-- 由于父模块chuang-service已经依赖了chuang-core，此处可以 not 重复声明 -->
-        
+
         <!-- no more than 2.3.3-->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
