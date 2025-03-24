@@ -4,24 +4,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.zhangchuangla.app</groupId>
-    <artifactId>app-backend</artifactId>
-    <version>1.0</version>
+    <groupId>cn.zhangchuangla</groupId>
+    <artifactId>chuang-backend</artifactId>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>admin</module>
-        <module>common</module>
-        <module>framework</module>
-        <module>system</module>
+        <module>chuang-api</module>
+        <module>chuang-core</module>
+        <module>chuang-infrastructure</module>
+        <module>chuang-service</module>
     </modules>
 
     <!-- 统一版本管理 -->
     <properties>
-        <app.version>1.0</app.version>
+        <app.version>1.0.0</app.version>
         <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Spring Boot & Security -->
@@ -45,13 +45,15 @@
 
         <!-- 工具类 -->
         <lombok.version>1.18.30</lombok.version>
-        <jwt.version>0.9.0</jwt.version>
+        <jwt.version>0.11.5</jwt.version>
         <okhttp.version>4.12.0</okhttp.version>
         <eu.bitwalker.version>1.21</eu.bitwalker.version>
         <oshi.version>6.6.6</oshi.version>
         <alibaba.fastjson.version>2.0.53</alibaba.fastjson.version>
         <alibaba.druid.starter.version>1.2.24</alibaba.druid.starter.version>
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
+        <jaxb.api.version>2.3.1</jaxb.api.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
     </properties>
 
     <dependencies>
@@ -100,18 +102,18 @@
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-impl</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
@@ -179,28 +181,60 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${apache.commons-io.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${javax.activation.version}</version>
+            </dependency>
+
             <!-- ===================== 项目模块依赖 ===================== -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>common</artifactId>
+                <artifactId>chuang-core</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>framework</artifactId>
+                <artifactId>chuang-infrastructure</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>system</artifactId>
+                <artifactId>chuang-service</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>chuang-system-service</artifactId>
                 <version>${app.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

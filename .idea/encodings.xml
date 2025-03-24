@@ -3,17 +3,19 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/accounting/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/accounting/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/admin/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/admin/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/common/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/framework/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/framework/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-infrastructure/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-infrastructure/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/system/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/system/src/main/resources" charset="UTF-8" />
   </component>
 </project>
