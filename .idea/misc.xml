@@ -10,12 +10,15 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-service/chuang-system-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-service/system/pom.xml" />
         <option value="$PROJECT_DIR$/model/pom.xml" />
+        <option value="$PROJECT_DIR$/system/pom.xml" />
       </set>
     </option>
   </component>

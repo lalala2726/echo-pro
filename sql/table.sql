@@ -171,3 +171,17 @@ create table file_upload_record
     update_by            VARCHAR(100) COMMENT '更新人',
     remark               TEXT COMMENT '备注'
 ) comment '文件上传记录表';
+
+create table file_config
+(
+    id          int auto_increment primary key not null comment '主键',
+    config_name varchar(100)                   not null comment '配置名称',
+    config      varchar(4096)                  not null comment '配置内容',
+    is_master   tinyint(1) default 0           not null comment '是否为默认配置(0-否,1-是)',
+    create_time DATETIME   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by   VARCHAR(100) COMMENT '创建人',
+    update_by   VARCHAR(100) COMMENT '更新人',
+    remark      TEXT COMMENT '备注',
+    is_deleted  tinyint(1) default 0           not null comment '是否删除(0-未删除,1-已删除)'
+) comment '文件存储配置表';

@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="FileUploadRecord" />
-                  <option name="tableName" value="file_upload_record" />
+                  <option name="className" value="FileConfig" />
+                  <option name="tableName" value="file_config" />
                 </TableUIInfo>
               </list>
             </option>
