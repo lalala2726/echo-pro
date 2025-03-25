@@ -2,8 +2,8 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.framework.annotation.Anonymous;
-import cn.zhangchuangla.framework.model.entity.Server;
+import cn.zhangchuangla.infrastructure.annotation.Anonymous;
+import cn.zhangchuangla.infrastructure.model.entity.Server;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;

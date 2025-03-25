@@ -35,7 +35,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>cn.zhangchuangla.api.AdminApplication</mainClass>
+                    <mainClass>cn.zhangchuangla.api.APIApplication</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>
