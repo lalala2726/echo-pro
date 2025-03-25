@@ -56,7 +56,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public boolean updateDept(SysDeptRequest request) {
-        return false;
+        SysDept sysDept = new SysDept();
+        BeanUtils.copyProperties(request, sysDept);
+        return updateById(sysDept);
     }
 
     /**
@@ -80,6 +82,21 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
     public boolean isDeptNameExist(String deptName) {
         LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().eq(SysDept::getDeptName, deptName);
         return count(eq) > 0;
+    }
+
+    /**
+     * 判断部门是否存在子部门
+     *
+     * @param id 部门ID
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean departmentHasSubordinates(Integer id) {
+        if (id != null) {
+            LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().eq(SysDept::getParentId, id);
+            return count(eq) > 0;
+        }
+        return false;
     }
 }
 

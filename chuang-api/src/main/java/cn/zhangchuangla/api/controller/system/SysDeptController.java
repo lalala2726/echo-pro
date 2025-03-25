@@ -75,6 +75,9 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     public AjaxResult addDept(@Validated SysDeptAddRequest request) {
         checkParam(sysDeptService.isDeptNameExist(request.getName()), "部门名称已存在！");
+        if (request.getParentId() != null) {
+            checkParam(sysDeptService.getById(request.getParentId()) == null, "父部门不存在！");
+        }
         return toAjax(sysDeptService.addDept(request));
     }
 
@@ -89,6 +92,7 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "修改部门")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDept(@Validated SysDeptRequest request) {
+        checkParam(sysDeptService.isDeptNameExist(request.getName()), "部门名称已存在！");
         return toAjax(sysDeptService.updateDept(request));
     }
 
@@ -119,6 +123,9 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "删除部门")
     @PostAuthorize("@auth.hasPermission('system:department:remove')")
     public AjaxResult removeDept(@PathVariable List<Integer> ids) {
+        ids.forEach(id -> {
+            checkParam(sysDeptService.departmentHasSubordinates(id), "该部门下有子部门，不能删除！");
+        });
         return toAjax(sysDeptService.removeByIds(ids));
     }
 }

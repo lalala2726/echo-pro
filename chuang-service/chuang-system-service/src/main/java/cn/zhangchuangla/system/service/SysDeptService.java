@@ -51,4 +51,11 @@ public interface SysDeptService extends IService<SysDept> {
      * @return true存在，false不存在
      */
     boolean isDeptNameExist(String deptName);
+
+    /**
+     * 部门下是否存在子部门
+     *
+     * @param id 部门ID
+     */
+    boolean departmentHasSubordinates(Integer id);
 }
