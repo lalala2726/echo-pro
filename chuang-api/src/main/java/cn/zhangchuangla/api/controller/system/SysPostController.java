@@ -1,0 +1,129 @@
+package cn.zhangchuangla.api.controller.system;
+
+import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.page.TableDataResult;
+import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.system.model.entity.SysPost;
+import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostUpdateRequest;
+import cn.zhangchuangla.system.model.vo.post.SysPostListVo;
+import cn.zhangchuangla.system.model.vo.post.SysPostVo;
+import cn.zhangchuangla.system.service.SysPostService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Chuang
+ * <p>
+ * created on 2025/3/25 20:30
+ */
+@RestController
+@RequestMapping("/system/post")
+@Tag(name = "岗位管理")
+public class SysPostController extends BaseController {
+
+    private final SysPostService sysPostService;
+
+    @Autowired
+    public SysPostController(SysPostService sysPostService) {
+        this.sysPostService = sysPostService;
+    }
+
+    /**
+     * 岗位列表
+     *
+     * @param request 请求参数
+     * @return 返回岗位列表
+     */
+    @GetMapping("/list")
+    @Operation(summary = "岗位列表")
+    @PreAuthorize("@auth.hasPermission('system:post:list')")
+    public TableDataResult listPost(SysPostListRequest request) {
+        Page<SysPost> page = sysPostService.listPost(request);
+        ArrayList<SysPostListVo> sysPostListVos = new ArrayList<>();
+        page.getRecords().forEach(sysPost -> {
+            SysPostListVo sysPostListVo = new SysPostListVo();
+            BeanUtils.copyProperties(sysPost, sysPostListVo);
+            sysPostListVos.add(sysPostListVo);
+        });
+        return getTableData(page, sysPostListVos);
+    }
+
+    /**
+     * 添加岗位
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @PostMapping
+    @PreAuthorize("@auth.hasPermission('system:post:add')")
+    @Operation(summary = "添加岗位")
+    @Log(title = "岗位管理", businessType = BusinessType.INSERT)
+    public AjaxResult addPost(@Validated @RequestBody SysPostAddRequest request) {
+        checkParam(sysPostService.isPostNameExist(request.getPostName()), "岗位名称已存在！");
+        checkParam(sysPostService.isPostCodeExist(request.getPostCode()), "岗位编码已存在！");
+        boolean result = sysPostService.addPost(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 删除岗位,支持批量删除
+     *
+     * @param ids 岗位id集合
+     * @return 操作结果
+     */
+    @DeleteMapping("/{ids}")
+    @PreAuthorize("@auth.hasPermission('system:post:remove')")
+    @Log(title = "岗位管理", businessType = BusinessType.DELETE)
+    @Operation(summary = "删除岗位")
+    public AjaxResult removePost(@PathVariable("ids") List<Integer> ids) {
+        checkParam(ids == null, "id不能为空");
+        boolean result = sysPostService.removePost(ids);
+        return toAjax(result);
+    }
+
+    /**
+     * 修改岗位
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @PutMapping
+    @PreAuthorize("@auth.hasPermission('system:post:edit')")
+    @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
+    @Operation(summary = "修改岗位")
+    public AjaxResult editPost(@Validated @RequestBody SysPostUpdateRequest request) {
+        boolean result = sysPostService.editPost(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 查询岗位
+     *
+     * @param id 岗位ID
+     * @return 操作结果
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("@auth.hasPermission('system:post:query')")
+    @Operation(summary = "查询岗位")
+    public AjaxResult getPostById(@PathVariable("id") Integer id) {
+        checkParam(id == null, "id不能为空");
+        SysPost post = sysPostService.getPostById(id);
+        SysPostVo sysPostVo = new SysPostVo();
+        BeanUtils.copyProperties(post, sysPostVo);
+        return AjaxResult.success(sysPostVo);
+    }
+}

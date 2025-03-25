@@ -204,3 +204,21 @@ CREATE TABLE sys_dept
     remark      TEXT COMMENT '备注',
     is_deleted  tinyint(1) default 0 not null comment '是否删除(0-未删除,1-已删除)'
 ) COMMENT ='部门表';
+
+
+create table sys_post
+(
+    post_id     int auto_increment primary key comment '岗位ID',
+    post_code   varchar(64)          not null comment '岗位编码',
+    post_name   varchar(50)          not null comment '岗位名称',
+    sort        int        default 0 comment '排序',
+    status      tinyint    default 0 comment '状态(0-正常,1-停用)',
+    created_at  TIMESTAMP  DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at  TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_time DATETIME   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by   VARCHAR(100) COMMENT '创建人',
+    update_by   VARCHAR(100) COMMENT '更新人',
+    remark      TEXT COMMENT '备注',
+    is_deleted  tinyint(1) default 0 not null comment '是否删除(0-未删除,1-已删除)'
+) comment '岗位表';
