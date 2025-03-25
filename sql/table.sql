@@ -185,3 +185,14 @@ create table file_config
     remark      TEXT COMMENT '备注',
     is_deleted  tinyint(1) default 0           not null comment '是否删除(0-未删除,1-已删除)'
 ) comment '文件存储配置表';
+
+CREATE TABLE department
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY COMMENT '部门ID',
+    name        VARCHAR(100) NOT NULL COMMENT '部门名称',
+    parent_id   INT       DEFAULT NULL COMMENT '父部门ID',
+    manager_id  INT       DEFAULT NULL COMMENT '部门负责人',
+    description TEXT COMMENT '部门描述',
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT ='部门表';
