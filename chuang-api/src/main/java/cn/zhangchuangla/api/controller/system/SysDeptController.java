@@ -73,7 +73,7 @@ public class SysDeptController extends BaseController {
     @PostAuthorize("@auth.hasPermission('system:department:add')")
     @Operation(summary = "新增部门")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
-    public AjaxResult addDept(@Validated SysDeptAddRequest request) {
+    public AjaxResult addDept(@Validated @RequestBody SysDeptAddRequest request) {
         checkParam(sysDeptService.isDeptNameExist(request.getName()), "部门名称已存在！");
         if (request.getParentId() != null) {
             checkParam(sysDeptService.getById(request.getParentId()) == null, "父部门不存在！");
@@ -91,7 +91,7 @@ public class SysDeptController extends BaseController {
     @PostAuthorize("@auth.hasPermission('system:department:edit')")
     @Operation(summary = "修改部门")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateDept(@Validated SysDeptRequest request) {
+    public AjaxResult updateDept(@Validated @RequestBody SysDeptRequest request) {
         checkParam(sysDeptService.isDeptNameExist(request.getName()), "部门名称已存在！");
         return toAjax(sysDeptService.updateDept(request));
     }
@@ -106,6 +106,7 @@ public class SysDeptController extends BaseController {
     @PostAuthorize("@auth.hasPermission('system:department:query')")
     @Operation(summary = "获取部门信息")
     public AjaxResult getDeptById(@PathVariable Integer id) {
+        checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
         SysDeptVo sysDeptVo = new SysDeptVo();
         BeanUtils.copyProperties(dept, sysDeptVo);
@@ -123,9 +124,12 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "删除部门")
     @PostAuthorize("@auth.hasPermission('system:department:remove')")
     public AjaxResult removeDept(@PathVariable List<Integer> ids) {
-        ids.forEach(id -> {
-            checkParam(sysDeptService.departmentHasSubordinates(id), "该部门下有子部门，不能删除！");
-        });
+        checkParam(ids == null, "部门ID不能为空！");
+        if (ids != null) {
+            ids.forEach(id -> {
+                checkParam(sysDeptService.departmentHasSubordinates(id), "该部门下有子部门，不能删除！");
+            });
+        }
         return toAjax(sysDeptService.removeByIds(ids));
     }
 }
