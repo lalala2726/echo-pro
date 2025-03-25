@@ -5,15 +5,16 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.system.model.entity.SysDepartment;
-import cn.zhangchuangla.system.model.request.department.SysDepartmentAddRequest;
-import cn.zhangchuangla.system.model.request.department.SysDepartmentListRequest;
-import cn.zhangchuangla.system.model.request.department.SysDepartmentUpdateRequest;
-import cn.zhangchuangla.system.model.vo.department.SysDepartmentListVo;
-import cn.zhangchuangla.system.model.vo.department.SysDepartmentVo;
-import cn.zhangchuangla.system.service.SysDepartmentService;
+import cn.zhangchuangla.system.model.entity.SysDept;
+import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
+import cn.zhangchuangla.system.model.request.department.SysDeptListRequest;
+import cn.zhangchuangla.system.model.request.department.SysDeptRequest;
+import cn.zhangchuangla.system.model.vo.department.SysDeptListVo;
+import cn.zhangchuangla.system.model.vo.department.SysDeptVo;
+import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,14 +30,15 @@ import java.util.List;
  * @author Chuang
  * created on 2025/3/25 10:57
  */
+@Tag(name = "部门管理")
 @RestController
 @RequestMapping("/system/department")
-public class SysDepartmentController extends BaseController {
+public class SysDeptController extends BaseController {
 
-    private final SysDepartmentService departmentService;
+    private final SysDeptService sysDeptService;
 
-    public SysDepartmentController(SysDepartmentService departmentService) {
-        this.departmentService = departmentService;
+    public SysDeptController(SysDeptService sysDeptService) {
+        this.sysDeptService = sysDeptService;
     }
 
 
@@ -50,15 +52,15 @@ public class SysDepartmentController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@auth.hasPermission('system:department:list')")
     @Operation(summary = "部门列表")
-    public TableDataResult listDepartment(SysDepartmentListRequest request) {
-        Page<SysDepartment> page = departmentService.listDepartment(request);
-        ArrayList<SysDepartmentListVo> sysDepartmentListVos = new ArrayList<>();
+    public TableDataResult listDept(SysDeptListRequest request) {
+        Page<SysDept> page = sysDeptService.listDept(request);
+        ArrayList<SysDeptListVo> sysDeptListVos = new ArrayList<>();
         page.getRecords().forEach(department -> {
-            SysDepartmentListVo sysDepartmentListVo = new SysDepartmentListVo();
-            BeanUtils.copyProperties(department, sysDepartmentListVo);
-            sysDepartmentListVos.add(sysDepartmentListVo);
+            SysDeptListVo sysDeptListVo = new SysDeptListVo();
+            BeanUtils.copyProperties(department, sysDeptListVo);
+            sysDeptListVos.add(sysDeptListVo);
         });
-        return getTableData(page, sysDepartmentListVos);
+        return getTableData(page, sysDeptListVos);
     }
 
     /**
@@ -71,8 +73,9 @@ public class SysDepartmentController extends BaseController {
     @PostAuthorize("@auth.hasPermission('system:department:add')")
     @Operation(summary = "新增部门")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
-    public AjaxResult addDepartment(@Validated SysDepartmentAddRequest request) {
-        return toAjax(departmentService.addDepartment(request));
+    public AjaxResult addDept(@Validated SysDeptAddRequest request) {
+        checkParam(sysDeptService.isDeptNameExist(request.getName()), "部门名称已存在！");
+        return toAjax(sysDeptService.addDept(request));
     }
 
     /**
@@ -85,8 +88,8 @@ public class SysDepartmentController extends BaseController {
     @PostAuthorize("@auth.hasPermission('system:department:edit')")
     @Operation(summary = "修改部门")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult editDepartment(@Validated SysDepartmentUpdateRequest request) {
-        return toAjax(departmentService.updateDepartment(request));
+    public AjaxResult updateDept(@Validated SysDeptRequest request) {
+        return toAjax(sysDeptService.updateDept(request));
     }
 
     /**
@@ -98,15 +101,16 @@ public class SysDepartmentController extends BaseController {
     @GetMapping("/{id}")
     @PostAuthorize("@auth.hasPermission('system:department:query')")
     @Operation(summary = "获取部门信息")
-    public AjaxResult getDepartmentById(@PathVariable Integer id) {
-        SysDepartment department = departmentService.getDepartmentById(id);
-        SysDepartmentVo sysDepartmentVo = new SysDepartmentVo();
-        BeanUtils.copyProperties(department, sysDepartmentVo);
-        return success(sysDepartmentVo);
+    public AjaxResult getDeptById(@PathVariable Integer id) {
+        SysDept dept = sysDeptService.getDeptById(id);
+        SysDeptVo sysDeptVo = new SysDeptVo();
+        BeanUtils.copyProperties(dept, sysDeptVo);
+        return success(sysDeptVo);
     }
 
     /**
      * 删除部门,支持批量删除
+     *
      * @param ids 部门id
      * @return 操作结果
      */
@@ -114,7 +118,7 @@ public class SysDepartmentController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
     @PostAuthorize("@auth.hasPermission('system:department:remove')")
-    public AjaxResult remove(@PathVariable List<Integer> ids) {
-        return toAjax(departmentService.removeByIds(ids));
+    public AjaxResult removeDept(@PathVariable List<Integer> ids) {
+        return toAjax(sysDeptService.removeByIds(ids));
     }
 }

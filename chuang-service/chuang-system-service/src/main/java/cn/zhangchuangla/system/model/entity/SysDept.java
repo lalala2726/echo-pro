@@ -1,9 +1,9 @@
-package cn.zhangchuangla.system.model.vo.department;
+package cn.zhangchuangla.system.model.entity;
 
-import cn.zhangchuangla.common.base.BaseVO;
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,37 +11,34 @@ import lombok.EqualsAndHashCode;
  * 部门表
  */
 @EqualsAndHashCode(callSuper = true)
+@TableName(value = "sys_department")
 @Data
-public class SysDepartmentVo extends BaseVO {
-
+public class SysDept extends BaseEntity {
     /**
      * 部门ID
      */
-    @Schema(name = "部门ID")
-    private Integer id;
+    @TableId(type = IdType.AUTO)
+    private Integer deptId;
 
     /**
      * 部门名称
      */
-    @Schema(name = "部门名称")
-    private String name;
+    private String deptName;
 
     /**
      * 父部门ID
      */
-    @Schema(name = "父部门ID")
     private Integer parentId;
 
     /**
      * 部门负责人
      */
-    @Schema(name = "部门负责人")
     private Integer managerId;
 
     /**
      * 部门描述
      */
-    @Schema
     private String description;
+
 
 }

@@ -13,10 +13,10 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @MapperScan("cn.zhangchuangla.**.mapper")
 @ComponentScan(basePackages = "cn.zhangchuangla.**")
-public class AdminApplication {
+public class APIApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AdminApplication.class, args);
+        SpringApplication.run(APIApplication.class, args);
         System.out.println("  ____  _             _                 ____                               __       _ \n" +
                 " / ___|| |_ __ _ _ __| |_ _   _ _ __   / ___| _   _  ___ ___ ___  ___ ___ / _|_   _| |\n" +
                 " \\___ \\| __/ _` | '__| __| | | | '_ \\  \\___ \\| | | |/ __/ __/ _ \\/ __/ __| |_| | | | |\n" +

@@ -35,12 +35,12 @@ import java.util.List;
 @RestController
 @Anonymous
 @RequestMapping("/system/dictionary")
-public class DictionaryController extends BaseController {
+public class SysDictionaryController extends BaseController {
 
 
     private final DictionaryService dictionaryService;
 
-    public DictionaryController(DictionaryService dictionaryService) {
+    public SysDictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
 

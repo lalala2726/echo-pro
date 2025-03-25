@@ -28,11 +28,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/file/management")
 @Tag(name = "文件管理", description = "管理系统所上传的文件")
-public class FileManagementController extends BaseController {
+public class SysFileManagementController extends BaseController {
 
     private final FileManagementService fileManagementService;
 
-    public FileManagementController(FileManagementService fileManagementService) {
+    public SysFileManagementController(FileManagementService fileManagementService) {
         this.fileManagementService = fileManagementService;
     }
 

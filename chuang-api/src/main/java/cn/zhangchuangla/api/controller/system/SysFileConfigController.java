@@ -30,12 +30,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/system/file/config")
 @Tag(name = "文件配置")
-public class FileConfigController extends BaseController {
+public class SysFileConfigController extends BaseController {
 
     private final RedisCache redisCache;
     private final ConfigCacheService configCacheService;
 
-    public FileConfigController(RedisCache redisCache, ConfigCacheService configCacheService) {
+    public SysFileConfigController(RedisCache redisCache, ConfigCacheService configCacheService) {
         this.redisCache = redisCache;
         this.configCacheService = configCacheService;
     }

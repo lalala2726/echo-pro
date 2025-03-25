@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -163,6 +164,19 @@ public class BaseController {
      */
     protected AjaxResult error(ResponseCode responseCode) {
         return AjaxResult.error(responseCode);
+    }
+
+
+    /**
+     * 验证是否为true
+     *
+     * @param conditionSupplier 条件
+     * @param errorMessage      错误信息
+     */
+    public void checkParam(boolean conditionSupplier, String errorMessage) {
+        if (conditionSupplier) {
+            throw new ParamException(errorMessage);
+        }
     }
 
 }

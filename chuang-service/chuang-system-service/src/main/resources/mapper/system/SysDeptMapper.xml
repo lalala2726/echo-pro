@@ -2,11 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysDepartmentMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDeptMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDepartment">
-        <id property="id" column="id"/>
-        <result property="name" column="name"/>
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDept">
+        <id property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
         <result property="parentId" column="parent_id"/>
         <result property="managerId" column="manager_id"/>
         <result property="description" column="description"/>
@@ -23,10 +23,10 @@
         <where>
             <if test="request != null">
                 <if test="request.id != null">
-                    AND id = #{request.id}
+                    AND dept_id = #{request.id}
                 </if>
                 <if test="request.name != null and request.name != ''">
-                    AND name LIKE concat('%', #{request.name}, '%')
+                    AND dept_name LIKE concat('%', #{request.name}, '%')
                 </if>
                 <if test="request.parentId != null">
                     AND parent_id = #{request.parentId}
