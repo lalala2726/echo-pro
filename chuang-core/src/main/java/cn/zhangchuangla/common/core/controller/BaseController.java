@@ -11,6 +11,7 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author Chuang
@@ -175,6 +176,18 @@ public class BaseController {
      */
     public void checkParam(boolean conditionSupplier, String errorMessage) {
         if (conditionSupplier) {
+            throw new ParamException(errorMessage);
+        }
+    }
+
+    /**
+     * 验证条件是否为true（函数方法）
+     *
+     * @param condition    条件
+     * @param errorMessage 错误信息
+     */
+    public void checkParam(Predicate<?> condition, String errorMessage) {
+        if (condition.test(null)) {
             throw new ParamException(errorMessage);
         }
     }

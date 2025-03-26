@@ -224,6 +224,7 @@ create table sys_post
 ) comment '岗位表';
 
 
+drop table user_site_message;
 
 CREATE TABLE site_messages
 (
@@ -231,16 +232,11 @@ CREATE TABLE site_messages
     sender_id    BIGINT UNSIGNED  NOT NULL COMMENT '发送者用户ID',
     title        VARCHAR(255) COMMENT '消息标题',
     content      TEXT             NOT NULL COMMENT '消息内容',
-    message_type TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息类型(1:普通消息,2:系统消息等)',
+    message_type varchar(64) not null comment '消息类型',
     status       TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息状态(1:正常,2:已删除)',
     created_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    INDEX idx_sender (sender_id),
-    INDEX idx_created (created_time)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='站内信对应表';
-
+    updated_time TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) comment '站内信表';
 
 CREATE TABLE user_site_message
 (
@@ -252,11 +248,5 @@ CREATE TABLE user_site_message
     is_deleted  TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否删除(0:否,1:是)',
     read_at     TIMESTAMP       NULL COMMENT '阅读时间',
     create_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    UNIQUE KEY uk_user_message (user_id, message_id),
-    INDEX idx_message (message_id),
-    INDEX idx_user_read (user_id, is_read),
-    INDEX idx_user_deleted (user_id, is_deleted)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='用户与站内信对应表';
+    update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) comment '用户站内信对应表';

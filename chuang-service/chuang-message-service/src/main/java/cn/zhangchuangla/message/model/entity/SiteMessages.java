@@ -37,7 +37,7 @@ public class SiteMessages {
     /**
      * 消息类型(1:普通消息,2:系统消息等)
      */
-    private Integer messageType;
+    private String messageType;
 
     /**
      * 消息状态(1:正常,2:已删除)
