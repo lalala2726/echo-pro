@@ -75,4 +75,9 @@ public enum BusinessType {
      * 刷新
      */
     REFRESH,
+
+    /**
+     * 发送消息
+     */
+    SEND_MESSAGES,
 }

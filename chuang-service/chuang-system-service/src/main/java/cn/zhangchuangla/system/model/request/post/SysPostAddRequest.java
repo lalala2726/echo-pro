@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.request.post;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -16,7 +18,7 @@ public class SysPostAddRequest {
      * 岗位编码
      */
     @Schema(description = "岗位编码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "岗位编码不能为空")
+    @Min(value = 1, message = "岗位编码必须大于等于1")
     private String postCode;
 
     /**
@@ -30,6 +32,8 @@ public class SysPostAddRequest {
      * 排序
      */
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Max(value = 999, message = "排序必须小于999")
+    @Min(value = 0, message = "排序必须大于等于0")
     private Integer sort;
 
     /**

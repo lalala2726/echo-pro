@@ -19,6 +19,31 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-infrastructure</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-message-service</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -37,7 +37,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      */
     @Override
     public Page<SysPost> listPost(SysPostListRequest request) {
-        Page<SysPost> page = new Page<>(request.getPageSize(), request.getPageNum());
+        Page<SysPost> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysPostMapper.listPost(page, request);
     }
 
@@ -51,7 +51,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
     public boolean addPost(SysPostAddRequest request) {
         SysPost sysPost = new SysPost();
         BeanUtils.copyProperties(request, sysPost);
-        return updateById(sysPost);
+        return save(sysPost);
     }
 
     /**
@@ -62,8 +62,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      */
     @Override
     public boolean removePost(List<Integer> ids) {
-        LambdaQueryWrapper<SysPost> eq = new LambdaQueryWrapper<SysPost>().eq(SysPost::getPostId, ids);
-        return remove(eq);
+        return removeByIds(ids);
     }
 
     /**
@@ -85,9 +84,9 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      */
     @Override
     public boolean editPost(SysPostUpdateRequest request) {
-        LambdaQueryWrapper<SysPost> eq = new LambdaQueryWrapper<SysPost>().eq(SysPost::getPostId, request.getPostId());
-        BeanUtils.copyProperties(request, sysPostMapper);
-        return update(eq);
+        SysPost sysPost = new SysPost();
+        BeanUtils.copyProperties(request, sysPost);
+        return updateById(sysPost);
     }
 
     /**
@@ -111,7 +110,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
     @Override
     public boolean isPostNameExist(String postName) {
         LambdaQueryWrapper<SysPost> eq = new LambdaQueryWrapper<SysPost>().eq(SysPost::getPostName, postName);
-        return count() > 0;
+        return count(eq) > 0;
     }
 }
 

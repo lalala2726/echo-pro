@@ -1,7 +1,8 @@
 package cn.zhangchuangla.system.model.request.post;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 /**
@@ -15,7 +16,7 @@ public class SysPostUpdateRequest {
      * 岗位ID
      */
     @Schema(description = "岗位ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "岗位ID不能为空")
+    @Min(value = 1, message = "岗位ID必须大于等于1")
     private Integer postId;
 
     /**
@@ -34,6 +35,8 @@ public class SysPostUpdateRequest {
      * 排序
      */
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Min(value = 0, message = "排序必须大于0")
+    @Max(value = 999, message = "排序必须小于999")
     private Integer sort;
 
     /**
@@ -42,9 +45,4 @@ public class SysPostUpdateRequest {
     @Schema(description = "状态(0-正常,1-停用)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer status;
 
-
-    /**
-     * 是否删除(0-未删除,1-已删除)
-     */
-    private Integer isDeleted;
 }
