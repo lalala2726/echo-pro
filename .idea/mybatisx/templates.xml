@@ -63,13 +63,13 @@
             </option>
             <option name="needsComment" value="true" />
             <option name="needsModel" value="true" />
-            <option name="relativePackage" value="domain" />
+            <option name="relativePackage" value="entity" />
             <option name="superClass" value="" />
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysMessageUser" />
-                  <option name="tableName" value="sys_message_user" />
+                  <option name="className" value="SiteMessages" />
+                  <option name="tableName" value="site_messages" />
                 </TableUIInfo>
               </list>
             </option>

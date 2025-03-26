@@ -2,15 +2,16 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.message.mapper.SysMessageUserMapper">
+<mapper namespace="cn.zhangchuangla.message.mapper.UserSiteMessageMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.message.model.entity.SysMessageUser">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.message.model.entity.UserSiteMessage">
         <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
         <result property="messageId" column="message_id"/>
-        <result property="receiverId" column="receiver_id"/>
-        <result property="readStatus" column="read_status"/>
-        <result property="readTime" column="read_time"/>
+        <result property="isRead" column="is_read"/>
+        <result property="isStarred" column="is_starred"/>
         <result property="isDeleted" column="is_deleted"/>
+        <result property="readAt" column="read_at"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>

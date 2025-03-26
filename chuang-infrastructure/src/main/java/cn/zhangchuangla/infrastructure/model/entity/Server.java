@@ -1,7 +1,7 @@
 package cn.zhangchuangla.infrastructure.model.entity;
 
-import cn.zhangchuangla.infrastructure.model.entity.server.System;
 import cn.zhangchuangla.infrastructure.model.entity.server.*;
+import cn.zhangchuangla.infrastructure.model.entity.server.System;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;

@@ -223,38 +223,40 @@ create table sys_post
     is_deleted  tinyint(1) default 0 not null comment '是否删除(0-未删除,1-已删除)'
 ) comment '岗位表';
 
--- 消息表
-CREATE TABLE sys_message
-(
-    id               BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '消息ID',
-    title            VARCHAR(100) NOT NULL COMMENT '消息标题',
-    content          TEXT         NOT NULL COMMENT '消息内容',
-    message_type     TINYINT      NOT NULL COMMENT '消息类型(0:系统消息 1:通知公告 2:私信)',
-    importance_level TINYINT  DEFAULT 0 COMMENT '重要等级(0:普通 1:重要 2:紧急)',
-    status           TINYINT  DEFAULT 0 COMMENT '消息状态(0:正常 1:删除)',
-    sender_id        BIGINT COMMENT '发送者ID(系统消息为空)',
-    sender_name      VARCHAR(50) COMMENT '发送者名称(系统消息为"系统")',
-    is_broadcast     TINYINT  DEFAULT 0 COMMENT '是否广播(0:否 1:是)',
-    create_time      DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    create_by        VARCHAR(100) COMMENT '创建人',
-    update_by        VARCHAR(100) COMMENT '更新人',
-    remark           VARCHAR(500) COMMENT '备注'
-) COMMENT ='系统消息表';
 
--- 消息接收表
-CREATE TABLE sys_message_user
-(
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
-    message_id  BIGINT NOT NULL COMMENT '消息ID',
-    receiver_id BIGINT NOT NULL COMMENT '接收者ID',
-    read_status TINYINT  DEFAULT 0 COMMENT '阅读状态(0:未读 1:已读)',
-    read_time   DATETIME COMMENT '阅读时间',
-    is_deleted  TINYINT  DEFAULT 0 COMMENT '是否删除(0:未删除 1:已删除)',
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-) COMMENT ='消息接收表';
 
--- 索引
-CREATE INDEX idx_message_user_receiver ON sys_message_user (receiver_id, read_status);
-CREATE INDEX idx_message_user_message_id ON sys_message_user (message_id);
+CREATE TABLE site_messages
+(
+    id           BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    sender_id    BIGINT UNSIGNED  NOT NULL COMMENT '发送者用户ID',
+    title        VARCHAR(255) COMMENT '消息标题',
+    content      TEXT             NOT NULL COMMENT '消息内容',
+    message_type TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息类型(1:普通消息,2:系统消息等)',
+    status       TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息状态(1:正常,2:已删除)',
+    created_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    INDEX idx_sender (sender_id),
+    INDEX idx_created (created_time)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='站内信对应表';
+
+
+CREATE TABLE user_site_message
+(
+    id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+    message_id  BIGINT UNSIGNED NOT NULL COMMENT '消息ID',
+    is_read     TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否已读(0:未读,1:已读)',
+    is_starred  TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否标星(0:否,1:是)',
+    is_deleted  TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否删除(0:否,1:是)',
+    read_at     TIMESTAMP       NULL COMMENT '阅读时间',
+    create_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_user_message (user_id, message_id),
+    INDEX idx_message (message_id),
+    INDEX idx_user_read (user_id, is_read),
+    INDEX idx_user_deleted (user_id, is_deleted)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='用户与站内信对应表';

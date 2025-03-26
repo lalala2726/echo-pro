@@ -8,49 +8,49 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 消息接收表
+ * 站内信对应表
  */
-@TableName(value = "sys_message_user")
+@TableName(value = "site_messages")
 @Data
-public class SysMessageUser {
+public class SiteMessages {
     /**
-     * 记录ID
+     *
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 消息ID
+     * 发送者用户ID
      */
-    private Long messageId;
+    private Long senderId;
 
     /**
-     * 接收者ID
+     * 消息标题
      */
-    private Long receiverId;
+    private String title;
 
     /**
-     * 阅读状态(0:未读 1:已读)
+     * 消息内容
      */
-    private Integer readStatus;
+    private String content;
 
     /**
-     * 阅读时间
+     * 消息类型(1:普通消息,2:系统消息等)
      */
-    private Date readTime;
+    private Integer messageType;
 
     /**
-     * 是否删除(0:未删除 1:已删除)
+     * 消息状态(1:正常,2:已删除)
      */
-    private Integer isDeleted;
+    private Integer status;
 
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Date createdTime;
 
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Date updatedTime;
 }
