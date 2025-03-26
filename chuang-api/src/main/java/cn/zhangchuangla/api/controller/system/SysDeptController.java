@@ -43,7 +43,6 @@ public class SysDeptController extends BaseController {
 
 
     /**
-     *
      * 获取部门列表信息
      * <p>
      *
