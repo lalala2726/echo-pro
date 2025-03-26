@@ -198,6 +198,12 @@
                 <artifactId>activation</artifactId>
                 <version>${javax.activation.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-websocket</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
 
             <!-- ===================== 项目模块依赖 ===================== -->
             <dependency>
@@ -220,7 +226,13 @@
                 <artifactId>chuang-system-service</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>chuang-message-service</artifactId>
+                <version>${app.version}</version>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>

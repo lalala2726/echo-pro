@@ -56,6 +56,19 @@ public class Knife4jConfig {
     }
 
     /**
+     * 消息功能分组
+     */
+    @Bean
+    public GroupedOpenApi messageApi() {
+        return GroupedOpenApi.builder()
+                // 分组名称
+                .group("消息功能")
+                // 扫描的基础包路径
+                .packagesToScan("cn.zhangchuangla.api.controller.message")
+                .build();
+    }
+
+    /**
      * 配置基本信息
      */
     @Bean

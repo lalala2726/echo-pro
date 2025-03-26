@@ -222,3 +222,39 @@ create table sys_post
     remark      TEXT COMMENT '备注',
     is_deleted  tinyint(1) default 0 not null comment '是否删除(0-未删除,1-已删除)'
 ) comment '岗位表';
+
+-- 消息表
+CREATE TABLE sys_message
+(
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '消息ID',
+    title            VARCHAR(100) NOT NULL COMMENT '消息标题',
+    content          TEXT         NOT NULL COMMENT '消息内容',
+    message_type     TINYINT      NOT NULL COMMENT '消息类型(0:系统消息 1:通知公告 2:私信)',
+    importance_level TINYINT  DEFAULT 0 COMMENT '重要等级(0:普通 1:重要 2:紧急)',
+    status           TINYINT  DEFAULT 0 COMMENT '消息状态(0:正常 1:删除)',
+    sender_id        BIGINT COMMENT '发送者ID(系统消息为空)',
+    sender_name      VARCHAR(50) COMMENT '发送者名称(系统消息为"系统")',
+    is_broadcast     TINYINT  DEFAULT 0 COMMENT '是否广播(0:否 1:是)',
+    create_time      DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by        VARCHAR(100) COMMENT '创建人',
+    update_by        VARCHAR(100) COMMENT '更新人',
+    remark           VARCHAR(500) COMMENT '备注'
+) COMMENT ='系统消息表';
+
+-- 消息接收表
+CREATE TABLE sys_message_user
+(
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
+    message_id  BIGINT NOT NULL COMMENT '消息ID',
+    receiver_id BIGINT NOT NULL COMMENT '接收者ID',
+    read_status TINYINT  DEFAULT 0 COMMENT '阅读状态(0:未读 1:已读)',
+    read_time   DATETIME COMMENT '阅读时间',
+    is_deleted  TINYINT  DEFAULT 0 COMMENT '是否删除(0:未删除 1:已删除)',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT ='消息接收表';
+
+-- 索引
+CREATE INDEX idx_message_user_receiver ON sys_message_user (receiver_id, read_status);
+CREATE INDEX idx_message_user_message_id ON sys_message_user (message_id);
