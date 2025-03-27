@@ -19,7 +19,7 @@ public class SiteMessageListRequest extends BasePageRequest {
      * 是否已读
      */
     @Schema(description = "是否已读", defaultValue = "0")
-    private Integer isRead = 0;
+    private Integer isRead;
 
 
 }

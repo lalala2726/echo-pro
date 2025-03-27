@@ -1,5 +1,7 @@
 package cn.zhangchuangla.message.service.impl;
 
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SiteMessagesMapper;
 import cn.zhangchuangla.message.model.entity.SiteMessages;
@@ -13,12 +15,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author zhangchuang
+ * author zhangchuang
  */
 @Service
 @Slf4j
@@ -53,6 +57,7 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
      * @return 操作结果
      */
     @Override
+    @Transactional
     public boolean sendSiteMessage(SiteMessageRequest siteMessageRequest) {
         // 1. 创建 SiteMessages 实例并复制属性
         SiteMessages siteMessages = new SiteMessages();
@@ -60,16 +65,17 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
 
         // 2. 设置发送者ID
         siteMessages.setSenderId(SecurityUtils.getUserId());
-        log.info("发送站内信:{}", siteMessages);
+        // 3. 保存站内信消息 - 修改这里
+        int rows = siteMessagesMapper.saveSiteMessage(siteMessages);
+        // 自增主键会被自动设置到 siteMessages 对象的 id 属性中
+        Long messageId = siteMessages.getId();
 
-        // 3. 保存站内信消息
-        Long messageId = siteMessagesMapper.saveSiteMessage(siteMessages);
-
-        // 4. 检查 messageId 是否保存成功
-        if (messageId == null) {
+        // 4. 检查是否保存成功
+        if (rows <= 0 || messageId == null) {
             log.error("站内信保存失败！");
             return false;
         }
+
         // 5. 批量创建 UserSiteMessage 列表
         List<UserSiteMessage> userSiteMessageList = siteMessageRequest.getUserId().stream()
                 .map(id -> {
@@ -81,15 +87,27 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
                 .collect(Collectors.toList());
 
         // 6. 批量保存用户消息关系
-        boolean result = userSiteMessageService.saveBatch(userSiteMessageList);
-
-        if (result) {
-            log.info("成功发送站内信，消息ID: {}，接收用户数量: {}", messageId, siteMessageRequest.getUserId().size());
-        } else {
-            log.error("批量保存用户消息失败，消息ID: {}", messageId);
-        }
-        return result;
+        return userSiteMessageService.saveBatch(userSiteMessageList);
     }
+
+    /**
+     * 根据 ID 获取站内信
+     *
+     * @param messageId 站内信 ID
+     * @return 站内信对象
+     */
+    @Override
+    public SiteMessages getSiteMessageById(Long messageId) {
+        Long userId = SecurityUtils.getUserId();
+        SiteMessages siteMessages = siteMessagesMapper.getCurrentUserSiteMessageById(userId, messageId);
+        if (siteMessages == null)
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "没有ID为 " + messageId + " 的站内信");
+        //设置站内信为已读
+        List<Long> list = Collections.singletonList(messageId);
+        userSiteMessageService.isRead(list);
+        return siteMessages;
+    }
+
 
 }
 

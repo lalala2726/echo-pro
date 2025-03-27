@@ -26,4 +26,14 @@ public interface SiteMessagesService extends IService<SiteMessages> {
      * @return 操作结果
      */
     boolean sendSiteMessage(SiteMessageRequest siteMessageRequest);
+
+    /**
+     * 根据id获取站内信
+     *
+     * @param id 消息ID
+     * @return 消息
+     */
+    SiteMessages getSiteMessageById(Long id);
+
+
 }
