@@ -21,24 +21,6 @@
         values (#{senderId}, #{title}, #{content}, #{messageType})
     </insert>
 
-    <update id="isRead">
-        update user_site_message
-        set is_read = 1
-        where message_id = #{messageId}
-          and user_id = #{userId};
-    </update>
-
-    <update id="batchMarkAsRead">
-        UPDATE user_site_message
-        SET is_read = 1, read_at = NOW()
-        WHERE message_id IN
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-        AND user_id = #{userId}
-    </update>
-
-
     <select id="getCurrentUserSiteMessagesList" resultMap="BaseResultMap">
         SELECT
         sm.id,
@@ -60,7 +42,6 @@
         ORDER BY
         sm.created_time DESC
     </select>
-
 
     <select id="getCurrentUserSiteMessageById" resultMap="BaseResultMap">
         select *

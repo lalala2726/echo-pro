@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 /**
  * @author zhangchuang
  */
@@ -39,22 +37,7 @@ public interface SiteMessagesMapper extends BaseMapper<SiteMessages> {
      */
     SiteMessages getCurrentUserSiteMessageById(@Param("userId") Long userId, @Param("messageId") Long messageId);
 
-    /**
-     * 设置消息已读
-     *
-     * @param messageId 消息ID
-     * @param userId    用户ID
-     */
-    void isRead(@Param("messageId") Long messageId, @Param("userId") Long userId);
 
-    /**
-     * 批量设置消息已读
-     *
-     * @param ids    消息ID
-     * @param userId 用户ID
-     * @return 更新的记录数
-     */
-    int batchMarkAsRead(@Param("ids") List<Long> ids, @Param("userId") Long userId);
 }
 
 

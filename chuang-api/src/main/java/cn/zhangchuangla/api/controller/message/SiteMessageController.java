@@ -8,14 +8,12 @@ import cn.zhangchuangla.message.model.request.SiteMessageListRequest;
 import cn.zhangchuangla.message.model.vo.SiteMessagesUserListVo;
 import cn.zhangchuangla.message.model.vo.SiteMessagesVo;
 import cn.zhangchuangla.message.service.SiteMessagesService;
+import cn.zhangchuangla.message.service.UserSiteMessageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +27,11 @@ import java.util.List;
 public class SiteMessageController extends BaseController {
 
     private final SiteMessagesService siteMessagesService;
+    private final UserSiteMessageService userSiteMessageService;
 
-    public SiteMessageController(SiteMessagesService siteMessagesService) {
+    public SiteMessageController(SiteMessagesService siteMessagesService, UserSiteMessageService userSiteMessageService) {
         this.siteMessagesService = siteMessagesService;
+        this.userSiteMessageService = userSiteMessageService;
     }
 
 
@@ -79,14 +79,41 @@ public class SiteMessageController extends BaseController {
      * @param ids 消息ID
      * @return 操作结果
      */
-    @GetMapping("/read/{ids}")
+    @PutMapping("/read/{ids}")
     @Operation(summary = "批量标记为已读")
-    public AjaxResult isReadSiteMessage(@PathVariable("ids") List<Long> ids) {
+    public AjaxResult readSiteMessage(@PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "id不能为空");
         });
-        int read = siteMessagesService.isRead(ids);
+        int read = userSiteMessageService.isRead(ids);
         return toAjax(read);
     }
+
+    /**
+     * 标记全部已读
+     *
+     * @return 操作结果
+     */
+    @PutMapping("/read/all")
+    @Operation(summary = "标记全部已读")
+    public AjaxResult readAllSiteMessage() {
+        return toAjax(userSiteMessageService.isReadAll());
+    }
+
+    /**
+     * 删除站内信，支持批量删除
+     *
+     * @param ids 站内信ID
+     * @return 返回操作结果
+     */
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除站内信")
+    public AjaxResult deleteSiteMessage(@PathVariable("ids") List<Long> ids) {
+        ids.forEach(id -> {
+            checkParam(id == null || id <= 0, "id不能为空");
+        });
+        return toAjax(userSiteMessageService.deleteSiteMessage(ids));
+    }
+
 
 }
