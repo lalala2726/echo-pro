@@ -224,29 +224,32 @@ create table sys_post
 ) comment '岗位表';
 
 
-drop table user_site_message;
+drop table site_messages;
 
 CREATE TABLE site_messages
 (
     id           BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT PRIMARY KEY,
     sender_id    BIGINT UNSIGNED  NOT NULL COMMENT '发送者用户ID',
-    title        VARCHAR(255) COMMENT '消息标题',
+    title        VARCHAR(255)     NOT NULL COMMENT '消息标题',
     content      TEXT             NOT NULL COMMENT '消息内容',
-    message_type varchar(64) not null comment '消息类型',
-    status       TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息状态(1:正常,2:已删除)',
+    message_type varchar(64)      NOT NULL COMMENT '消息类型',
+    status       TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '消息状态(1:正常, 2:已删除)',
     created_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_time TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-) comment '站内信表';
+    updated_time TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT '站内信表';
+
 
 CREATE TABLE user_site_message
 (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id     BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
     message_id  BIGINT UNSIGNED NOT NULL COMMENT '消息ID',
-    is_read     TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否已读(0:未读,1:已读)',
-    is_starred  TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否标星(0:否,1:是)',
-    is_deleted  TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否删除(0:否,1:是)',
-    read_at     TIMESTAMP       NULL COMMENT '阅读时间',
+    is_read     TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否已读(0:未读, 1:已读)',
+    is_starred  TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否标星(0:否, 1:是)',
+    is_deleted  TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除(0:否, 1:已删除)',
+    read_at     TIMESTAMP  NULL     DEFAULT NULL COMMENT '阅读时间',
     create_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-) comment '用户站内信对应表';
+    update_time TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    CONSTRAINT fk_user_site_message_message FOREIGN KEY (message_id) REFERENCES site_messages (id) ON DELETE CASCADE
+) COMMENT '用户站内信对应表';
+
