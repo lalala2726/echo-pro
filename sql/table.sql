@@ -253,3 +253,5 @@ CREATE TABLE user_site_message
     CONSTRAINT fk_user_site_message_message FOREIGN KEY (message_id) REFERENCES site_messages (id) ON DELETE CASCADE
 ) COMMENT '用户站内信对应表';
 
+
+

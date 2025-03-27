@@ -21,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,12 +53,7 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "部门列表")
     public TableDataResult listDept(SysDeptListRequest request) {
         Page<SysDept> page = sysDeptService.listDept(request);
-        ArrayList<SysDeptListVo> sysDeptListVos = new ArrayList<>();
-        page.getRecords().forEach(department -> {
-            SysDeptListVo sysDeptListVo = new SysDeptListVo();
-            BeanUtils.copyProperties(department, sysDeptListVo);
-            sysDeptListVos.add(sysDeptListVo);
-        });
+        List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
         return getTableData(page, sysDeptListVos);
     }
 

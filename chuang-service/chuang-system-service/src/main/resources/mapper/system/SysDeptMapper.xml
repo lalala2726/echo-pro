@@ -19,7 +19,7 @@
     <select id="listDepartment" resultMap="BaseResultMap">
         SELECT
         *
-        FROM sys_department
+        FROM sys_dept
         <where>
             <if test="request != null">
                 <if test="request.id != null">

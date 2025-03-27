@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * 字典值表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "dictionary_data")
+@TableName(value = "sys_dictionary_data")
 @Data
 public class DictionaryData extends BaseEntity {
 

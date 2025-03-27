@@ -4,8 +4,6 @@ import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
@@ -14,11 +12,9 @@ import cn.zhangchuangla.system.service.FileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,12 +44,7 @@ public class SysFileManagementController extends BaseController {
     @GetMapping("/list")
     public TableDataResult fileList(FileManagementListRequest request) {
         Page<FileManagement> page = fileManagementService.fileList(request);
-        ArrayList<FileManagementListVo> fileManagementListVos = new ArrayList<>();
-        page.getRecords().forEach(fileManagement -> {
-            FileManagementListVo fileManagementListVo = new FileManagementListVo();
-            BeanUtils.copyProperties(fileManagement, fileManagementListVo);
-            fileManagementListVos.add(fileManagementListVo);
-        });
+        List<FileManagementListVo> fileManagementListVos = copyListProperties(page, FileManagementListVo.class);
         return getTableData(page, fileManagementListVos);
     }
 
@@ -82,9 +73,7 @@ public class SysFileManagementController extends BaseController {
     @Operation(summary = "获取文件信息", description = "根据文件id获取文件信息")
     @PreAuthorize("@auth.hasPermission('system:file:management:info')")
     public AjaxResult getFileById(@PathVariable("id") Long id) {
-        if (id == null) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "文件ID不能为空！");
-        }
+        checkParam(id == null, "文件ID不能为空！");
         FileManagement fileManagement = fileManagementService.getFileById(id);
         return success(fileManagement);
     }

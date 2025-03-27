@@ -84,24 +84,17 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateLocalFileConfig(@RequestBody LocalFileConfigEntity request) {
         String uploadPath = request.getUploadPath();
-        log.info("接收前端的地址: {}", uploadPath);
-
         //  1. 校验路径
         if (PathUtils.isLinuxPath(uploadPath)) {
-            log.info("Linux 系统路径，直接上传...");
         } else if (PathUtils.isWindowsPath(uploadPath)) {
             //  2. 处理 Windows 路径
             uploadPath = PathUtils.processWindowsPath(uploadPath);
             request.setUploadPath(uploadPath);
-            log.info("处理后的 Windows 地址: {}", uploadPath);
         } else {
-            log.error("不支持的路径格式: {}", uploadPath);
             return AjaxResult.error("路径格式不正确，请检查！");
         }
-
         // 3. 保存到 Redis
         redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_LOCAL, request);
-        log.info("配置已保存至 Redis");
         configCacheService.refreshAllConfigs();
         return AjaxResult.success(SystemMessageConstant.UPDATE_SUCCESS);
     }

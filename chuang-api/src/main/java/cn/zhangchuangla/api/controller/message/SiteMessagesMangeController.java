@@ -47,4 +47,5 @@ public class SiteMessagesMangeController extends BaseController {
         boolean result = siteMessagesService.sendSiteMessage(siteMessageRequest);
         return toAjax(result);
     }
+
 }

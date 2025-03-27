@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.message.model.entity.SiteMessages;
 import cn.zhangchuangla.message.model.request.SiteMessageListRequest;
-import cn.zhangchuangla.message.model.vo.SiteMessagesUserListVo;
 import cn.zhangchuangla.message.model.vo.SiteMessagesVo;
 import cn.zhangchuangla.message.service.SiteMessagesService;
 import cn.zhangchuangla.message.service.UserSiteMessageService;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,16 +42,8 @@ public class SiteMessageController extends BaseController {
     @Operation(summary = "获取当前用户站内信列表")
     public TableDataResult getCurrentUserSiteMessagesList(SiteMessageListRequest request) {
         Page<SiteMessages> currentUserSiteMessagesList = siteMessagesService.getCurrentUserSiteMessagesList(request);
-
-        // 转换成前端需要的数据格式
-        ArrayList<SiteMessagesUserListVo> siteMessagesUserListVos = new ArrayList<>();
-        currentUserSiteMessagesList.getRecords().forEach(siteMessages -> {
-            SiteMessagesUserListVo siteMessagesUserListVo = new SiteMessagesUserListVo();
-            BeanUtils.copyProperties(siteMessages, siteMessagesUserListVo);
-            siteMessagesUserListVos.add(siteMessagesUserListVo);
-        });
-
-        return getTableData(currentUserSiteMessagesList, siteMessagesUserListVos);
+        List<SiteMessagesVo> siteMessagesVos = copyListProperties(currentUserSiteMessagesList, SiteMessagesVo.class);
+        return getTableData(currentUserSiteMessagesList, siteMessagesVos);
     }
 
     /**
