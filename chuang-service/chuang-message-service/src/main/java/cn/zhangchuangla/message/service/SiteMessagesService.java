@@ -6,6 +6,8 @@ import cn.zhangchuangla.message.model.request.SiteMessageRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 
 /**
  * @author zhangchuang
@@ -34,4 +36,13 @@ public interface SiteMessagesService extends IService<SiteMessages> {
      * @return 消息
      */
     SiteMessages getSiteMessageById(Long id);
+
+    /**
+     * 设置已读,支持多条消息已读
+     *
+     * @param ids 消息ID
+     */
+    int isRead(List<Long> ids);
+
+
 }

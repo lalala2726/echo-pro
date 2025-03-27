@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 站内信
@@ -43,12 +44,15 @@ public class SiteMessageController extends BaseController {
     @Operation(summary = "获取当前用户站内信列表")
     public TableDataResult getCurrentUserSiteMessagesList(SiteMessageListRequest request) {
         Page<SiteMessages> currentUserSiteMessagesList = siteMessagesService.getCurrentUserSiteMessagesList(request);
+
+        // 转换成前端需要的数据格式
         ArrayList<SiteMessagesUserListVo> siteMessagesUserListVos = new ArrayList<>();
         currentUserSiteMessagesList.getRecords().forEach(siteMessages -> {
             SiteMessagesUserListVo siteMessagesUserListVo = new SiteMessagesUserListVo();
             BeanUtils.copyProperties(siteMessages, siteMessagesUserListVo);
             siteMessagesUserListVos.add(siteMessagesUserListVo);
         });
+
         return getTableData(currentUserSiteMessagesList, siteMessagesUserListVos);
     }
 
@@ -67,4 +71,22 @@ public class SiteMessageController extends BaseController {
         BeanUtils.copyProperties(siteMessages, siteMessagesVo);
         return success(siteMessagesVo);
     }
+
+
+    /**
+     * 批量标记为已读
+     *
+     * @param ids 消息ID
+     * @return 操作结果
+     */
+    @GetMapping("/read/{ids}")
+    @Operation(summary = "批量标记为已读")
+    public AjaxResult isReadSiteMessage(@PathVariable("ids") List<Long> ids) {
+        ids.forEach(id -> {
+            checkParam(id == null || id <= 0, "id不能为空");
+        });
+        int read = siteMessagesService.isRead(ids);
+        return toAjax(read);
+    }
+
 }

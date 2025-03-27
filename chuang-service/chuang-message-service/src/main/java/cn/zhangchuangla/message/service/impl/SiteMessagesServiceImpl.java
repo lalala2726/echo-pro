@@ -1,6 +1,7 @@
 package cn.zhangchuangla.message.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SiteMessagesMapper;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,16 +94,35 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
     /**
      * 根据 ID 获取站内信
      *
-     * @param id 站内信 ID
+     * @param messageId 站内信 ID
      * @return 站内信对象
      */
     @Override
-    public SiteMessages getSiteMessageById(Long id) {
+    public SiteMessages getSiteMessageById(Long messageId) {
         Long userId = SecurityUtils.getUserId();
-        SiteMessages siteMessages = siteMessagesMapper.getCurrentUserSiteMessageById(userId, id);
+        SiteMessages siteMessages = siteMessagesMapper.getCurrentUserSiteMessageById(userId, messageId);
         if (siteMessages == null)
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "没有ID为 " + id + " 的站内信");
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "没有ID为 " + messageId + " 的站内信");
+        //设置站内信为已读
+        siteMessagesMapper.isRead(messageId, userId);
         return siteMessages;
+    }
+
+    /**
+     * 设置站内信为已读
+     *
+     * @param ids 消息ID
+     */
+    @Override
+    public int isRead(List<Long> ids) {
+        // 参数校验
+        if (CollectionUtils.isEmpty(ids)) {
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "参数不能为空");
+        }
+        Long userId = SecurityUtils.getUserId();
+
+        // 批量更新站内信为已读状态
+        return siteMessagesMapper.batchMarkAsRead(ids, userId);
     }
 
 }
