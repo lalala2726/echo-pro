@@ -84,9 +84,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateLocalFileConfig(@RequestBody LocalFileConfigEntity request) {
         String uploadPath = request.getUploadPath();
-        //  1. 校验路径
-        if (PathUtils.isLinuxPath(uploadPath)) {
-        } else if (PathUtils.isWindowsPath(uploadPath)) {
+        // 1. 校验路径
+        if (PathUtils.isWindowsPath(uploadPath)) {
             //  2. 处理 Windows 路径
             uploadPath = PathUtils.processWindowsPath(uploadPath);
             request.setUploadPath(uploadPath);
@@ -110,9 +109,7 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "更新默认文件上传配置")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateDefaultFileConfig(@RequestBody DefaultFileConfigRequest request) {
-        if (request.getFileUploadType().isBlank()) {
-            return error("默认文件上传配置不能为空");
-        }
+
         DefaultFileUploadEnum defaultFileUploadEnum = DefaultFileUploadEnum.getByName(request.getFileUploadType());
         if (defaultFileUploadEnum == null) {
             error("您的输入错误，请检查后再输入!");

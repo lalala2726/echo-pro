@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
@@ -54,7 +53,7 @@ public class SysDictionaryDataController extends BaseController {
     @Operation(summary = "根据字典名称获取字典值")
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
     public TableDataResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
-        ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
+        checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         Page<DictionaryData> dictionaryDataPage = dictionaryDataService.getDictDataByDictionaryName(id, request);
         List<DictionaryDataListVo> dictionaryDataListVos = copyListProperties(dictionaryDataPage, DictionaryDataListVo.class);
         return getTableData(dictionaryDataPage, dictionaryDataListVos);
@@ -86,12 +85,8 @@ public class SysDictionaryDataController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
     @Log(title = "字典值管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
-        ParamsUtils.objectIsNull(request, "参数不能为空!");
-        ParamsUtils.minValidParam(request.getDictionaryId(), "字典ID不能小于等于零!");
-        boolean isExits = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        ParamsUtils.paramCheck(isExits, "字典项键已存在!");
-        boolean result = dictionaryDataService.addDictionaryData(request);
-        return toAjax(result);
+        checkParam(dictionaryDataService.noDuplicateKeys(request.getDataKey()), "字典项键已存在!");
+        return toAjax(dictionaryDataService.addDictionaryData(request));
     }
 
     /**
@@ -104,7 +99,7 @@ public class SysDictionaryDataController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:info')")
     public AjaxResult getDictionaryItemById(@PathVariable("id") Long id) {
-        ParamsUtils.minValidParam(id, "字典值ID不能小于等于零!");
+        checkParam(id == null || id > 0, "字典值ID不能小于等于零!");
         DictionaryData dictionaryData = dictionaryDataService.getDictionaryById(id);
         DictionaryDataVo dictionaryDataVo = new DictionaryDataVo();
         BeanUtils.copyProperties(dictionaryData, dictionaryDataVo);
@@ -128,8 +123,7 @@ public class SysDictionaryDataController extends BaseController {
             isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
         }
         checkParam(isExist, "字典项键已存在!");
-        boolean result = dictionaryDataService.updateDictionaryData(request);
-        return success(result);
+        return success(dictionaryDataService.updateDictionaryData(request));
     }
 
     /**

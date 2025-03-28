@@ -21,7 +21,6 @@ public class LoginRequest {
     @NotBlank(message = "用户名不能为空!")
     @Size(min = 5, max = 20, message = "用户名长度在5-20位之间!")
     @Pattern(regexp = "^[a-zA-Z0-9_-]{5,20}$", message = "用户名只能是字母、数字、下划线、减号!")
-
     @Schema(description = "用户名")
     private String username;
 
