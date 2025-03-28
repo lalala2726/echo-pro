@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
     private final DictionaryDataService dictionaryDataService;
     private final DictionaryMapper dictionaryMapper;
 
+    @Autowired
     public DictionaryServiceImpl(DictionaryDataService dictionaryDataService, DictionaryMapper dictionaryMapper) {
         this.dictionaryDataService = dictionaryDataService;
         this.dictionaryMapper = dictionaryMapper;

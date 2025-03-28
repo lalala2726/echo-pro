@@ -10,7 +10,6 @@ import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
-import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,6 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +31,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
-    private final SysRoleService sysRoleService;
 
-    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService, SysRoleService sysRoleService) {
+    @Autowired
+    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService) {
         this.sysUserMapper = sysUserMapper;
         this.sysUserRoleService = sysUserRoleService;
-        this.sysRoleService = sysRoleService;
     }
-
-    //todo 在修改用户角色信息会有不确定会操作失败,下一步计划打印详细的日志方便进行排查
 
 
     /**

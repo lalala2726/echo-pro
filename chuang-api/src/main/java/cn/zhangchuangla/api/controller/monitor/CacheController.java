@@ -6,6 +6,7 @@ import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,7 @@ public class CacheController extends BaseController {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
     public CacheController(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }

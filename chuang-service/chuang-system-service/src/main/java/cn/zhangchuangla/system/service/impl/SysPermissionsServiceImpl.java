@@ -11,6 +11,7 @@ import cn.zhangchuangla.system.service.SysPermissionsService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
     private final SysPermissionsMapper sysPermissionsMapper;
     private final RedisCache redisCache;
 
+    @Autowired
     public SysPermissionsServiceImpl(SysPermissionsMapper sysPermissionsMapper, RedisCache redisCache) {
         this.sysPermissionsMapper = sysPermissionsMapper;
         this.redisCache = redisCache;

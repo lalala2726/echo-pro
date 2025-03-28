@@ -16,6 +16,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -45,6 +46,7 @@ public class TokenServiceImpl implements TokenService {
     private final RedisCache redisCache;
     private final ReentrantLock lock = new ReentrantLock();
 
+    @Autowired
     public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
         this.tokenConfig = tokenConfig;
         this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));// 从配置文件中读取密钥字符串并转换为SecretKey

@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.service.MinioFileUploadService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -36,6 +37,7 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
     private final AliyunOssUploadService aliyunOssUploadService;
     private final MinioFileUploadService minioFileUploadService;
 
+    @Autowired
     public FileManagementServiceImpl(ConfigCacheService configCacheService, FileManagementMapper fileManagementMapper, LocalFileUploadService localFileUploadService, AliyunOssUploadService aliyunOssUploadService, MinioFileUploadService minioFileUploadService) {
         this.configCacheService = configCacheService;
         this.fileManagementMapper = fileManagementMapper;

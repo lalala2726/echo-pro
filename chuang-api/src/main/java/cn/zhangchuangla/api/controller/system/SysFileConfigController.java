@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.model.request.file.DefaultFileConfigRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class SysFileConfigController extends BaseController {
     private final RedisCache redisCache;
     private final ConfigCacheService configCacheService;
 
+    @Autowired
     public SysFileConfigController(RedisCache redisCache, ConfigCacheService configCacheService) {
         this.redisCache = redisCache;
         this.configCacheService = configCacheService;

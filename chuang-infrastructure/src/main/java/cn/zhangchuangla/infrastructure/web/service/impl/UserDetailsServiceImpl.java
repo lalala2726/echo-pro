@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final SysUserService sysUserService;
 
+    @Autowired
     public UserDetailsServiceImpl(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
     }
