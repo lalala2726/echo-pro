@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 当后续因为业务需求改变需要接入到微服务架构,这边建议使用Redis单独存储角色和权限信息,从而实现权限实时刷新
@@ -57,12 +57,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:role:list')")
     public TableDataResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
-        ArrayList<SysRoleVo> sysRoleVos = new ArrayList<>();
-        page.getRecords().forEach(sysRole -> {
-            SysRoleVo sysRoleVo = new SysRoleVo();
-            BeanUtils.copyProperties(sysRole, sysRoleVo);
-            sysRoleVos.add(sysRoleVo);
-        });
+        List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
         return getTableData(page, sysRoleVos);
     }
 

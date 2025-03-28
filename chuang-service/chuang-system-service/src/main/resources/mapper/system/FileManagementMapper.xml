@@ -31,6 +31,6 @@
 
     <select id="fileList" resultMap="BaseResultMap">
         select *
-        from file_management
+        from sys_file_management
     </select>
 </mapper>

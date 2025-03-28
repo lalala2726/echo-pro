@@ -9,7 +9,9 @@ import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -20,6 +22,42 @@ import java.util.function.Predicate;
  */
 public class BaseController {
 
+
+    /**
+     * 将 List<T> 转换为 List<V>，使用 BeanUtils 进行属性拷贝
+     *
+     * @param sourceList  源数据列表
+     * @param targetClass 目标类型的 Class
+     * @param <T>         源数据类型
+     * @param <V>         目标数据类型
+     * @return 转换后的目标数据列表
+     */
+    protected static <T, V> List<V> copyListProperties(List<T> sourceList, Class<V> targetClass) {
+        List<V> targetList = new ArrayList<>();
+        try {
+            for (T source : sourceList) {
+                V target = targetClass.getDeclaredConstructor().newInstance();
+                BeanUtils.copyProperties(source, target);
+                targetList.add(target);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("List 属性拷贝失败", e);
+        }
+        return targetList;
+    }
+
+    /**
+     * 将 Page<T> 转换为 List<V>，使用 BeanUtils 进行属性拷贝
+     *
+     * @param sourceList  源数据列表
+     * @param targetClass 目标类型的 Class
+     * @param <T>         源数据类型
+     * @param <V>         目标数据类型
+     * @return 转换后的目标数据列表
+     */
+    protected static <T, V> List<V> copyListProperties(Page<T> sourceList, Class<V> targetClass) {
+        return copyListProperties(sourceList.getRecords(), targetClass);
+    }
 
     /**
      * 封装分页数据,直接返回数据
@@ -55,7 +93,6 @@ public class BaseController {
         tableDataResult.setPageSize(page.getSize());
         return tableDataResult;
     }
-
 
     /**
      * 获取当前用户信息

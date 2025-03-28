@@ -26,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 用户管理控制器
@@ -54,12 +53,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:user:list')")
     public TableDataResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         Page<SysUser> userPage = sysUserService.UserList(request);
-        List<UserListVo> userListVos = userPage.getRecords().stream()
-                .map(sysUser -> {
-                    UserListVo userListVo = new UserListVo();
-                    BeanUtils.copyProperties(sysUser, userListVo);
-                    return userListVo;
-                }).collect(Collectors.toList());
+        List<UserListVo> userListVos = copyListProperties(userPage, UserListVo.class);
         return getTableData(userPage, userListVos);
     }
 

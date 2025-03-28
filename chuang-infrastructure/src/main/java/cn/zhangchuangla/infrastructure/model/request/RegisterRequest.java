@@ -3,7 +3,6 @@ package cn.zhangchuangla.infrastructure.model.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 
@@ -22,10 +21,7 @@ public class RegisterRequest {
      * 用户名
      */
     @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[a-zA-Z0-9_-]{5,20}$", message = "用户名只能是字母、数字、下划线、减号!")
-    @NotBlank(message = "用户名不能为空")
-    @Size(min = 5, max = 20, message = "用户名不能超过20个字符")
-    @Pattern(regexp = "^[a-zA-Z0-9_]{5,20}$", message = "用户名只能是英文数字和下划线")
+
     private String username;
 
     /**
@@ -33,9 +29,7 @@ public class RegisterRequest {
      */
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
-    @Size(min = 8, max = 20, message = "密码长度在 8-16 之间")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#¥%&*()—+/])[A-Za-z0-9!@#¥%&*()—+/]{8,20}$\n",
-            message = "至少一个大写字母、一个小写字母、一个数字和一个特殊字符（只允许 !@#¥%&*()—+/ 这些特殊字符")
+
     private String password;
 
     /**

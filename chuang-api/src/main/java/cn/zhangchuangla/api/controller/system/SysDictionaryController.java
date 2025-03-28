@@ -23,7 +23,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,12 +54,7 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary:list')")
     public TableDataResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
-        ArrayList<DictionaryListVo> dictionaryListVos = new ArrayList<>();
-        list.getRecords().forEach(item -> {
-            DictionaryListVo dictionaryListVo = new DictionaryListVo();
-            BeanUtils.copyProperties(item, dictionaryListVo);
-            dictionaryListVos.add(dictionaryListVo);
-        });
+        List<DictionaryListVo> dictionaryListVos = copyListProperties(list, DictionaryListVo.class);
         return getTableData(list, dictionaryListVos);
     }
 

@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * 文件上传记录表
  */
-@TableName(value = "file_management")
+@TableName(value = "sys_file_management")
 @Data
 public class FileManagement {
     /**

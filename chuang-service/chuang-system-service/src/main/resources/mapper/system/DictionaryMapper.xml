@@ -18,7 +18,7 @@
 
     <select id="getDictionaryList" resultMap="BaseResultMap">
         select *
-        from dictionary
+        from sys_dictionary
         <where>
             <if test="request.name != null and  request.name != ''">
                 and `name` like concat('%',#{request.name},'%')
@@ -33,7 +33,7 @@
     </select>
     <select id="getDictionaryCountExcludeCurrentId" resultType="java.lang.Long">
         select count(*)
-        from dictionary
+        from sys_dictionary
         where name = #{dictName}
           and id != #{id}
     </select>

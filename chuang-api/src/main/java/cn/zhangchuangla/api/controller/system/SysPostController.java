@@ -21,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,12 +51,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:post:list')")
     public TableDataResult listPost(SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
-        ArrayList<SysPostListVo> sysPostListVos = new ArrayList<>();
-        page.getRecords().forEach(sysPost -> {
-            SysPostListVo sysPostListVo = new SysPostListVo();
-            BeanUtils.copyProperties(sysPost, sysPostListVo);
-            sysPostListVos.add(sysPostListVo);
-        });
+        List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
     }
 

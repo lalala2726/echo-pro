@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * 部门表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_department")
+@TableName(value = "sys_dept")
 @Data
 public class SysDept extends BaseEntity {
     /**
