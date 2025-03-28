@@ -37,7 +37,13 @@ public interface SiteMessagesMapper extends BaseMapper<SiteMessages> {
      */
     SiteMessages getCurrentUserSiteMessageById(@Param("userId") Long userId, @Param("messageId") Long messageId);
 
-
+    /**
+     * 获取站内消息列表
+     *
+     * @param page 分页对象
+     * @return 消息列表
+     */
+    Page<SiteMessages> listSiteMessages(Page<SiteMessages> page);
 }
 
 

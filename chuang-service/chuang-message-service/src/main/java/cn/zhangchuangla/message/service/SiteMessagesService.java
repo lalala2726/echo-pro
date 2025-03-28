@@ -1,5 +1,6 @@
 package cn.zhangchuangla.message.service;
 
+import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.message.model.entity.SiteMessages;
 import cn.zhangchuangla.message.model.request.SiteMessageListRequest;
 import cn.zhangchuangla.message.model.request.SiteMessageRequest;
@@ -35,5 +36,13 @@ public interface SiteMessagesService extends IService<SiteMessages> {
      */
     SiteMessages getSiteMessageById(Long id);
 
+
+    /**
+     * 获取站内信列表
+     *
+     * @param request 分页请求
+     * @return 站内信列表
+     */
+    Page<SiteMessages> listSiteMessages(BasePageRequest request);
 
 }

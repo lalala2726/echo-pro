@@ -1,6 +1,8 @@
 package cn.zhangchuangla.message.service.impl;
 
+import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SiteMessagesMapper;
@@ -59,14 +61,24 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
     @Override
     @Transactional
     public boolean sendSiteMessage(SiteMessageRequest siteMessageRequest) {
+
+        //fixme 使用消息队列重构设计
+        siteMessageRequest.getUserId().forEach(id -> {
+            if (id == null || id <= 0) {
+                throw new ParamException(ResponseCode.PARAM_NOT_NULL, "用户ID不能为空");
+            }
+        });
         // 1. 创建 SiteMessages 实例并复制属性
         SiteMessages siteMessages = new SiteMessages();
         BeanUtils.copyProperties(siteMessageRequest, siteMessages);
 
-        // 2. 设置发送者ID
+        // 2. 设置发送者ID和用户名
         siteMessages.setSenderId(SecurityUtils.getUserId());
+        siteMessages.setSenderName(SecurityUtils.getUsername());
+
         // 3. 保存站内信消息 - 修改这里
         int rows = siteMessagesMapper.saveSiteMessage(siteMessages);
+
         // 自增主键会被自动设置到 siteMessages 对象的 id 属性中
         Long messageId = siteMessages.getId();
 
@@ -106,6 +118,18 @@ public class SiteMessagesServiceImpl extends ServiceImpl<SiteMessagesMapper, Sit
         List<Long> list = Collections.singletonList(messageId);
         userSiteMessageService.isRead(list);
         return siteMessages;
+    }
+
+    /**
+     * 获取站内信列表
+     *
+     * @param request 分页请求对象
+     * @return 分页结果
+     */
+    @Override
+    public Page<SiteMessages> listSiteMessages(BasePageRequest request) {
+        Page<SiteMessages> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return siteMessagesMapper.listSiteMessages(page);
     }
 
 

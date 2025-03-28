@@ -25,6 +25,11 @@ public class SiteMessages {
     private Long senderId;
 
     /**
+     * 发送者用户名
+     */
+    private String senderName;
+
+    /**
      * 消息标题
      */
     private String title;
@@ -39,10 +44,6 @@ public class SiteMessages {
      */
     private String messageType;
 
-    /**
-     * 消息状态(1:正常,2:已删除)
-     */
-    private Integer status;
 
     /**
      * 创建时间

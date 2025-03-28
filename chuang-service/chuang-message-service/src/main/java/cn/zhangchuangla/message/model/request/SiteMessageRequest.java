@@ -2,7 +2,6 @@ package cn.zhangchuangla.message.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,8 +21,6 @@ public class SiteMessageRequest {
      * 接受人
      */
     @Schema(description = "接受人", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "接受人列表不能为空")
-    @NotNull(message = "接受人列表不能为空")
     private List<Long> userId;
 
     /**
