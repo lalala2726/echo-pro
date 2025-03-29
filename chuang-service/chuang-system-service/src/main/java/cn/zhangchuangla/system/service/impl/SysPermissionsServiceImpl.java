@@ -3,12 +3,11 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.model.entity.UserPermissions;
 import cn.zhangchuangla.common.core.redis.RedisCache;
-import cn.zhangchuangla.common.utils.ParamsUtils;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysPermissionsMapper;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
 import cn.zhangchuangla.system.service.SysPermissionsService;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +63,13 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
      */
     @Override
     public Set<String> getPermissionsByUserId(Long id) {
-        ParamsUtils.minValidParam(id, "用户ID不能小于等于零");
-        Object object = redisCache.getCacheObject(RedisKeyConstant.USER_PERMISSIONS + id);
-        if (object != null) {
-            UserPermissions userPermissions = JSON.parseObject(JSON.toJSONString(object), UserPermissions.class);
+        //如果是管理员将拥有全部权限
+        if (SecurityUtils.isSuperAdmin()) {
+            return Set.of("*.*.*");
+        }
+        //优先从Redis中获取权限信息，如果没有，则从数据库中获取并将权限信息缓存到Redis中
+        UserPermissions userPermissions = redisCache.getCacheObject(RedisKeyConstant.USER_PERMISSIONS + id);
+        if (userPermissions != null) {
             return userPermissions.getPermissions();
         }
         List<SysPermissions> permissionsList = sysPermissionsMapper.getPermissionsByUserId(id);

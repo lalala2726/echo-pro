@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Slf4j
 public class SecurityUtils {
 
+
     /**
      * 获取用户
      *
@@ -55,5 +56,14 @@ public class SecurityUtils {
         return getLoginUser().getUserId();
     }
 
+
+    /**
+     * 判断是否为超级管理员
+     *
+     * @return true - 是超级管理员，false - 不是超级管理员
+     */
+    public static boolean isSuperAdmin() {
+        return getLoginUser().getSysUser().isSuperAdmin();
+    }
 
 }

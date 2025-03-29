@@ -28,4 +28,24 @@
         select *
         from sys_menu
     </select>
+    <select id="getMenuUserId" resultMap="BaseResultMap">
+        SELECT sm.menu_id,
+               sm.menu_name,
+               sm.parent_id,
+               sm.order_num,
+               sm.path,
+               sm.component,
+               sm.is_frame,
+               sm.is_cache,
+               sm.menu_type,
+               sm.visible,
+               sm.status,
+               sm.perms,
+               sm.icon,
+               sm.create_time
+        FROM sys_menu sm
+                 INNER JOIN sys_role_menu srm ON sm.menu_id = srm.menu_id
+                 INNER JOIN sys_user_role sur ON srm.role_id = sur.role_id
+        WHERE sur.user_id = #{userId}
+    </select>
 </mapper>
