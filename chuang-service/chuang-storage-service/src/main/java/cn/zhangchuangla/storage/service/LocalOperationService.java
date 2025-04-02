@@ -11,3 +11,4 @@ import cn.zhangchuangla.storage.core.StorageOperation;
  */
 public interface LocalOperationService extends StorageOperation {
 }
+

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.zhangchuangla.common.enums.ContentType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +16,8 @@ import java.util.UUID;
  * 文件相关工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/2/18 15:27
+ * <p>
+ * created on 2025/2/18 15:27
  */
 public class FileUtils {
     /**
@@ -149,28 +150,7 @@ public class FileUtils {
      * @return 返回文件ContentType
      */
     public static String generateFileContentType(String fileName) {
-        // todo 使用枚举用户检测
-        String fileExtension = getFileExtension(fileName);
-        switch (fileExtension) {
-            case ".jpg", ".jpeg" -> {
-                return "image/jpeg";
-            }
-            case ".png" -> {
-                return "image/png";
-            }
-            case ".gif" -> {
-                return "image/gif";
-            }
-            case ".pdf" -> {
-                return "application/pdf";
-            }
-            case ".mp4" -> {
-                return "video/mp4";
-            }
-            default -> {
-                return "application/octet-stream";
-            }
-        }
+        return ContentType.fromExtension(fileName).toString();
     }
 
     /**
