@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
+ * 岗位接口实现类
+ *
  * @author zhangchuang
  */
 @Service

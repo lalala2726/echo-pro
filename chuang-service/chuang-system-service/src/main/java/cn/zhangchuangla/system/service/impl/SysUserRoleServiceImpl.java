@@ -1,6 +1,9 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.utils.ParamsUtils;
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.system.mapper.SysUserRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysUserRoleService;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
+ * 用户角色关联实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -18,9 +23,11 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
         implements SysUserRoleService {
 
     private final SysUserRoleMapper sysUserRoleMapper;
+    private final RedisCache redisCache;
 
-    public SysUserRoleServiceImpl(SysUserRoleMapper sysUserRoleMapper) {
+    public SysUserRoleServiceImpl(SysUserRoleMapper sysUserRoleMapper, RedisCache redisCache) {
         this.sysUserRoleMapper = sysUserRoleMapper;
+        this.redisCache = redisCache;
     }
 
     /**
@@ -31,7 +38,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public List<SysUserRole> getUserRoleByUserId(Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
+        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
         LambdaQueryWrapper<SysUserRole> sysUserRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysUserRoleLambdaQueryWrapper.eq(SysUserRole::getUserId, userId);
         return list(sysUserRoleLambdaQueryWrapper);
@@ -44,8 +51,12 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void deleteUserRoleAssociation(Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
-        int result = sysUserRoleMapper.deleteUserRoleByUserId(userId);
+        if (userId == null || userId <= 0) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于零");
+        }
+        //删除redis缓存
+        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
+        sysUserRoleMapper.deleteUserRoleByUserId(userId);
     }
 
     /**
@@ -56,10 +67,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void addUserRoleAssociation(List<Long> roleId, Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
-        roleId.forEach(role -> {
-            ParamsUtils.minValidParam(role, "角色ID不能小于等于零");
-        });
+        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
         roleId.forEach(role -> {
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(role);

@@ -24,6 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 用户实现类
+ *
+ * @author Chuang
+ */
 @Service
 @Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
@@ -208,12 +213,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public void updateUserInfoById(UpdateUserRequest request) {
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
-        //去除重复的角色ID,并校验角色ID
-
         //修改用户信息
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(request, sysUser);
-        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, request.getUserId());
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().
+                eq(SysUser::getUserId, request.getUserId());
         update(sysUser, eq);
         //修改用户角色
         //1.删除角色所关联的全部角色信息

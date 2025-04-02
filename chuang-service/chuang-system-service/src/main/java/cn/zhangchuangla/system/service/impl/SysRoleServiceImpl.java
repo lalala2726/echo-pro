@@ -1,10 +1,13 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,6 +21,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * 角色接口实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -26,9 +31,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
 
+    private final RedisCache redisCache;
+
     @Autowired
-    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper) {
+    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper, RedisCache redisCache) {
         this.sysRoleMapper = sysRoleMapper;
+        this.redisCache = redisCache;
     }
 
 
@@ -55,8 +63,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
-        //todo 将角色信息缓存到数据中,当用户角色信息发生变化时，更新缓存
-        return sysRoleMapper.getRoleListByUserId(userId);
+        List<SysRole> cacheRoleCache = redisCache.getCacheObject(RedisKeyConstant.USER_ROLE + userId);
+        if (cacheRoleCache != null) {
+            return cacheRoleCache;
+        }
+        List<SysRole> roleListByUserId = sysRoleMapper.getRoleListByUserId(userId);
+        redisCache.setCacheObject(RedisKeyConstant.USER_ROLE + userId, roleListByUserId);
+        return roleListByUserId;
     }
 
     /**
@@ -121,6 +134,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return false;
     }
 
+    /**
+     * 修改角色信息
+     *
+     * @param request 修改角色信息
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateRoleInfo(SysRoleUpdateRequest request) {
+        //test 这边需要待测试
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(request, sysRole);
+        return updateById(sysRole);
+    }
 
 }
 

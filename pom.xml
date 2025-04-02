@@ -231,6 +231,11 @@
                 <artifactId>chuang-system-service</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-storage-service</artifactId>
+                <version>${app.version}</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>

@@ -16,7 +16,6 @@ import cn.zhangchuangla.system.model.vo.permission.SysRoleVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -59,7 +58,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@auth.hasPermission('system:role:list')")
-    public TableDataResult list(@Parameter(name = "角色查询参数") @Validated SysRoleQueryRequest request) {
+    public TableDataResult list(@Validated SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
         List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
         return getTableData(page, sysRoleVos);
@@ -75,8 +74,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:info')")
-    public AjaxResult getRoleInfoById(@Parameter(name = "角色ID", required = true)
-                                      @PathVariable("id") Long id) {
+    public AjaxResult getRoleInfoById(@PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
         if (sysRole == null) {
             return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "角色不存在");
@@ -97,7 +95,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:delete')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
-    public AjaxResult deleteRoleInfo(@Parameter(name = "角色ID", required = true) @PathVariable("id") Long id) {
+    public AjaxResult deleteRoleInfo(@PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return success(SystemMessageConstant.DELETE_SUCCESS);
         }
@@ -107,7 +105,6 @@ public class SysRoleController extends BaseController {
     /**
      * 修改角色信息
      * <p>
-     * //todo 当修改用户信息需要将角色关系表中数据进行同步
      *
      * @param request 修改角色信息
      * @return 修改结果
@@ -116,14 +113,9 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "修改角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:update')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateRoleInfo(@Parameter(name = "修改角色信息", required = true, description = "其中角色ID是必填项,其他参数是修改后的结果")
-                                     @Validated @RequestBody SysRoleUpdateRequest request) {
-        SysRole sysRole = new SysRole();
-        BeanUtils.copyProperties(request, sysRole);
-        if (sysRoleService.updateById(sysRole)) {
-            return success(SystemMessageConstant.UPDATE_SUCCESS);
-        }
-        return error(SystemMessageConstant.UPDATE_FAIL);
+    public AjaxResult updateRoleInfo(@Validated @RequestBody SysRoleUpdateRequest request) {
+        boolean result = sysRoleService.updateRoleInfo(request);
+        return toAjax(result);
     }
 
     /**
@@ -135,8 +127,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "添加角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:add')")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
-    public AjaxResult addRoleInfo(@Parameter(name = "角色名称", required = true)
-                                  @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
+    public AjaxResult addRoleInfo(@Validated @RequestBody SysRoleAddRequest roleAddRequest) {
         checkParam(sysRoleService.isRoleNameExist(roleAddRequest.getRoleName()), "角色名已存在");
         checkParam(sysRoleService.isRoleKeyExist(roleAddRequest.getRoleKey()), "角色权限字符串已存在");
         sysRoleService.addRoleInfo(roleAddRequest);
