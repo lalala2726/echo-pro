@@ -11,6 +11,8 @@
     <file url="file://$PROJECT_DIR$/chuang-infrastructure/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-service/chuang-message-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-service/chuang-message-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/chuang-storage-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-service/chuang-storage-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-service/src/main/java" charset="UTF-8" />

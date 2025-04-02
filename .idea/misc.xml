@@ -12,6 +12,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/chuang-system-service/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-core/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
