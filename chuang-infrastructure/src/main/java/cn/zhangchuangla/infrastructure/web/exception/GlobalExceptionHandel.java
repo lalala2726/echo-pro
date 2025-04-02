@@ -23,13 +23,12 @@ import java.util.Objects;
  * 全局异常处理
  *
  * @author Chuang
- * <p>
- * created on 2025/1/11 10:10
+ *         <p>
+ *         created on 2025/1/11 10:10
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandel {
-
 
     /**
      * 业务异常
@@ -103,7 +102,8 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public AjaxResult methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
         log.error("参数校验失败:", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+        return AjaxResult.error(ResponseCode.PARAM_ERROR,
+                Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -130,6 +130,5 @@ public class GlobalExceptionHandel {
         log.error("系统异常", exception);
         return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
     }
-
 
 }

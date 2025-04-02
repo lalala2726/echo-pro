@@ -19,12 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +34,7 @@ import java.util.Set;
 @RestController
 @Slf4j
 @Tag(name = "登录接口")
+@RequestMapping("/login")
 public class LoginController extends BaseController {
 
 
@@ -47,7 +44,6 @@ public class LoginController extends BaseController {
     private final SysPermissionsService sysPermissionsService;
     private final SysMenuService sysMenuService;
 
-    @Autowired
     public LoginController(SysLoginService sysLoginService, SysUserService sysUserService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService, SysMenuService sysMenuService) {
         this.sysLoginService = sysLoginService;
         this.sysUserService = sysUserService;
@@ -63,7 +59,7 @@ public class LoginController extends BaseController {
      * @param request 请求参数
      * @return token
      */
-    @PostMapping("/login")
+    @PostMapping()
     @Operation(summary = "登录")
     public AjaxResult login(@Parameter(name = "登录参数", required = true)
                             @Validated @RequestBody LoginRequest loginRequest,
@@ -75,7 +71,7 @@ public class LoginController extends BaseController {
         return success(result);
     }
 
-    @PostMapping("/login/logout")
+    @PostMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout() {
         boolean result = sysLoginService.logout();
@@ -88,7 +84,7 @@ public class LoginController extends BaseController {
      *
      * @return 用户信息
      */
-    @GetMapping("/login/getUserInfo")
+    @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
         AjaxResult ajax = new AjaxResult();
@@ -109,7 +105,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回路由信息
      */
-    @GetMapping("/login/getRouters")
+    @GetMapping("/getRouters")
     @Operation(summary = "获取路由信息")
     public AjaxResult getRouters() {
         Long currentUserId = getUserId();

@@ -27,6 +27,11 @@ public class RedisKeyConstant {
      */
     public static final String SYSTEM_CONFIG = "system_config:";
 
+    /**
+     * 验证码前缀
+     */
+    public static final String CAPTCHA_CODE = "captcha:code:";
+
 
     /**
      * 文件上传服务选择
