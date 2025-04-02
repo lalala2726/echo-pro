@@ -1,37 +1,21 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
 import org.springframework.stereotype.Service;
 
 /**
+ * 腾讯云COS 操作服务实现类
+ *
  * @author Chuang
  * <p>
  * created on 2025/4/2 20:03
  */
 @Service
 public class TencentCOSOperationServiceImpl implements TencentCOSOperationService {
-    @Override
-    public boolean save(String fileName, byte[] bytes) {
-        return false;
-    }
 
     @Override
-    public byte[] load(String fileName) {
-        return new byte[0];
-    }
-
-    @Override
-    public boolean delete(String fileName) {
-        return false;
-    }
-
-    @Override
-    public boolean update(String fileName, byte[] bytes) {
-        return false;
-    }
-
-    @Override
-    public boolean exists(String fileName) {
-        return false;
+    public FileTransferDto save(FileTransferDto fileTransferDto) {
+        return null;
     }
 }

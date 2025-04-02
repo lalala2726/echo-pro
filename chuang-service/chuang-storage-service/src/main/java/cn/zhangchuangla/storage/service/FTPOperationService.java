@@ -3,7 +3,7 @@ package cn.zhangchuangla.storage.service;
 import cn.zhangchuangla.storage.core.StorageOperation;
 
 /**
- * FTP文件操作服务
+ * FTP文件操作服务接口
  *
  * @author Chuang
  * <p>

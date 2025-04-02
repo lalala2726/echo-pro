@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.NASOperationService;
 import org.springframework.stereotype.Service;
 
@@ -13,38 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class NASOperationServiceImpl implements NASOperationService {
 
-    @Override
-    public long getUsedSpace() {
-        return 0;
-    }
 
     @Override
-    public String getMountPoint() {
-        return "";
-    }
-
-    @Override
-    public boolean save(String fileName, byte[] bytes) {
-        return false;
-    }
-
-    @Override
-    public byte[] load(String fileName) {
-        return new byte[0];
-    }
-
-    @Override
-    public boolean delete(String fileName) {
-        return false;
-    }
-
-    @Override
-    public boolean update(String fileName, byte[] bytes) {
-        return false;
-    }
-
-    @Override
-    public boolean exists(String fileName) {
-        return false;
+    public FileTransferDto save(FileTransferDto fileTransferDto) {
+        return null;
     }
 }
