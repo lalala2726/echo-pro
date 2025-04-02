@@ -2,18 +2,22 @@ package cn.zhangchuangla.common.core.redis;
 
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.RedisKeyCommands;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Redis缓存操作工具类
+ */
 @Slf4j
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 @Component
@@ -50,14 +54,14 @@ public class RedisCache {
     }
 
     /**
-     * 缓存基本的对象，Integer、String、实体类等
+     * 缓存基本的对象，Integer、String、实体类等，默认时间单位为秒
      *
      * @param key     key
      * @param value   value
-     * @param timeout 超时时间
+     * @param timeout 超时时间（秒）
      */
     public <T> void setCacheObject(final String key, final T value, final Long timeout) {
-        redisTemplate.opsForValue().set(key, value, timeout);
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 
 
@@ -65,7 +69,7 @@ public class RedisCache {
      * 设置有效时间
      *
      * @param key     Redis键
-     * @param timeout 超时时间
+     * @param timeout 超时时间（秒）
      * @return true=设置成功；false=设置失败
      */
     public boolean expire(final String key, final long timeout) {
@@ -97,139 +101,10 @@ public class RedisCache {
 
 
     /**
-     * 根据前缀从Redis中获取字段（Keys）
-     *
-     * @param keyPrefix Redis 的Key前缀（如 "user:"）
-     * @param limit     限制返回的字段数量
-     * @param <T>       返回值的泛型
-     * @return 返回符合条件的字段和值
-     */
-    @Deprecated
-    public <T> Map<String, T> fetchFieldsByPrefix(final String keyPrefix, final int limit) {
-        log.info("Fetching fields from Redis with prefix: {} and limit: {}", keyPrefix, limit);
-        Map<String, T> result = new HashMap<>();
-
-        // 使用 Redis scan 避免全量 keys 查询
-        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(limit).build();
-
-        // 使用 RedisTemplate 执行 scan 操作
-        redisTemplate.execute((RedisCallback<Void>) connection -> {
-            RedisKeyCommands keyCommands = connection.keyCommands();
-            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
-                while (cursor.hasNext()) {
-                    byte[] keyBytes = cursor.next();
-                    String key = new String(keyBytes);
-                    Object value = redisTemplate.opsForValue().get(key);
-
-                    if (value != null) {
-                        result.put(key, (T) value);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Error while fetching fields from Redis", e);
-            }
-            return null;
-        });
-        return result;
-    }
-
-    /**
-     * 根据前缀统计 Redis 中的键数量
-     *
-     * @param keyPrefix Redis 键前缀（如 "user:"）
-     * @return 匹配的键数量
-     */
-    @Deprecated
-    public long countKeysByPrefix(final String keyPrefix) {
-        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(1000).build();
-
-        // 使用 RedisTemplate 执行 scan 操作并统计键数量
-        Long count = (Long) redisTemplate.execute((RedisCallback<Long>) connection -> {
-            RedisKeyCommands keyCommands = connection.keyCommands();
-            AtomicInteger counter = new AtomicInteger();
-
-            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
-                while (cursor.hasNext()) {
-                    cursor.next();
-                    counter.incrementAndGet();
-                }
-            } catch (Exception e) {
-                log.error("Error while counting keys from Redis", e);
-            }
-            return (long) counter.get();
-        });
-        if (count == null) {
-            throw new RuntimeException("无法正常执行本次操作!");
-        }
-        return count;
-    }
-
-    /**
-     * 获取Redis中指定前缀的最早登录信息
-     *
-     * @param keyPrefix Redis 的Key前缀（如 "user:"）
-     * @return 返回符合条件的字段和值
-     */
-    @Deprecated()
-    @SuppressWarnings("unchecked")
-    public String fetchAndDeleteEarliestLoginByPrefix(final String keyPrefix) {
-        log.info("开始扫描最早登录的前缀信息:{}", keyPrefix);
-        HashMap<String, LoginUser> loginUserHashMap = new HashMap<>();
-        // 使用 Redis scan 避免全量 keys 查询
-        ScanOptions options = ScanOptions.scanOptions().match(keyPrefix + "*").count(1000).build();
-
-        // 使用 RedisTemplate 执行 scan 操作
-        redisTemplate.execute((RedisCallback<Void>) connection -> {
-            RedisKeyCommands keyCommands = connection.keyCommands();
-            try (Cursor<byte[]> cursor = keyCommands.scan(options)) {
-                while (cursor.hasNext()) {
-                    byte[] keyBytes = cursor.next();
-                    String key = new String(keyBytes);
-                    Object object = redisTemplate.opsForValue().get(key);
-                    if (object != null) {
-                        LoginUser loginUser = convertToLoginUser(object);
-                        if (loginUser != null) {
-                            loginUserHashMap.put(key, loginUser);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                log.error("从Redis中获取字段出错", e);
-            }
-            return null;
-        });
-        // 找到最早的登录用户
-        String earliestKey = loginUserHashMap.entrySet().stream()
-                .min(Comparator.comparingLong(entry -> entry.getValue().getLoginTime()))
-                .map(Map.Entry::getKey)
-                .orElse(null);
-
-        if (earliestKey != null) {
-            loginUserHashMap.remove(earliestKey);
-        }
-        return earliestKey;
-    }
-
-    /**
-     * 将 Redis 值转换为 LoginUser 对象
-     *
-     * @param value Redis 值
-     * @return LoginUser
-     */
-    private LoginUser convertToLoginUser(Object value) {
-        if (value instanceof LoginUser) {
-            return (LoginUser) value;
-        } else if (value instanceof JSONObject) {
-            return ((JSONObject) value).toJavaObject(LoginUser.class);
-        } else if (value instanceof String) {
-            return JSON.parseObject((String) value, LoginUser.class);
-        }
-        return null;
-    }
-
-
-    /**
      * 删除单个对象
+     *
+     * @param key 缓存键值
+     * @return true=删除成功；false=删除失败
      */
     public boolean deleteObject(final String key) {
         return redisTemplate.delete(key);
@@ -238,8 +113,8 @@ public class RedisCache {
     /**
      * 删除集合对象
      *
-     * @param collection 多个对象
-     * @return
+     * @param collection 多个对象的集合
+     * @return 删除成功的个数
      */
     public long deleteObject(final Collection collection) {
         return redisTemplate.delete(collection);
@@ -250,7 +125,7 @@ public class RedisCache {
      *
      * @param key      缓存的键值
      * @param dataList 待缓存的List数据
-     * @return 缓存的对象
+     * @return 缓存的对象个数
      */
     public <T> long setCacheList(final String key, final List<T> dataList) {
         Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
@@ -261,7 +136,7 @@ public class RedisCache {
      * 获得缓存的list对象
      *
      * @param key 缓存的键值
-     * @return 缓存键值对应的数据
+     * @return 缓存键值对应的数据列表
      */
     public <T> List<T> getCacheList(final String key) {
         return redisTemplate.opsForList().range(key, 0, -1);
@@ -276,9 +151,8 @@ public class RedisCache {
      */
     public <T> BoundSetOperations<String, T> setCacheSet(final String key, final Set<T> dataSet) {
         BoundSetOperations<String, T> setOperation = redisTemplate.boundSetOps(key);
-        Iterator<T> it = dataSet.iterator();
-        while (it.hasNext()) {
-            setOperation.add(it.next());
+        for (T t : dataSet) {
+            setOperation.add(t);
         }
         return setOperation;
     }
@@ -286,8 +160,8 @@ public class RedisCache {
     /**
      * 获得缓存的set
      *
-     * @param key
-     * @return
+     * @param key 缓存键值
+     * @return 缓存键值对应的数据集合
      */
     public <T> Set<T> getCacheSet(final String key) {
         return redisTemplate.opsForSet().members(key);
@@ -296,8 +170,8 @@ public class RedisCache {
     /**
      * 缓存Map
      *
-     * @param key
-     * @param dataMap
+     * @param key     缓存键值
+     * @param dataMap 缓存的数据
      */
     public <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
         if (dataMap != null) {
@@ -308,8 +182,8 @@ public class RedisCache {
     /**
      * 获得缓存的Map
      *
-     * @param key
-     * @return
+     * @param key 缓存键值
+     * @return 缓存键值对应的数据
      */
     public <T> Map<String, T> getCacheMap(final String key) {
         return redisTemplate.opsForHash().entries(key);
@@ -336,17 +210,6 @@ public class RedisCache {
     public <T> T getCacheMapValue(final String key, final String hKey) {
         HashOperations<String, String, T> opsForHash = redisTemplate.opsForHash();
         return opsForHash.get(key, hKey);
-    }
-
-    /**
-     * 删除Hash中的数据
-     *
-     * @param key
-     * @param hkey
-     */
-    public void delCacheMapValue(final String key, final String hkey) {
-        HashOperations hashOperations = redisTemplate.opsForHash();
-        hashOperations.delete(key, hkey);
     }
 
     /**
@@ -382,12 +245,173 @@ public class RedisCache {
     }
 
     /**
+     * 判断给定键是否存在于Redis中
+     *
+     * @param key 键
+     * @return true=存在；false=不存在
+     */
+    public boolean exists(String key) {
+        return redisTemplate.hasKey(key);
+    }
+
+    /**
      * 获取指定key的过期时间
      *
      * @param key key
+     * @return 过期时间（秒），返回-1表示永不过期，返回-2表示键不存在
      */
     public Long getKeyExpire(String key) {
         return redisTemplate.getExpire(key);
     }
 
+    /**
+     * 获取指定key的过期时间，指定时间单位
+     *
+     * @param key  键
+     * @param unit 时间单位
+     * @return 过期时间，返回-1表示永不过期，返回-2表示键不存在
+     */
+    public Long getKeyExpire(String key, TimeUnit unit) {
+        return redisTemplate.getExpire(key, unit);
+    }
+
+    /**
+     * 递增操作
+     *
+     * @param key   键
+     * @param delta 递增因子（大于0）
+     * @return 递增后的值
+     */
+    public Long increment(String key, long delta) {
+        return redisTemplate.opsForValue().increment(key, delta);
+    }
+
+    /**
+     * 递减操作
+     *
+     * @param key   键
+     * @param delta 递减因子（大于0）
+     * @return 递减后的值
+     */
+    public Long decrement(String key, long delta) {
+        return redisTemplate.opsForValue().decrement(key, delta);
+    }
+
+    /**
+     * 向Set中添加元素
+     *
+     * @param key    键
+     * @param values 值（可以是多个）
+     * @return 添加成功的个数
+     */
+    public <T> Long setCacheSetValues(String key, T... values) {
+        return redisTemplate.opsForSet().add(key, values);
+    }
+
+    /**
+     * 删除Hash中的值
+     *
+     * @param key  Redis键
+     * @param hKey Hash键
+     * @return true=成功；false=失败
+     */
+    public Boolean deleteCacheMapValue(String key, String hKey) {
+        return redisTemplate.opsForHash().delete(key, hKey) > 0;
+    }
+
+    /**
+     * 获取List中指定范围的元素
+     *
+     * @param key   键
+     * @param start 开始位置
+     * @param end   结束位置，-1表示所有值
+     * @return 指定范围的元素列表
+     */
+    public <T> List<T> getCacheListRange(String key, long start, long end) {
+        return redisTemplate.opsForList().range(key, start, end);
+    }
+
+    /**
+     * 向List中添加单个元素
+     *
+     * @param key   键
+     * @param value 值
+     * @return List长度
+     */
+    public <T> Long setCacheListValue(String key, T value) {
+        return redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    /**
+     * 移除List中的最后一个元素，并返回该元素
+     *
+     * @param key 键
+     * @return 移除的元素
+     */
+    public <T> T rightPopList(String key) {
+        return (T) redisTemplate.opsForList().rightPop(key);
+    }
+
+    /**
+     * 移除List中的第一个元素，并返回该元素
+     *
+     * @param key 键
+     * @return 移除的元素
+     */
+    public <T> T leftPopList(String key) {
+        return (T) redisTemplate.opsForList().leftPop(key);
+    }
+
+    /**
+     * 检查Set中是否包含指定元素
+     *
+     * @param key   键
+     * @param value 值
+     * @return true=包含；false=不包含
+     */
+    public <T> Boolean isMemberOfSet(String key, T value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    /**
+     * 获取Hash中的所有键
+     *
+     * @param key Redis键
+     * @return Hash键集合
+     */
+    public Set<Object> getCacheMapKeys(String key) {
+        return redisTemplate.opsForHash().keys(key);
+    }
+
+    /**
+     * 获取Hash中的所有值
+     *
+     * @param key Redis键
+     * @return Hash值集合
+     */
+    public <T> List<T> getCacheMapValues(String key) {
+        return redisTemplate.opsForHash().values(key);
+    }
+
+    /**
+     * 获取Hash的大小
+     *
+     * @param key Redis键
+     * @return Hash大小
+     */
+    public Long getCacheMapSize(String key) {
+        return redisTemplate.opsForHash().size(key);
+    }
+
+    /**
+     * 设置Hash中的值，仅当字段不存在时
+     *
+     * @param key   Redis键
+     * @param hKey  Hash键
+     * @param value 值
+     * @return true=设置成功；false=设置失败（字段已存在）
+     */
+    public <T> Boolean setCacheMapValueIfAbsent(String key, String hKey, T value) {
+        return redisTemplate.opsForHash().putIfAbsent(key, hKey, value);
+    }
 }

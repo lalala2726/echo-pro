@@ -9,14 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Chuang
@@ -32,10 +29,7 @@ public class RegisterController extends BaseController {
 
     private final SysUserService sysUserService;
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(500); // 使用固定大小的线程池
-
-    private final ReentrantLock lock = new ReentrantLock();
-
+    @Autowired
     public RegisterController(RegisterService registerService, SysUserService sysUserService) {
         this.registerService = registerService;
         this.sysUserService = sysUserService;
@@ -51,17 +45,9 @@ public class RegisterController extends BaseController {
     @Operation(summary = "注册")
     public AjaxResult register(@Parameter(name = "注册参数", required = true)
                                @Validated @RequestBody RegisterRequest request) {
-        if (request.getUsername() == null) {
-            return error("用户名不能为空");
-        }
-        if (request.getPassword() == null) {
-            return error("密码不能为空");
-        }
-        if (sysUserService.isUsernameExist(request.getUsername())) {
-            return error("用户名已存在");
-        }
         request.setUsername(request.getUsername().trim());
         request.setPassword(request.getPassword().trim());
+        checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         Long userId = registerService.register(request);
         log.info("用户注册成功，用户ID：{}", userId);
         return success(userId);

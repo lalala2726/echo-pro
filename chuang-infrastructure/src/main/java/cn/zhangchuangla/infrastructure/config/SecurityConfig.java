@@ -6,6 +6,7 @@ import cn.zhangchuangla.infrastructure.security.filter.JwtAuthenticationTokenFil
 import cn.zhangchuangla.infrastructure.security.handel.AuthenticationEntryPointImpl;
 import cn.zhangchuangla.infrastructure.security.handel.LogoutSuccessHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -47,6 +48,7 @@ public class SecurityConfig {
     private final LogoutSuccessHandlerImpl logoutSuccessHandler;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
+    @Autowired
     public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, LogoutSuccessHandlerImpl logoutSuccessHandler, RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;

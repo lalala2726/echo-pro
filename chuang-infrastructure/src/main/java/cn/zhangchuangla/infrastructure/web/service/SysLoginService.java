@@ -18,4 +18,11 @@ public interface SysLoginService {
      * @return 返回token
      */
     String login(LoginRequest loginRequest, HttpServletRequest request);
+
+    /**
+     * 登出
+     *
+     * @return 结果
+     */
+    boolean logout();
 }

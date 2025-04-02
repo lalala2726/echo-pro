@@ -1,5 +1,8 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.zhangchuangla.common.constant.Constants;
+
+import java.util.Collection;
 
 import static java.util.Objects.isNull;
 
@@ -9,7 +12,7 @@ import static java.util.Objects.isNull;
  * @author Ruoyi
  * created on 2025/1/12 11:23
  */
-public class StringUtils {
+public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /**
      * 空字符串
@@ -44,15 +47,6 @@ public class StringUtils {
         return false;
     }
 
-    /**
-     * 判断字符串是否非空（非null且非空字符串）
-     *
-     * @param str 字符串
-     * @return true 如果非空，false 如果为null或空字符串
-     */
-    public static boolean isNotBlank(String str) {
-        return str != null && !str.trim().isEmpty();
-    }
 
     /**
      * 将字符串首字母转为大写
@@ -207,7 +201,6 @@ public class StringUtils {
         return isNull(str) || NULL_STR.equals(str.trim());
     }
 
-
     /**
      * 判断对象是否为空
      *
@@ -218,11 +211,71 @@ public class StringUtils {
         return !isNull(object);
     }
 
-
     /**
      * 去空格
      */
     public static String trim(String str) {
         return (str == null ? "" : str.trim());
+    }
+
+    /**
+     * 下划线转驼峰命名
+     *
+     * @param str 字符串
+     * @return 驼峰命名字符串
+     */
+    public static String toCamelCase(String str) {
+        if (str == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder(str.length());
+        // 标记是否需要转大写
+        boolean toUpperCase = false;
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+
+            if (c == '_') {
+                toUpperCase = true;
+            } else if (toUpperCase) {
+                sb.append(Character.toUpperCase(c));
+                toUpperCase = false;
+            } else {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 判断集合是否为空
+     *
+     * @param coll 集合
+     * @return true：为空 false：非空
+     */
+    public static boolean isEmpty(Collection<?> coll) {
+        return isNull(coll) || coll.isEmpty();
+    }
+
+    /**
+     * 判断集合是否不为空
+     *
+     * @param coll 集合
+     * @return true：非空 false：为空
+     */
+    public static boolean isNotEmpty(Collection<?> coll) {
+        return !isEmpty(coll);
+    }
+
+    /**
+     * 判断字符串是否为http(s)链接
+     *
+     * @param link 字符串
+     * @return true：是 false：否
+     */
+    public static boolean isHttp(String link) {
+        return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
 }

@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +37,7 @@ public class SysDeptController extends BaseController {
 
     private final SysDeptService sysDeptService;
 
+    @Autowired
     public SysDeptController(SysDeptService sysDeptService) {
         this.sysDeptService = sysDeptService;
     }

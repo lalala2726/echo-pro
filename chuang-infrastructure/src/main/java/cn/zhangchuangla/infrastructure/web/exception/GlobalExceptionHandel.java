@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -14,6 +15,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Objects;
 
@@ -21,13 +23,12 @@ import java.util.Objects;
  * 全局异常处理
  *
  * @author Chuang
- * <p>
- * created on 2025/1/11 10:10
+ *         <p>
+ *         created on 2025/1/11 10:10
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandel {
-
 
     /**
      * 业务异常
@@ -101,7 +102,15 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public AjaxResult methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
         log.error("参数校验失败:", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+        return AjaxResult.error(ResponseCode.PARAM_ERROR,
+                Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public AjaxResult noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
+        log.error("资源不存在：{}", exception.toString());
+        String message = String.format("资源不存在: %s", request.getRequestURI());
+        return AjaxResult.error(ResponseCode.NOT_FOUND, message);
     }
 
     /**
@@ -121,6 +130,5 @@ public class GlobalExceptionHandel {
         log.error("系统异常", exception);
         return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
     }
-
 
 }

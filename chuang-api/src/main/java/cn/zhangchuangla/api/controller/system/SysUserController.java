@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class SysUserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
 
+    @Autowired
     public SysUserController(SysUserService sysUserService, SysRoleService sysRoleService) {
         this.sysUserService = sysUserService;
         this.sysRoleService = sysRoleService;
@@ -67,9 +69,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @Validated @RequestBody AddUserRequest request) {
-        ParamsUtils.objectIsNull(request, "参数不能为空!");
-        Long result = sysUserService.addUserInfo(request);
-        return toAjax(result);
+        return toAjax(sysUserService.addUserInfo(request));
     }
 
     /**
@@ -84,9 +84,8 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
                                      @PathVariable("ids") List<Long> ids) {
-        ParamsUtils.objectIsNull(ids, "用户ID不能为空!");
         ids.forEach(id -> {
-            ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
+            checkParam(id == null || id <= 0, "用户ID不能为空!");
         });
         sysUserService.deleteUserById(ids);
         return success();
@@ -107,12 +106,10 @@ public class SysUserController extends BaseController {
         sysUserService.isAllowUpdate(request.getUserId());
         //参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-            boolean phoneExist = sysUserService.isPhoneExist(request.getPhone(), request.getUserId());
-            ParamsUtils.paramCheck(phoneExist, "手机号已存在!");
+            checkParam(sysUserService.isPhoneExist(request.getPhone(), request.getUserId()), "手机号已存在");
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            boolean emailExist = sysUserService.isEmailExist(request.getEmail(), request.getUserId());
-            ParamsUtils.paramCheck(emailExist, "邮箱已存在!");
+            checkParam(sysUserService.isEmailExist(request.getEmail(), request.getUserId()), "邮箱已经存在");
         }
         //业务逻辑
         sysUserService.updateUserInfoById(request);

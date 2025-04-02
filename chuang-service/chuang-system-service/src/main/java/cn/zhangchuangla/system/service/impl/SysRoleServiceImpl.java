@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,11 +26,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
 
+    @Autowired
     public SysRoleServiceImpl(SysRoleMapper sysRoleMapper) {
         this.sysRoleMapper = sysRoleMapper;
     }
 
-    //todo 添加一个根据用户ID获取当前用户所拥有的角色,每个用户角色都会缓存到Redis和用户Id进行绑定,方便后续撤销等操作
 
     /**
      * 角色列表

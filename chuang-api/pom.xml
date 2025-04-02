@@ -30,12 +30,6 @@
             <artifactId>chuang-system-service</artifactId>
         </dependency>
 
-        <!-- 移除对chuang-service的直接依赖 -->
-
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-message-service</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

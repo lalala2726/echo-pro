@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.infrastructure.model.request.RegisterRequest;
 import cn.zhangchuangla.infrastructure.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     private final SysUserService sysUserService;
 
+    @Autowired
     public RegisterServiceImpl(BCryptPasswordEncoder passwordEncoder, SysUserService sysUserService) {
         this.passwordEncoder = passwordEncoder;
         this.sysUserService = sysUserService;
@@ -34,9 +36,6 @@ public class RegisterServiceImpl implements RegisterService {
             throw new ParamException(ResponseCode.PARAM_ERROR);
         }
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-        //fixme 优化注册流程
-        // 创建用户对象
         SysUser user = new SysUser();
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
