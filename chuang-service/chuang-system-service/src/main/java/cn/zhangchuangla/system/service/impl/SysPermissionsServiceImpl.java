@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 包括权限相关操作
+ * 用户权限服务实现类
  *
  * @author zhangchuang
  */

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
+ * 部门接口
+ *
  * @author zhangchuang
  */
 public interface SysDeptService extends IService<SysDept> {

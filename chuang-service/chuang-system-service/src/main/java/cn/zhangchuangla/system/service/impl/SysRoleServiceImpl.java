@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * 角色接口实现类
+ *
  * @author zhangchuang
  */
 @Service

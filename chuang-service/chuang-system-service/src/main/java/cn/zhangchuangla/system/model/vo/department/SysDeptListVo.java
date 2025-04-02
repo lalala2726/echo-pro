@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 部门表
+ * 部门列表视图
  */
 @Data
 public class SysDeptListVo {

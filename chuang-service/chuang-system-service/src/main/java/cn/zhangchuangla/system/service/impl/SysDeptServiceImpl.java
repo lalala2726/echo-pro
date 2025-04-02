@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
+ * 部门服务实现类
+ *
  * @author zhangchuang
  */
 @Service

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 部门表
+ * 部门视图
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

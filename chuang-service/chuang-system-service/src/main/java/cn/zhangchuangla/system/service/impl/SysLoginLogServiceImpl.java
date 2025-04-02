@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.service.SysLoginLogService;
@@ -27,13 +28,14 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
      */
     @Override
     public void recordLoginLog(String username, HttpServletRequest httpServletRequest, Integer loginStatus) {
+        String header = httpServletRequest.getHeader("User-Agent");
         SysLoginLog sysLoginLog = new SysLoginLog();
         sysLoginLog.setStatus(loginStatus);
         sysLoginLog.setUsername(username);
         sysLoginLog.setIp(httpServletRequest.getRemoteAddr());
         sysLoginLog.setAddress(httpServletRequest.getRemoteAddr());
-        sysLoginLog.setBrowser(httpServletRequest.getHeader("User-Agent"));
-        sysLoginLog.setOs(httpServletRequest.getHeader("sec-ch-ua-platform"));
+        sysLoginLog.setBrowser(UserAgentUtils.getBrowserManufacturer(header));
+        sysLoginLog.setOs(UserAgentUtils.getOsName(header));
         sysLoginLog.setCreateBy(Constants.SYSTEM_CREATE);
         save(sysLoginLog);
     }

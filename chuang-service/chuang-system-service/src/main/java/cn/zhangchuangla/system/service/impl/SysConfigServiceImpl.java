@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
+ * 系统配置服务接口实现类
+ *
  * @author zhangchuang
  */
 @Service

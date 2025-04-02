@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
+ * 菜单服务接口
+ *
  * @author zhangchuang
  */
 public interface SysMenuService extends IService<SysMenu> {

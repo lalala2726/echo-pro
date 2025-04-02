@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
+ * 用户角色关联实现类
+ *
  * @author zhangchuang
  */
 @Service

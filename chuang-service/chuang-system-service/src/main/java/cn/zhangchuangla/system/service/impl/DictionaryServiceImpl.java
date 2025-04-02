@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
+ * 字典服务实现类
+ *
  * @author zhangchuang
  */
 @Service

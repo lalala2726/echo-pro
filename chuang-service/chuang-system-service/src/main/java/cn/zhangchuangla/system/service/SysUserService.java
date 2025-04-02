@@ -10,6 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
+/**
+ * 用户服务接口
+ */
 public interface SysUserService extends IService<SysUser> {
 
     /**

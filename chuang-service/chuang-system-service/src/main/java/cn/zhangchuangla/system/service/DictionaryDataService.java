@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
+ * 字典内值接口
+ *
  * @author chuang
  */
 public interface DictionaryDataService extends IService<DictionaryData> {
