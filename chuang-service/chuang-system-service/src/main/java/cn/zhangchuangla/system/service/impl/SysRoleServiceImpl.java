@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -26,9 +28,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
 
+    private final RedisCache redisCache;
+
     @Autowired
-    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper) {
+    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper, RedisCache redisCache) {
         this.sysRoleMapper = sysRoleMapper;
+        this.redisCache = redisCache;
     }
 
 
@@ -55,8 +60,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
-        //todo 将角色信息缓存到数据中,当用户角色信息发生变化时，更新缓存
-        return sysRoleMapper.getRoleListByUserId(userId);
+        List<SysRole> cacheRoleCache = redisCache.getCacheObject(RedisKeyConstant.USER_ROLE + userId);
+        if (cacheRoleCache != null) {
+            return cacheRoleCache;
+        }
+        List<SysRole> roleListByUserId = sysRoleMapper.getRoleListByUserId(userId);
+        redisCache.setCacheObject(RedisKeyConstant.USER_ROLE + userId, roleListByUserId);
+        return roleListByUserId;
     }
 
     /**

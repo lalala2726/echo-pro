@@ -57,4 +57,5 @@ public class RedisKeyConstant {
      * 默认文件上传服务选择
      */
     public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":default";
+    public static final String USER_ROLE = "user_role:";
 }
