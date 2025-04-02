@@ -2,7 +2,9 @@ package cn.zhangchuangla.storage.factory;
 
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.service.*;
+import cn.zhangchuangla.storage.service.AliyunOssOperationService;
+import cn.zhangchuangla.storage.service.MinioOperationService;
+import cn.zhangchuangla.storage.service.TencentCOSOperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,16 +22,12 @@ public class StorageFactory {
     private final AliyunOssOperationService aliyunOssOperationService;
     private final TencentCOSOperationService tencentCOSOperationService;
     private final MinioOperationService minioOperationService;
-    private final FTPOperationService ftpOperationService;
-    private final NASOperationService nasOperationService;
 
     @Autowired
-    public StorageFactory(AliyunOssOperationService aliyunOssOperationService, TencentCOSOperationService tencentCOSOperationService, MinioOperationService minioOperationService, FTPOperationService ftpOperationService, NASOperationService nasOperationService) {
+    public StorageFactory(AliyunOssOperationService aliyunOssOperationService, TencentCOSOperationService tencentCOSOperationService, MinioOperationService minioOperationService) {
         this.aliyunOssOperationService = aliyunOssOperationService;
         this.tencentCOSOperationService = tencentCOSOperationService;
         this.minioOperationService = minioOperationService;
-        this.ftpOperationService = ftpOperationService;
-        this.nasOperationService = nasOperationService;
     }
 
     /**
@@ -43,8 +41,6 @@ public class StorageFactory {
             case StorageTypeConstants.ALIYUN_OSS -> aliyunOssOperationService;
             case StorageTypeConstants.TENCENT_COS -> tencentCOSOperationService;
             case StorageTypeConstants.MINIO -> minioOperationService;
-            case StorageTypeConstants.FTP -> ftpOperationService;
-            case StorageTypeConstants.LOCAL -> nasOperationService;
             default -> null;
         };
     }

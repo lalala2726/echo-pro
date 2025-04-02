@@ -69,9 +69,7 @@ public class LocalFileUploadServiceImpl implements LocalFileUploadService {
             fileExtension = fileName.substring(fileName.lastIndexOf("."));
         }
 
-        String uuidFileName = String.format("%s%s",
-                System.currentTimeMillis(),
-                UUID.randomUUID().toString().substring(0, 8));
+        String uuidFileName = String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString().substring(0, 8));
 
         // 只保留小写字母和数字
         Pattern pattern = Pattern.compile("[^a-z0-9]");

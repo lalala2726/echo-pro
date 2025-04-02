@@ -4,16 +4,19 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
  * 文件相关工具类
  *
  * @author Chuang
- * <p>
- * created on 2025/2/18 15:27
+ *         <p>
+ *         created on 2025/2/18 15:27
  */
 public class FileUtils {
     /**
@@ -48,7 +51,6 @@ public class FileUtils {
         }
         return contentType;
     }
-
 
     /**
      * 生成唯一文件名,使用UUID和时间戳结合
@@ -106,5 +108,101 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 生成文件名
+     *
+     * @return 文件名
+     */
+    public static String generateFileName() {
+        return String.format("%s%s", System.currentTimeMillis(), UUIDUtils.simpleUUID().substring(0, 8));
+    }
 
+    /**
+     * 生成年月格式的目录
+     *
+     * @return 年月格式的目录
+     */
+    public static String generateYearMonthDir() {
+        // 生成年月格式的目录
+        SimpleDateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
+        String yearMonthDir = yearMonthFormat.format(new Date());
+        return yearMonthDir + File.separator;
+    }
+
+    /**
+     * 生成文件相对路径
+     *
+     * @param targetDir     目标目录
+     * @param fileName      文件名
+     * @param fileExtension 文件扩展
+     * @return 文件相对路径
+     */
+    public static String generateFileRelativePath(String targetDir, String fileName, String fileExtension) {
+        return ("/" + targetDir + "/" + fileName + fileExtension)
+                .replace('\\', '/');
+    }
+
+    /**
+     * 生成文件ContentType
+     *
+     * @param fileName 文件名
+     * @return 返回文件ContentType
+     */
+    public static String generateFileContentType(String fileName) {
+        // todo 使用枚举用户检测
+        String fileExtension = getFileExtension(fileName);
+        switch (fileExtension) {
+            case ".jpg", ".jpeg" -> {
+                return "image/jpeg";
+            }
+            case ".png" -> {
+                return "image/png";
+            }
+            case ".gif" -> {
+                return "image/gif";
+            }
+            case ".pdf" -> {
+                return "application/pdf";
+            }
+            case ".mp4" -> {
+                return "video/mp4";
+            }
+            default -> {
+                return "application/octet-stream";
+            }
+        }
+    }
+
+    /**
+     * 构建文件路径
+     *
+     * @param args 文件路径
+     * @return 文件路径
+     */
+    public static String buildFinalPath(String... args) { // 修正方法名称，首字母小写
+        if (args == null || args.length == 0) {
+            return "";
+        }
+        StringBuilder pathBuilder = new StringBuilder();
+        for (String folder : args) {
+            if (folder != null && !folder.isEmpty()) {
+                if (pathBuilder.length() > 0 && !pathBuilder.toString().endsWith("/")) {
+                    pathBuilder.append("/");
+                }
+                pathBuilder.append(folder.trim());
+            }
+        }
+
+        return pathBuilder.toString();
+    }
+
+    /**
+     * 为保持向后兼容性，保留旧方法名称
+     *
+     * @param args 文件路径
+     * @return 文件路径
+     */
+    public static String BuildFinalPath(String... args) {
+        return buildFinalPath(args);
+    }
 }

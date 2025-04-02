@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Data;
  * created on 2025/4/2 20:32
  */
 @Data
+@Builder
 public class FileTransferDto {
 
     /**
