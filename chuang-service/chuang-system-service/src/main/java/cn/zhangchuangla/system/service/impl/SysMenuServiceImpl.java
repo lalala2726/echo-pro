@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
@@ -10,17 +11,22 @@ import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * //todo 后续调试完毕，这边需要给前端路由完善
  * 菜单服务实现类
- * 
+ *
  * @author zhangchuang
  */
 @Service
+@Slf4j
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
 
@@ -53,144 +59,172 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<RouterVo> buildMenu(List<SysMenu> menus) {
-        List<RouterVo> routers = new LinkedList<>();
-        
-        // 如果菜单为空，直接返回空列表
-        if (menus == null || menus.isEmpty()) {
+        if (CollectionUtils.isEmpty(menus)) {
+            return null;
+        }
+
+        // 获取所有顶级菜单（父节点ID为0的菜单）
+        List<SysMenu> rootMenus = menus.stream()
+                .filter(menu -> menu.getParentId() == Constants.IS_PARENT_NODE)
+                .collect(Collectors.toList());
+
+        // 递归构建菜单树
+        return buildRouterTree(rootMenus, menus);
+    }
+
+    /**
+     * 递归构建路由树
+     *
+     * @param rootMenus 根菜单列表
+     * @param allMenus  所有菜单列表
+     * @return 路由树列表
+     */
+    private List<RouterVo> buildRouterTree(List<SysMenu> rootMenus, List<SysMenu> allMenus) {
+        List<RouterVo> routers = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(rootMenus)) {
             return routers;
         }
-        
-        // 根据父节点ID对菜单进行分组
-        Map<Long, List<SysMenu>> childrenMap = menus.stream()
-                .collect(Collectors.groupingBy(SysMenu::getParentId));
-        
-        // 获取顶级菜单（parentId为0的菜单）
-        List<SysMenu> rootMenus = childrenMap.getOrDefault(0L, new ArrayList<>());
-        
-        // 递归组装路由
-        routers = buildRouters(rootMenus, childrenMap);
-        
-        return routers;
-    }
-    
-    /**
-     * 递归构建路由
-     * 
-     * @param menus 菜单列表
-     * @param childrenMap 子菜单映射
-     * @return 路由列表
-     */
-    private List<RouterVo> buildRouters(List<SysMenu> menus, Map<Long, List<SysMenu>> childrenMap) {
-        List<RouterVo> routers = new ArrayList<>();
-        
-        // 菜单类型常量
-        final String TYPE_DIR = "M";
 
-
-        for (SysMenu menu : menus) {
+        // 遍历根菜单列表
+        for (SysMenu menu : rootMenus) {
             RouterVo router = new RouterVo();
-            
-            // 设置路由基本信息
             router.setName(getRouteName(menu));
-            router.setPath(getRouterPath(menu));
-            router.setComponent(getComponent(menu));
-            router.setHidden("1".equals(menu.getVisible()));
-            
-            // 设置路由元数据
-            MetaVo meta = new MetaVo();
-            meta.setTitle(menu.getMenuName());
-            meta.setIcon(menu.getIcon());
-            meta.setNoCache(menu.getIsCache() == 1); // 0缓存 1不缓存，noCache=true表示不缓存
-            meta.setAffix(false); // 默认不固定在标签栏
-            meta.setAlwaysShow(TYPE_DIR.equals(menu.getMenuType())); // 如果是目录，则总是显示
-            router.setMeta(meta);
-            
-            // 处理子菜单
-            List<SysMenu> childMenus = childrenMap.get(menu.getMenuId());
-            if (childMenus != null && !childMenus.isEmpty()) {
-                // 如果是目录，需要设置redirect和alwaysShow
-                if (TYPE_DIR.equals(menu.getMenuType())) {
-                    // 设置重定向到第一个子菜单
-                    router.setAlwaysShow(true);
-                    router.setRedirect(router.getPath() + "/" + childMenus.get(0).getPath());
-                }
-                
-                // 递归处理子菜单
-                router.setChildren(buildRouters(childMenus, childrenMap));
+
+            String routerPath = getRouterPath(menu);
+            router.setPath(routerPath);
+
+            String component = getComponent(menu);
+            router.setComponent(component);
+            router.setHidden(Constants.IS_HIDDEN.equals(menu.getVisible()));
+            router.setRedirect(getRedirect(menu));
+
+            // 设置meta信息
+            MetaVo metaVo = MetaVo.builder()
+                    .title(menu.getTitle())
+                    .icon(menu.getIcon())
+                    .noCache(Constants.IS_CACHE.equals(menu.getIsCache()))
+                    .build();
+            router.setMeta(metaVo);
+
+            // 查找当前菜单的子菜单
+            List<SysMenu> childMenus = getChildMenus(menu.getMenuId(), allMenus);
+
+            // 如果存在子菜单，递归构建子菜单树
+            if (!CollectionUtils.isEmpty(childMenus)) {
+                router.setChildren(buildRouterTree(childMenus, allMenus));
             }
-            
+
             routers.add(router);
         }
-        
+
         return routers;
     }
-    
+
     /**
      * 获取路由名称
+     *
+     * @param menu 菜单信息
+     * @return 路由名称
      */
     private String getRouteName(SysMenu menu) {
-        // 将下划线路径转为驼峰命名
-        String path = menu.getPath();
-        String routerName = StringUtils.toCamelCase(path);
-        // 如果不是外链且是菜单类型，则使用路径的驼峰命名作为路由名称
-        if (menu.getIsFrame() == 1 && menu.getMenuType().equals("C")) {
-            return routerName;
+        // 使用菜单名称作为路由名称
+        return StringUtils.capitalize(menu.getMenuName());
+    }
+
+    /**
+     * 获取路由地址
+     *
+     * @param menu 菜单信息
+     * @return 路由地址
+     */
+    private String getRouterPath(SysMenu menu) {
+        // 如果是外链
+        if (Constants.IS_MENU_EXTERNAL_LINK.equals(menu.getIsFrame())) {
+            StringUtils.isHttp(menu.getPath());
+        }
+        // 其他情况
+        return menu.getPath();
+    }
+
+    /**
+     * 获取指定父菜单ID的所有子菜单
+     *
+     * @param parentId 父菜单ID
+     * @param allMenus 所有菜单列表
+     * @return 子菜单列表
+     */
+    private List<SysMenu> getChildMenus(Long parentId, List<SysMenu> allMenus) {
+        return allMenus.stream()
+                .filter(menu -> menu.getParentId().equals(parentId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取菜单重定向地址
+     *
+     * @param menu 菜单
+     * @return 返回重定向地址
+     */
+    private String getRedirect(SysMenu menu) {
+        if (StringUtils.isNotBlank(menu.getRedirect())) {
+            return menu.getRedirect();
         }
         return null;
     }
-    
+
     /**
-     * 获取路由路径
-     */
-    private String getRouterPath(SysMenu menu) {
-        String routerPath = menu.getPath();
-        
-        // 如果是外链
-        if (menu.getIsFrame() == 0) {
-            return routerPath;
-        }
-        
-        // 一级目录
-        if (menu.getParentId() == 0 && "M".equals(menu.getMenuType())) {
-            routerPath = "/" + menu.getPath();
-        } 
-        // 非一级目录或菜单
-        else if (menu.getParentId() != 0 && "C".equals(menu.getMenuType())) {
-            routerPath = menu.getPath();
-        }
-        
-        return routerPath;
-    }
-    
-    /**
-     * 获取组件信息
+     * 获取菜单组件的类型
+     *
+     * @param menu 菜单
+     * @return 返回组件类型
      */
     private String getComponent(SysMenu menu) {
-        String component = menu.getComponent();
-        
-        // 如果组件为空或使用了特殊组件标识
-        if (component == null || component.isEmpty() || "#".equals(component)) {
-            // 顶级目录使用Layout组件
-            if (menu.getParentId() == 0 && "M".equals(menu.getMenuType())) {
-                component = "Layout";
-            } 
-            // 如果是内部菜单并且非顶级目录
-            else if (menu.getParentId() != 0 && "M".equals(menu.getMenuType())) {
-                component = "ParentView";
-            }
-            // 如果是按钮，则不需要组件
-            else if ("F".equals(menu.getMenuType())) {
-                component = "";
-            }
-            // 外链或其他情况
-            else {
-                component = "InnerLink";
-            }
+        String component = "#";
+        if (StringUtils.isNotBlank(menu.getComponent()) && isMenuFrame(menu)) {
+            component = menu.getComponent();
+        } else if (StringUtils.isNotBlank(menu.getComponent()) && menu.getParentId()
+                != Constants.IS_PARENT_NODE && isInnerLink(menu)) {
+            component = Constants.INNER_LINK;
+        } else if (StringUtils.isNotBlank(menu.getComponent()) && isParentView(menu)) {
+            component = Constants.PARENT_VIEW;
         }
-        
         return component;
     }
 
+    /**
+     * 判断菜单是否为父视图
+     *
+     * @param menu 菜单对象
+     * @return 如果菜单是父视图则返回true，否则返回false
+     */
+    private boolean isParentView(SysMenu menu) {
+        // 检查菜单的父ID是否不为0且菜单类型为目录
+        return menu.getParentId() != Constants.IS_PARENT_NODE && Constants.MENU_TYPE_DIRECTORY.equals(menu.getMenuType());
+    }
+
+    /**
+     * 判断菜单是否为内部菜单框架
+     *
+     * @param menu 菜单对象
+     * @return 如果菜单是内部菜单框架则返回true，否则返回false
+     */
+    private boolean isMenuFrame(SysMenu menu) {
+        // 检查菜单的父ID是否为0，菜单类型为菜单且不是外部链接
+        return Constants.MENU_TYPE_MENU.equals(menu.getMenuType())
+                && !Constants.IS_NOT_MENU_EXTERNAL_LINK.equals(menu.getIsFrame());
+    }
+
+    /**
+     * 判断菜单是否为内部链接
+     *
+     * @param menu 菜单对象
+     * @return 如果菜单是内部链接则返回true，否则返回false
+     */
+    private boolean isInnerLink(SysMenu menu) {
+        // 检查菜单是否为外部链接且路径是HTTP格式
+        return Constants.IS_MENU_EXTERNAL_LINK.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath());
+    }
 }
 
 

@@ -111,13 +111,11 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "更新默认文件上传配置")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateDefaultFileConfig(@RequestBody DefaultFileConfigRequest request) {
-
         DefaultFileUploadEnum defaultFileUploadEnum = DefaultFileUploadEnum.getByName(request.getFileUploadType());
         if (defaultFileUploadEnum == null) {
             error("您的输入错误，请检查后再输入!");
         }
         // 存储枚举的name值，比如"local", "minio", "oss"
-
         if (defaultFileUploadEnum != null) {
             redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, defaultFileUploadEnum.getName());
             configCacheService.refreshAllConfigs();

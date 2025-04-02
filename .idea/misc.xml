@@ -17,6 +17,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-service/chuang-message-service/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/system/pom.xml" />
         <option value="$PROJECT_DIR$/model/pom.xml" />
         <option value="$PROJECT_DIR$/system/pom.xml" />

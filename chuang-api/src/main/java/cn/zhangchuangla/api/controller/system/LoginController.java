@@ -75,13 +75,20 @@ public class LoginController extends BaseController {
         return success(result);
     }
 
+    @PostMapping("/login/logout")
+    @Operation(summary = "退出登录")
+    public AjaxResult logout() {
+        boolean result = sysLoginService.logout();
+        return success(result);
+    }
+
 
     /**
      * 获取用户信息
      *
      * @return 用户信息
      */
-    @GetMapping("/getUserInfo")
+    @GetMapping("/login/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
         AjaxResult ajax = new AjaxResult();
@@ -102,7 +109,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回路由信息
      */
-    @GetMapping("/getRouters")
+    @GetMapping("/login/getRouters")
     @Operation(summary = "获取路由信息")
     public AjaxResult getRouters() {
         Long currentUserId = getUserId();
@@ -110,5 +117,6 @@ public class LoginController extends BaseController {
         List<RouterVo> routerVos = sysMenuService.buildMenu(menus);
         return success(routerVos);
     }
+
 
 }

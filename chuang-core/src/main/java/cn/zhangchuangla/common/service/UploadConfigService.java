@@ -9,7 +9,6 @@ import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,7 @@ public class UploadConfigService {
     /**
      * 项目启动时加载 Redis 配置
      */
-    @PostConstruct
+    //todo 重构文件加载文件配置等信息
     public void loadUploadConfig() {
         String config = redisCache.getCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT);
         // 如果 Redis 中没有配置，则使用默认使用本地文件进行上传

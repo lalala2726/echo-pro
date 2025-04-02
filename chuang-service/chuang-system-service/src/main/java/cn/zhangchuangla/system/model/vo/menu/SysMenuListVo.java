@@ -82,5 +82,15 @@ public class SysMenuListVo {
     @Schema(description = "权限标识")
     private String perms;
 
+    /**
+     * 菜单图标
+     */
+    @Schema(description = "菜单图标")
+    private String icon;
 
+    /**
+     * 重定向地址
+     */
+    @Schema(description = "重定向地址")
+    private String redirect;
 }

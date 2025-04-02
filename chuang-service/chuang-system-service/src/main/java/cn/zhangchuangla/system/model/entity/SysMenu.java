@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Schema(description = "菜单权限表")
 public class SysMenu implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -46,6 +48,19 @@ public class SysMenu implements Serializable {
     @Schema(description = "显示顺序")
     private Integer orderNum;
 
+
+    /**
+     * 重定向地址
+     */
+    @Schema(description = "重定向地址")
+    private String redirect;
+
+
+    /**
+     * 标题
+     */
+    @Schema(description = "标题")
+    private String title;
     /**
      * 路由地址
      */
@@ -62,13 +77,13 @@ public class SysMenu implements Serializable {
      * 是否外链（0是 1否）
      */
     @Schema(description = "是否外链（0是 1否）")
-    private Integer isFrame;
+    private String isFrame;
 
     /**
      * 是否缓存（0缓存 1不缓存）
      */
     @Schema(description = "是否缓存（0缓存 1不缓存）")
-    private Integer isCache;
+    private String isCache;
 
     /**
      * 菜单类型（M目录 C菜单 F按钮）
