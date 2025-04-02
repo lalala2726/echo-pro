@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.constraints.NotBlank;
@@ -64,4 +65,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @return true 存在，false不存在
      */
     boolean isRoleKeyExist(@NotBlank(message = "角色权限字符串不能为空") @Size(min = 2, max = 50, message = "角色权限字符串长度必须介于 2 和 50 之间") String roleKey);
+
+    /**
+     * 修改角色信息
+     *
+     * @param request 修改角色信息
+     * @return true 修改成功，false 修改失败
+     */
+    boolean updateRoleInfo(SysRoleUpdateRequest request);
 }

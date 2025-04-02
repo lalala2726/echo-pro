@@ -114,12 +114,8 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:role:update')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateRoleInfo(@Validated @RequestBody SysRoleUpdateRequest request) {
-        SysRole sysRole = new SysRole();
-        BeanUtils.copyProperties(request, sysRole);
-        if (sysRoleService.updateById(sysRole)) {
-            return success(SystemMessageConstant.UPDATE_SUCCESS);
-        }
-        return error(SystemMessageConstant.UPDATE_FAIL);
+        boolean result = sysRoleService.updateRoleInfo(request);
+        return toAjax(result);
     }
 
     /**

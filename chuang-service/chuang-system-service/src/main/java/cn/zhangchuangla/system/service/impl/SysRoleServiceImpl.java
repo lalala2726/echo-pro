@@ -7,6 +7,7 @@ import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -131,6 +132,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return false;
     }
 
+    /**
+     * 修改角色信息
+     *
+     * @param request 修改角色信息
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateRoleInfo(SysRoleUpdateRequest request) {
+        //test 这边需要待测试
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(request, sysRole);
+        return updateById(sysRole);
+    }
 
 }
 
