@@ -27,9 +27,13 @@
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-service</artifactId>
+            <artifactId>chuang-storage-service</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-service</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
