@@ -2,6 +2,7 @@ package cn.zhangchuangla.storage.config.loader;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
@@ -61,9 +62,9 @@ public class SysFileConfigLoader {
      * 初始化存储类型对应的加载方法
      */
     private void initLoaders() {
-        configLoaders.put(Constants.LOCAL_FILE_UPLOAD, this::loadLocalFileConfig);
-        configLoaders.put(Constants.MINIO_FILE_UPLOAD, this::loadMinioConfig);
-        configLoaders.put(Constants.ALIYUN_OSS_FILE_UPLOAD, this::loadAliyunOSSConfig);
+        configLoaders.put(StorageTypeConstants.LOCAL, this::loadLocalFileConfig);
+        configLoaders.put(StorageTypeConstants.MINIO, this::loadMinioConfig);
+        configLoaders.put(StorageTypeConstants.ALIYUN_OSS, this::loadAliyunOSSConfig);
     }
 
     /**
@@ -85,8 +86,8 @@ public class SysFileConfigLoader {
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }
-            sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
-            sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, Constants.LOCAL_FILE_UPLOAD);
+            sysFileConfigCache.put(StorageTypeConstants.LOCAL, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
+            sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.LOCAL);
         } catch (Exception e) {
             log.error("没有找到本地文件上传配置! 项目会正常启动！但是将无法上传文件！错误详情: {}", e.getMessage());
         }
@@ -116,41 +117,41 @@ public class SysFileConfigLoader {
      * 获取 MinIO 配置
      */
     public MinioConfigEntity getMinioConfig() {
-        return parseConfig(sysFileConfigCache.get(Constants.MINIO_FILE_UPLOAD), MinioConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.MINIO), MinioConfigEntity.class);
     }
 
     /**
      * 获取本地文件存储配置
      */
     public LocalFileConfigEntity getLocalFileConfig() {
-        return parseConfig(sysFileConfigCache.get(Constants.LOCAL_FILE_UPLOAD), LocalFileConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.LOCAL), LocalFileConfigEntity.class);
     }
 
     /**
      * 获取阿里云 OSS 配置
      */
     public AliyunOSSConfigEntity getAliyunOSSConfig() {
-        return parseConfig(sysFileConfigCache.get(Constants.ALIYUN_OSS_FILE_UPLOAD), AliyunOSSConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.ALIYUN_OSS), AliyunOSSConfigEntity.class);
     }
 
     /**
      * 加载 MinIO 配置
      */
     public void loadMinioConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.MINIO_FILE_UPLOAD, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageTypeConstants.MINIO, sysFileConfig.getStorageValue());
     }
 
     /**
      * 加载阿里云 OSS 配置
      */
     public void loadAliyunOSSConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.ALIYUN_OSS_FILE_UPLOAD, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageTypeConstants.ALIYUN_OSS, sysFileConfig.getStorageValue());
     }
 
     /**
      * 加载本地文件存储配置
      */
     public void loadLocalFileConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageTypeConstants.LOCAL, sysFileConfig.getStorageValue());
     }
 }

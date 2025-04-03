@@ -55,17 +55,6 @@ public class Constants {
      */
     public static final String ALL_PERMISSION = "*:*:*";  // 拥有所有权限
 
-    /**
-     * 文件上传方式常量
-     */
-    public static final String LOCAL_FILE_UPLOAD = "local";        // 本地文件上传
-    public static final String MINIO_FILE_UPLOAD = "minio";        // Minio 上传
-    public static final String ALIYUN_OSS_FILE_UPLOAD = "oss";     // 阿里云 OSS 上传
-    public static final String FILE_URL = "fileUrl";
-    public static final String COMPRESSED_URL = "compressedUrl";
-    public static final String RELATIVE_FILE_LOCATION = "relativeFileLocation";
-    public static final String FILE_PREVIEW_FOLDER = "preview";
-    public static final String FILE_ORIGINAL_FOLDER = "original";
 
     /**
      * 系统默认标识常量

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
@@ -77,7 +77,7 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
             String fileExtension = FileUtils.getFileExtension(fileName);
 
             // 根据isCompress决定使用哪个文件夹
-            String folderType = Constants.FILE_ORIGINAL_FOLDER;
+            String folderType = StorageTypeConstants.FILE_ORIGINAL_FOLDER;
 
             // 生成日期目录
             String datePath = FileUtils.generateYearMonthDir();
