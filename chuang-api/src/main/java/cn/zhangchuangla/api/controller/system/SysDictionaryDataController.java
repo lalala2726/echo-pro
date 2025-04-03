@@ -87,7 +87,6 @@ public class SysDictionaryDataController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
     @Log(title = "字典值管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
-        checkParam(dictionaryDataService.noDuplicateKeys(request.getDataKey()), "字典项键已存在!");
         return toAjax(dictionaryDataService.addDictionaryData(request));
     }
 
@@ -120,11 +119,6 @@ public class SysDictionaryDataController extends BaseController {
     @Log(title = "字典值管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         checkParam(request == null, "参数不能为空!");
-        boolean isExist = false;
-        if (request != null) {
-            isExist = dictionaryDataService.noDuplicateKeys(request.getDataKey());
-        }
-        checkParam(isExist, "字典项键已存在!");
         return success(dictionaryDataService.updateDictionaryData(request));
     }
 

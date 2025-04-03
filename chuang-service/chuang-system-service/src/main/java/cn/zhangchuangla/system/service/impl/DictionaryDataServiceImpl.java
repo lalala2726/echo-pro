@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.DictionaryDataMapper;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
@@ -86,6 +87,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      */
     @Override
     public boolean addDictionaryData(AddDictionaryDataRequest request) {
+        if (noDuplicateKeys(request.getDataKey())) {
+            throw new ServiceException("字典项键已存在!");
+        }
         DictionaryData dictionaryData = new DictionaryData();
         BeanUtils.copyProperties(request, dictionaryData);
         return save(dictionaryData);
@@ -112,6 +116,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      */
     @Override
     public boolean updateDictionaryData(UpdateDictionaryDataRequest request) {
+        if (noDuplicateKeys(request.getDataKey())) {
+            throw new ServiceException("字典项键已存在!");
+        }
         DictionaryData dictionaryData = new DictionaryData();
         BeanUtils.copyProperties(request, dictionaryData);
         log.info("更新字典项:{}", dictionaryData);
