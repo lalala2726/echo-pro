@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.request.file;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -8,8 +9,15 @@ import lombok.Data;
  * 文件配置表
  */
 @Data
-@Schema(description = "文件添加配置请求类")
-public class SysFileConfigAddRequest {
+@Schema(description = "文件配置修改请求类")
+public class SysFileConfigUpdateRequest {
+
+    /**
+     * ID
+     */
+    @Schema(description = "参数ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Min(value = 1, message = "参数ID不能小于1")
+    private Integer id;
 
     /**
      * 参数名称
