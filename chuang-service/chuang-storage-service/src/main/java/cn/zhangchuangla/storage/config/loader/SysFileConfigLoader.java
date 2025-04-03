@@ -29,7 +29,8 @@ import java.util.function.Consumer;
 public class SysFileConfigLoader {
 
     private final SysFileConfigService sysFileConfigService;
-    private final Map<String, Object> sysFileConfigCache = new HashMap<>(2);
+    // 使用 HashMap 存储配置信息，值为 JSON 字符串
+    private final Map<String, String> sysFileConfigCache = new HashMap<>(2);
     private final Map<String, Consumer<SysFileConfig>> configLoaders = new HashMap<>();
     private final AppConfig appConfig;
 
@@ -81,10 +82,13 @@ public class SysFileConfigLoader {
     public void autoSetLocalStorage() {
         try {
             String uploadPath = appConfig.getUploadPath();
-            sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, uploadPath);
+            if (uploadPath == null || uploadPath.isEmpty()) {
+                throw new ProfileException("本地存储路径为空！");
+            }
+            sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
             sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, Constants.LOCAL_FILE_UPLOAD);
         } catch (Exception e) {
-            log.error("没有找到本地文件上传配置! 项目会正常启动！但是将无法上传文件！");
+            log.error("没有找到本地文件上传配置! 项目会正常启动！但是将无法上传文件！错误详情: {}", e.getMessage());
         }
     }
 
@@ -92,7 +96,7 @@ public class SysFileConfigLoader {
      * 获取当前默认上传类型
      */
     public String getCurrentDefaultUploadType() {
-        return Optional.ofNullable((String) sysFileConfigCache.get(Constants.CURRENT_DEFAULT_UPLOAD_TYPE))
+        return Optional.ofNullable(sysFileConfigCache.get(Constants.CURRENT_DEFAULT_UPLOAD_TYPE))
                 .filter(config -> !config.isEmpty())
                 .orElseThrow(() -> new ProfileException(ResponseCode.PROFILE_ERROR, "无法设置存储！请在系统中设置一个存储"));
     }
@@ -101,6 +105,10 @@ public class SysFileConfigLoader {
      * 解析 JSON 配置数据
      */
     private <T> T parseConfig(String json, Class<T> clazz) {
+        if (json == null || json.isEmpty()) {
+            log.warn("解析配置失败: JSON 数据为空");
+            return null;
+        }
         return JSON.parseObject(json, clazz);
     }
 
@@ -108,41 +116,41 @@ public class SysFileConfigLoader {
      * 获取 MinIO 配置
      */
     public MinioConfigEntity getMinioConfig() {
-        return (MinioConfigEntity) sysFileConfigCache.get(Constants.MINIO_FILE_UPLOAD);
+        return parseConfig(sysFileConfigCache.get(Constants.MINIO_FILE_UPLOAD), MinioConfigEntity.class);
     }
 
     /**
      * 获取本地文件存储配置
      */
     public LocalFileConfigEntity getLocalFileConfig() {
-        return (LocalFileConfigEntity) sysFileConfigCache.get(Constants.LOCAL_FILE_UPLOAD);
+        return parseConfig(sysFileConfigCache.get(Constants.LOCAL_FILE_UPLOAD), LocalFileConfigEntity.class);
     }
 
     /**
      * 获取阿里云 OSS 配置
      */
     public AliyunOSSConfigEntity getAliyunOSSConfig() {
-        return (AliyunOSSConfigEntity) sysFileConfigCache.get(Constants.ALIYUN_OSS_FILE_UPLOAD);
+        return parseConfig(sysFileConfigCache.get(Constants.ALIYUN_OSS_FILE_UPLOAD), AliyunOSSConfigEntity.class);
     }
 
     /**
      * 加载 MinIO 配置
      */
     public void loadMinioConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.MINIO_FILE_UPLOAD, parseConfig(sysFileConfig.getStorageValue(), MinioConfigEntity.class));
+        sysFileConfigCache.put(Constants.MINIO_FILE_UPLOAD, sysFileConfig.getStorageValue());
     }
 
     /**
      * 加载阿里云 OSS 配置
      */
     public void loadAliyunOSSConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.ALIYUN_OSS_FILE_UPLOAD, parseConfig(sysFileConfig.getStorageValue(), AliyunOSSConfigEntity.class));
+        sysFileConfigCache.put(Constants.ALIYUN_OSS_FILE_UPLOAD, sysFileConfig.getStorageValue());
     }
 
     /**
      * 加载本地文件存储配置
      */
     public void loadLocalFileConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, parseConfig(sysFileConfig.getStorageValue(), LocalFileConfigEntity.class));
+        sysFileConfigCache.put(Constants.LOCAL_FILE_UPLOAD, sysFileConfig.getStorageValue());
     }
 }

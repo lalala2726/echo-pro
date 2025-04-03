@@ -1,19 +1,14 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.mapper.FileManagementMapper;
 import cn.zhangchuangla.system.model.dto.SaveFileInfoDto;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
-import cn.zhangchuangla.system.service.AliyunOssUploadService;
 import cn.zhangchuangla.system.service.FileManagementService;
-import cn.zhangchuangla.system.service.LocalFileUploadService;
-import cn.zhangchuangla.system.service.MinioFileUploadService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -33,19 +28,11 @@ import java.util.List;
 public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper, FileManagement>
         implements FileManagementService {
 
-    private final ConfigCacheService configCacheService;
     private final FileManagementMapper fileManagementMapper;
-    private final LocalFileUploadService localFileUploadService;
-    private final AliyunOssUploadService aliyunOssUploadService;
-    private final MinioFileUploadService minioFileUploadService;
 
     @Autowired
-    public FileManagementServiceImpl(ConfigCacheService configCacheService, FileManagementMapper fileManagementMapper, LocalFileUploadService localFileUploadService, AliyunOssUploadService aliyunOssUploadService, MinioFileUploadService minioFileUploadService) {
-        this.configCacheService = configCacheService;
+    public FileManagementServiceImpl(FileManagementMapper fileManagementMapper) {
         this.fileManagementMapper = fileManagementMapper;
-        this.localFileUploadService = localFileUploadService;
-        this.aliyunOssUploadService = aliyunOssUploadService;
-        this.minioFileUploadService = minioFileUploadService;
     }
 
 
@@ -73,34 +60,7 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
             if (file == null) {
                 throw new ServiceException(ResponseCode.RESULT_IS_NULL, "ID:" + id + "的文件不存在！");
             }
-            deleteFileByFileIdWithStorageType(file);
         });
-    }
-
-
-    /**
-     * 根据文件ID和存储类型删除文件
-     *
-     * @param fileManagement 文件管理实体
-     */
-    public void deleteFileByFileIdWithStorageType(FileManagement fileManagement) {
-        if (fileManagement == null) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "文件管理实体不能为空！");
-        }
-
-        switch (fileManagement.getStorageType()) {
-            case Constants.MINIO_FILE_UPLOAD:
-                minioFileUploadService.deleteFileByFileId(fileManagement);
-                break;
-            case Constants.ALIYUN_OSS_FILE_UPLOAD:
-                aliyunOssUploadService.deleteFileByFileId(fileManagement);
-                break;
-            case Constants.LOCAL_FILE_UPLOAD:
-                localFileUploadService.deleteFileByFileId(fileManagement);
-                break;
-            default:
-                break;
-        }
     }
 
 
@@ -164,15 +124,7 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
      * @return 对应存储类型的Bucket名称，如果存储类型不匹配则返回null
      */
     private String getBucketName(String storageType) {
-        // 当存储类型为MinIO文件上传时，获取MinIO配置中的Bucket名称
-        if (Constants.MINIO_FILE_UPLOAD.equals(storageType)) {
-            return configCacheService.getMinioConfig().getBucketName();
-        }
-        // 当存储类型为阿里云OSS文件上传时，获取阿里云OSS配置中的Bucket名称
-        else if (Constants.ALIYUN_OSS_FILE_UPLOAD.equals(storageType)) {
-            return configCacheService.getAliyunOSSConfig().getBucketName();
-        }
-        // 如果存储类型既不是MinIO也不是阿里云OSS，则返回null
+
         return null;
     }
 

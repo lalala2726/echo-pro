@@ -9,7 +9,7 @@
         <result property="storageName" column="storage_name"/>
         <result property="storageKey" column="storage_key"/>
         <result property="storageType" column="storage_type"/>
-        <result property="isDefault" column="is_default"/>
+        <result property="isMaster" column="is_master"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
