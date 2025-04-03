@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
