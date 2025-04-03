@@ -1,4 +1,4 @@
-package cn.zhangchuangla.infrastructure.config.loader;
+package cn.zhangchuangla.common.config.loader;
 
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
