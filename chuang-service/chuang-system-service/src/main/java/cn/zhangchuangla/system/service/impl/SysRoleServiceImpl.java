@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -97,6 +98,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public void addRoleInfo(SysRoleAddRequest roleAddRequest) {
+        if (isRoleNameExist(roleAddRequest.getRoleName())) {
+            throw new ServiceException("角色名称已存在");
+        }
+        if (isRoleKeyExist(roleAddRequest.getRoleKey())) {
+            throw new ServiceException("角色权限字符串已存在");
+        }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(roleAddRequest, sysRole);
         save(sysRole);
