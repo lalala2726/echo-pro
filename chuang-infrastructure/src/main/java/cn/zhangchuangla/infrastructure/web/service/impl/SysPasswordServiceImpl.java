@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.infrastructure.web.service.SysPasswordService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,7 @@ public class SysPasswordServiceImpl implements SysPasswordService {
     private final RedisCache redisCache;
     private final PasswordConfig passwordConfig;
 
+    @Autowired
     public SysPasswordServiceImpl(RedisCache redisCache, PasswordConfig passwordConfig) {
         this.redisCache = redisCache;
         this.passwordConfig = passwordConfig;

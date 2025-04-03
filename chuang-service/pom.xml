@@ -17,7 +17,7 @@
     <!-- 添加子模块 -->
     <modules>
         <module>chuang-system-service</module>
-        <module>chuang-message-service</module>
+        <module>chuang-storage-service</module>
     </modules>
 
     <dependencies>

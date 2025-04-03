@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.model.request.file.DefaultFileConfigRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class SysFileConfigController extends BaseController {
     private final RedisCache redisCache;
     private final ConfigCacheService configCacheService;
 
+    @Autowired
     public SysFileConfigController(RedisCache redisCache, ConfigCacheService configCacheService) {
         this.redisCache = redisCache;
         this.configCacheService = configCacheService;
@@ -84,9 +86,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateLocalFileConfig(@RequestBody LocalFileConfigEntity request) {
         String uploadPath = request.getUploadPath();
-        //  1. 校验路径
-        if (PathUtils.isLinuxPath(uploadPath)) {
-        } else if (PathUtils.isWindowsPath(uploadPath)) {
+        // 1. 校验路径
+        if (PathUtils.isWindowsPath(uploadPath)) {
             //  2. 处理 Windows 路径
             uploadPath = PathUtils.processWindowsPath(uploadPath);
             request.setUploadPath(uploadPath);
@@ -110,15 +111,11 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "更新默认文件上传配置")
     @PreAuthorize("@auth.hasPermission('system:file:config')")
     public AjaxResult updateDefaultFileConfig(@RequestBody DefaultFileConfigRequest request) {
-        if (request.getFileUploadType().isBlank()) {
-            return error("默认文件上传配置不能为空");
-        }
         DefaultFileUploadEnum defaultFileUploadEnum = DefaultFileUploadEnum.getByName(request.getFileUploadType());
         if (defaultFileUploadEnum == null) {
             error("您的输入错误，请检查后再输入!");
         }
         // 存储枚举的name值，比如"local", "minio", "oss"
-
         if (defaultFileUploadEnum != null) {
             redisCache.setCacheObject(RedisKeyConstant.SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT, defaultFileUploadEnum.getName());
             configCacheService.refreshAllConfigs();

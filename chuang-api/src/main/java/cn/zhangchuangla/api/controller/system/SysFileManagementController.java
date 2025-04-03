@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.service.FileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class SysFileManagementController extends BaseController {
 
     private final FileManagementService fileManagementService;
 
+    @Autowired
     public SysFileManagementController(FileManagementService fileManagementService) {
         this.fileManagementService = fileManagementService;
     }

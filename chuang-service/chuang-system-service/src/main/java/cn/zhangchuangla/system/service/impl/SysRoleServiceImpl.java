@@ -1,15 +1,20 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * 角色接口实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -25,11 +32,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
 
-    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper) {
+    private final RedisCache redisCache;
+
+    @Autowired
+    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper, RedisCache redisCache) {
         this.sysRoleMapper = sysRoleMapper;
+        this.redisCache = redisCache;
     }
 
-    //todo 添加一个根据用户ID获取当前用户所拥有的角色,每个用户角色都会缓存到Redis和用户Id进行绑定,方便后续撤销等操作
 
     /**
      * 角色列表
@@ -54,8 +64,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
-        //todo 将角色信息缓存到数据中,当用户角色信息发生变化时，更新缓存
-        return sysRoleMapper.getRoleListByUserId(userId);
+        List<SysRole> cacheRoleCache = redisCache.getCacheObject(RedisKeyConstant.USER_ROLE + userId);
+        if (cacheRoleCache != null) {
+            return cacheRoleCache;
+        }
+        List<SysRole> roleListByUserId = sysRoleMapper.getRoleListByUserId(userId);
+        redisCache.setCacheObject(RedisKeyConstant.USER_ROLE + userId, roleListByUserId);
+        return roleListByUserId;
     }
 
     /**
@@ -83,6 +98,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public void addRoleInfo(SysRoleAddRequest roleAddRequest) {
+        if (isRoleNameExist(roleAddRequest.getRoleName())) {
+            throw new ServiceException("角色名称已存在");
+        }
+        if (isRoleKeyExist(roleAddRequest.getRoleKey())) {
+            throw new ServiceException("角色权限字符串已存在");
+        }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(roleAddRequest, sysRole);
         save(sysRole);
@@ -120,6 +141,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return false;
     }
 
+    /**
+     * 修改角色信息
+     *
+     * @param request 修改角色信息
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateRoleInfo(SysRoleUpdateRequest request) {
+        //test 这边需要待测试
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(request, sysRole);
+        return updateById(sysRole);
+    }
 
 }
 

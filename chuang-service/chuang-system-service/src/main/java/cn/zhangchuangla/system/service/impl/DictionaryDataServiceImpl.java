@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.DictionaryDataMapper;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
@@ -12,11 +13,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
+ * 字典内值服务实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -26,6 +30,7 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
 
     private final DictionaryDataMapper dictionaryDataMapper;
 
+    @Autowired
     public DictionaryDataServiceImpl(DictionaryDataMapper dictionaryDataMapper) {
         this.dictionaryDataMapper = dictionaryDataMapper;
     }
@@ -82,6 +87,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      */
     @Override
     public boolean addDictionaryData(AddDictionaryDataRequest request) {
+        if (noDuplicateKeys(request.getDataKey())) {
+            throw new ServiceException("字典项键已存在!");
+        }
         DictionaryData dictionaryData = new DictionaryData();
         BeanUtils.copyProperties(request, dictionaryData);
         return save(dictionaryData);
@@ -108,6 +116,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      */
     @Override
     public boolean updateDictionaryData(UpdateDictionaryDataRequest request) {
+        if (noDuplicateKeys(request.getDataKey())) {
+            throw new ServiceException("字典项键已存在!");
+        }
         DictionaryData dictionaryData = new DictionaryData();
         BeanUtils.copyProperties(request, dictionaryData);
         log.info("更新字典项:{}", dictionaryData);

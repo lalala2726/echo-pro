@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
+ * 岗位服务接口
+ *
  * @author zhangchuang
  */
 public interface SysPostService extends IService<SysPost> {

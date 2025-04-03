@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
@@ -10,9 +12,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
+ * 部门服务实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -21,6 +28,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
 
     private final SysDeptMapper sysDeptMapper;
 
+    @Autowired
     public SysDeptServiceImpl(SysDeptMapper sysDeptMapper) {
         this.sysDeptMapper = sysDeptMapper;
     }
@@ -44,6 +52,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public boolean addDept(SysDeptAddRequest request) {
+        if (isDeptNameExist(request.getName())) {
+            throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
+        }
         SysDept sysDept = new SysDept();
         BeanUtils.copyProperties(request, sysDept);
         return save(sysDept);
@@ -56,6 +67,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public boolean updateDept(SysDeptRequest request) {
+        if (isDeptNameExist(request.getName())) {
+            throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
+        }
         SysDept sysDept = new SysDept();
         BeanUtils.copyProperties(request, sysDept);
         return updateById(sysDept);
@@ -97,6 +111,22 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
             return count(eq) > 0;
         }
         return false;
+    }
+
+    /**
+     * 删除部门，支持批量删除，如果批量删除，则判断是否有子部门，如果有子部门，则不允许删除，并且回滚
+     *
+     * @param ids 部门ID集合
+     * @return 操作结果
+     */
+    @Override
+    public boolean removeDeptById(List<Integer> ids) {
+        ids.forEach(id -> {
+            if (departmentHasSubordinates(id)) {
+                throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "该部门下有子部门，不能删除！");
+            }
+        });
+        return removeByIds(ids);
     }
 }
 

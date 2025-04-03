@@ -19,7 +19,7 @@
     </resultMap>
     <update id="updateDictionaryDataByDictName"
             parameterType="cn.zhangchuangla.system.model.vo.dictionary.DictionaryDataListVo">
-        update dictionary_data
+        update sys_dictionary_data
         <trim prefix="SET" suffixOverrides=",">
             <if test="request.dataKey != null and request.dataKey != ''">
                 data_key = #{request.dataKey},
@@ -49,7 +49,7 @@
     </update>
 
     <delete id="deleteDictionaryItem">
-        delete from dictionary_data
+        delete from sys_dictionary_data
         where id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -68,7 +68,7 @@
     </select>
     <select id="getDictDataByDictionaryName" resultMap="BaseResultMap">
         select *
-        from dictionary_data
+        from sys_dictionary_data
         join dictionary on dictionary_data.dictionary_id = dictionary.id
         where dictionary_data.dictionary_id = #{dictionaryId}
         <where>

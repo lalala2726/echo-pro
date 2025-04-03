@@ -6,7 +6,6 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.system.model.entity.Dictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
@@ -19,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,7 @@ public class SysDictionaryController extends BaseController {
 
     private final DictionaryService dictionaryService;
 
+    @Autowired
     public SysDictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
@@ -69,7 +70,6 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
     @Log(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
-        ParamsUtils.paramCheck(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
         return success(SystemMessageConstant.ADD_SUCCESS);
     }
@@ -84,7 +84,7 @@ public class SysDictionaryController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@auth.hasPermission('system:dictionary:info')")
     public AjaxResult getDictionaryById(@PathVariable("id") Long id) {
-        ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
+        checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         DictionaryVo dictionaryVo = new DictionaryVo();
         BeanUtils.copyProperties(dictionary, dictionaryVo);
@@ -100,13 +100,9 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "修改字典")
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
-    @Log(title = "字典管理", businessType = BusinessType.UPDATE, isSaveResponseData = true)
+    @Log(title = "字典管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
-        ParamsUtils.minValidParam(request.getId(), "字典ID不能小于等于零!");
-        boolean current = dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName());
-        ParamsUtils.paramCheck(current, "字典名称已存在!");
-        boolean result = dictionaryService.updateDictionaryById(request);
-        return toAjax(result);
+        return toAjax(dictionaryService.updateDictionaryById(request));
     }
 
     /**
@@ -120,7 +116,9 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary:delete')")
     @Log(title = "字典管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
-        ParamsUtils.minValidParam(ids, "字典ID不能小于等于零!");
+        ids.forEach(id -> {
+            checkParam(id == null || id > 0, "字典ID不能小于等于零!");
+        });
         dictionaryService.deleteDictionary(ids);
         return success();
     }

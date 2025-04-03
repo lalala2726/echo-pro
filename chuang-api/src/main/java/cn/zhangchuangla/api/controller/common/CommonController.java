@@ -11,7 +11,6 @@ import cn.zhangchuangla.system.service.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,11 +27,11 @@ public class CommonController extends BaseController {
     private final FileUploadService fileUploadService;
     private final ConfigCacheService configCacheService;
 
-    @Autowired
     public CommonController(FileUploadService fileUploadService, ConfigCacheService configCacheService) {
         this.fileUploadService = fileUploadService;
         this.configCacheService = configCacheService;
     }
+
 
     /**
      * 智能文件上传
@@ -57,7 +56,6 @@ public class CommonController extends BaseController {
             // 返回结果
             AjaxResult response = AjaxResult.success("文件上传成功");
             response.put("data", result);
-
             if (result.isImage()) {
                 log.info("图片上传成功 - 原始URL: {}, 压缩URL: {}", result.getOriginalUrl(), result.getCompressedUrl());
             } else {

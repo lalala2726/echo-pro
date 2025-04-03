@@ -24,6 +24,7 @@ public class SysRoleUpdateRequest {
     /**
      * 角色名
      */
+    @NotBlank(message = "角色名不能为空")
     @Schema(description = "角色名")
     private String name;
 

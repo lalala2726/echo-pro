@@ -27,14 +27,12 @@
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-service</artifactId>
+            <artifactId>chuang-storage-service</artifactId>
         </dependency>
-
-        <!-- 移除对chuang-service的直接依赖 -->
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-message-service</artifactId>
+            <artifactId>chuang-system-service</artifactId>
         </dependency>
     </dependencies>
 

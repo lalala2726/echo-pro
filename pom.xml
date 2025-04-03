@@ -54,6 +54,7 @@
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
         <jaxb.api.version>2.3.1</jaxb.api.version>
         <javax.activation.version>1.1.1</javax.activation.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
     </properties>
 
     <dependencies>
@@ -203,6 +204,11 @@
                 <artifactId>spring-boot-starter-websocket</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.penggle</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
 
             <!-- ===================== 项目模块依赖 ===================== -->
             <dependency>
@@ -226,8 +232,8 @@
                 <version>${app.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-message-service</artifactId>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-storage-service</artifactId>
                 <version>${app.version}</version>
             </dependency>
         </dependencies>

@@ -2,8 +2,10 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.security.context.AuthenticationContextHolder;
 import cn.zhangchuangla.infrastructure.web.service.SysLoginService;
@@ -12,6 +14,7 @@ import cn.zhangchuangla.infrastructure.web.service.TokenService;
 import cn.zhangchuangla.system.service.SysLoginLogService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,12 +37,15 @@ public class SysLoginServiceImpl implements SysLoginService {
     private final TokenService tokenService;
     private final SysPasswordService sysPasswordService;
     private final SysLoginLogService sysLoginLogService;
+    private final RedisCache redisCache;
 
-    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysPasswordService sysPasswordService, SysLoginLogService sysLoginLogService) {
+    @Autowired
+    public SysLoginServiceImpl(AuthenticationManager authenticationManager, TokenService tokenService, SysPasswordService sysPasswordService, SysLoginLogService sysLoginLogService, RedisCache redisCache) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.sysPasswordService = sysPasswordService;
         this.sysLoginLogService = sysLoginLogService;
+        this.redisCache = redisCache;
     }
 
 
@@ -72,7 +78,7 @@ public class SysLoginServiceImpl implements SysLoginService {
         if (authenticate != null) {
             loginUser = (LoginUser) authenticate.getPrincipal();
         }
-        Long userId = null;
+        Long userId;
         if (loginUser != null) {
             userId = loginUser.getSysUser().getUserId();
             loginUser.setUserId(userId);
@@ -81,6 +87,17 @@ public class SysLoginServiceImpl implements SysLoginService {
         //记录登录成功日志
         sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, Constants.LOGIN_SUCCESS);
         return tokenService.createToken(loginUser, httpServletRequest);
+    }
+
+    /**
+     * 登出
+     *
+     * @return 登出结果
+     */
+    @Override
+    public boolean logout() {
+        String sessionId = SecurityUtils.getLoginUser().getSessionId();
+        return redisCache.deleteObject(sessionId);
     }
 }
 

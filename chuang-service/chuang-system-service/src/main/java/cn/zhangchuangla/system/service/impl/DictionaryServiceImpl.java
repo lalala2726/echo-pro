@@ -13,12 +13,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
+ * 字典服务实现类
+ *
  * @author zhangchuang
  */
 @Service
@@ -29,6 +32,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
     private final DictionaryDataService dictionaryDataService;
     private final DictionaryMapper dictionaryMapper;
 
+    @Autowired
     public DictionaryServiceImpl(DictionaryDataService dictionaryDataService, DictionaryMapper dictionaryMapper) {
         this.dictionaryDataService = dictionaryDataService;
         this.dictionaryMapper = dictionaryMapper;
@@ -80,6 +84,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public void addDictionary(AddDictionaryRequest request) {
+        if (isNameExist(request.getName())) {
+            throw new ServiceException("字典名称已存在");
+        }
         Dictionary dictionary = new Dictionary();
         BeanUtils.copyProperties(request, dictionary);
         save(dictionary);
@@ -105,6 +112,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public boolean updateDictionaryById(UpdateDictionaryRequest request) {
+        if (isNameExistExceptCurrent(request.getId(), request.getName())) {
+            throw new ServiceException("字典名称已存在");
+        }
         Dictionary dictionary = new Dictionary();
         BeanUtils.copyProperties(request, dictionary);
         LambdaQueryWrapper<Dictionary> eq = new LambdaQueryWrapper<Dictionary>().eq(Dictionary::getId, request.getId());

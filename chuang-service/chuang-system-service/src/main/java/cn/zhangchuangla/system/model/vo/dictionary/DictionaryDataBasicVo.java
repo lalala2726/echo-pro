@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 字典值表
+ * 字典值
  */
 @Data
 @Schema(name = "基本视图", description = "基本视图响应对象")

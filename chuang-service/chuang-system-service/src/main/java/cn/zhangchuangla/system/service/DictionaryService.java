@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
+ * 字典服务
+ *
  * @author zhangchuang
  */
 public interface DictionaryService extends IService<Dictionary> {

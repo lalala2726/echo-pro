@@ -3,7 +3,7 @@ app:
     name: 后台管理系统
     author: zhangchuang
     version: alpha 0.1
-    description: 基本后台管理系统，采用SpringBoot3+SpringSecurity+MybatisPlus+Redis+MySQL+Minio等技术栈开发
+    description: 基本后台管理系统，采用SpringBoot3+SpringSecurity+MybatisPlus
     copyright: Copyright © 2024-2025 zhangchuang All Rights Reserved.
     ip-address-enable: false
     strictLoginEnable: false
@@ -38,22 +38,7 @@ mybatis-plus:
       logic-delete-value: 1         # 逻辑已删除值
       logic-not-delete-value: 0     # 逻辑未删除值
 
-# 阿里云OSS配置
-aliyun:
-  oss:
-    file-domain: https://bed.oss.zhangchuangla.cn/
-    end-point: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tSFwfMsPQwsr8Q3pbUA
-    access-key-secret: DMu2VMrBrKZADqrDLXZgdXVJLUQiOM
-    bucket-name: chuang-drawingbed
 
-#Minio 文件上传
-minio:
-  fileDomain: https://bed.data-center.zhangchuangla.cn/
-  endpoint: http://192.168.1.120:9000/
-  accessKey: cwytEbLXyBo2Tul2C9OZ
-  secretKey: UGGQUnHCjjooNlrZZfO1WCNEB1OvCriYOWX47Oi5
-  bucketName: bed
 token:
   expire: 300000
   secret: zhangchuang2726zhangchuang2726zhangchuang2726

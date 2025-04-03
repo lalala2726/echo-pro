@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="lombok.Getter" />
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Log" />
+      <item index="1" class="java.lang.String" itemvalue="lombok.Getter" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
@@ -11,11 +12,13 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/chuang-system-service/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-core/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-service/chuang-message-service/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/system/pom.xml" />
         <option value="$PROJECT_DIR$/model/pom.xml" />
         <option value="$PROJECT_DIR$/system/pom.xml" />
