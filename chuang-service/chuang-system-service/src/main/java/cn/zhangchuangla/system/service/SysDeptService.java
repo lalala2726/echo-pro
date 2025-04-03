@@ -7,6 +7,8 @@ import cn.zhangchuangla.system.model.request.department.SysDeptRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * 部门接口
  *
@@ -60,4 +62,12 @@ public interface SysDeptService extends IService<SysDept> {
      * @param id 部门ID
      */
     boolean departmentHasSubordinates(Integer id);
+
+    /**
+     * 删除部门，支持批量删除
+     *
+     * @param ids 部门ID集合
+     * @return 操作结果
+     */
+    boolean removeDeptById(List<Integer> ids);
 }

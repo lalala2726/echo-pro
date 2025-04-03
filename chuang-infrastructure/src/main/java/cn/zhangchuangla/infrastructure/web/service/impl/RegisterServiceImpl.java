@@ -3,6 +3,7 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.infrastructure.model.request.RegisterRequest;
 import cn.zhangchuangla.infrastructure.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -34,6 +35,9 @@ public class RegisterServiceImpl implements RegisterService {
     public Long register(RegisterRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new ParamException(ResponseCode.PARAM_ERROR);
+        }
+        if (sysUserService.isUsernameExist(request.getUsername())) {
+            throw new ServiceException(String.format("用户名%s已存在", request.getUsername()));
         }
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         SysUser user = new SysUser();
