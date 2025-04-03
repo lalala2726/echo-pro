@@ -1,8 +1,9 @@
 package cn.zhangchuangla.infrastructure.config;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.redis.ConfigCacheService;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Slf4j
 public class ResourcesConfig implements WebMvcConfigurer {
 
-    private final ConfigCacheService configCacheService;
-
-    public ResourcesConfig(ConfigCacheService configCacheService) {
-        this.configCacheService = configCacheService;
-    }
+    @Resource
+    private SysFileConfigLoader sysFileConfigLoader;
 
 
     /**
@@ -32,12 +30,14 @@ public class ResourcesConfig implements WebMvcConfigurer {
     public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
 
         // 本地文件上传路径
-        LocalFileConfigEntity localFileConfig = configCacheService.getLocalFileConfig();
-        if (localFileConfig != null) {
-            log.info("静态资源加载映射：{}", localFileConfig.getUploadPath());
-            registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                    .addResourceLocations("file:" + localFileConfig.getUploadPath() + "/");
+        String defaultFileUploadType = sysFileConfigLoader.getDefaultFileUploadType();
+        if (!Constants.LOCAL_FILE_UPLOAD.equals(defaultFileUploadType)) {
+            return;
         }
+        LocalFileConfigEntity localFileConfig = sysFileConfigLoader.getLocalFileConfig();
+        log.info("静态资源加载映射：{}", localFileConfig.getUploadPath());
+        registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
+                .addResourceLocations("file:" + localFileConfig.getUploadPath() + "/");
 
 
         // 添加静态资源映射规则
