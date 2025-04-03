@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysPostMapper;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
@@ -51,6 +52,12 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      */
     @Override
     public boolean addPost(SysPostAddRequest request) {
+        if (isPostNameExist(request.getPostName())) {
+            throw new ServiceException("岗位名称已存在");
+        }
+        if (isPostCodeExist(request.getPostCode())) {
+            throw new ServiceException("岗位编码已存在");
+        }
         SysPost sysPost = new SysPost();
         BeanUtils.copyProperties(request, sysPost);
         return save(sysPost);
