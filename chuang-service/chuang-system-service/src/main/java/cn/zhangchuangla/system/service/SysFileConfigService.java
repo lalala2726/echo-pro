@@ -75,4 +75,11 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @return true 是主配置，false不是主配置
      */
     boolean isMaster(Integer id);
+
+    /**
+     * 读取主配置
+     *
+     * @return 返回主配置
+     */
+    SysFileConfig getMasterConfig();
 }

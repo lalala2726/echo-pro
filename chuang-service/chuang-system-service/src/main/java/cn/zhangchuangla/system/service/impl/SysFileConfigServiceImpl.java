@@ -62,7 +62,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (isMaster(id)) {
             throw new ServiceException("主配置不允许删除");
         }
-        removeById(id);
+        return removeById(id);
     }
 
     /**
@@ -123,6 +123,18 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
                 .eq(SysFileConfig::getId, id)
                 .eq(SysFileConfig::getIsDefault, 1);
         return count(eq) > 0;
+    }
+
+    /**
+     * 读取主配置
+     *
+     * @return 主配置
+     */
+    @Override
+    public SysFileConfig getMasterConfig() {
+        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
+                .eq(SysFileConfig::getIsDefault, 1);
+        return getOne(eq);
     }
 }
 

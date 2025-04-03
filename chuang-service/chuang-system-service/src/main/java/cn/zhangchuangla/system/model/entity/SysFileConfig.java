@@ -31,6 +31,11 @@ public class SysFileConfig {
     private String storageKey;
 
     /**
+     * 存储值
+     */
+    private String storageValue;
+
+    /**
      * 存储类型
      */
     private String storageType;
