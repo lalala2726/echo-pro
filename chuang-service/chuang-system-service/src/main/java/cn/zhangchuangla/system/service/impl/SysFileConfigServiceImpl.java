@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
@@ -62,7 +63,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (isMaster(id)) {
             throw new ServiceException("主配置不允许删除");
         }
-        removeById(id);
+        return removeById(id);
     }
 
     /**
@@ -121,8 +122,20 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isMaster(Integer id) {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
                 .eq(SysFileConfig::getId, id)
-                .eq(SysFileConfig::getIsDefault, 1);
+                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
+    }
+
+    /**
+     * 读取主配置
+     *
+     * @return 主配置
+     */
+    @Override
+    public SysFileConfig getMasterConfig() {
+        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
+                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
+        return getOne(eq);
     }
 }
 

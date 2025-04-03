@@ -1,23 +1,22 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.redis.ConfigCacheService;
+import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 阿里云OSS 操作服务实现类
@@ -30,10 +29,12 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class AliyunOssOperationServiceImpl implements AliyunOssOperationService {
 
-    private final ConfigCacheService configCacheService;
 
-    public AliyunOssOperationServiceImpl(ConfigCacheService configCacheService) {
-        this.configCacheService = configCacheService;
+    private final SysFileConfigLoader sysFileConfigLoader;
+
+    @Autowired
+    public AliyunOssOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
+        this.sysFileConfigLoader = sysFileConfigLoader;
     }
 
     /**
@@ -53,7 +54,11 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
         // 默认不压缩
         boolean isCompress = false;
 
-        AliyunOSSConfigEntity aliyunOSSConfig = configCacheService.getAliyunOSSConfig();
+        AliyunOSSConfigEntity aliyunOSSConfig = sysFileConfigLoader.getAliyunOSSConfig();
+
+        if (aliyunOSSConfig == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置为空！请你检查配置文件");
+        }
 
         // 获取OSS配置
         String bucketName = aliyunOSSConfig.getBucketName();
@@ -72,10 +77,10 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
             String fileExtension = FileUtils.getFileExtension(fileName);
 
             // 根据isCompress决定使用哪个文件夹
-            String folderType = Constants.FILE_ORIGINAL_FOLDER;
+            String folderType = StorageTypeConstants.FILE_ORIGINAL_FOLDER;
 
             // 生成日期目录
-            String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+            String datePath = FileUtils.generateYearMonthDir();
 
             // 构建上传路径
             String uploadPath = FileUtils.buildFinalPath(
@@ -91,8 +96,6 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
             metadata.setHeader("Content-Disposition", "inline");
             metadata.setContentType(contentType);
 
-            // 添加自定义元数据，标记是否为压缩版本
-            metadata.addUserMetadata("isCompressed", String.valueOf(isCompress));
 
             // 上传文件
             ossClient.putObject(bucketName, uploadFileName, new ByteArrayInputStream(data), metadata);

@@ -1,44 +1,36 @@
 package cn.zhangchuangla.common.constant;
 
 /**
+ * 存储类型常量
+ * 
  * @author Chuang
  * <p>
- * created on 2025/4/2 20:13
+ * created on 2025/4/3
  */
 public class StorageTypeConstants {
-
     /**
-     * minio
+     * 本地存储
      */
-    public final static String MINIO = "minio";
-
+    public static final String LOCAL = "local";
+    
     /**
-     * 腾讯云COS
+     * 阿里云OSS存储
      */
-    public final static String TENCENT_COS = "tencent_cos";
-
+    public static final String ALIYUN_OSS = "aliyun-oss";
+    
     /**
-     * 阿里云OSS
+     * 腾讯云COS存储
      */
-    public final static String ALIYUN_OSS = "aliyun_oss";
-
+    public static final String TENCENT_COS = "tencent-cos";
+    
     /**
-     * FTP
+     * MinIO存储
      */
-    public final static String FTP = "ftp";
+    public static final String MINIO = "minio";
 
-    /**
-     * 本地
-     */
-    public final static String LOCAL = "local";
-
-    /**
-     * 其他S3
-     */
-    public final static String OTHER_S3 = "other_s3";
-
-    /**
-     * 七牛云
-     */
-    public final static String QI_NUE_YUN = "qi_nue_yun";
+    public static final String FILE_URL = "fileUrl";
+    public static final String COMPRESSED_URL = "compressedUrl";
+    public static final String RELATIVE_FILE_LOCATION = "relativeFileLocation";
+    public static final String FILE_PREVIEW_FOLDER = "preview";
+    public static final String FILE_ORIGINAL_FOLDER = "original";
 }

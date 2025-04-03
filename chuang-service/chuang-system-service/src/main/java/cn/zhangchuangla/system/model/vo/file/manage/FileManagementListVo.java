@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo.file;
+package cn.zhangchuangla.system.model.vo.file.manage;
 
 import cn.zhangchuangla.common.base.BaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;

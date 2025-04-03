@@ -11,5 +11,11 @@
 
     <artifactId>chuang-storage-service</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-service</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
