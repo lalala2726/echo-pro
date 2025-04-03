@@ -1,6 +1,7 @@
 package cn.zhangchuangla.infrastructure.config;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import jakarta.annotation.Resource;
@@ -40,16 +41,14 @@ public class ResourcesConfig implements WebMvcConfigurer {
      */
     private void configureLocalFileAccess(ResourceHandlerRegistry registry) {
         String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
-        log.info("当前默认存储类型：{}", currentDefaultUploadType);
-
         // 仅当存储类型为本地文件时，才进行资源映射
-        if (Constants.LOCAL_FILE_UPLOAD.equals(currentDefaultUploadType)) {
+        if (StorageTypeConstants.LOCAL.equals(currentDefaultUploadType)) {
             LocalFileConfigEntity localFileConfig = sysFileConfigLoader.getLocalFileConfig();
             if (localFileConfig.getUploadPath() != null) {
                 log.info("静态资源加载映射: {}", localFileConfig.getUploadPath());
                 registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
                         .addResourceLocations("file:" + localFileConfig.getUploadPath() + "/");
-
+                return;
             }
             log.info("本地文件存储路径未配置，跳过静态资源映射");
         }

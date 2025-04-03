@@ -1,16 +1,17 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.nio.file.Paths;
  * <p>
  * created on 2025/4/2 20:42
  */
+@Service
 @Slf4j
 public class LocalOperationServiceImpl implements LocalOperationService {
 

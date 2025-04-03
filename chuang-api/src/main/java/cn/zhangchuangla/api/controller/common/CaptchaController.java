@@ -6,6 +6,8 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.Base64;
 import cn.zhangchuangla.common.utils.UUIDUtils;
 import com.google.code.kaptcha.Producer;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -25,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/captcha")
+@Tag(name = "验证码相关")
 public class CaptchaController extends BaseController {
 
 
@@ -40,6 +43,7 @@ public class CaptchaController extends BaseController {
      * @return 返回验证码对应的UUID
      */
     @GetMapping
+    @Operation(summary = "获取验证码")
     public AjaxResult getCaptcha() {
         // 保存验证码信息
         String uuid = UUIDUtils.simpleUUID();

@@ -3,8 +3,10 @@ package cn.zhangchuangla.storage.factory;
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
+import cn.zhangchuangla.storage.service.LocalOperationService;
 import cn.zhangchuangla.storage.service.MinioOperationService;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +19,24 @@ import org.springframework.stereotype.Component;
  * created on 2025/4/2
  */
 @Component
+@Slf4j
 public class StorageFactory {
 
     private final AliyunOssOperationService aliyunOssOperationService;
     private final TencentCOSOperationService tencentCOSOperationService;
     private final MinioOperationService minioOperationService;
+    private final LocalOperationService localOperationService;
 
     @Autowired
-    public StorageFactory(AliyunOssOperationService aliyunOssOperationService, TencentCOSOperationService tencentCOSOperationService, MinioOperationService minioOperationService) {
+    public StorageFactory(
+            AliyunOssOperationService aliyunOssOperationService, 
+            TencentCOSOperationService tencentCOSOperationService, 
+            MinioOperationService minioOperationService,
+            LocalOperationService localOperationService) {
         this.aliyunOssOperationService = aliyunOssOperationService;
         this.tencentCOSOperationService = tencentCOSOperationService;
         this.minioOperationService = minioOperationService;
+        this.localOperationService = localOperationService;
     }
 
     /**
@@ -37,11 +46,18 @@ public class StorageFactory {
      * @return 存储服务
      */
     public StorageOperation getStorageOperation(String storageType) {
-        return switch (storageType) {
+        StorageOperation operation = switch (storageType) {
             case StorageTypeConstants.ALIYUN_OSS -> aliyunOssOperationService;
             case StorageTypeConstants.TENCENT_COS -> tencentCOSOperationService;
             case StorageTypeConstants.MINIO -> minioOperationService;
+            case StorageTypeConstants.LOCAL -> localOperationService;
             default -> null;
         };
+        
+        if (operation == null) {
+            log.warn("未找到类型为 [{}] 的存储服务，将使用本地存储作为默认服务", storageType);
+            return localOperationService; // 默认使用本地存储
+        }
+        return operation;
     }
 }
