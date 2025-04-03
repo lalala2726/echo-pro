@@ -128,8 +128,6 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:role:add')")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     public AjaxResult addRoleInfo(@Validated @RequestBody SysRoleAddRequest roleAddRequest) {
-        checkParam(sysRoleService.isRoleNameExist(roleAddRequest.getRoleName()), "角色名已存在");
-        checkParam(sysRoleService.isRoleKeyExist(roleAddRequest.getRoleKey()), "角色权限字符串已存在");
         sysRoleService.addRoleInfo(roleAddRequest);
         return AjaxResult.success();
     }

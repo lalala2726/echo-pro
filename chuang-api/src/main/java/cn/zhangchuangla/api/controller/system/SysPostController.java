@@ -66,8 +66,6 @@ public class SysPostController extends BaseController {
     @Operation(summary = "添加岗位")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     public AjaxResult addPost(@Validated @RequestBody SysPostAddRequest request) {
-        checkParam(sysPostService.isPostNameExist(request.getPostName()), "岗位名称已存在！");
-        checkParam(sysPostService.isPostCodeExist(request.getPostCode()), "岗位编码已存在！");
         boolean result = sysPostService.addPost(request);
         return toAjax(result);
     }

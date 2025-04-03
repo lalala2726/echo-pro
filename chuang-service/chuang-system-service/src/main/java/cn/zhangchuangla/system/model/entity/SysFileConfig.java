@@ -1,18 +1,19 @@
 package cn.zhangchuangla.system.model.entity;
 
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
  * 文件配置表
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_file_config")
 @Data
-public class SysFileConfig {
+public class SysFileConfig extends BaseEntity {
 
     /**
      * 主键
@@ -31,6 +32,11 @@ public class SysFileConfig {
     private String storageKey;
 
     /**
+     * 存储值
+     */
+    private String storageValue;
+
+    /**
      * 存储类型
      */
     private String storageType;
@@ -38,30 +44,6 @@ public class SysFileConfig {
     /**
      * 是否默认
      */
-    private Integer isDefault;
+    private Integer isMaster;
 
-    /**
-     * 创建者
-     */
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

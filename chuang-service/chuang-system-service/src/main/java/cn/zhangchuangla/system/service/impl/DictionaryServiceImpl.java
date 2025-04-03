@@ -84,6 +84,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public void addDictionary(AddDictionaryRequest request) {
+        if (isNameExist(request.getName())) {
+            throw new ServiceException("字典名称已存在");
+        }
         Dictionary dictionary = new Dictionary();
         BeanUtils.copyProperties(request, dictionary);
         save(dictionary);
@@ -109,6 +112,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public boolean updateDictionaryById(UpdateDictionaryRequest request) {
+        if (isNameExistExceptCurrent(request.getId(), request.getName())) {
+            throw new ServiceException("字典名称已存在");
+        }
         Dictionary dictionary = new Dictionary();
         BeanUtils.copyProperties(request, dictionary);
         LambdaQueryWrapper<Dictionary> eq = new LambdaQueryWrapper<Dictionary>().eq(Dictionary::getId, request.getId());

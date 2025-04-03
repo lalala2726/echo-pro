@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
-import cn.zhangchuangla.system.model.vo.file.FileManagementListVo;
+import cn.zhangchuangla.system.model.vo.file.manage.FileManagementListVo;
 import cn.zhangchuangla.system.service.FileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;

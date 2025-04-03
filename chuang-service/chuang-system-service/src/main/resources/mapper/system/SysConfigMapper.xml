@@ -15,5 +15,9 @@
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
     </resultMap>
+    <select id="listSysConfig" resultMap="BaseResultMap">
+        select *
+        from sys_config
+    </select>
 
 </mapper>

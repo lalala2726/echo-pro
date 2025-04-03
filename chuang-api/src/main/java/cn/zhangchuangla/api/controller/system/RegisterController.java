@@ -4,12 +4,10 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.RegisterRequest;
 import cn.zhangchuangla.infrastructure.web.service.RegisterService;
-import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +25,10 @@ public class RegisterController extends BaseController {
 
     private final RegisterService registerService;
 
-    private final SysUserService sysUserService;
-
-    @Autowired
-    public RegisterController(RegisterService registerService, SysUserService sysUserService) {
+    public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
-        this.sysUserService = sysUserService;
     }
+
 
     /**
      * 注册
@@ -47,7 +42,6 @@ public class RegisterController extends BaseController {
                                @Validated @RequestBody RegisterRequest request) {
         request.setUsername(request.getUsername().trim());
         request.setPassword(request.getPassword().trim());
-        checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         Long userId = registerService.register(request);
         log.info("用户注册成功，用户ID：{}", userId);
         return success(userId);

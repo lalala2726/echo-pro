@@ -70,7 +70,6 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
     @Log(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
-        checkParam(dictionaryService.isNameExist(request.getName()), "字典名称已存在!");
         dictionaryService.addDictionary(request);
         return success(SystemMessageConstant.ADD_SUCCESS);
     }
@@ -103,7 +102,6 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
     @Log(title = "字典管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
-        checkParam(dictionaryService.isNameExistExceptCurrent(request.getId(), request.getName()), "字典名称已存在!");
         return toAjax(dictionaryService.updateDictionaryById(request));
     }
 

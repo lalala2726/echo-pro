@@ -80,4 +80,9 @@ public enum BusinessType {
      * 发送消息
      */
     SEND_MESSAGES,
+
+    /**
+     * 上传
+     */
+    UPLOAD,
 }

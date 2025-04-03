@@ -1,12 +1,16 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,13 +28,23 @@ import java.nio.file.Paths;
 @Slf4j
 public class LocalOperationServiceImpl implements LocalOperationService {
 
+    private final SysFileConfigLoader sysFileConfigLoader;
+
+    @Autowired
+    public LocalOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
+        this.sysFileConfigLoader = sysFileConfigLoader;
+    }
+
 
     @Override
     public FileTransferDto save(FileTransferDto fileTransferDto) {
         // 使用appConfig获取本地文件路径
 
-        //todo 暂时不获取本地文件路径
-        String localPath = "";
+        LocalFileConfigEntity localFileConfig = sysFileConfigLoader.getLocalFileConfig();
+        if (localFileConfig == null) {
+            throw new ProfileException("本地上传配置文件未找到！请您检查文件配置");
+        }
+        String uploadPath = localFileConfig.getUploadPath();
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
@@ -40,7 +54,7 @@ public class LocalOperationServiceImpl implements LocalOperationService {
         String uuidFileName = FileUtils.generateFileName();
 
         // 设置目标路径，包含年月目录和文件夹类型
-        Path directory = Paths.get(localPath + File.separator + targetDir);
+        Path directory = Paths.get(uploadPath + File.separator + targetDir);
         Path filePath = directory.resolve(uuidFileName + fileExtension);
 
         try {

@@ -1,9 +1,10 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.core.redis.ConfigCacheService;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.entity.FileTransferDto;
 import cn.zhangchuangla.storage.service.MinioOperationService;
@@ -12,6 +13,7 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -27,10 +29,11 @@ import java.io.ByteArrayInputStream;
 @Slf4j
 public class MinioOperationServiceImpl implements MinioOperationService {
 
-    private final ConfigCacheService configCacheService;
+    private final SysFileConfigLoader sysFileConfigLoader;
 
-    public MinioOperationServiceImpl(ConfigCacheService configCacheService) {
-        this.configCacheService = configCacheService;
+    @Autowired
+    public MinioOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
+        this.sysFileConfigLoader = sysFileConfigLoader;
     }
 
     @Override
@@ -38,7 +41,10 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
-        MinioConfigEntity minioConfig = configCacheService.getMinioConfig();
+        MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
+        if (minioConfig == null) {
+            throw new ProfileException("Minio配置文件为空！请你检查配置文件是否存在？");
+        }
         String endpoint = minioConfig.getEndpoint();
         String accessKey = minioConfig.getAccessKey();
         String secretKey = minioConfig.getSecretKey();
