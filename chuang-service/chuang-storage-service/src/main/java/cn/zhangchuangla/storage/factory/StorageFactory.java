@@ -29,8 +29,8 @@ public class StorageFactory {
 
     @Autowired
     public StorageFactory(
-            AliyunOssOperationService aliyunOssOperationService, 
-            TencentCOSOperationService tencentCOSOperationService, 
+            AliyunOssOperationService aliyunOssOperationService,
+            TencentCOSOperationService tencentCOSOperationService,
             MinioOperationService minioOperationService,
             LocalOperationService localOperationService) {
         this.aliyunOssOperationService = aliyunOssOperationService;
@@ -53,7 +53,7 @@ public class StorageFactory {
             case StorageTypeConstants.LOCAL -> localOperationService;
             default -> null;
         };
-        
+
         if (operation == null) {
             log.warn("未找到类型为 [{}] 的存储服务，将使用本地存储作为默认服务", storageType);
             return localOperationService; // 默认使用本地存储

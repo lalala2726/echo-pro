@@ -1,14 +1,13 @@
 package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.annotation.Log;
-import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,23 +55,23 @@ public class FileController extends BaseController {
         if (file.isEmpty()) {
             return error("请选择一个文件上传");
         }
-        
+
         try {
             AjaxResult ajax = AjaxResult.success();
             String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
             log.info("当前使用的存储类型: {}", currentDefaultUploadType);
-            
+
             StorageOperation storageOperation = storageFactory.getStorageOperation(currentDefaultUploadType);
             if (storageOperation == null) {
                 return error("未配置存储服务，请联系管理员");
             }
-            
+
             FileTransferDto fileTransferDto = FileTransferDto.builder()
                     .fileName(file.getOriginalFilename())
                     .bytes(file.getBytes())
                     .fileType(file.getContentType())
                     .build();
-            
+
             FileTransferDto result = storageOperation.save(fileTransferDto);
             ajax.put(StorageTypeConstants.FILE_URL, result.getFileUrl());
             return ajax;

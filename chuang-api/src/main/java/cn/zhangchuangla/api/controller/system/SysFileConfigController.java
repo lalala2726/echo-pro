@@ -2,6 +2,9 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
+import cn.zhangchuangla.common.core.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.core.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.core.request.MinioConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
@@ -13,9 +16,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -63,9 +65,54 @@ public class SysFileConfigController extends BaseController {
      */
     @Operation(summary = "新增文件配置", description = "新增文件配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
-    @GetMapping("/add")
-    public AjaxResult saveFileConfig(SysFileConfigAddRequest request) {
+    @PostMapping("/add")
+    public AjaxResult saveFileConfig(@Validated @RequestBody SysFileConfigAddRequest request) {
         boolean result = sysFileConfigService.saveFileConfig(request);
         return toAjax(result);
     }
+
+    /**
+     * 新增Minio配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Operation(summary = "新增Minio配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PostMapping("/add/minio")
+    public AjaxResult saveMinioConfig(@Validated @RequestBody MinioConfigRequest request) {
+        boolean result = sysFileConfigService.saveFileConfig(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 新增阿里云OSS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Operation(summary = "新增Minio配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PostMapping("/add/aliyun")
+    public AjaxResult saveAliyunOssConfig(@Validated @RequestBody AliyunOSSConfigRequest request) {
+        boolean result = sysFileConfigService.saveFileConfig(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 新增本地文件配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Operation(summary = "新增Minio配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PostMapping("/add/local")
+    public AjaxResult saveLocalConfig(LocalFileConfigRequest request) {
+        boolean result = sysFileConfigService.saveFileConfig(request);
+        return toAjax(result);
+    }
+
+
 }

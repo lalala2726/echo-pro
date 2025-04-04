@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.MinioOperationService;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;

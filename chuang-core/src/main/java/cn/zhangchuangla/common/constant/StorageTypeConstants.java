@@ -2,7 +2,7 @@ package cn.zhangchuangla.common.constant;
 
 /**
  * 存储类型常量
- * 
+ *
  * @author Chuang
  * <p>
  * created on 2025/4/3
@@ -12,17 +12,17 @@ public class StorageTypeConstants {
      * 本地存储
      */
     public static final String LOCAL = "local";
-    
+
     /**
      * 阿里云OSS存储
      */
     public static final String ALIYUN_OSS = "aliyun-oss";
-    
+
     /**
      * 腾讯云COS存储
      */
     public static final String TENCENT_COS = "tencent-cos";
-    
+
     /**
      * MinIO存储
      */

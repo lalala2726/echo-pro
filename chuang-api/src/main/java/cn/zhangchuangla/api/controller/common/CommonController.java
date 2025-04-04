@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

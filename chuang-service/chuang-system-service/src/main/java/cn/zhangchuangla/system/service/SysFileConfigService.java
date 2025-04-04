@@ -1,5 +1,8 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.core.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.core.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.core.request.MinioConfigRequest;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
@@ -52,6 +55,32 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
 
 
     /**
+     * 新增本地文件配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean saveFileConfig(LocalFileConfigRequest request);
+
+    /**
+     * 新增阿里云OSS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean saveFileConfig(AliyunOSSConfigRequest request);
+
+
+    /**
+     * 新增Minio配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean saveFileConfig(MinioConfigRequest request);
+
+
+    /**
      * 修改文件配置
      *
      * @param request 请求参数
@@ -82,4 +111,14 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @return 返回主配置
      */
     SysFileConfig getMasterConfig();
+
+
+    /**
+     * 判断存储名称是否存在
+     *
+     * @param storageName 存储名称
+     * @return true 存在，false不存在
+     */
+    boolean isNameExist(String storageName);
+
 }

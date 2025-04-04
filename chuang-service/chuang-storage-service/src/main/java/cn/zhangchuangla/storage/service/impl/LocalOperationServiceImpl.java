@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
 import org.springframework.stereotype.Service;
 

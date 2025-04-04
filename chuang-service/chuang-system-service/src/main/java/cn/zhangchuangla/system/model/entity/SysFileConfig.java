@@ -4,8 +4,7 @@ import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * 文件配置表
@@ -13,6 +12,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_file_config")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysFileConfig extends BaseEntity {
 
     /**
