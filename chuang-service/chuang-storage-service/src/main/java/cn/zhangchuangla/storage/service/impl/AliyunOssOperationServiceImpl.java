@@ -1,8 +1,8 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
@@ -11,6 +11,9 @@ import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.CannedAccessControlList;
+import com.aliyun.oss.model.CreateBucketRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,83 +40,74 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
         this.sysFileConfigLoader = sysFileConfigLoader;
     }
 
-    /**
-     * 文件上传
-     *
-     * @param fileTransferDto 文件传输对象
-     * @return 文件传输对象
-     */
     @Override
     public FileTransferDto save(FileTransferDto fileTransferDto) {
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
-        // 使用FileUtils获取内容类型
-        String contentType = FileUtils.generateFileContentType(fileName);
-
-        // 默认不压缩
-        boolean isCompress = false;
-
-        AliyunOSSConfigEntity aliyunOSSConfig = sysFileConfigLoader.getAliyunOSSConfig();
-
-        if (aliyunOSSConfig == null) {
-            throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置为空！请你检查配置文件");
+        AliyunOSSConfigEntity ossConfig = sysFileConfigLoader.getAliyunOSSConfig();
+        if (ossConfig == null) {
+            throw new ProfileException("阿里云OSS配置文件为空！请检查配置文件是否存在？");
         }
 
-        // 获取OSS配置
-        String bucketName = aliyunOSSConfig.getBucketName();
-        String endPoint = aliyunOSSConfig.getEndpoint();
-        String accessKeyId = aliyunOSSConfig.getAccessKeyId();
-        String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
-        String fileDomain = aliyunOSSConfig.getFileDomain();
-        String bucketPath = aliyunOSSConfig.getBucketPath();
+        String endpoint = ossConfig.getEndpoint();
+        String accessKeyId = ossConfig.getAccessKeyId();
+        String accessKeySecret = ossConfig.getAccessKeySecret();
+        String bucketName = ossConfig.getBucketName();
+        String fileDomain = ossConfig.getFileDomain();
 
         // 创建OSS客户端
-        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
-
+        OSS ossClient = null;
         try {
-            // 生成文件名
-            String fileNameWithoutExt = FileUtils.generateFileName();
-            String fileExtension = FileUtils.getFileExtension(fileName);
+            ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
-            // 根据isCompress决定使用哪个文件夹
-            String folderType = StorageConstants.FILE_ORIGINAL_FOLDER;
+            // 检查存储桶是否存在，不存在则创建
+            if (!ossClient.doesBucketExist(bucketName)) {
+                CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
+                // 设置存储桶权限为公共读，私有写
+                createBucketRequest.setCannedACL(CannedAccessControlList.PublicRead);
+                ossClient.createBucket(createBucketRequest);
+            }
 
-            // 生成日期目录
+            // 生成存储路径
             String datePath = FileUtils.generateYearMonthDir();
+            // 获取文件扩展名
+            String fileExtension = FileUtils.getFileExtension(fileName);
+            // 生成唯一文件名
+            String uuid = FileUtils.generateUUID();
+            // 组合最终路径: 日期/uuid+扩展名
+            String objectName = FileUtils.buildFinalPath(datePath, uuid + fileExtension);
 
-            // 构建上传路径
-            String uploadPath = FileUtils.buildFinalPath(
-                    StringUtils.trim(bucketPath),
-                    datePath,
-                    folderType);
-
-            String uploadFileName = FileUtils.buildFinalPath(uploadPath, fileNameWithoutExt + fileExtension);
-
-            // 设置元数据
+            // 设置文件元数据
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(data.length);
-            metadata.setHeader("Content-Disposition", "inline");
-            metadata.setContentType(contentType);
-
+            // 设置内容类型
+            metadata.setContentType(FileUtils.generateFileContentType(fileName));
 
             // 上传文件
-            ossClient.putObject(bucketName, uploadFileName, new ByteArrayInputStream(data), metadata);
+            ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(data), metadata);
 
-            // 返回文件URL
-            String fileUrl = fileDomain + uploadFileName;
+            // 构建文件URL
+            String fileUrl = "";
+            if (!StringUtils.isEmpty(fileDomain)) {
+                fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
+            }
 
-            // 构建并返回文件传输对象
+            // 返回文件信息
             return FileTransferDto.builder()
                     .fileUrl(fileUrl)
-                    .relativePath(uploadFileName)
+                    .relativePath(objectName)
                     .build();
-
+        } catch (OSSException oe) {
+            log.error("OSS服务异常: {}", oe.getErrorMessage(), oe);
+            throw new FileException(ResponseCode.FileUploadFailed, "OSS服务异常: " + oe.getErrorMessage());
         } catch (Exception e) {
-            log.warn("文件上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！");
+            log.error("文件上传失败", e);
+            throw new FileException(ResponseCode.FileUploadFailed);
         } finally {
-            ossClient.shutdown();
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
         }
     }
 }

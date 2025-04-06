@@ -1,14 +1,15 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.system.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
@@ -22,6 +23,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 文件配置服务实现类
@@ -90,6 +93,20 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         SysFileConfig sysFileConfig = new SysFileConfig();
         BeanUtils.copyProperties(request, sysFileConfig);
         return save(sysFileConfig);
+    }
+
+    /**
+     * 添加腾讯云COS配置文件
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean saveFileConfig(TencentCOSConfigRequest request) {
+        TencentCOSConfigEntity tencentCOSConfigEntity = new TencentCOSConfigEntity();
+        BeanUtils.copyProperties(request, tencentCOSConfigEntity);
+        String value = JSON.toJSONString(tencentCOSConfigEntity);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
     }
 
     /**
@@ -200,7 +217,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isMaster(Integer id) {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
                 .eq(SysFileConfig::getId, id)
-                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
+                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
     }
 
@@ -212,7 +229,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public SysFileConfig getMasterConfig() {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
+                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
 
@@ -228,6 +245,47 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
                 .eq(SysFileConfig::getStorageName, storageName);
         long count = count(eq);
         return count > 0;
+    }
+
+    /**
+     * 设置主配置
+     *
+     * @param id 文件配置id
+     * @return 操作结果
+     */
+    @Override
+    public boolean setMasterConfig(Long id) {
+        // 取消当前主配置
+        SysFileConfig currentMasterConfig = getMasterConfig();
+        if (currentMasterConfig != null) {
+            currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
+            updateById(currentMasterConfig);
+        }
+        // 设置新的主配置
+        SysFileConfig newMasterConfig = getById(id);
+        if (newMasterConfig == null) {
+            throw new ServiceException("文件配置不存在");
+        }
+        newMasterConfig.setIsMaster(StorageConstants.IS_FILE_UPLOAD_MASTER);
+        return updateById(newMasterConfig);
+    }
+
+    /**
+     * 删除文件配置，支持批量删除
+     *
+     * @param ids 文件配置id列表
+     * @return 操作结果
+     */
+    @Override
+    public boolean deleteFileConfig(List<Long> ids) {
+        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>().eq(SysFileConfig::getId, ids);
+        List<SysFileConfig> list = list(eq);
+        list.forEach(sysFileConfig -> {
+            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(sysFileConfig.getIsMaster())) {
+                throw new ServiceException(String.format("文件配置【%s】为当前主配置，不能删除", sysFileConfig.getStorageName()));
+            }
+        });
+        return removeByIds(ids);
     }
 
 }

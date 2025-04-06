@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.MinioOperationService;
@@ -80,8 +81,11 @@ public class MinioOperationServiceImpl implements MinioOperationService {
                             .build()
             );
 
-            String fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
-
+            // 构建文件URL
+            String fileUrl = "";
+            if (!StringUtils.isEmpty(fileDomain)) {
+                fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
+            }
             // 返回文件URL
             return FileTransferDto.builder()
                     .fileUrl(fileUrl) // 修正字段名称

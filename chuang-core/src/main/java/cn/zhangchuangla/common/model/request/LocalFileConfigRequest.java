@@ -41,5 +41,11 @@ public class LocalFileConfigRequest {
     @NotBlank(message = "文件上传路径不能为空")
     private String uploadPath;
 
+    /**
+     * 文件访问路径
+     */
+    @Schema(description = "文件访问路径,如果为空将直接返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String fileDomain;
+
 
 }

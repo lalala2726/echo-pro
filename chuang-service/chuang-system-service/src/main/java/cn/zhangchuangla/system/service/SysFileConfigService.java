@@ -3,12 +3,15 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * 文件配置接口
@@ -52,6 +55,15 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @return 操作结果
      */
     boolean saveFileConfig(SysFileConfigAddRequest request);
+
+
+    /**
+     * 新增腾讯云COS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean saveFileConfig(TencentCOSConfigRequest request);
 
 
     /**
@@ -121,4 +133,19 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      */
     boolean isNameExist(String storageName);
 
+    /**
+     * 设置主配置
+     *
+     * @param id 文件配置id
+     * @return 操作结果
+     */
+    boolean setMasterConfig(Long id);
+
+    /**
+     * 删除文件配置，支持批量删除
+     *
+     * @param ids 文件配置id列表
+     * @return 操作结果
+     */
+    boolean deleteFileConfig(List<Long> ids);
 }

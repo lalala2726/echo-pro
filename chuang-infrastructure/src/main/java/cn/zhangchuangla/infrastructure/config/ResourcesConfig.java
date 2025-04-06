@@ -1,9 +1,7 @@
 package cn.zhangchuangla.infrastructure.config;
 
+import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.StorageConstants;
-import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -17,14 +15,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 该类用于配置 Spring Boot 的静态资源映射，支持本地存储文件访问和 API 文档访问
  *
  * @author Chuang
- * @date 2025/2/19 02:15
+ * created 2025/2/19 02:15
  */
 @Configuration
 @Slf4j
 public class ResourcesConfig implements WebMvcConfigurer {
 
     @Resource
-    private SysFileConfigLoader sysFileConfigLoader;
+    private AppConfig appConfig;
+
 
     /**
      * 配置静态资源访问路径
@@ -40,18 +39,8 @@ public class ResourcesConfig implements WebMvcConfigurer {
      * 配置本地文件存储的访问路径
      */
     private void configureLocalFileAccess(ResourceHandlerRegistry registry) {
-        String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
-        // 仅当存储类型为本地文件时，才进行资源映射
-        if (StorageConstants.LOCAL.equals(currentDefaultUploadType)) {
-            LocalFileConfigEntity localFileConfig = sysFileConfigLoader.getLocalFileConfig();
-            if (localFileConfig.getUploadPath() != null) {
-                log.info("静态资源加载映射: {}", localFileConfig.getUploadPath());
-                registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                        .addResourceLocations("file:" + localFileConfig.getUploadPath() + "/");
-                return;
-            }
-            log.info("本地文件存储路径未配置，跳过静态资源映射");
-        }
+        registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
+                .addResourceLocations("file:" + appConfig.getUploadPath() + "/");
     }
 
     /**
@@ -71,4 +60,5 @@ public class ResourcesConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
+
 }

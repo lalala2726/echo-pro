@@ -1,17 +1,17 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
 import cn.zhangchuangla.system.model.vo.file.config.SysFileConfigListVo;
 import cn.zhangchuangla.system.service.SysFileConfigService;
@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zhangchuang
@@ -64,22 +65,6 @@ public class SysFileConfigController extends BaseController {
         return getTableData(sysFileConfigPage, sysFileConfigListVos);
     }
 
-
-    /**
-     * 新增文件配置
-     *
-     * @param request 文件配置信息
-     * @return 新增结果
-     */
-    @Operation(summary = "新增文件配置", description = "新增文件配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
-    @PostMapping("/add")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult saveFileConfig(@Validated @RequestBody SysFileConfigAddRequest request) {
-        boolean result = sysFileConfigService.saveFileConfig(request);
-        return toAjax(result);
-    }
-
     /**
      * 新增Minio配置
      *
@@ -94,7 +79,9 @@ public class SysFileConfigController extends BaseController {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        if (!StringUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        }
         boolean result = sysFileConfigService.saveFileConfig(request);
 
         return toAjax(result);
@@ -107,7 +94,7 @@ public class SysFileConfigController extends BaseController {
      * @param request 请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增Minio配置")
+    @Operation(summary = "新增阿里云OSS配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
@@ -115,23 +102,49 @@ public class SysFileConfigController extends BaseController {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        if (!StringUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        }
         boolean result = sysFileConfigService.saveFileConfig(request);
         return toAjax(result);
     }
 
     /**
-     * 新增本地文件配置
+     * 新增腾讯云COS配置
      *
      * @param request 请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增Minio配置")
+    @Operation(summary = "新增腾讯云COS配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
-    @PostMapping("/add/local")
+    @PostMapping("/add/tencent")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult saveLocalConfig(LocalFileConfigRequest request) {
+    public AjaxResult saveTencentCosConfig(@Validated @RequestBody TencentCOSConfigRequest request) {
+        // 去除末尾的斜杠,确保一致性
+        String endpoint = request.getRegion();
+        request.setRegion(StringUtils.removeTrailingSlash(endpoint));
+        if (!StringUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        }
         boolean result = sysFileConfigService.saveFileConfig(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 设置主配置
+     *
+     * @return 设置结果
+     */
+    @PutMapping("/setMaster/{id}")
+    @Operation(summary = "设置主配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:update')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
+    public AjaxResult setIsMasterConfig(@PathVariable("id") Long id) {
+        checkParam(id == null || id <= 0, "文件配置ID不能为空!");
+        boolean result = sysFileConfigService.setMasterConfig(id);
+        // 刷新缓存
+        if (result) refreshCache();
         return toAjax(result);
     }
 
@@ -143,11 +156,32 @@ public class SysFileConfigController extends BaseController {
      */
     @GetMapping("/refreshCache")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:refreshCache')")
-    @Operation(summary = "刷新文件配置缓存")
+    @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult RefreshCache() {
+    public AjaxResult refreshCache() {
         String currentConfigName = sysFileConfigLoader.refreshCache();
         return AjaxResult.success(currentConfigName);
+    }
+
+
+    /**
+     * 删除文件配置
+     *
+     * @param ids 文件配置ID
+     * @return 删除结果
+     */
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除文件配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:delete')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, isSaveRequestData = false)
+    public AjaxResult deleteFileConfig(@PathVariable("ids") List<Long> ids) {
+        ids.forEach(id -> {
+            checkParam(id == null || id <= 0, "文件配置ID不能为空!");
+            checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID), String.format("ID为 %s 是默认配置！无法删除:",
+                    StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID));
+        });
+        boolean result = sysFileConfigService.deleteFileConfig(ids);
+        return toAjax(result);
     }
 
 }
