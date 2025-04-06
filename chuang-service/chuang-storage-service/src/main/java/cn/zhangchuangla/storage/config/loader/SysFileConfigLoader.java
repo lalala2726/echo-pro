@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.service.SysFileConfigService;
 import com.alibaba.fastjson.JSON;
@@ -71,10 +72,10 @@ public class SysFileConfigLoader {
         sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, storageType);
 
         switch (storageType) {
-            case StorageConstants.MINIO -> log.info("加载 MinIO 配置: {}", sysFileConfig);
-            case StorageConstants.ALIYUN_OSS -> log.info("加载阿里云OSS配置: {}", sysFileConfig);
-            case StorageConstants.TENCENT_COS -> log.info("加载腾讯云COS配置: {}", sysFileConfig);
-            case StorageConstants.LOCAL -> log.info("加载本地文件系统配置: {}", sysFileConfig);
+            case StorageConstants.MINIO -> log.info("加载 Minio 配置");
+            case StorageConstants.ALIYUN_OSS -> log.info("加载阿里云OSS配置");
+            case StorageConstants.TENCENT_COS -> log.info("加载腾讯云COS配置");
+            case StorageConstants.LOCAL -> log.info("加载本地文件系统配置");
             default -> throw new ProfileException(ResponseCode.PROFILE_ERROR, "未知的存储类型: " + storageType);
         }
 
@@ -109,6 +110,13 @@ public class SysFileConfigLoader {
      */
     public MinioConfigEntity getMinioConfig() {
         return parseConfig(sysFileConfigCache.get(StorageConstants.MINIO), MinioConfigEntity.class);
+    }
+
+    /**
+     * 获取腾讯云 COS 配置
+     */
+    public TencentCOSConfigEntity getTencentCOSConfig() {
+        return parseConfig(sysFileConfigCache.get(StorageConstants.TENCENT_COS), TencentCOSConfigEntity.class);
     }
 
     /**

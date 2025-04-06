@@ -5,9 +5,11 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.system.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
@@ -91,6 +93,20 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         SysFileConfig sysFileConfig = new SysFileConfig();
         BeanUtils.copyProperties(request, sysFileConfig);
         return save(sysFileConfig);
+    }
+
+    /**
+     * 添加腾讯云COS配置文件
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean saveFileConfig(TencentCOSConfigRequest request) {
+        TencentCOSConfigEntity tencentCOSConfigEntity = new TencentCOSConfigEntity();
+        BeanUtils.copyProperties(request, tencentCOSConfigEntity);
+        String value = JSON.toJSONString(tencentCOSConfigEntity);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
     }
 
     /**

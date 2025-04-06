@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
@@ -101,6 +102,27 @@ public class SysFileConfigController extends BaseController {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
+        if (!StringUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        }
+        boolean result = sysFileConfigService.saveFileConfig(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 新增腾讯云COS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Operation(summary = "新增腾讯云COS配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PostMapping("/add/tencent")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
+    public AjaxResult saveTencentCosConfig(@Validated @RequestBody TencentCOSConfigRequest request) {
+        // 去除末尾的斜杠,确保一致性
+        String endpoint = request.getRegion();
+        request.setRegion(StringUtils.removeTrailingSlash(endpoint));
         if (!StringUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         }

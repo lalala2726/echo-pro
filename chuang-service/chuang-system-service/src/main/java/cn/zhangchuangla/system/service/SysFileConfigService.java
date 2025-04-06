@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
@@ -54,6 +55,15 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @return 操作结果
      */
     boolean saveFileConfig(SysFileConfigAddRequest request);
+
+
+    /**
+     * 新增腾讯云COS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean saveFileConfig(TencentCOSConfigRequest request);
 
 
     /**
