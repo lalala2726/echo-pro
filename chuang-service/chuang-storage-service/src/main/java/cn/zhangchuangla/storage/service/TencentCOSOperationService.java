@@ -18,5 +18,5 @@ public interface TencentCOSOperationService extends StorageOperation {
      * @param fileTransferDto 文件传输对象
      * @return 文件传输对象
      */
-    FileTransferDto save(FileTransferDto fileTransferDto);
+    FileTransferDto fileUpload(FileTransferDto fileTransferDto);
 }

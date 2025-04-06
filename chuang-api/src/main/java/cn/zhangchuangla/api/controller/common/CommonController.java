@@ -56,7 +56,7 @@ public class CommonController extends BaseController {
                 .bytes(file.getBytes())
                 .fileType(file.getContentType())
                 .build();
-        storageOperation.save(fileTransferDto);
+        storageOperation.fileUpload(fileTransferDto);
         return success();
     }
 

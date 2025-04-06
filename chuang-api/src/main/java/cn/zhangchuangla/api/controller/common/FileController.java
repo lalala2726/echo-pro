@@ -72,7 +72,7 @@ public class FileController extends BaseController {
                     .fileType(file.getContentType())
                     .build();
 
-            FileTransferDto result = storageOperation.save(fileTransferDto);
+            FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
             ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
             return ajax;
         } catch (IOException e) {
@@ -82,5 +82,27 @@ public class FileController extends BaseController {
             log.error("文件上传异常", e);
             return error("文件上传失败: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/image/upload")
+    public AjaxResult imageUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return error("请选择一个图片上传");
+        }
+        AjaxResult ajax = AjaxResult.success();
+        String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
+        StorageOperation storageOperation = storageFactory.getStorageOperation(currentDefaultUploadType);
+        try {
+            FileTransferDto fileTransferDto = FileTransferDto.builder()
+                    .fileName(file.getOriginalFilename())
+                    .bytes(file.getBytes())
+                    .fileType(file.getContentType())
+                    .build();
+            FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
+            ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
+        } catch (IOException e) {
+            return error("文件读取失败: " + e.getMessage());
+        }
+        return ajax;
     }
 }
