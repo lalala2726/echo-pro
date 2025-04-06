@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
@@ -30,6 +31,7 @@ import java.io.ByteArrayInputStream;
 @Service
 @Slf4j
 public class AliyunOssOperationServiceImpl implements AliyunOssOperationService {
+
 
     private final SysFileConfigLoader sysFileConfigLoader;
 
@@ -86,7 +88,10 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
             ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(data), metadata);
 
             // 构建文件URL
-            String fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
+            String fileUrl = "";
+            if (!StringUtils.isEmpty(fileDomain)) {
+                fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
+            }
 
             // 返回文件信息
             return FileTransferDto.builder()

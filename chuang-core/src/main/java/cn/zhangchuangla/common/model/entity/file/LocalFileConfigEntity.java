@@ -22,5 +22,10 @@ public class LocalFileConfigEntity {
      */
     private String uploadPath;
 
+    /**
+     * 文件访问路径,如果为空将直接返回相对路径
+     */
+    private String fileDomain;
+
 
 }

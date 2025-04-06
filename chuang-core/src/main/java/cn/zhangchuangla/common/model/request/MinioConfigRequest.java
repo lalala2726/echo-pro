@@ -67,8 +67,7 @@ public class MinioConfigRequest {
     /**
      * 文件访问域名
      */
-    @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "文件访问域名不能为空")
+    @Schema(description = "文件访问路径,如果为空将直接返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
             message = "文件访问域名格式不正确")
     private String fileDomain;

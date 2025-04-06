@@ -10,6 +10,8 @@ import cn.zhangchuangla.system.model.request.file.SysFileConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * 文件配置接口
  *
@@ -128,4 +130,12 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @return 操作结果
      */
     boolean setMasterConfig(Long id);
+
+    /**
+     * 删除文件配置，支持批量删除
+     *
+     * @param ids 文件配置id列表
+     * @return 操作结果
+     */
+    boolean deleteFileConfig(List<Long> ids);
 }

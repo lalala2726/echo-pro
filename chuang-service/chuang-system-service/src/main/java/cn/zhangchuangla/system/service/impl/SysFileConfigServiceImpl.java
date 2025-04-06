@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 文件配置服务实现类
  *
@@ -250,6 +252,24 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         }
         newMasterConfig.setIsMaster(StorageConstants.IS_FILE_UPLOAD_MASTER);
         return updateById(newMasterConfig);
+    }
+
+    /**
+     * 删除文件配置，支持批量删除
+     *
+     * @param ids 文件配置id列表
+     * @return 操作结果
+     */
+    @Override
+    public boolean deleteFileConfig(List<Long> ids) {
+        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>().eq(SysFileConfig::getId, ids);
+        List<SysFileConfig> list = list(eq);
+        list.forEach(sysFileConfig -> {
+            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(sysFileConfig.getIsMaster())) {
+                throw new ServiceException(String.format("文件配置【%s】为当前主配置，不能删除", sysFileConfig.getStorageName()));
+            }
+        });
+        return removeByIds(ids);
     }
 
 }

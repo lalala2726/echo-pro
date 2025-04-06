@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.service.SysFileConfigService;
@@ -74,7 +73,8 @@ public class SysFileConfigLoader {
         switch (storageType) {
             case StorageConstants.MINIO -> log.info("加载 MinIO 配置: {}", sysFileConfig);
             case StorageConstants.ALIYUN_OSS -> log.info("加载阿里云OSS配置: {}", sysFileConfig);
-            case StorageConstants.LOCAL -> log.info("加载本地存储配置: {}", sysFileConfig);
+            case StorageConstants.TENCENT_COS -> log.info("加载腾讯云COS配置: {}", sysFileConfig);
+            case StorageConstants.LOCAL -> log.info("加载本地文件系统配置: {}", sysFileConfig);
             default -> throw new ProfileException(ResponseCode.PROFILE_ERROR, "未知的存储类型: " + storageType);
         }
 
@@ -90,8 +90,6 @@ public class SysFileConfigLoader {
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }
-            sysFileConfigCache.put(StorageConstants.LOCAL, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
-            sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageConstants.LOCAL);
         } catch (Exception e) {
             log.error("未找到本地存储配置，上传将不可用！原因: {}", e.getMessage());
         }
@@ -120,12 +118,6 @@ public class SysFileConfigLoader {
         return parseConfig(sysFileConfigCache.get(StorageConstants.ALIYUN_OSS), AliyunOSSConfigEntity.class);
     }
 
-    /**
-     * 获取本地文件配置
-     */
-    public LocalFileConfigEntity getLocalFileConfig() {
-        return parseConfig(sysFileConfigCache.get(StorageConstants.LOCAL), LocalFileConfigEntity.class);
-    }
 
     /**
      * 通用 JSON 配置解析方法

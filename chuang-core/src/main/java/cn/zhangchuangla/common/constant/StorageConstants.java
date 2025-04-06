@@ -87,4 +87,9 @@ public class StorageConstants {
      * 存储值(JSON格式)
      */
     public static final String STORAGE_VALUE = "storageValue";
+
+    /**
+     * 系统默认文件配置ID
+     */
+    public static final Long SYSTEM_DEFAULT_FILE_CONFIG_ID = 1L;
 }

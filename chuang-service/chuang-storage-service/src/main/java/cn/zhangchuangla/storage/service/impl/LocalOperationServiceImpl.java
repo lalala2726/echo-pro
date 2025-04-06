@@ -1,16 +1,15 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.exception.ProfileException;
-import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.LocalOperationService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -30,23 +29,21 @@ import java.nio.file.Paths;
 @Slf4j
 public class LocalOperationServiceImpl implements LocalOperationService {
 
-    private final SysFileConfigLoader sysFileConfigLoader;
-
-    @Autowired
-    public LocalOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
-        this.sysFileConfigLoader = sysFileConfigLoader;
-    }
+    @Resource(name = "appConfig")
+    private AppConfig appConfig;
 
 
     @Override
     public FileTransferDto save(FileTransferDto fileTransferDto) {
-        // 使用appConfig获取本地文件路径
-
-        LocalFileConfigEntity localFileConfig = sysFileConfigLoader.getLocalFileConfig();
-        if (localFileConfig == null) {
-            throw new ProfileException("本地上传配置文件未找到！请您检查文件配置");
+        String fileDomain = null;
+        String uploadPath = null;
+        uploadPath = appConfig.getUploadPath();
+        try {
+            fileDomain = appConfig.getFileDomain();
+        } catch (NullPointerException e) {
+            //文件域名不是必填项，可以不配置，默认为空字符串
+            fileDomain = "";
         }
-        String uploadPath = localFileConfig.getUploadPath();
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
@@ -71,10 +68,12 @@ public class LocalOperationServiceImpl implements LocalOperationService {
 
         String relativeFileLocation = FileUtils.generateFileRelativePath(targetDir, uuidFileName, fileExtension);
         String fileUrl = Constants.RESOURCE_PREFIX + relativeFileLocation;
-
+        // 构建文件URL
+        if (!StringUtils.isEmpty(fileDomain)) {
+            fileUrl = FileUtils.buildFinalPath(fileDomain, fileUrl);
+        }
         return FileTransferDto.builder()
                 .fileUrl(fileUrl)
-                .relativePath(relativeFileLocation)
                 .build();
     }
 }

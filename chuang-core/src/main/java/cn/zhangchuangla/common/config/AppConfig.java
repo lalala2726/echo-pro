@@ -45,6 +45,11 @@ public class AppConfig {
      */
     private String uploadPath;
 
+    /**
+     * 文件访问路径
+     */
+    private String fileDomain;
+
 
     /**
      * 是否开启ip地址解析
