@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.entity;
+package generator.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @TableName(value = "sys_file_management")
 @Data
-public class FileManagement {
+public class SysFileManagement {
     /**
      * 主键ID
      */
@@ -20,44 +20,44 @@ public class FileManagement {
     private Long id;
 
     /**
-     * 文件名称
+     * 文件名
      */
-    private String fileName;
+    private String originalName;
 
     /**
-     * 原始文件名
+     * 文件类型，如 image/jpeg, application/pdf 等
      */
-    private String originalFileName;
+    private String contentType;
 
     /**
-     * 文件相对路径
+     * 文件大小，格式化后的字符串，如 "1.5MB"
      */
-    private String originalRelativeFileLocation;
+    private String fileSize;
 
     /**
-     * 预言文件相对路径
+     * 文件MD5值，用于文件完整性校验
      */
-    private String previewRelativeFileLocation;
+    private String fileMd5;
 
     /**
-     * 文件访问URL
+     * 原始文件URL，直接访问地址
      */
-    private String fileUrl;
+    private String originalFileUrl;
 
     /**
-     * 预览图片
+     * 原始文件相对路径，存储在服务器上的路径
      */
-    private String previewImage;
+    private String originalRelativePath;
 
     /**
-     * 文件大小(字节)
+     * 压缩文件URL，用于图片预览等场景
      */
-    private Long fileSize;
+    private String compressedFileUrl;
 
     /**
-     * 文件类型/MIME类型
+     * 压缩文件相对路径，存储在服务器上的路径
      */
-    private String fileType;
+    private String compressedRelativePath;
 
     /**
      * 文件扩展名
@@ -65,19 +65,14 @@ public class FileManagement {
     private String fileExtension;
 
     /**
-     * 存储类型(LOCAL/MINIO/ALIYUN_OSS)
+     * 存储类型 (LOCAL/MINIO/ALIYUN_OSS)
      */
     private String storageType;
 
     /**
-     * 存储桶名称(OSS/MINIO使用)
+     * 存储桶名称（OSS/MINIO 使用）
      */
     private String bucketName;
-
-    /**
-     * 文件MD5值
-     */
-    private String md5;
 
     /**
      * 上传者ID
@@ -95,7 +90,7 @@ public class FileManagement {
     private Date uploadTime;
 
     /**
-     * 是否删除(0-未删除,1-已删除)
+     * 是否删除 (0-未删除, 1-已删除)
      */
     private Integer isDeleted;
 
@@ -108,19 +103,4 @@ public class FileManagement {
      * 更新时间
      */
     private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

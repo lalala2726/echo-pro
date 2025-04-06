@@ -1,23 +1,13 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.utils.FileUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.MinioOperationService;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import cn.zhangchuangla.storage.utils.MinioUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.ByteArrayInputStream;
 
 /**
  * Minio 操作服务实现类
@@ -38,64 +28,19 @@ public class MinioOperationServiceImpl implements MinioOperationService {
     }
 
     @Override
-    public FileTransferDto save(FileTransferDto fileTransferDto) {
-        String fileName = fileTransferDto.getFileName();
-        byte[] data = fileTransferDto.getBytes();
+    public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
         MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
-        if (minioConfig == null) {
-            throw new ProfileException("Minio配置文件为空！请你检查配置文件是否存在？");
-        }
-        String endpoint = minioConfig.getEndpoint();
-        String accessKey = minioConfig.getAccessKey();
-        String secretKey = minioConfig.getSecretKey();
-        String bucketName = minioConfig.getBucketName();
-        String fileDomain = minioConfig.getFileDomain();
-        try {
-            // 创建Minio客户端
-            MinioClient minioClient = MinioClient.builder()
-                    .endpoint(endpoint)
-                    .credentials(accessKey, secretKey)
-                    .build();
-
-            // 检查存储桶是否存在
-            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
-                // 如果存储桶不存在，则创建
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-            }
-
-            // 生成存储路径
-            String datePath = FileUtils.generateYearMonthDir();
-            // 获取文件扩展名
-            String fileExtension = FileUtils.getFileExtension(fileName);
-            // 组合最终路径: 日期/文件夹类型/文件名
-            String uuid = FileUtils.generateUUID();
-            String objectName = FileUtils.buildFinalPath(datePath, uuid + fileExtension);
-
-
-            // 上传文件
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(objectName)
-                            .stream(new ByteArrayInputStream(data), data.length, -1)
-                            .build()
-            );
-
-            // 构建文件URL
-            String fileUrl = "";
-            if (!StringUtils.isEmpty(fileDomain)) {
-                fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
-            }
-            // 返回文件URL
-            return FileTransferDto.builder()
-                    .fileUrl(fileUrl) // 修正字段名称
-                    .relativePath(objectName)
-                    .build();
-        } catch (Exception e) {
-            log.warn("文件上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed);
-        }
-
+        return MinioUtils.uploadFile(fileTransferDto, minioConfig);
     }
 
+    /**
+     * 上传图片
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return FileTransferDto
+     */
+    @Override
+    public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
+        return MinioUtils.uploadFile(fileTransferDto, sysFileConfigLoader.getMinioConfig());
+    }
 }

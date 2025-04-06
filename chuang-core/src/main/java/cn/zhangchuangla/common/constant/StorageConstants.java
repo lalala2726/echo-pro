@@ -92,4 +92,6 @@ public class StorageConstants {
      * 系统默认文件配置ID
      */
     public static final Long SYSTEM_DEFAULT_FILE_CONFIG_ID = 1L;
+    public static final String STORAGE_DIR_FILE = "file";
+    public static final String STORAGE_DIR_IMAGES = "images";
 }

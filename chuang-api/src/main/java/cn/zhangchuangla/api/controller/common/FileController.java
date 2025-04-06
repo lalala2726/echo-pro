@@ -1,14 +1,16 @@
 package cn.zhangchuangla.api.controller.common;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.factory.StorageFactory;
+import cn.zhangchuangla.system.service.FileManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +35,13 @@ public class FileController extends BaseController {
 
     private final SysFileConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
+    private final FileManagementService fileManagementService;
 
     @Autowired
-    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory) {
+    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory, FileManagementService fileManagementService) {
         this.sysFileConfigLoader = sysFileConfigLoader;
         this.storageFactory = storageFactory;
+        this.fileManagementService = fileManagementService;
     }
 
     /**
@@ -67,13 +71,13 @@ public class FileController extends BaseController {
             }
 
             FileTransferDto fileTransferDto = FileTransferDto.builder()
-                    .fileName(file.getOriginalFilename())
+                    .originalName(file.getOriginalFilename())
                     .bytes(file.getBytes())
-                    .fileType(file.getContentType())
+                    .contentType(file.getContentType())
                     .build();
 
-            FileTransferDto result = storageOperation.save(fileTransferDto);
-            ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
+            FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
+            ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
             return ajax;
         } catch (IOException e) {
             log.error("文件读取失败", e);
@@ -82,5 +86,40 @@ public class FileController extends BaseController {
             log.error("文件上传异常", e);
             return error("文件上传失败: " + e.getMessage());
         }
+    }
+
+
+    /**
+     * 图片上传
+     * 进行压缩处理并上传两个版本
+     *
+     * @param file 上传的文件
+     * @return 上传结果
+     */
+    @OperationLog(title = "图片上传", businessType = BusinessType.UPLOAD)
+    @Operation(summary = "图片上传")
+    @PostMapping("/image/upload")
+    public AjaxResult imageUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return error("请选择一个图片上传");
+        }
+        AjaxResult ajax = AjaxResult.success();
+        String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
+        StorageOperation storageOperation = storageFactory.getStorageOperation(currentDefaultUploadType);
+        try {
+            FileTransferDto fileTransferDto = FileTransferDto.builder()
+                    .originalName(file.getOriginalFilename())
+                    .bytes(file.getBytes())
+                    .contentType(file.getContentType())
+                    .build();
+            FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
+            // 保存文件信息到数据库
+            fileManagementService.saveFileInfo(result);
+            ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
+            ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());
+        } catch (IOException e) {
+            return error("文件读取失败: " + e.getMessage());
+        }
+        return ajax;
     }
 }

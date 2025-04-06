@@ -157,7 +157,7 @@ public class FileUtils {
      * @param args 文件路径
      * @return 文件路径
      */
-    public static String buildFinalPath(String... args) { // 修正方法名称，首字母小写
+    public static String buildFinalPath(String... args) {
         if (args == null || args.length == 0) {
             return "";
         }
@@ -173,7 +173,6 @@ public class FileUtils {
                 pathBuilder.append(sanitizedArg);
             }
         }
-
         return pathBuilder.toString();
     }
 
