@@ -137,15 +137,33 @@ public class SysFileConfigController extends BaseController {
 
 
     /**
+     * 设置主配置
+     *
+     * @return 设置结果
+     */
+    @PutMapping("/setMaster")
+    @Operation(summary = "设置主配置")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:update')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
+    public AjaxResult setIsMasterConfig(@RequestBody Long id) {
+        checkParam(id == null || id <= 0, "文件配置ID不能为空!");
+        boolean result = sysFileConfigService.setMasterConfig(id);
+        if (result) refreshCache();
+        toAjax(result);
+
+    }
+
+
+    /**
      * 刷新文件配置缓存
      *
      * @return 刷新结果
      */
     @GetMapping("/refreshCache")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:refreshCache')")
-    @Operation(summary = "刷新文件配置缓存")
+    @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult RefreshCache() {
+    public AjaxResult refreshCache() {
         String currentConfigName = sysFileConfigLoader.refreshCache();
         return AjaxResult.success(currentConfigName);
     }

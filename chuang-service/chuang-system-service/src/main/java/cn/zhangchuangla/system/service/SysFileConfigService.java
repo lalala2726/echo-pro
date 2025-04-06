@@ -121,4 +121,11 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      */
     boolean isNameExist(String storageName);
 
+    /**
+     * 设置主配置
+     *
+     * @param id 文件配置id
+     * @return 操作结果
+     */
+    boolean setMasterConfig(Long id);
 }

@@ -230,6 +230,32 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         return count > 0;
     }
 
+    /**
+     * 设置主配置
+     *
+     * @param id 文件配置id
+     * @return 操作结果
+     */
+    @Override
+    public boolean setMasterConfig(Long id) {
+        // 取消当前主配置
+        SysFileConfig currentMasterConfig = getMasterConfig();
+        if (currentMasterConfig != null) {
+            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(currentMasterConfig.getIsMaster())) {
+                throw new ServiceException("当前已经是主配置，无需再次设置");
+            }
+            currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
+            updateById(currentMasterConfig);
+        }
+        // 设置新的主配置
+        SysFileConfig newMasterConfig = getById(id);
+        if (newMasterConfig == null) {
+            throw new ServiceException("文件配置不存在");
+        }
+        newMasterConfig.setIsMaster(StorageConstants.IS_FILE_UPLOAD_MASTER);
+        return updateById(newMasterConfig);
+    }
+
 }
 
 
