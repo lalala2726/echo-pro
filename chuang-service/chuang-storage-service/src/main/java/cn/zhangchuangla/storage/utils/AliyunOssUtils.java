@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
@@ -33,18 +34,18 @@ public class AliyunOssUtils {
         if (aliyunOSSConfig == null) throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置不能为空！");
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
+
         String fileDomain = aliyunOSSConfig.getFileDomain();
         String endPoint = aliyunOSSConfig.getEndpoint();
         String accessKeyId = aliyunOSSConfig.getAccessKeyId();
         String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
         String bucketName = aliyunOSSConfig.getBucketName();
+
         // 使用FileUtils获取内容类型
         String contentType = FileUtils.generateFileContentType(fileName);
 
         // 默认不压缩
-        boolean isCompress = false;
 
-        // 创建OSS客户端
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
 
         try {
@@ -53,16 +54,18 @@ public class AliyunOssUtils {
             String fileExtension = FileUtils.getFileExtension(fileName);
 
             // 生成日期目录
-            String datePath = FileUtils.generateYearMonthDir();
 
-            String uploadFileName = FileUtils.buildFinalPath(fileNameWithoutExt + fileExtension);
+            String datePath = FileUtils.generateYearMonthDir();
+            // 构建上传路径
+            String uploadPath = FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE);
+
+            String uploadFileName = FileUtils.buildFinalPath(uploadPath, fileNameWithoutExt + fileExtension);
 
             // 设置元数据
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(data.length);
             metadata.setHeader("Content-Disposition", "inline");
             metadata.setContentType(contentType);
-
 
             // 上传文件
             ossClient.putObject(bucketName, uploadFileName, new ByteArrayInputStream(data), metadata);

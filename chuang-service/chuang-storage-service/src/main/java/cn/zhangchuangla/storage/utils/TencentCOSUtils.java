@@ -1,7 +1,9 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
@@ -9,8 +11,6 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
@@ -36,10 +36,12 @@ public class TencentCOSUtils {
      * @return 文件传输对象
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, TencentCOSConfigEntity tencentCOSConfigEntity) {
-        if (tencentCOSConfigEntity == null)
-            throw new FileException(ResponseCode.FileUploadFailed, "腾讯云COS配置不能为空！");
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
+
+        if (tencentCOSConfigEntity == null) {
+            throw new ProfileException("腾讯云COS配置文件为空！请检查配置文件是否存在？");
+        }
 
         String region = tencentCOSConfigEntity.getRegion();
         String secretId = tencentCOSConfigEntity.getSecretId();
@@ -69,7 +71,7 @@ public class TencentCOSUtils {
             String datePath = FileUtils.generateYearMonthDir();
             String fileExtension = FileUtils.getFileExtension(fileName);
             String uuid = FileUtils.generateUUID();
-            String objectName = FileUtils.buildFinalPath(datePath, uuid + fileExtension);
+            String objectName = FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
 
             // 6. 设置元数据
             ObjectMetadata metadata = new ObjectMetadata();
@@ -88,18 +90,6 @@ public class TencentCOSUtils {
                     .fileUrl(fileUrl)
                     .relativePath(objectName)
                     .build();
-
-        } catch (CosServiceException serviceException) {
-            // COS服务异常
-            log.error("COS服务异常: {} - {}",
-                    serviceException.getErrorCode(), serviceException.getErrorMessage(), serviceException);
-            throw new FileException(ResponseCode.FileUploadFailed,
-                    "COS服务异常: " + serviceException.getErrorMessage());
-        } catch (CosClientException clientException) {
-            // COS客户端异常
-            log.error("COS客户端异常", clientException);
-            throw new FileException(ResponseCode.FileUploadFailed,
-                    "COS客户端异常: " + clientException.getMessage());
         } catch (Exception e) {
             // 其他异常
             log.error("文件上传失败", e);

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
@@ -60,7 +61,7 @@ public class MinioUtils {
             String fileExtension = FileUtils.getFileExtension(fileName);
             // 组合最终路径: 日期/文件夹类型/文件名
             String uuid = FileUtils.generateUUID();
-            String objectName = FileUtils.buildFinalPath(datePath, uuid + fileExtension);
+            String objectName = FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
 
             // 上传文件
             minioClient.putObject(
