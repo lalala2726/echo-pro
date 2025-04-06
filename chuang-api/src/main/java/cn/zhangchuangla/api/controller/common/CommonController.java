@@ -1,12 +1,12 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +46,7 @@ public class CommonController extends BaseController {
      */
     @Operation(summary = "智能文件上传", description = "上传文件，如果上传的是图片，将进行压缩处理并上传两个版本")
     @PostMapping("/upload")
-    @Log(title = "文件上传", businessType = BusinessType.INSERT)
+    @OperationLog(title = "文件上传", businessType = BusinessType.INSERT)
     public AjaxResult upload(
             @RequestParam("file") MultipartFile file) throws IOException {
         String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();

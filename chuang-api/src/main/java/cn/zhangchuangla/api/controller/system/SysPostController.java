@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
@@ -64,7 +64,7 @@ public class SysPostController extends BaseController {
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:post:add')")
     @Operation(summary = "添加岗位")
-    @Log(title = "岗位管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "岗位管理", businessType = BusinessType.INSERT)
     public AjaxResult addPost(@Validated @RequestBody SysPostAddRequest request) {
         boolean result = sysPostService.addPost(request);
         return toAjax(result);
@@ -79,7 +79,7 @@ public class SysPostController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @PreAuthorize("@auth.hasPermission('system:post:remove')")
-    @Log(title = "岗位管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult removePost(@PathVariable("ids") List<Integer> ids) {
         checkParam(ids == null, "id不能为空");
@@ -95,7 +95,7 @@ public class SysPostController extends BaseController {
      */
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:post:edit')")
-    @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
     public AjaxResult editPost(@Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.editPost(request));

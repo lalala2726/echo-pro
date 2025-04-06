@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.core.page.TableDataResult;
@@ -8,6 +7,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
@@ -66,7 +66,7 @@ public class SysUserController extends BaseController {
     @PostMapping()
     @Operation(summary = "添加用户")
     @PreAuthorize("@auth.hasPermission('system:user:add')")
-    @Log(title = "用户管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @Validated @RequestBody AddUserRequest request) {
         return toAjax(sysUserService.addUserInfo(request));
@@ -81,7 +81,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除用户")
     @PreAuthorize("@auth.hasPermission('system:user:info')")
-    @Log(title = "用户管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
                                      @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
@@ -100,7 +100,7 @@ public class SysUserController extends BaseController {
     @PutMapping
     @Operation(summary = "修改用户信息")
     @PreAuthorize("@auth.hasPermission('system:user:update')")
-    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息")
                                          @Validated @RequestBody UpdateUserRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());

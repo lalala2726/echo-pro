@@ -7,7 +7,7 @@ app:
     copyright: Copyright © 2024-2025 zhangchuang All Rights Reserved.
     ip-address-enable: false
     strictLoginEnable: false
-    upload-path: D:\DevelopUploads\personApp
+    upload-path: /Users/zhangchuang/DevelopFileUpload
 #开发环境数据库文件
 server:
   port: 8080
@@ -20,7 +20,7 @@ spring:
       max-request-size: 1024MB
   data:
     redis:
-      host: localhost
+      host: 192.168.1.110
       port: 6379
       database: 0
       password: zhangchuang2726

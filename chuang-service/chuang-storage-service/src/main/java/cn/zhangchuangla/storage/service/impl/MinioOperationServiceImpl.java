@@ -1,12 +1,12 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.entity.FileTransferDto;
+import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.MinioOperationService;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
@@ -40,7 +40,6 @@ public class MinioOperationServiceImpl implements MinioOperationService {
     public FileTransferDto save(FileTransferDto fileTransferDto) {
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
-
         MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
         if (minioConfig == null) {
             throw new ProfileException("Minio配置文件为空！请你检查配置文件是否存在？");
@@ -50,7 +49,6 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         String secretKey = minioConfig.getSecretKey();
         String bucketName = minioConfig.getBucketName();
         String fileDomain = minioConfig.getFileDomain();
-
         try {
             // 创建Minio客户端
             MinioClient minioClient = MinioClient.builder()
@@ -64,20 +62,14 @@ public class MinioOperationServiceImpl implements MinioOperationService {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            // 生成年月目录
-            String yearMonthDir = FileUtils.generateYearMonthDir();
-
+            // 生成存储路径
+            String datePath = FileUtils.generateYearMonthDir();
             // 获取文件扩展名
             String fileExtension = FileUtils.getFileExtension(fileName);
+            // 组合最终路径: 日期/文件夹类型/文件名
+            String uuid = FileUtils.generateUUID();
+            String objectName = FileUtils.buildFinalPath(datePath, uuid + fileExtension);
 
-            // 生成唯一文件名
-            String uuidFileName = FileUtils.generateFileName();
-
-            // 构建对象名称（包含路径和扩展名）
-            String objectName = FileUtils.buildFinalPath(yearMonthDir, uuidFileName + fileExtension);
-
-            // 获取内容类型
-            String contentType = FileUtils.generateFileContentType(fileName);
 
             // 上传文件
             minioClient.putObject(
@@ -85,11 +77,12 @@ public class MinioOperationServiceImpl implements MinioOperationService {
                             .bucket(bucketName)
                             .object(objectName)
                             .stream(new ByteArrayInputStream(data), data.length, -1)
-                            .contentType(contentType)
-                            .build());
+                            .build()
+            );
+
+            String fileUrl = FileUtils.buildFinalPath(fileDomain, objectName);
 
             // 返回文件URL
-            String fileUrl = fileDomain + "/" + objectName;
             return FileTransferDto.builder()
                     .fileUrl(fileUrl) // 修正字段名称
                     .relativePath(objectName)
@@ -98,5 +91,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
             log.warn("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed);
         }
+
     }
+
 }

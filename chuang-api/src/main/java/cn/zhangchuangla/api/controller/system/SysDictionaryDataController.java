@@ -1,11 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.DictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
@@ -85,7 +85,7 @@ public class SysDictionaryDataController extends BaseController {
     @Operation(summary = "添加字典值")
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
-    @Log(title = "字典值管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "字典值管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
         return toAjax(dictionaryDataService.addDictionaryData(request));
     }
@@ -116,7 +116,7 @@ public class SysDictionaryDataController extends BaseController {
     @Operation(summary = "修改字典值")
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:update')")
-    @Log(title = "字典值管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "字典值管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         checkParam(request == null, "参数不能为空!");
         return success(dictionaryDataService.updateDictionaryData(request));
@@ -131,7 +131,7 @@ public class SysDictionaryDataController extends BaseController {
     @Operation(summary = "删除字典值")
     @DeleteMapping("/{id}")
     @PreAuthorize("@auth.hasPermission('system:dictionary-data:delete')")
-    @Log(title = "字典值管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "字典值管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionaryData(@PathVariable("id") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "字典值ID不能为空!");

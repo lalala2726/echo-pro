@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.annotation;
+package cn.zhangchuangla.infrastructure.annotation;
 
 
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Log {
+public @interface OperationLog {
     /**
      * 模块
      */

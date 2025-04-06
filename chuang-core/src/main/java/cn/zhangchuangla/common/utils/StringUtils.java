@@ -62,6 +62,19 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 如果字符串的最后一个字符是“/”，则替换为空字符串
+     *
+     * @param input 输入字符串
+     * @return 处理后的字符串
+     */
+    public static String removeTrailingSlash(String input) {
+        if (input != null && input.endsWith("/")) {
+            return input.substring(0, input.length() - 1);
+        }
+        return input;
+    }
+
+    /**
      * 将字符串首字母转为小写
      *
      * @param str 输入字符串

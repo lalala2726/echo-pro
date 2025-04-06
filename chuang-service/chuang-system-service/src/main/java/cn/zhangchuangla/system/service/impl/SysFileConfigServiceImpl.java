@@ -1,16 +1,25 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.system.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigUpdateRequest;
 import cn.zhangchuangla.system.service.SysFileConfigService;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +29,7 @@ import org.springframework.stereotype.Service;
  * @author zhangchuang
  */
 @Service
+@Slf4j
 public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, SysFileConfig>
         implements SysFileConfigService {
 
@@ -83,6 +93,74 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     }
 
     /**
+     * 添加本地文件配置文件
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean saveFileConfig(LocalFileConfigRequest request) {
+        LocalFileConfigEntity localFileConfig = new LocalFileConfigEntity();
+        BeanUtils.copyProperties(request, localFileConfig);
+        String value = JSON.toJSONString(localFileConfig);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
+    }
+
+    /**
+     * 添加阿里云OSS配置文件
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean saveFileConfig(AliyunOSSConfigRequest request) {
+        AliyunOSSConfigEntity aliyunOSSConfigEntity = new AliyunOSSConfigEntity();
+        BeanUtils.copyProperties(request, aliyunOSSConfigEntity);
+        String value = JSON.toJSONString(aliyunOSSConfigEntity);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
+    }
+
+    /**
+     * 添加Minio配置文件
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean saveFileConfig(MinioConfigRequest request) {
+        MinioConfigEntity minioConfigEntity = new MinioConfigEntity();
+        BeanUtils.copyProperties(request, minioConfigEntity);
+        String value = JSON.toJSONString(minioConfigEntity);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
+    }
+
+
+    /**
+     * 保存文件配置
+     *
+     * @param storageName 存储名字
+     * @param storageKey  存储key
+     * @param storageType 存储类型
+     * @param value       文件配置文件（JSON）
+     * @return 保存结果
+     */
+    private boolean saveFileConfig(String storageName, String storageKey, String storageType, String value) {
+        if (isStorageKeyExist(storageKey)) {
+            throw new ServiceException(String.format("存储key【%s】已存在", storageName));
+        }
+        if (isNameExist(storageName)) {
+            throw new ServiceException(String.format("存储名称【%s】已存在", storageKey));
+        }
+        SysFileConfig sysFileConfig = SysFileConfig.builder()
+                .storageName(storageName)
+                .storageKey(storageKey)
+                .storageValue(value)
+                .storageType(storageType)
+                .build();
+        return save(sysFileConfig);
+    }
+
+    /**
      * 更新文件配置
      *
      * @param request 请求参数
@@ -137,6 +215,21 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
                 .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
+
+    /**
+     * 判断存储名称是否存在
+     *
+     * @param storageName 存储名称
+     * @return true存在，false不存在
+     */
+    @Override
+    public boolean isNameExist(String storageName) {
+        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
+                .eq(SysFileConfig::getStorageName, storageName);
+        long count = count(eq);
+        return count > 0;
+    }
+
 }
 
 

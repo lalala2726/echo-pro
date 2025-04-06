@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage.entity;
+package cn.zhangchuangla.storage.dto;
 
 import lombok.Builder;
 import lombok.Data;

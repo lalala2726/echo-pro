@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
@@ -8,6 +7,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
@@ -94,7 +94,7 @@ public class SysRoleController extends BaseController {
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:delete')")
-    @Log(title = "角色管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteRoleInfo(@PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
             return success(SystemMessageConstant.DELETE_SUCCESS);
@@ -112,7 +112,7 @@ public class SysRoleController extends BaseController {
     @PutMapping
     @Operation(summary = "修改角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:update')")
-    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "角色管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateRoleInfo(@Validated @RequestBody SysRoleUpdateRequest request) {
         boolean result = sysRoleService.updateRoleInfo(request);
         return toAjax(result);
@@ -126,7 +126,7 @@ public class SysRoleController extends BaseController {
     @PostMapping
     @Operation(summary = "添加角色信息")
     @PreAuthorize("@auth.hasPermission('system:role:add')")
-    @Log(title = "角色管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "角色管理", businessType = BusinessType.INSERT)
     public AjaxResult addRoleInfo(@Validated @RequestBody SysRoleAddRequest roleAddRequest) {
         sysRoleService.addRoleInfo(roleAddRequest);
         return AjaxResult.success();

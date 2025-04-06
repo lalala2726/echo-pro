@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.dto;
 
-import cn.zhangchuangla.common.entity.file.FileInfo;
+import cn.zhangchuangla.common.model.entity.file.FileInfo;
 import lombok.Builder;
 import lombok.Data;
 
