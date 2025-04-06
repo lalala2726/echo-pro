@@ -164,12 +164,15 @@ public class FileUtils {
             return "";
         }
         StringBuilder pathBuilder = new StringBuilder();
-        for (String folder : args) {
-            if (folder != null && !folder.isEmpty()) {
-                if (pathBuilder.length() > 0 && !pathBuilder.toString().endsWith("/")) {
+        for (String arg : args) {
+            if (arg != null && !arg.isEmpty()) {
+                // 去除路径中的反斜杠
+                String sanitizedArg = arg.replace("\\", "/");
+                // 如果路径不以斜杠开头，则添加斜杠
+                if (pathBuilder.length() > 0 && !sanitizedArg.startsWith("/")) {
                     pathBuilder.append("/");
                 }
-                pathBuilder.append(folder.trim());
+                pathBuilder.append(sanitizedArg);
             }
         }
 
