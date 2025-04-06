@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
@@ -16,13 +17,12 @@ import java.io.ByteArrayInputStream;
  * 阿里云OSS存储工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 10:00
+ * <p>
+ * created on 2025/4/3 10:00
  */
 @Slf4j
 public class AliyunOssUtils extends AbstractStorageUtils {
 
-    private static final String STORAGE_TYPE = "ALIYUN_OSS";
 
     /**
      * 上传文件到阿里云OSS
@@ -36,7 +36,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
         validateUploadParams(fileTransferDto, aliyunOSSConfig);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, aliyunOSSConfig.getBucketName());
+        fillFileTransferInfo(fileTransferDto, StorageConstants.ALIYUN_OSS, aliyunOSSConfig.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
         if (isImage(fileTransferDto)) {
@@ -82,7 +82,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
         validateUploadParams(fileTransferDto, aliyunOSSConfig);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, aliyunOSSConfig.getBucketName());
+        fillFileTransferInfo(fileTransferDto, StorageConstants.ALIYUN_OSS, aliyunOSSConfig.getBucketName());
 
         // 验证是否为图片类型
         if (!isImage(fileTransferDto)) {

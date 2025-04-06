@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
@@ -24,7 +25,6 @@ import java.nio.file.Paths;
 @Slf4j
 public class LocalStorageUtils extends AbstractStorageUtils {
 
-    private static final String STORAGE_TYPE = "LOCAL";
 
     /**
      * 上传文件到本地存储
@@ -41,7 +41,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         }
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, "local-storage");
+        fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
 
         // 如果是图片类型，则调用图片上传方法
         if (isImage(fileTransferDto)) {
@@ -79,7 +79,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         }
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, "local-storage");
+        fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
 
         // 验证是否为图片类型
         //fixme 图片类型判断需要修复

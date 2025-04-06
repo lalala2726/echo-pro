@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
@@ -18,13 +19,12 @@ import java.io.ByteArrayInputStream;
  * Minio存储工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 10:00
+ * <p>
+ * created on 2025/4/3 10:00
  */
 @Slf4j
 public class MinioUtils extends AbstractStorageUtils {
 
-    private static final String STORAGE_TYPE = "MINIO";
 
     /**
      * 上传文件到Minio
@@ -38,7 +38,7 @@ public class MinioUtils extends AbstractStorageUtils {
         validateUploadParams(fileTransferDto, minioConfigEntity);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, minioConfigEntity.getBucketName());
+        fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO, minioConfigEntity.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
         if (isImage(fileTransferDto)) {
@@ -84,7 +84,7 @@ public class MinioUtils extends AbstractStorageUtils {
         validateUploadParams(fileTransferDto, minioConfigEntity);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, minioConfigEntity.getBucketName());
+        fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO, minioConfigEntity.getBucketName());
 
         // 验证是否为图片类型
         if (!isImage(fileTransferDto)) {
