@@ -24,11 +24,16 @@ public class FileTransferDto {
      */
     private String originalName;
 
+    /**
+     * 文件字节数组
+     */
+    private byte[] bytes;
 
     /**
      * 文件类型，如image/jpeg, application/pdf等
      */
     private String contentType;
+
 
     /**
      * 文件大小，格式化后的字符串，如"1.5MB"
@@ -59,4 +64,21 @@ public class FileTransferDto {
      * 压缩文件相对路径，存储在服务器上的路径
      */
     private String compressedRelativePath;
+
+    /**
+     * 文件扩展名
+     */
+    private String fileExtension;
+
+    /**
+     * 文件存储类型
+     */
+    private String storageType;
+
+    /**
+     * 文件所属存储桶名称
+     */
+    private String bucketName;
+
+
 }

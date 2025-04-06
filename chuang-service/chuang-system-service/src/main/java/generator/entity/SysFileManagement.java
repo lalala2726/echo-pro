@@ -1,24 +1,18 @@
-package cn.zhangchuangla.system.model.entity;
+package generator.entity;
 
-import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.Data;
 
 import java.util.Date;
 
 /**
  * 文件上传记录表
  */
-@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_file_management")
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class FileManagement extends BaseEntity {
-
+public class SysFileManagement {
     /**
      * 主键ID
      */
@@ -31,18 +25,12 @@ public class FileManagement extends BaseEntity {
     private String originalName;
 
     /**
-     * 文件字节数组
-     */
-    private byte[] bytes;
-
-    /**
-     * 文件类型，如image/jpeg, application/pdf等
+     * 文件类型，如 image/jpeg, application/pdf 等
      */
     private String contentType;
 
-
     /**
-     * 文件大小，格式化后的字符串，如"1.5MB"
+     * 文件大小，格式化后的字符串，如 "1.5MB"
      */
     private String fileSize;
 
@@ -77,12 +65,12 @@ public class FileManagement extends BaseEntity {
     private String fileExtension;
 
     /**
-     * 存储类型(LOCAL/MINIO/ALIYUN_OSS)
+     * 存储类型 (LOCAL/MINIO/ALIYUN_OSS)
      */
     private String storageType;
 
     /**
-     * 存储桶名称(OSS/MINIO使用)
+     * 存储桶名称（OSS/MINIO 使用）
      */
     private String bucketName;
 
@@ -102,8 +90,17 @@ public class FileManagement extends BaseEntity {
     private Date uploadTime;
 
     /**
-     * 是否删除(0-未删除,1-已删除)
+     * 是否删除 (0-未删除, 1-已删除)
      */
     private Integer isDeleted;
 
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

@@ -28,7 +28,8 @@ public abstract class AbstractStorageUtils {
      * @return 是否为图片
      */
     protected static boolean isImage(FileTransferDto fileTransferDto) {
-        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getOriginalName() == null) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null
+                || fileTransferDto.getOriginalName() == null) {
             return false;
         }
 
@@ -48,7 +49,8 @@ public abstract class AbstractStorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "存储服务配置不能为空！");
         }
 
-        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getOriginalName() == null) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null
+                || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
         }
 
@@ -144,5 +146,82 @@ public abstract class AbstractStorageUtils {
                 .compressedFileUrl(compressedUrl)
                 .compressedRelativePath(compressedPath)
                 .build();
+    }
+
+    /**
+     * 填充文件传输对象的基本信息
+     *
+     * @param fileTransferDto 文件传输对象
+     * @param storageType     存储类型
+     * @param bucketName      桶名称
+     * @return 填充后的文件传输对象
+     */
+    protected static FileTransferDto fillFileTransferInfo(FileTransferDto fileTransferDto, String storageType,
+                                                          String bucketName) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null
+                || fileTransferDto.getOriginalName() == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
+        }
+
+        byte[] data = fileTransferDto.getBytes();
+        String fileName = fileTransferDto.getOriginalName();
+
+        // 填充文件基础信息
+        fileTransferDto.setFileExtension(FileUtils.getFileExtension(fileName));
+        fileTransferDto.setContentType(FileUtils.generateFileContentType(fileName));
+        fileTransferDto.setFileMd5(FileUtils.calculateMD5(data));
+
+        // 计算并格式化文件大小
+        long fileSizeBytes = data.length;
+        String formattedSize = formatFileSize(fileSizeBytes);
+        fileTransferDto.setFileSize(formattedSize);
+
+        // 设置存储相关信息
+        fileTransferDto.setStorageType(storageType);
+        fileTransferDto.setBucketName(bucketName);
+
+        return fileTransferDto;
+    }
+
+    /**
+     * 格式化文件大小为人类可读格式
+     *
+     * @param sizeInBytes 文件大小（字节）
+     * @return 格式化后的文件大小字符串
+     */
+    protected static String formatFileSize(long sizeInBytes) {
+        if (sizeInBytes < 1024) {
+            return sizeInBytes + " B";
+        } else if (sizeInBytes < 1024 * 1024) {
+            return String.format("%.2f KB", sizeInBytes / 1024.0);
+        } else if (sizeInBytes < 1024 * 1024 * 1024) {
+            return String.format("%.2f MB", sizeInBytes / (1024.0 * 1024));
+        } else {
+            return String.format("%.2f GB", sizeInBytes / (1024.0 * 1024 * 1024));
+        }
+    }
+
+    /**
+     * 创建增强版的FileTransferDto响应对象，填充所有必要的字段
+     *
+     * @param originalUrl          原始文件URL
+     * @param originalRelativePath 原始文件相对路径
+     * @param compressedUrl        压缩文件URL (可为null)
+     * @param compressedPath       压缩文件相对路径 (可为null)
+     * @param fileTransferDto      原始文件传输对象，包含基础信息
+     * @return 增强的文件传输对象
+     */
+    protected static FileTransferDto createEnhancedFileTransferResponse(
+            String originalUrl, String originalRelativePath,
+            String compressedUrl, String compressedPath,
+            FileTransferDto fileTransferDto) {
+
+        // 保留原有信息
+        fileTransferDto.setOriginalFileUrl(originalUrl);
+        fileTransferDto.setOriginalRelativePath(originalRelativePath);
+        fileTransferDto.setCompressedFileUrl(compressedUrl);
+        fileTransferDto.setCompressedRelativePath(compressedPath);
+
+        return fileTransferDto;
     }
 }

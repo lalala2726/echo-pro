@@ -113,6 +113,7 @@ public class FileController extends BaseController {
                     .contentType(file.getContentType())
                     .build();
             FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
+            // 保存文件信息到数据库
             fileManagementService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
             ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());

@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysFileConfig" />
-                  <option name="tableName" value="sys_file_config" />
+                  <option name="className" value="SysFileManagement" />
+                  <option name="tableName" value="sys_file_management" />
                 </TableUIInfo>
               </list>
             </option>

@@ -24,6 +24,8 @@ import java.nio.file.Paths;
 @Slf4j
 public class LocalStorageUtils extends AbstractStorageUtils {
 
+    private static final String STORAGE_TYPE = "LOCAL";
+
     /**
      * 上传文件到本地存储
      *
@@ -33,6 +35,19 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 文件传输对象
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null
+                || fileTransferDto.getOriginalName() == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
+        }
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, "local-storage");
+
+        // 如果是图片类型，则调用图片上传方法
+        if (isImage(fileTransferDto)) {
+            return imageUpload(fileTransferDto, uploadPath, fileDomain);
+        }
+
         String fileName = fileTransferDto.getOriginalName();
         byte[] data = fileTransferDto.getBytes();
 
@@ -45,7 +60,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         // 构建URL
         String fileUrl = buildCompleteUrl(relativePath, fileDomain);
 
-        return createFileTransferResponse(fileUrl, relativePath, null, null);
+        return createEnhancedFileTransferResponse(fileUrl, relativePath, null, null, fileTransferDto);
     }
 
     /**
@@ -58,6 +73,20 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 增强后的文件传输对象
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null
+                || fileTransferDto.getOriginalName() == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
+        }
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, "local-storage");
+
+        // 验证是否为图片类型
+        //fixme 图片类型判断需要修复
+//        if (!isImage(fileTransferDto)) {
+//            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
+//        }
+
         String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
 
@@ -75,9 +104,10 @@ public class LocalStorageUtils extends AbstractStorageUtils {
             saveFile(compressedData, uploadPath, compressedRelativePath);
             String compressedUrl = buildCompleteUrl(compressedRelativePath, fileDomain);
 
-            return createFileTransferResponse(
+            return createEnhancedFileTransferResponse(
                     originalUrl, originalRelativePath,
-                    compressedUrl, compressedRelativePath);
+                    compressedUrl, compressedRelativePath,
+                    fileTransferDto);
 
         } catch (Exception e) {
             log.error("图片处理及保存失败", e);

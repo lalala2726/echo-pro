@@ -20,11 +20,13 @@ import java.io.ByteArrayInputStream;
  * 腾讯云COS存储工具类
  *
  * @author Chuang
- * <p>
- * created on 2025/4/3 10:00
+ *         <p>
+ *         created on 2025/4/3 10:00
  */
 @Slf4j
 public class TencentCOSUtils extends AbstractStorageUtils {
+
+    private static final String STORAGE_TYPE = "TENCENT_COS";
 
     /**
      * 上传文件到腾讯云COS
@@ -37,6 +39,9 @@ public class TencentCOSUtils extends AbstractStorageUtils {
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto,
                                              TencentCOSConfigEntity tencentCOSConfigEntity) {
         validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, tencentCOSConfigEntity.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
         if (isImage(fileTransferDto)) {
@@ -60,7 +65,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             // 构建文件URL
             String fileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), objectName);
 
-            return createFileTransferResponse(fileUrl, objectName, null, null);
+            return createEnhancedFileTransferResponse(fileUrl, objectName, null, null, fileTransferDto);
         } catch (Exception e) {
             log.error("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
@@ -82,6 +87,9 @@ public class TencentCOSUtils extends AbstractStorageUtils {
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto,
                                               TencentCOSConfigEntity tencentCOSConfigEntity) {
         validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, tencentCOSConfigEntity.getBucketName());
 
         // 验证是否为图片类型
         if (!isImage(fileTransferDto)) {
@@ -110,9 +118,10 @@ public class TencentCOSUtils extends AbstractStorageUtils {
                     fileName);
             String compressedFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), compressedObjectName);
 
-            return createFileTransferResponse(
+            return createEnhancedFileTransferResponse(
                     originalFileUrl, originalObjectName,
-                    compressedFileUrl, compressedObjectName);
+                    compressedFileUrl, compressedObjectName,
+                    fileTransferDto);
         } catch (Exception e) {
             log.error("图片上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());

@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 @Slf4j
 public class AliyunOssUtils extends AbstractStorageUtils {
 
+    private static final String STORAGE_TYPE = "ALIYUN_OSS";
+
     /**
      * 上传文件到阿里云OSS
      * 如果检测到是图片类型，会自动调用图片上传方法
@@ -32,6 +34,9 @@ public class AliyunOssUtils extends AbstractStorageUtils {
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig) {
         validateUploadParams(fileTransferDto, aliyunOSSConfig);
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, aliyunOSSConfig.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
         if (isImage(fileTransferDto)) {
@@ -54,7 +59,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
             // 构建文件URL
             String fileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), objectName);
 
-            return createFileTransferResponse(fileUrl, objectName, null, null);
+            return createEnhancedFileTransferResponse(fileUrl, objectName, null, null, fileTransferDto);
         } catch (Exception e) {
             log.warn("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
@@ -75,6 +80,9 @@ public class AliyunOssUtils extends AbstractStorageUtils {
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig) {
         validateUploadParams(fileTransferDto, aliyunOSSConfig);
+
+        // 填充文件基础信息
+        fillFileTransferInfo(fileTransferDto, STORAGE_TYPE, aliyunOSSConfig.getBucketName());
 
         // 验证是否为图片类型
         if (!isImage(fileTransferDto)) {
@@ -101,9 +109,10 @@ public class AliyunOssUtils extends AbstractStorageUtils {
             uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), compressedObjectName, compressedData, fileName);
             String compressedFileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), compressedObjectName);
 
-            return createFileTransferResponse(
+            return createEnhancedFileTransferResponse(
                     originalFileUrl, originalObjectName,
-                    compressedFileUrl, compressedObjectName);
+                    compressedFileUrl, compressedObjectName,
+                    fileTransferDto);
         } catch (Exception e) {
             log.warn("图片上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());
