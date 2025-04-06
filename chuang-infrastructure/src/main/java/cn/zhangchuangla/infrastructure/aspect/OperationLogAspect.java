@@ -1,12 +1,12 @@
-package cn.zhangchuangla.infrastructure.aspectj;
+package cn.zhangchuangla.infrastructure.aspect;
 
-import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.ServletUtils;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.service.SysOperationLogService;
 import com.alibaba.fastjson.JSON;
@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 @Aspect
 @Component
 @Slf4j
-public class LogAspect {
+public class OperationLogAspect {
 
     /**
      * 默认排除的敏感字段，防止敏感信息被记录
@@ -54,7 +54,7 @@ public class LogAspect {
     /**
      * 构造方法注入日志服务
      */
-    public LogAspect(SysOperationLogService sysOperationLogService) {
+    public OperationLogAspect(SysOperationLogService sysOperationLogService) {
         this.sysOperationLogService = sysOperationLogService;
     }
 

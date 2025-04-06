@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.annotation;
+package cn.zhangchuangla.infrastructure.annotation;
 
 
 import cn.zhangchuangla.common.enums.BusinessType;

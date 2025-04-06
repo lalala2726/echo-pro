@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.department.SysDeptListRequest;

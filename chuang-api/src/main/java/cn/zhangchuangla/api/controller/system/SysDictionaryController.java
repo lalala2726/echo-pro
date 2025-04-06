@@ -1,12 +1,12 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.Dictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
