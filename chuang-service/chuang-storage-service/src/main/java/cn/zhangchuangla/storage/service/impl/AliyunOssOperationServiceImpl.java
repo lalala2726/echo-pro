@@ -32,13 +32,18 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
         AliyunOSSConfigEntity aliyunOSSConfig = sysFileConfigLoader.getAliyunOSSConfig();
 
 
-        FileTransferDto fileResult = AliyunOssUtils.uploadFile(fileTransferDto, aliyunOSSConfig);
-        return fileResult;
+        return AliyunOssUtils.uploadFile(fileTransferDto, aliyunOSSConfig);
     }
 
 
+    /**
+     * 上传图片
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return FileTransferDto
+     */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        return null;
+        return AliyunOssUtils.imageUpload(fileTransferDto, sysFileConfigLoader.getAliyunOSSConfig());
     }
 }

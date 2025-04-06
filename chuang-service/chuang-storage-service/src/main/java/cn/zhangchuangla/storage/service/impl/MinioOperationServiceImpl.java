@@ -33,8 +33,14 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         return MinioUtils.uploadFile(fileTransferDto, minioConfig);
     }
 
+    /**
+     * 上传图片
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return FileTransferDto
+     */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        return null;
+        return MinioUtils.uploadFile(fileTransferDto, sysFileConfigLoader.getMinioConfig());
     }
 }

@@ -20,8 +20,8 @@ import java.io.ByteArrayInputStream;
  * 腾讯云COS存储工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 10:00
+ * <p>
+ * created on 2025/4/3 10:00
  */
 @Slf4j
 public class TencentCOSUtils extends AbstractStorageUtils {
@@ -117,9 +117,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             log.error("图片上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());
         } finally {
-            if (cosClient != null) {
-                cosClient.shutdown();
-            }
+            cosClient.shutdown();
         }
     }
 
