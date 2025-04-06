@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core;
 
-import cn.zhangchuangla.storage.dto.FileTransferDto;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 
 /**
  * 存储操作接口

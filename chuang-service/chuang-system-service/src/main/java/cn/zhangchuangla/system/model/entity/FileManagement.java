@@ -1,18 +1,24 @@
 package cn.zhangchuangla.system.model.entity;
 
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
 
 /**
  * 文件上传记录表
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_file_management")
 @Data
-public class FileManagement {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class FileManagement extends BaseEntity {
+
     /**
      * 主键ID
      */
@@ -20,44 +26,50 @@ public class FileManagement {
     private Long id;
 
     /**
-     * 文件名称
+     * 文件名
      */
-    private String fileName;
+    private String originalName;
 
     /**
-     * 原始文件名
+     * 文件字节数组
      */
-    private String originalFileName;
+    private byte[] bytes;
 
     /**
-     * 文件相对路径
+     * 文件类型，如image/jpeg, application/pdf等
      */
-    private String originalRelativeFileLocation;
+    private String contentType;
+
 
     /**
-     * 预言文件相对路径
+     * 文件大小，格式化后的字符串，如"1.5MB"
      */
-    private String previewRelativeFileLocation;
+    private String fileSize;
 
     /**
-     * 文件访问URL
+     * 文件MD5值，用于文件完整性校验
      */
-    private String fileUrl;
+    private String fileMd5;
 
     /**
-     * 预览图片
+     * 原始文件URL，直接访问地址
      */
-    private String previewImage;
+    private String originalFileUrl;
 
     /**
-     * 文件大小(字节)
+     * 原始文件相对路径，存储在服务器上的路径
      */
-    private Long fileSize;
+    private String originalRelativePath;
 
     /**
-     * 文件类型/MIME类型
+     * 压缩文件URL，用于图片预览等场景
      */
-    private String fileType;
+    private String compressedFileUrl;
+
+    /**
+     * 压缩文件相对路径，存储在服务器上的路径
+     */
+    private String compressedRelativePath;
 
     /**
      * 文件扩展名
@@ -73,11 +85,6 @@ public class FileManagement {
      * 存储桶名称(OSS/MINIO使用)
      */
     private String bucketName;
-
-    /**
-     * 文件MD5值
-     */
-    private String md5;
 
     /**
      * 上传者ID
@@ -99,28 +106,4 @@ public class FileManagement {
      */
     private Integer isDeleted;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

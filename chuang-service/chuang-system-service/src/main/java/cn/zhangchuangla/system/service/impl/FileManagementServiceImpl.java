@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.system.mapper.FileManagementMapper;
 import cn.zhangchuangla.system.model.entity.FileManagement;
 import cn.zhangchuangla.system.service.FileManagementService;
@@ -17,6 +18,16 @@ import org.springframework.stereotype.Service;
 public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper, FileManagement>
         implements FileManagementService {
 
+    /**
+     * 保存文件信息
+     *
+     * @param fileTransferDto 文件上传结果
+     */
+    @Override
+    public void saveFileInfo(FileTransferDto fileTransferDto) {
+        FileManagement fileManagement = FileManagement.builder()
+                .build();
+    }
 }
 
 

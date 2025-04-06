@@ -2,9 +2,9 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -43,7 +43,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             return imageUpload(fileTransferDto, tencentCOSConfigEntity);
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] data = fileTransferDto.getBytes();
 
         // 创建COS客户端
@@ -88,7 +88,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
 
         // 创建COS客户端

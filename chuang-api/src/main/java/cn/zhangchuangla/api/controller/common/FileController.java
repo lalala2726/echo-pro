@@ -4,12 +4,13 @@ import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.factory.StorageFactory;
+import cn.zhangchuangla.system.service.FileManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +35,13 @@ public class FileController extends BaseController {
 
     private final SysFileConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
+    private final FileManagementService fileManagementService;
 
     @Autowired
-    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory) {
+    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory, FileManagementService fileManagementService) {
         this.sysFileConfigLoader = sysFileConfigLoader;
         this.storageFactory = storageFactory;
+        this.fileManagementService = fileManagementService;
     }
 
     /**
@@ -68,9 +71,9 @@ public class FileController extends BaseController {
             }
 
             FileTransferDto fileTransferDto = FileTransferDto.builder()
-                    .fileName(file.getOriginalFilename())
+                    .originalName(file.getOriginalFilename())
                     .bytes(file.getBytes())
-                    .fileType(file.getContentType())
+                    .contentType(file.getContentType())
                     .build();
 
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
@@ -105,11 +108,12 @@ public class FileController extends BaseController {
         StorageOperation storageOperation = storageFactory.getStorageOperation(currentDefaultUploadType);
         try {
             FileTransferDto fileTransferDto = FileTransferDto.builder()
-                    .fileName(file.getOriginalFilename())
+                    .originalName(file.getOriginalFilename())
                     .bytes(file.getBytes())
-                    .fileType(file.getContentType())
+                    .contentType(file.getContentType())
                     .build();
             FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
+            fileManagementService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
             ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());
         } catch (IOException e) {

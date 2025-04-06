@@ -2,10 +2,10 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -40,7 +40,7 @@ public class MinioUtils extends AbstractStorageUtils {
             return imageUpload(fileTransferDto, minioConfigEntity);
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] data = fileTransferDto.getBytes();
 
         try {
@@ -83,7 +83,7 @@ public class MinioUtils extends AbstractStorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
 
         try {

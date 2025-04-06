@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage.dto;
+package cn.zhangchuangla.common.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
  * 用于文件上传、下载等操作的数据传输
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/2 20:32
+ * <p>
+ * created on 2025/4/2 20:32
  */
 @Data
 @Builder
@@ -22,22 +22,13 @@ public class FileTransferDto {
     /**
      * 文件名
      */
-    private String fileName;
+    private String originalName;
 
-    /**
-     * 文件字节数组
-     */
-    private byte[] bytes;
 
     /**
      * 文件类型，如image/jpeg, application/pdf等
      */
-    private String fileType;
-
-    /**
-     * 文件路径
-     */
-    private String filePath;
+    private String contentType;
 
     /**
      * 文件大小，格式化后的字符串，如"1.5MB"

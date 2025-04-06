@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.config.AppConfig;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import cn.zhangchuangla.storage.utils.LocalStorageUtils;
 import jakarta.annotation.Resource;

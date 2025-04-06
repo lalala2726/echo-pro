@@ -1,8 +1,8 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
 import cn.zhangchuangla.storage.utils.TencentCOSUtils;
 import lombok.extern.slf4j.Slf4j;

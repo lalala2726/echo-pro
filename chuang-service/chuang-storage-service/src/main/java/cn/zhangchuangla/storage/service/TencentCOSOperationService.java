@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.service;
 
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.core.StorageOperation;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 
 /**
  * 腾讯云COS操作接口

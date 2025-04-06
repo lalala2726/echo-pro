@@ -3,9 +3,9 @@ package cn.zhangchuangla.storage.utils;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.ImageUtils;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,11 +28,11 @@ public abstract class AbstractStorageUtils {
      * @return 是否为图片
      */
     protected static boolean isImage(FileTransferDto fileTransferDto) {
-        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getFileName() == null) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getOriginalName() == null) {
             return false;
         }
 
-        String contentType = FileUtils.generateFileContentType(fileTransferDto.getFileName());
+        String contentType = FileUtils.generateFileContentType(fileTransferDto.getOriginalName());
         return ImageUtils.isImage(contentType);
     }
 
@@ -48,11 +48,11 @@ public abstract class AbstractStorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "存储服务配置不能为空！");
         }
 
-        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getFileName() == null) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
         }
 
-        return fileTransferDto.getFileName();
+        return fileTransferDto.getOriginalName();
     }
 
     /**

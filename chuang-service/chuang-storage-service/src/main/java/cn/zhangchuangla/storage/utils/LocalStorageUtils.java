@@ -3,9 +3,9 @@ package cn.zhangchuangla.storage.utils;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 文件传输对象
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] data = fileTransferDto.getBytes();
 
         // 生成存储路径
@@ -58,7 +58,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 增强后的文件传输对象
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
 
         try {

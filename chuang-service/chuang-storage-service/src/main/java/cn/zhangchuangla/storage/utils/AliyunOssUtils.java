@@ -2,9 +2,9 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
+import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
-import cn.zhangchuangla.storage.dto.FileTransferDto;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -38,7 +38,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
             return imageUpload(fileTransferDto, aliyunOSSConfig);
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] data = fileTransferDto.getBytes();
 
         // 创建OSS客户端
@@ -81,7 +81,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
-        String fileName = fileTransferDto.getFileName();
+        String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
 
         // 创建OSS客户端
