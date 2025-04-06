@@ -1,10 +1,10 @@
 package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.dto.FileTransferDto;

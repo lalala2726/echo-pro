@@ -3,10 +3,10 @@ package cn.zhangchuangla.common.utils;
 import cn.zhangchuangla.common.config.AliyunOSSConfig;
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.config.MinioConfig;
-import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import org.apache.commons.lang3.StringUtils;
 
 /**

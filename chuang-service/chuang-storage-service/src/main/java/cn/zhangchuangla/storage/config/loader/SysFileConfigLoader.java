@@ -3,11 +3,11 @@ package cn.zhangchuangla.storage.config.loader;
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
-import cn.zhangchuangla.common.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.service.SysFileConfigService;
 import com.alibaba.fastjson.JSON;
@@ -53,6 +53,7 @@ public class SysFileConfigLoader {
             return;
         }
         cacheSysFileConfigByStorageType(config);
+        log.info("文件上传配置加载成功!当前加载的文件上传配置类型为: {},存储Key名称:{}", config.getStorageType(), config.getStorageKey());
     }
 
 

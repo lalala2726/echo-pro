@@ -2,7 +2,7 @@ package cn.zhangchuangla.infrastructure.config;
 
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
-import cn.zhangchuangla.common.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

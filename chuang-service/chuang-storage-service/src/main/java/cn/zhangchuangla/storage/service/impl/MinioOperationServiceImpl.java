@@ -1,9 +1,9 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
@@ -35,7 +35,6 @@ public class MinioOperationServiceImpl implements MinioOperationService {
     public MinioOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
         this.sysFileConfigLoader = sysFileConfigLoader;
     }
-
     @Override
     public FileTransferDto save(FileTransferDto fileTransferDto) {
         String fileName = fileTransferDto.getFileName();
@@ -50,7 +49,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         String secretKey = minioConfig.getSecretKey();
         String bucketName = minioConfig.getBucketName();
         String fileDomain = minioConfig.getFileDomain();
-
+        log.info("当前Minio配置为: {}", minioConfig);
         try {
             // 创建Minio客户端
             MinioClient minioClient = MinioClient.builder()
@@ -99,4 +98,5 @@ public class MinioOperationServiceImpl implements MinioOperationService {
             throw new FileException(ResponseCode.FileUploadFailed);
         }
     }
+
 }

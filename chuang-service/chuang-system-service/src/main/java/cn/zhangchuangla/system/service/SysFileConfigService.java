@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.core.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.core.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.core.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;

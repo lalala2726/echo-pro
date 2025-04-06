@@ -2,14 +2,14 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
-import cn.zhangchuangla.common.core.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.core.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.core.request.MinioConfigRequest;
+import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
-import cn.zhangchuangla.system.model.vo.file.manage.FileManagementListVo;
+import cn.zhangchuangla.system.model.vo.file.config.SysFileConfigListVo;
 import cn.zhangchuangla.system.service.SysFileConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,8 +52,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:list')")
     public TableDataResult listSysFileConfig(SysFileConfigListRequest request) {
         Page<SysFileConfig> sysFileConfigPage = sysFileConfigService.listSysFileConfig(request);
-        List<FileManagementListVo> fileManagementListVos = copyListProperties(sysFileConfigPage, FileManagementListVo.class);
-        return getTableData(sysFileConfigPage, fileManagementListVos);
+        List<SysFileConfigListVo> sysFileConfigListVos = copyListProperties(sysFileConfigPage, SysFileConfigListVo.class);
+        return getTableData(sysFileConfigPage, sysFileConfigListVos);
     }
 
 

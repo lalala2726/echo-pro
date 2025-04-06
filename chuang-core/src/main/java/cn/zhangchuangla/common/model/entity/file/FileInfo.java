@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.entity.file;
+package cn.zhangchuangla.common.model.entity.file;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;

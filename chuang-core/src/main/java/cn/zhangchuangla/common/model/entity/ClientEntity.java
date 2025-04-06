@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.entity;
+package cn.zhangchuangla.common.model.entity;
 
 import lombok.Data;
 
