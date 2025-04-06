@@ -11,8 +11,6 @@ import com.aliyun.oss.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 阿里云OSS存储工具类
@@ -55,12 +53,9 @@ public class AliyunOssUtils {
             String fileExtension = FileUtils.getFileExtension(fileName);
 
             // 生成日期目录
-            String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+            String datePath = FileUtils.generateYearMonthDir();
 
-            // 构建上传路径
-            String uploadPath = FileUtils.buildFinalPath(datePath);
-
-            String uploadFileName = FileUtils.buildFinalPath(uploadPath, fileNameWithoutExt + fileExtension);
+            String uploadFileName = FileUtils.buildFinalPath(fileNameWithoutExt + fileExtension);
 
             // 设置元数据
             ObjectMetadata metadata = new ObjectMetadata();
@@ -68,8 +63,6 @@ public class AliyunOssUtils {
             metadata.setHeader("Content-Disposition", "inline");
             metadata.setContentType(contentType);
 
-            // 添加自定义元数据，标记是否为压缩版本
-            metadata.addUserMetadata("isCompressed", String.valueOf(isCompress));
 
             // 上传文件
             ossClient.putObject(bucketName, uploadFileName, new ByteArrayInputStream(data), metadata);

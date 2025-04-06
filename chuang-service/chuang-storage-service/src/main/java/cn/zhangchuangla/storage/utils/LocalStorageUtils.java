@@ -2,6 +2,7 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.utils.FileUtils;
@@ -39,10 +40,10 @@ public class LocalStorageUtils {
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
         String targetDir = FileUtils.generateYearMonthDir();
+        targetDir = FileUtils.buildFinalPath(targetDir, StorageConstants.STORAGE_DIR_FILE);
         // 获取文件扩展名
         String fileExtension = FileUtils.getFileExtension(fileName);
-        String uuidFileName = FileUtils.generateFileName();
-
+        String uuidFileName = FileUtils.buildFinalPath(FileUtils.generateFileName());
         // 设置目标路径，包含年月目录和文件夹类型
         Path directory = Paths.get(uploadPath + File.separator + targetDir);
         Path filePath = directory.resolve(uuidFileName + fileExtension);
@@ -57,9 +58,10 @@ public class LocalStorageUtils {
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件写入失败！");
         }
 
-        String relativeFileLocation = FileUtils.generateFileRelativePath(targetDir, uuidFileName, fileExtension);
-        String fileUrl = Constants.RESOURCE_PREFIX + relativeFileLocation;
+
+        String relativeFileLocation = FileUtils.buildFinalPath(Constants.RESOURCE_PREFIX, targetDir, uuidFileName + fileExtension);
         // 构建文件URL
+        String fileUrl = relativeFileLocation;
         if (!StringUtils.isEmpty(fileDomain)) {
             fileUrl = FileUtils.buildFinalPath(fileDomain, fileUrl);
         }
@@ -68,5 +70,10 @@ public class LocalStorageUtils {
                 .fileUrl(fileUrl)
                 .relativePath(relativeFileLocation)
                 .build();
+    }
+
+    public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
+
+        return null;
     }
 }
