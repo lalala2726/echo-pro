@@ -2,7 +2,6 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
@@ -27,46 +26,44 @@ public class MinioUtils extends AbstractStorageUtils {
 
     /**
      * 上传文件到Minio
+     * 如果检测到是图片类型，会自动调用图片上传方法
      *
      * @param fileTransferDto   文件传输对象
      * @param minioConfigEntity Minio配置
      * @return 文件传输对象
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, MinioConfigEntity minioConfigEntity) {
-        if (minioConfigEntity == null)
-            throw new ProfileException("Minio配置文件为空！请你检查配置文件是否存在？");
+        validateUploadParams(fileTransferDto, minioConfigEntity);
+
+        // 如果是图片类型，则调用图片上传方法
+        if (isImage(fileTransferDto)) {
+            return imageUpload(fileTransferDto, minioConfigEntity);
+        }
 
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
-        // 从配置获取参数
-        String endpoint = minioConfigEntity.getEndpoint();
-        String accessKey = minioConfigEntity.getAccessKey();
-        String secretKey = minioConfigEntity.getSecretKey();
-        String bucketName = minioConfigEntity.getBucketName();
-        String fileDomain = minioConfigEntity.getFileDomain();
-
         try {
             // 创建Minio客户端并确保存储桶存在
-            MinioClient minioClient = createMinioClient(endpoint, accessKey, secretKey);
-            ensureBucketExists(minioClient, bucketName);
+            MinioClient minioClient = createMinioClient(minioConfigEntity);
+            ensureBucketExists(minioClient, minioConfigEntity.getBucketName());
 
             // 生成存储路径
             String objectName = generateFilePath(fileName);
 
             // 上传文件
-            uploadToMinio(minioClient, bucketName, objectName, data, fileName);
+            uploadToMinio(minioClient, minioConfigEntity.getBucketName(), objectName, data, fileName);
 
             // 构建文件URL
             String fileUrl = "";
-            if (!StringUtils.isEmpty(fileDomain)) {
-                fileUrl = buildFullUrl(fileDomain, objectName);
+            if (!StringUtils.isEmpty(minioConfigEntity.getFileDomain())) {
+                fileUrl = buildFullUrl(minioConfigEntity.getFileDomain(), objectName);
             }
 
             return createFileTransferResponse(fileUrl, objectName, null, null);
         } catch (Exception e) {
             log.warn("文件上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed);
+            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
         }
     }
 
@@ -79,41 +76,39 @@ public class MinioUtils extends AbstractStorageUtils {
      * @return 增强后的文件传输对象
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, MinioConfigEntity minioConfigEntity) {
-        if (minioConfigEntity == null)
-            throw new ProfileException("Minio配置文件为空！请你检查配置文件是否存在？");
+        validateUploadParams(fileTransferDto, minioConfigEntity);
+
+        // 验证是否为图片类型
+        if (!isImage(fileTransferDto)) {
+            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
+        }
 
         String fileName = fileTransferDto.getFileName();
         byte[] originalData = fileTransferDto.getBytes();
 
-        // 从配置获取参数
-        String endpoint = minioConfigEntity.getEndpoint();
-        String accessKey = minioConfigEntity.getAccessKey();
-        String secretKey = minioConfigEntity.getSecretKey();
-        String bucketName = minioConfigEntity.getBucketName();
-        String fileDomain = minioConfigEntity.getFileDomain();
-
         try {
             // 创建Minio客户端并确保存储桶存在
-            MinioClient minioClient = createMinioClient(endpoint, accessKey, secretKey);
-            ensureBucketExists(minioClient, bucketName);
+            MinioClient minioClient = createMinioClient(minioConfigEntity);
+            ensureBucketExists(minioClient, minioConfigEntity.getBucketName());
 
             // 生成存储路径
             String originalObjectName = generateOriginalImagePath(fileName);
             String compressedObjectName = generateCompressedImagePath(fileName);
 
             // 上传原图
-            uploadToMinio(minioClient, bucketName, originalObjectName, originalData, fileName);
+            uploadToMinio(minioClient, minioConfigEntity.getBucketName(), originalObjectName, originalData, fileName);
 
             // 上传压缩图
             byte[] compressedData = compressImage(originalData);
-            uploadToMinio(minioClient, bucketName, compressedObjectName, compressedData, fileName);
+            uploadToMinio(minioClient, minioConfigEntity.getBucketName(), compressedObjectName, compressedData,
+                    fileName);
 
             // 构建URL
             String originalFileUrl = "";
             String compressedFileUrl = "";
-            if (!StringUtils.isEmpty(fileDomain)) {
-                originalFileUrl = buildFullUrl(fileDomain, originalObjectName);
-                compressedFileUrl = buildFullUrl(fileDomain, compressedObjectName);
+            if (!StringUtils.isEmpty(minioConfigEntity.getFileDomain())) {
+                originalFileUrl = buildFullUrl(minioConfigEntity.getFileDomain(), originalObjectName);
+                compressedFileUrl = buildFullUrl(minioConfigEntity.getFileDomain(), compressedObjectName);
             }
 
             return createFileTransferResponse(
@@ -121,17 +116,21 @@ public class MinioUtils extends AbstractStorageUtils {
                     compressedFileUrl, compressedObjectName);
         } catch (Exception e) {
             log.warn("图片上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed);
+            throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());
         }
     }
 
     /**
      * 创建Minio客户端
      */
-    private static MinioClient createMinioClient(String endpoint, String accessKey, String secretKey) {
+    private static MinioClient createMinioClient(MinioConfigEntity minioConfigEntity) {
+        if (minioConfigEntity == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "Minio配置不能为空！");
+        }
+
         return MinioClient.builder()
-                .endpoint(endpoint)
-                .credentials(accessKey, secretKey)
+                .endpoint(minioConfigEntity.getEndpoint())
+                .credentials(minioConfigEntity.getAccessKey(), minioConfigEntity.getSecretKey())
                 .build();
     }
 

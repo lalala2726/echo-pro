@@ -2,7 +2,6 @@ package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
-import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.utils.FileUtils;
 import cn.zhangchuangla.storage.dto.FileTransferDto;
@@ -29,6 +28,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
 
     /**
      * 上传文件到腾讯云COS
+     * 如果检测到是图片类型，会自动调用图片上传方法
      *
      * @param fileTransferDto        文件传输对象
      * @param tencentCOSConfigEntity 腾讯云COS配置
@@ -36,39 +36,34 @@ public class TencentCOSUtils extends AbstractStorageUtils {
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto,
                                              TencentCOSConfigEntity tencentCOSConfigEntity) {
+        validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+
+        // 如果是图片类型，则调用图片上传方法
+        if (isImage(fileTransferDto)) {
+            return imageUpload(fileTransferDto, tencentCOSConfigEntity);
+        }
+
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
-        if (tencentCOSConfigEntity == null) {
-            throw new ProfileException("腾讯云COS配置文件为空！请检查配置文件是否存在？");
-        }
-
-        // 从配置获取参数
-        String region = tencentCOSConfigEntity.getRegion();
-        String secretId = tencentCOSConfigEntity.getSecretId();
-        String secretKey = tencentCOSConfigEntity.getSecretKey();
-        String bucketName = tencentCOSConfigEntity.getBucketName();
-        String fileDomain = tencentCOSConfigEntity.getFileDomain();
-
         // 创建COS客户端
-        COSClient cosClient = null;
+        COSClient cosClient = createCOSClient(tencentCOSConfigEntity);
         try {
-            cosClient = createCOSClient(region, secretId, secretKey);
-            ensureBucketExists(cosClient, bucketName);
+            ensureBucketExists(cosClient, tencentCOSConfigEntity.getBucketName());
 
             // 生成存储路径
             String objectName = generateFilePath(fileName);
 
             // 上传文件
-            uploadToCOS(cosClient, bucketName, objectName, data, fileName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), objectName, data, fileName);
 
             // 构建文件URL
-            String fileUrl = buildFullUrl(fileDomain, objectName);
+            String fileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), objectName);
 
             return createFileTransferResponse(fileUrl, objectName, null, null);
         } catch (Exception e) {
             log.error("文件上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed);
+            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
         } finally {
             if (cosClient != null) {
                 cosClient.shutdown();
@@ -86,45 +81,41 @@ public class TencentCOSUtils extends AbstractStorageUtils {
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto,
                                               TencentCOSConfigEntity tencentCOSConfigEntity) {
+        validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+
+        // 验证是否为图片类型
+        if (!isImage(fileTransferDto)) {
+            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
+        }
+
         String fileName = fileTransferDto.getFileName();
         byte[] originalData = fileTransferDto.getBytes();
 
-        if (tencentCOSConfigEntity == null) {
-            throw new ProfileException("腾讯云COS配置文件为空！请检查配置文件是否存在？");
-        }
-
-        // 从配置获取参数
-        String region = tencentCOSConfigEntity.getRegion();
-        String secretId = tencentCOSConfigEntity.getSecretId();
-        String secretKey = tencentCOSConfigEntity.getSecretKey();
-        String bucketName = tencentCOSConfigEntity.getBucketName();
-        String fileDomain = tencentCOSConfigEntity.getFileDomain();
-
         // 创建COS客户端
-        COSClient cosClient = null;
+        COSClient cosClient = createCOSClient(tencentCOSConfigEntity);
         try {
-            cosClient = createCOSClient(region, secretId, secretKey);
-            ensureBucketExists(cosClient, bucketName);
+            ensureBucketExists(cosClient, tencentCOSConfigEntity.getBucketName());
 
             // 生成存储路径
             String originalObjectName = generateOriginalImagePath(fileName);
             String compressedObjectName = generateCompressedImagePath(fileName);
 
             // 上传原图
-            uploadToCOS(cosClient, bucketName, originalObjectName, originalData, fileName);
-            String originalFileUrl = buildFullUrl(fileDomain, originalObjectName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), originalObjectName, originalData, fileName);
+            String originalFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), originalObjectName);
 
             // 压缩并上传缩略图
             byte[] compressedData = compressImage(originalData);
-            uploadToCOS(cosClient, bucketName, compressedObjectName, compressedData, fileName);
-            String compressedFileUrl = buildFullUrl(fileDomain, compressedObjectName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), compressedObjectName, compressedData,
+                    fileName);
+            String compressedFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), compressedObjectName);
 
             return createFileTransferResponse(
                     originalFileUrl, originalObjectName,
                     compressedFileUrl, compressedObjectName);
         } catch (Exception e) {
             log.error("图片上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed);
+            throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());
         } finally {
             if (cosClient != null) {
                 cosClient.shutdown();
@@ -135,9 +126,15 @@ public class TencentCOSUtils extends AbstractStorageUtils {
     /**
      * 创建COS客户端
      */
-    private static COSClient createCOSClient(String region, String secretId, String secretKey) {
-        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
-        ClientConfig clientConfig = new ClientConfig(new Region(region));
+    private static COSClient createCOSClient(TencentCOSConfigEntity tencentCOSConfigEntity) {
+        if (tencentCOSConfigEntity == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "腾讯云COS配置不能为空！");
+        }
+
+        COSCredentials cred = new BasicCOSCredentials(
+                tencentCOSConfigEntity.getSecretId(),
+                tencentCOSConfigEntity.getSecretKey());
+        ClientConfig clientConfig = new ClientConfig(new Region(tencentCOSConfigEntity.getRegion()));
         return new COSClient(cred, clientConfig);
     }
 

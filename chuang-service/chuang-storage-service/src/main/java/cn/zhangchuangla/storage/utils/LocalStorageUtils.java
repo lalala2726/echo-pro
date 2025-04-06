@@ -18,8 +18,8 @@ import java.nio.file.Paths;
  * 本地文件存储工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 10:00
+ * <p>
+ * created on 2025/4/3 10:00
  */
 @Slf4j
 public class LocalStorageUtils extends AbstractStorageUtils {
@@ -90,8 +90,8 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      */
     private static void saveFile(byte[] data, String uploadPath, String relativePath) {
         String filePath = uploadPath + File.separator + relativePath;
-        Path directory = Paths.get(filePath).getParent();
-
+        Path path = Paths.get(filePath);
+        Path directory = path.getParent();
         try {
             // 创建目录
             if (directory != null) {
@@ -99,7 +99,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
             }
 
             // 写入文件
-            Files.write(Paths.get(filePath), data);
+            Files.write(path, data);
         } catch (IOException e) {
             log.error("文件写入失败", e);
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件写入失败！");

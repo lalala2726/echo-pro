@@ -24,43 +24,44 @@ public class AliyunOssUtils extends AbstractStorageUtils {
 
     /**
      * 上传文件到阿里云OSS
+     * 如果检测到是图片类型，会自动调用图片上传方法
      *
      * @param fileTransferDto 文件传输对象
      * @param aliyunOSSConfig 阿里云OSS配置
      * @return 文件传输对象
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig) {
-        if (aliyunOSSConfig == null)
-            throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置不能为空！");
+        validateUploadParams(fileTransferDto, aliyunOSSConfig);
+
+        // 如果是图片类型，则调用图片上传方法
+        if (isImage(fileTransferDto)) {
+            return imageUpload(fileTransferDto, aliyunOSSConfig);
+        }
 
         String fileName = fileTransferDto.getFileName();
         byte[] data = fileTransferDto.getBytes();
 
-        // 从配置获取参数
-        String endPoint = aliyunOSSConfig.getEndpoint();
-        String accessKeyId = aliyunOSSConfig.getAccessKeyId();
-        String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
-        String bucketName = aliyunOSSConfig.getBucketName();
-        String fileDomain = aliyunOSSConfig.getFileDomain();
-
-        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
+        // 创建OSS客户端
+        OSS ossClient = createOSSClient(aliyunOSSConfig);
 
         try {
             // 生成存储路径
             String objectName = generateFilePath(fileName);
 
             // 上传文件
-            uploadToOSS(ossClient, bucketName, objectName, data, fileName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), objectName, data, fileName);
 
             // 构建文件URL
-            String fileUrl = buildFullUrl(fileDomain, objectName);
+            String fileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), objectName);
 
             return createFileTransferResponse(fileUrl, objectName, null, null);
         } catch (Exception e) {
             log.warn("文件上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！");
+            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
         } finally {
-            ossClient.shutdown();
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
         }
     }
 
@@ -73,20 +74,18 @@ public class AliyunOssUtils extends AbstractStorageUtils {
      * @return 增强后的文件传输对象
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig) {
-        if (aliyunOSSConfig == null)
-            throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置不能为空！");
+        validateUploadParams(fileTransferDto, aliyunOSSConfig);
+
+        // 验证是否为图片类型
+        if (!isImage(fileTransferDto)) {
+            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
+        }
 
         String fileName = fileTransferDto.getFileName();
         byte[] originalData = fileTransferDto.getBytes();
 
-        // 从配置获取参数
-        String endPoint = aliyunOSSConfig.getEndpoint();
-        String accessKeyId = aliyunOSSConfig.getAccessKeyId();
-        String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
-        String bucketName = aliyunOSSConfig.getBucketName();
-        String fileDomain = aliyunOSSConfig.getFileDomain();
-
-        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
+        // 创建OSS客户端
+        OSS ossClient = createOSSClient(aliyunOSSConfig);
 
         try {
             // 生成存储路径
@@ -94,23 +93,40 @@ public class AliyunOssUtils extends AbstractStorageUtils {
             String compressedObjectName = generateCompressedImagePath(fileName);
 
             // 上传原图
-            uploadToOSS(ossClient, bucketName, originalObjectName, originalData, fileName);
-            String originalFileUrl = buildFullUrl(fileDomain, originalObjectName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), originalObjectName, originalData, fileName);
+            String originalFileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), originalObjectName);
 
             // 压缩图片并上传
             byte[] compressedData = compressImage(originalData);
-            uploadToOSS(ossClient, bucketName, compressedObjectName, compressedData, fileName);
-            String compressedFileUrl = buildFullUrl(fileDomain, compressedObjectName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), compressedObjectName, compressedData, fileName);
+            String compressedFileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), compressedObjectName);
 
             return createFileTransferResponse(
                     originalFileUrl, originalObjectName,
                     compressedFileUrl, compressedObjectName);
         } catch (Exception e) {
             log.warn("图片上传失败", e);
-            throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！");
+            throw new FileException(ResponseCode.FileUploadFailed, "图片上传失败！" + e.getMessage());
         } finally {
-            ossClient.shutdown();
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
         }
+    }
+
+    /**
+     * 创建OSS客户端
+     */
+    private static OSS createOSSClient(AliyunOSSConfigEntity aliyunOSSConfig) {
+        if (aliyunOSSConfig == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "阿里云OSS配置不能为空！");
+        }
+
+        String endPoint = aliyunOSSConfig.getEndpoint();
+        String accessKeyId = aliyunOSSConfig.getAccessKeyId();
+        String accessKeySecret = aliyunOSSConfig.getAccessKeySecret();
+
+        return new OSSClientBuilder().build(endPoint, accessKeyId, accessKeySecret);
     }
 
     /**

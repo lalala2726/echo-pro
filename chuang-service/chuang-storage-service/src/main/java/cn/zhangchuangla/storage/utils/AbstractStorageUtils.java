@@ -15,11 +15,45 @@ import java.io.IOException;
  * 封装各存储服务的共用方法
  *
  * @author Chuang
- * <p>
- * created on 2025/4/3 15:00
+ *         <p>
+ *         created on 2025/4/3 15:00
  */
 @Slf4j
 public abstract class AbstractStorageUtils {
+
+    /**
+     * 校验图片类型
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 是否为图片
+     */
+    protected static boolean isImage(FileTransferDto fileTransferDto) {
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getFileName() == null) {
+            return false;
+        }
+
+        String contentType = FileUtils.generateFileContentType(fileTransferDto.getFileName());
+        return ImageUtils.isImage(contentType);
+    }
+
+    /**
+     * 验证文件上传参数
+     *
+     * @param fileTransferDto 文件传输对象
+     * @param configObject    配置对象
+     * @return 文件名
+     */
+    protected static String validateUploadParams(FileTransferDto fileTransferDto, Object configObject) {
+        if (configObject == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "存储服务配置不能为空！");
+        }
+
+        if (fileTransferDto == null || fileTransferDto.getBytes() == null || fileTransferDto.getFileName() == null) {
+            throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
+        }
+
+        return fileTransferDto.getFileName();
+    }
 
     /**
      * 生成文件的统一存储路径
