@@ -67,12 +67,6 @@ public class MinioConfigRequest {
     @NotBlank(message = "文件访问域名不能为空")
     private String fileDomain;
 
-    /**
-     * 存储桶区域
-     */
-    @Schema(description = "存储桶区域", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "存储桶区域不能为空")
-    private String bucketRegion;
 
 
 }

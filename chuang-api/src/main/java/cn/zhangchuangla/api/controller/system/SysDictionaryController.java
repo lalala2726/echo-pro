@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
@@ -68,7 +68,7 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "新增字典")
     @PostMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
-    @Log(title = "字典管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
         dictionaryService.addDictionary(request);
         return success(SystemMessageConstant.ADD_SUCCESS);
@@ -100,7 +100,7 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "修改字典")
     @PutMapping
     @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
-    @Log(title = "字典管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "字典管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         return toAjax(dictionaryService.updateDictionaryById(request));
     }
@@ -114,7 +114,7 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "删除字典")
     @DeleteMapping("/{ids}")
     @PreAuthorize("@auth.hasPermission('system:dictionary:delete')")
-    @Log(title = "字典管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "字典管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id > 0, "字典ID不能小于等于零!");

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.aspectj;
 
-import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
@@ -62,10 +62,10 @@ public class LogAspect {
      * 在方法执行前记录开始时间
      *
      * @param joinPoint     切点，表示被拦截的方法
-     * @param controllerLog @Log 注解对象，包含日志记录的配置信息
+     * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
      */
-    @Before(value = "@annotation(controllerLog)")
-    public void doBefore(JoinPoint joinPoint, Log controllerLog) {
+    @Before(value = "@annotation(controllerOperationLog)")
+    public void doBefore(JoinPoint joinPoint, OperationLog controllerOperationLog) {
         // 记录当前方法开始执行的时间
         TIME_THREADLOCAL.set(System.currentTimeMillis());
     }
@@ -74,45 +74,45 @@ public class LogAspect {
      * 在方法执行完成后（成功）记录日志
      *
      * @param joinPoint     切点，表示被拦截的方法
-     * @param controllerLog @Log 注解对象，包含日志记录的配置信息
+     * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
      * @param jsonResult    方法返回的结果
      */
-    @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
-    public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
+    @AfterReturning(pointcut = "@annotation(controllerOperationLog)", returning = "jsonResult")
+    public void doAfterReturning(JoinPoint joinPoint, OperationLog controllerOperationLog, Object jsonResult) {
         // 处理成功的日志
-        handleLog(joinPoint, controllerLog, null, jsonResult);
+        handleLog(joinPoint, controllerOperationLog, null, jsonResult);
     }
 
     /**
      * 在方法执行出现异常时记录日志
      *
      * @param joinPoint     切点，表示被拦截的方法
-     * @param controllerLog @Log 注解对象，包含日志记录的配置信息
+     * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
      * @param e             抛出的异常信息
      */
-    @AfterThrowing(pointcut = "@annotation(controllerLog)", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, Log controllerLog, Exception e) {
+    @AfterThrowing(pointcut = "@annotation(controllerOperationLog)", throwing = "e")
+    public void doAfterThrowing(JoinPoint joinPoint, OperationLog controllerOperationLog, Exception e) {
         // 处理异常的日志
-        handleLog(joinPoint, controllerLog, e, null);
+        handleLog(joinPoint, controllerOperationLog, e, null);
     }
 
     /**
      * 处理日志的核心方法，记录请求参数、返回结果和异常信息
      *
      * @param joinPoint     切点，表示被拦截的方法
-     * @param controllerLog @Log 注解对象，包含日志记录的配置信息
+     * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
      * @param exception     如果方法抛出异常，则包含异常信息
      * @param jsonResult    如果方法执行成功，则包含返回结果
      */
-    private void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception exception, Object jsonResult) {
+    private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {
             // 获取当前登录用户
             LoginUser loginUser = SecurityUtils.getLoginUser();
 
             // 构建操作日志对象
             SysOperationLog sysOperationLog = new SysOperationLog();
-            sysOperationLog.setModule(controllerLog.title());
-            sysOperationLog.setOperationType(controllerLog.businessType().name());
+            sysOperationLog.setModule(controllerOperationLog.title());
+            sysOperationLog.setOperationType(controllerOperationLog.businessType().name());
             sysOperationLog.setUserId(loginUser != null ? loginUser.getUserId() : null);
             sysOperationLog.setUserName(loginUser != null ? loginUser.getUsername() : SysRolesConstant.ANONYMOUS);
 
@@ -127,8 +127,8 @@ public class LogAspect {
             sysOperationLog.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
 
             // 记录请求参数
-            if (controllerLog.isSaveRequestData()) {
-                sysOperationLog.setParams(getRequestParams(joinPoint, controllerLog.excludeParamNames()));
+            if (controllerOperationLog.isSaveRequestData()) {
+                sysOperationLog.setParams(getRequestParams(joinPoint, controllerOperationLog.excludeParamNames()));
             }
 
             // 记录返回结果或异常信息
@@ -139,7 +139,7 @@ public class LogAspect {
             } else {
                 // 记录成功地返回结果
                 sysOperationLog.setResultCode(HttpStatusConstant.SUCCESS); // HTTP 200 代表成功
-                if (controllerLog.isSaveResponseData() && jsonResult != null) {
+                if (controllerOperationLog.isSaveResponseData() && jsonResult != null) {
                     sysOperationLog.setOperationResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
                 }
             }

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * 系统文件配置加载器
@@ -32,7 +31,6 @@ public class SysFileConfigLoader {
     private final SysFileConfigService sysFileConfigService;
     // 使用 HashMap 存储配置信息，值为 JSON 字符串
     private final Map<String, String> sysFileConfigCache = new HashMap<>(2);
-    private final Map<String, Consumer<SysFileConfig>> configLoaders = new HashMap<>();
     private final AppConfig appConfig;
 
     @Autowired
@@ -54,28 +52,28 @@ public class SysFileConfigLoader {
             log.info("自动设置本地存储成功！");
             return;
         }
-        initLoaders();
-        loadConfigByStorageType(config);
+        cacheSysFileConfigByStorageType(config);
     }
 
-    /**
-     * 初始化存储类型对应的加载方法
-     */
-    private void initLoaders() {
-        configLoaders.put(StorageTypeConstants.LOCAL, this::loadLocalFileConfig);
-        configLoaders.put(StorageTypeConstants.MINIO, this::loadMinioConfig);
-        configLoaders.put(StorageTypeConstants.ALIYUN_OSS, this::loadAliyunOSSConfig);
-    }
 
     /**
-     * 根据存储类型加载配置
+     * 根据文件上传配置的存储类型缓存配置
+     *
+     * @param sysFileConfig 文件配置对象
      */
-    public void loadConfigByStorageType(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, sysFileConfig.getStorageType());
-        Optional.ofNullable(configLoaders.get(sysFileConfig.getStorageType()))
-                .ifPresentOrElse(loader -> loader.accept(sysFileConfig),
-                        () -> log.warn("未识别的存储类型: {}", sysFileConfig.getStorageType()));
+    public void cacheSysFileConfigByStorageType(SysFileConfig sysFileConfig) {
+        String storageType = sysFileConfig.getStorageType();
+        switch (storageType) {
+            case StorageTypeConstants.MINIO -> loadMinioConfig(sysFileConfig);
+            case StorageTypeConstants.ALIYUN_OSS -> loadAliyunOSSConfig(sysFileConfig);
+            case StorageTypeConstants.LOCAL -> loadLocalFileConfig(sysFileConfig);
+            default -> {
+                log.error("未知的存储类型: {}", storageType);
+                throw new ProfileException(ResponseCode.PROFILE_ERROR, "未知的存储类型");
+            }
+        }
     }
+
 
     /**
      * 自动设置本地存储
@@ -97,7 +95,7 @@ public class SysFileConfigLoader {
      * 获取当前默认上传类型
      */
     public String getCurrentDefaultUploadType() {
-        return Optional.ofNullable(sysFileConfigCache.get(Constants.CURRENT_DEFAULT_UPLOAD_TYPE))
+        return Optional.ofNullable(sysFileConfigCache.get(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE))
                 .filter(config -> !config.isEmpty())
                 .orElseThrow(() -> new ProfileException(ResponseCode.PROFILE_ERROR, "无法设置存储！请在系统中设置一个存储"));
     }
@@ -138,6 +136,7 @@ public class SysFileConfigLoader {
      * 加载 MinIO 配置
      */
     public void loadMinioConfig(SysFileConfig sysFileConfig) {
+        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.MINIO);
         sysFileConfigCache.put(StorageTypeConstants.MINIO, sysFileConfig.getStorageValue());
     }
 
@@ -145,6 +144,7 @@ public class SysFileConfigLoader {
      * 加载阿里云 OSS 配置
      */
     public void loadAliyunOSSConfig(SysFileConfig sysFileConfig) {
+        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.ALIYUN_OSS);
         sysFileConfigCache.put(StorageTypeConstants.ALIYUN_OSS, sysFileConfig.getStorageValue());
     }
 
@@ -152,6 +152,7 @@ public class SysFileConfigLoader {
      * 加载本地文件存储配置
      */
     public void loadLocalFileConfig(SysFileConfig sysFileConfig) {
+        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.LOCAL);
         sysFileConfigCache.put(StorageTypeConstants.LOCAL, sysFileConfig.getStorageValue());
     }
 }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -46,7 +46,7 @@ public class CommonController extends BaseController {
      */
     @Operation(summary = "智能文件上传", description = "上传文件，如果上传的是图片，将进行压缩处理并上传两个版本")
     @PostMapping("/upload")
-    @Log(title = "文件上传", businessType = BusinessType.INSERT)
+    @OperationLog(title = "文件上传", businessType = BusinessType.INSERT)
     public AjaxResult upload(
             @RequestParam("file") MultipartFile file) throws IOException {
         String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();

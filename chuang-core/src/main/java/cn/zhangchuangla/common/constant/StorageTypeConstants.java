@@ -33,4 +33,5 @@ public class StorageTypeConstants {
     public static final String RELATIVE_FILE_LOCATION = "relativeFileLocation";
     public static final String FILE_PREVIEW_FOLDER = "preview";
     public static final String FILE_ORIGINAL_FOLDER = "original";
+    public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
 }

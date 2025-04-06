@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -68,7 +68,7 @@ public class SysDeptController extends BaseController {
     @PostMapping
     @PostAuthorize("@auth.hasPermission('system:department:add')")
     @Operation(summary = "新增部门")
-    @Log(title = "部门管理", businessType = BusinessType.INSERT)
+    @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
     public AjaxResult addDept(@Validated @RequestBody SysDeptAddRequest request) {
         if (request.getParentId() != null) {
             checkParam(sysDeptService.getById(request.getParentId()) == null, "父部门不存在！");
@@ -85,7 +85,7 @@ public class SysDeptController extends BaseController {
     @PutMapping
     @PostAuthorize("@auth.hasPermission('system:department:edit')")
     @Operation(summary = "修改部门")
-    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
+    @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDept(@Validated @RequestBody SysDeptRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
@@ -114,7 +114,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @DeleteMapping("/{ids}")
-    @Log(title = "部门管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
     @PostAuthorize("@auth.hasPermission('system:department:remove')")
     public AjaxResult removeDept(@PathVariable List<Integer> ids) {

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.annotation.Log;
+import cn.zhangchuangla.common.annotation.OperationLog;
 import cn.zhangchuangla.common.constant.StorageTypeConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -49,7 +49,7 @@ public class FileController extends BaseController {
      */
     @PostMapping("/upload")
     @Operation(summary = "普通文件上传")
-    @Log(title = "文件上传", businessType = BusinessType.UPLOAD)
+    @OperationLog(title = "文件上传", businessType = BusinessType.UPLOAD)
     public AjaxResult upload(
             @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
