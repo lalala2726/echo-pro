@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
@@ -81,7 +82,12 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/minio")
     public AjaxResult saveMinioConfig(@Validated @RequestBody MinioConfigRequest request) {
+        // 去除末尾的斜杠,确保一致性
+        String endpoint = request.getEndpoint();
+        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
+        request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         boolean result = sysFileConfigService.saveFileConfig(request);
+
         return toAjax(result);
     }
 
@@ -96,6 +102,10 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
     public AjaxResult saveAliyunOssConfig(@Validated @RequestBody AliyunOSSConfigRequest request) {
+        // 去除末尾的斜杠,确保一致性
+        String endpoint = request.getEndpoint();
+        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
+        request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         boolean result = sysFileConfigService.saveFileConfig(request);
         return toAjax(result);
     }

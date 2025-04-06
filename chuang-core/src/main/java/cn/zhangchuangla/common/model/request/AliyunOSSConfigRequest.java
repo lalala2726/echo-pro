@@ -2,6 +2,7 @@ package cn.zhangchuangla.common.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 /**
@@ -35,6 +36,8 @@ public class AliyunOSSConfigRequest {
     /**
      * 访问端点
      */
+    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+            message = "访问端点域名格式不正确")
     @Schema(description = "访问端点", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "访问端点不能为空")
     private String endpoint;
@@ -70,6 +73,8 @@ public class AliyunOSSConfigRequest {
     /**
      * 域名
      */
+    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+            message = "访问端点域名格式不正确")
     @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "域名不能为空")
     private String fileDomain;

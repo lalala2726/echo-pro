@@ -38,6 +38,8 @@ public class MinioConfigRequest {
      */
     @Schema(description = "访问端点", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "访问端点不能为空")
+    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+            message = "访问端点域名格式不正确")
     private String endpoint;
 
     /**
@@ -53,7 +55,6 @@ public class MinioConfigRequest {
     @Schema(description = "密钥", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密钥不能为空")
     private String secretKey;
-
     /**
      * 存储桶名称
      */
@@ -68,6 +69,8 @@ public class MinioConfigRequest {
      */
     @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "文件访问域名不能为空")
+    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+            message = "文件访问域名格式不正确")
     private String fileDomain;
 
 
