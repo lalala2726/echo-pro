@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
  * @author zhangchuang
  */
 @Service
+@Slf4j
 public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, SysFileConfig>
         implements SysFileConfigService {
 
@@ -143,10 +145,10 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 保存结果
      */
     private boolean saveFileConfig(String storageName, String storageKey, String storageType, String value) {
-        if (isStorageKeyExist(storageName)) {
+        if (isStorageKeyExist(storageKey)) {
             throw new ServiceException(String.format("存储key【%s】已存在", storageName));
         }
-        if (isNameExist(storageKey)) {
+        if (isNameExist(storageName)) {
             throw new ServiceException(String.format("存储名称【%s】已存在", storageKey));
         }
         SysFileConfig sysFileConfig = SysFileConfig.builder()
@@ -224,9 +226,9 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isNameExist(String storageName) {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
                 .eq(SysFileConfig::getStorageName, storageName);
-        return count(eq) > 0;
+        long count = count(eq);
+        return count > 0;
     }
-
 
 }
 
