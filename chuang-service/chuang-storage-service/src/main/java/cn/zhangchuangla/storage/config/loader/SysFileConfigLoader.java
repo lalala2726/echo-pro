@@ -156,4 +156,13 @@ public class SysFileConfigLoader {
         sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.LOCAL);
         sysFileConfigCache.put(StorageTypeConstants.LOCAL, sysFileConfig.getStorageValue());
     }
+
+    /**
+     * 刷新缓存
+     */
+    public String refreshCache() {
+        sysFileConfigCache.clear();
+        init();
+        return getCurrentDefaultUploadType();
+    }
 }

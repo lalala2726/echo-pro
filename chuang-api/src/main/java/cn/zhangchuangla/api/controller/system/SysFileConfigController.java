@@ -2,11 +2,14 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
+import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
 import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
@@ -35,10 +38,13 @@ public class SysFileConfigController extends BaseController {
 
     private final SysFileConfigService sysFileConfigService;
 
+    private final SysFileConfigLoader sysFileConfigLoader;
+
 
     @Autowired
-    public SysFileConfigController(SysFileConfigService sysFileConfigService) {
+    public SysFileConfigController(SysFileConfigService sysFileConfigService, SysFileConfigLoader sysFileConfigLoader) {
         this.sysFileConfigService = sysFileConfigService;
+        this.sysFileConfigLoader = sysFileConfigLoader;
     }
 
 
@@ -51,6 +57,7 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "文件配置列表", description = "文件配置列表")
     @GetMapping("/list")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:list')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public TableDataResult listSysFileConfig(SysFileConfigListRequest request) {
         Page<SysFileConfig> sysFileConfigPage = sysFileConfigService.listSysFileConfig(request);
         List<SysFileConfigListVo> sysFileConfigListVos = copyListProperties(sysFileConfigPage, SysFileConfigListVo.class);
@@ -67,6 +74,7 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "新增文件配置", description = "新增文件配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveFileConfig(@Validated @RequestBody SysFileConfigAddRequest request) {
         boolean result = sysFileConfigService.saveFileConfig(request);
         return toAjax(result);
@@ -81,6 +89,7 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "新增Minio配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/minio")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveMinioConfig(@Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
@@ -101,6 +110,7 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "新增Minio配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveAliyunOssConfig(@Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
@@ -119,10 +129,25 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "新增Minio配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/local")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveLocalConfig(LocalFileConfigRequest request) {
         boolean result = sysFileConfigService.saveFileConfig(request);
         return toAjax(result);
     }
 
+
+    /**
+     * 刷新文件配置缓存
+     *
+     * @return 刷新结果
+     */
+    @GetMapping("/refreshCache")
+    @PreAuthorize("@auth.hasAnyPermission('system:file-config:refreshCache')")
+    @Operation(summary = "刷新文件配置缓存")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
+    public AjaxResult RefreshCache() {
+        String currentConfigName = sysFileConfigLoader.refreshCache();
+        return AjaxResult.success(currentConfigName);
+    }
 
 }
