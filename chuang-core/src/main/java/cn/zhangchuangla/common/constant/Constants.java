@@ -91,4 +91,6 @@ public class Constants {
     public static final String IS_CACHE = "1";
     public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
     public static final int IS_FILE_UPLOAD_MASTER = 1;
+    public static final String ORIGINAL = "original";
+    public static final String PREVIEW = "preview";
 }

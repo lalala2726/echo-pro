@@ -1,5 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -73,7 +74,7 @@ public class FileController extends BaseController {
                     .build();
 
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
-            ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
+            ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
             return ajax;
         } catch (IOException e) {
             log.error("文件读取失败", e);
@@ -84,6 +85,16 @@ public class FileController extends BaseController {
         }
     }
 
+
+    /**
+     * 图片上传
+     * 进行压缩处理并上传两个版本
+     *
+     * @param file 上传的文件
+     * @return 上传结果
+     */
+    @OperationLog(title = "图片上传", businessType = BusinessType.UPLOAD)
+    @Operation(summary = "图片上传")
     @PostMapping("/image/upload")
     public AjaxResult imageUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -98,8 +109,9 @@ public class FileController extends BaseController {
                     .bytes(file.getBytes())
                     .fileType(file.getContentType())
                     .build();
-            FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
-            ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
+            FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
+            ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
+            ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());
         } catch (IOException e) {
             return error("文件读取失败: " + e.getMessage());
         }

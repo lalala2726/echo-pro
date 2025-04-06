@@ -38,6 +38,14 @@ public class LocalOperationServiceImpl implements LocalOperationService {
 
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        return null;
+        String uploadPath = appConfig.getUploadPath();
+        String fileDomain;
+        try {
+            fileDomain = appConfig.getFileDomain();
+        } catch (NullPointerException e) {
+            // 文件域名不是必填项，可以不配置，默认为空字符串
+            fileDomain = "";
+        }
+        return LocalStorageUtils.imageUpload(fileTransferDto, uploadPath, fileDomain);
     }
 }
