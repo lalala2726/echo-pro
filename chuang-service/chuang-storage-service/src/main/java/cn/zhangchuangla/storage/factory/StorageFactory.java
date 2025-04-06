@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.factory;
 
-import cn.zhangchuangla.common.constant.StorageTypeConstants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import cn.zhangchuangla.storage.service.LocalOperationService;
@@ -47,10 +47,10 @@ public class StorageFactory {
      */
     public StorageOperation getStorageOperation(String storageType) {
         StorageOperation operation = switch (storageType) {
-            case StorageTypeConstants.ALIYUN_OSS -> aliyunOssOperationService;
-            case StorageTypeConstants.TENCENT_COS -> tencentCOSOperationService;
-            case StorageTypeConstants.MINIO -> minioOperationService;
-            case StorageTypeConstants.LOCAL -> localOperationService;
+            case StorageConstants.ALIYUN_OSS -> aliyunOssOperationService;
+            case StorageConstants.TENCENT_COS -> tencentCOSOperationService;
+            case StorageConstants.MINIO -> minioOperationService;
+            case StorageConstants.LOCAL -> localOperationService;
             default -> null;
         };
 

@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.config.loader;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.StorageTypeConstants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
@@ -30,7 +30,7 @@ public class SysFileConfigLoader {
 
     private final SysFileConfigService sysFileConfigService;
     // 使用 HashMap 存储配置信息，值为 JSON 字符串
-    private final Map<String, String> sysFileConfigCache = new HashMap<>(2);
+    private final Map<String, String> sysFileConfigCache = new HashMap<>(4);
     private final AppConfig appConfig;
 
     @Autowired
@@ -65,9 +65,9 @@ public class SysFileConfigLoader {
     public void cacheSysFileConfigByStorageType(SysFileConfig sysFileConfig) {
         String storageType = sysFileConfig.getStorageType();
         switch (storageType) {
-            case StorageTypeConstants.MINIO -> loadMinioConfig(sysFileConfig);
-            case StorageTypeConstants.ALIYUN_OSS -> loadAliyunOSSConfig(sysFileConfig);
-            case StorageTypeConstants.LOCAL -> loadLocalFileConfig(sysFileConfig);
+            case StorageConstants.MINIO -> loadMinioConfig(sysFileConfig);
+            case StorageConstants.ALIYUN_OSS -> loadAliyunOSSConfig(sysFileConfig);
+            case StorageConstants.LOCAL -> loadLocalFileConfig(sysFileConfig);
             default -> {
                 log.error("未知的存储类型: {}", storageType);
                 throw new ProfileException(ResponseCode.PROFILE_ERROR, "未知的存储类型");
@@ -85,8 +85,8 @@ public class SysFileConfigLoader {
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }
-            sysFileConfigCache.put(StorageTypeConstants.LOCAL, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
-            sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.LOCAL);
+            sysFileConfigCache.put(StorageConstants.LOCAL, JSON.toJSONString(new LocalFileConfigEntity(uploadPath)));
+            sysFileConfigCache.put(Constants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageConstants.LOCAL);
         } catch (Exception e) {
             log.error("没有找到本地文件上传配置! 项目会正常启动！但是将无法上传文件！错误详情: {}", e.getMessage());
         }
@@ -96,10 +96,11 @@ public class SysFileConfigLoader {
      * 获取当前默认上传类型
      */
     public String getCurrentDefaultUploadType() {
-        return Optional.ofNullable(sysFileConfigCache.get(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE))
+        return Optional.ofNullable(sysFileConfigCache.get(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE))
                 .filter(config -> !config.isEmpty())
                 .orElseThrow(() -> new ProfileException(ResponseCode.PROFILE_ERROR, "无法设置存储！请在系统中设置一个存储"));
     }
+
 
     /**
      * 解析 JSON 配置数据
@@ -116,45 +117,54 @@ public class SysFileConfigLoader {
      * 获取 MinIO 配置
      */
     public MinioConfigEntity getMinioConfig() {
-        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.MINIO), MinioConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageConstants.MINIO), MinioConfigEntity.class);
     }
 
     /**
      * 获取本地文件存储配置
      */
     public LocalFileConfigEntity getLocalFileConfig() {
-        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.LOCAL), LocalFileConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageConstants.LOCAL), LocalFileConfigEntity.class);
     }
 
     /**
      * 获取阿里云 OSS 配置
      */
     public AliyunOSSConfigEntity getAliyunOSSConfig() {
-        return parseConfig(sysFileConfigCache.get(StorageTypeConstants.ALIYUN_OSS), AliyunOSSConfigEntity.class);
+        return parseConfig(sysFileConfigCache.get(StorageConstants.ALIYUN_OSS), AliyunOSSConfigEntity.class);
     }
 
     /**
      * 加载 MinIO 配置
      */
     public void loadMinioConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.MINIO);
-        sysFileConfigCache.put(StorageTypeConstants.MINIO, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageConstants.MINIO);
+        initCommonConfig(sysFileConfig);
     }
 
     /**
      * 加载阿里云 OSS 配置
      */
     public void loadAliyunOSSConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.ALIYUN_OSS);
-        sysFileConfigCache.put(StorageTypeConstants.ALIYUN_OSS, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageConstants.ALIYUN_OSS);
+        initCommonConfig(sysFileConfig);
     }
 
     /**
      * 加载本地文件存储配置
      */
     public void loadLocalFileConfig(SysFileConfig sysFileConfig) {
-        sysFileConfigCache.put(StorageTypeConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageTypeConstants.LOCAL);
-        sysFileConfigCache.put(StorageTypeConstants.LOCAL, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, StorageConstants.LOCAL);
+        initCommonConfig(sysFileConfig);
+    }
+
+    /**
+     * 初始化通用配置
+     */
+    private void initCommonConfig(SysFileConfig sysFileConfig) {
+        sysFileConfigCache.put(StorageConstants.LOCAL, sysFileConfig.getStorageValue());
+        sysFileConfigCache.put(StorageConstants.STORAGE_KEY, sysFileConfig.getStorageKey());
+        sysFileConfigCache.put(StorageConstants.STORAGE_NAME, sysFileConfig.getStorageName());
     }
 
     /**
@@ -163,6 +173,6 @@ public class SysFileConfigLoader {
     public String refreshCache() {
         sysFileConfigCache.clear();
         init();
-        return getCurrentDefaultUploadType();
+        return sysFileConfigCache.get(StorageConstants.STORAGE_NAME);
     }
 }

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.StorageTypeConstants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
@@ -103,7 +103,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         LocalFileConfigEntity localFileConfig = new LocalFileConfigEntity();
         BeanUtils.copyProperties(request, localFileConfig);
         String value = JSON.toJSONString(localFileConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageTypeConstants.LOCAL, value);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
     }
 
     /**
@@ -117,7 +117,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         AliyunOSSConfigEntity aliyunOSSConfigEntity = new AliyunOSSConfigEntity();
         BeanUtils.copyProperties(request, aliyunOSSConfigEntity);
         String value = JSON.toJSONString(aliyunOSSConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageTypeConstants.ALIYUN_OSS, value);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
     }
 
     /**
@@ -131,7 +131,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         MinioConfigEntity minioConfigEntity = new MinioConfigEntity();
         BeanUtils.copyProperties(request, minioConfigEntity);
         String value = JSON.toJSONString(minioConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageTypeConstants.MINIO, value);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
     }
 
 

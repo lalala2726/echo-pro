@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.constant.StorageTypeConstants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -73,7 +73,7 @@ public class FileController extends BaseController {
                     .build();
 
             FileTransferDto result = storageOperation.save(fileTransferDto);
-            ajax.put(StorageTypeConstants.FILE_URL, result.getFileUrl());
+            ajax.put(StorageConstants.FILE_URL, result.getFileUrl());
             return ajax;
         } catch (IOException e) {
             log.error("文件读取失败", e);

@@ -7,7 +7,7 @@ package cn.zhangchuangla.common.constant;
  * <p>
  * created on 2025/4/3
  */
-public class StorageTypeConstants {
+public class StorageConstants {
     /**
      * 本地存储
      */
@@ -34,4 +34,6 @@ public class StorageTypeConstants {
     public static final String FILE_PREVIEW_FOLDER = "preview";
     public static final String FILE_ORIGINAL_FOLDER = "original";
     public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
+    public static final String STORAGE_KEY = "storageKey";
+    public static final String STORAGE_NAME = "storageName";
 }
