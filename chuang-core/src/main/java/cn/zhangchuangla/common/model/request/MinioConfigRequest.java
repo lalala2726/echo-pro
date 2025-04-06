@@ -2,6 +2,7 @@ package cn.zhangchuangla.common.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 /**
@@ -57,6 +58,8 @@ public class MinioConfigRequest {
      * 存储桶名称
      */
     @Schema(description = "存储桶名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(regexp = "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$",
+            message = "存储桶名称只能包含小写字母、数字、点号和短横线，且必须以小写字母或数字开头和结尾，长度在 3 到 63 个字符之间")
     @NotBlank(message = "存储桶名称不能为空")
     private String bucketName;
 
@@ -66,7 +69,6 @@ public class MinioConfigRequest {
     @Schema(description = "文件访问域名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "文件访问域名不能为空")
     private String fileDomain;
-
 
 
 }

@@ -29,7 +29,8 @@ public enum ContentType {
     XLS("application/vnd.ms-excel"),
     XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     PPT("application/vnd.ms-powerpoint"),
-    PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+    OTHER("application/octet-stream");
 
     /**
      * MIME 类型字符串
@@ -59,7 +60,7 @@ public enum ContentType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("不支持的文件扩展名: " + extension);
+        return OTHER;
     }
 
     /**
