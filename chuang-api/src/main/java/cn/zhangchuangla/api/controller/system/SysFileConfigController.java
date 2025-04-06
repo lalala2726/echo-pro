@@ -107,7 +107,7 @@ public class SysFileConfigController extends BaseController {
      * @param request 请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增Minio配置")
+    @Operation(summary = "新增阿里云OSS配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
@@ -126,7 +126,7 @@ public class SysFileConfigController extends BaseController {
      * @param request 请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增Minio配置")
+    @Operation(summary = "新增本地配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
     @PostMapping("/add/local")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
@@ -141,16 +141,16 @@ public class SysFileConfigController extends BaseController {
      *
      * @return 设置结果
      */
-    @PutMapping("/setMaster")
+    @PutMapping("/setMaster/{id}")
     @Operation(summary = "设置主配置")
     @PreAuthorize("@auth.hasAnyPermission('system:file-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult setIsMasterConfig(@RequestBody Long id) {
+    public AjaxResult setIsMasterConfig(@PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
         boolean result = sysFileConfigService.setMasterConfig(id);
+        // 刷新缓存
         if (result) refreshCache();
-        toAjax(result);
-
+        return toAjax(result);
     }
 
 

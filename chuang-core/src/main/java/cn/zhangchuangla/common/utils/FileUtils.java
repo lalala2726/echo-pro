@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -119,16 +118,15 @@ public class FileUtils {
     }
 
     /**
-     * 生成年月格式的目录
+     * 生成年月格式的目录路径，用于对象存储路径（始终使用 / 作为分隔符）
      *
-     * @return 年月格式的目录
+     * @return 例如 "2025/04"
      */
     public static String generateYearMonthDir() {
-        // 生成年月格式的目录
-        SimpleDateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
-        String yearMonthDir = yearMonthFormat.format(new Date());
-        return yearMonthDir + File.separator;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM");
+        return format.format(new Date());
     }
+
 
     /**
      * 生成文件相对路径

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
@@ -200,7 +199,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isMaster(Integer id) {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
                 .eq(SysFileConfig::getId, id)
-                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
+                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
     }
 
@@ -212,7 +211,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public SysFileConfig getMasterConfig() {
         LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getIsMaster, Constants.IS_FILE_UPLOAD_MASTER);
+                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
 
@@ -241,9 +240,6 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         // 取消当前主配置
         SysFileConfig currentMasterConfig = getMasterConfig();
         if (currentMasterConfig != null) {
-            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(currentMasterConfig.getIsMaster())) {
-                throw new ServiceException("当前已经是主配置，无需再次设置");
-            }
             currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
             updateById(currentMasterConfig);
         }
