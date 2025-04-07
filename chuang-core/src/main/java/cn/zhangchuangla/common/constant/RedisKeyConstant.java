@@ -2,8 +2,8 @@ package cn.zhangchuangla.common.constant;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025/2/19 22:55
+ *         <p>
+ *         created on 2025/2/19 22:55
  */
 public class RedisKeyConstant {
 
@@ -32,7 +32,6 @@ public class RedisKeyConstant {
      */
     public static final String CAPTCHA_CODE = "captcha:code:";
 
-
     /**
      * 文件上传服务选择
      */
@@ -56,6 +55,27 @@ public class RedisKeyConstant {
     /**
      * 默认文件上传服务选择
      */
-    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT = SYSTEM_FILE_UPLOAD_SERVICE_SELECT + ":default";
+    public static final String SYSTEM_FILE_UPLOAD_SERVICE_SELECT_DEFAULT = SYSTEM_FILE_UPLOAD_SERVICE_SELECT
+            + ":default";
     public static final String USER_ROLE = "user_role:";
+
+    /**
+     * 接口访问限流前缀
+     */
+    public static final String ACCESS_LIMIT_PREFIX = "access_limit:";
+
+    /**
+     * IP限流前缀
+     */
+    public static final String ACCESS_LIMIT_IP = ACCESS_LIMIT_PREFIX + "ip:";
+
+    /**
+     * 用户ID限流前缀
+     */
+    public static final String ACCESS_LIMIT_USER = ACCESS_LIMIT_PREFIX + "user:";
+
+    /**
+     * 自定义限流前缀
+     */
+    public static final String ACCESS_LIMIT_CUSTOM = ACCESS_LIMIT_PREFIX + "custom:";
 }

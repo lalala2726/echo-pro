@@ -67,10 +67,13 @@ public enum ResponseCode {
     FileNameIsNull(40008, "文件名不能为空"),
     FileUploadFailed(40009, "文件上传失败"),             // 文件上传失败
     PROFILE_ERROR(40010, "配置文件错误"),
-    ACCOUNT_LOCKED(10002, "账号被锁定"), ACCESS_DENIED(40001, "您没有权限访问本资源"),
+    ACCOUNT_LOCKED(10002, "账号被锁定"),
+    ACCESS_DENIED(40001, "您没有权限访问本资源"),
     OPERATION_ERROR(10003, "操作失败"),   // 配置文件错误
     SYSTEM_ERROR(500, "系统错误！"),
-    FILE_OPERATION_FAILED(50001, "文件操作失败！");
+    FILE_OPERATION_FAILED(50001, "文件操作失败！"),
+    REQUEST_LIMIT(4002, "请求超过限制"),
+    TOO_MANY_REQUESTS(4003, "请求过于频繁");
     // endregion
 
 

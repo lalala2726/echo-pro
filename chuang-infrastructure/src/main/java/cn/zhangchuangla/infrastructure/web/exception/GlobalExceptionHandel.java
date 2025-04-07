@@ -1,10 +1,7 @@
 package cn.zhangchuangla.infrastructure.web.exception;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.AccountException;
-import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.exception.ProfileException;
-import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.exception.*;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -123,6 +120,15 @@ public class GlobalExceptionHandel {
     }
 
     /**
+     * 访问过于频繁
+     */
+    @ExceptionHandler(TooManyRequestException.class)
+    public AjaxResult tooManyRequestExceptionHandel(TooManyRequestException exception) {
+        log.error("请求过于频繁", exception);
+        return AjaxResult.error(ResponseCode.TOO_MANY_REQUESTS, exception.getMessage());
+    }
+
+    /**
      * 系统异常
      */
     @ExceptionHandler(Exception.class)
@@ -130,5 +136,6 @@ public class GlobalExceptionHandel {
         log.error("系统异常", exception);
         return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
     }
+
 
 }
