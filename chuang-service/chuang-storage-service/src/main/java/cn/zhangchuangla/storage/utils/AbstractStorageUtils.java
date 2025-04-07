@@ -15,8 +15,8 @@ import java.io.IOException;
  * 封装各存储服务的共用方法
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 15:00
+ * <p>
+ * created on 2025/4/3 15:00
  */
 @Slf4j
 public abstract class AbstractStorageUtils {
@@ -32,9 +32,8 @@ public abstract class AbstractStorageUtils {
                 || fileTransferDto.getOriginalName() == null) {
             return false;
         }
-
-        String contentType = FileUtils.generateFileContentType(fileTransferDto.getOriginalName());
-        return ImageUtils.isImage(contentType);
+        String fileExtension = fileTransferDto.getFileExtension();
+        return ImageUtils.isImage(fileExtension);
     }
 
     /**
@@ -167,7 +166,7 @@ public abstract class AbstractStorageUtils {
         String fileName = fileTransferDto.getOriginalName();
 
         // 填充文件基础信息
-        fileTransferDto.setFileExtension(FileUtils.getFileExtension(fileName));
+        fileTransferDto.setFileExtension(FileUtils.getFileExtensionWithoutDot(fileName));
         fileTransferDto.setContentType(FileUtils.generateFileContentType(fileName));
         fileTransferDto.setFileMd5(FileUtils.calculateMD5(data));
 

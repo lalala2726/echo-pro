@@ -31,6 +31,12 @@
             <artifactId>chuang-storage-service</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google.gvava.version}</version>
+        </dependency>
+
 
         <!-- SpringBoot 拦截器 -->
         <dependency>
