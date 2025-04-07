@@ -26,8 +26,8 @@ public class ImageUtils {
     /**
      * 支持的图片MIME类型集合
      */
-    public static final Set<String> IMAGE_MIME_TYPES = new HashSet<>(Arrays.asList(
-            "image/jpeg", "image/jpg", "image/png", "image/gif", "image/bmp", "image/webp"
+    public static final Set<String> IMAGE_EXTENSION = new HashSet<>(Arrays.asList(
+            "jpeg", "png", "gif", "bmp", "webp", "jpg", "tiff", "svg+xml"
     ));
 
     /**
@@ -116,11 +116,14 @@ public class ImageUtils {
     /**
      * 判断文件是否为图片类型
      *
-     * @param contentType 文件Content-Type
+     * @param imageExtension 文件后缀名
      * @return 是否为图片
      */
-    public static boolean isImage(String contentType) {
-        return contentType != null && IMAGE_MIME_TYPES.contains(contentType.toLowerCase());
+    public static boolean isImage(String imageExtension) {
+        log.info("文件后缀名: {}", imageExtension);
+        boolean result = imageExtension != null && IMAGE_EXTENSION.contains(imageExtension.toLowerCase());
+        log.info("判断结果: {}", result);
+        return result;
     }
 
     /**

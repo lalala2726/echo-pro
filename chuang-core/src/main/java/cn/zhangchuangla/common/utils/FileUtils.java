@@ -34,6 +34,13 @@ public class FileUtils {
     }
 
     /**
+     * 获取文件扩展名（不带点）
+     */
+    public static String getFileExtensionWithoutDot(String fileName) {
+        return (fileName != null && fileName.contains(".")) ? fileName.substring(fileName.lastIndexOf(".") + 1) : "";
+    }
+
+    /**
      * 根据文件类型返回合适的 Content-Type
      */
     public static String determineContentType(MultipartFile file) {

@@ -87,7 +87,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
         validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS, tencentCOSConfigEntity.getBucketName());
+        fileTransferDto = fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS, tencentCOSConfigEntity.getBucketName());
 
         // 验证是否为图片类型
         if (!isImage(fileTransferDto)) {

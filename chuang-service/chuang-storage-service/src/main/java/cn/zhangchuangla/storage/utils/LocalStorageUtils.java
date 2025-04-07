@@ -82,10 +82,9 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
 
         // 验证是否为图片类型
-        //fixme 图片类型判断需要修复
-//        if (!isImage(fileTransferDto)) {
-//            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
-//        }
+        if (!isImage(fileTransferDto)) {
+            throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
+        }
 
         String fileName = fileTransferDto.getOriginalName();
         byte[] originalData = fileTransferDto.getBytes();
