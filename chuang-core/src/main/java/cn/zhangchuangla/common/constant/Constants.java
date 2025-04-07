@@ -34,27 +34,26 @@ public class Constants {
     /**
      * 账号状态常量
      */
-    public static final Integer ACCOUNT_LOCK_KEY = 1;    // 账号封禁
-    public static final Integer ACCOUNT_UNLOCK_KEY = 0;  // 账号正常
+    public static final Integer ACCOUNT_LOCK_KEY = 1; // 账号封禁
+    public static final Integer ACCOUNT_UNLOCK_KEY = 0; // 账号正常
 
     /**
      * 登录状态常量
      */
-    public static final Integer LOGIN_SUCCESS = 0;  // 登录成功
-    public static final Integer LOGIN_FAIL = 1;     // 登录失败
+    public static final Integer LOGIN_SUCCESS = 0; // 登录成功
+    public static final Integer LOGIN_FAIL = 1; // 登录失败
 
     /**
      * 系统相关常量
      */
     public static final String SYSTEM_CREATE = "系统自动创建";
     public static final String RESOURCE_PREFIX = "/profile";
-    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15;  // 用户权限缓存过期时间（分钟）
+    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15; // 用户权限缓存过期时间（分钟）
 
     /**
      * 权限相关常量
      */
-    public static final String ALL_PERMISSION = "*:*:*";  // 拥有所有权限
-
+    public static final String ALL_PERMISSION = "*:*:*"; // 拥有所有权限
 
     /**
      * 系统默认标识常量
@@ -93,4 +92,13 @@ public class Constants {
     public static final int IS_FILE_UPLOAD_MASTER = 1;
     public static final String ORIGINAL = "original";
     public static final String PREVIEW = "preview";
+
+    /**
+     * 登录异常类型标识
+     */
+    public static final String LOGIN_EXCEPTION_ATTR = "LOGIN_EXCEPTION";
+    public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
+    public static final String INVALID_TOKEN = "INVALID_TOKEN";
+    public static final String NOT_LOGIN = "NOT_LOGIN";
+    public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
 }

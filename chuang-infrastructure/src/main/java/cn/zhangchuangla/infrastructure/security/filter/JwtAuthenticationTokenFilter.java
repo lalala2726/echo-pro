@@ -1,6 +1,10 @@
 package cn.zhangchuangla.infrastructure.security.filter;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.LoginException;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.web.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,13 +19,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Token认证拦截器
- * 该拦截器用于验证请求中的JWT token，并将用户信息设置到Spring Security的上下文中。
  *
  * @author Chuang
- * created on 2025/2/19 17:47
  */
 @Slf4j
 @Component
@@ -33,30 +36,44 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         this.tokenService = tokenService;
     }
 
-
-    /**
-     * 拦截请求，判断请求头中是否包含token，并且验证token是否正确
-     *
-     * @param request     请求
-     * @param response    响应
-     * @param filterChain 过滤器链
-     * @throws ServletException servlet异常
-     * @throws IOException      io异常
-     */
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 获取token
-        // 验证token是否存在且有效
-        LoginUser loginUser = tokenService.getLoginUser(request);
-        if (loginUser != null) {
-            // 创建认证对象并设置到SecurityContext中
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        String token = tokenService.getToken(request);
+
+        if (StringUtils.isNotBlank(token)) {
+            try {
+                // 验证token并获取用户信息
+                LoginUser loginUser = tokenService.getLoginUser(request);
+
+                if (loginUser != null) {
+                    // 验证token有效期
+                    tokenService.validateToken(loginUser);
+
+                    // 设置认证信息
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            loginUser, null, loginUser.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            } catch (LoginException e) {
+                // 根据异常类型设置请求属性
+                if (Objects.equals(e.getCode(), ResponseCode.TOKEN_EXPIRED.getCode())) {
+                    request.setAttribute(Constants.LOGIN_EXCEPTION_ATTR, Constants.TOKEN_EXPIRED);
+                } else if (Objects.equals(e.getCode(), ResponseCode.INVALID_TOKEN.getCode())) {
+                    request.setAttribute(Constants.LOGIN_EXCEPTION_ATTR, Constants.INVALID_TOKEN);
+                } else {
+                    request.setAttribute(Constants.LOGIN_EXCEPTION_ATTR, Constants.NOT_LOGIN);
+                }
+                SecurityContextHolder.clearContext();
+            } catch (Exception e) {
+                request.setAttribute(Constants.LOGIN_EXCEPTION_ATTR, Constants.SYSTEM_ERROR);
+                SecurityContextHolder.clearContext();
+            }
         }
+
         // 继续执行过滤器链
         filterChain.doFilter(request, response);
     }
-
-
 }

@@ -6,14 +6,14 @@ import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.AccountException;
+import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.infrastructure.web.service.TokenService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Token服务实现类
@@ -44,7 +43,6 @@ public class TokenServiceImpl implements TokenService {
     private final TokenConfig tokenConfig;
     private final SecretKey key;
     private final RedisCache redisCache;
-    private final ReentrantLock lock = new ReentrantLock();
 
     @Autowired
     public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
@@ -76,7 +74,6 @@ public class TokenServiceImpl implements TokenService {
                 .signWith(key)
                 .compact();
     }
-
 
     /**
      * 获取登录设备基本信息
@@ -174,14 +171,64 @@ public class TokenServiceImpl implements TokenService {
      *
      * @param token Token字符串
      * @return Claims对象
+     * @throws JwtException 如果token解析失败
      */
     @Override
     public Claims parseToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("Token已过期: {}", e.getMessage());
+            throw e;
+        } catch (MalformedJwtException | SignatureException e) {
+            log.warn("非法Token: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("解析Token发生未知错误: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * 检查Token状态
+     *
+     * @param token Token字符串
+     * @return Token状态
+     */
+    @Override
+    public TokenStatus checkTokenStatus(String token) {
+        if (StringUtils.isBlank(token)) {
+            return TokenStatus.INVALID;
+        }
+
+        try {
+            // 尝试解析token
+            Claims claims = parseToken(token);
+            String sessionId = (String) claims.get(Constants.LOGIN_USER_KEY);
+
+            if (StringUtils.isBlank(sessionId)) {
+                return TokenStatus.INVALID;
+            }
+
+            // 检查Redis中是否存在对应的用户信息
+            String redisKey = RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId;
+            if (!redisCache.hasKey(redisKey)) {
+                return TokenStatus.EXPIRED;
+            }
+
+            return TokenStatus.VALID;
+
+        } catch (ExpiredJwtException e) {
+            return TokenStatus.EXPIRED;
+        } catch (MalformedJwtException | SignatureException e) {
+            return TokenStatus.INVALID;
+        } catch (Exception e) {
+            return TokenStatus.ERROR;
+        }
     }
 
     /**
@@ -193,16 +240,30 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public LoginUser getLoginUser(HttpServletRequest request) {
         String token = getToken(request);
-        if (!StringUtils.isBlank(token)) {
-            try {
-                Claims claims = parseToken(token);
-                String sessionId = (String) claims.get(Constants.LOGIN_USER_KEY);
-                return getLoginUserByToken(sessionId);
-            } catch (Exception e) {
-                log.warn("获取用户信息失败:", e);
-            }
+        if (StringUtils.isBlank(token)) {
+            return null;
         }
-        return null;
+
+        try {
+            Claims claims = parseToken(token);
+            String sessionId = (String) claims.get(Constants.LOGIN_USER_KEY);
+
+            if (StringUtils.isBlank(sessionId)) {
+                throw new LoginException("Token非法，无法获取用户会话标识");
+            }
+
+            return getLoginUserByToken(sessionId);
+
+        } catch (ExpiredJwtException e) {
+            throw new LoginException(ResponseCode.TOKEN_EXPIRED);
+        } catch (MalformedJwtException | SignatureException e) {
+            throw new LoginException(ResponseCode.INVALID_TOKEN);
+        } catch (LoginException le) {
+            // 直接抛出登录异常
+            throw le;
+        } catch (Exception e) {
+            throw new LoginException(ResponseCode.USER_NOT_LOGIN);
+        }
     }
 
     /**
@@ -216,22 +277,36 @@ public class TokenServiceImpl implements TokenService {
             String redisKey = RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId;
             Object cacheObject = redisCache.getCacheObject(redisKey);
 
+            // 如果没有找到Redis中的对应对象，则直接认为Token已过期
+            if (cacheObject == null) {
+                throw new LoginException(ResponseCode.TOKEN_EXPIRED, "会话已过期，请重新登录");
+            }
+
             LoginUser loginUser = null;
             // 处理可能的类型转换问题
             if (cacheObject instanceof LoginUser) {
                 loginUser = (LoginUser) cacheObject;
-            } else if (cacheObject != null) {
-                // 如果不是LoginUser类型但有值，尝试使用FastJson2进行转换
-                loginUser = com.alibaba.fastjson2.JSON.to(LoginUser.class, cacheObject);
+            } else {
+                try {
+                    // 如果不是LoginUser类型但有值，尝试使用FastJson2进行转换
+                    loginUser = com.alibaba.fastjson2.JSON.to(LoginUser.class, cacheObject);
+                } catch (Exception e) {
+                    log.error("用户对象转换失败: {}, 类型: {}", e.getMessage(), cacheObject.getClass().getName(), e);
+                    throw new LoginException(ResponseCode.USER_NOT_LOGIN, "用户数据异常");
+                }
             }
 
+            // 再次检查转换后的对象是否有效
             if (loginUser == null) {
-                throw new AccountException(ResponseCode.USER_NOT_LOGIN);
+                throw new LoginException(ResponseCode.USER_NOT_LOGIN, "用户数据为空");
             }
             return loginUser;
+        } catch (LoginException le) {
+            // 用户未登录或会话过期的异常直接抛出
+            throw le;
         } catch (Exception e) {
             log.error("获取用户失败: {}", e.getMessage(), e);
-            throw new AccountException(ResponseCode.USER_NOT_LOGIN);
+            throw new LoginException(ResponseCode.USER_NOT_LOGIN, "获取用户信息失败");
         }
     }
 
@@ -250,6 +325,3 @@ public class TokenServiceImpl implements TokenService {
         return request.getHeader(header);
     }
 }
-
-
-

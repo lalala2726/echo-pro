@@ -55,12 +55,21 @@ public class GlobalExceptionHandel {
     }
 
     /**
+     * 登录异常
+     */
+    @ExceptionHandler(LoginException.class)
+    public AjaxResult loginExceptionHandel(LoginException exception) {
+        log.error("登录异常:", exception);
+        return AjaxResult.error(ResponseCode.LOGIN_ERROR, exception.getMessage());
+    }
+
+    /**
      * 认证异常
      */
     @ExceptionHandler(AccountException.class)
     public AjaxResult accountExceptionExceptionHandel(Exception exception) {
         log.error("认证异常", exception);
-        return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
+        return AjaxResult.error(ResponseCode.ACCOUNT_ERROR, exception.getMessage());
     }
 
     /**

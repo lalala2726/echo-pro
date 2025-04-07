@@ -61,7 +61,7 @@ public class OperationLogAspect {
     /**
      * 在方法执行前记录开始时间
      *
-     * @param joinPoint     切点，表示被拦截的方法
+     * @param joinPoint              切点，表示被拦截的方法
      * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
      */
     @Before(value = "@annotation(controllerOperationLog)")
@@ -73,9 +73,9 @@ public class OperationLogAspect {
     /**
      * 在方法执行完成后（成功）记录日志
      *
-     * @param joinPoint     切点，表示被拦截的方法
+     * @param joinPoint              切点，表示被拦截的方法
      * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
-     * @param jsonResult    方法返回的结果
+     * @param jsonResult             方法返回的结果
      */
     @AfterReturning(pointcut = "@annotation(controllerOperationLog)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, OperationLog controllerOperationLog, Object jsonResult) {
@@ -86,9 +86,9 @@ public class OperationLogAspect {
     /**
      * 在方法执行出现异常时记录日志
      *
-     * @param joinPoint     切点，表示被拦截的方法
+     * @param joinPoint              切点，表示被拦截的方法
      * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
-     * @param e             抛出的异常信息
+     * @param e                      抛出的异常信息
      */
     @AfterThrowing(pointcut = "@annotation(controllerOperationLog)", throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, OperationLog controllerOperationLog, Exception e) {
@@ -99,10 +99,10 @@ public class OperationLogAspect {
     /**
      * 处理日志的核心方法，记录请求参数、返回结果和异常信息
      *
-     * @param joinPoint     切点，表示被拦截的方法
+     * @param joinPoint              切点，表示被拦截的方法
      * @param controllerOperationLog @Log 注解对象，包含日志记录的配置信息
-     * @param exception     如果方法抛出异常，则包含异常信息
-     * @param jsonResult    如果方法执行成功，则包含返回结果
+     * @param exception              如果方法抛出异常，则包含异常信息
+     * @param jsonResult             如果方法执行成功，则包含返回结果
      */
     private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {

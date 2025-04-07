@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 
-
 /**
  * @author Chuang
  * <p>
@@ -45,7 +44,6 @@ public interface TokenService {
      */
     Claims parseToken(String token);
 
-
     /**
      * 获取登录用户信息
      *
@@ -61,4 +59,37 @@ public interface TokenService {
      * @return 返回token
      */
     String getToken(HttpServletRequest request);
+
+    /**
+     * 检查Token状态
+     *
+     * @param token Token字符串
+     * @return Token状态
+     */
+    TokenStatus checkTokenStatus(String token);
+
+    /**
+     * Token校验结果枚举
+     */
+    enum TokenStatus {
+        /**
+         * 有效的Token
+         */
+        VALID,
+
+        /**
+         * 过期的Token（能解析但Redis中无数据）
+         */
+        EXPIRED,
+
+        /**
+         * 非法Token（无法解析）
+         */
+        INVALID,
+
+        /**
+         * 未知错误
+         */
+        ERROR
+    }
 }
