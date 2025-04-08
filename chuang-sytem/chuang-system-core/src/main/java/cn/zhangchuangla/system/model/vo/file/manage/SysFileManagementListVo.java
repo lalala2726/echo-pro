@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.model.vo.file.manage;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -88,18 +89,15 @@ public class SysFileManagementListVo {
     /**
      * 上传时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Schema(description = "上传时间")
     private Date uploadTime;
 
-    /**
-     * 创建时间
-     */
-    @Schema(description = "创建时间")
-    private Date createTime;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Schema(description = "更新时间")
     private Date updateTime;
 }

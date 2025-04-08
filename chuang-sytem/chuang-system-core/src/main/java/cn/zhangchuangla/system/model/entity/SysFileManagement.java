@@ -101,10 +101,6 @@ public class SysFileManagement {
      */
     private Integer isDeleted;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
     /**
      * 更新时间

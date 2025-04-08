@@ -21,7 +21,6 @@
         <result property="uploaderName" column="uploader_name"/>
         <result property="uploadTime" column="upload_time"/>
         <result property="isDeleted" column="is_deleted"/>
-        <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
     <select id="listFileManage" resultMap="BaseResultMap">
