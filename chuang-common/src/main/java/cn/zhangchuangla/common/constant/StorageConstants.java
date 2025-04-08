@@ -95,4 +95,5 @@ public class StorageConstants {
     public static final String STORAGE_DIR_FILE = "file";
     public static final String STORAGE_DIR_IMAGES = "images";
     public static final String TRASH_DIR = "trash";
+    public static final Integer IS_TRASH = 1;//标记为已存放在回收站
 }

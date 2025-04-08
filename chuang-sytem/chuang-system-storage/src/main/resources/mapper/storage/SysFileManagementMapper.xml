@@ -21,6 +21,7 @@
         <result property="uploaderName" column="uploader_name"/>
         <result property="uploadTime" column="upload_time"/>
         <result property="isDeleted" column="is_deleted"/>
+        <result property="isTrash" column="is_trash"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
     <select id="listFileManage" resultMap="BaseResultMap">
@@ -29,6 +30,7 @@
         */
         select *
         from sys_file_management
+        where is_trash = 0
     </select>
 
 </mapper>

@@ -36,6 +36,12 @@ public class LocalOperationServiceImpl implements LocalOperationService {
         return LocalStorageUtils.uploadFile(fileTransferDto, uploadPath, fileDomain);
     }
 
+    /**
+     * 图片上传
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 文件信息
+     */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
         String uploadPath = appConfig.getUploadPath();
@@ -58,6 +64,6 @@ public class LocalOperationServiceImpl implements LocalOperationService {
      */
     @Override
     public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
-        return false;
+        return LocalStorageUtils.removeFile(appConfig.getUploadPath(), fileTransferDto, isDelete);
     }
 }

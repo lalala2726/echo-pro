@@ -101,6 +101,11 @@ public class SysFileManagement {
      */
     private Integer isDeleted;
 
+    /**
+     * 是否回收站 (0-否, 1-是)
+     */
+    private Integer isTrash;
+
 
     /**
      * 更新时间
