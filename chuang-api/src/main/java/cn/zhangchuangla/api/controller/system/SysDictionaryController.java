@@ -52,7 +52,7 @@ public class SysDictionaryController extends BaseController {
      */
     @Operation(summary = "字典列表")
     @GetMapping("/list")
-    @PreAuthorize("@auth.hasPermission('system:dictionary:list')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary:list')")
     public TableDataResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
         List<DictionaryListVo> dictionaryListVos = copyListProperties(list, DictionaryListVo.class);
@@ -67,7 +67,7 @@ public class SysDictionaryController extends BaseController {
      */
     @Operation(summary = "新增字典")
     @PostMapping
-    @PreAuthorize("@auth.hasPermission('system:dictionary:add')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary:add')")
     @OperationLog(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
         dictionaryService.addDictionary(request);
@@ -82,7 +82,7 @@ public class SysDictionaryController extends BaseController {
      */
     @Operation(summary = "字典详情")
     @GetMapping("/{id}")
-    @PreAuthorize("@auth.hasPermission('system:dictionary:info')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary:info')")
     public AjaxResult getDictionaryById(@PathVariable("id") Long id) {
         checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
@@ -99,7 +99,7 @@ public class SysDictionaryController extends BaseController {
      */
     @Operation(summary = "修改字典")
     @PutMapping
-    @PreAuthorize("@auth.hasPermission('system:dictionary:update')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary:update')")
     @OperationLog(title = "字典管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
         return toAjax(dictionaryService.updateDictionaryById(request));
@@ -113,7 +113,7 @@ public class SysDictionaryController extends BaseController {
      */
     @Operation(summary = "删除字典")
     @DeleteMapping("/{ids}")
-    @PreAuthorize("@auth.hasPermission('system:dictionary:delete')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary:delete')")
     @OperationLog(title = "字典管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionary(@PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {

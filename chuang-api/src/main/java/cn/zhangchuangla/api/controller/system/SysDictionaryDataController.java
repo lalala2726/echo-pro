@@ -53,7 +53,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @GetMapping("/dictId/{id}")
     @Operation(summary = "根据字典名称获取字典值")
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:list')")
     public TableDataResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
         checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         Page<DictionaryData> dictionaryDataPage = dictionaryDataService.getDictDataByDictionaryName(id, request);
@@ -69,7 +69,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @Operation(summary = "根据字典名称获取字典值")
     @GetMapping("/dictName/{dictionaryName}")
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:list')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:list')")
     public AjaxResult getDictionaryDataByDictionaryName(@PathVariable("dictionaryName") String dictionaryName) {
         List<DictionaryData> result = dictionaryDataService.getDictionaryDataByIdDictName(dictionaryName);
         List<DictionaryDataBasicVo> dictionaryDataBasicVos = copyListProperties(result, DictionaryDataBasicVo.class);
@@ -84,7 +84,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @Operation(summary = "添加字典值")
     @PostMapping
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:add')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:add')")
     @OperationLog(title = "字典值管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionaryData(@Validated @RequestBody AddDictionaryDataRequest request) {
         return toAjax(dictionaryDataService.addDictionaryData(request));
@@ -98,7 +98,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @Operation(summary = "字典值详情")
     @GetMapping("/{id}")
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:info')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:info')")
     public AjaxResult getDictionaryItemById(@PathVariable("id") Long id) {
         checkParam(id == null || id > 0, "字典值ID不能小于等于零!");
         DictionaryData dictionaryData = dictionaryDataService.getDictionaryById(id);
@@ -115,7 +115,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @Operation(summary = "修改字典值")
     @PutMapping
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:update')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:update')")
     @OperationLog(title = "字典值管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionaryData(@Validated @RequestBody UpdateDictionaryDataRequest request) {
         checkParam(request == null, "参数不能为空!");
@@ -130,7 +130,7 @@ public class SysDictionaryDataController extends BaseController {
      */
     @Operation(summary = "删除字典值")
     @DeleteMapping("/{id}")
-    @PreAuthorize("@auth.hasPermission('system:dictionary-data:delete')")
+    @PreAuthorize("@ss.hasPermission('system:dictionary-data:delete')")
     @OperationLog(title = "字典值管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteDictionaryData(@PathVariable("id") List<Long> ids) {
         ids.forEach(id -> {

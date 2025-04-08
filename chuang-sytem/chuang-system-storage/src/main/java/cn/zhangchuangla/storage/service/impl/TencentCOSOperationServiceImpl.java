@@ -1,13 +1,16 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.common.utils.file.TencentCOSUtils;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
-import cn.zhangchuangla.storage.utils.TencentCOSUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /**
  * 腾讯云COS 操作服务实现类
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class TencentCOSOperationServiceImpl implements TencentCOSOperationService {
 
     private final SysFileConfigLoader sysFileConfigLoader;
+    private AppConfig appConfig;
 
     @Autowired
     public TencentCOSOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
@@ -39,4 +43,20 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
 
         return TencentCOSUtils.imageUpload(fileTransferDto, cosConfig);
     }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash) {
+        return false;
+    }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto) {
+        return false;
+    }
+
+    @Override
+    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+        return false;
+    }
+
 }

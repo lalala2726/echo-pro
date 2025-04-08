@@ -17,11 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Anonymous
 public class AppController {
 
-    private final AppConfig appConfig;
-
-    public AppController(AppConfig appConfig) {
-        this.appConfig = appConfig;
-    }
 
     /**
      * 欢迎页
@@ -29,6 +24,7 @@ public class AppController {
     @GetMapping("/")
     @Schema(name = "欢迎页")
     public AjaxResult getAppConfig() {
+        AppConfig appConfig = new AppConfig();
         String name = appConfig.getName();
         String version = appConfig.getVersion();
         StringBuffer append = new StringBuffer()

@@ -43,7 +43,7 @@ public class SysMenuController extends BaseController {
      * @return 返回分页列表
      */
     @RequestMapping("/list")
-    @PreAuthorize("@auth.hasPermission('system:menu:list')")
+    @PreAuthorize("@ss.hasPermission('system:menu:list')")
     @Operation(summary = "菜单列表")
     public TableDataResult listMenu(SysMenuListRequest sysMenuListRequest) {
         Page<SysMenu> page = sysMenuService.listMenu(sysMenuListRequest);
@@ -51,6 +51,12 @@ public class SysMenuController extends BaseController {
         return getTableData(page, sysMenuListVos);
     }
 
+    /**
+     * todo 待开发
+     *
+     * @param roleId
+     * @return
+     */
     @GetMapping("/roleMenuTree/{roleId}")
     public AjaxResult roleMenuTree(@PathVariable("roleId") Long roleId) {
 

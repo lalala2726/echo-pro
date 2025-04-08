@@ -49,7 +49,7 @@ public class StorageConstants {
     public static final String FILE_PREVIEW_FOLDER = "preview";
 
     /**
-     * 原图文件夹
+     * 原始文件夹
      */
     public static final String FILE_ORIGINAL_FOLDER = "original";
 
@@ -94,4 +94,27 @@ public class StorageConstants {
     public static final Long SYSTEM_DEFAULT_FILE_CONFIG_ID = 1L;
     public static final String STORAGE_DIR_FILE = "file";
     public static final String STORAGE_DIR_IMAGES = "images";
+    public static final String TRASH_DIR = "trash";
+    public static final Integer IS_TRASH = 1;//标记为已存放在回收站
+    public static final Integer IS_NOT_TRASH = 0;
+
+    /**
+     * 文件已删除状态
+     */
+    public static final Integer IS_DELETED = 1;
+
+    /**
+     * 文件未删除状态
+     */
+    public static final Integer IS_NOT_DELETED = 0;
+
+    /**
+     * 本地存储类型
+     */
+    public static final String STORAGE_TYPE_LOCAL = "LOCAL";
+
+    /**
+     * 回收站目录名称
+     */
+    public static final String TRASH_DIR_NAME = "trash";
 }

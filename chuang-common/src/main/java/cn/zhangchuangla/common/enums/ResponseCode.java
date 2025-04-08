@@ -83,7 +83,7 @@ public enum ResponseCode {
     TOO_MANY_REQUESTS(42902, "请求过于频繁"),
     // endregion
 
-    ;
+    FILE_OPERATION_ERROR(50001, "文件操作失败");
 
     /**
      * 状态码

@@ -2,12 +2,14 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.common.utils.file.AliyunOssUtils;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
-import cn.zhangchuangla.storage.utils.AliyunOssUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /**
  * 阿里云OSS 操作服务实现类
@@ -44,4 +46,16 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
         return AliyunOssUtils.imageUpload(fileTransferDto, sysFileConfigLoader.getAliyunOSSConfig());
     }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash) {
+        return false;
+    }
+
+    @Override
+    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+        return false;
+    }
+
+
 }

@@ -48,7 +48,7 @@ public class SysPostController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
-    @PreAuthorize("@auth.hasPermission('system:post:list')")
+    @PreAuthorize("@ss.hasPermission('system:post:list')")
     public TableDataResult listPost(SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
@@ -62,7 +62,7 @@ public class SysPostController extends BaseController {
      * @return 操作结果
      */
     @PostMapping
-    @PreAuthorize("@auth.hasPermission('system:post:add')")
+    @PreAuthorize("@ss.hasPermission('system:post:add')")
     @Operation(summary = "添加岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.INSERT)
     public AjaxResult addPost(@Validated @RequestBody SysPostAddRequest request) {
@@ -78,7 +78,7 @@ public class SysPostController extends BaseController {
      * @return 操作结果
      */
     @DeleteMapping("/{ids}")
-    @PreAuthorize("@auth.hasPermission('system:post:remove')")
+    @PreAuthorize("@ss.hasPermission('system:post:remove')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult removePost(@PathVariable("ids") List<Integer> ids) {
@@ -94,7 +94,7 @@ public class SysPostController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PreAuthorize("@auth.hasPermission('system:post:edit')")
+    @PreAuthorize("@ss.hasPermission('system:post:edit')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
     public AjaxResult editPost(@Validated @RequestBody SysPostUpdateRequest request) {
@@ -108,7 +108,7 @@ public class SysPostController extends BaseController {
      * @return 操作结果
      */
     @GetMapping("/{id}")
-    @PreAuthorize("@auth.hasPermission('system:post:query')")
+    @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult getPostById(@PathVariable("id") Integer id) {
         checkParam(id == null, "id不能为空");

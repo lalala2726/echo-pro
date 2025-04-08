@@ -120,10 +120,7 @@ public class ImageUtils {
      * @return 是否为图片
      */
     public static boolean isImage(String imageExtension) {
-        log.info("文件后缀名: {}", imageExtension);
-        boolean result = imageExtension != null && IMAGE_EXTENSION.contains(imageExtension.toLowerCase());
-        log.info("判断结果: {}", result);
-        return result;
+        return imageExtension != null && IMAGE_EXTENSION.contains(imageExtension.toLowerCase());
     }
 
     /**

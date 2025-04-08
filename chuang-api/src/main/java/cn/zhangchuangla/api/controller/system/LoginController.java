@@ -71,6 +71,11 @@ public class LoginController extends BaseController {
         return success(result);
     }
 
+    /**
+     * 退出登录
+     *
+     * @return 退出结果
+     */
     @PostMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout() {

@@ -291,4 +291,48 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean isHttp(String link) {
         return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
+
+    /**
+     * 检查字符串是否有实际文本内容
+     * <p>
+     * 与 isEmpty 不同，该方法会检查字符串是否包含非空白字符。
+     * 例如：" " 对于 isEmpty 返回 false，但对于 hasText 返回 false
+     *
+     * @param text 需要检查的字符串
+     * @return true：如果字符串不为 null 且包含至少一个非空白字符，false：其他情况
+     */
+    public static boolean hasText(String text) {
+        // 首先检查是否为 null
+        if (text == null) {
+            return false;
+        }
+
+        // 检查字符串是否为空
+        if (text.isEmpty()) {
+            return false;
+        }
+
+        // 检查是否全部为空白字符
+        for (int i = 0; i < text.length(); i++) {
+            // 如果有一个非空白字符，则认为有文本内容
+            if (!Character.isWhitespace(text.charAt(i))) {
+                return true;
+            }
+        }
+
+        // 如果全部是空白字符，则认为没有文本内容
+        return false;
+    }
+
+    /**
+     * 检查字符串是否不包含实际文本内容
+     * <p>
+     * 是 hasText 方法的逻辑取反
+     *
+     * @param text 需要检查的字符串
+     * @return true：如果字符串为 null 或者不包含非空白字符，false：其他情况
+     */
+    public static boolean hasNoText(String text) {
+        return !hasText(text);
+    }
 }
