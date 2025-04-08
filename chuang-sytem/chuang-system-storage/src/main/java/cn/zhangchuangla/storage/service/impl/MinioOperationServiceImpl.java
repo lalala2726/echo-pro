@@ -2,9 +2,9 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.common.utils.file.MinioUtils;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.MinioOperationService;
-import cn.zhangchuangla.storage.utils.MinioUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         this.sysFileConfigLoader = sysFileConfigLoader;
     }
 
+
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
         MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
@@ -46,6 +47,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
 
     @Override
     public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
+
         return false;
     }
 }

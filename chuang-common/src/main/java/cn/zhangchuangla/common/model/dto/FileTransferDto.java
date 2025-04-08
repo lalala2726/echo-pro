@@ -58,12 +58,12 @@ public class FileTransferDto {
     /**
      * 压缩文件URL，用于图片预览等场景
      */
-    private String compressedFileUrl;
+    private String previewImageUrl;
 
     /**
      * 压缩文件相对路径，存储在服务器上的路径
      */
-    private String compressedRelativePath;
+    private String previewImagePath;
 
     /**
      * 文件扩展名

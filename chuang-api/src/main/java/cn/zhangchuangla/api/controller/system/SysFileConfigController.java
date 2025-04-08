@@ -10,15 +10,14 @@ import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
-import cn.zhangchuangla.system.model.entity.SysFileConfig;
-import cn.zhangchuangla.system.model.request.file.config.SysFileConfigListRequest;
-import cn.zhangchuangla.system.model.vo.file.config.SysFileConfigListVo;
-import cn.zhangchuangla.system.service.SysFileConfigService;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.model.entity.SysFileConfig;
+import cn.zhangchuangla.storage.model.request.config.SysFileConfigListRequest;
+import cn.zhangchuangla.storage.model.vo.config.SysFileConfigListVo;
+import cn.zhangchuangla.storage.service.SysFileConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +40,6 @@ public class SysFileConfigController extends BaseController {
 
     private final SysFileConfigLoader sysFileConfigLoader;
 
-
-    @Autowired
     public SysFileConfigController(SysFileConfigService sysFileConfigService, SysFileConfigLoader sysFileConfigLoader) {
         this.sysFileConfigService = sysFileConfigService;
         this.sysFileConfigLoader = sysFileConfigLoader;

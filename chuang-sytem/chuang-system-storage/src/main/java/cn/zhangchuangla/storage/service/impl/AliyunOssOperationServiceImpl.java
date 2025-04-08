@@ -2,9 +2,9 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
+import cn.zhangchuangla.common.utils.file.AliyunOssUtils;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
-import cn.zhangchuangla.storage.utils.AliyunOssUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

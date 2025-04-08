@@ -7,10 +7,10 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
-import cn.zhangchuangla.system.service.SysFileManagementService;
+import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.service.SysFileManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +116,7 @@ public class FileController extends BaseController {
             // 保存文件信息到数据库
             sysFileManagementService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
-            ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());
+            ajax.put(Constants.PREVIEW, result.getPreviewImageUrl());
         } catch (IOException e) {
             return error("文件读取失败: " + e.getMessage());
         }

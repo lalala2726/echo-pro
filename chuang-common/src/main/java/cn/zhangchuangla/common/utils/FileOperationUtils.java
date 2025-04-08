@@ -192,4 +192,22 @@ public class FileOperationUtils {
     public static String BuildFinalPath(String... args) {
         return buildFinalPath(args);
     }
+
+    /**
+     * 从原始相对路径中获取文件名
+     *
+     * @param RelativePath 原始相对路径
+     * @return 文件名
+     */
+    public static String getFileNameByRelativePath(String RelativePath) {
+        if (RelativePath == null || RelativePath.isEmpty()) {
+            return "";
+        }
+        int lastSlashIndex = RelativePath.lastIndexOf("/");
+        if (lastSlashIndex >= 0 && lastSlashIndex < RelativePath.length() - 1) {
+            return RelativePath.substring(lastSlashIndex + 1);
+        } else {
+            return RelativePath;
+        }
+    }
 }

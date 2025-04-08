@@ -2,8 +2,8 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
+import cn.zhangchuangla.common.utils.file.LocalStorageUtils;
 import cn.zhangchuangla.storage.service.LocalOperationService;
-import cn.zhangchuangla.storage.utils.LocalStorageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
