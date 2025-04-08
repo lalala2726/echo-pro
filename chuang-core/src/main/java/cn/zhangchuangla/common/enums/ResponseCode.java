@@ -3,82 +3,87 @@ package cn.zhangchuangla.common.enums;
 import lombok.Getter;
 
 /**
- * @author Chuang
+ * 响应码枚举，定义所有返回给前端的状态码及其含义
  * <p>
- * created on 2025/1/11 03:47
+ * created by Chuang on 2025/1/11 03:47
  */
 @Getter
 public enum ResponseCode {
 
     // region 通用成功与错误状态
     SUCCESS(200, "操作成功"), // 当操作成功完成时的响应
-    ERROR(500, "操作失败"), // 当操作执行过程中发生内部错误时的响应
-    SERVER_ERROR(500, "服务器错误"), // 当服务器内部发生错误时的响应
+    ERROR(500, "操作失败"), // 当操作执行过程中发生未知错误时的响应
+    SERVER_ERROR(50001, "服务器错误"), // 明确标识为服务器内部错误
+    SYSTEM_ERROR(50002, "系统错误！"), // 明确标识为系统级异常
+    OPERATION_ERROR(50003, "操作失败"), // 通用操作失败
+    FILE_OPERATION_FAILED(50004, "文件操作失败！"), // 文件读写等失败
     // endregion
 
     // region 请求相关错误状态
-    PARAM_ERROR(400, "参数错误!"), // 当请求参数有误或缺失时的响应
-    PARAM_NOT_NULL(1009, "参数不能为空"), // 当参数不能为空时的响应
-    PARAM_ERROR_TOO_LARGE(40000, "请求参数过大"), // 当请求参数过于庞大时的响应
-    PARAM_ERROR_ZERO(40001, "参数不能小于0"), // 当请求参数为0时的响应
-    NOT_FOUND(404, "未找到该资源"), // 当请求的资源不存在时的响应
-    NOT_SUPPORT(405, "不支持该请求"), // 当请求方法不被允许时的响应
+    PARAM_ERROR(400, "参数错误!"), // 请求参数错误
+    PARAM_NOT_NULL(40001, "参数不能为空"), // 请求参数缺失
+    PARAM_ERROR_TOO_LARGE(40002, "请求参数过大"), // 参数超出限制
+    PARAM_ERROR_ZERO(40003, "参数不能小于0"), // 参数为0无效
+    NOT_FOUND(404, "未找到该资源"), // 请求资源不存在
+    NOT_SUPPORT(405, "不支持该请求"), // 请求方法不被允许
     // endregion
 
     // region 认证与授权错误状态
-    UNAUTHORIZED(401, "未授权"), // 当用户未通过身份验证时的响应
-    FORBIDDEN(403, "禁止访问"), // 当用户没有访问资源的权限时的响应
-    NOT_LOGIN(501, "未登录"), // 当用户尝试访问需要登录的资源但未登录时的响应
-    USER_NOT_LOGIN(1004, "用户未登录"),
-    TOKEN_EXPIRED(40015, "凭证已过期,请重新登录"), // 凭证已过期
-    TOKEN_EXPIRE(40016, "会话已过期,请重新登录"), // 会话已过期
-    TOKEN_MISS(40017, "缺少令牌"), // 缺少令牌
-    AUTHORIZED(40011, "认证授权失败"), // 认证授权失败
-    ILLEGAL_TOKEN(40018, "非法的token"), // 非法的token
-    TOKEN_ERROR(40019, "token错误"), // token错误
+    UNAUTHORIZED(401, "未授权"), // 请求未提供有效身份信息
+    FORBIDDEN(403, "禁止访问"), // 有身份但无权限
+    NOT_LOGIN(40101, "未登录"), // 用户未登录
+    USER_NOT_LOGIN(40102, "用户未登录"),
+    TOKEN_EXPIRED(40103, "凭证已过期,请重新登录"),
+    TOKEN_EXPIRE(40104, "会话已过期,请重新登录"),
+    TOKEN_MISS(40105, "缺少令牌"),
+    AUTHORIZED(40106, "认证授权失败"),
+    ILLEGAL_TOKEN(40107, "非法的token"),
+    TOKEN_ERROR(40108, "token错误"),
+    INVALID_TOKEN(40109, "token非法"),
     // endregion
 
     // region 用户相关错误状态
-    USER_NOT_EXIST(1001, "用户不存在"), // 当指定的用户不存在时的响应
-    USER_EXIST(1002, "用户已存在"), // 当尝试创建已存在的用户时的响应
-    USER_PASSWORD_ERROR(1003, "用户名或密码错误"), // 当用户提供的用户名或密码不正确时的响应
-    USERNAME_FORMAT_ERROR(40012, "用户名不合法"), // 用户名不合法
-    PASSWORD_FORMAT_ERROR(40013, "密码不合法"), // 密码不合法
-    LOGIN_ERROR(40014, "登录失败"), // 登录失败
-    USER_NOT_ADMIN(1005, "用户不是管理员"), // 当需要管理员权限但用户不是管理员时的响应
-    USER_NOT_ACTIVE(1006, "用户未激活"), // 当用户账户未激活时的响应
-    USER_NOT_VERIFY(1007, "用户未验证"), // 当用户信息未验证时的响应
-    USER_NOT_BIND(1008, "用户未绑定"), // 当用户未绑定必要信息时的响应
+    USER_NOT_EXIST(40401, "用户不存在"),
+    USER_EXIST(40901, "用户已存在"), // 资源冲突
+    USER_PASSWORD_ERROR(40004, "用户名或密码错误"),
+    USERNAME_FORMAT_ERROR(40005, "用户名不合法"),
+    PASSWORD_FORMAT_ERROR(40006, "密码不合法"),
+    LOGIN_ERROR(40007, "登录失败"),
+    USER_NOT_ADMIN(40301, "用户不是管理员"),
+    USER_NOT_ACTIVE(40302, "用户未激活"),
+    USER_NOT_VERIFY(40303, "用户未验证"),
+    USER_NOT_BIND(40304, "用户未绑定"),
+    ACCOUNT_LOCKED(40305, "账号被锁定"),
+    ACCOUNT_ERROR(40306, "账号异常"),
     // endregion
 
     // region 数据相关错误状态
-    DATA_NOT_FOUND(40002, "数据未找到"), // 当查询不到相关数据时的响应
-    RESULT_IS_NULL(40006, "查询为空"), // 当查询结果为空时的响应
-    DELETE_ERROR(40003, "删除失败"), // 当删除操作失败时的响应
+    DATA_NOT_FOUND(40402, "数据未找到"),
+    RESULT_IS_NULL(204, "查询为空"), // 无内容返回，语义更标准
+    DELETE_ERROR(40008, "删除失败"),
     // endregion
 
     // region 字典相关错误状态
-    DICT_NAME_EXIST(40004, "字典名称已存在"), // 当字典名称重复时的响应
-    DICT_TYPE_EXIST(40005, "字典类型已存在"), // 当字典类型重复时的响应
-    DICT_NAME_ERROR(40007, "只能是英文数字和下划线"), // 当字典名称格式不正确时的响应
+    DICT_NAME_EXIST(40902, "字典名称已存在"),
+    DICT_TYPE_EXIST(40903, "字典类型已存在"),
+    DICT_NAME_ERROR(40009, "只能是英文数字和下划线"),
+    // endregion
+
+    // region 文件与配置相关
+    FileNameIsNull(40010, "文件名不能为空"),
+    FileUploadFailed(50005, "文件上传失败"),
+    PROFILE_ERROR(50006, "配置文件错误"),
     // endregion
 
     // region 其他错误状态
-    NOT_EXIST(502, "不存在"), // 当请求的资源不存在时的响应
-    NOT_ALLOW(503, "不允许"),
-    FileNameIsNull(40008, "文件名不能为空"),
-    FileUploadFailed(40009, "文件上传失败"), // 文件上传失败
-    PROFILE_ERROR(40010, "配置文件错误"),
-    ACCOUNT_LOCKED(10002, "账号被锁定"),
-    ACCESS_DENIED(40001, "您没有权限访问本资源"),
-    OPERATION_ERROR(10003, "操作失败"), // 配置文件错误
-    SYSTEM_ERROR(500, "系统错误！"),
-    FILE_OPERATION_FAILED(50001, "文件操作失败！"),
-    REQUEST_LIMIT(4002, "请求超过限制"),
-    TOO_MANY_REQUESTS(4003, "请求过于频繁"),
-    ACCOUNT_ERROR(4005, "账号异常"),
-    INVALID_TOKEN(4006, "token非法");
+    NOT_EXIST(40403, "不存在"),
+    NOT_ALLOW(40307, "不允许"),
+    ACCESS_DENIED(40308, "您没有权限访问本资源"),
+    REQUEST_LIMIT(42901, "请求超过限制"), // 使用 429 更标准
+    TOO_MANY_REQUESTS(42902, "请求过于频繁"),
     // endregion
+
+    ;
 
     /**
      * 状态码
@@ -107,7 +112,7 @@ public enum ResponseCode {
                 return rc;
             }
         }
-        return null; // 如果找不到匹配的状态码，返回 null
+        return null;
     }
 
 }
