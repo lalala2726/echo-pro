@@ -11,9 +11,9 @@
 
     <modules>
         <module>chuang-api</module>
-        <module>chuang-core</module>
-        <module>chuang-infrastructure</module>
-        <module>chuang-service</module>
+        <module>chuang-common</module>
+        <module>chuang-framework</module>
+        <module>chuang-sytem</module>
     </modules>
 
     <!-- 统一版本管理 -->
@@ -227,27 +227,27 @@
             <!-- ===================== 项目模块依赖 ===================== -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-core</artifactId>
+                <artifactId>chuang-common</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-infrastructure</artifactId>
+                <artifactId>chuang-framework</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-service</artifactId>
+                <artifactId>chuang-system</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-system-service</artifactId>
+                <artifactId>chuang-system-core</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>
-                <artifactId>chuang-storage-service</artifactId>
+                <artifactId>chuang-system-storage</artifactId>
                 <version>${app.version}</version>
             </dependency>
         </dependencies>

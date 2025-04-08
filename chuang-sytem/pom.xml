@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.zhangchuangla</groupId>
+        <artifactId>chuang-backend</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>chuang-sytem</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+    <description>业务服务模块，包含各种业务逻辑实现</description>
+
+    <!-- 添加子模块 -->
+    <modules>
+        <module>chuang-system-core</module>
+        <module>chuang-system-storage</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common</artifactId>
+        </dependency>
+    </dependencies>
+</project>

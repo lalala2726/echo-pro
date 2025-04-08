@@ -17,22 +17,22 @@
         <!-- 依赖基础设施模块（包含所有需要的依赖） -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-infrastructure</artifactId>
+            <artifactId>chuang-framework</artifactId>
         </dependency>
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-core</artifactId>
+            <artifactId>chuang-common</artifactId>
         </dependency>
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-storage-service</artifactId>
+            <artifactId>chuang-system-storage</artifactId>
         </dependency>
 
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-service</artifactId>
+            <artifactId>chuang-system-core</artifactId>
         </dependency>
     </dependencies>
 

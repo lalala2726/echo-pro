@@ -5,18 +5,18 @@
     <file url="file://$PROJECT_DIR$/accounting/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-core/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-core/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-infrastructure/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-infrastructure/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-message-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-message-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-storage-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-storage-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/chuang-system-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/chuang-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-framework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-framework/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-message-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-message-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-system-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-system-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-system-storage/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/chuang-system-storage/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-sytem/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
