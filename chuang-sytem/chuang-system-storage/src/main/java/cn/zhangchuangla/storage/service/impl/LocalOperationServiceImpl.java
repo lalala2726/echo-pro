@@ -48,4 +48,16 @@ public class LocalOperationServiceImpl implements LocalOperationService {
         }
         return LocalStorageUtils.imageUpload(fileTransferDto, uploadPath, fileDomain);
     }
+
+    /**
+     * 默认会将文件传入回收站，也可以直接删除
+     *
+     * @param fileTransferDto 文件传输对象
+     * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
+     * @return 文件操作结果
+     */
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
+        return false;
+    }
 }

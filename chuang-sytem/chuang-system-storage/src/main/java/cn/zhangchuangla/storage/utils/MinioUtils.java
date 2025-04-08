@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
@@ -161,7 +161,7 @@ public class MinioUtils extends AbstractStorageUtils {
                 PutObjectArgs.builder()
                         .bucket(bucketName)
                         .object(objectName)
-                        .contentType(FileUtils.generateFileContentType(fileName))
+                        .contentType(FileOperationUtils.generateFileContentType(fileName))
                         .stream(new ByteArrayInputStream(data), data.length, -1)
                         .build());
     }

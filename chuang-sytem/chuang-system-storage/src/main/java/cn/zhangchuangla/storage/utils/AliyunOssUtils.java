@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -147,7 +147,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);
         metadata.setHeader("Content-Disposition", "inline");
-        metadata.setContentType(FileUtils.generateFileContentType(fileName));
+        metadata.setContentType(FileOperationUtils.generateFileContentType(fileName));
 
         // 上传文件
         ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(data), metadata);

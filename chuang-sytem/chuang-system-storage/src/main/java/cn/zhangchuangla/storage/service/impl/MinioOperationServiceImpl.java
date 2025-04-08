@@ -43,4 +43,9 @@ public class MinioOperationServiceImpl implements MinioOperationService {
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
         return MinioUtils.uploadFile(fileTransferDto, sysFileConfigLoader.getMinioConfig());
     }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
+        return false;
+    }
 }

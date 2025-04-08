@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -160,7 +160,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
                                     byte[] data, String fileName) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);
-        metadata.setContentType(FileUtils.generateFileContentType(fileName));
+        metadata.setContentType(FileOperationUtils.generateFileContentType(fileName));
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(
                 bucketName, objectName, new ByteArrayInputStream(data), metadata);

@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,8 +140,12 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      */
     private static String buildCompleteUrl(String relativePath, String domain) {
         if (StringUtils.isEmpty(domain)) {
-            return FileUtils.buildFinalPath(Constants.RESOURCE_PREFIX, relativePath);
+            return FileOperationUtils.buildFinalPath(Constants.RESOURCE_PREFIX, relativePath);
         }
         return buildFullUrl(domain, relativePath);
+    }
+
+    public static boolean moveFileToTrash(String filePath) {
+        return false;
     }
 }

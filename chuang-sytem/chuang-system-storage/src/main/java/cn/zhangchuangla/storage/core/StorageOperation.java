@@ -13,7 +13,7 @@ import cn.zhangchuangla.common.model.dto.FileTransferDto;
 public interface StorageOperation {
 
     /**
-     * 文件上传接口，直接上传图片并返回文件URL
+     * 文件上传接口，直接删除文件
      *
      * @param fileTransferDto 文件传输对象
      * @return 文件传输结果
@@ -27,4 +27,13 @@ public interface StorageOperation {
      * @return 文件传输结果
      */
     FileTransferDto imageUpload(FileTransferDto fileTransferDto);
+
+    /**
+     * 默认会将文件传入回收站，也可以直接删除
+     *
+     * @param fileTransferDto 文件传输对象
+     * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
+     * @return 文件操作结果
+     */
+    boolean removeFile(FileTransferDto fileTransferDto, final boolean isDelete);
 }

@@ -18,7 +18,7 @@ import java.util.UUID;
  * <p>
  * created on 2025/2/18 15:27
  */
-public class FileUtils {
+public class FileOperationUtils {
     /**
      * 校验文件有效性
      */

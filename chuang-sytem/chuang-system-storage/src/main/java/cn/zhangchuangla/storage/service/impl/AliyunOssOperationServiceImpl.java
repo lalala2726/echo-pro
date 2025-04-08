@@ -44,4 +44,9 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
         return AliyunOssUtils.imageUpload(fileTransferDto, sysFileConfigLoader.getAliyunOSSConfig());
     }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
+        return false;
+    }
 }

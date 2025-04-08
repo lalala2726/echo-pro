@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
-import cn.zhangchuangla.common.utils.FileUtils;
+import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.ImageUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,10 +63,10 @@ public abstract class AbstractStorageUtils {
      * @return 存储路径
      */
     protected static String generateFilePath(String fileName) {
-        String datePath = FileUtils.generateYearMonthDir();
-        String fileExtension = FileUtils.getFileExtension(fileName);
-        String uuid = FileUtils.generateUUID();
-        return FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
+        String datePath = FileOperationUtils.generateYearMonthDir();
+        String fileExtension = FileOperationUtils.getFileExtension(fileName);
+        String uuid = FileOperationUtils.generateUUID();
+        return FileOperationUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
     }
 
     /**
@@ -76,13 +76,13 @@ public abstract class AbstractStorageUtils {
      * @return 原始图片存储路径
      */
     protected static String generateOriginalImagePath(String fileName) {
-        String datePath = FileUtils.generateYearMonthDir();
-        String fileExtension = FileUtils.getFileExtension(fileName);
-        String uuid = FileUtils.generateUUID();
+        String datePath = FileOperationUtils.generateYearMonthDir();
+        String fileExtension = FileOperationUtils.getFileExtension(fileName);
+        String uuid = FileOperationUtils.generateUUID();
         String fileName1 = uuid + fileExtension;
-        String originalDir = FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
+        String originalDir = FileOperationUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_ORIGINAL_FOLDER);
-        return FileUtils.buildFinalPath(originalDir, fileName1);
+        return FileOperationUtils.buildFinalPath(originalDir, fileName1);
     }
 
     /**
@@ -92,13 +92,13 @@ public abstract class AbstractStorageUtils {
      * @return 压缩图片存储路径
      */
     protected static String generateCompressedImagePath(String fileName) {
-        String datePath = FileUtils.generateYearMonthDir();
-        String fileExtension = FileUtils.getFileExtension(fileName);
-        String uuid = FileUtils.generateUUID();
+        String datePath = FileOperationUtils.generateYearMonthDir();
+        String fileExtension = FileOperationUtils.getFileExtension(fileName);
+        String uuid = FileOperationUtils.generateUUID();
         String fileName1 = uuid + fileExtension;
-        String compressedDir = FileUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
+        String compressedDir = FileOperationUtils.buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_PREVIEW_FOLDER);
-        return FileUtils.buildFinalPath(compressedDir, fileName1);
+        return FileOperationUtils.buildFinalPath(compressedDir, fileName1);
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class AbstractStorageUtils {
      * @return 完整URL
      */
     protected static String buildFullUrl(String domain, String relativePath) {
-        return FileUtils.buildFinalPath(domain, relativePath);
+        return FileOperationUtils.buildFinalPath(domain, relativePath);
     }
 
     /**
@@ -166,9 +166,9 @@ public abstract class AbstractStorageUtils {
         String fileName = fileTransferDto.getOriginalName();
 
         // 填充文件基础信息
-        fileTransferDto.setFileExtension(FileUtils.getFileExtensionWithoutDot(fileName));
-        fileTransferDto.setContentType(FileUtils.generateFileContentType(fileName));
-        fileTransferDto.setFileMd5(FileUtils.calculateMD5(data));
+        fileTransferDto.setFileExtension(FileOperationUtils.getFileExtensionWithoutDot(fileName));
+        fileTransferDto.setContentType(FileOperationUtils.generateFileContentType(fileName));
+        fileTransferDto.setFileMd5(FileOperationUtils.calculateMD5(data));
 
         // 计算并格式化文件大小
         long fileSizeBytes = data.length;

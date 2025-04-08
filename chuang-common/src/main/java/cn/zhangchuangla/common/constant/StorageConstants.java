@@ -94,4 +94,5 @@ public class StorageConstants {
     public static final Long SYSTEM_DEFAULT_FILE_CONFIG_ID = 1L;
     public static final String STORAGE_DIR_FILE = "file";
     public static final String STORAGE_DIR_IMAGES = "images";
+    public static final String TRASH_DIR = "trash";
 }
