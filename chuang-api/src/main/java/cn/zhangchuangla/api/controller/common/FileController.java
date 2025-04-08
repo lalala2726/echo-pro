@@ -77,6 +77,7 @@ public class FileController extends BaseController {
                     .build();
 
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
+            sysFileManagementService.saveFileInfo(result);
             ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
             return ajax;
         } catch (IOException e) {

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
@@ -13,6 +12,7 @@ import cn.zhangchuangla.storage.mapper.SysFileManagementMapper;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
 import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
 import cn.zhangchuangla.storage.service.SysFileManagementService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -36,14 +35,12 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
 
     private final SysFileManagementMapper sysFileManagementMapper;
     private final StorageFactory storageFactory;
-    private final AppConfig appConfig;
 
-
-    public SysFileManagementServiceImpl(SysFileManagementMapper sysFileManagementMapper, StorageFactory storageFactory, AppConfig appConfig) {
+    public SysFileManagementServiceImpl(SysFileManagementMapper sysFileManagementMapper, StorageFactory storageFactory) {
         this.sysFileManagementMapper = sysFileManagementMapper;
         this.storageFactory = storageFactory;
-        this.appConfig = appConfig;
     }
+
 
     /**
      * 保存文件信息
@@ -88,26 +85,22 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
     /**
      * 删除文件
      *
-     * @param ids      文件id列表
-     * @param isDelete true表示移动到回收站，false表示直接删除
+     * @param ids           文件id列表
+     * @param isPermanently true代表永久删除文件，false将会转移到回收站
      * @return 操作结果
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean removeFile(List<Long> ids, Boolean isDelete) {
+    public boolean removeFile(List<Long> ids, Boolean isPermanently) {
         if (ids == null || ids.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
         }
 
         for (Long id : ids) {
-            SysFileManagement fileManagement = getById(id);
+            SysFileManagement fileManagement = getFileManageById(id);
             if (fileManagement == null) {
-                throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件不存在！");
-            }
-
-            // 如果是移动到回收站，先更新数据库标记
-            if (isDelete) {
-                updateFileTrashStatus(id);
+                log.warn("文件不存在，ID: {}", id);
+                throw new FileException(ResponseCode.RESULT_IS_NULL, "文件不存在，ID: " + id);
             }
 
             try {
@@ -117,23 +110,40 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
                 // 获取对应的存储操作实现
                 StorageOperation storageOperation = storageFactory.getStorageOperation(fileManagement.getStorageType());
 
-                // 执行文件删除操作
-                boolean deleteResult = storageOperation.removeFile(fileTransferDto, isDelete);
+                // 决定是否使用回收站：
+                // 1. 如果用户选择移至回收站(isPermanently=false)，无论系统设置如何都使用回收站
+                // 2. 如果用户选择永久删除(isPermanently=true)：
+                //    - 如果系统启用回收站，仍然使用回收站
+                //    - 如果系统关闭回收站，则真正删除文件
+                boolean forceTrash = !isPermanently; // 如果不是永久删除，强制使用回收站
 
-                // 删除成功后，从数据库中移除记录
-                if (deleteResult) {
-                    removeById(id);
-                    log.info("文件已{}：ID={}, 名称={}", isDelete ? "移至回收站" : "删除", id, fileManagement.getOriginalName());
+                // 执行文件删除或移至回收站操作
+                boolean operationResult = storageOperation.removeFile(fileTransferDto, forceTrash);
+
+                if (operationResult) {
+                    // 检查文件是否被放入回收站（通过检查是否设置了回收站路径）
+                    boolean movedToTrash = fileTransferDto.getOriginalTrashPath() != null;
+
+                    if (movedToTrash) {
+                        // 文件被移至回收站：更新数据库状态
+                        String originalTrashPath = fileTransferDto.getOriginalTrashPath();
+                        String previewTrashPath = fileTransferDto.getPreviewTrashPath();
+
+                        updateFileTrashStatus(id, originalTrashPath, previewTrashPath);
+                        log.info("文件已移至回收站：ID={}, 名称={}, 源文件回收站路径={}",
+                                id, fileManagement.getOriginalName(), originalTrashPath);
+                    } else {
+                        // 文件被永久删除：从数据库中删除记录
+                        removeById(id);
+                        log.info("文件已永久删除：ID={}, 名称={}", id, fileManagement.getOriginalName());
+                    }
                 } else {
-                    log.warn("文件{}操作失败：ID={}", isDelete ? "移至回收站" : "删除", id);
-                    throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件" + (isDelete ? "移至回收站" : "删除") + "操作失败");
+                    log.warn("文件操作失败：ID={}", id);
+                    throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件操作失败");
                 }
-            } catch (IOException e) {
-                log.error("文件处理出现IO异常：ID={}, 错误信息={}", id, e.getMessage(), e);
-                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败：" + e.getMessage());
             } catch (Exception e) {
-                log.error("文件删除发生未预期异常：ID={}, 错误信息={}", id, e.getMessage(), e);
-                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除出现异常：" + e.getMessage());
+                log.error("文件操作发生未预期异常：ID={}, 错误信息={}", id, e.getMessage(), e);
+                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件操作出现异常：" + e.getMessage());
             }
         }
 
@@ -143,13 +153,19 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
     /**
      * 更新文件的回收站状态
      *
-     * @param id 文件ID
+     * @param id                文件ID
+     * @param originalTrashPath 源文件在回收站的路径
+     * @param previewTrashPath  预览图文件在回收站的路径（可能为null）
      */
-    private void updateFileTrashStatus(Long id) {
+    private void updateFileTrashStatus(Long id, String originalTrashPath, String previewTrashPath) {
         SysFileManagement sysFileManagement = SysFileManagement.builder()
                 .id(id)
-                .isTrash(StorageConstants.IS_TRASH)
+                .isTrash(StorageConstants.IS_TRASH)  // 设置为"在回收站"
+                .originalTrashPath(originalTrashPath) // 记录原始文件回收站路径
+                .previewTrashPath(previewTrashPath)   // 记录预览图回收站路径（可能为null）
+                .updateTime(new Date())
                 .build();
+
         if (!updateById(sysFileManagement)) {
             log.warn("更新文件回收站状态失败，ID: {}", id);
         }
@@ -175,7 +191,98 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
      */
     @Override
     public SysFileManagement getFileManageById(Long id) {
-        return getById(id);
+        LambdaQueryWrapper<SysFileManagement> eq = new LambdaQueryWrapper<SysFileManagement>()
+                .eq(SysFileManagement::getId, id)
+                .eq(SysFileManagement::getIsTrash, StorageConstants.IS_NOT_DELETED);
+        return getOne(eq);
+    }
+
+    /**
+     * 查询文件回收站列表
+     *
+     * @param request 查询参数
+     * @return 分页结果
+     */
+    @Override
+    public Page<SysFileManagement> listFileTrash(SysFileManagementListRequest request) {
+        Page<SysFileManagement> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysFileManagementMapper.listFileTrash(sysFileManagementPage, request);
+    }
+
+    /**
+     * 恢复文件
+     *
+     * @param id 文件id
+     * @return 是否恢复成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean recoverFile(Long id) {
+        // 获取回收站中的文件记录
+        LambdaQueryWrapper<SysFileManagement> eq = new LambdaQueryWrapper<SysFileManagement>()
+                .eq(SysFileManagement::getId, id)
+                .eq(SysFileManagement::getIsTrash, StorageConstants.IS_TRASH);
+
+        SysFileManagement fileManagement = getOne(eq);
+
+        if (fileManagement == null) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件不存在或未在回收站中");
+        }
+
+        // 验证必要的路径字段
+        if (fileManagement.getOriginalTrashPath() == null || fileManagement.getOriginalRelativePath() == null) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件回收站路径或原始路径数据不完整，无法恢复");
+        }
+
+        try {
+
+            FileTransferDto fileTransferDto = FileTransferDto.builder()
+                    .originalName(fileManagement.getOriginalName())
+                    .contentType(fileManagement.getContentType())
+                    .fileSize(fileManagement.getFileSize())
+                    .fileMd5(fileManagement.getFileMd5())
+                    .originalFileUrl(fileManagement.getOriginalFileUrl())
+                    .storageType(fileManagement.getStorageType())
+                    .bucketName(fileManagement.getBucketName())
+                    .originalRelativePath(fileManagement.getOriginalRelativePath())
+                    .originalTrashPath(fileManagement.getOriginalTrashPath())
+                    .previewImagePath(fileManagement.getPreviewImagePath())
+                    .previewTrashPath(fileManagement.getPreviewTrashPath())
+                    .build();
+
+            // 获取对应的存储操作实现
+            StorageOperation storageOperation = storageFactory.getStorageOperation(fileManagement.getStorageType());
+
+            // 执行文件恢复操作
+            boolean recoverResult = storageOperation.recoverFile(fileTransferDto);
+
+            if (recoverResult) {
+                // 恢复成功，更新数据库状态
+                SysFileManagement updateEntity = SysFileManagement.builder()
+                        .id(id)
+                        .isTrash(StorageConstants.IS_NOT_TRASH) // 设置为"不在回收站"
+                        .originalTrashPath(null) // 清空回收站路径
+                        .previewTrashPath(null) // 清空预览图回收站路径
+                        .updateTime(new Date())
+                        .build();
+
+                boolean updateResult = updateById(updateEntity);
+
+                if (updateResult) {
+                    log.info("文件已从回收站恢复：ID={}, 名称={}", id, fileManagement.getOriginalName());
+                    return true;
+                } else {
+                    log.warn("文件恢复后更新数据库状态失败：ID={}", id);
+                    throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "更新文件状态失败");
+                }
+            } else {
+                log.warn("文件恢复失败：ID={}", id);
+                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复操作失败");
+            }
+        } catch (Exception e) {
+            log.error("文件恢复发生异常：ID={}, 错误信息={}", id, e.getMessage(), e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复出现异常：" + e.getMessage());
+        }
     }
 }
 

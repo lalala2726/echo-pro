@@ -31,11 +31,11 @@ public interface SysFileManagementService extends IService<SysFileManagement> {
     /**
      * 删除文件
      *
-     * @param ids      文件id列表
-     * @param isDelete true代表文件，false将会转移到回收站
+     * @param ids           文件id列表
+     * @param isPermanently true代表永久删除文件，false将会转移到回收站
      * @return true: 删除成功, false: 删除失败
      */
-    boolean removeFile(List<Long> ids, Boolean isDelete);
+    boolean removeFile(List<Long> ids, final Boolean isPermanently);
 
 
     /**
@@ -45,4 +45,20 @@ public interface SysFileManagementService extends IService<SysFileManagement> {
      * @return 文件信息
      */
     SysFileManagement getFileManageById(Long id);
+
+    /**
+     * 查询回收站文件列表
+     *
+     * @param request 查询参数
+     * @return 分页结果
+     */
+    Page<SysFileManagement> listFileTrash(SysFileManagementListRequest request);
+
+    /**
+     * 恢复文件
+     *
+     * @param id 文件id
+     * @return true: 恢复成功, false: 恢复失败
+     */
+    boolean recoverFile(Long id);
 }

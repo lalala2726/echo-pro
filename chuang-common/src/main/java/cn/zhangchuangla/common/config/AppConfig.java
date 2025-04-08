@@ -39,11 +39,15 @@ public class AppConfig {
      */
     private String copyright;
 
-
     /**
      * 本地上传路径
      */
     private String uploadPath;
+
+    /**
+     * 是否开启回收站
+     */
+    private boolean enableTrash;
 
     /**
      * 文件访问路径

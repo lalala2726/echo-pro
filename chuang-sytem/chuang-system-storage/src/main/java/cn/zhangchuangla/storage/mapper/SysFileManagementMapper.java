@@ -20,6 +20,14 @@ public interface SysFileManagementMapper extends BaseMapper<SysFileManagement> {
      */
     Page<SysFileManagement> listFileManage(Page<SysFileManagement> page, @Param("request") SysFileManagementListRequest request);
 
+    /**
+     * 文件回收列表
+     *
+     * @param sysFileManagementPage 分页对象
+     * @param request               请求参数
+     * @return 结果
+     */
+    Page<SysFileManagement> listFileTrash(Page<SysFileManagement> sysFileManagementPage, @Param("request") SysFileManagementListRequest request);
 }
 
 

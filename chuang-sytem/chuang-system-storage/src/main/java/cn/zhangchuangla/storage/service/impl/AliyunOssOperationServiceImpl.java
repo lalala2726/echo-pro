@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 /**
  * 阿里云OSS 操作服务实现类
  *
@@ -46,7 +48,14 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
     }
 
     @Override
-    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash) {
         return false;
     }
+
+    @Override
+    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+        return false;
+    }
+
+
 }

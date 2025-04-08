@@ -102,10 +102,19 @@ public class SysFileManagement {
     private Integer isDeleted;
 
     /**
+     * 源文件回收站路径
+     */
+    private String originalTrashPath;
+
+    /**
+     * 预览图文件回收站路径
+     */
+    private String previewTrashPath;
+
+    /**
      * 是否回收站 (0-否, 1-是)
      */
     private Integer isTrash;
-
 
     /**
      * 更新时间

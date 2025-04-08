@@ -30,12 +30,32 @@ public interface StorageOperation {
      */
     FileTransferDto imageUpload(FileTransferDto fileTransferDto);
 
+
     /**
-     * 默认会将文件传入回收站，也可以直接删除
+     * 删除文件
      *
      * @param fileTransferDto 文件传输对象
-     * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
+     * @param forceTrash      是否强制使用回收站，无视系统设置
      * @return 文件操作结果
      */
-    boolean removeFile(FileTransferDto fileTransferDto, final boolean isDelete) throws IOException;
+    boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash);
+
+    /**
+     * 删除文件 - 兼容旧接口，使用系统默认回收站设置
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 文件操作结果
+     */
+    default boolean removeFile(FileTransferDto fileTransferDto) {
+        return removeFile(fileTransferDto, false);
+    }
+
+    /**
+     * 恢复文件
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 文件操作结果
+     * @throws IOException IO异常
+     */
+    boolean recoverFile(FileTransferDto fileTransferDto) throws IOException;
 }

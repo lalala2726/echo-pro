@@ -85,4 +85,9 @@ public enum BusinessType {
      * 上传
      */
     UPLOAD,
+
+    /**
+     * 恢复
+     */
+    RECOVER,
 }

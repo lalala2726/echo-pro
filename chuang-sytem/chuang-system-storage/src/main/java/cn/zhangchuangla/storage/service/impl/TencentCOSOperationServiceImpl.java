@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 /**
  * 腾讯云COS 操作服务实现类
  *
@@ -42,16 +44,19 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
         return TencentCOSUtils.imageUpload(fileTransferDto, cosConfig);
     }
 
-    /**
-     * 删除文件
-     *
-     * @param fileTransferDto 文件传输对象
-     * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
-     * @return 操作结果
-     */
     @Override
-    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
-
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash) {
         return false;
     }
+
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto) {
+        return false;
+    }
+
+    @Override
+    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+        return false;
+    }
+
 }

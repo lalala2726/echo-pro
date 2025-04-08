@@ -51,25 +51,56 @@ public class SysFileManageController extends BaseController {
         return getTableData(sysFileManagementPage, sysFileManagementListVos);
     }
 
+    /**
+     * 文件资源列表
+     *
+     * @param request 请求参数
+     * @return 文件资源列表
+     */
+    @GetMapping("/trash/list")
+    @Operation(summary = "文件资源回收站列表")
+    @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
+    public TableDataResult listFileTrash(SysFileManagementListRequest request) {
+        Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileTrash(request);
+        List<SysFileManagementListVo> sysFileManagementListVos = copyListProperties(sysFileManagementPage, SysFileManagementListVo.class);
+        return getTableData(sysFileManagementPage, sysFileManagementListVos);
+    }
+
+    /**
+     * 恢复文件
+     *
+     * @param id 文件ID
+     * @return 恢复结果
+     */
+    @PreAuthorize("@ss.hasPermission('system:file-manage:recover')")
+    @Operation(summary = "恢复文件")
+    @PutMapping("/recover/{id}")
+    @OperationLog(title = "文件资源管理", businessType = BusinessType.RECOVER)
+    public AjaxResult recoverFile(@PathVariable("id") Long id) {
+        checkParam(id == null || id <= 0, "文件ID不能为空!");
+        boolean result = sysFileManagementService.recoverFile(id);
+        return toAjax(result);
+    }
+
 
     /**
      * 删除文件,支持批量删除，因为涉及IO操作所以最大支持批量删除100个文件
      *
-     * @param ids      文件ID
-     * @param isDelete 如果是true,则删除文件,如果是false,会暂时删除文件,但文件信息不会被删除
+     * @param ids           文件ID
+     * @param isPermanently 如果是true,直接则删除文件,如果是false文件将会放在回收站
      * @return 删除结果
      */
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPermission('ststem:file-manage:list')")
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源管理", businessType = BusinessType.DELETE)
-    public AjaxResult removeFile(@PathVariable("ids") List<Long> ids, @RequestParam("isDelete") Boolean isDelete) {
-        if (isDelete == null) return error("是否删除文件不能为空！");
+    public AjaxResult removeFile(@PathVariable("ids") List<Long> ids, @RequestParam("isPermanently") Boolean isPermanently) {
+        if (isPermanently == null) return error("是否删除文件不能为空！");
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件ID不能为空!");
         });
         checkParam(ids.size() > 100, "最多只能删除100个文件!");
-        boolean result = sysFileManagementService.removeFile(ids, isDelete);
+        boolean result = sysFileManagementService.removeFile(ids, isPermanently);
         return toAjax(result);
     }
 }

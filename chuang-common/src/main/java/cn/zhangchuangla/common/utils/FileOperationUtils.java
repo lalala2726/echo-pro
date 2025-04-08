@@ -7,8 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -124,16 +123,20 @@ public class FileOperationUtils {
         return String.format("%s%s", System.currentTimeMillis(), UUIDUtils.simpleUUID().substring(0, 8));
     }
 
+
     /**
-     * 生成年月格式的目录路径，用于对象存储路径（始终使用 / 作为分隔符）
+     * 生成按年月组织的目录路径
+     * 格式: yyyy/MM
      *
-     * @return 例如 "2025/04"
+     * @return 年月目录路径，如 2023/05
      */
     public static String generateYearMonthDir() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM");
-        return format.format(new Date());
+        Calendar now = Calendar.getInstance();
+        int year = now.get(Calendar.YEAR);
+        // 月份从0开始，所以+1
+        int month = now.get(Calendar.MONTH) + 1;
+        return String.format("%d/%02d", year, month);
     }
-
 
     /**
      * 生成文件相对路径
@@ -193,21 +196,28 @@ public class FileOperationUtils {
         return buildFinalPath(args);
     }
 
+
     /**
-     * 从原始相对路径中获取文件名
+     * 从相对路径获取文件名
      *
-     * @param RelativePath 原始相对路径
-     * @return 文件名
+     * @param relativePath 相对路径
+     * @return 文件名（包含扩展名）
      */
-    public static String getFileNameByRelativePath(String RelativePath) {
-        if (RelativePath == null || RelativePath.isEmpty()) {
+    public static String getFileNameByRelativePath(String relativePath) {
+        if (relativePath == null || relativePath.isEmpty()) {
             return "";
         }
-        int lastSlashIndex = RelativePath.lastIndexOf("/");
-        if (lastSlashIndex >= 0 && lastSlashIndex < RelativePath.length() - 1) {
-            return RelativePath.substring(lastSlashIndex + 1);
-        } else {
-            return RelativePath;
+
+        // 替换Windows路径分隔符为Unix风格
+        String path = relativePath.replace('\\', '/');
+
+        // 获取最后一个斜杠后的内容作为文件名
+        int lastSlashIndex = path.lastIndexOf('/');
+        if (lastSlashIndex >= 0 && lastSlashIndex < path.length() - 1) {
+            return path.substring(lastSlashIndex + 1);
         }
+
+        // 如果没有斜杠，整个字符串就是文件名
+        return path;
     }
 }

@@ -8,6 +8,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 /**
  * 本地存储服务实现类
  *
@@ -56,14 +58,50 @@ public class LocalOperationServiceImpl implements LocalOperationService {
     }
 
     /**
-     * 默认会将文件传入回收站，也可以直接删除
+     * 删除文件
      *
      * @param fileTransferDto 文件传输对象
-     * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
+     * @param forceTrash 是否强制使用回收站，无视系统设置
      * @return 文件操作结果
      */
     @Override
-    public boolean removeFile(FileTransferDto fileTransferDto, boolean isDelete) {
-        return LocalStorageUtils.removeFile(appConfig.getUploadPath(), fileTransferDto, isDelete);
+    public boolean removeFile(FileTransferDto fileTransferDto, boolean forceTrash) {
+        // 决定是否使用回收站
+        // 如果强制使用回收站，则无论系统设置如何都使用回收站
+        // 否则，根据系统设置决定
+        boolean enableTrash = forceTrash || appConfig.isEnableTrash();
+
+        log.info("删除文件：{}, 强制使用回收站: {}, 系统启用回收站: {}, 最终决定: {}",
+                fileTransferDto.getOriginalName(),
+                forceTrash,
+                appConfig.isEnableTrash(),
+                enableTrash ? "移至回收站" : "永久删除");
+
+        // 调用LocalStorageUtils的删除方法
+        return LocalStorageUtils.removeFile(appConfig.getUploadPath(), fileTransferDto, enableTrash);
+    }
+
+    /**
+     * 删除文件 - 兼容旧接口，使用系统默认回收站设置
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 文件操作结果
+     */
+    @Override
+    public boolean removeFile(FileTransferDto fileTransferDto) {
+        return removeFile(fileTransferDto, false);
+    }
+
+    /**
+     * 从回收站恢复文件
+     *
+     * @param fileTransferDto 文件传输对象
+     * @return 恢复操作结果
+     * @throws IOException IO异常
+     */
+    @Override
+    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+        // 调用LocalStorageUtils的恢复方法
+        return LocalStorageUtils.recoverFile(appConfig.getUploadPath(), fileTransferDto);
     }
 }

@@ -80,5 +80,14 @@ public class FileTransferDto {
      */
     private String bucketName;
 
+    /**
+     * 原文件回收站路径
+     */
+    private String originalTrashPath;
+
+    /**
+     * 预览图回收站路径
+     */
+    private String previewTrashPath;
 
 }
