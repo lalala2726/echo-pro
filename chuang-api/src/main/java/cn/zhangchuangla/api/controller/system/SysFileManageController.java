@@ -43,7 +43,7 @@ public class SysFileManageController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "文件资源列表")
-    @PreAuthorize("@auth.hasPermission('system:file-manage:list')")
+    @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public TableDataResult listFileManage(SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileManage(request);
         List<SysFileManagementListVo> sysFileManagementListVos = copyListProperties(sysFileManagementPage, SysFileManagementListVo.class);

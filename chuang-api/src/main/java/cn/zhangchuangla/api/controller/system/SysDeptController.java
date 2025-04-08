@@ -51,7 +51,7 @@ public class SysDeptController extends BaseController {
      * @return 返回一个包含部门列表信息的TableDataResult对象
      */
     @GetMapping("/list")
-    @PreAuthorize("@auth.hasPermission('system:department:list')")
+    @PreAuthorize("@ss.hasPermission('system:department:list')")
     @Operation(summary = "部门列表")
     public TableDataResult listDept(SysDeptListRequest request) {
         Page<SysDept> page = sysDeptService.listDept(request);
@@ -66,7 +66,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PostMapping
-    @PostAuthorize("@auth.hasPermission('system:department:add')")
+    @PostAuthorize("@ss.hasPermission('system:department:add')")
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
     public AjaxResult addDept(@Validated @RequestBody SysDeptAddRequest request) {
@@ -83,7 +83,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PostAuthorize("@auth.hasPermission('system:department:edit')")
+    @PostAuthorize("@ss.hasPermission('system:department:edit')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDept(@Validated @RequestBody SysDeptRequest request) {
@@ -97,7 +97,7 @@ public class SysDeptController extends BaseController {
      * @return 部门信息
      */
     @GetMapping("/{id}")
-    @PostAuthorize("@auth.hasPermission('system:department:query')")
+    @PostAuthorize("@ss.hasPermission('system:department:query')")
     @Operation(summary = "获取部门信息")
     public AjaxResult getDeptById(@PathVariable Integer id) {
         checkParam(id == null, "部门ID不能为空！");
@@ -116,7 +116,7 @@ public class SysDeptController extends BaseController {
     @DeleteMapping("/{ids}")
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
-    @PostAuthorize("@auth.hasPermission('system:department:remove')")
+    @PostAuthorize("@ss.hasPermission('system:department:remove')")
     public AjaxResult removeDept(@PathVariable List<Integer> ids) {
         checkParam(ids == null, "部门ID不能为空！");
         boolean result = sysDeptService.removeDeptById(ids);

@@ -25,7 +25,7 @@ import java.util.Set;
  * @since 2025/2/26
  */
 @Slf4j
-@Service("auth")
+@Service("ss")
 public class PermissionAuth {
 
     private final SysPermissionsService sysPermissionsService;
@@ -75,7 +75,7 @@ public class PermissionAuth {
         Set<String> userPermissions = sysPermissionsService.getPermissionsByUserId(loginUser.getUserId());
         for (String permission : permissions) {
             if (userPermissions.contains(StringUtils.trim(permission))) {
-                log.debug("用户 [{}] 拥有权限 [{}]，返回 true", loginUser.getUsername(), permission);
+                log.info("用户 [{}] 拥有权限 [{}]，返回 true", loginUser.getUsername(), permission);
                 return true;
             }
         }

@@ -57,7 +57,7 @@ public class SysFileConfigController extends BaseController {
      */
     @Operation(summary = "文件配置列表", description = "文件配置列表")
     @GetMapping("/list")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:list')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public TableDataResult listSysFileConfig(SysFileConfigListRequest request) {
         Page<SysFileConfig> sysFileConfigPage = sysFileConfigService.listSysFileConfig(request);
@@ -72,7 +72,7 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增Minio配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/minio")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveMinioConfig(@Validated @RequestBody MinioConfigRequest request) {
@@ -95,7 +95,7 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增阿里云OSS配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveAliyunOssConfig(@Validated @RequestBody AliyunOSSConfigRequest request) {
@@ -116,7 +116,7 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增腾讯云COS配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/tencent")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult saveTencentCosConfig(@Validated @RequestBody TencentCOSConfigRequest request) {
@@ -138,7 +138,7 @@ public class SysFileConfigController extends BaseController {
      */
     @PutMapping("/setMaster/{id}")
     @Operation(summary = "设置主配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:update')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult setIsMasterConfig(@PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
@@ -155,7 +155,7 @@ public class SysFileConfigController extends BaseController {
      * @return 刷新结果
      */
     @GetMapping("/refreshCache")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:refreshCache')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:refreshCache')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult refreshCache() {
@@ -172,7 +172,7 @@ public class SysFileConfigController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除文件配置")
-    @PreAuthorize("@auth.hasAnyPermission('system:file-config:delete')")
+    @PreAuthorize("@ss.hasPermission('system:file-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, isSaveRequestData = false)
     public AjaxResult deleteFileConfig(@PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {

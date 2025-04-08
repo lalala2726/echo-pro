@@ -57,7 +57,7 @@ public class SysRoleController extends BaseController {
 
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
-    @PreAuthorize("@auth.hasPermission('system:role:list')")
+    @PreAuthorize("@ss.hasPermission('system:role:list')")
     public TableDataResult list(@Validated SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
         List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
@@ -73,7 +73,7 @@ public class SysRoleController extends BaseController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:info')")
+    @PreAuthorize("@ss.hasPermission('system:role:info')")
     public AjaxResult getRoleInfoById(@PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
         if (sysRole == null) {
@@ -93,7 +93,7 @@ public class SysRoleController extends BaseController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:delete')")
+    @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteRoleInfo(@PathVariable("id") Long id) {
         if (sysRoleService.removeById(id)) {
@@ -111,7 +111,7 @@ public class SysRoleController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:update')")
+    @PreAuthorize("@ss.hasPermission('system:role:update')")
     @OperationLog(title = "角色管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateRoleInfo(@Validated @RequestBody SysRoleUpdateRequest request) {
         boolean result = sysRoleService.updateRoleInfo(request);
@@ -125,7 +125,7 @@ public class SysRoleController extends BaseController {
      */
     @PostMapping
     @Operation(summary = "添加角色信息")
-    @PreAuthorize("@auth.hasPermission('system:role:add')")
+    @PreAuthorize("@ss.hasPermission('system:role:add')")
     @OperationLog(title = "角色管理", businessType = BusinessType.INSERT)
     public AjaxResult addRoleInfo(@Validated @RequestBody SysRoleAddRequest roleAddRequest) {
         sysRoleService.addRoleInfo(roleAddRequest);
