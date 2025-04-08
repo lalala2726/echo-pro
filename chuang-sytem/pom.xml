@@ -9,21 +9,21 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>chuang-service</artifactId>
+    <artifactId>chuang-sytem</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
     <description>业务服务模块，包含各种业务逻辑实现</description>
 
     <!-- 添加子模块 -->
     <modules>
-        <module>chuang-system-service</module>
-        <module>chuang-storage-service</module>
+        <module>chuang-system-core</module>
+        <module>chuang-system-storage</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-core</artifactId>
+            <artifactId>chuang-common</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>chuang-core</artifactId>
+    <artifactId>chuang-common</artifactId>
     <version>1.0.0</version>
     <description>公共模块，包含公共工具类、实体类和常量定义</description>
 
