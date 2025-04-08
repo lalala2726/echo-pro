@@ -2,6 +2,8 @@ package cn.zhangchuangla.storage.core;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 
+import java.io.IOException;
+
 /**
  * 存储操作接口
  * 定义所有存储服务需要实现的基本方法
@@ -35,5 +37,5 @@ public interface StorageOperation {
      * @param isDelete        如果是true，则直接删除文件，如果是false，则将文件放入回收站
      * @return 文件操作结果
      */
-    boolean removeFile(FileTransferDto fileTransferDto, final boolean isDelete);
+    boolean removeFile(FileTransferDto fileTransferDto, final boolean isDelete) throws IOException;
 }

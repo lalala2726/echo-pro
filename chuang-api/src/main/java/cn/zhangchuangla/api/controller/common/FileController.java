@@ -10,7 +10,7 @@ import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
-import cn.zhangchuangla.system.service.FileManagementService;
+import cn.zhangchuangla.system.service.SysFileManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +35,13 @@ public class FileController extends BaseController {
 
     private final SysFileConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
-    private final FileManagementService fileManagementService;
+    private final SysFileManagementService sysFileManagementService;
 
     @Autowired
-    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory, FileManagementService fileManagementService) {
+    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory, SysFileManagementService sysFileManagementService) {
         this.sysFileConfigLoader = sysFileConfigLoader;
         this.storageFactory = storageFactory;
-        this.fileManagementService = fileManagementService;
+        this.sysFileManagementService = sysFileManagementService;
     }
 
     /**
@@ -114,7 +114,7 @@ public class FileController extends BaseController {
                     .build();
             FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
             // 保存文件信息到数据库
-            fileManagementService.saveFileInfo(result);
+            sysFileManagementService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
             ajax.put(Constants.PREVIEW, result.getCompressedFileUrl());
         } catch (IOException e) {

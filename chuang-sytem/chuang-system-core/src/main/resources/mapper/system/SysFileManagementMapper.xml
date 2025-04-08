@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.FileManagementMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysFileManagementMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysFileManagement">
         <id property="id" column="id"/>
@@ -12,8 +12,8 @@
         <result property="fileMd5" column="file_md5"/>
         <result property="originalFileUrl" column="original_file_url"/>
         <result property="originalRelativePath" column="original_relative_path"/>
-        <result property="compressedFileUrl" column="compressed_file_url"/>
-        <result property="compressedRelativePath" column="compressed_relative_path"/>
+        <result property="previewImagePath" column="preview_image_path"/>
+        <result property="previewImageUrl" column="preview_image_url"/>
         <result property="fileExtension" column="file_extension"/>
         <result property="storageType" column="storage_type"/>
         <result property="bucketName" column="bucket_name"/>
@@ -24,5 +24,9 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
+    <select id="listFileManage" resultMap="BaseResultMap">
+        select *
+        from sys_file_management
+    </select>
 
 </mapper>

@@ -5,9 +5,9 @@ import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigAddRequest;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigUpdateRequest;
+import cn.zhangchuangla.system.model.request.file.config.SysFileConfigAddRequest;
+import cn.zhangchuangla.system.model.request.file.config.SysFileConfigListRequest;
+import cn.zhangchuangla.system.model.request.file.config.SysFileConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.request.file;
+package cn.zhangchuangla.system.model.request.file.config;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;

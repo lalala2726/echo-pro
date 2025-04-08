@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
+import cn.zhangchuangla.system.model.request.file.config.SysFileConfigListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;

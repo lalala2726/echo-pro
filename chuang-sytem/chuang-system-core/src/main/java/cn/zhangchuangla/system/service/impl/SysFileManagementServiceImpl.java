@@ -2,9 +2,11 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.system.mapper.FileManagementMapper;
+import cn.zhangchuangla.system.mapper.SysFileManagementMapper;
 import cn.zhangchuangla.system.model.entity.SysFileManagement;
-import cn.zhangchuangla.system.service.FileManagementService;
+import cn.zhangchuangla.system.model.request.file.manage.SysFileManagementListRequest;
+import cn.zhangchuangla.system.service.SysFileManagementService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,14 @@ import java.util.Date;
  */
 @Service
 @Slf4j
-public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper, SysFileManagement>
-        implements FileManagementService {
+public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementMapper, SysFileManagement>
+        implements SysFileManagementService {
+
+    private final SysFileManagementMapper sysFileManagementMapper;
+
+    public SysFileManagementServiceImpl(SysFileManagementMapper sysFileManagementMapper) {
+        this.sysFileManagementMapper = sysFileManagementMapper;
+    }
 
     /**
      * 保存文件信息
@@ -37,8 +45,8 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
                 .fileMd5(fileTransferDto.getFileMd5())
                 .originalFileUrl(fileTransferDto.getOriginalFileUrl())
                 .originalRelativePath(fileTransferDto.getOriginalRelativePath())
-                .compressedFileUrl(fileTransferDto.getCompressedFileUrl())
-                .compressedRelativePath(fileTransferDto.getCompressedRelativePath())
+                .previewImageUrl(fileTransferDto.getCompressedFileUrl())
+                .previewImagePath(fileTransferDto.getCompressedRelativePath())
                 .fileExtension(fileTransferDto.getFileExtension())
                 .storageType(fileTransferDto.getStorageType())
                 .bucketName(fileTransferDto.getBucketName())
@@ -47,6 +55,12 @@ public class FileManagementServiceImpl extends ServiceImpl<FileManagementMapper,
                 .uploadTime(new Date())
                 .build();
         save(sysFileManagement);
+    }
+
+    @Override
+    public Page<SysFileManagement> listFileManage(SysFileManagementListRequest request) {
+        Page<SysFileManagement> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysFileManagementMapper.listFileManage(sysFileManagementPage, request);
     }
 }
 

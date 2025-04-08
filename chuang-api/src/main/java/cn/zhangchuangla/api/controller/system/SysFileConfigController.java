@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.config.loader.SysFileConfigLoader;
 import cn.zhangchuangla.system.model.entity.SysFileConfig;
-import cn.zhangchuangla.system.model.request.file.SysFileConfigListRequest;
+import cn.zhangchuangla.system.model.request.file.config.SysFileConfigListRequest;
 import cn.zhangchuangla.system.model.vo.file.config.SysFileConfigListVo;
 import cn.zhangchuangla.system.service.SysFileConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

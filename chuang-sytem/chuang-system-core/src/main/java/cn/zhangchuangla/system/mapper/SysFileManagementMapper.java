@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysFileManagement;
-import cn.zhangchuangla.system.model.request.file.FileManagementListRequest;
+import cn.zhangchuangla.system.model.request.file.manage.SysFileManagementListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * @author zhangchuang
  */
-public interface FileManagementMapper extends BaseMapper<SysFileManagement> {
+public interface SysFileManagementMapper extends BaseMapper<SysFileManagement> {
 
     /**
      * 文件列表
@@ -18,7 +18,8 @@ public interface FileManagementMapper extends BaseMapper<SysFileManagement> {
      * @param request 请求参数
      * @return 结果
      */
-    Page<SysFileManagement> fileList(Page<SysFileManagement> page, @Param("request") FileManagementListRequest request);
+    Page<SysFileManagement> listFileManage(Page<SysFileManagement> page, @Param("request") SysFileManagementListRequest request);
+
 }
 
 
