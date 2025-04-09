@@ -5,20 +5,14 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.utils.FileOperationUtils;
+import cn.zhangchuangla.common.utils.StorageUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import io.minio.*;
 import io.minio.errors.ErrorResponseException;
-import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Minio存储组件
@@ -44,10 +38,11 @@ public class MinioStorageHandler {
         validateUploadParams(fileTransferDto, minioConfigEntity);
 
         // 填充文件基础信息
-        AbstractStorageHandler.fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO, minioConfigEntity.getBucketName());
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO,
+                minioConfigEntity.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
-        if (AbstractStorageHandler.isImage(fileTransferDto)) {
+        if (StorageUtils.isImage(fileTransferDto)) {
             return imageUpload(fileTransferDto, minioConfigEntity);
         }
 
@@ -60,7 +55,7 @@ public class MinioStorageHandler {
             ensureBucketExists(minioClient, minioConfigEntity.getBucketName());
 
             // 生成存储路径
-            String objectName = AbstractStorageHandler.generateFilePath(fileName);
+            String objectName = StorageUtils.generateFilePath(fileName);
 
             // 上传文件
             uploadToMinio(minioClient, minioConfigEntity.getBucketName(), objectName, data);
@@ -68,10 +63,11 @@ public class MinioStorageHandler {
             // 构建文件URL
             String fileUrl = "";
             if (!StringUtils.isEmpty(minioConfigEntity.getFileDomain())) {
-                fileUrl = AbstractStorageHandler.buildFullUrl(minioConfigEntity.getFileDomain(), objectName);
+                fileUrl = StorageUtils.buildFullUrl(minioConfigEntity.getFileDomain(), objectName);
             }
 
-            return AbstractStorageHandler.createEnhancedFileTransferResponse(fileUrl, objectName, null, null, fileTransferDto);
+            return StorageUtils.createEnhancedFileTransferResponse(fileUrl, objectName, null, null,
+                    fileTransferDto);
         } catch (Exception e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
@@ -90,10 +86,11 @@ public class MinioStorageHandler {
         validateUploadParams(fileTransferDto, minioConfigEntity);
 
         // 填充文件基础信息
-        AbstractStorageHandler.fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO, minioConfigEntity.getBucketName());
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.MINIO,
+                minioConfigEntity.getBucketName());
 
         // 验证是否为图片类型
-        if (!AbstractStorageHandler.isImage(fileTransferDto)) {
+        if (!StorageUtils.isImage(fileTransferDto)) {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
@@ -106,25 +103,27 @@ public class MinioStorageHandler {
             ensureBucketExists(minioClient, minioConfigEntity.getBucketName());
 
             // 生成存储路径
-            String originalObjectName = AbstractStorageHandler.generateOriginalImagePath(fileName);
-            String compressedObjectName = AbstractStorageHandler.generateCompressedImagePath(fileName);
+            String originalObjectName = StorageUtils.generateOriginalImagePath(fileName);
+            String compressedObjectName = StorageUtils.generateCompressedImagePath(fileName);
 
             // 上传原图
             uploadToMinio(minioClient, minioConfigEntity.getBucketName(), originalObjectName, originalData);
 
             // 上传压缩图
-            byte[] compressedData = AbstractStorageHandler.compressImage(originalData);
+            byte[] compressedData = StorageUtils.compressImage(originalData);
             uploadToMinio(minioClient, minioConfigEntity.getBucketName(), compressedObjectName, compressedData);
 
             // 构建URL
             String originalFileUrl = "";
             String compressedFileUrl = "";
             if (!StringUtils.isEmpty(minioConfigEntity.getFileDomain())) {
-                originalFileUrl = AbstractStorageHandler.buildFullUrl(minioConfigEntity.getFileDomain(), originalObjectName);
-                compressedFileUrl = AbstractStorageHandler.buildFullUrl(minioConfigEntity.getFileDomain(), compressedObjectName);
+                originalFileUrl = StorageUtils.buildFullUrl(minioConfigEntity.getFileDomain(),
+                        originalObjectName);
+                compressedFileUrl = StorageUtils.buildFullUrl(minioConfigEntity.getFileDomain(),
+                        compressedObjectName);
             }
 
-            return AbstractStorageHandler.createEnhancedFileTransferResponse(
+            return StorageUtils.createEnhancedFileTransferResponse(
                     originalFileUrl, originalObjectName,
                     compressedFileUrl, compressedObjectName,
                     fileTransferDto);
@@ -144,26 +143,19 @@ public class MinioStorageHandler {
      */
     public boolean removeFile(FileTransferDto fileTransferDto, MinioConfigEntity minioConfigEntity,
                               boolean enableTrash) {
-        if (fileTransferDto == null || minioConfigEntity == null
-                || StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
-            log.error("文件信息不完整，无法删除");
-            throw new FileException(ResponseCode.FileUploadFailed, "文件信息不完整，无法删除！");
-        }
+        StorageUtils.validateRemoveParams(fileTransferDto, minioConfigEntity);
 
         // 原文件信息
         String originalObjectName = fileTransferDto.getOriginalRelativePath();
         String bucketName = minioConfigEntity.getBucketName();
-        String originalFileName = FileOperationUtils.getFileNameByRelativePath(originalObjectName);
+        String originalFileName = StorageUtils.getFileNameByRelativePath(originalObjectName);
 
         // 预览图信息（可能不存在）
         String previewObjectName = fileTransferDto.getPreviewImagePath();
         boolean hasPreviewImage = StringUtils.hasText(previewObjectName);
 
         // 记录操作类型
-        log.info("开始处理Minio文件 - 原始对象: {}, 预览图: {}, 操作模式: {}",
-                originalObjectName,
-                hasPreviewImage ? previewObjectName : "无",
-                enableTrash ? "移至回收站" : "直接删除");
+        StorageUtils.logFileOperationType("Minio", originalObjectName, previewObjectName, hasPreviewImage, enableTrash);
 
         try {
             // 创建Minio客户端
@@ -194,7 +186,7 @@ public class MinioStorageHandler {
                     if (!previewExists) {
                         log.warn("预览图文件不存在: {}/{}", bucketName, previewObjectName);
                     } else {
-                        String previewFileName = FileOperationUtils.getFileNameByRelativePath(previewObjectName);
+                        String previewFileName = StorageUtils.getFileNameByRelativePath(previewObjectName);
                         String previewTrashObjectName = generateTrashPath(previewFileName,
                                 StorageConstants.FILE_PREVIEW_FOLDER);
 
@@ -243,7 +235,7 @@ public class MinioStorageHandler {
      * @return 恢复结果
      */
     public boolean recoverFile(FileTransferDto fileTransferDto, MinioConfigEntity minioConfigEntity) {
-        validateRecoveryParams(fileTransferDto, minioConfigEntity);
+        StorageUtils.validateRecoveryParams(fileTransferDto, minioConfigEntity);
 
         String bucketName = minioConfigEntity.getBucketName();
         String originalObjectName = fileTransferDto.getOriginalRelativePath();
@@ -294,9 +286,7 @@ public class MinioStorageHandler {
                 }
             }
 
-            if (hasError) {
-                throw new IOException("文件恢复过程中发生错误，部分文件可能未恢复成功");
-            }
+            StorageUtils.handleRecoveryErrors(hasError);
 
             return success;
         } catch (Exception e) {
@@ -306,44 +296,23 @@ public class MinioStorageHandler {
     }
 
     /**
-     * 检查文件恢复参数是否有效
-     */
-    private void validateRecoveryParams(FileTransferDto fileTransferDto, MinioConfigEntity minioConfigEntity) {
-        if (fileTransferDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件传输对象不能为空，无法进行恢复");
-        }
-
-        if (minioConfigEntity == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "Minio配置不能为空，无法进行恢复");
-        }
-
-        // 验证必要的路径信息
-        if (StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR,
-                    "文件信息不完整，缺少原始路径或回收站路径");
-        }
-    }
-
-    /**
      * 检查对象是否存在于Minio存储中
      */
     private boolean checkObjectExists(MinioClient minioClient, String bucketName, String objectName) {
-        try {
-            minioClient.statObject(StatObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build());
-            return true;
-        } catch (ErrorResponseException e) {
-            if (e.errorResponse().code().equals("NoSuchKey")) {
-                return false;
+        return StorageUtils.checkObjectExistsWithLogging(bucketName, objectName, () -> {
+            try {
+                minioClient.statObject(StatObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(objectName)
+                        .build());
+                return true;
+            } catch (ErrorResponseException e) {
+                if (e.errorResponse().code().equals("NoSuchKey")) {
+                    return false;
+                }
+                throw e;
             }
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "检查文件是否存在失败: " + e.getMessage());
-        } catch (Exception e) {
-            log.warn("检查文件是否存在时出错: {}", e.getMessage());
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "检查文件是否存在失败: " + e.getMessage());
-        }
+        });
     }
 
     /**
@@ -380,55 +349,10 @@ public class MinioStorageHandler {
     }
 
     /**
-     * 获取对象内容
-     */
-    public byte[] getObjectData(MinioClient minioClient, String bucketName, String objectName) {
-        try {
-
-            try (InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build())) {
-                return IOUtils.toByteArray(inputStream);
-            }
-        } catch (Exception e) {
-            log.error("获取对象内容失败: {}/{}, 错误: {}", bucketName, objectName, e.getMessage(), e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "获取对象内容失败: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 列出指定前缀的所有对象
-     */
-    public List<String> listObjects(MinioClient minioClient, String bucketName, String prefix) {
-        List<String> objectNames = new ArrayList<>();
-        try {
-            Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder()
-                            .bucket(bucketName)
-                            .prefix(prefix)
-                            .recursive(true)
-                            .build());
-
-            for (Result<Item> result : results) {
-                objectNames.add(result.get().objectName());
-            }
-        } catch (Exception e) {
-            log.error("列出对象失败: bucket={}, prefix={}, error={}", bucketName, prefix, e.getMessage(), e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "列出对象失败: " + e.getMessage());
-        }
-        return objectNames;
-    }
-
-    /**
      * 生成回收站路径
      */
     private String generateTrashPath(String fileName, String subFolder) {
-        String yearMonthDir = FileOperationUtils.generateYearMonthDir();
-        return StorageConstants.TRASH_DIR + "/" +
-                subFolder + "/" +
-                yearMonthDir + "/" +
-                System.currentTimeMillis() + "_" + fileName;
+        return StorageUtils.generateTrashPath(fileName, subFolder);
     }
 
     /**
@@ -479,7 +403,7 @@ public class MinioStorageHandler {
                 PutObjectArgs.builder()
                         .bucket(bucketName)
                         .object(objectName)
-                        .contentType(FileOperationUtils.generateFileContentType(data))
+                        .contentType(StorageUtils.generateFileContentType(data))
                         .stream(new ByteArrayInputStream(data), data.length, -1)
                         .build());
     }

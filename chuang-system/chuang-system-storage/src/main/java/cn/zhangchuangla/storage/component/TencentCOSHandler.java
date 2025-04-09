@@ -5,32 +5,32 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.common.utils.FileOperationUtils;
+import cn.zhangchuangla.common.utils.StorageUtils;
+import cn.zhangchuangla.common.utils.StringUtils;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.CopyObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * 腾讯云COS存储工具类
  *
  * @author Chuang
- *         <p>
- *         created on 2025/4/3 10:00
+ * <p>
+ * created on 2025/4/3 10:00
  */
 @Slf4j
 @Component
-public class TencentCOSHandler extends AbstractStorageHandler {
+public class TencentCOSHandler {
 
     /**
      * 上传文件到腾讯云COS
@@ -42,13 +42,14 @@ public class TencentCOSHandler extends AbstractStorageHandler {
      */
     public static FileTransferDto uploadFile(FileTransferDto fileTransferDto,
                                              TencentCOSConfigEntity tencentCOSConfigEntity) {
-        validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+        StorageUtils.validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS, tencentCOSConfigEntity.getBucketName());
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS,
+                tencentCOSConfigEntity.getBucketName());
 
         // 如果是图片类型，则调用图片上传方法
-        if (isImage(fileTransferDto)) {
+        if (StorageUtils.isImage(fileTransferDto)) {
             return imageUpload(fileTransferDto, tencentCOSConfigEntity);
         }
 
@@ -61,15 +62,15 @@ public class TencentCOSHandler extends AbstractStorageHandler {
             ensureBucketExists(cosClient, tencentCOSConfigEntity.getBucketName());
 
             // 生成存储路径
-            String objectName = generateFilePath(fileName);
+            String objectName = StorageUtils.generateFilePath(fileName);
 
             // 上传文件
             uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), objectName, data);
 
             // 构建文件URL
-            String fileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), objectName);
+            String fileUrl = StorageUtils.buildFullUrl(tencentCOSConfigEntity.getFileDomain(), objectName);
 
-            return createEnhancedFileTransferResponse(fileUrl, objectName, null, null, fileTransferDto);
+            return StorageUtils.createEnhancedFileTransferResponse(fileUrl, objectName, null, null, fileTransferDto);
         } catch (Exception e) {
             log.error("文件上传失败", e);
             throw new FileException(ResponseCode.FileUploadFailed, "文件上传失败！" + e.getMessage());
@@ -88,14 +89,14 @@ public class TencentCOSHandler extends AbstractStorageHandler {
      */
     public static FileTransferDto imageUpload(FileTransferDto fileTransferDto,
                                               TencentCOSConfigEntity tencentCOSConfigEntity) {
-        validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
+        StorageUtils.validateUploadParams(fileTransferDto, tencentCOSConfigEntity);
 
         // 填充文件基础信息
-        fileTransferDto = fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS,
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.TENCENT_COS,
                 tencentCOSConfigEntity.getBucketName());
 
         // 验证是否为图片类型
-        if (!isImage(fileTransferDto)) {
+        if (!StorageUtils.isImage(fileTransferDto)) {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
@@ -108,19 +109,21 @@ public class TencentCOSHandler extends AbstractStorageHandler {
             ensureBucketExists(cosClient, tencentCOSConfigEntity.getBucketName());
 
             // 生成存储路径
-            String originalObjectName = generateOriginalImagePath(fileName);
-            String compressedObjectName = generateCompressedImagePath(fileName);
+            String originalObjectName = StorageUtils.generateOriginalImagePath(fileName);
+            String compressedObjectName = StorageUtils.generateCompressedImagePath(fileName);
 
             // 上传原图
             uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), originalObjectName, originalData);
-            String originalFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), originalObjectName);
+            String originalFileUrl = StorageUtils.buildFullUrl(tencentCOSConfigEntity.getFileDomain(),
+                    originalObjectName);
 
             // 压缩并上传缩略图
-            byte[] compressedData = compressImage(originalData);
+            byte[] compressedData = StorageUtils.compressImage(originalData);
             uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), compressedObjectName, compressedData);
-            String compressedFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), compressedObjectName);
+            String compressedFileUrl = StorageUtils.buildFullUrl(tencentCOSConfigEntity.getFileDomain(),
+                    compressedObjectName);
 
-            return createEnhancedFileTransferResponse(
+            return StorageUtils.createEnhancedFileTransferResponse(
                     originalFileUrl, originalObjectName,
                     compressedFileUrl, compressedObjectName,
                     fileTransferDto);
@@ -142,26 +145,20 @@ public class TencentCOSHandler extends AbstractStorageHandler {
      */
     public static boolean removeFile(FileTransferDto fileTransferDto, TencentCOSConfigEntity tencentCOSConfigEntity,
                                      boolean enableTrash) {
-        if (fileTransferDto == null || tencentCOSConfigEntity == null ||
-                fileTransferDto.getOriginalRelativePath() == null) {
-            log.error("文件信息不完整，无法删除");
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件信息不完整，无法删除！");
-        }
+        StorageUtils.validateRemoveParams(fileTransferDto, tencentCOSConfigEntity);
 
         // 原文件信息
         String originalObjectName = fileTransferDto.getOriginalRelativePath();
         String bucketName = tencentCOSConfigEntity.getBucketName();
-        String originalFileName = FileOperationUtils.getFileNameByRelativePath(originalObjectName);
+        String originalFileName = StorageUtils.getFileNameByRelativePath(originalObjectName);
 
         // 预览图信息（可能不存在）
         String previewObjectName = fileTransferDto.getPreviewImagePath();
-        boolean hasPreviewImage = previewObjectName != null && !previewObjectName.isEmpty();
+        boolean hasPreviewImage = StringUtils.hasText(previewObjectName);
 
         // 记录操作类型
-        log.info("开始处理腾讯云COS文件 - 原始对象: {}, 预览图: {}, 操作模式: {}",
-                originalObjectName,
-                hasPreviewImage ? previewObjectName : "无",
-                enableTrash ? "移至回收站" : "直接删除");
+        StorageUtils.logFileOperationType("腾讯云COS", originalObjectName, previewObjectName, hasPreviewImage,
+                enableTrash);
 
         COSClient cosClient = null;
         try {
@@ -180,7 +177,7 @@ public class TencentCOSHandler extends AbstractStorageHandler {
 
                 // 1. 处理原始文件
                 if (originalExists) {
-                    String originalTrashObjectName = generateTrashPath(originalFileName,
+                    String originalTrashObjectName = StorageUtils.generateTrashPath(originalFileName,
                             StorageConstants.FILE_ORIGINAL_FOLDER);
                     moveObjectToTrash(cosClient, bucketName, originalObjectName, originalTrashObjectName);
                     fileTransferDto.setOriginalTrashPath(originalTrashObjectName);
@@ -193,8 +190,8 @@ public class TencentCOSHandler extends AbstractStorageHandler {
                     if (!previewExists) {
                         log.warn("预览图文件不存在: {}/{}", bucketName, previewObjectName);
                     } else {
-                        String previewFileName = FileOperationUtils.getFileNameByRelativePath(previewObjectName);
-                        String previewTrashObjectName = generateTrashPath(previewFileName,
+                        String previewFileName = StorageUtils.getFileNameByRelativePath(previewObjectName);
+                        String previewTrashObjectName = StorageUtils.generateTrashPath(previewFileName,
                                 StorageConstants.FILE_PREVIEW_FOLDER);
 
                         moveObjectToTrash(cosClient, bucketName, previewObjectName, previewTrashObjectName);
@@ -241,20 +238,7 @@ public class TencentCOSHandler extends AbstractStorageHandler {
      */
     public static boolean recoverFile(FileTransferDto fileTransferDto, TencentCOSConfigEntity tencentCOSConfigEntity)
             throws IOException {
-        // 参数校验
-        if (fileTransferDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件传输对象不能为空，无法进行恢复");
-        }
-
-        if (tencentCOSConfigEntity == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "腾讯云COS配置不能为空，无法进行恢复");
-        }
-
-        // 验证必要的路径信息
-        if (fileTransferDto.getOriginalRelativePath() == null || fileTransferDto.getOriginalRelativePath().isEmpty() ||
-                fileTransferDto.getOriginalTrashPath() == null || fileTransferDto.getOriginalTrashPath().isEmpty()) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件信息不完整，缺少原始路径或回收站路径");
-        }
+        StorageUtils.validateRecoveryParams(fileTransferDto, tencentCOSConfigEntity);
 
         String bucketName = tencentCOSConfigEntity.getBucketName();
         String originalObjectName = fileTransferDto.getOriginalRelativePath();
@@ -263,8 +247,7 @@ public class TencentCOSHandler extends AbstractStorageHandler {
         // 预览图信息（可能不存在）
         String previewObjectName = fileTransferDto.getPreviewImagePath();
         String previewTrashPath = fileTransferDto.getPreviewTrashPath();
-        boolean hasPreviewImage = previewObjectName != null && !previewObjectName.isEmpty() &&
-                previewTrashPath != null && !previewTrashPath.isEmpty();
+        boolean hasPreviewImage = StringUtils.hasText(previewObjectName) && StringUtils.hasText(previewTrashPath);
 
         COSClient cosClient = null;
         boolean success = true;
@@ -307,9 +290,7 @@ public class TencentCOSHandler extends AbstractStorageHandler {
                 }
             }
 
-            if (hasError) {
-                throw new IOException("文件恢复过程中发生错误，部分文件可能未恢复成功");
-            }
+            StorageUtils.handleRecoveryErrors(hasError);
 
             return success;
         } catch (Exception e) {
@@ -354,7 +335,7 @@ public class TencentCOSHandler extends AbstractStorageHandler {
                                     byte[] data) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);
-        metadata.setContentType(FileOperationUtils.generateFileContentType(data));
+        metadata.setContentType(StorageUtils.generateFileContentType(data));
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(
                 bucketName, objectName, new ByteArrayInputStream(data), metadata);
@@ -365,16 +346,17 @@ public class TencentCOSHandler extends AbstractStorageHandler {
      * 检查对象是否存在于腾讯云COS中
      */
     private static boolean checkObjectExists(COSClient cosClient, String bucketName, String objectName) {
-        try {
-            cosClient.getObjectMetadata(bucketName, objectName);
-            return true;
-        } catch (Exception e) {
-            if (e.getMessage().contains("Not Found") || e.getMessage().contains("404")) {
-                return false;
+        return StorageUtils.checkObjectExistsWithLogging(bucketName, objectName, () -> {
+            try {
+                cosClient.getObjectMetadata(bucketName, objectName);
+                return true;
+            } catch (Exception e) {
+                if (e.getMessage().contains("Not Found") || e.getMessage().contains("404")) {
+                    return false;
+                }
+                throw e;
             }
-            log.warn("检查文件是否存在时出错: {}", e.getMessage());
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "检查文件是否存在失败: " + e.getMessage());
-        }
+        });
     }
 
     /**
@@ -405,33 +387,4 @@ public class TencentCOSHandler extends AbstractStorageHandler {
         }
     }
 
-    /**
-     * 获取对象内容
-     */
-    private static byte[] getObjectData(COSClient cosClient, String bucketName, String objectName) {
-        try {
-            GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, objectName);
-            COSObject cosObject = cosClient.getObject(getObjectRequest);
-
-            try (InputStream inputStream = cosObject.getObjectContent();
-                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                IOUtils.copy(inputStream, outputStream);
-                return outputStream.toByteArray();
-            }
-        } catch (Exception e) {
-            log.error("获取对象内容失败: {}/{}, 错误: {}", bucketName, objectName, e.getMessage(), e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "获取对象内容失败: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 生成回收站路径
-     */
-    private static String generateTrashPath(String fileName, String subFolder) {
-        String yearMonthDir = FileOperationUtils.generateYearMonthDir();
-        return StorageConstants.TRASH_DIR + "/" +
-                subFolder + "/" +
-                yearMonthDir + "/" +
-                System.currentTimeMillis() + "_" + fileName;
-    }
 }

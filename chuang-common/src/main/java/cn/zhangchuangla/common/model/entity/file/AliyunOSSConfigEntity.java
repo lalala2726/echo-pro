@@ -47,4 +47,10 @@ public class AliyunOSSConfigEntity implements Serializable {
      */
     private String fileDomain;
 
+    /**
+     * 是否开启回收站 0:关闭 1:开启
+     */
+    private Integer enableTrash;
+
+
 }

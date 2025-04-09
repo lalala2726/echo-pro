@@ -64,7 +64,8 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         // 决定是否使用回收站
         // 如果强制使用回收站，则无论系统设置如何都使用回收站
         // 否则，根据系统设置决定
-        boolean enableTrash = forceTrash || (minioConfig.getEnableTrash() != null && StorageConstants.IS_TRASH.equals(minioConfig.getEnableTrash()));
+        boolean enableTrash = forceTrash || (minioConfig.getEnableTrash() != null &&
+                StorageConstants.IS_TRASH.equals(minioConfig.getEnableTrash()));
 
         log.info("删除Minio文件：{}, 强制使用回收站: {}, 系统启用回收站: {}, 最终决定: {}",
                 fileTransferDto.getOriginalName(),
@@ -72,7 +73,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
                 minioConfig.getEnableTrash(),
                 enableTrash ? "移至回收站" : "永久删除");
 
-        // 调用MinioComponent进行删除
+        // 调用MinioStorageHandler进行删除
         return minioStorageHandler.removeFile(fileTransferDto, minioConfig, enableTrash);
     }
 
@@ -99,7 +100,7 @@ public class MinioOperationServiceImpl implements MinioOperationService {
         // 获取Minio配置
         MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
 
-        // 调用MinioComponent进行恢复
+        // 调用MinioStorageHandler进行恢复
         return minioStorageHandler.recoverFile(fileTransferDto, minioConfig);
     }
 }
