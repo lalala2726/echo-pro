@@ -380,7 +380,7 @@ public class LocalStorageHandler extends AbstractStorageHandler {
                 throw new IOException("文件恢复过程中发生错误，部分文件可能未恢复成功");
             }
 
-            return success;
+            return true;
         } catch (IOException e) {
             log.error("恢复文件失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "恢复文件失败: " + e.getMessage());

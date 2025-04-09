@@ -56,7 +56,7 @@ public class AliyunOSSStorageHandler extends AbstractStorageHandler {
             String objectName = generateFilePath(fileName);
 
             // 上传文件
-            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), objectName, data, fileName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), objectName, data);
 
             // 构建文件URL
             String fileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), objectName);
@@ -103,12 +103,12 @@ public class AliyunOSSStorageHandler extends AbstractStorageHandler {
             String compressedObjectName = generateCompressedImagePath(fileName);
 
             // 上传原图
-            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), originalObjectName, originalData, fileName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), originalObjectName, originalData);
             String originalFileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), originalObjectName);
 
             // 压缩图片并上传
             byte[] compressedData = compressImage(originalData);
-            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), compressedObjectName, compressedData, fileName);
+            uploadToOSS(ossClient, aliyunOSSConfig.getBucketName(), compressedObjectName, compressedData);
             String compressedFileUrl = buildFullUrl(aliyunOSSConfig.getFileDomain(), compressedObjectName);
 
             return createEnhancedFileTransferResponse(
@@ -144,7 +144,7 @@ public class AliyunOSSStorageHandler extends AbstractStorageHandler {
      * 上传文件到OSS
      */
     private static void uploadToOSS(OSS ossClient, String bucketName, String objectName,
-                                    byte[] data, String fileName) {
+                                    byte[] data) {
         // 设置元数据
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);

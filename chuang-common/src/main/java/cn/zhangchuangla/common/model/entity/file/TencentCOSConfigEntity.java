@@ -34,4 +34,9 @@ public class TencentCOSConfigEntity {
      * 文件域名
      */
     private String fileDomain;
+
+    /**
+     * 是否使用回收站 1 使用 0 不使用
+     */
+    private Integer enableTrash;
 }
