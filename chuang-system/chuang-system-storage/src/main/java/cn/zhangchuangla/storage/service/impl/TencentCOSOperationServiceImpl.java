@@ -1,9 +1,8 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.common.utils.file.TencentCOSUtils;
+import cn.zhangchuangla.storage.component.TencentCOSHandler;
 import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import java.io.IOException;
 public class TencentCOSOperationServiceImpl implements TencentCOSOperationService {
 
     private final SysFileConfigLoader sysFileConfigLoader;
-    private AppConfig appConfig;
 
     @Autowired
     public TencentCOSOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
@@ -34,14 +32,14 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
         TencentCOSConfigEntity cosConfig = sysFileConfigLoader.getTencentCOSConfig();
-        return TencentCOSUtils.uploadFile(fileTransferDto, cosConfig);
+        return TencentCOSHandler.uploadFile(fileTransferDto, cosConfig);
     }
 
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
         TencentCOSConfigEntity cosConfig = sysFileConfigLoader.getTencentCOSConfig();
 
-        return TencentCOSUtils.imageUpload(fileTransferDto, cosConfig);
+        return TencentCOSHandler.imageUpload(fileTransferDto, cosConfig);
     }
 
     @Override

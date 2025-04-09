@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Anonymous
 public class AppController {
 
+    @Resource
+    private AppConfig appConfig;
+
 
     /**
      * 欢迎页
@@ -24,7 +28,6 @@ public class AppController {
     @GetMapping("/")
     @Schema(name = "欢迎页")
     public AjaxResult getAppConfig() {
-        AppConfig appConfig = new AppConfig();
         String name = appConfig.getName();
         String version = appConfig.getVersion();
         StringBuffer append = new StringBuffer()

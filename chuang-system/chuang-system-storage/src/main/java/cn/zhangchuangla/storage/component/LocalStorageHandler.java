@@ -1,6 +1,5 @@
-package cn.zhangchuangla.common.utils.file;
+package cn.zhangchuangla.storage.component;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -8,10 +7,10 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,18 +20,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * 本地文件存储工具类
+ * 本地文件存储组件
+ * 替代原本的本地存储工具类
  *
  * @author Chuang
  * <p>
  * created on 2025/4/3 10:00
  */
 @Slf4j
-public class LocalStorageUtils extends AbstractStorageUtils {
-
-
-    @Resource
-    private AppConfig appConfig;
+@Component
+public class LocalStorageHandler extends AbstractStorageHandler {
 
 
     /**
@@ -43,7 +40,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileDomain      文件访问域名
      * @return 文件传输对象
      */
-    public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+    public FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
         if (fileTransferDto == null || fileTransferDto.getBytes() == null
                 || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
@@ -81,7 +78,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileDomain      文件访问域名
      * @return 增强后的文件传输对象
      */
-    public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+    public FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
         if (fileTransferDto == null || fileTransferDto.getBytes() == null
                 || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
@@ -126,7 +123,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
     /**
      * 保存文件到本地
      */
-    private static void saveFile(byte[] data, String uploadPath, String relativePath) {
+    private void saveFile(byte[] data, String uploadPath, String relativePath) {
         String filePath = uploadPath + File.separator + relativePath;
         Path path = Paths.get(filePath);
         Path directory = path.getParent();
@@ -147,7 +144,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
     /**
      * 构建完整的URL
      */
-    private static String buildCompleteUrl(String relativePath, String domain) {
+    private String buildCompleteUrl(String relativePath, String domain) {
         if (StringUtils.isEmpty(domain)) {
             return FileOperationUtils.buildFinalPath(Constants.RESOURCE_PREFIX, relativePath);
         }
@@ -164,7 +161,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param enableTrash     是否启用回收站（true：移动到回收站，false：直接删除）
      * @return 操作结果
      */
-    public static boolean removeFile(@NotNull final String rootPath, @NotNull FileTransferDto fileTransferDto, boolean enableTrash) {
+    public boolean removeFile(@NotNull final String rootPath, @NotNull FileTransferDto fileTransferDto, boolean enableTrash) {
         // 参数校验
         if (fileTransferDto == null || StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
             log.error("文件信息不完整，无法执行删除操作");
@@ -246,7 +243,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param rootPath 根路径
      * @throws IOException 如果创建目录失败
      */
-    private static void createTrashDirectories(String rootPath) throws IOException {
+    private void createTrashDirectories(String rootPath) throws IOException {
         // 回收站主目录
         Path trashPath = Paths.get(rootPath, StorageConstants.TRASH_DIR);
         if (!Files.exists(trashPath)) {
@@ -279,7 +276,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 回收站中的相对路径
      * @throws IOException 如果移动文件失败
      */
-    private static String moveFileToTrash(String rootPath, File sourceFile, String fileName, String subFolder) throws IOException {
+    private String moveFileToTrash(String rootPath, File sourceFile, String fileName, String subFolder) throws IOException {
         // 生成回收站中的路径（按年月目录组织）
         String yearMonthDir = FileOperationUtils.generateYearMonthDir();
         String trashRelativePath =
@@ -310,7 +307,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileTransferDto 文件传输对象
      * @return 恢复结果
      */
-    public static boolean recoverFile(String uploadPath, FileTransferDto fileTransferDto) {
+    public boolean recoverFile(String uploadPath, FileTransferDto fileTransferDto) {
         // 参数校验
         if (fileTransferDto == null) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件传输对象不能为空，无法进行恢复");

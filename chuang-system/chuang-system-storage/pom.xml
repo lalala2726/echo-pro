@@ -12,26 +12,23 @@
     <artifactId>chuang-system-storage</artifactId>
     <version>1.0.0</version>
     <description>系统存储相关管理</description>
-
     <dependencies>
-        <!-- 依赖系统核心模块 -->
+        <!-- 腾讯云API -->
         <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-core</artifactId>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
         </dependency>
 
-        <!-- 存储相关依赖 -->
-        <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.minio/minio -->
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
         </dependency>
+
+        <!-- 阿里云OSS -->
         <dependency>
-            <groupId>com.qcloud</groupId>
-            <artifactId>cos_api</artifactId>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
     </dependencies>
 </project>

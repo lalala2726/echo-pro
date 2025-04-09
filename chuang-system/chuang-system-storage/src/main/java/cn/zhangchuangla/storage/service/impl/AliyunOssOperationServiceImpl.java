@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.utils.file.AliyunOssUtils;
+import cn.zhangchuangla.storage.component.AliyunOSSStorageHandler;
 import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
         AliyunOSSConfigEntity aliyunOSSConfig = sysFileConfigLoader.getAliyunOSSConfig();
-        return AliyunOssUtils.uploadFile(fileTransferDto, aliyunOSSConfig);
+        return AliyunOSSStorageHandler.uploadFile(fileTransferDto, aliyunOSSConfig);
     }
 
 
@@ -44,7 +44,7 @@ public class AliyunOssOperationServiceImpl implements AliyunOssOperationService 
      */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        return AliyunOssUtils.imageUpload(fileTransferDto, sysFileConfigLoader.getAliyunOSSConfig());
+        return AliyunOSSStorageHandler.imageUpload(fileTransferDto, sysFileConfigLoader.getAliyunOSSConfig());
     }
 
     @Override

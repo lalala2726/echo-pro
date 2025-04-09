@@ -51,5 +51,10 @@ public class MinioConfigEntity implements Serializable {
      */
     private String bucketRegion;
 
+    /**
+     * 是否启用回收站
+     */
+    private Integer enableTrash;
+
 
 }

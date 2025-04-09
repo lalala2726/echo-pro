@@ -1,8 +1,8 @@
 package cn.zhangchuangla.common.utils;
 
-import cn.zhangchuangla.common.enums.ContentType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import org.apache.tika.Tika;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
@@ -18,6 +18,9 @@ import java.util.UUID;
  * created on 2025/2/18 15:27
  */
 public class FileOperationUtils {
+
+    private static final Tika TIKA_INSTANCE = new Tika();
+
     /**
      * 校验文件有效性
      */
@@ -123,7 +126,6 @@ public class FileOperationUtils {
         return String.format("%s%s", System.currentTimeMillis(), UUIDUtils.simpleUUID().substring(0, 8));
     }
 
-
     /**
      * 生成按年月组织的目录路径
      * 格式: yyyy/MM
@@ -151,14 +153,15 @@ public class FileOperationUtils {
                 .replace('\\', '/');
     }
 
+
     /**
      * 生成文件ContentType
      *
-     * @param fileName 文件名
+     * @param file 文件
      * @return 返回文件ContentType
      */
-    public static String generateFileContentType(String fileName) {
-        return ContentType.fromExtension(fileName).toString();
+    public static String generateFileContentType(byte[] file) {
+        return TIKA_INSTANCE.detect(file);
     }
 
     /**
@@ -195,7 +198,6 @@ public class FileOperationUtils {
     public static String BuildFinalPath(String... args) {
         return buildFinalPath(args);
     }
-
 
     /**
      * 从相对路径获取文件名

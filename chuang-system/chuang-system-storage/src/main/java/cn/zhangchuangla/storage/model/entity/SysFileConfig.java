@@ -48,4 +48,9 @@ public class SysFileConfig extends BaseEntity {
      */
     private Integer isMaster;
 
+    /**
+     * 是否启用回收站(0不启用，1启用)
+     */
+    private Integer enableTrash;
+
 }

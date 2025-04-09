@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils.file;
+package cn.zhangchuangla.storage.component;
 
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -7,11 +7,12 @@ import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.FileOperationUtils;
 import cn.zhangchuangla.common.utils.ImageUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 /**
- * 存储工具类抽象基类
+ * 存储组件抽象基类
  * 封装各存储服务的共用方法
  *
  * @author Chuang
@@ -19,7 +20,8 @@ import java.io.IOException;
  * created on 2025/4/3 15:00
  */
 @Slf4j
-public abstract class AbstractStorageUtils {
+@Component
+public abstract class AbstractStorageHandler {
 
     /**
      * 校验图片类型
@@ -32,7 +34,8 @@ public abstract class AbstractStorageUtils {
                 || fileTransferDto.getOriginalName() == null) {
             return false;
         }
-        String fileExtension = fileTransferDto.getFileExtension();
+        String fileExtension = FileOperationUtils.getFileExtensionWithoutDot(fileTransferDto.getOriginalName());
+        fileTransferDto.setFileExtension(fileExtension);
         return ImageUtils.isImage(fileExtension);
     }
 
@@ -167,7 +170,8 @@ public abstract class AbstractStorageUtils {
 
         // 填充文件基础信息
         fileTransferDto.setFileExtension(FileOperationUtils.getFileExtensionWithoutDot(fileName));
-        fileTransferDto.setContentType(FileOperationUtils.generateFileContentType(fileName));
+        //fixme 后期设置
+//        fileTransferDto.setContentType(FileOperationUtils.generateFileContentType(fileName));
         fileTransferDto.setFileMd5(FileOperationUtils.calculateMD5(data));
 
         // 计算并格式化文件大小
@@ -188,7 +192,7 @@ public abstract class AbstractStorageUtils {
      * @param sizeInBytes 文件大小（字节）
      * @return 格式化后的文件大小字符串
      */
-    protected static String formatFileSize(long sizeInBytes) {
+    private static String formatFileSize(long sizeInBytes) {
         if (sizeInBytes < 1024) {
             return sizeInBytes + " B";
         } else if (sizeInBytes < 1024 * 1024) {

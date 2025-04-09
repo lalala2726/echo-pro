@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils.file;
+package cn.zhangchuangla.storage.component;
 
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -14,6 +14,7 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 
@@ -25,7 +26,8 @@ import java.io.ByteArrayInputStream;
  * created on 2025/4/3 10:00
  */
 @Slf4j
-public class TencentCOSUtils extends AbstractStorageUtils {
+@Component
+public class TencentCOSHandler extends AbstractStorageHandler {
 
 
     /**
@@ -60,7 +62,7 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             String objectName = generateFilePath(fileName);
 
             // 上传文件
-            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), objectName, data, fileName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), objectName, data);
 
             // 构建文件URL
             String fileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), objectName);
@@ -107,13 +109,12 @@ public class TencentCOSUtils extends AbstractStorageUtils {
             String compressedObjectName = generateCompressedImagePath(fileName);
 
             // 上传原图
-            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), originalObjectName, originalData, fileName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), originalObjectName, originalData);
             String originalFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), originalObjectName);
 
             // 压缩并上传缩略图
             byte[] compressedData = compressImage(originalData);
-            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), compressedObjectName, compressedData,
-                    fileName);
+            uploadToCOS(cosClient, tencentCOSConfigEntity.getBucketName(), compressedObjectName, compressedData);
             String compressedFileUrl = buildFullUrl(tencentCOSConfigEntity.getFileDomain(), compressedObjectName);
 
             return createEnhancedFileTransferResponse(
@@ -157,10 +158,10 @@ public class TencentCOSUtils extends AbstractStorageUtils {
      * 上传文件到COS
      */
     private static void uploadToCOS(COSClient cosClient, String bucketName, String objectName,
-                                    byte[] data, String fileName) {
+                                    byte[] data) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);
-        metadata.setContentType(FileOperationUtils.generateFileContentType(fileName));
+        metadata.setContentType(FileOperationUtils.generateFileContentType(data));
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(
                 bucketName, objectName, new ByteArrayInputStream(data), metadata);

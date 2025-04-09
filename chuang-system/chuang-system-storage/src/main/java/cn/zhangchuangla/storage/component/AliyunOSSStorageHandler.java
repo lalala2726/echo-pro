@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils.file;
+package cn.zhangchuangla.storage.component;
 
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -10,6 +10,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 
@@ -21,7 +22,8 @@ import java.io.ByteArrayInputStream;
  * created on 2025/4/3 10:00
  */
 @Slf4j
-public class AliyunOssUtils extends AbstractStorageUtils {
+@Component
+public class AliyunOSSStorageHandler extends AbstractStorageHandler {
 
 
     /**
@@ -147,7 +149,7 @@ public class AliyunOssUtils extends AbstractStorageUtils {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(data.length);
         metadata.setHeader("Content-Disposition", "inline");
-        metadata.setContentType(FileOperationUtils.generateFileContentType(fileName));
+        metadata.setContentType(FileOperationUtils.generateFileContentType(data));
 
         // 上传文件
         ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(data), metadata);
