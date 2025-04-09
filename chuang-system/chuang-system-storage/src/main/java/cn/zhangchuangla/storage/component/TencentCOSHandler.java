@@ -250,7 +250,6 @@ public class TencentCOSHandler {
         boolean hasPreviewImage = StringUtils.hasText(previewObjectName) && StringUtils.hasText(previewTrashPath);
 
         COSClient cosClient = null;
-        boolean success = true;
         boolean hasError = false;
 
         try {
@@ -261,11 +260,10 @@ public class TencentCOSHandler {
             if (!originalTrashExists) {
                 log.warn("回收站中的原始文件不存在: {}/{}", bucketName, originalTrashPath);
                 hasError = true;
-                success = false;
             } else {
                 try {
                     // 1. 恢复原始文件
-                    moveObject(cosClient, bucketName, originalTrashPath, bucketName, originalObjectName);
+                    safelyMoveObject(cosClient, bucketName, originalTrashPath, bucketName, originalObjectName);
                     log.info("已从回收站恢复文件: {} -> {}", originalTrashPath, originalObjectName);
                 } catch (Exception e) {
                     log.error("恢复原始文件失败: {} -> {}, 错误: {}", originalTrashPath, originalObjectName, e.getMessage());
@@ -281,7 +279,7 @@ public class TencentCOSHandler {
                     // 预览图不存在不影响整体恢复成功状态，因为它是可选的
                 } else {
                     try {
-                        moveObject(cosClient, bucketName, previewTrashPath, bucketName, previewObjectName);
+                        safelyMoveObject(cosClient, bucketName, previewTrashPath, bucketName, previewObjectName);
                         log.info("已从回收站恢复预览图: {} -> {}", previewTrashPath, previewObjectName);
                     } catch (Exception e) {
                         log.error("恢复预览图文件失败: {} -> {}, 错误: {}", previewTrashPath, previewObjectName, e.getMessage());
@@ -292,7 +290,7 @@ public class TencentCOSHandler {
 
             StorageUtils.handleRecoveryErrors(hasError);
 
-            return success;
+            return true;
         } catch (Exception e) {
             log.error("腾讯云COS文件恢复失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件恢复失败: " + e.getMessage());
@@ -364,26 +362,48 @@ public class TencentCOSHandler {
      */
     private static void moveObjectToTrash(COSClient cosClient, String bucketName, String sourceObjectName,
                                           String trashObjectName) {
-        moveObject(cosClient, bucketName, sourceObjectName, bucketName, trashObjectName);
+        safelyMoveObject(cosClient, bucketName, sourceObjectName, bucketName, trashObjectName);
     }
 
     /**
-     * 移动对象（先复制，后删除）
+     * 安全地移动对象（先复制，后删除）
+     * 增加了验证和日志记录，以确保操作的正确性
      */
-    private static void moveObject(COSClient cosClient, String sourceBucket, String sourceObject, String targetBucket,
-                                   String targetObject) {
+    private static void safelyMoveObject(COSClient cosClient, String sourceBucket, String sourceObject,
+                                         String targetBucket, String targetObject) {
         try {
+            // 验证源对象是否存在
+            if (!checkObjectExists(cosClient, sourceBucket, sourceObject)) {
+                log.error("源对象不存在，无法移动: {}/{}", sourceBucket, sourceObject);
+                throw new FileException(ResponseCode.FILE_OPERATION_ERROR,
+                        String.format("源对象不存在，无法移动: %s/%s", sourceBucket, sourceObject));
+            }
+
+            log.debug("准备移动对象: {}/{} -> {}/{}", sourceBucket, sourceObject, targetBucket, targetObject);
+
             // 1. 复制对象
             CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
                     sourceBucket, sourceObject, targetBucket, targetObject);
             cosClient.copyObject(copyObjectRequest);
+            log.debug("对象复制成功: {}/{} -> {}/{}", sourceBucket, sourceObject, targetBucket, targetObject);
 
-            // 2. 删除源对象
+            // 2. 验证目标对象是否创建成功
+            if (!checkObjectExists(cosClient, targetBucket, targetObject)) {
+                log.error("目标对象创建失败: {}/{}", targetBucket, targetObject);
+                throw new FileException(ResponseCode.FILE_OPERATION_FAILED,
+                        String.format("目标对象创建失败: %s/%s", targetBucket, targetObject));
+            }
+
+            // 3. 删除源对象（只删除特定的对象，不影响其他对象）
             cosClient.deleteObject(sourceBucket, sourceObject);
+            log.debug("源对象删除成功: {}/{}", sourceBucket, sourceObject);
+
         } catch (Exception e) {
-            log.error("移动对象失败: {} -> {}, 错误: {}", sourceObject, targetObject, e.getMessage(), e);
+            log.error("移动对象失败: {}/{} -> {}/{}, 错误: {}",
+                    sourceBucket, sourceObject, targetBucket, targetObject, e.getMessage(), e);
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED,
-                    String.format("移动对象失败 [%s -> %s]: %s", sourceObject, targetObject, e.getMessage()));
+                    String.format("移动对象失败 [%s/%s -> %s/%s]: %s",
+                            sourceBucket, sourceObject, targetBucket, targetObject, e.getMessage()));
         }
     }
 

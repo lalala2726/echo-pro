@@ -11,13 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 腾讯云COS 操作服务实现类
  *
  * @author Chuang
- * <p>
- * created on 2025/4/2 20:03
+ *         <p>
+ *         created on 2025/4/2 20:03
  */
 @Service
 @Slf4j
@@ -25,9 +27,14 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
 
     private final SysFileConfigLoader sysFileConfigLoader;
 
+    // 线程池用于高级操作
+    private final ExecutorService threadPool;
+
     @Autowired
     public TencentCOSOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
         this.sysFileConfigLoader = sysFileConfigLoader;
+        // 创建线程池用于文件操作
+        this.threadPool = Executors.newFixedThreadPool(16);
     }
 
     @Override
@@ -67,7 +74,7 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
                 cosConfig.getEnableTrash(),
                 enableTrash ? "移至回收站" : "永久删除");
 
-        // 调用TencentCOSHandler进行删除
+        // 调用TencentCOSHandler的删除方法
         return TencentCOSHandler.removeFile(fileTransferDto, cosConfig, enableTrash);
     }
 
@@ -94,7 +101,7 @@ public class TencentCOSOperationServiceImpl implements TencentCOSOperationServic
         // 获取腾讯云COS配置
         TencentCOSConfigEntity cosConfig = sysFileConfigLoader.getTencentCOSConfig();
 
-        // 调用TencentCOSHandler进行恢复
+        // 调用TencentCOSHandler的恢复方法
         return TencentCOSHandler.recoverFile(fileTransferDto, cosConfig);
     }
 }
