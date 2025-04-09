@@ -53,7 +53,7 @@ public class OnlineUserController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
-    @PreAuthorize("@auth.hasPermission('monitor:online-user:list')")
+    @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public TableDataResult onlineUserList(OnlineUserListRequest request) {
         Collection<String> keys = redisCache.keys(RedisKeyConstant.LOGIN_TOKEN_KEY + "*");
         ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
@@ -77,7 +77,7 @@ public class OnlineUserController extends BaseController {
     @DeleteMapping("/{sessionId}")
     @Operation(summary = "强制退出登录")
     @OperationLog(title = "在线用户管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@auth.hasPermission('monitor:online-user:delete')")
+    @PreAuthorize("@ss.hasPermission('monitor:online-user:delete')")
     public AjaxResult forceLogout(@PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
         if (sessionId == null) {
             return error(ResponseCode.PARAM_NOT_NULL);

@@ -83,7 +83,11 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
     }
 
     /**
-     * 删除文件
+     * 决定是否使用回收站：
+     * 1. 如果用户选择移至回收站(isPermanently=false)，无论系统设置如何都使用回收站
+     * 2. 如果用户选择永久删除(isPermanently=true)：
+     * - 如果系统启用回收站，仍然使用回收站
+     * - 如果系统关闭回收站，则真正删除文件
      *
      * @param ids           文件id列表
      * @param isPermanently true代表永久删除文件，false将会转移到回收站
@@ -110,11 +114,6 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
                 // 获取对应的存储操作实现
                 StorageOperation storageOperation = storageFactory.getStorageOperation(fileManagement.getStorageType());
 
-                // 决定是否使用回收站：
-                // 1. 如果用户选择移至回收站(isPermanently=false)，无论系统设置如何都使用回收站
-                // 2. 如果用户选择永久删除(isPermanently=true)：
-                //    - 如果系统启用回收站，仍然使用回收站
-                //    - 如果系统关闭回收站，则真正删除文件
                 boolean forceTrash = !isPermanently; // 如果不是永久删除，强制使用回收站
 
                 // 执行文件删除或移至回收站操作

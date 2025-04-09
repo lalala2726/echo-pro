@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.model.vo.manage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  * 文件管理列表视图对象
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SysFileManagementListVo {
 
     /**
@@ -67,6 +69,11 @@ public class SysFileManagementListVo {
      */
     @Schema(description = "存储类型 (LOCAL/MINIO/ALIYUN_OSS)")
     private String storageType;
+
+    /**
+     * 是否可预览图片 (0-否, 1-是)
+     */
+    private Boolean isPreviewImage;
 
     /**
      * 存储桶名称（OSS/MINIO 使用）
