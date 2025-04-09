@@ -11,32 +11,37 @@
 
     <artifactId>chuang-framework</artifactId>
     <version>1.0.0</version>
-    <description>框架核心模块，提供基础K框架功能</description>
+    <description>框架基础模块，提供核心功能支持</description>
 
     <dependencies>
-        <!-- 依赖服务模块 -->
+        <!-- 依赖公共模块 -->
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common</artifactId>
+        </dependency>
+
+        <!-- 添加系统核心模块依赖 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-system-core</artifactId>
         </dependency>
 
-        <!-- SpringBoot Web容器 -->
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${google.gvava.version}</version>
-        </dependency>
-
-
-        <!-- SpringBoot 拦截器 -->
+        <!-- Spring Boot AOP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!-- WebSocket 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -6,6 +6,7 @@ import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.model.entity.Server;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Anonymous
 @Tag(name = "服务器监控")
 public class ServerController extends BaseController {
+
+
     /**
      * 服务器信息
      *
@@ -26,6 +29,7 @@ public class ServerController extends BaseController {
      */
     @GetMapping
     @Operation(summary = "服务器信息")
+    @PreAuthorize("@ss.hasPermission('monitor:server:list')")
     public AjaxResult getInfo() {
         Server server = new Server();
         server.copyInfo();

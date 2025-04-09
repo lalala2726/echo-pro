@@ -12,9 +12,11 @@ import cn.zhangchuangla.storage.service.SysFileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +49,13 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public TableDataResult listFileManage(SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileManage(request);
-        List<SysFileManagementListVo> sysFileManagementListVos = copyListProperties(sysFileManagementPage, SysFileManagementListVo.class);
+        ArrayList<SysFileManagementListVo> sysFileManagementListVos = new ArrayList<>();
+        sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
+            SysFileManagementListVo sysFileManagementListVo = new SysFileManagementListVo();
+            BeanUtils.copyProperties(sysFileManagement, sysFileManagementListVo);
+            sysFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
+            sysFileManagementListVos.add(sysFileManagementListVo);
+        });
         return getTableData(sysFileManagementPage, sysFileManagementListVos);
     }
 

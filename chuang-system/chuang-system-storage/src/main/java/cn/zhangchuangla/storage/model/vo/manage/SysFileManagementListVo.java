@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.model.vo.manage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  * 文件管理列表视图对象
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SysFileManagementListVo {
 
     /**
@@ -73,6 +75,9 @@ public class SysFileManagementListVo {
      */
     @Schema(description = "存储桶名称（OSS/MINIO 使用）")
     private String bucketName;
+
+    @Schema(description = "是否包含预览图片")
+    private Boolean isIncludePreviewImage;
 
     /**
      * 上传者ID

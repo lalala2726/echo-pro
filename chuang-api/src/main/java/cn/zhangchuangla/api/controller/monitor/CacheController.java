@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +38,14 @@ public class CacheController extends BaseController {
         this.redisTemplate = redisTemplate;
     }
 
+    /**
+     * 获取 Redis 基本信息
+     *
+     * @return AjaxResult
+     */
     @GetMapping
     @Operation(summary = "Redis基本信息")
+    @PreAuthorize("@ss.hasPermission('monitor:cache:list')")
     public AjaxResult list() {
         // 执行 Redis 命令
         Properties info = getRedisInfo();
