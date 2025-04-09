@@ -53,7 +53,7 @@ public class SysFileManageController extends BaseController {
         sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
             SysFileManagementListVo sysFileManagementListVo = new SysFileManagementListVo();
             BeanUtils.copyProperties(sysFileManagement, sysFileManagementListVo);
-            sysFileManagementListVo.setIsPreviewImage(sysFileManagement.getPreviewImageUrl() != null);
+            sysFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
             sysFileManagementListVos.add(sysFileManagementListVo);
         });
         return getTableData(sysFileManagementPage, sysFileManagementListVos);

@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.zhangchuangla</groupId>
-        <artifactId>chuang-sytem</artifactId>
+        <artifactId>chuang-system</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>chuang-system-storage</artifactId>
-
-
+    <artifactId>chuang-system-core</artifactId>
+    <version>1.0.0</version>
+    <description>系统核心模块，提供基础系统功能</description>
 </project>

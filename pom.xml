@@ -10,10 +10,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>chuang-api</module>
         <module>chuang-common</module>
+        <module>chuang-system</module>
         <module>chuang-framework</module>
-        <module>chuang-sytem</module>
+        <module>chuang-api</module>
     </modules>
 
     <!-- 统一版本管理 -->
@@ -246,7 +246,7 @@
                 <version>${app.version}</version>
             </dependency>
             <dependency>
-                <groupId>cn.zhangchuangla</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system-storage</artifactId>
                 <version>${app.version}</version>
             </dependency>

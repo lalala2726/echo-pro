@@ -71,15 +71,13 @@ public class SysFileManagementListVo {
     private String storageType;
 
     /**
-     * 是否可预览图片 (0-否, 1-是)
-     */
-    private Boolean isPreviewImage;
-
-    /**
      * 存储桶名称（OSS/MINIO 使用）
      */
     @Schema(description = "存储桶名称（OSS/MINIO 使用）")
     private String bucketName;
+
+    @Schema(description = "是否包含预览图片")
+    private Boolean isIncludePreviewImage;
 
     /**
      * 上传者ID

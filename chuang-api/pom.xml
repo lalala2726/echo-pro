@@ -14,25 +14,17 @@
     <description>API入口模块，包含启动类和对外接口</description>
 
     <dependencies>
-        <!-- 依赖基础设施模块（包含所有需要的依赖） -->
+        <!-- 依赖框架模块（包含所有核心功能支持） -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-framework</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-common</artifactId>
-        </dependency>
-
+        <!-- 添加系统存储模块依赖 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-system-storage</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-core</artifactId>
+            <version>${app.version}</version>
         </dependency>
     </dependencies>
 
