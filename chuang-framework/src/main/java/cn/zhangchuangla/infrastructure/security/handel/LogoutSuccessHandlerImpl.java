@@ -15,8 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * @author Chuang
  * <p>
@@ -42,7 +40,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
      * @param authentication 认证
      */
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (StringUtils.isNotNull(loginUser)) {
             String sessionId = loginUser.getSessionId();

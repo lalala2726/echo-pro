@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 /**
  * 腾讯云COS存储工具类
@@ -236,8 +235,7 @@ public class TencentCOSHandler {
      * @param tencentCOSConfigEntity 腾讯云COS配置
      * @return 恢复操作的结果
      */
-    public static boolean recoverFile(FileTransferDto fileTransferDto, TencentCOSConfigEntity tencentCOSConfigEntity)
-            throws IOException {
+    public static boolean recoverFile(FileTransferDto fileTransferDto, TencentCOSConfigEntity tencentCOSConfigEntity) {
         StorageUtils.validateRecoveryParams(fileTransferDto, tencentCOSConfigEntity);
 
         String bucketName = tencentCOSConfigEntity.getBucketName();

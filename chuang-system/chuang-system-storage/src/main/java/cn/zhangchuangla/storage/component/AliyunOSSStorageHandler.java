@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 /**
  * 阿里云OSS存储工具类
@@ -229,10 +228,8 @@ public class AliyunOSSStorageHandler {
      * @param fileTransferDto 文件传输对象
      * @param aliyunOSSConfig 阿里云OSS配置
      * @return 恢复操作的结果
-     * @throws IOException 如果恢复过程中发生IO错误
      */
-    public static boolean recoverFile(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig)
-            throws IOException {
+    public static boolean recoverFile(FileTransferDto fileTransferDto, AliyunOSSConfigEntity aliyunOSSConfig) {
         StorageUtils.validateRecoveryParams(fileTransferDto, aliyunOSSConfig);
 
         String bucketName = aliyunOSSConfig.getBucketName();

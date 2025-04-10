@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 /**
  * Minio 操作服务实现类
  *
@@ -93,10 +91,9 @@ public class MinioOperationServiceImpl implements MinioOperationService {
      *
      * @param fileTransferDto 文件传输对象
      * @return 恢复操作结果
-     * @throws IOException IO异常
      */
     @Override
-    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+    public boolean recoverFile(FileTransferDto fileTransferDto) {
         // 获取Minio配置
         MinioConfigEntity minioConfig = sysFileConfigLoader.getMinioConfig();
 

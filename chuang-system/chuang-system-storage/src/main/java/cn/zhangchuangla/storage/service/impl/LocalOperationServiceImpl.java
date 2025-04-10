@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 /**
  * 本地存储服务实现类
  *
@@ -103,10 +101,9 @@ public class LocalOperationServiceImpl implements LocalOperationService {
      *
      * @param fileTransferDto 文件传输对象
      * @return 恢复操作结果
-     * @throws IOException IO异常
      */
     @Override
-    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
+    public boolean recoverFile(FileTransferDto fileTransferDto) {
         // 调用LocalStorageComponent的恢复方法
         return localStorageComponent.recoverFile(appConfig.getUploadPath(), fileTransferDto);
     }
