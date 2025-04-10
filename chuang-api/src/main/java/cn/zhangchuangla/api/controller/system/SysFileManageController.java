@@ -80,6 +80,7 @@ public class SysFileManageController extends BaseController {
      * @param id 文件ID
      * @return 恢复结果
      */
+    //todo 对文件进行操作的时候当前配置必须和文件上传配置一致才可以进行修改，如果不一致则不允许修改
     @PreAuthorize("@ss.hasPermission('system:file-manage:recover')")
     @Operation(summary = "恢复文件")
     @PutMapping("/recover/{id}")
