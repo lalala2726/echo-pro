@@ -9,6 +9,7 @@
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
         <result property="module" column="module"/>
+        <result property="params" column="params"/>
         <result property="requestMethod" column="request_method"/>
         <result property="operationIp" column="operation_ip"/>
         <result property="operationResult" column="operation_result"/>

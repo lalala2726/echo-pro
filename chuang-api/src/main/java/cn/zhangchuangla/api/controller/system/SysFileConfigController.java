@@ -151,7 +151,7 @@ public class SysFileConfigController extends BaseController {
      *
      * @return 刷新结果
      */
-    @GetMapping("/refreshCache")
+    @PutMapping("/refreshCache")
     @PreAuthorize("@ss.hasPermission('system:file-config:refreshCache')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)

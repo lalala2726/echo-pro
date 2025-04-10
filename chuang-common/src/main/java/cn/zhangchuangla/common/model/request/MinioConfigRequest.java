@@ -72,5 +72,11 @@ public class MinioConfigRequest {
             message = "文件访问域名格式不正确")
     private String fileDomain;
 
+    /**
+     * 是否启用文件回收站 0 否 1 是
+     */
+    @Schema(description = "是否启用文件回收站，当选择此功能后文件就算是永久删除了也不会真正删除，而是放入回收站，默认不启用,1启用，0不启用", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Integer enableTrash = 0;
+
 
 }

@@ -2,13 +2,12 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
-import cn.zhangchuangla.common.utils.file.LocalStorageUtils;
+import cn.zhangchuangla.storage.component.LocalStorageHandler;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 /**
  * 本地存储服务实现类
@@ -21,12 +20,17 @@ import java.io.IOException;
 @Slf4j
 public class LocalOperationServiceImpl implements LocalOperationService {
 
+    private final LocalStorageHandler localStorageComponent;
     @Resource(name = "appConfig")
     private AppConfig appConfig;
 
+    @Autowired
+    public LocalOperationServiceImpl(LocalStorageHandler localStorageComponent) {
+        this.localStorageComponent = localStorageComponent;
+    }
+
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
-
         String uploadPath = appConfig.getUploadPath();
         String fileDomain;
         try {
@@ -35,7 +39,7 @@ public class LocalOperationServiceImpl implements LocalOperationService {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
         }
-        return LocalStorageUtils.uploadFile(fileTransferDto, uploadPath, fileDomain);
+        return localStorageComponent.uploadFile(fileTransferDto, uploadPath, fileDomain);
     }
 
     /**
@@ -54,14 +58,14 @@ public class LocalOperationServiceImpl implements LocalOperationService {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
         }
-        return LocalStorageUtils.imageUpload(fileTransferDto, uploadPath, fileDomain);
+        return localStorageComponent.imageUpload(fileTransferDto, uploadPath, fileDomain);
     }
 
     /**
      * 删除文件
      *
      * @param fileTransferDto 文件传输对象
-     * @param forceTrash 是否强制使用回收站，无视系统设置
+     * @param forceTrash      是否强制使用回收站，无视系统设置
      * @return 文件操作结果
      */
     @Override
@@ -77,8 +81,8 @@ public class LocalOperationServiceImpl implements LocalOperationService {
                 appConfig.isEnableTrash(),
                 enableTrash ? "移至回收站" : "永久删除");
 
-        // 调用LocalStorageUtils的删除方法
-        return LocalStorageUtils.removeFile(appConfig.getUploadPath(), fileTransferDto, enableTrash);
+        // 调用LocalStorageComponent的删除方法
+        return localStorageComponent.removeFile(appConfig.getUploadPath(), fileTransferDto, enableTrash);
     }
 
     /**
@@ -97,11 +101,10 @@ public class LocalOperationServiceImpl implements LocalOperationService {
      *
      * @param fileTransferDto 文件传输对象
      * @return 恢复操作结果
-     * @throws IOException IO异常
      */
     @Override
-    public boolean recoverFile(FileTransferDto fileTransferDto) throws IOException {
-        // 调用LocalStorageUtils的恢复方法
-        return LocalStorageUtils.recoverFile(appConfig.getUploadPath(), fileTransferDto);
+    public boolean recoverFile(FileTransferDto fileTransferDto) {
+        // 调用LocalStorageComponent的恢复方法
+        return localStorageComponent.recoverFile(appConfig.getUploadPath(), fileTransferDto);
     }
 }

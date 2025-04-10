@@ -70,7 +70,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
-                             @NotNull Object handler) throws Exception {
+                             @NotNull Object handler) {
         // 如果不是方法处理器，直接放行
         if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;

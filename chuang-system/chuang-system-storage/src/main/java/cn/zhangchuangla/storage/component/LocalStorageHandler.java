@@ -1,17 +1,16 @@
-package cn.zhangchuangla.common.utils.file;
+package cn.zhangchuangla.storage.component;
 
-import cn.zhangchuangla.common.config.AppConfig;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
-import cn.zhangchuangla.common.utils.FileOperationUtils;
+import cn.zhangchuangla.common.utils.StorageUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,19 +20,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * 本地文件存储工具类
+ * 本地文件存储组件
+ * 替代原本的本地存储工具类
  *
  * @author Chuang
  * <p>
  * created on 2025/4/3 10:00
  */
 @Slf4j
-public class LocalStorageUtils extends AbstractStorageUtils {
-
-
-    @Resource
-    private AppConfig appConfig;
-
+@Component
+public class LocalStorageHandler {
 
     /**
      * 上传文件到本地存储
@@ -43,17 +39,17 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileDomain      文件访问域名
      * @return 文件传输对象
      */
-    public static FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+    public FileTransferDto uploadFile(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
         if (fileTransferDto == null || fileTransferDto.getBytes() == null
                 || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
         }
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
 
         // 如果是图片类型，则调用图片上传方法
-        if (isImage(fileTransferDto)) {
+        if (StorageUtils.isImage(fileTransferDto)) {
             return imageUpload(fileTransferDto, uploadPath, fileDomain);
         }
 
@@ -61,7 +57,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         byte[] data = fileTransferDto.getBytes();
 
         // 生成存储路径
-        String relativePath = generateFilePath(fileName);
+        String relativePath = StorageUtils.generateFilePath(fileName);
 
         // 保存文件
         saveFile(data, uploadPath, relativePath);
@@ -69,7 +65,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         // 构建URL
         String fileUrl = buildCompleteUrl(relativePath, fileDomain);
 
-        return createEnhancedFileTransferResponse(fileUrl, relativePath, null, null, fileTransferDto);
+        return StorageUtils.createEnhancedFileTransferResponse(fileUrl, relativePath, null, null, fileTransferDto);
     }
 
     /**
@@ -81,17 +77,17 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileDomain      文件访问域名
      * @return 增强后的文件传输对象
      */
-    public static FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
+    public FileTransferDto imageUpload(FileTransferDto fileTransferDto, String uploadPath, String fileDomain) {
         if (fileTransferDto == null || fileTransferDto.getBytes() == null
                 || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
         }
 
         // 填充文件基础信息
-        fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
+        StorageUtils.fillFileTransferInfo(fileTransferDto, StorageConstants.LOCAL, "local-storage");
 
         // 验证是否为图片类型
-        if (!isImage(fileTransferDto)) {
+        if (!StorageUtils.isImage(fileTransferDto)) {
             throw new FileException(ResponseCode.FileUploadFailed, "非图片类型文件不能使用图片上传接口！");
         }
 
@@ -100,19 +96,19 @@ public class LocalStorageUtils extends AbstractStorageUtils {
 
         try {
             // 生成存储路径
-            String originalRelativePath = generateOriginalImagePath(fileName);
-            String compressedRelativePath = generateCompressedImagePath(fileName);
+            String originalRelativePath = StorageUtils.generateOriginalImagePath(fileName);
+            String compressedRelativePath = StorageUtils.generateCompressedImagePath(fileName);
 
             // 保存原图
             saveFile(originalData, uploadPath, originalRelativePath);
             String originalUrl = buildCompleteUrl(originalRelativePath, fileDomain);
 
             // 压缩并保存
-            byte[] compressedData = compressImage(originalData);
+            byte[] compressedData = StorageUtils.compressImage(originalData);
             saveFile(compressedData, uploadPath, compressedRelativePath);
             String compressedUrl = buildCompleteUrl(compressedRelativePath, fileDomain);
 
-            return createEnhancedFileTransferResponse(
+            return StorageUtils.createEnhancedFileTransferResponse(
                     originalUrl, originalRelativePath,
                     compressedUrl, compressedRelativePath,
                     fileTransferDto);
@@ -126,7 +122,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
     /**
      * 保存文件到本地
      */
-    private static void saveFile(byte[] data, String uploadPath, String relativePath) {
+    private void saveFile(byte[] data, String uploadPath, String relativePath) {
         String filePath = uploadPath + File.separator + relativePath;
         Path path = Paths.get(filePath);
         Path directory = path.getParent();
@@ -147,11 +143,11 @@ public class LocalStorageUtils extends AbstractStorageUtils {
     /**
      * 构建完整的URL
      */
-    private static String buildCompleteUrl(String relativePath, String domain) {
+    private String buildCompleteUrl(String relativePath, String domain) {
         if (StringUtils.isEmpty(domain)) {
-            return FileOperationUtils.buildFinalPath(Constants.RESOURCE_PREFIX, relativePath);
+            return StorageUtils.buildFinalPath(Constants.RESOURCE_PREFIX, relativePath);
         }
-        return buildFullUrl(domain, relativePath);
+        return StorageUtils.buildFullUrl(domain, relativePath);
     }
 
     /**
@@ -164,8 +160,8 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param enableTrash     是否启用回收站（true：移动到回收站，false：直接删除）
      * @return 操作结果
      */
-    public static boolean removeFile(@NotNull final String rootPath, @NotNull FileTransferDto fileTransferDto, boolean enableTrash) {
-        // 参数校验
+    public boolean removeFile(@NotNull final String rootPath, @NotNull FileTransferDto fileTransferDto,
+                              boolean enableTrash) {
         if (fileTransferDto == null || StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
             log.error("文件信息不完整，无法执行删除操作");
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件信息不完整，无法删除！");
@@ -174,17 +170,16 @@ public class LocalStorageUtils extends AbstractStorageUtils {
         // 原文件信息
         String originalRelativePath = fileTransferDto.getOriginalRelativePath();
         String originalFilePath = rootPath + File.separator + originalRelativePath;
-        String originalFileName = FileOperationUtils.getFileNameByRelativePath(originalRelativePath);
+        String originalFileName = StorageUtils.getFileNameByRelativePath(originalRelativePath);
 
         // 预览图信息（可能不存在）
         String previewImagePath = fileTransferDto.getPreviewImagePath();
         boolean hasPreviewImage = StringUtils.hasText(previewImagePath);
 
         // 记录操作类型
-        log.info("开始处理文件 - 原始文件: {}, 预览图: {}, 操作模式: {}",
-                originalFilePath,
-                hasPreviewImage ? (rootPath + File.separator + previewImagePath) : "无",
-                enableTrash ? "移至回收站" : "直接删除");
+        StorageUtils.logFileOperationType("本地存储", originalFilePath,
+                hasPreviewImage ? (rootPath + File.separator + previewImagePath) : null,
+                hasPreviewImage, enableTrash);
 
         try {
             // 如果启用回收站，确保回收站目录结构存在
@@ -199,7 +194,8 @@ public class LocalStorageUtils extends AbstractStorageUtils {
             } else {
                 if (enableTrash) {
                     // 移动到回收站
-                    String originalTrashRelativePath = moveFileToTrash(rootPath, originalFile, originalFileName, StorageConstants.FILE_ORIGINAL_FOLDER);
+                    String originalTrashRelativePath = moveFileToTrash(rootPath, originalFile, originalFileName,
+                            StorageConstants.FILE_ORIGINAL_FOLDER);
                     fileTransferDto.setOriginalTrashPath(originalTrashRelativePath);
                     log.debug("已将原始文件移动到回收站路径: {}", originalTrashRelativePath);
                 } else {
@@ -219,10 +215,11 @@ public class LocalStorageUtils extends AbstractStorageUtils {
                 } else {
                     if (enableTrash) {
                         // 获取预览图文件名
-                        String previewFileName = FileOperationUtils.getFileNameByRelativePath(previewImagePath);
+                        String previewFileName = StorageUtils.getFileNameByRelativePath(previewImagePath);
 
                         // 移动到回收站
-                        String previewTrashRelativePath = moveFileToTrash(rootPath, previewFile, previewFileName, StorageConstants.FILE_PREVIEW_FOLDER);
+                        String previewTrashRelativePath = moveFileToTrash(rootPath, previewFile, previewFileName,
+                                StorageConstants.FILE_PREVIEW_FOLDER);
                         fileTransferDto.setPreviewTrashPath(previewTrashRelativePath);
                         log.debug("已将预览图文件移动到回收站路径: {}", previewTrashRelativePath);
                     } else {
@@ -246,7 +243,7 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param rootPath 根路径
      * @throws IOException 如果创建目录失败
      */
-    private static void createTrashDirectories(String rootPath) throws IOException {
+    private void createTrashDirectories(String rootPath) throws IOException {
         // 回收站主目录
         Path trashPath = Paths.get(rootPath, StorageConstants.TRASH_DIR);
         if (!Files.exists(trashPath)) {
@@ -279,14 +276,14 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @return 回收站中的相对路径
      * @throws IOException 如果移动文件失败
      */
-    private static String moveFileToTrash(String rootPath, File sourceFile, String fileName, String subFolder) throws IOException {
+    private String moveFileToTrash(String rootPath, File sourceFile, String fileName, String subFolder)
+            throws IOException {
         // 生成回收站中的路径（按年月目录组织）
-        String yearMonthDir = FileOperationUtils.generateYearMonthDir();
-        String trashRelativePath =
-                StorageConstants.TRASH_DIR + "/" +
-                        subFolder + "/" +
-                        yearMonthDir + "/" +
-                        System.currentTimeMillis() + "_" + fileName;
+        String yearMonthDir = StorageUtils.generateYearMonthDir();
+        String trashRelativePath = StorageConstants.TRASH_DIR + "/" +
+                subFolder + "/" +
+                yearMonthDir + "/" +
+                System.currentTimeMillis() + "_" + fileName;
 
         // 创建目标文件对象
         File targetFile = new File(rootPath + File.separator + trashRelativePath);
@@ -310,20 +307,9 @@ public class LocalStorageUtils extends AbstractStorageUtils {
      * @param fileTransferDto 文件传输对象
      * @return 恢复结果
      */
-    public static boolean recoverFile(String uploadPath, FileTransferDto fileTransferDto) {
-        // 参数校验
-        if (fileTransferDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件传输对象不能为空，无法进行恢复");
-        }
+    public boolean recoverFile(String uploadPath, FileTransferDto fileTransferDto) {
+        StorageUtils.validateRecoveryParams(fileTransferDto, uploadPath);
 
-        // 验证必要的路径信息
-        if (StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR,
-                    "文件信息不完整，缺少原始路径或回收站路径");
-        }
-
-        boolean success = true;
         boolean hasError = false;
 
         try {
@@ -334,7 +320,6 @@ public class LocalStorageUtils extends AbstractStorageUtils {
             if (!Files.exists(originalTrashPath)) {
                 log.warn("回收站中的原始文件不存在: {}", originalTrashPath);
                 hasError = true;
-                success = false;
             } else {
                 try {
                     // 确保目标目录存在
@@ -379,11 +364,9 @@ public class LocalStorageUtils extends AbstractStorageUtils {
                 }
             }
 
-            if (hasError) {
-                throw new IOException("文件恢复过程中发生错误，部分文件可能未恢复成功");
-            }
+            StorageUtils.handleRecoveryErrors(hasError);
 
-            return success;
+            return true;
         } catch (IOException e) {
             log.error("恢复文件失败: {}", e.getMessage(), e);
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "恢复文件失败: " + e.getMessage());
