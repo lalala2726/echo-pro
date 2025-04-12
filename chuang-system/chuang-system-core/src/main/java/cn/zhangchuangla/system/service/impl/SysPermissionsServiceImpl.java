@@ -7,7 +7,9 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysPermissionsMapper;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
+import cn.zhangchuangla.system.model.request.permissions.SysPermissionsListRequest;
 import cn.zhangchuangla.system.service.SysPermissionsService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper, SysPermissions>
         implements SysPermissionsService {
 
+    // 权限过期时间，单位天
     private final static long permissionExpireTime = 15;
     private final SysPermissionsMapper sysPermissionsMapper;
     private final RedisCache redisCache;
@@ -100,6 +103,18 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
         } catch (Exception e) {
             log.error("保存用户权限到Redis失败", e);
         }
+    }
+
+    /**
+     * 分页查询权限列表
+     *
+     * @param request 请求参数
+     * @return 权限列表
+     */
+    @Override
+    public Page<SysPermissions> listPermissions(SysPermissionsListRequest request) {
+        Page<SysPermissions> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysPermissionsMapper.listPermissions(page, request);
     }
 }
 

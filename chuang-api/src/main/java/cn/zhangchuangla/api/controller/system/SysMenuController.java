@@ -59,7 +59,6 @@ public class SysMenuController extends BaseController {
      */
     @GetMapping("/roleMenuTree/{roleId}")
     public AjaxResult roleMenuTree(@PathVariable("roleId") Long roleId) {
-
         return success();
     }
 
