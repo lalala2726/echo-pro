@@ -9,8 +9,9 @@ import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.department.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.department.SysDeptRequest;
-import cn.zhangchuangla.system.model.vo.department.SysDeptListVo;
-import cn.zhangchuangla.system.model.vo.department.SysDeptVo;
+import cn.zhangchuangla.system.model.vo.dept.DeptTree;
+import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
+import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -105,6 +106,19 @@ public class SysDeptController extends BaseController {
         SysDeptVo sysDeptVo = new SysDeptVo();
         BeanUtils.copyProperties(dept, sysDeptVo);
         return success(sysDeptVo);
+    }
+
+    /**
+     * 部门树
+     *
+     * @return 部门树
+     */
+    @GetMapping("/tree")
+    @PreAuthorize("@ss.hasPermission('system:department:tree')")
+    @Operation(summary = "部门树")
+    public AjaxResult treeDept() {
+        List<DeptTree> deptList = sysDeptService.buildTree();
+        return success(deptList);
     }
 
     /**

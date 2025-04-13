@@ -18,7 +18,7 @@ public class SysDept extends BaseEntity {
      * 部门ID
      */
     @TableId(type = IdType.AUTO)
-    private Integer deptId;
+    private Long deptId;
 
     /**
      * 部门名称
@@ -28,12 +28,12 @@ public class SysDept extends BaseEntity {
     /**
      * 父部门ID
      */
-    private Integer parentId;
+    private Long parentId;
 
     /**
      * 部门负责人
      */
-    private Integer managerId;
+    private Long managerId;
 
     /**
      * 部门描述
