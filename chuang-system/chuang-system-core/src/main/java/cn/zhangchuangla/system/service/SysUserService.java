@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
@@ -21,7 +22,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      * @return 分页数据
      */
-    Page<SysUser> UserList(UserRequest request);
+    Page<SysUserDeptDto> listUser(UserRequest request);
 
 
     /**

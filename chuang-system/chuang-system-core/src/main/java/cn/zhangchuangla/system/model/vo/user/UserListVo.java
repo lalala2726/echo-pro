@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.vo.user;
 
 import cn.zhangchuangla.common.base.BaseVO;
+import cn.zhangchuangla.system.model.entity.SysDept;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -87,4 +88,10 @@ public class UserListVo extends BaseVO {
      */
     @Schema(description = "备注")
     private String remark;
+
+    /**
+     * 部门对象
+     */
+    @Schema(description = "部门对象")
+    private SysDept sysDept;
 }

@@ -25,7 +25,6 @@ spring:
       port: 6379
       database: 0
       password: zhangchuang2726
-
 mybatis-plus:
   #  configuration:
   #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

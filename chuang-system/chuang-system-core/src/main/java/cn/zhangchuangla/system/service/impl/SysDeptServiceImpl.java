@@ -7,6 +7,7 @@ import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.department.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.department.SysDeptRequest;
+import cn.zhangchuangla.system.model.vo.dept.DeptTree;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -128,8 +129,44 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         });
         return removeByIds(ids);
     }
+
+    /**
+     * 构建部门树
+     *
+     * @return 部门树
+     */
+    @Override
+    public List<DeptTree> buildTree() {
+        List<SysDept> deptList = list();
+        return buildDeptTreeRecursive(0L, deptList);
+    }
+
+    /**
+     * 递归构建部门树
+     *
+     * @param parentId 父部门ID
+     * @param allDepts 所有部门列表
+     * @return 部门树列表
+     */
+    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDepts) {
+        return allDepts.stream()
+                .filter(dept -> {
+                    // 处理可能的 null 值情况
+                    Long deptParentId = dept.getParentId();
+                    return deptParentId != null && deptParentId.equals(parentId);
+                })
+                .map(dept -> {
+                    DeptTree node = new DeptTree();
+                    node.setId(dept.getDeptId());
+                    node.setLabel(dept.getDeptName());
+                    // 递归查找子节点
+                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDepts);
+                    if (!children.isEmpty()) {
+                        node.setChildren(children);
+                    }
+                    return node;
+                })
+                .toList();
+    }
+
 }
-
-
-
-

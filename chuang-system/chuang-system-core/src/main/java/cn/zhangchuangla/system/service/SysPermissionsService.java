@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysPermissions;
+import cn.zhangchuangla.system.model.request.permissions.SysPermissionsListRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Set;
@@ -35,4 +37,12 @@ public interface SysPermissionsService extends IService<SysPermissions> {
      * @param userId 用户ID
      */
     void saveUserPermissionsToRedis(Long userId, final long expireTime);
+
+    /**
+     * 获取权限列表
+     *
+     * @param request 请求参数
+     * @return 返回权限列表
+     */
+    Page<SysPermissions> listPermissions(SysPermissionsListRequest request);
 }

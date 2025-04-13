@@ -39,4 +39,6 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 路由列表
      */
     List<RouterVo> buildMenu(List<SysMenu> menus);
+
+    void roleMenuTree(Long roleId);
 }

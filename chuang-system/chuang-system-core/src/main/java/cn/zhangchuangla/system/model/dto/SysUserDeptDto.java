@@ -1,19 +1,20 @@
-package cn.zhangchuangla.common.core.model.entity;
+package cn.zhangchuangla.system.model.dto;
 
 import cn.zhangchuangla.common.base.BaseEntity;
+import cn.zhangchuangla.system.model.entity.SysDept;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_users")
 @Data
-@Schema(name = "用户实体类")
-public class SysUser extends BaseEntity {
+@Schema(name = "用户部门传输类")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class SysUserDeptDto extends BaseEntity {
 
     /**
      * ID
@@ -85,11 +86,10 @@ public class SysUser extends BaseEntity {
 
 
     /**
-     * 是否为超级管理员
+     * 部门对象
      */
-    public boolean isSuperAdmin() {
-        return this.userId == 1L;
-    }
+    @Schema(description = "部门对象")
+    private SysDept sysDept;
 
 
 }

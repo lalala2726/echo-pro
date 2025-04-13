@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo.department;
+package cn.zhangchuangla.system.model.vo.dept;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

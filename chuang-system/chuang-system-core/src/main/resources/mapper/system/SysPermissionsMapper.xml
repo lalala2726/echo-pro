@@ -46,5 +46,9 @@
                  join sys_user_role
         where sys_user_role.user_id = #{userId}
     </select>
+    <select id="listPermissions" resultMap="BaseResultMap">
+        select *
+        from sys_permissions
+    </select>
 
 </mapper>

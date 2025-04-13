@@ -77,6 +77,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return routers;
     }
 
+    @Override
+    public void roleMenuTree(Long roleId) {
+
+    }
+
     /**
      * 递归构建路由
      *
@@ -109,7 +114,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                     .alwaysShow(TYPE_DIR.equals(menu.getMenuType())) // 如果是目录，则总是显示
                     .build();
 
-// 将构建好的MetaVo对象设置到路由中
+            // 将构建好的MetaVo对象设置到路由中
             router.setMeta(meta);
 
 

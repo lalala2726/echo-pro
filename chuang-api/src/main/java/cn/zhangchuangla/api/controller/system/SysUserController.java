@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
@@ -26,6 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,10 +54,15 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
-    @PreAuthorize("@auth.hasPermission('system:user:list')")
-    public TableDataResult getUserListByQuery(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
-        Page<SysUser> userPage = sysUserService.UserList(request);
-        List<UserListVo> userListVos = copyListProperties(userPage, UserListVo.class);
+    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    public TableDataResult listUser(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
+        Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
+        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        userPage.getRecords().forEach(item -> {
+            UserListVo userListVo = new UserListVo();
+            BeanUtils.copyProperties(item, userListVo);
+            userListVos.add(userListVo);
+        });
         return getTableData(userPage, userListVos);
     }
 
@@ -65,7 +72,7 @@ public class SysUserController extends BaseController {
      */
     @PostMapping()
     @Operation(summary = "添加用户")
-    @PreAuthorize("@auth.hasPermission('system:user:add')")
+    @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(name = "添加用户参数", required = true)
                               @Validated @RequestBody AddUserRequest request) {
@@ -80,7 +87,7 @@ public class SysUserController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除用户")
-    @PreAuthorize("@auth.hasPermission('system:user:info')")
+    @PreAuthorize("@ss.hasPermission('system:user:info')")
     @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult deleteUserById(@Parameter(name = "用户ID", required = true)
                                      @PathVariable("ids") List<Long> ids) {
@@ -99,7 +106,7 @@ public class SysUserController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改用户信息")
-    @PreAuthorize("@auth.hasPermission('system:user:update')")
+    @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateUserInfoById(@Parameter(name = "修改用户信息")
                                          @Validated @RequestBody UpdateUserRequest request) {
@@ -124,7 +131,7 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取用户信息")
-    @PreAuthorize("@auth.hasPermission('system:user:info')")
+    @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
                                       @PathVariable("id") Long id) {
         ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
