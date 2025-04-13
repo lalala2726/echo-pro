@@ -77,6 +77,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return routers;
     }
 
+    @Override
+    public void roleMenuTree(Long roleId) {
+
+    }
+
     /**
      * 递归构建路由
      *

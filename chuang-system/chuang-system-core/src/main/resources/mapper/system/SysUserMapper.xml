@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.system.mapper.SysUserMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.model.entity.SysUser">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.dto.SysUserDeptDto">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
@@ -13,6 +13,7 @@
         <result property="gender" column="gender"/>
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
+        <result property="deptId" column="dept_id"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="createBy" column="create_by"/>
@@ -20,36 +21,75 @@
         <result property="isDeleted" column="is_deleted"/>
         <result property="status" column="status"/>
         <result property="remark" column="remark"/>
+        <association property="sysDept" javaType="SysDept" resultMap="deptResult"/>
     </resultMap>
 
+    <resultMap id="deptResult" type="SysDept">
+        <id property="deptId" column="dept_dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="createTime" column="dept_create_time"/>
+        <result property="updateTime" column="dept_update_time"/>
+        <result property="createBy" column="dept_create_by"/>
+        <result property="updateBy" column="dept_update_by"/>
+        <result property="remark" column="dept_remark"/>
+        <result property="managerId" column="manager_id"/>
+        <result property="description" column="description"/>
+    </resultMap>
 
-    <select id="UserList" resultMap="BaseResultMap">
-        select * from sys_users
+    <select id="listUser" resultMap="BaseResultMap">
+        select user.user_id as user_id,
+        user.username as username,
+        user.nick_name as nick_name,
+        user.email as email,
+        user.dept_id as dept_id,
+        user.phone as phone,
+        user.gender as gender,
+        user.avatar as avatar,
+        user.status as status,
+        user.create_time as create_time,
+        user.update_time as update_time,
+        user.create_by as create_by,
+        user.update_by as update_by,
+        user.is_deleted as is_deleted,
+        user.remark as remark,
+        dept.dept_id as dept_dept_id,
+        dept.dept_name as dept_name,
+        dept.parent_id as parent_id,
+        dept.manager_id as manager_id,
+        dept.description as description,
+        dept.create_time as dept_create_time,
+        dept.update_time as dept_update_time,
+        dept.create_by as dept_create_by,
+        dept.update_by as dept_update_by,
+        dept.remark as dept_remark
+        from sys_users user
+        left join sys_dept dept on user.dept_id = dept.dept_id
         <where>
-            <if test="user != null">
-                <if test="user.username != null and user.username != ''">
-                    and username like concat('%', #{user.username}, '%')
+            <if test="request != null">
+                <if test="request.username != null and request.username != ''">
+                    and user.username like concat('%', #{request.username}, '%')
                 </if>
-                <if test="user.nickName != null and user.nickName != ''">
-                    and nick_name like concat('%', #{user.nickName}, '%')
+                <if test="request.nickName != null and request.nickName != ''">
+                    and user.nick_name like concat('%', #{request.nickName}, '%')
                 </if>
-                <if test="user.email != null and user.email != ''">
-                    and email like concat('%', #{user.email}, '%')
+                <if test="request.email != null and request.email != ''">
+                    and user.email like concat('%', #{request.email}, '%')
                 </if>
-                <if test="user.phone != null and user.phone != ''">
-                    and phone like concat('%', #{user.phone}, '%')
+                <if test="request.phone != null and request.phone != ''">
+                    and user.phone like concat('%', #{request.phone}, '%')
                 </if>
-                <if test="user.gender != null">
-                    and gender = #{user.gender}
+                <if test="request.gender != null">
+                    and user.gender = #{request.gender}
                 </if>
-                <if test="user.status != null">
-                    and status = #{user.status}
+                <if test="request.status != null">
+                    and user.status = #{request.status}
                 </if>
-                <if test="user.remark != null and user.remark != ''">
-                    and remark like concat('%', #{user.remark}, '%')
+                <if test="request.remark != null and request.remark != ''">
+                    and user.remark like concat('%', #{request.remark}, '%')
                 </if>
             </if>
-            and is_deleted = 0
+            and user.is_deleted = 0
         </where>
     </select>
     <select id="countOtherUserEmails" resultType="java.lang.Integer">

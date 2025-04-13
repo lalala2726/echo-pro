@@ -59,7 +59,7 @@ public class LoginController extends BaseController {
      * @param request 请求参数
      * @return token
      */
-    @PostMapping()
+    @PostMapping
     @Operation(summary = "登录")
     public AjaxResult login(@Parameter(name = "登录参数", required = true)
                             @Validated @RequestBody LoginRequest loginRequest,
@@ -71,17 +71,6 @@ public class LoginController extends BaseController {
         return success(result);
     }
 
-    /**
-     * 退出登录
-     *
-     * @return 退出结果
-     */
-    @PostMapping("/logout")
-    @Operation(summary = "退出登录")
-    public AjaxResult logout() {
-        boolean result = sysLoginService.logout();
-        return success(result);
-    }
 
 
     /**
@@ -92,7 +81,7 @@ public class LoginController extends BaseController {
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
-        AjaxResult ajax = new AjaxResult();
+        HashMap<String, Object> ajax = new HashMap<>(4);
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
         Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
@@ -102,7 +91,7 @@ public class LoginController extends BaseController {
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
         ajax.put("permissions", permissions);
-        return AjaxResult.success(ajax);
+        return success(ajax);
     }
 
     /**

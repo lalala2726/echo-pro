@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
+import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
@@ -51,9 +52,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @return 分页数据
      */
     @Override
-    public Page<SysUser> UserList(UserRequest request) {
-        Page<SysUser> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysUserMapper.UserList(sysUserPage, request);
+    public Page<SysUserDeptDto> listUser(UserRequest request) {
+        Page<SysUserDeptDto> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysUserMapper.listUser(sysUserPage, request);
     }
 
     /**
@@ -175,11 +176,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public SysUser getUserInfoByUserId(Long userId) {
         ParamsUtils.minValidParam(userId, "用户ID不能为空");
         LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, userId);
-        SysUser one = getOne(sysUserLambdaQueryWrapper);
-        if (one == null) {
+        SysUser user = getOne(sysUserLambdaQueryWrapper);
+        if (user == null) {
             throw new ServiceException(ResponseCode.USER_NOT_EXIST);
         }
-        return one;
+        return user;
     }
 
     /**
