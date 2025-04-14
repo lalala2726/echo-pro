@@ -1,53 +1,56 @@
 package cn.zhangchuangla.system.model.vo.menu;
 
-import cn.zhangchuangla.common.config.jackson.CustomBooleanSerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
- * 路由显示信息
+ * 路由元数据
  *
  * @author zhangchuang
  */
 @Data
-@Builder
-@Schema(description = "路由元数据信息")
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MetaVo {
 
     /**
-     * 设置该路由在侧边栏和面包屑中展示的名字
+     * 菜单标题
      */
-    @Schema(description = "路由标题")
     private String title;
 
     /**
-     * 设置该路由的图标
+     * 菜单图标
      */
-    @Schema(description = "路由图标")
     private String icon;
 
     /**
-     * 是否缓存
+     * 是否缓存（0缓存 1不缓存）
      */
-    @Schema(description = "是否缓存", defaultValue = "false")
-    @JsonSerialize(using = CustomBooleanSerializer.class)
-    private boolean noCache;
+    private Boolean keepAlive;
 
     /**
-     * 是否固定在标签栏
+     * 排序编号
      */
-    @Schema(description = "是否固定在标签栏", defaultValue = "false")
-    @JsonSerialize(using = CustomBooleanSerializer.class)
-    private boolean affix;
+    private Integer rank;
 
     /**
-     * 是否总是显示
+     * 角色列表
      */
-    @Schema(description = "是否总是显示", defaultValue = "false")
-    @JsonSerialize(using = CustomBooleanSerializer.class)
-    private boolean alwaysShow;
+    private List<String> roles;
+
+    /**
+     * 按钮权限列表
+     */
+    private List<String> auths;
+
+    /**
+     * 激活菜单
+     */
+    private String activeMenu;
+
 }

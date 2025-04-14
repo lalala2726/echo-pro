@@ -103,7 +103,7 @@ public class LoginController extends BaseController {
     @Operation(summary = "获取路由信息")
     public AjaxResult getRouters() {
         Long currentUserId = getUserId();
-        List<SysMenu> menus = sysMenuService.getMenuUserId(currentUserId);
+        List<SysMenu> menus = sysMenuService.getMenuByUserId(currentUserId);
         List<RouterVo> routerVos = sysMenuService.buildMenu(menus);
         return success(routerVos);
     }

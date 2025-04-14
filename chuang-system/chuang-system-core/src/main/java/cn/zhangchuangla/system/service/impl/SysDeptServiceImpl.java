@@ -145,11 +145,11 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * 递归构建部门树
      *
      * @param parentId 父部门ID
-     * @param allDepts 所有部门列表
+     * @param allDept 所有部门列表
      * @return 部门树列表
      */
-    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDepts) {
-        return allDepts.stream()
+    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDept) {
+        return allDept.stream()
                 .filter(dept -> {
                     // 处理可能的 null 值情况
                     Long deptParentId = dept.getParentId();
@@ -160,7 +160,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                     node.setId(dept.getDeptId());
                     node.setLabel(dept.getDeptName());
                     // 递归查找子节点
-                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDepts);
+                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDept);
                     if (!children.isEmpty()) {
                         node.setChildren(children);
                     }
