@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.controller;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.property.AppProperty;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppController {
 
     @Resource
-    private AppConfig appConfig;
+    private AppProperty appProperty;
 
 
     /**
@@ -28,15 +28,15 @@ public class AppController {
     @GetMapping("/")
     @Schema(name = "欢迎页")
     public AjaxResult getAppConfig() {
-        String name = appConfig.getName();
-        String version = appConfig.getVersion();
+        String name = appProperty.getName();
+        String version = appProperty.getVersion();
         StringBuffer append = new StringBuffer()
                 .append("欢迎访问:")
                 .append(name)
                 .append("，版本号：")
                 .append(version)
                 .append("，系统描述：")
-                .append(appConfig.getDescription());
+                .append(appProperty.getDescription());
         return AjaxResult.success(append);
     }
 

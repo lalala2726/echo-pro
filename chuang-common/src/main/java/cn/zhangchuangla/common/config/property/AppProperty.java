@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.config;
+package cn.zhangchuangla.common.config.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app.config")
 @Configuration
 @Data
-public class AppConfig {
+public class AppProperty {
 
 
     /**

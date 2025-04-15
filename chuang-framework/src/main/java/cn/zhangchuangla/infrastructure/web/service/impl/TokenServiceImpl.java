@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.web.service.impl;
 
-import cn.zhangchuangla.common.config.TokenConfig;
+import cn.zhangchuangla.common.config.property.SecurityProperties;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
@@ -40,14 +40,14 @@ public class TokenServiceImpl implements TokenService {
     protected static final long MILLIS_SECOND = 1000;
     protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
-    private final TokenConfig tokenConfig;
+    private final SecurityProperties securityProperties;
     private final SecretKey key;
     private final RedisCache redisCache;
 
     @Autowired
-    public TokenServiceImpl(TokenConfig tokenConfig, RedisCache redisCache) {
-        this.tokenConfig = tokenConfig;
-        this.key = Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes(StandardCharsets.UTF_8));// 从配置文件中读取密钥字符串并转换为SecretKey
+    public TokenServiceImpl(SecurityProperties securityProperties, RedisCache redisCache) {
+        this.securityProperties = securityProperties;
+        this.key = Keys.hmacShaKeyFor(securityProperties.getSecret().getBytes(StandardCharsets.UTF_8));// 从配置文件中读取密钥字符串并转换为SecretKey
         this.redisCache = redisCache;
     }
 
@@ -55,7 +55,7 @@ public class TokenServiceImpl implements TokenService {
      * 创建token
      *
      * @param sysUserDetails 用户信息
-     * @param request   请求
+     * @param request        请求
      * @return 返回创建的token
      */
     @Override
@@ -79,7 +79,7 @@ public class TokenServiceImpl implements TokenService {
      * 获取登录设备基本信息
      *
      * @param sysUserDetails 登录用户信息
-     * @param request   请求
+     * @param request        请求
      */
     public void setUserAgent(SysUserDetails sysUserDetails, HttpServletRequest request) {
         String userAgent = UserAgentUtils.getUserAgent(request);
@@ -102,8 +102,9 @@ public class TokenServiceImpl implements TokenService {
      * @param sysUserDetails 登录信息
      */
     public void refreshToken(SysUserDetails sysUserDetails) {
-        Long expire = tokenConfig.getExpire();
+        Long expire = securityProperties.getExpire();
         sysUserDetails.setLoginTime(System.currentTimeMillis());
+        //fixme 待优化，过期时间优化
         sysUserDetails.setExpireTime(sysUserDetails.getLoginTime() + expire * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
         String userKey = getTokenKey(sysUserDetails.getSessionId());
@@ -158,7 +159,7 @@ public class TokenServiceImpl implements TokenService {
     public String refreshToken(String token) {
         Claims claims = parseToken(token);
         claims.setIssuedAt(new Date());
-        claims.setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpire() * 1000));
+        claims.setExpiration(new Date(System.currentTimeMillis() + securityProperties.getExpire() * 1000));
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -318,7 +319,7 @@ public class TokenServiceImpl implements TokenService {
      */
     @Override
     public String getToken(HttpServletRequest request) {
-        String header = tokenConfig.getHeader();
+        String header = securityProperties.getHeader();
         if (StringUtils.isBlank(header)) {
             return null;
         }

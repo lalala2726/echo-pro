@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.loader;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.property.AppProperty;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
@@ -27,13 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SysFileConfigLoader {
 
     private final SysFileConfigService sysFileConfigService;
-    private final AppConfig appConfig;
+    private final AppProperty appProperty;
     private final Map<String, String> sysFileConfigCache = new ConcurrentHashMap<>(4);
 
     @Autowired
-    public SysFileConfigLoader(SysFileConfigService sysFileConfigService, AppConfig appConfig) {
+    public SysFileConfigLoader(SysFileConfigService sysFileConfigService, AppProperty appProperty) {
         this.sysFileConfigService = sysFileConfigService;
-        this.appConfig = appConfig;
+        this.appProperty = appProperty;
     }
 
     /**
@@ -87,7 +87,7 @@ public class SysFileConfigLoader {
      */
     private void autoSetLocalStorage() {
         try {
-            String uploadPath = appConfig.getUploadPath();
+            String uploadPath = appProperty.getUploadPath();
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }

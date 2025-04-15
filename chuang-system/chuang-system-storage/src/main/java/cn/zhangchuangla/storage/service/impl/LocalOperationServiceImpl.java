@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.property.AppProperty;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.component.LocalStorageHandler;
 import cn.zhangchuangla.storage.service.LocalOperationService;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 public class LocalOperationServiceImpl implements LocalOperationService {
 
     private final LocalStorageHandler localStorageComponent;
-    @Resource(name = "appConfig")
-    private AppConfig appConfig;
+    @Resource(name = "appProperty")
+    private AppProperty appProperty;
 
     @Autowired
     public LocalOperationServiceImpl(LocalStorageHandler localStorageComponent) {
@@ -31,10 +31,10 @@ public class LocalOperationServiceImpl implements LocalOperationService {
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
-        String uploadPath = appConfig.getUploadPath();
+        String uploadPath = appProperty.getUploadPath();
         String fileDomain;
         try {
-            fileDomain = appConfig.getFileDomain();
+            fileDomain = appProperty.getFileDomain();
         } catch (NullPointerException e) {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
@@ -50,10 +50,10 @@ public class LocalOperationServiceImpl implements LocalOperationService {
      */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        String uploadPath = appConfig.getUploadPath();
+        String uploadPath = appProperty.getUploadPath();
         String fileDomain;
         try {
-            fileDomain = appConfig.getFileDomain();
+            fileDomain = appProperty.getFileDomain();
         } catch (NullPointerException e) {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
@@ -73,16 +73,16 @@ public class LocalOperationServiceImpl implements LocalOperationService {
         // 决定是否使用回收站
         // 如果强制使用回收站，则无论系统设置如何都使用回收站
         // 否则，根据系统设置决定
-        boolean enableTrash = forceTrash || appConfig.isEnableTrash();
+        boolean enableTrash = forceTrash || appProperty.isEnableTrash();
 
         log.info("删除文件：{}, 强制使用回收站: {}, 系统启用回收站: {}, 最终决定: {}",
                 fileTransferDto.getOriginalName(),
                 forceTrash,
-                appConfig.isEnableTrash(),
+                appProperty.isEnableTrash(),
                 enableTrash ? "移至回收站" : "永久删除");
 
         // 调用LocalStorageComponent的删除方法
-        return localStorageComponent.removeFile(appConfig.getUploadPath(), fileTransferDto, enableTrash);
+        return localStorageComponent.removeFile(appProperty.getUploadPath(), fileTransferDto, enableTrash);
     }
 
     /**
@@ -105,6 +105,6 @@ public class LocalOperationServiceImpl implements LocalOperationService {
     @Override
     public boolean recoverFile(FileTransferDto fileTransferDto) {
         // 调用LocalStorageComponent的恢复方法
-        return localStorageComponent.recoverFile(appConfig.getUploadPath(), fileTransferDto);
+        return localStorageComponent.recoverFile(appProperty.getUploadPath(), fileTransferDto);
     }
 }

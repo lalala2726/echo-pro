@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.config;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.property.AppProperty;
 import cn.zhangchuangla.common.constant.Constants;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class ResourcesConfig implements WebMvcConfigurer {
 
     @Resource
-    private AppConfig appConfig;
+    private AppProperty appProperty;
 
 
     /**
@@ -40,7 +40,7 @@ public class ResourcesConfig implements WebMvcConfigurer {
      */
     private void configureLocalFileAccess(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                .addResourceLocations("file:" + appConfig.getUploadPath() + "/");
+                .addResourceLocations("file:" + appProperty.getUploadPath() + "/");
     }
 
     /**
