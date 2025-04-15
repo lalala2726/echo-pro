@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.model.entity.Option;
-import cn.zhangchuangla.system.model.entity.Menu;
+import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.MenuForm;
 import cn.zhangchuangla.system.model.request.menu.MenuQuery;
 import cn.zhangchuangla.system.model.vo.menu.MenuVO;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author zhangchuang
  */
-public interface SysMenuService extends IService<Menu> {
+public interface SysMenuService extends IService<SysMenu> {
 
 
     /**

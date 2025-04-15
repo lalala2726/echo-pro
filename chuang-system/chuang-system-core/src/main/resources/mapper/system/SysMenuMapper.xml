@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysMenuMapper">
 
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.Menu">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysMenu">
         <id property="id" column="id"/>
         <result property="parentId" column="parent_id"/>
         <result property="treePath" column="tree_path"/>
@@ -27,7 +27,7 @@
     </resultMap>
 
 
-    <select id="getMenusByRoleCodes" resultType="cn.zhangchuangla.system.model.entity.Menu">
+    <select id="getMenusByRoleCodes" resultType="cn.zhangchuangla.system.model.entity.SysMenu">
         select *
         from sys_menu
     </select>

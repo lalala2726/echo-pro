@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.enums;
 
-import cn.zhangchuangla.common.base.IBaseEnum;
+import cn.zhangchuangla.common.base.BaseEnum;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 2022/4/23 9:36
  */
 @Getter
-public enum MenuTypeEnum implements IBaseEnum<Integer> {
+public enum MenuTypeEnum implements BaseEnum<Integer> {
 
     NULL(0, null),
     MENU(1, "菜单"),

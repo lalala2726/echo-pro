@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author haoxr
  * @since 2022/3/27 12:06
  */
-public interface IBaseEnum<T> {
+public interface BaseEnum<T> {
 
     /**
      * 根据值获取枚举
@@ -22,7 +22,7 @@ public interface IBaseEnum<T> {
      * @param <E>   枚举
      * @return
      */
-    static <E extends Enum<E> & IBaseEnum> E getEnumByValue(Object value, Class<E> clazz) {
+    static <E extends Enum<E> & BaseEnum> E getEnumByValue(Object value, Class<E> clazz) {
         Objects.requireNonNull(value);
         EnumSet<E> allEnums = EnumSet.allOf(clazz); // 获取类型下的所有枚举
         E matchEnum = allEnums.stream()
@@ -40,7 +40,7 @@ public interface IBaseEnum<T> {
      * @param <E>
      * @return
      */
-    static <E extends Enum<E> & IBaseEnum> String getLabelByValue(Object value, Class<E> clazz) {
+    static <E extends Enum<E> & BaseEnum> String getLabelByValue(Object value, Class<E> clazz) {
         Objects.requireNonNull(value);
         EnumSet<E> allEnums = EnumSet.allOf(clazz); // 获取类型下的所有枚举
         E matchEnum = allEnums.stream()
@@ -63,7 +63,7 @@ public interface IBaseEnum<T> {
      * @param <E>
      * @return
      */
-    static <E extends Enum<E> & IBaseEnum> Object getValueByLabel(String label, Class<E> clazz) {
+    static <E extends Enum<E> & BaseEnum> Object getValueByLabel(String label, Class<E> clazz) {
         Objects.requireNonNull(label);
         EnumSet<E> allEnums = EnumSet.allOf(clazz); // 获取类型下的所有枚举
         E matchEnum = allEnums.stream()

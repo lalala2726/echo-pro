@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @TableName("sys_menu")
 @Getter
 @Setter
-public class Menu {
+public class SysMenu {
 
     /**
      * 菜单ID
