@@ -4,7 +4,6 @@ package cn.zhangchuangla.infrastructure.config;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.security.filter.JwtAuthenticationTokenFilter;
 import cn.zhangchuangla.infrastructure.security.handel.AuthenticationEntryPointImpl;
-import cn.zhangchuangla.infrastructure.security.handel.LogoutSuccessHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -45,18 +44,25 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
-    private final LogoutSuccessHandlerImpl logoutSuccessHandler;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, LogoutSuccessHandlerImpl logoutSuccessHandler, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
-        this.logoutSuccessHandler = logoutSuccessHandler;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
     }
 
+
+    /**
+     * Spring Security 过滤器链配置
+     * 该方法配置了Spring Security的过滤器链，包括CSRF、会话管理、异常处理和请求授权等。
+     *
+     * @param http HttpSecurity对象
+     * @return SecurityFilterChain对象
+     * @throws Exception 异常
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // 获取所有标记了@Anonymous注解的接口
@@ -92,8 +98,8 @@ public class SecurityConfig {
                 )
                 // 过滤请求
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/logout").permitAll()  // 明确允许登录和注册接口
-                        .requestMatchers("/", "/druid/**").permitAll()  // 允许所有请求，包括根路径和所有子路径
+                        .requestMatchers("/login", "/register").permitAll()  // 明确允许登录和注册接口
+                        .requestMatchers("/", "/druid/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**").permitAll()  // Swagger相关资源
                         // 静态资源允许访问
                         .requestMatchers("/static/**", "/profile/**", "/**.html", "/**.css", "/**.js", "/favicon.ico").permitAll()
@@ -103,8 +109,6 @@ public class SecurityConfig {
                 )
                 // 添加JWT filter
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                // 添加退出登录filter
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
                 .build();
     }
 

@@ -8,6 +8,7 @@ import cn.zhangchuangla.system.model.vo.permissions.SysPermissionsListVo;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import java.util.List;
  * created on 2025/4/11 18:15
  */
 @RequestMapping
+@Tag(name = "权限接口")
 @RestController("/system/permission")
 public class SysPermissionsController extends BaseController {
 
