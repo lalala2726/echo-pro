@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
-import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -260,9 +260,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (userId == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
-        boolean admin = loginUser.getSysUser().isSuperAdmin();
-        Long currentId = loginUser.getUserId();
+        SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
+        boolean admin = sysUserDetails.getSysUser().isSuperAdmin();
+        Long currentId = sysUserDetails.getUserId();
         if (admin || Objects.equals(currentId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
         }

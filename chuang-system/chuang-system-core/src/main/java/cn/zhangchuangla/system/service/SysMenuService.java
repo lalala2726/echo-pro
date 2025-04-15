@@ -1,31 +1,65 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.common.model.entity.Option;
+import cn.zhangchuangla.system.model.entity.Menu;
+import cn.zhangchuangla.system.model.request.menu.MenuForm;
+import cn.zhangchuangla.system.model.request.menu.MenuQuery;
+import cn.zhangchuangla.system.model.vo.menu.MenuVO;
+import cn.zhangchuangla.system.model.vo.menu.RouteVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
 /**
- * 菜单服务接口
- *
  * @author zhangchuang
  */
-public interface SysMenuService extends IService<SysMenu> {
+public interface SysMenuService extends IService<Menu> {
+
 
     /**
-     * 构建菜单
-     *
-     * @param menus 菜单列表
-     * @return 菜单树形结构
+     * 获取菜单表格列表
      */
-    List<RouterVo> buildMenu(List<SysMenu> menus);
+    List<MenuVO> listMenus(MenuQuery queryParams);
 
     /**
-     * 根据用户ID获取菜单
+     * 获取菜单下拉列表
      *
-     * @param userId 用户ID
-     * @return 返回用户的菜单
+     * @param onlyParent 是否只查询父级菜单
      */
-    List<SysMenu> getMenuByUserId(Long userId);
+    List<Option<Long>> listMenuOptions(boolean onlyParent);
+
+    /**
+     * 新增菜单
+     *
+     * @param menuForm 菜单表单对象
+     */
+    boolean saveMenu(MenuForm menuForm);
+
+    /**
+     * 获取路由列表
+     */
+    List<RouteVO> getCurrentUserRoutes();
+
+    /**
+     * 修改菜单显示状态
+     *
+     * @param menuId  菜单ID
+     * @param visible 是否显示(1-显示 0-隐藏)
+     */
+    boolean updateMenuVisible(Long menuId, Integer visible);
+
+    /**
+     * 获取菜单表单数据
+     *
+     * @param id 菜单ID
+     */
+    MenuForm getMenuForm(Long id);
+
+    /**
+     * 删除菜单
+     *
+     * @param id 菜单ID
+     */
+    boolean deleteMenu(Long id);
+
 }

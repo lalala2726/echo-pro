@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.web.service;
 
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public interface TokenService {
 
-    String createToken(LoginUser loginUser, HttpServletRequest request);
+    String createToken(SysUserDetails sysUserDetails, HttpServletRequest request);
 
     /**
      * 从Token中获取用户ID
@@ -24,9 +24,9 @@ public interface TokenService {
     /**
      * 验证Token
      *
-     * @param loginUser 登录用户
+     * @param sysUserDetails 登录用户
      */
-    void validateToken(LoginUser loginUser);
+    void validateToken(SysUserDetails sysUserDetails);
 
     /**
      * 刷新Token
@@ -50,7 +50,7 @@ public interface TokenService {
      * @param request 请求
      * @return 返回登录用户信息
      */
-    LoginUser getLoginUser(HttpServletRequest request);
+    SysUserDetails getLoginUser(HttpServletRequest request);
 
     /**
      * 获取Token

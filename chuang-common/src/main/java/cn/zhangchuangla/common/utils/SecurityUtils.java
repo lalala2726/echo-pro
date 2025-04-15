@@ -1,16 +1,24 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 安全工具类
@@ -25,7 +33,7 @@ public class SecurityUtils {
      *
      * @return LoginUser
      */
-    public static LoginUser getLoginUser() {
+    public static SysUserDetails getLoginUser() {
         try {
             // 检查请求属性中是否有登录异常信息
             HttpServletRequest request = getRequest();
@@ -42,8 +50,8 @@ public class SecurityUtils {
             }
 
             // 判断Principal是否为LoginUser类型
-            if (authentication.getPrincipal() instanceof LoginUser) {
-                return (LoginUser) authentication.getPrincipal();
+            if (authentication.getPrincipal() instanceof SysUserDetails) {
+                return (SysUserDetails) authentication.getPrincipal();
             } else {
                 throw new ServiceException("获取用户信息失败");
             }
@@ -105,5 +113,23 @@ public class SecurityUtils {
      */
     public static boolean isSuperAdmin() {
         return getLoginUser().getSysUser().isSuperAdmin();
+    }
+
+    /**
+     * 获取用户角色集合
+     *
+     * @return 角色集合
+     */
+    public static Set<String> getRoles() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getAuthorities)
+                .filter(CollectionUtil::isNotEmpty)
+                .stream()
+                .flatMap(Collection::stream)
+                .map(GrantedAuthority::getAuthority)
+                // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
+                .filter(authority -> authority.startsWith("ROLE_"))
+                .map(authority -> StrUtil.removePrefix(authority, "ROLE_"))
+                .collect(Collectors.toSet());
     }
 }

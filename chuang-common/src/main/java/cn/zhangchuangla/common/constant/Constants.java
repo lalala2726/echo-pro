@@ -101,4 +101,5 @@ public class Constants {
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
     public static final String NOT_LOGIN = "NOT_LOGIN";
     public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
+    public static final Long ROOT_NODE_ID = 0L;
 }

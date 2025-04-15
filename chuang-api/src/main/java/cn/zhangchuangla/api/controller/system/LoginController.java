@@ -3,16 +3,15 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
-import cn.zhangchuangla.common.core.model.entity.SysUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysLoginService;
 import cn.zhangchuangla.infrastructure.web.service.TokenService;
-import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.menu.RouteVO;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysPermissionsService;
@@ -22,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +40,7 @@ import java.util.Set;
 @Slf4j
 @Tag(name = "登录接口")
 @RequestMapping("/login")
+@RequiredArgsConstructor
 public class LoginController extends BaseController {
 
 
@@ -50,16 +51,6 @@ public class LoginController extends BaseController {
     private final TokenService tokenService;
     private final SysMenuService sysMenuService;
     private final RedisCache redisCache;
-
-    public LoginController(SysLoginService sysLoginService, SysUserService sysUserService, SysRoleService sysRoleService, SysPermissionsService sysPermissionsService, TokenService tokenService, SysMenuService sysMenuService, RedisCache redisCache) {
-        this.sysLoginService = sysLoginService;
-        this.sysUserService = sysUserService;
-        this.sysRoleService = sysRoleService;
-        this.sysPermissionsService = sysPermissionsService;
-        this.tokenService = tokenService;
-        this.sysMenuService = sysMenuService;
-        this.redisCache = redisCache;
-    }
 
 
     /**
@@ -103,18 +94,15 @@ public class LoginController extends BaseController {
     }
 
     /**
-     * 获取路由信息
+     * 获取用户路由
      *
-     * @return 返回路由信息
+     * @return 用户路由
      */
-    @GetMapping("/getRouters")
-    @Operation(summary = "获取路由信息")
-    public AjaxResult getRouters() {
-        Long currentUserId = getUserId();
-        //fixme 路由信息待完善！前端暂时使用静态路由，这边需要使用数据结构完善这个路由信息
-        List<SysMenu> menus = sysMenuService.getMenuByUserId(currentUserId);
-        List<RouterVo> routerVos = sysMenuService.buildMenu(menus);
-        return success(routerVos);
+    @Operation(summary = "菜单路由列表")
+    @GetMapping("/routes")
+    public AjaxResult getCurrentUserRoutes() {
+        List<RouteVO> routeList = sysMenuService.getCurrentUserRoutes();
+        return success(routeList);
     }
 
     /**
@@ -126,10 +114,10 @@ public class LoginController extends BaseController {
     @PostMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout(HttpServletRequest request) {
-        LoginUser loginUser = tokenService.getLoginUser(request);
-        if (StringUtils.isNotNull(loginUser)) {
-            String sessionId = loginUser.getSessionId();
-            Long userId = loginUser.getUserId();
+        SysUserDetails sysUserDetails = tokenService.getLoginUser(request);
+        if (StringUtils.isNotNull(sysUserDetails)) {
+            String sessionId = sysUserDetails.getSessionId();
+            Long userId = sysUserDetails.getUserId();
             //删除用户缓存记录
             redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
             //删除用户权限缓存

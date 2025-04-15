@@ -1,16 +1,20 @@
-package cn.zhangchuangla.common.core.model.entity;
+package cn.zhangchuangla.common.core.security.model;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.zhangchuangla.common.constant.Constants;
-import com.alibaba.fastjson.annotation.JSONField;
+import cn.zhangchuangla.common.constant.SecurityConstants;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Chuang
@@ -18,7 +22,7 @@ import java.util.Objects;
  * created on 2025/2/19 13:50
  */
 @Data
-public class LoginUser implements UserDetails, Serializable {
+public class SysUserDetails implements UserDetails, Serializable {
 
 
     @Serial
@@ -74,18 +78,30 @@ public class LoginUser implements UserDetails, Serializable {
      */
     private String os;
 
-    public LoginUser() {
+
+    /**
+     * 用户角色权限集合
+     */
+    private Collection<SimpleGrantedAuthority> authorities;
+
+    public SysUserDetails() {
+
     }
 
-    public LoginUser(SysUser sysUser) {
+    public SysUserDetails(SysUser sysUser, Set<String> roles) {
         this.sysUser = sysUser;
+        // 初始化角色权限集合
+        this.authorities = CollectionUtil.isNotEmpty(roles)
+                ? roles.stream()
+                // 角色名加上前缀 "ROLE_"，用于区分角色 (ROLE_ADMIN) 和权限 (user:add)
+                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
+                .collect(Collectors.toSet())
+                : Collections.emptySet();
     }
 
-    //此方法不会被序列化
-    @JSONField(serialize = false, deserialize = false)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return this.authorities;
     }
 
     /**

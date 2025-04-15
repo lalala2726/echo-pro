@@ -1,7 +1,7 @@
 package cn.zhangchuangla.infrastructure.security.filter;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.utils.StringUtils;
@@ -45,15 +45,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (StringUtils.isNotBlank(token)) {
             try {
                 // 验证token并获取用户信息
-                LoginUser loginUser = tokenService.getLoginUser(request);
+                SysUserDetails sysUserDetails = tokenService.getLoginUser(request);
 
-                if (loginUser != null) {
+                if (sysUserDetails != null) {
                     // 验证token有效期
-                    tokenService.validateToken(loginUser);
+                    tokenService.validateToken(sysUserDetails);
 
                     // 设置认证信息
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            loginUser, null, loginUser.getAuthorities());
+                            sysUserDetails, null, sysUserDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }

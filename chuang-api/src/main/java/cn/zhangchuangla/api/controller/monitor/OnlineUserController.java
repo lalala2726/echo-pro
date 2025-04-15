@@ -2,9 +2,9 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -58,9 +58,9 @@ public class OnlineUserController extends BaseController {
         Collection<String> keys = redisCache.keys(RedisKeyConstant.LOGIN_TOKEN_KEY + "*");
         ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
         keys.forEach(key -> {
-            LoginUser loginUser = redisCache.getCacheObject(key);
+            SysUserDetails sysUserDetails = redisCache.getCacheObject(key);
             OnlineUser onlineUser = new OnlineUser();
-            BeanUtils.copyProperties(loginUser, onlineUser);
+            BeanUtils.copyProperties(sysUserDetails, onlineUser);
             onlineUsers.add(onlineUser);
         });
         Page<OnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineUsers.size(), onlineUsers);

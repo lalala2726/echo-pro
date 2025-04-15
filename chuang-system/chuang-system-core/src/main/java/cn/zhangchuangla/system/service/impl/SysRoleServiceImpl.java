@@ -2,8 +2,9 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
@@ -81,7 +82,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public Set<String> getUserRoleSetByUserId(Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能为小于等于零");
+        if (userId <= 0) throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
         if (roleListByUserId == null) {
             return null;
@@ -153,6 +154,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(request, sysRole);
         return updateById(sysRole);
+    }
+
+    @Override
+    public void refreshRolePermsCache() {
+        //todo 待开发
     }
 
 }

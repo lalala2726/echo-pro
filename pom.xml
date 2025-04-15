@@ -74,6 +74,8 @@
         <kaptcha.version>2.3.2</kaptcha.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.1.0</version.apache.tika>
+        <cn.hutool.version>5.8.37</cn.hutool.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
     <!-- 项目的依赖列表 -->
@@ -281,6 +283,24 @@
                 <artifactId>chuang-common</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${cn.hutool.version}</version>
+            </dependency>
+
+            <!-- MapStruct 对象映射 -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
             <!-- 框架模块依赖 -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -309,21 +329,36 @@
 
     </dependencyManagement>
 
-    <!-- 项目构建配置 -->
     <build>
         <plugins>
-            <!-- Maven 编译插件配置 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <!-- 编译源文件使用的 Java 版本 -->
                     <source>${java.version}</source>
-                    <!-- 编译目标文件使用的 Java 版本 -->
                     <target>${java.version}</target>
-                    <!-- 编译文件的编码格式 -->
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <!-- Lombok 必须在 MapStruct 之前 -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!-- MapStruct 处理器 -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <!-- lombok-mapstruct-binding 解决 Lombok 与 MapStruct 的兼容性问题 -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

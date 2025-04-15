@@ -1,7 +1,7 @@
 package cn.zhangchuangla.infrastructure.aspect;
 
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.AccessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.TooManyRequestException;
@@ -167,9 +167,9 @@ public class AccessLimitAspect {
             // 用户ID限流模式
             case USER -> {
                 try {
-                    LoginUser loginUser = SecurityUtils.getLoginUser();
+                    SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
                     keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_USER).append(baseKey)
-                            .append(":").append(loginUser.getUserId());
+                            .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 获取用户失败，降级为IP限流
                     String ipAddress = (request != null) ? IPUtils.getClientIp(request) : "non-web";

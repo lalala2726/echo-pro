@@ -4,34 +4,31 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.system.mapper.SysMenuMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysMenu">
-        <id property="menuId" column="menu_id"/>
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.Menu">
+        <id property="id" column="id"/>
         <result property="parentId" column="parent_id"/>
-        <result property="menuName" column="menu_name"/>
-        <result property="path" column="path"/>
+        <result property="treePath" column="tree_path"/>
         <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="routeName" column="route_name"/>
+        <result property="routePath" column="route_path"/>
         <result property="component" column="component"/>
-        <result property="redirect" column="redirect"/>
-        <result property="menuType" column="menu_type"/>
-        <result property="hidden" column="hidden"/>
-        <result property="isFrame" column="is_frame"/>
-        <result property="isCache" column="is_cache"/>
-        <result property="title" column="title"/>
-        <result property="icon" column="icon"/>
-        <result property="sort" column="sort"/>
+        <result property="perm" column="perm"/>
         <result property="alwaysShow" column="always_show"/>
-        <result property="status" column="status"/>
-        <result property="params" column="params"/>
-        <result property="createBy" column="create_by"/>
+        <result property="keepAlive" column="keep_alive"/>
+        <result property="visible" column="visible"/>
+        <result property="sort" column="sort"/>
+        <result property="icon" column="icon"/>
+        <result property="redirect" column="redirect"/>
         <result property="createTime" column="create_time"/>
-        <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
-        <result property="remark" column="remark"/>
+        <result property="params" column="params"/>
     </resultMap>
 
-    <select id="getMenuByUserId" resultMap="BaseResultMap">
+
+    <select id="getMenusByRoleCodes" resultType="cn.zhangchuangla.system.model.entity.Menu">
         select *
         from sys_menu
     </select>
-
 </mapper>

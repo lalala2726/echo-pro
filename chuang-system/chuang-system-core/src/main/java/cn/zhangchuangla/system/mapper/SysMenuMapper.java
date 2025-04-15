@@ -1,22 +1,26 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.entity.Menu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * 菜单Mapper接口
- *
  * @author zhangchuang
  */
-public interface SysMenuMapper extends BaseMapper<SysMenu> {
+public interface SysMenuMapper extends BaseMapper<Menu> {
 
     /**
-     * 根据用户ID查询菜单
+     * 获取菜单路由列表
      *
-     * @param userId 用户ID
-     * @return 菜单列表
+     * @param roleCodes 角色编码集合
      */
-    List<SysMenu> getMenuByUserId(Long userId);
+    //perfect 待完善
+    List<Menu> getMenusByRoleCodes(Set<String> roleCodes);
+
 }
+
+
+
+

@@ -1,8 +1,8 @@
 package cn.zhangchuangla.infrastructure.web.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
@@ -74,19 +74,19 @@ public class SysLoginServiceImpl implements SysLoginService {
             AuthenticationContextHolder.clearContext();
         }
         // 获取用户信息
-        LoginUser loginUser = null;
+        SysUserDetails sysUserDetails = null;
         if (authenticate != null) {
-            loginUser = (LoginUser) authenticate.getPrincipal();
+            sysUserDetails = (SysUserDetails) authenticate.getPrincipal();
         }
         Long userId;
-        if (loginUser != null) {
-            userId = loginUser.getSysUser().getUserId();
-            loginUser.setUserId(userId);
+        if (sysUserDetails != null) {
+            userId = sysUserDetails.getSysUser().getUserId();
+            sysUserDetails.setUserId(userId);
         }
-        log.info("登录用户信息: {}", loginUser);
+        log.info("登录用户信息: {}", sysUserDetails);
         //记录登录成功日志
         sysLoginLogService.recordLoginLog(requestParams.getUsername(), httpServletRequest, Constants.LOGIN_SUCCESS);
-        return tokenService.createToken(loginUser, httpServletRequest);
+        return tokenService.createToken(sysUserDetails, httpServletRequest);
     }
 
     /**

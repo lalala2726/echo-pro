@@ -24,7 +24,7 @@
         <association property="sysDept" javaType="SysDept" resultMap="deptResult"/>
     </resultMap>
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.model.entity.SysUser">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.security.model.SysUser">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>

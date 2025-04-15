@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.web.service.impl;
 
-import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;

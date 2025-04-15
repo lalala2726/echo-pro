@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.model.entity;
+package cn.zhangchuangla.common.core.security.model;
 
 import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;

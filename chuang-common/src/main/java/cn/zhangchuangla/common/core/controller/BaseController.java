@@ -2,8 +2,8 @@ package cn.zhangchuangla.common.core.controller;
 
 import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.page.TableDataResult;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -99,7 +99,7 @@ public class BaseController {
      *
      * @return 当前用户信息
      */
-    protected LoginUser getLoginUser() {
+    protected SysUserDetails getLoginUser() {
         return SecurityUtils.getLoginUser();
     }
 

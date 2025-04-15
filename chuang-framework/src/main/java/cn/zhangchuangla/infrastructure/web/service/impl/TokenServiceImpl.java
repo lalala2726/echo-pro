@@ -3,8 +3,8 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 import cn.zhangchuangla.common.config.TokenConfig;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.utils.IPUtils;
@@ -54,20 +54,20 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 创建token
      *
-     * @param loginUser 用户信息
+     * @param sysUserDetails 用户信息
      * @param request   请求
      * @return 返回创建的token
      */
     @Override
-    public String createToken(LoginUser loginUser, HttpServletRequest request) {
+    public String createToken(SysUserDetails sysUserDetails, HttpServletRequest request) {
         // 开始生成 token 并将用户信息存储在 Redis 中
         String uuid = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
-        loginUser.setSessionId(uuid);
+        sysUserDetails.setSessionId(uuid);
         claims.put(Constants.LOGIN_USER_KEY, uuid);
-        setUserAgent(loginUser, request);
+        setUserAgent(sysUserDetails, request);
         // 将用户信息存储到 Redis 中
-        refreshToken(loginUser);
+        refreshToken(sysUserDetails);
         // 返回 Token
         return Jwts.builder()
                 .setClaims(claims)
@@ -78,37 +78,37 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 获取登录设备基本信息
      *
-     * @param loginUser 登录用户信息
+     * @param sysUserDetails 登录用户信息
      * @param request   请求
      */
-    public void setUserAgent(LoginUser loginUser, HttpServletRequest request) {
+    public void setUserAgent(SysUserDetails sysUserDetails, HttpServletRequest request) {
         String userAgent = UserAgentUtils.getUserAgent(request);
         if (StringUtils.isNotBlank(userAgent)) {
             String browserName = UserAgentUtils.getBrowserName(userAgent);
-            loginUser.setBrowser(browserName);
-            loginUser.setOs(UserAgentUtils.getOsName(userAgent));
+            sysUserDetails.setBrowser(browserName);
+            sysUserDetails.setOs(UserAgentUtils.getOsName(userAgent));
         }
         String clientIp = IPUtils.getClientIp(request);
         if (StringUtils.isNotBlank(clientIp)) {
             String addressByIp = IPUtils.getAddressByIp(clientIp);
-            loginUser.setIp(clientIp);
-            loginUser.setAddress(addressByIp);
+            sysUserDetails.setIp(clientIp);
+            sysUserDetails.setAddress(addressByIp);
         }
     }
 
     /**
      * 如果是新会话时候将用户基本信息存入到Redis中,如果是旧会话就重新刷新Token
      *
-     * @param loginUser 登录信息
+     * @param sysUserDetails 登录信息
      */
-    public void refreshToken(LoginUser loginUser) {
+    public void refreshToken(SysUserDetails sysUserDetails) {
         Long expire = tokenConfig.getExpire();
-        loginUser.setLoginTime(System.currentTimeMillis());
-        loginUser.setExpireTime(loginUser.getLoginTime() + expire * MILLIS_MINUTE);
+        sysUserDetails.setLoginTime(System.currentTimeMillis());
+        sysUserDetails.setExpireTime(sysUserDetails.getLoginTime() + expire * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
-        String userKey = getTokenKey(loginUser.getSessionId());
+        String userKey = getTokenKey(sysUserDetails.getSessionId());
         // 将登录用户信息缓存到 Redis 中
-        redisCache.setCacheObject(userKey, loginUser, expire, TimeUnit.MINUTES);
+        redisCache.setCacheObject(userKey, sysUserDetails, expire, TimeUnit.MINUTES);
     }
 
     /**
@@ -136,14 +136,14 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 验证Token
      *
-     * @param loginUser 登录用户
+     * @param sysUserDetails 登录用户
      */
     @Override
-    public void validateToken(LoginUser loginUser) {
-        long expireTime = loginUser.getExpireTime();
+    public void validateToken(SysUserDetails sysUserDetails) {
+        long expireTime = sysUserDetails.getExpireTime();
         long currentTime = System.currentTimeMillis();
         if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
-            refreshToken(loginUser);
+            refreshToken(sysUserDetails);
         }
 
     }
@@ -238,7 +238,7 @@ public class TokenServiceImpl implements TokenService {
      * @return 登录用户信息
      */
     @Override
-    public LoginUser getLoginUser(HttpServletRequest request) {
+    public SysUserDetails getLoginUser(HttpServletRequest request) {
         String token = getToken(request);
         if (StringUtils.isBlank(token)) {
             return null;
@@ -272,7 +272,7 @@ public class TokenServiceImpl implements TokenService {
      * @param sessionId 会话ID
      * @return 返回登录用户信息
      */
-    private LoginUser getLoginUserByToken(String sessionId) {
+    private SysUserDetails getLoginUserByToken(String sessionId) {
         try {
             String redisKey = RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId;
             Object cacheObject = redisCache.getCacheObject(redisKey);
@@ -282,14 +282,14 @@ public class TokenServiceImpl implements TokenService {
                 throw new LoginException(ResponseCode.TOKEN_EXPIRED, "会话已过期，请重新登录");
             }
 
-            LoginUser loginUser = null;
+            SysUserDetails sysUserDetails = null;
             // 处理可能的类型转换问题
-            if (cacheObject instanceof LoginUser) {
-                loginUser = (LoginUser) cacheObject;
+            if (cacheObject instanceof SysUserDetails) {
+                sysUserDetails = (SysUserDetails) cacheObject;
             } else {
                 try {
                     // 如果不是LoginUser类型但有值，尝试使用FastJson2进行转换
-                    loginUser = com.alibaba.fastjson2.JSON.to(LoginUser.class, cacheObject);
+                    sysUserDetails = com.alibaba.fastjson2.JSON.to(SysUserDetails.class, cacheObject);
                 } catch (Exception e) {
                     log.error("用户对象转换失败: {}, 类型: {}", e.getMessage(), cacheObject.getClass().getName(), e);
                     throw new LoginException(ResponseCode.USER_NOT_LOGIN, "用户数据异常");
@@ -297,10 +297,10 @@ public class TokenServiceImpl implements TokenService {
             }
 
             // 再次检查转换后的对象是否有效
-            if (loginUser == null) {
+            if (sysUserDetails == null) {
                 throw new LoginException(ResponseCode.USER_NOT_LOGIN, "用户数据为空");
             }
-            return loginUser;
+            return sysUserDetails;
         } catch (LoginException le) {
             // 用户未登录或会话过期的异常直接抛出
             throw le;
