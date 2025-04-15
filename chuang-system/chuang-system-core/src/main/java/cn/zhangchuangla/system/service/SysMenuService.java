@@ -2,10 +2,10 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.MenuForm;
-import cn.zhangchuangla.system.model.request.menu.MenuQuery;
-import cn.zhangchuangla.system.model.vo.menu.MenuVO;
-import cn.zhangchuangla.system.model.vo.menu.RouteVO;
+import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.MenuQueryRequest;
+import cn.zhangchuangla.system.model.vo.menu.MenuVo;
+import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 获取菜单表格列表
      */
-    List<MenuVO> listMenus(MenuQuery queryParams);
+    List<MenuVo> listMenus(MenuQueryRequest queryParams);
 
     /**
      * 获取菜单下拉列表
@@ -31,14 +31,14 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 新增菜单
      *
-     * @param menuForm 菜单表单对象
+     * @param menuAddRequest 菜单表单对象
      */
-    boolean saveMenu(MenuForm menuForm);
+    boolean saveMenu(MenuAddRequest menuAddRequest);
 
     /**
      * 获取路由列表
      */
-    List<RouteVO> getCurrentUserRoutes();
+    List<RouteVo> getCurrentUserRoutes();
 
     /**
      * 修改菜单显示状态
@@ -53,7 +53,7 @@ public interface SysMenuService extends IService<SysMenu> {
      *
      * @param id 菜单ID
      */
-    MenuForm getMenuForm(Long id);
+    MenuAddRequest getMenuForm(Long id);
 
     /**
      * 删除菜单

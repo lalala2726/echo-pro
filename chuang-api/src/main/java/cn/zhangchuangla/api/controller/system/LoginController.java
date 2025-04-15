@@ -11,7 +11,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysLoginService;
 import cn.zhangchuangla.infrastructure.web.service.TokenService;
-import cn.zhangchuangla.system.model.vo.menu.RouteVO;
+import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysPermissionsService;
@@ -101,7 +101,7 @@ public class LoginController extends BaseController {
     @Operation(summary = "菜单路由列表")
     @GetMapping("/routes")
     public AjaxResult getCurrentUserRoutes() {
-        List<RouteVO> routeList = sysMenuService.getCurrentUserRoutes();
+        List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
         return success(routeList);
     }
 

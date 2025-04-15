@@ -11,11 +11,17 @@ import lombok.Data;
  */
 @Schema(description = "菜单查询对象")
 @Data
-public class MenuQuery {
+public class MenuQueryRequest {
 
+    /**
+     * 关键字(菜单名称)
+     */
     @Schema(description = "关键字(菜单名称)")
     private String keywords;
 
+    /**
+     * 状态(1->显示；0->隐藏)
+     */
     @Schema(description = "状态(1->显示；0->隐藏)")
     private Integer status;
 
