@@ -120,7 +120,7 @@ public class OperationLogAspect {
             HttpServletRequest request = ServletUtils.getRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
-            sysOperationLog.setOperationIp(IPUtils.getClientIp(request));
+            sysOperationLog.setOperationIp(IPUtils.getIpAddr(request));
             sysOperationLog.setRequestMethod(request.getMethod());
 
             // 计算方法执行耗时

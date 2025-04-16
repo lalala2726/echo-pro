@@ -104,4 +104,13 @@ public class SecurityUtils {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         return request.getHeader(HttpHeaders.AUTHORIZATION);
     }
+
+    /**
+     * 获取当前请求的Request
+     *
+     * @return request
+     */
+    public static HttpServletRequest getHttpServletRequest() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+    }
 }

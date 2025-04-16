@@ -11,6 +11,10 @@ import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.utils.IPUtils;
+import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.common.utils.UserAgentUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,7 +66,7 @@ public class RedisTokenManager implements TokenManager {
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toSet()))
                 .build();
-
+        setClientInfo(onlineUser);
         // 存储访问令牌、刷新令牌和刷新令牌映射
         storeTokensInRedis(accessToken, refreshToken, onlineUser);
 
@@ -74,6 +78,26 @@ public class RedisTokenManager implements TokenManager {
                 .refreshToken(refreshToken)
                 .expiresIn(securityProperties.getSession().getAccessTokenExpireTime())
                 .build();
+    }
+
+    private void setClientInfo(OnlineLoginUser onlineUser) {
+        //从Security中获取当前request
+        HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
+        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+        String osName = UserAgentUtils.getOsName(userAgent);
+        String browserName = UserAgentUtils.getBrowserName(userAgent);
+        String deviceManufacturer = UserAgentUtils.getDeviceManufacturer(userAgent);
+
+        //设置基本的信息
+        String region = IPUtils.getRegion(ipAddr);
+        onlineUser.setIP(ipAddr);
+        onlineUser.setRegion(region);
+        onlineUser.setOs(osName);
+        onlineUser.setBrowser(browserName);
+        onlineUser.setDevice(deviceManufacturer);
+        onlineUser.setLoginTime(System.currentTimeMillis());
+        onlineUser.setUserAgent(userAgent);
     }
 
     /**

@@ -76,6 +76,8 @@
         <version.apache.tika>2.1.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <!-- IP 地区转换 -->
+        <ip2region.version>2.7.0</ip2region.version>
     </properties>
 
     <!-- 项目的依赖列表 -->
@@ -181,6 +183,13 @@
                 <groupId>com.qcloud</groupId>
                 <artifactId>cos_api</artifactId>
                 <version>${tencent.cos.version}</version>
+            </dependency>
+
+            <!-- IP 转省市区 -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
 
             <!-- ===================== API 文档 (Knife4j) ===================== -->

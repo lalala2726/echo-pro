@@ -68,7 +68,7 @@ public class AccessLimitHelper {
     public boolean checkWithIp(String key, int maxCount, int period) {
         try {
             HttpServletRequest request = ServletUtils.getRequest();
-            String ip = IPUtils.getClientIp(request);
+            String ip = IPUtils.getIpAddr(request);
             String redisKey = RedisKeyConstant.ACCESS_LIMIT_IP + key + ":" + ip;
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {

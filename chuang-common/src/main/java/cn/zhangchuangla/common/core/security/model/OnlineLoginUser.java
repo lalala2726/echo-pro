@@ -20,6 +20,7 @@ import java.util.Set;
 @Builder
 public class OnlineLoginUser {
 
+
     /**
      * 用户ID
      */
@@ -39,5 +40,42 @@ public class OnlineLoginUser {
      * 角色权限集合
      */
     private Set<String> roles;
+
+
+    /**
+     * 登录IP地址
+     */
+    private String IP;
+
+    /**
+     * 登录地点
+     */
+    private String region;
+
+    /**
+     * 登录时间
+     */
+    private Long loginTime;
+
+    /**
+     * userAgent
+     */
+    private String userAgent;
+
+    /**
+     * 设备信息
+     */
+    private String device;
+
+    /**
+     * 过期时间
+     */
+    private String os;
+
+    /**
+     * 浏览器信息
+     */
+    private String browser;
+
 
 }

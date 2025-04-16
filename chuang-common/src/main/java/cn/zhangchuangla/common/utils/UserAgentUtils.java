@@ -30,7 +30,7 @@ public class UserAgentUtils {
      * @return User-Agent 字符串
      */
     public static String getUserAgent(HttpServletRequest request) {
-        return IPUtils.getUserAgent(request);
+        return request.getHeader("User-Agent");
     }
 
     /**
