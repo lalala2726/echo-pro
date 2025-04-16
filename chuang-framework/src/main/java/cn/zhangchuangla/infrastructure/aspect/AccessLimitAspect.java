@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.aspect;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.AccessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -162,29 +162,29 @@ public class AccessLimitAspect {
             // IP限流模式
             case IP -> {
                 String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
             // 用户ID限流模式
             case USER -> {
                 try {
                     SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_USER).append(baseKey)
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_USER).append(baseKey)
                             .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 获取用户失败，降级为IP限流
                     String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
                     log.debug("获取用户信息失败，降级为IP限流: {}", ipAddress);
                 }
             }
             // 自定义参数限流模式
             case CUSTOM -> {
                 String uri = (request != null) ? request.getRequestURI() : "non-web";
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
             }
             default -> {
                 String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
         }
 

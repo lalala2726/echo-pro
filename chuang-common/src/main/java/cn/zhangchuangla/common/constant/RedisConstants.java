@@ -9,6 +9,26 @@ package cn.zhangchuangla.common.constant;
 public interface RedisConstants {
 
     /**
+     * 接口访问限流前缀
+     */
+    String ACCESS_LIMIT_PREFIX = "access_limit:";
+
+    /**
+     * IP限流前缀
+     */
+    String ACCESS_LIMIT_IP = ACCESS_LIMIT_PREFIX + "ip:";
+
+    /**
+     * 用户ID限流前缀
+     */
+    String ACCESS_LIMIT_USER = ACCESS_LIMIT_PREFIX + "user:";
+
+    /**
+     * 自定义限流前缀
+     */
+    String ACCESS_LIMIT_CUSTOM = ACCESS_LIMIT_PREFIX + "custom:";
+
+    /**
      * 认证模块
      */
     interface Auth {

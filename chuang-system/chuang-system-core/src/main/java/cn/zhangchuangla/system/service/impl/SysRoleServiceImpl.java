@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
@@ -65,13 +64,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public List<SysRole> getRoleListByUserId(Long userId) {
-        List<SysRole> cacheRoleCache = redisCache.getCacheObject(RedisKeyConstant.USER_ROLE + userId);
-        if (cacheRoleCache != null) {
-            return cacheRoleCache;
-        }
-        List<SysRole> roleListByUserId = sysRoleMapper.getRoleListByUserId(userId);
-        redisCache.setCacheObject(RedisKeyConstant.USER_ROLE + userId, roleListByUserId);
-        return roleListByUserId;
+        return sysRoleMapper.getRoleListByUserId(userId);
     }
 
     /**

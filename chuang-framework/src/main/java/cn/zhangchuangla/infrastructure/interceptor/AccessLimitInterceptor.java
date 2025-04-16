@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.interceptor;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.AccessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -143,31 +143,31 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             // IP限流模式
             case IP -> {
                 String ipAddress = IPUtils.getIpAddr(request);
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
             // 用户ID限流模式
             case USER -> {
                 // 尝试获取当前登录用户
                 try {
                     SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_USER).append(baseKey)
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_USER).append(baseKey)
                             .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 未登录用户，默认降级为IP限流
                     String ipAddress = IPUtils.getIpAddr(request);
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
                     log.debug("用户未登录，降级为IP限流: {}", ipAddress);
                 }
             }
             // 自定义参数限流模式（此处使用URI作为自定义参数）
             case CUSTOM -> {
                 String uri = request.getRequestURI();
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
             }
             default -> {
                 // 默认采用IP限流
                 String ipAddress = IPUtils.getIpAddr(request);
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
         }
 

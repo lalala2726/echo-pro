@@ -53,7 +53,6 @@ public class SysUserController extends BaseController {
      *
      * @return 用户信息
      */
-    //fixme 移动到用户中心
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
