@@ -17,9 +17,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +35,10 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/monitor/online")
 @Tag(name = "在线用户管理")
+@RequiredArgsConstructor
 public class OnlineUserController extends BaseController {
 
     private final RedisCache redisCache;
-
-    @Autowired
-    public OnlineUserController(RedisCache redisCache) {
-        this.redisCache = redisCache;
-    }
 
 
     /**

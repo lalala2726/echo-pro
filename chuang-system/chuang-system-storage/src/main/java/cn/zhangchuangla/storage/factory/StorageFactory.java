@@ -6,8 +6,8 @@ import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import cn.zhangchuangla.storage.service.MinioOperationService;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class StorageFactory {
 
     private final AliyunOssOperationService aliyunOssOperationService;
@@ -27,17 +28,6 @@ public class StorageFactory {
     private final MinioOperationService minioOperationService;
     private final LocalOperationService localOperationService;
 
-    @Autowired
-    public StorageFactory(
-            AliyunOssOperationService aliyunOssOperationService,
-            TencentCOSOperationService tencentCOSOperationService,
-            MinioOperationService minioOperationService,
-            LocalOperationService localOperationService) {
-        this.aliyunOssOperationService = aliyunOssOperationService;
-        this.tencentCOSOperationService = tencentCOSOperationService;
-        this.minioOperationService = minioOperationService;
-        this.localOperationService = localOperationService;
-    }
 
     /**
      * 根据存储类型获取存储服务

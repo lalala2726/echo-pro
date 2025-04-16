@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -13,8 +12,8 @@ import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,18 +26,11 @@ import java.util.stream.Collectors;
  * @author zhangchuang
  */
 @Service
+@RequiredArgsConstructor
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         implements SysRoleService {
 
     private final SysRoleMapper sysRoleMapper;
-
-    private final RedisCache redisCache;
-
-    @Autowired
-    public SysRoleServiceImpl(SysRoleMapper sysRoleMapper, RedisCache redisCache) {
-        this.sysRoleMapper = sysRoleMapper;
-        this.redisCache = redisCache;
-    }
 
 
     /**

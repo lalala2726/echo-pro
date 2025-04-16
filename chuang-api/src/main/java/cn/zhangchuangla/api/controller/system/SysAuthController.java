@@ -1,16 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
-import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysPermissionsService;
-import cn.zhangchuangla.system.service.SysRoleService;
-import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author Chuang
@@ -36,11 +28,6 @@ public class SysAuthController extends BaseController {
 
 
     private final SysAuthService sysAuthService;
-    private final SysUserService sysUserService;
-    private final SysRoleService sysRoleService;
-    private final SysPermissionsService sysPermissionsService;
-    private final SysMenuService sysMenuService;
-    private final RedisCache redisCache;
 
 
     /**
@@ -71,19 +58,6 @@ public class SysAuthController extends BaseController {
                                    @RequestParam String refreshToken) {
         AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
         return success(newAuthenticationToken);
-    }
-
-
-    /**
-     * 获取用户路由
-     *
-     * @return 用户路由
-     */
-    @Operation(summary = "菜单路由列表")
-    @GetMapping("/routes")
-    public AjaxResult getCurrentUserRoutes() {
-        List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
-        return success(routeList);
     }
 
     /**

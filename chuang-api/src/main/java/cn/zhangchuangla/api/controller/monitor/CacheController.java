@@ -2,11 +2,10 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,17 +25,13 @@ import java.util.stream.Collectors;
  * created on 2025/3/20 09:55
  */
 @RestController
-@Anonymous
 @RequestMapping("/monitor/cache")
 @Tag(name = "缓存监控")
+@RequiredArgsConstructor
 public class CacheController extends BaseController {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    public CacheController(RedisTemplate<String, String> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 
     /**
      * 获取 Redis 基本信息

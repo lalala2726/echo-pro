@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/captcha")
 @Tag(name = "验证码相关")
+
 public class CaptchaController extends BaseController {
 
 

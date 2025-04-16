@@ -12,8 +12,8 @@ import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,15 +24,12 @@ import java.util.List;
  * @author zhangchuang
  */
 @Service
+@RequiredArgsConstructor
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         implements SysDeptService {
 
     private final SysDeptMapper sysDeptMapper;
 
-    @Autowired
-    public SysDeptServiceImpl(SysDeptMapper sysDeptMapper) {
-        this.sysDeptMapper = sysDeptMapper;
-    }
 
     /**
      * 部门列表

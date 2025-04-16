@@ -12,6 +12,7 @@ import cn.zhangchuangla.storage.service.SysFileManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +30,12 @@ import java.util.List;
 @Tag(name = "文件资源管理")
 @RestController
 @RequestMapping("/file/manage")
+@RequiredArgsConstructor
 public class SysFileManageController extends BaseController {
 
 
     private final SysFileManagementService sysFileManagementService;
 
-    public SysFileManageController(SysFileManagementService sysFileManagementService) {
-        this.sysFileManagementService = sysFileManagementService;
-    }
 
     /**
      * 文件资源列表

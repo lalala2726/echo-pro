@@ -5,8 +5,8 @@ import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.component.LocalStorageHandler;
 import cn.zhangchuangla.storage.service.LocalOperationService;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,16 +18,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class LocalOperationServiceImpl implements LocalOperationService {
 
     private final LocalStorageHandler localStorageComponent;
     @Resource(name = "appProperty")
     private AppProperty appProperty;
-
-    @Autowired
-    public LocalOperationServiceImpl(LocalStorageHandler localStorageComponent) {
-        this.localStorageComponent = localStorageComponent;
-    }
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {

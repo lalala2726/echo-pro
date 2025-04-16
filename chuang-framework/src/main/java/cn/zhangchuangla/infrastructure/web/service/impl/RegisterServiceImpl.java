@@ -7,24 +7,18 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.infrastructure.model.request.RegisterRequest;
 import cn.zhangchuangla.infrastructure.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
 
     private final BCryptPasswordEncoder passwordEncoder;
-
     private final SysUserService sysUserService;
-
-    @Autowired
-    public RegisterServiceImpl(BCryptPasswordEncoder passwordEncoder, SysUserService sysUserService) {
-        this.passwordEncoder = passwordEncoder;
-        this.sysUserService = sysUserService;
-    }
 
     /**
      * 注册用户

@@ -18,6 +18,7 @@ import cn.zhangchuangla.storage.service.SysFileConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,17 +34,12 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/system/file/config")
 @Tag(name = "文件配置")
+@RequiredArgsConstructor
 public class SysFileConfigController extends BaseController {
 
 
     private final SysFileConfigService sysFileConfigService;
-
     private final SysFileConfigLoader sysFileConfigLoader;
-
-    public SysFileConfigController(SysFileConfigService sysFileConfigService, SysFileConfigLoader sysFileConfigLoader) {
-        this.sysFileConfigService = sysFileConfigService;
-        this.sysFileConfigLoader = sysFileConfigLoader;
-    }
 
 
     /**

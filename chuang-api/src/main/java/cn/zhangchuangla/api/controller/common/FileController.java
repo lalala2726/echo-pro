@@ -13,8 +13,8 @@ import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.SysFileManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,18 +33,13 @@ import java.io.IOException;
 @RestController
 @Tag(name = "文件相关")
 @Slf4j
+@RequiredArgsConstructor
 public class FileController extends BaseController {
 
     private final SysFileConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
     private final SysFileManagementService sysFileManagementService;
 
-    @Autowired
-    public FileController(SysFileConfigLoader sysFileConfigLoader, StorageFactory storageFactory, SysFileManagementService sysFileManagementService) {
-        this.sysFileConfigLoader = sysFileConfigLoader;
-        this.storageFactory = storageFactory;
-        this.sysFileManagementService = sysFileManagementService;
-    }
 
     /**
      * 智能文件上传

@@ -11,9 +11,9 @@ import cn.zhangchuangla.system.service.DictionaryDataService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,15 +25,12 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper, DictionaryData>
         implements DictionaryDataService {
 
     private final DictionaryDataMapper dictionaryDataMapper;
 
-    @Autowired
-    public DictionaryDataServiceImpl(DictionaryDataMapper dictionaryDataMapper) {
-        this.dictionaryDataMapper = dictionaryDataMapper;
-    }
 
     /**
      * 根据字典编码和字典项键查询字典项是否存在

@@ -15,8 +15,8 @@ import cn.zhangchuangla.system.service.SysPostService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,14 +31,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/post")
 @Tag(name = "岗位管理")
+@RequiredArgsConstructor
 public class SysPostController extends BaseController {
 
     private final SysPostService sysPostService;
 
-    @Autowired
-    public SysPostController(SysPostService sysPostService) {
-        this.sysPostService = sysPostService;
-    }
 
     /**
      * 岗位列表
