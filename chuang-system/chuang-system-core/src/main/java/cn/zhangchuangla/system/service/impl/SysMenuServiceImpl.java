@@ -84,7 +84,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 递归生成菜单列表
      *
-     * @param parentId 父级ID
+     * @param parentId    父级ID
      * @param sysMenuList 菜单列表
      * @return 菜单列表
      */
@@ -117,7 +117,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 递归生成菜单下拉层级列表
      *
-     * @param parentId 父级ID
+     * @param parentId    父级ID
      * @param sysMenuList 菜单列表
      * @return 菜单下拉列表
      */
@@ -166,7 +166,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 递归生成菜单路由层级列表
      *
-     * @param parentId 父级ID
+     * @param parentId    父级ID
      * @param sysMenuList 菜单列表
      * @return 路由层级列表
      */

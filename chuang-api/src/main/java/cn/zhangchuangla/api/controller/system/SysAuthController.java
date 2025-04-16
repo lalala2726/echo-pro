@@ -1,16 +1,12 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
-import cn.zhangchuangla.infrastructure.web.service.TokenService;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
@@ -48,7 +44,6 @@ public class SysAuthController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final SysPermissionsService sysPermissionsService;
-    private final TokenService tokenService;
     private final SysMenuService sysMenuService;
     private final RedisCache redisCache;
 
@@ -120,22 +115,13 @@ public class SysAuthController extends BaseController {
     /**
      * 退出登录
      *
-     * @param request 请求对象
      * @return 操作结果
      */
     @PostMapping("/logout")
     @Operation(summary = "退出登录")
-    public AjaxResult logout(HttpServletRequest request) {
-        SysUserDetails sysUserDetails = tokenService.getLoginUser(request);
-        if (StringUtils.isNotNull(sysUserDetails)) {
-            String sessionId = sysUserDetails.getSessionId();
-            Long userId = sysUserDetails.getUserId();
-            //删除用户缓存记录
-            redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
-            //删除用户权限缓存
-            redisCache.deleteObject(RedisKeyConstant.PASSWORD_ERROR_COUNT + userId);
-        }
-        return success("退出登录成功！");
+    public AjaxResult logout() {
+        sysAuthService.logout();
+        return success();
     }
 
 

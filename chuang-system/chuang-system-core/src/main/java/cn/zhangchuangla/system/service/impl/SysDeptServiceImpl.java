@@ -145,7 +145,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * 递归构建部门树
      *
      * @param parentId 父部门ID
-     * @param allDept 所有部门列表
+     * @param allDept  所有部门列表
      * @return 部门树列表
      */
     private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDept) {
