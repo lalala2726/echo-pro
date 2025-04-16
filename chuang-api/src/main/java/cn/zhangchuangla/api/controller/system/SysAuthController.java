@@ -3,12 +3,10 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
-import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
@@ -19,13 +17,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Chuang
@@ -78,27 +73,6 @@ public class SysAuthController extends BaseController {
         return success(newAuthenticationToken);
     }
 
-    /**
-     * 获取用户信息
-     *
-     * @return 用户信息
-     */
-    //fixme 移动到用户中心
-    @GetMapping("/getUserInfo")
-    @Operation(summary = "获取用户信息")
-    public AjaxResult getInfo() {
-        HashMap<String, Object> ajax = new HashMap<>(4);
-        Long userId = getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysPermissionsService.getPermissionsByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        ajax.put("user", userInfoVo);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        return success(ajax);
-    }
 
     /**
      * 获取用户路由

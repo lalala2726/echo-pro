@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.security.context.PermissionContextHolder;
 import cn.zhangchuangla.system.service.SysPermissionsService;
-import cn.zhangchuangla.system.service.SysRoleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +24,10 @@ import java.util.Set;
  */
 @Slf4j
 @Service("ss")
+@RequiredArgsConstructor
 public class PermissionAuth {
 
     private final SysPermissionsService sysPermissionsService;
-    private final SysRoleService sysRoleService;
-
-    public PermissionAuth(SysPermissionsService sysPermissionsService, SysRoleService sysRoleService) {
-        this.sysPermissionsService = sysPermissionsService;
-        this.sysRoleService = sysRoleService;
-    }
 
     /**
      * 判断当前用户是否拥有指定的权限
@@ -49,7 +44,8 @@ public class PermissionAuth {
             log.warn("未找到登录用户信息，无法进行权限校验");
             return false;
         }
-        Set<String> permissions = sysPermissionsService.getPermissionsByUserId(sysUserDetails.getUserId());
+        Set<String> roles = SecurityUtils.getRoles();
+        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
         PermissionContextHolder.setContext(permission);
         log.info("用户 [{}] 权限校验: 权限标识 [{}]，用户权限：{}", sysUserDetails.getUsername(), permission, permissions);
         return isAllow(permissions, permission);
@@ -95,7 +91,7 @@ public class PermissionAuth {
             log.warn("未找到登录用户信息，无法进行角色校验");
             return false;
         }
-        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(sysUserDetails.getUserId());
+        Set<String> roleSet = SecurityUtils.getRoles();
         boolean hasRole = roleSet.contains(role);
         log.debug("用户 [{}] 角色校验 [{}]，匹配结果：{}", sysUserDetails.getUsername(), role, hasRole);
         return hasRole;
@@ -129,7 +125,7 @@ public class PermissionAuth {
      */
     private boolean isSuperAdmin() {
         Set<String> roles = SecurityUtils.getRoles();
-        return roles.contains(SysRolesConstant.ADMIN);
+        return roles.contains(SysRolesConstant.SUPER_ADMIN);
     }
 
     /**

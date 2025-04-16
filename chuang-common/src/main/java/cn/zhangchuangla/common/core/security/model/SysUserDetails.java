@@ -99,6 +99,7 @@ public class SysUserDetails implements UserDetails, Serializable {
         this.deptId = sysUser.getDeptId();
         this.username = sysUser.getUsername();
         // 初始化角色权限集合
+        // 初始化角色权限集合
         this.authorities = CollectionUtil.isNotEmpty(roles)
                 ? roles.stream()
                 // 角色名加上前缀 "ROLE_"，用于区分角色 (ROLE_ADMIN) 和权限 (user:add)

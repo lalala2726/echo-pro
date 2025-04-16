@@ -15,20 +15,23 @@ import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
+import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户管理控制器
@@ -37,16 +40,36 @@ import java.util.List;
 @RestController
 @Anonymous
 @RequestMapping("/system/user")
+@RequiredArgsConstructor
 public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
+    private final SysPermissionsService sysPermissionsService;
 
-    @Autowired
-    public SysUserController(SysUserService sysUserService, SysRoleService sysRoleService) {
-        this.sysUserService = sysUserService;
-        this.sysRoleService = sysRoleService;
+
+    /**
+     * 获取用户信息
+     *
+     * @return 用户信息
+     */
+    //fixme 移动到用户中心
+    @GetMapping("/getUserInfo")
+    @Operation(summary = "获取用户信息")
+    public AjaxResult getInfo() {
+        HashMap<String, Object> ajax = new HashMap<>(4);
+        Long userId = getUserId();
+        SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
+        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
+        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(sysUser, userInfoVo);
+        ajax.put("user", userInfoVo);
+        ajax.put("roles", roles);
+        ajax.put("permissions", permissions);
+        return success(ajax);
     }
+
 
     /**
      * 获取用户列表

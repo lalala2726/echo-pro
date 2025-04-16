@@ -1,10 +1,11 @@
 package cn.zhangchuangla.api.controller.monitor;
 
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -55,10 +56,11 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public TableDataResult onlineUserList(OnlineUserListRequest request) {
-        Collection<String> keys = redisCache.keys(RedisKeyConstant.LOGIN_TOKEN_KEY + "*");
+        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
+        Collection<String> keys = redisCache.keys(replace);
         ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
         keys.forEach(key -> {
-            SysUserDetails sysUserDetails = redisCache.getCacheObject(key);
+            OnlineLoginUser sysUserDetails = redisCache.getCacheObject(key);
             OnlineUser onlineUser = new OnlineUser();
             BeanUtils.copyProperties(sysUserDetails, onlineUser);
             onlineUsers.add(onlineUser);
