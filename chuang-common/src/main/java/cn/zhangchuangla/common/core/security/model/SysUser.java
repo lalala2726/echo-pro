@@ -91,5 +91,4 @@ public class SysUser extends BaseEntity {
         return this.userId == 1L;
     }
 
-
 }

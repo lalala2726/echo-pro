@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
@@ -16,7 +16,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +34,7 @@ import java.util.List;
 public class SysPostController extends BaseController {
 
     private final SysPostService sysPostService;
+    private final SysRoleConverter sysRoleConverter;
 
 
     /**
@@ -46,7 +46,7 @@ public class SysPostController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
-    public TableDataResult listPost(SysPostListRequest request) {
+    public AjaxResult listPost(SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
@@ -110,8 +110,7 @@ public class SysPostController extends BaseController {
     public AjaxResult getPostById(@PathVariable("id") Integer id) {
         checkParam(id == null, "id不能为空");
         SysPost post = sysPostService.getPostById(id);
-        SysPostVo sysPostVo = new SysPostVo();
-        BeanUtils.copyProperties(post, sysPostVo);
+        SysPostVo sysPostVo = sysRoleConverter.toSysPostVo(post);
         return AjaxResult.success(sysPostVo);
     }
 }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.system.model.entity.DictionaryData;
+import cn.zhangchuangla.system.model.entity.SysDictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.UpdateDictionaryDataRequest;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author chuang
  */
-public interface DictionaryDataService extends IService<DictionaryData> {
+public interface SysDictionaryDataService extends IService<SysDictionaryData> {
 
     /**
      * 根据字典编码和字典项键查询字典项是否存在
@@ -39,7 +39,7 @@ public interface DictionaryDataService extends IService<DictionaryData> {
      * @param dictionaryName 字典名称
      * @return 字典值列表
      */
-    List<DictionaryData> getDictionaryDataByIdDictName(String dictionaryName);
+    List<SysDictionaryData> getDictionaryDataByIdDictName(String dictionaryName);
 
     /**
      * 添加字典项
@@ -55,7 +55,7 @@ public interface DictionaryDataService extends IService<DictionaryData> {
      * @param id 字典项id
      * @return 字典项
      */
-    DictionaryData getDictionaryById(Long id);
+    SysDictionaryData getDictionaryById(Long id);
 
     /**
      * 更新字典项
@@ -78,5 +78,5 @@ public interface DictionaryDataService extends IService<DictionaryData> {
      * @param id 字典ID
      * @return 返回获取的字典项
      */
-    Page<DictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request);
+    Page<SysDictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request);
 }

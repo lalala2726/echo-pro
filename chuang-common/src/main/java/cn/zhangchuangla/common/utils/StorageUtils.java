@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.hutool.core.util.IdUtil;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.FileException;
@@ -81,7 +82,7 @@ public class StorageUtils {
     public static String generateFilePath(String fileName) {
         String datePath = StorageUtils.generateYearMonthDir();
         String fileExtension = StorageUtils.getFileExtension(fileName);
-        String uuid = UUIDUtils.simpleUUID();
+        String uuid = IdUtil.simpleUUID();
         return buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
     }
 
@@ -94,7 +95,7 @@ public class StorageUtils {
     public static String generateOriginalImagePath(String fileName) {
         String datePath = StorageUtils.generateYearMonthDir();
         String fileExtension = StorageUtils.getFileExtension(fileName);
-        String uuid = UUIDUtils.simpleUUID();
+        String uuid = IdUtil.simpleUUID();
         String fileName1 = uuid + fileExtension;
         String originalDir = buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_ORIGINAL_FOLDER);
@@ -218,7 +219,7 @@ public class StorageUtils {
     public static String generateCompressedImagePath(String fileName) {
         String datePath = generateYearMonthDir();
         String fileExtension = getFileExtension(fileName);
-        String uuid = UUIDUtils.simpleUUID();
+        String uuid = IdUtil.simpleUUID();
         String fileName1 = uuid + fileExtension;
         String compressedDir = buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_PREVIEW_FOLDER);

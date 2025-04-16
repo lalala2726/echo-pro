@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.system.converter.SysPostConverter;
 import cn.zhangchuangla.system.mapper.SysPostMapper;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
@@ -11,7 +12,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +27,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
         implements SysPostService {
 
     private final SysPostMapper sysPostMapper;
+    private final SysPostConverter sysPostConverter;
 
 
     /**
@@ -55,8 +56,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
         if (isPostCodeExist(request.getPostCode())) {
             throw new ServiceException("岗位编码已存在");
         }
-        SysPost sysPost = new SysPost();
-        BeanUtils.copyProperties(request, sysPost);
+        SysPost sysPost = sysPostConverter.toEntity(request);
         return save(sysPost);
     }
 
@@ -90,8 +90,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      */
     @Override
     public boolean editPost(SysPostUpdateRequest request) {
-        SysPost sysPost = new SysPost();
-        BeanUtils.copyProperties(request, sysPost);
+        SysPost sysPost = sysPostConverter.toEntity(request);
         return updateById(sysPost);
     }
 

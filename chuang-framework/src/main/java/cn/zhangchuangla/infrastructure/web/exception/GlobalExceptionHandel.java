@@ -32,7 +32,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(ServiceException.class)
     public AjaxResult serviceExceptionHandel(ServiceException exception) {
-        log.error("业务异常：{}", exception.toString());
+        log.error("业务异常", exception);
         return AjaxResult.error(exception.getMessage());
     }
 

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.DictionaryDataMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictionaryDataMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.DictionaryData">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictionaryData">
         <id property="id" column="id"/>
         <result property="dictionaryId" column="dictionary_id"/>
         <result property="dataKey" column="data_key"/>
@@ -44,7 +44,7 @@
             </if>
         </trim>
         where dictionary_id = (
-        select id from dictionary where name = #{dictName}
+        select id from sysDictionary where name = #{dictName}
         )
     </update>
 
@@ -63,13 +63,13 @@
                dictionary_data.update_by,
                dictionary_data.remark
         from dictionary_data
-                 join dictionary d on d.id = dictionary_data.dictionary_id
+                 join sysDictionary d on d.id = dictionary_data.dictionary_id
         where d.name = #{dictionaryName}
     </select>
     <select id="getDictDataByDictionaryName" resultMap="BaseResultMap">
         select *
         from sys_dictionary_data
-        join dictionary on dictionary_data.dictionary_id = dictionary.id
+        join sysDictionary on dictionary_data.dictionary_id = sysDictionary.id
         where dictionary_data.dictionary_id = #{dictionaryId}
         <where>
             <if test="request.dataKey != null and request.dataKey != ''">

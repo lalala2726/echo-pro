@@ -16,9 +16,8 @@ public class SecurityConstants {
      * 接口白名单
      */
     public static final String[] WHITELIST = {
-            "/auth/**",
-            "/logout/**",
-            "/captcha/**",
+            "/auth/login",
+            "/captcha ",
             "/register"
     };
 

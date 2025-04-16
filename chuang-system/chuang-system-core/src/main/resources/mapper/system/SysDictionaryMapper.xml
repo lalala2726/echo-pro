@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.DictionaryMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictionaryMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.Dictionary">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictionary">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="status" column="status"/>

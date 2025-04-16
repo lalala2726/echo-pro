@@ -6,11 +6,13 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,7 +20,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
+    private final SysUserConverter sysUserConverter;
 
 
     /**
@@ -63,8 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (request == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR);
         }
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
+        SysUser sysUser = sysUserConverter.toEntity(request);
         if (!save(sysUser)) {
             return -1L;
         }
@@ -210,8 +211,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
         //修改用户信息
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
+        SysUser sysUser = sysUserConverter.toEntity(request);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().
                 eq(SysUser::getUserId, request.getUserId());
         update(sysUser, eq);
@@ -261,6 +261,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (admin || Objects.equals(currentId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
         }
+    }
+
+    /**
+     * 获取用户个人中心信息
+     *
+     * @return 用户个人中心信息
+     */
+    @Override
+    public UserProfileVo getUserProfile() {
+        Long currentUserId = SecurityUtils.getUserId();
+        SysUser user = getUserInfoByUserId(currentUserId);
+        UserProfileVo userProfileVo = sysUserConverter.toUserProfileVo(user);
+        log.info("获取用户信息:{}", user);
+        userProfileVo.setDeptName("开发部门");
+        return userProfileVo;
     }
 }
 

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.system.mapper.SysUserRoleMapper;
@@ -8,6 +7,7 @@ import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,16 +18,12 @@ import java.util.List;
  * @author zhangchuang
  */
 @Service
+@RequiredArgsConstructor
 public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUserRole>
         implements SysUserRoleService {
 
     private final SysUserRoleMapper sysUserRoleMapper;
-    private final RedisCache redisCache;
 
-    public SysUserRoleServiceImpl(SysUserRoleMapper sysUserRoleMapper, RedisCache redisCache) {
-        this.sysUserRoleMapper = sysUserRoleMapper;
-        this.redisCache = redisCache;
-    }
 
     /**
      * 根据用户id获取用户角色

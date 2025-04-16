@@ -10,7 +10,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.system.model.entity.OnlineUser;
+import cn.zhangchuangla.system.model.entity.SysOnlineUser;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,14 +53,14 @@ public class OnlineUserController extends BaseController {
     public TableDataResult onlineUserList(OnlineUserListRequest request) {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
-        ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
+        ArrayList<SysOnlineUser> sysOnlineUsers = new ArrayList<>();
         keys.forEach(key -> {
             OnlineLoginUser sysUserDetails = redisCache.getCacheObject(key);
-            OnlineUser onlineUser = new OnlineUser();
-            BeanUtils.copyProperties(sysUserDetails, onlineUser);
-            onlineUsers.add(onlineUser);
+            SysOnlineUser sysOnlineUser = new SysOnlineUser();
+            BeanUtils.copyProperties(sysUserDetails, sysOnlineUser);
+            sysOnlineUsers.add(sysOnlineUser);
         });
-        Page<OnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineUsers.size(), onlineUsers);
+        Page<SysOnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), sysOnlineUsers.size(), sysOnlineUsers);
         return getTableData(page);
     }
 

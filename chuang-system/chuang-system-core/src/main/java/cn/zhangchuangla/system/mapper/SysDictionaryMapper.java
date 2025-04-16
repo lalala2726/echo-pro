@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.system.model.entity.Dictionary;
+import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * @author zhangchuang
  */
-public interface DictionaryMapper extends BaseMapper<Dictionary> {
+public interface SysDictionaryMapper extends BaseMapper<SysDictionary> {
 
     /**
      * 分页查询字典
@@ -18,7 +18,7 @@ public interface DictionaryMapper extends BaseMapper<Dictionary> {
      * @param request        请求参数
      * @return 返回字典分页数据
      */
-    Page<Dictionary> getDictionaryList(Page<Dictionary> dictionaryPage, @Param("request") DictionaryRequest request);
+    Page<SysDictionary> getDictionaryList(Page<SysDictionary> dictionaryPage, @Param("request") DictionaryRequest request);
 
     /**
      * 根据id查询字典数量,排除当前id

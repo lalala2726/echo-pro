@@ -2,23 +2,22 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.system.model.entity.Dictionary;
+import cn.zhangchuangla.system.converter.SysDictionaryConverter;
+import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.UpdateDictionaryRequest;
 import cn.zhangchuangla.system.model.vo.dictionary.DictionaryListVo;
 import cn.zhangchuangla.system.model.vo.dictionary.DictionaryVo;
-import cn.zhangchuangla.system.service.DictionaryService;
+import cn.zhangchuangla.system.service.SysDictionaryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +37,8 @@ import java.util.List;
 public class SysDictionaryController extends BaseController {
 
 
-    private final DictionaryService dictionaryService;
+    private final SysDictionaryService sysDictionaryService;
+    private final SysDictionaryConverter sysDictionaryConverter;
 
 
     /**
@@ -49,8 +49,8 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dictionary:list')")
-    public TableDataResult list(@Validated DictionaryRequest request) {
-        Page<Dictionary> list = dictionaryService.getDictionaryList(request);
+    public AjaxResult list(@Validated DictionaryRequest request) {
+        Page<SysDictionary> list = sysDictionaryService.getDictionaryList(request);
         List<DictionaryListVo> dictionaryListVos = copyListProperties(list, DictionaryListVo.class);
         return getTableData(list, dictionaryListVos);
     }
@@ -66,7 +66,7 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dictionary:add')")
     @OperationLog(title = "字典管理", businessType = BusinessType.INSERT)
     public AjaxResult addDictionary(@Validated @RequestBody AddDictionaryRequest request) {
-        dictionaryService.addDictionary(request);
+        sysDictionaryService.addDictionary(request);
         return success(SystemMessageConstant.ADD_SUCCESS);
     }
 
@@ -81,9 +81,8 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dictionary:info')")
     public AjaxResult getDictionaryById(@PathVariable("id") Long id) {
         checkParam(id == null || id > 0, "字典ID不能小于等于零!");
-        Dictionary dictionary = dictionaryService.getDictionaryById(id);
-        DictionaryVo dictionaryVo = new DictionaryVo();
-        BeanUtils.copyProperties(dictionary, dictionaryVo);
+        SysDictionary sysDictionary = sysDictionaryService.getDictionaryById(id);
+        DictionaryVo dictionaryVo = sysDictionaryConverter.toDictionaryVo(sysDictionary);
         return success(dictionaryVo);
     }
 
@@ -98,7 +97,7 @@ public class SysDictionaryController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dictionary:update')")
     @OperationLog(title = "字典管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDictionary(@Validated @RequestBody UpdateDictionaryRequest request) {
-        return toAjax(dictionaryService.updateDictionaryById(request));
+        return toAjax(sysDictionaryService.updateDictionaryById(request));
     }
 
     /**
@@ -115,7 +114,7 @@ public class SysDictionaryController extends BaseController {
         ids.forEach(id -> {
             checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         });
-        dictionaryService.deleteDictionary(ids);
+        sysDictionaryService.deleteDictionary(ids);
         return success();
     }
 

@@ -1,13 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
@@ -15,7 +13,7 @@ import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
-import cn.zhangchuangla.system.service.SysPermissionsService;
+import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,29 +21,25 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 用户管理控制器
  */
 @Tag(name = "用户管理接口")
 @RestController
-@Anonymous
 @RequestMapping("/system/user")
 @RequiredArgsConstructor
 public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
-    private final SysPermissionsService sysPermissionsService;
+    private final SysUserConverter sysUserConverter;
 
 
     /**
@@ -53,22 +47,12 @@ public class SysUserController extends BaseController {
      *
      * @return 用户信息
      */
-    @GetMapping("/getUserInfo")
+    @GetMapping("/profile")
     @Operation(summary = "获取用户信息")
-    public AjaxResult getInfo() {
-        HashMap<String, Object> ajax = new HashMap<>(4);
-        Long userId = getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        ajax.put("user", userInfoVo);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        return success(ajax);
+    public AjaxResult userProfile() {
+        UserProfileVo profileVo = sysUserService.getUserProfile();
+        return success(profileVo);
     }
-
 
     /**
      * 获取用户列表
@@ -77,12 +61,11 @@ public class SysUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
-    public TableDataResult listUser(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
+    public AjaxResult listUser(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(item -> {
-            UserListVo userListVo = new UserListVo();
-            BeanUtils.copyProperties(item, userListVo);
+            UserListVo userListVo = sysUserConverter.toUserListVo(item);
             userListVos.add(userListVo);
         });
         return getTableData(userPage, userListVos);
@@ -156,13 +139,12 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
                                       @PathVariable("id") Long id) {
-        ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
+        if (id == null || id <= 0) return error("用户ID不能小于等于0");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         List<SysRole> roleList = sysRoleService.getRoleListByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
+        UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         userInfoVo.setRoles(roleList);
-        BeanUtils.copyProperties(sysUser, userInfoVo);
         return success();
     }
 
