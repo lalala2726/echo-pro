@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -33,14 +34,11 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, SysFileConfig>
         implements SysFileConfigService {
 
     private final SysFileConfigMapper sysFileConfigMapper;
-
-    public SysFileConfigServiceImpl(SysFileConfigMapper sysFileConfigMapper) {
-        this.sysFileConfigMapper = sysFileConfigMapper;
-    }
 
     /**
      * 查询文件配置列表

@@ -41,6 +41,7 @@ public class SysFileConfigLoader {
 
         SysFileConfig config = sysFileConfigService.getMasterConfig();
         if (config == null) {
+            //未找到主要配置，自动降级为本地存储
             log.error("没有找到主要配置，自动设置为本地存储");
             autoSetLocalStorage();
             return;

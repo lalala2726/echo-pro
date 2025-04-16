@@ -6,11 +6,13 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -38,6 +40,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
+    private final SysUserConverter sysUserConverter;
 
 
     /**
@@ -261,6 +264,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (admin || Objects.equals(currentId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
         }
+    }
+
+    /**
+     * 获取用户个人中心信息
+     *
+     * @return 用户个人中心信息
+     */
+    @Override
+    public UserProfileVo getUserProfile() {
+        Long currentUserId = SecurityUtils.getUserId();
+        SysUser user = getUserInfoByUserId(currentUserId);
+        UserProfileVo userProfileVo = sysUserConverter.toUserProfileVo(user);
+        log.info("获取用户信息:{}", user);
+        userProfileVo.setDeptName("开发部门");
+        return userProfileVo;
     }
 }
 

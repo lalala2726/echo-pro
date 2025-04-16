@@ -18,7 +18,7 @@
         <result property="remark" column="remark"/>
     </resultMap>
     <update id="updateDictionaryDataByDictName"
-            parameterType="cn.zhangchuangla.system.model.vo.sysDictionary.DictionaryDataListVo">
+            parameterType="cn.zhangchuangla.system.model.vo.dictionary.DictionaryDataListVo">
         update sys_dictionary_data
         <trim prefix="SET" suffixOverrides=",">
             <if test="request.dataKey != null and request.dataKey != ''">

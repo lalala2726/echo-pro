@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -13,6 +12,7 @@ import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
+import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -49,10 +49,8 @@ public class SysUserController extends BaseController {
     @GetMapping("/profile")
     @Operation(summary = "获取用户信息")
     public AjaxResult userProfile() {
-        Long currentUserId = SecurityUtils.getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(currentUserId);
-
-        return success();
+        UserProfileVo profileVo = sysUserService.getUserProfile();
+        return success(profileVo);
     }
 
     /**
