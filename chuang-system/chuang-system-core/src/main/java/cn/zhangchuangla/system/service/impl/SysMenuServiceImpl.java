@@ -151,7 +151,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         }
         List<SysMenu> sysMenuList;
         // 超级管理员获取所有菜单
-        if (SecurityUtils.isSuperAdmin()) {
+        if (SecurityUtils.isAdmin()) {
             log.info("当前用户是超级管理员，允许所有菜单信息:{}", roleCodes);
             sysMenuList = this.list(new LambdaQueryWrapper<SysMenu>()
                     .ne(SysMenu::getType, MenuTypeEnum.BUTTON.getValue())

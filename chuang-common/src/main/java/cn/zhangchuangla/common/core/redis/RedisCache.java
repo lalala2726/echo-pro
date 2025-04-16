@@ -1,7 +1,6 @@
 package cn.zhangchuangla.common.core.redis;
 
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
@@ -49,7 +48,7 @@ public class RedisCache {
      * @param timeout  时间
      * @param timeUnit 时间颗粒度
      */
-    public <T> void setCacheObject(final String key, final T value, final Long timeout, final TimeUnit timeUnit) {
+    public <T> void setCacheObject(final String key, final T value, final int timeout, final TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
 
@@ -60,7 +59,7 @@ public class RedisCache {
      * @param value   value
      * @param timeout 超时时间（秒）
      */
-    public <T> void setCacheObject(final String key, final T value, final Long timeout) {
+    public <T> void setCacheObject(final String key, final T value, final int timeout) {
         redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 
@@ -241,7 +240,7 @@ public class RedisCache {
      * @return true=存在；false=不存在
      */
     public boolean hasKey(String key) {
-        return redisTemplate.hasKey(RedisKeyConstant.LOGIN_TOKEN_KEY + key);
+        return redisTemplate.hasKey(key);
     }
 
     /**

@@ -15,7 +15,15 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "security")
 public class SecurityProperties {
 
+    /**
+     * 密码管理配置
+     */
     public PasswordConfig passwordConfig;
+
+    /**
+     * 会话管理配置
+     */
+    public SessionConfig session;
 
 
     /**
@@ -31,7 +39,7 @@ public class SecurityProperties {
     /**
      * 过期时间
      */
-    private Long expire;
+    private Integer expire;
 
 
     @Data
@@ -41,14 +49,40 @@ public class SecurityProperties {
          * 最大尝试次数，-1不限制
          */
         @Min(-1)
-        private long maxRetryCount;
+        private Integer maxRetryCount = 3;
 
         /**
          * 锁定时间
          */
         @Min(60)
-        private long lockTime;
+        private Integer lockTime = 120;
+    }
+
+    @Data
+    public static class SessionConfig {
+
+        /**
+         * 访问令牌有效期（单位：秒）
+         * 默认值：7200秒（2小时）
+         */
+        @Min(-1)
+        private Integer accessTokenExpireTime = 7200;
+
+        /**
+         * 刷新令牌有效期（单位：秒）
+         * 默认值：2592000秒（30天）
+         */
+        @Min(-1)
+        private Integer refreshTokenExpireTime = 2592000;
+
+        /**
+         * 是否允许多设备同时登录
+         * <p>true - 允许同一账户多设备登录（默认）</p>
+         * <p>false - 新登录会使旧令牌失效</p>
+         */
+        private Boolean singleLogin = true;
 
     }
+
 
 }

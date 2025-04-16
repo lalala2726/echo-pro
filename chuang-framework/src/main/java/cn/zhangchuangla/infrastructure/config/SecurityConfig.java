@@ -1,11 +1,13 @@
 package cn.zhangchuangla.infrastructure.config;
 
 
+import cn.zhangchuangla.common.constant.SecurityConstants;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
-import cn.zhangchuangla.infrastructure.security.filter.JwtAuthenticationTokenFilter;
+import cn.zhangchuangla.infrastructure.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.infrastructure.security.handel.AuthenticationEntryPointImpl;
+import cn.zhangchuangla.infrastructure.security.token.TokenManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -39,20 +41,13 @@ import java.util.Set;
 @Slf4j
 @Configuration
 @EnableMethodSecurity()
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, RequestMappingHandlerMapping requestMappingHandlerMapping) {
-        this.userDetailsService = userDetailsService;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-    }
+    private final TokenManager tokenManager;
 
 
     /**
@@ -84,31 +79,33 @@ public class SecurityConfig {
         }
 
         return http
-                // 禁用 CSRF
-                .csrf(AbstractHttpConfigurer::disable)
-                // 禁用HTTP响应标头
-                .headers(headers -> headers
-                        .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 // 基于token，所以不需要session
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // 禁用HTTP响应标头
+                .headers(headers -> headers
+                        .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
+                .csrf(AbstractHttpConfigurer::disable)      // 禁用 CSRF 防护，前后端分离无需此防护机制
+                .formLogin(AbstractHttpConfigurer::disable) // 禁用默认的表单登录功能，前后端分离采用 Token 认证方式
+                .httpBasic(AbstractHttpConfigurer::disable) // 禁用 HTTP Basic 认证，避免弹窗式登录
                 // 过滤请求
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register").permitAll()  // 明确允许登录和注册接口
-                        .requestMatchers("/", "/druid/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**").permitAll()  // Swagger相关资源
+                        // 明确允许登录和注册接口
+                        .requestMatchers(SecurityConstants.WHITELIST).permitAll()
+                        // Swagger相关资源
+                        .requestMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
                         // 静态资源允许访问
-                        .requestMatchers("/static/**", "/profile/**", "/**.html", "/**.css", "/**.js", "/favicon.ico").permitAll()
+                        .requestMatchers(SecurityConstants.STATIC_RESOURCES_WHITELIST).permitAll()
                         // 添加自定义匿名访问的URL
                         .requestMatchers(anonymousUrls.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()  // 其他请求需要认证
                 )
                 // 添加JWT filter
-                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenAuthenticationFilter(tokenManager), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

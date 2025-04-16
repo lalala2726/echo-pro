@@ -46,3 +46,7 @@ security:
   password-config:
     lock-time: 3
     max-retry-count: 5
+  session:
+    access-token-expire-time: 7200
+    refresh-token-expire-time: 2592000
+    single-login: true

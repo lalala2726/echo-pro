@@ -44,6 +44,11 @@ public class SysUserDetails implements UserDetails, Serializable {
     private String username;
 
     /**
+     * 部门ID
+     */
+    private Long deptId;
+
+    /**
      * 登录IP地址
      */
     private String ip;
@@ -90,6 +95,9 @@ public class SysUserDetails implements UserDetails, Serializable {
 
     public SysUserDetails(SysUser sysUser, Set<String> roles) {
         this.sysUser = sysUser;
+        this.userId = sysUser.getUserId();
+        this.deptId = sysUser.getDeptId();
+        this.username = sysUser.getUsername();
         // 初始化角色权限集合
         this.authorities = CollectionUtil.isNotEmpty(roles)
                 ? roles.stream()
@@ -121,7 +129,7 @@ public class SysUserDetails implements UserDetails, Serializable {
      */
     @Override
     public String getUsername() {
-        return sysUser.getUsername();
+        return username;
     }
 
     /**

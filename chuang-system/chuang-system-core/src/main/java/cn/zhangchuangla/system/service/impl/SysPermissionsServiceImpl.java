@@ -31,7 +31,7 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
         implements SysPermissionsService {
 
     // 权限过期时间，单位天
-    private final static long permissionExpireTime = 15;
+    private final static int permissionExpireTime = 15;
     private final SysPermissionsMapper sysPermissionsMapper;
     private final RedisCache redisCache;
 
@@ -67,7 +67,7 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
     @Override
     public Set<String> getPermissionsByUserId(Long id) {
         //如果是管理员将拥有全部权限
-        if (SecurityUtils.isSuperAdmin()) {
+        if (SecurityUtils.isAdmin()) {
             return Set.of("*.*.*");
         }
         //优先从Redis中获取权限信息，如果没有，则从数据库中获取并将权限信息缓存到Redis中
@@ -93,7 +93,7 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
      * @param expireTime 过期时间,单位天
      */
     @Override
-    public void saveUserPermissionsToRedis(Long userId, long expireTime) {
+    public void saveUserPermissionsToRedis(Long userId, int expireTime) {
         try {
             Set<String> permissions = getPermissionsByUserId(userId);
             UserPermissions userPermissions = new UserPermissions();

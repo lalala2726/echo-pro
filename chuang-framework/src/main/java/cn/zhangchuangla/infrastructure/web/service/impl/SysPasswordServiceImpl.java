@@ -48,7 +48,8 @@ public class SysPasswordServiceImpl implements SysPasswordService {
             throw new AccountException(ResponseCode.ACCOUNT_LOCKED, "账号已被锁定,请在" + keyExpire + "秒后重新尝试");
         }
 
-        redisCache.setCacheObject(key, ++retryCount, securityProperties.getPasswordConfig().getLockTime(), TimeUnit.MINUTES);
+        Integer lockTime = securityProperties.getPasswordConfig().getLockTime();
+        redisCache.setCacheObject(key, ++retryCount, lockTime, TimeUnit.MINUTES);
     }
 
 }

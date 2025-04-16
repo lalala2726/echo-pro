@@ -2,7 +2,6 @@ package cn.zhangchuangla.infrastructure.security.component;
 
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
@@ -11,7 +10,6 @@ import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
@@ -120,9 +118,8 @@ public class PermissionAuth {
      * @return true - 是管理员，false - 不是管理员
      */
     private boolean isAdmin() {
-        Long userId = SecurityUtils.getUserId();
-        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(userId);
-        return !CollectionUtils.isEmpty(roleSet) && roleSet.contains(SysRolesConstant.ADMIN);
+        Set<String> roles = SecurityUtils.getRoles();
+        return roles.contains(SysRolesConstant.ADMIN);
     }
 
     /**
@@ -131,8 +128,8 @@ public class PermissionAuth {
      * @return true - 是超级管理员，false - 不是超级管理员
      */
     private boolean isSuperAdmin() {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        return sysUser.isSuperAdmin();
+        Set<String> roles = SecurityUtils.getRoles();
+        return roles.contains(SysRolesConstant.ADMIN);
     }
 
     /**

@@ -102,7 +102,7 @@ public class TokenServiceImpl implements TokenService {
      * @param sysUserDetails 登录信息
      */
     public void refreshToken(SysUserDetails sysUserDetails) {
-        Long expire = securityProperties.getExpire();
+        Integer expire = securityProperties.getExpire();
         sysUserDetails.setLoginTime(System.currentTimeMillis());
         //fixme 待优化，过期时间优化
         sysUserDetails.setExpireTime(sysUserDetails.getLoginTime() + expire * MILLIS_MINUTE);

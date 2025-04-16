@@ -1,15 +1,15 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
-import cn.zhangchuangla.infrastructure.web.service.SysLoginService;
+import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
 import cn.zhangchuangla.infrastructure.web.service.TokenService;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
@@ -39,12 +39,12 @@ import java.util.Set;
 @RestController
 @Slf4j
 @Tag(name = "登录接口")
-@RequestMapping("/login")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
-public class LoginController extends BaseController {
+public class SysAuthController extends BaseController {
 
 
-    private final SysLoginService sysLoginService;
+    private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final SysPermissionsService sysPermissionsService;
@@ -59,24 +59,36 @@ public class LoginController extends BaseController {
      * @param request 请求参数
      * @return token
      */
-    @PostMapping
+    @PostMapping("/login")
     @Operation(summary = "登录")
     public AjaxResult login(@Parameter(name = "登录参数", required = true)
                             @Validated @RequestBody LoginRequest loginRequest,
                             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         log.info("登录请求参数：{}", request);
-        String token = sysLoginService.login(loginRequest, request);
-        HashMap<String, String> result = new HashMap<>();
-        result.put(Constants.TOKEN, token);
-        return success(result);
+        AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
+        return success(authenticationToken);
     }
 
+    /**
+     * 刷新token
+     *
+     * @param refreshToken 刷新令牌
+     * @return 新的token
+     */
+    @PostMapping
+    @Operation(summary = "刷新令牌")
+    public AjaxResult refreshToken(@Parameter(name = "刷新令牌", required = true)
+                                   @RequestParam String refreshToken) {
+        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
+        return success(newAuthenticationToken);
+    }
 
     /**
      * 获取用户信息
      *
      * @return 用户信息
      */
+    //fixme 移动到用户中心
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
