@@ -1,7 +1,7 @@
 package cn.zhangchuangla.infrastructure.web.service.impl;
 
 import cn.zhangchuangla.common.config.property.SecurityProperties;
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.AccountException;
@@ -33,7 +33,7 @@ public class SysPasswordServiceImpl implements SysPasswordService {
      */
     @Override
     public void PasswordErrorCount(String username) {
-        String key = RedisKeyConstant.PASSWORD_ERROR_COUNT + username;
+        String key = RedisConstants.PASSWORD_ERROR_COUNT + username;
         long maxRetryCount = securityProperties.getPasswordConfig().getMaxRetryCount();
         if (maxRetryCount == -1) {
             return;

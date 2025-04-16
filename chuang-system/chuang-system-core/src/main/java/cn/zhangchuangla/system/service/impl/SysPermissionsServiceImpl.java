@@ -2,7 +2,6 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.zhangchuangla.common.constant.RedisConstants;
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.UserPermissions;
 import cn.zhangchuangla.common.utils.SecurityUtils;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -93,11 +91,6 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
         if (SecurityUtils.isAdmin()) {
             return Set.of("*.*.*");
         }
-        //优先从Redis中获取权限信息，如果没有，则从数据库中获取并将权限信息缓存到Redis中
-        UserPermissions userPermissions = redisCache.getCacheObject(RedisKeyConstant.USER_PERMISSIONS + id);
-        if (userPermissions != null) {
-            return userPermissions.getPermissions();
-        }
         List<SysPermissions> permissionsList = sysPermissionsMapper.getPermissionsByUserId(id);
         Set<String> userPermission = permissionsList.stream()
                 .map(SysPermissions::getPermissionsKey)
@@ -105,28 +98,9 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
         UserPermissions userPermissionsRedis = new UserPermissions();
         userPermissionsRedis.setUserId(id);
         userPermissionsRedis.setPermissions(userPermission);
-        redisCache.setCacheObject(RedisKeyConstant.USER_PERMISSIONS + id, userPermissionsRedis, permissionExpireTime, TimeUnit.DAYS);
         return userPermission;
     }
 
-    /**
-     * 保存用户权限到Redis
-     *
-     * @param userId     用户ID
-     * @param expireTime 过期时间,单位天
-     */
-    @Override
-    public void saveUserPermissionsToRedis(Long userId, int expireTime) {
-        try {
-            Set<String> permissions = getPermissionsByUserId(userId);
-            UserPermissions userPermissions = new UserPermissions();
-            userPermissions.setUserId(userId);
-            userPermissions.setPermissions(permissions);
-            redisCache.setCacheObject(RedisKeyConstant.USER_PERMISSIONS + userId, userPermissions, expireTime, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.error("保存用户权限到Redis失败", e);
-        }
-    }
 
     /**
      * 分页查询权限列表

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.Base64;
@@ -59,7 +59,7 @@ public class CaptchaController extends BaseController {
         image = captchaProducerMath.createImage(capStr);
 
         // 将验证码存储到redis中，有效期2分钟
-        String verifyKey = RedisKeyConstant.CAPTCHA_CODE + uuid;
+        String verifyKey = RedisConstants.CAPTCHA_CODE + uuid;
         redisTemplate.opsForValue().set(verifyKey, code, 2, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();

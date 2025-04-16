@@ -9,6 +9,22 @@ package cn.zhangchuangla.common.constant;
 public interface RedisConstants {
 
     /**
+     * 用户登录密码错误次数前缀
+     */
+    public static final String PASSWORD_ERROR_COUNT = "password_error_count:";
+
+
+    /**
+     * 系统配置
+     */
+    public static final String SYSTEM_CONFIG = "system_config:";
+
+    /**
+     * 验证码前缀
+     */
+    public static final String CAPTCHA_CODE = "captcha:code:";
+
+    /**
      * 接口访问限流前缀
      */
     String ACCESS_LIMIT_PREFIX = "access_limit:";

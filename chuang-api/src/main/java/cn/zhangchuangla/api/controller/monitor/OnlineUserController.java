@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.constant.RedisConstants;
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
@@ -84,7 +83,8 @@ public class OnlineUserController extends BaseController {
         if (sessionId == null) {
             return error(ResponseCode.PARAM_NOT_NULL);
         }
-        redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
+        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "");
+        redisCache.deleteObject(replace + sessionId);
         return success();
     }
 }
