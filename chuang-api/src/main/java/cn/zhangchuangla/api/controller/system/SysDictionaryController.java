@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
@@ -49,7 +48,7 @@ public class SysDictionaryController extends BaseController {
     @Operation(summary = "字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dictionary:list')")
-    public TableDataResult list(@Validated DictionaryRequest request) {
+    public AjaxResult list(@Validated DictionaryRequest request) {
         Page<Dictionary> list = dictionaryService.getDictionaryList(request);
         List<DictionaryListVo> dictionaryListVos = copyListProperties(list, DictionaryListVo.class);
         return getTableData(list, dictionaryListVos);

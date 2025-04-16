@@ -1,7 +1,5 @@
 package cn.zhangchuangla.common.core.controller;
 
-import cn.zhangchuangla.common.constant.HttpStatusConstant;
-import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -66,8 +64,6 @@ public class BaseController {
      */
     protected TableDataResult getTableData(Page<?> page) {
         TableDataResult tableDataResult = new TableDataResult();
-        tableDataResult.setCode(HttpStatusConstant.SUCCESS);
-        tableDataResult.setMessage(SystemMessageConstant.QUERY_SUCCESS);
         tableDataResult.setTotal(page.getTotal());
         tableDataResult.setRows(page.getRecords());
         tableDataResult.setCurrentTime(System.currentTimeMillis());
@@ -82,16 +78,14 @@ public class BaseController {
      * @param page 分页对象
      * @param vo   VO对象
      */
-    protected TableDataResult getTableData(Page<?> page, List<?> vo) {
+    protected AjaxResult getTableData(Page<?> page, List<?> vo) {
         TableDataResult tableDataResult = new TableDataResult();
-        tableDataResult.setCode(HttpStatusConstant.SUCCESS);
-        tableDataResult.setMessage(SystemMessageConstant.QUERY_SUCCESS);
         tableDataResult.setTotal(page.getTotal());
         tableDataResult.setRows(vo);
         tableDataResult.setCurrentTime(System.currentTimeMillis());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
-        return tableDataResult;
+        return success(tableDataResult);
     }
 
     /**

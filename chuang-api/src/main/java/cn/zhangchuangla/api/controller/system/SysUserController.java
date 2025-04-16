@@ -1,12 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -29,16 +27,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 用户管理控制器
  */
 @Tag(name = "用户管理接口")
 @RestController
-@Anonymous
 @RequestMapping("/system/user")
 @RequiredArgsConstructor
 public class SysUserController extends BaseController {
@@ -49,35 +44,13 @@ public class SysUserController extends BaseController {
 
 
     /**
-     * 获取用户信息
-     *
-     * @return 用户信息
-     */
-    @GetMapping("/getUserInfo")
-    @Operation(summary = "获取用户信息")
-    public AjaxResult getInfo() {
-        HashMap<String, Object> ajax = new HashMap<>(4);
-        Long userId = getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        ajax.put("user", userInfoVo);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        return success(ajax);
-    }
-
-
-    /**
      * 获取用户列表
      * 需要特定权限才能访问
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
-    public TableDataResult listUser(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
+    public AjaxResult listUser(@Parameter(name = "用户查询参数") @Validated UserRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(item -> {

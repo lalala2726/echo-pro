@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
+import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
 import cn.zhangchuangla.system.model.request.permissions.SysPermissionsListRequest;
 import cn.zhangchuangla.system.model.vo.permissions.SysPermissionsListVo;
@@ -41,7 +41,7 @@ public class SysPermissionsController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取权限列表")
     @PreAuthorize("@ss.hasPermission('system:permission:list')")
-    public TableDataResult listPermissions(SysPermissionsListRequest request) {
+    public AjaxResult listPermissions(SysPermissionsListRequest request) {
         Page<SysPermissions> page = sysPermissionsService.listPermissions(request);
         List<SysPermissionsListVo> sysPermissionsListVos = copyListProperties(page, SysPermissionsListVo.class);
         return getTableData(page, sysPermissionsListVos);

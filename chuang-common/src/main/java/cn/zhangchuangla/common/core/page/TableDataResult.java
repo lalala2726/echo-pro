@@ -1,6 +1,5 @@
 package cn.zhangchuangla.common.core.page;
 
-import cn.zhangchuangla.common.enums.ResponseCode;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,15 +23,6 @@ public class TableDataResult implements Serializable {
     @Serial
     private static final long serialVersionUID = -8909765534058591928L;
 
-    /**
-     * 状态码
-     */
-    private Integer code;
-
-    /**
-     * 返回信息
-     */
-    private String message;
 
     /**
      * 总记录数
@@ -70,8 +60,6 @@ public class TableDataResult implements Serializable {
         this.total = page.getTotal();
         this.pageNum = page.getCurrent();
         this.pageSize = page.getSize();
-        this.message = ResponseCode.SUCCESS.getMessage();
-        this.code = ResponseCode.SUCCESS.getCode();
         this.rows = page.getRecords();
         this.currentTime = System.currentTimeMillis();
     }
@@ -88,8 +76,6 @@ public class TableDataResult implements Serializable {
         this.total = total;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
-        this.message = ResponseCode.SUCCESS.getMessage();
-        this.code = ResponseCode.SUCCESS.getCode();
         this.rows = rows;
         this.currentTime = System.currentTimeMillis();
     }

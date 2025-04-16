@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
@@ -46,7 +45,7 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public TableDataResult listFileManage(SysFileManagementListRequest request) {
+    public AjaxResult listFileManage(SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileManage(request);
         ArrayList<SysFileManagementListVo> sysFileManagementListVos = new ArrayList<>();
         sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
@@ -67,7 +66,7 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/trash/list")
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public TableDataResult listFileTrash(SysFileManagementListRequest request) {
+    public AjaxResult listFileTrash(SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileTrash(request);
         List<SysFileManagementListVo> sysFileManagementListVos = copyListProperties(sysFileManagementPage, SysFileManagementListVo.class);
         return getTableData(sysFileManagementPage, sysFileManagementListVos);

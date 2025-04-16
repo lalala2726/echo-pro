@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
@@ -50,7 +49,7 @@ public class SysDictionaryDataController extends BaseController {
     @GetMapping("/dictId/{id}")
     @Operation(summary = "根据字典名称获取字典值")
     @PreAuthorize("@ss.hasPermission('system:dictionary-data:list')")
-    public TableDataResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
+    public AjaxResult getDictDataByDictionaryName(@PathVariable("id") Long id, @Validated DictionaryDataRequest request) {
         checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         Page<DictionaryData> dictionaryDataPage = dictionaryDataService.getDictDataByDictionaryName(id, request);
         List<DictionaryDataListVo> dictionaryDataListVos = copyListProperties(dictionaryDataPage, DictionaryDataListVo.class);
