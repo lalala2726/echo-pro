@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,8 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (request == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR);
         }
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
+        SysUser sysUser = sysUserConverter.toEntity(request);
         if (!save(sysUser)) {
             return -1L;
         }
@@ -213,8 +211,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
         //修改用户信息
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
+        SysUser sysUser = sysUserConverter.toEntity(request);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().
                 eq(SysUser::getUserId, request.getUserId());
         update(sysUser, eq);

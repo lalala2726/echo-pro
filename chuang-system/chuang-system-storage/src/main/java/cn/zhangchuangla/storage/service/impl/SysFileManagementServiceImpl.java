@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.mapper.SysFileManagementMapper;
@@ -15,8 +16,8 @@ import cn.zhangchuangla.storage.service.SysFileManagementService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,16 +31,13 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementMapper, SysFileManagement>
         implements SysFileManagementService {
 
     private final SysFileManagementMapper sysFileManagementMapper;
     private final StorageFactory storageFactory;
-
-    public SysFileManagementServiceImpl(SysFileManagementMapper sysFileManagementMapper, StorageFactory storageFactory) {
-        this.sysFileManagementMapper = sysFileManagementMapper;
-        this.storageFactory = storageFactory;
-    }
+    private final StorageConverter storageConverter;
 
 
     /**
@@ -178,9 +176,7 @@ public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @return 文件传输DTO
      */
     private FileTransferDto convertToFileTransferDto(SysFileManagement fileManagement) {
-        FileTransferDto fileTransferDto = new FileTransferDto();
-        BeanUtils.copyProperties(fileManagement, fileTransferDto);
-        return fileTransferDto;
+        return storageConverter.toFileTransferDto(fileManagement);
     }
 
     /**

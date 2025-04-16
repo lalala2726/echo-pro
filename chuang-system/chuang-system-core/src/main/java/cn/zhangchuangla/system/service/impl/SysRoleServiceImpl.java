@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
@@ -13,7 +14,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +31,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         implements SysRoleService {
 
     private final SysRoleMapper sysRoleMapper;
+    private final SysRoleConverter sysRoleConverter;
 
 
     /**
@@ -90,8 +91,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         if (isRoleKeyExist(roleAddRequest.getRoleKey())) {
             throw new ServiceException("角色权限字符串已存在");
         }
-        SysRole sysRole = new SysRole();
-        BeanUtils.copyProperties(roleAddRequest, sysRole);
+        SysRole sysRole = sysRoleConverter.toEntity(roleAddRequest);
         save(sysRole);
     }
 
@@ -136,8 +136,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
         //test 这边需要待测试
-        SysRole sysRole = new SysRole();
-        BeanUtils.copyProperties(request, sysRole);
+        SysRole sysRole = sysRoleConverter.toEntity(request);
         return updateById(sysRole);
     }
 

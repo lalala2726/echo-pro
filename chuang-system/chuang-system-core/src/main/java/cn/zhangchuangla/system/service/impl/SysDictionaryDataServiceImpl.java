@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
+import cn.zhangchuangla.system.converter.SysDictionaryDataConverter;
 import cn.zhangchuangla.system.mapper.SysDictionaryDataMapper;
 import cn.zhangchuangla.system.model.entity.SysDictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
@@ -13,7 +14,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +30,7 @@ public class SysDictionaryDataServiceImpl extends ServiceImpl<SysDictionaryDataM
         implements SysDictionaryDataService {
 
     private final SysDictionaryDataMapper sysDictionaryDataMapper;
+    private final SysDictionaryDataConverter sysDictionaryDataConverter;
 
 
     /**
@@ -87,8 +88,7 @@ public class SysDictionaryDataServiceImpl extends ServiceImpl<SysDictionaryDataM
         if (noDuplicateKeys(request.getDataKey())) {
             throw new ServiceException("字典项键已存在!");
         }
-        SysDictionaryData sysDictionaryData = new SysDictionaryData();
-        BeanUtils.copyProperties(request, sysDictionaryData);
+        SysDictionaryData sysDictionaryData = sysDictionaryDataConverter.toEntity(request);
         return save(sysDictionaryData);
     }
 
@@ -116,8 +116,7 @@ public class SysDictionaryDataServiceImpl extends ServiceImpl<SysDictionaryDataM
         if (noDuplicateKeys(request.getDataKey())) {
             throw new ServiceException("字典项键已存在!");
         }
-        SysDictionaryData sysDictionaryData = new SysDictionaryData();
-        BeanUtils.copyProperties(request, sysDictionaryData);
+        SysDictionaryData sysDictionaryData = sysDictionaryDataConverter.toEntity(request);
         log.info("更新字典项:{}", sysDictionaryData);
         int result = sysDictionaryDataMapper.updateDictionaryDataByDictName(sysDictionaryData, request.getDictName());
         return result > 0;

@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
@@ -17,7 +18,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,7 @@ import java.util.List;
 public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
+    private final SysRoleConverter sysRoleConverter;
 
 
     /**
@@ -72,8 +73,7 @@ public class SysRoleController extends BaseController {
         if (sysRole == null) {
             return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "角色不存在");
         }
-        SysRoleVo sysRoleVo = new SysRoleVo();
-        BeanUtils.copyProperties(sysRole, sysRoleVo);
+        SysRoleVo sysRoleVo = sysRoleConverter.toSysRoleVo(sysRole);
         return success(sysRoleVo);
     }
 

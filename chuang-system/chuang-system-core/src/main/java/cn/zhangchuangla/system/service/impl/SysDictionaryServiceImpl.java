@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.system.converter.SysDictionaryConverter;
 import cn.zhangchuangla.system.mapper.SysDictionaryMapper;
 import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
@@ -13,7 +14,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +32,7 @@ public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, S
 
     private final SysDictionaryDataService sysDictionaryDataService;
     private final SysDictionaryMapper sysDictionaryMapper;
+    private final SysDictionaryConverter sysDictionaryConverter;
 
 
     /**
@@ -82,8 +83,7 @@ public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, S
         if (isNameExist(request.getName())) {
             throw new ServiceException("字典名称已存在");
         }
-        SysDictionary sysDictionary = new SysDictionary();
-        BeanUtils.copyProperties(request, sysDictionary);
+        SysDictionary sysDictionary = sysDictionaryConverter.toEntity(request);
         save(sysDictionary);
     }
 
@@ -110,8 +110,7 @@ public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, S
         if (isNameExistExceptCurrent(request.getId(), request.getName())) {
             throw new ServiceException("字典名称已存在");
         }
-        SysDictionary sysDictionary = new SysDictionary();
-        BeanUtils.copyProperties(request, sysDictionary);
+        SysDictionary sysDictionary = sysDictionaryConverter.toEntity(request);
         LambdaQueryWrapper<SysDictionary> eq = new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getId, request.getId());
         return update(sysDictionary, eq);
     }

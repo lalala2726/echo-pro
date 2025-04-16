@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
@@ -20,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,7 @@ public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
+    private final SysUserConverter sysUserConverter;
 
 
     /**
@@ -64,8 +65,7 @@ public class SysUserController extends BaseController {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(item -> {
-            UserListVo userListVo = new UserListVo();
-            BeanUtils.copyProperties(item, userListVo);
+            UserListVo userListVo = sysUserConverter.toUserListVo(item);
             userListVos.add(userListVo);
         });
         return getTableData(userPage, userListVos);
@@ -143,9 +143,8 @@ public class SysUserController extends BaseController {
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         List<SysRole> roleList = sysRoleService.getRoleListByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
+        UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         userInfoVo.setRoles(roleList);
-        BeanUtils.copyProperties(sysUser, userInfoVo);
         return success();
     }
 

@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
 import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
 import cn.zhangchuangla.storage.model.vo.manage.SysFileManagementListVo;
@@ -12,7 +13,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +34,7 @@ public class SysFileManageController extends BaseController {
 
 
     private final SysFileManagementService sysFileManagementService;
+    private final StorageConverter storageConverter;
 
 
     /**
@@ -49,8 +50,7 @@ public class SysFileManageController extends BaseController {
         Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileManage(request);
         ArrayList<SysFileManagementListVo> sysFileManagementListVos = new ArrayList<>();
         sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
-            SysFileManagementListVo sysFileManagementListVo = new SysFileManagementListVo();
-            BeanUtils.copyProperties(sysFileManagement, sysFileManagementListVo);
+            SysFileManagementListVo sysFileManagementListVo = storageConverter.toSysFileManagementListVo(sysFileManagement);
             sysFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
             sysFileManagementListVos.add(sysFileManagementListVo);
         });

@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
+import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +44,7 @@ public class SysAuthController extends BaseController {
     private final SysPermissionsService sysPermissionsService;
     private final SysRoleService sysRoleService;
     private final SysMenuService sysMenuService;
+    private final SysUserConverter sysUserConverter;
 
 
     /**
@@ -103,8 +104,7 @@ public class SysAuthController extends BaseController {
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
         Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
         Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
+        UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
         ajax.put("permissions", permissions);

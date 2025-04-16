@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.Anonymous;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysDictionaryConverter;
 import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
@@ -17,7 +18,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +38,7 @@ public class SysDictionaryController extends BaseController {
 
 
     private final SysDictionaryService sysDictionaryService;
+    private final SysDictionaryConverter sysDictionaryConverter;
 
 
     /**
@@ -81,8 +82,7 @@ public class SysDictionaryController extends BaseController {
     public AjaxResult getDictionaryById(@PathVariable("id") Long id) {
         checkParam(id == null || id > 0, "字典ID不能小于等于零!");
         SysDictionary sysDictionary = sysDictionaryService.getDictionaryById(id);
-        DictionaryVo dictionaryVo = new DictionaryVo();
-        BeanUtils.copyProperties(sysDictionary, dictionaryVo);
+        DictionaryVo dictionaryVo = sysDictionaryConverter.toDictionaryVo(sysDictionary);
         return success(dictionaryVo);
     }
 

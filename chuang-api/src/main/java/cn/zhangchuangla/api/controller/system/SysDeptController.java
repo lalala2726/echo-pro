@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
@@ -16,7 +17,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +37,7 @@ import java.util.List;
 public class SysDeptController extends BaseController {
 
     private final SysDeptService sysDeptService;
+    private final SysDeptConverter sysDeptConverter;
 
 
     /**
@@ -98,8 +99,7 @@ public class SysDeptController extends BaseController {
     public AjaxResult getDeptById(@PathVariable Integer id) {
         checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
-        SysDeptVo sysDeptVo = new SysDeptVo();
-        BeanUtils.copyProperties(dept, sysDeptVo);
+        SysDeptVo sysDeptVo = sysDeptConverter.toSysDeptVo(dept);
         return success(sysDeptVo);
     }
 

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.system.converter.SysConfigConverter;
 import cn.zhangchuangla.system.mapper.SysConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysConfig;
 import cn.zhangchuangla.system.model.request.config.SysConfigAddRequest;
@@ -10,7 +11,7 @@ import cn.zhangchuangla.system.service.SysConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.BeanUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,14 +23,12 @@ import java.util.List;
  * @author zhangchuang
  */
 @Service
+@RequiredArgsConstructor
 public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig>
         implements SysConfigService {
 
     private final SysConfigMapper sysConfigMapper;
-
-    public SysConfigServiceImpl(SysConfigMapper sysConfigMapper) {
-        this.sysConfigMapper = sysConfigMapper;
-    }
+    private final SysConfigConverter sysConfigConverter;
 
 
     /**
@@ -66,8 +65,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         if (isConfigKeyExist(request.getConfigKey())) {
             throw new ServiceException(String.format("参数键名【%s】已存在", request.getConfigKey()));
         }
-        SysConfig sysConfig = new SysConfig();
-        BeanUtils.copyProperties(request, sysConfig);
+        SysConfig sysConfig = sysConfigConverter.toEntity(request);
         return save(sysConfig);
     }
 
@@ -82,8 +80,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         if (isConfigKeyExist(request.getConfigKey())) {
             throw new ServiceException(String.format("参数键名【%s】已存在", request.getConfigKey()));
         }
-        SysConfig sysConfig = new SysConfig();
-        BeanUtils.copyProperties(request, sysConfig);
+        SysConfig sysConfig = sysConfigConverter.toEntity(request);
         return updateById(sysConfig);
     }
 
