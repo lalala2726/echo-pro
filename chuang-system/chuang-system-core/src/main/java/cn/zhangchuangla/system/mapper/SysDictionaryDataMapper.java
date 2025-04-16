@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.system.model.entity.DictionaryData;
+import cn.zhangchuangla.system.model.entity.SysDictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author zhangchuang
  */
-public interface DictionaryDataMapper extends BaseMapper<DictionaryData> {
+public interface SysDictionaryDataMapper extends BaseMapper<SysDictionaryData> {
 
 
     /**
@@ -20,7 +20,7 @@ public interface DictionaryDataMapper extends BaseMapper<DictionaryData> {
      * @param dictionaryName 字典名称
      * @return 字典值集合
      */
-    List<DictionaryData> dictionaryDataService(@Param("dictionaryName") String dictionaryName);
+    List<SysDictionaryData> dictionaryDataService(@Param("dictionaryName") String dictionaryName);
 
     /**
      * 根据字典值id删除字典值,支持批量删除
@@ -38,9 +38,9 @@ public interface DictionaryDataMapper extends BaseMapper<DictionaryData> {
      * @param page    分页
      * @return 字典值集合
      */
-    Page<DictionaryData> getDictDataByDictionaryName(Page<DictionaryData> page,
-                                                     @Param("dictionaryId") Long id,
-                                                     @Param("request") DictionaryDataRequest request);
+    Page<SysDictionaryData> getDictDataByDictionaryName(Page<SysDictionaryData> page,
+                                                        @Param("dictionaryId") Long id,
+                                                        @Param("request") DictionaryDataRequest request);
 
     /**
      * 修改字典值,通过所属的dictName进行修改
@@ -48,7 +48,7 @@ public interface DictionaryDataMapper extends BaseMapper<DictionaryData> {
      * @param request 请求参数
      * @return 操作结果
      */
-    int updateDictionaryDataByDictName(@Param("request") DictionaryData request, @Param("dictName") String dictName);
+    int updateDictionaryDataByDictName(@Param("request") SysDictionaryData request, @Param("dictName") String dictName);
 }
 
 

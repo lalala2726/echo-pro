@@ -2,12 +2,12 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
-import cn.zhangchuangla.system.mapper.DictionaryDataMapper;
-import cn.zhangchuangla.system.model.entity.DictionaryData;
+import cn.zhangchuangla.system.mapper.SysDictionaryDataMapper;
+import cn.zhangchuangla.system.model.entity.SysDictionaryData;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryDataRequest;
 import cn.zhangchuangla.system.model.request.dictionary.UpdateDictionaryDataRequest;
-import cn.zhangchuangla.system.service.DictionaryDataService;
+import cn.zhangchuangla.system.service.SysDictionaryDataService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -26,10 +26,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper, DictionaryData>
-        implements DictionaryDataService {
+public class SysDictionaryDataServiceImpl extends ServiceImpl<SysDictionaryDataMapper, SysDictionaryData>
+        implements SysDictionaryDataService {
 
-    private final DictionaryDataMapper dictionaryDataMapper;
+    private final SysDictionaryDataMapper sysDictionaryDataMapper;
 
 
     /**
@@ -41,12 +41,12 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
     @Override
     public boolean noDuplicateKeys(String itemKey) {
         ParamsUtils.paramsNotIsNullOrBlank("字典项键不能为空", itemKey);
-        LambdaQueryWrapper<DictionaryData> queryWrapper = new LambdaQueryWrapper<DictionaryData>()
-                .eq(DictionaryData::getDataKey, itemKey);
-        DictionaryData dictionaryData = getOne(queryWrapper);
-        LambdaQueryWrapper<DictionaryData> eq = new LambdaQueryWrapper<DictionaryData>()
-                .eq(DictionaryData::getDictionaryId, dictionaryData.getDictionaryId())
-                .eq(DictionaryData::getDataKey, itemKey);
+        LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<SysDictionaryData>()
+                .eq(SysDictionaryData::getDataKey, itemKey);
+        SysDictionaryData sysDictionaryData = getOne(queryWrapper);
+        LambdaQueryWrapper<SysDictionaryData> eq = new LambdaQueryWrapper<SysDictionaryData>()
+                .eq(SysDictionaryData::getDictionaryId, sysDictionaryData.getDictionaryId())
+                .eq(SysDictionaryData::getDataKey, itemKey);
         return count(eq) > 0;
     }
 
@@ -59,7 +59,7 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
     @Override
     public long getCountByDictionaryId(Long dictionaryId) {
         ParamsUtils.minValidParam(dictionaryId, "字典ID不能小于等于零!");
-        LambdaQueryWrapper<DictionaryData> eq = new LambdaQueryWrapper<DictionaryData>().eq(DictionaryData::getDictionaryId, dictionaryId);
+        LambdaQueryWrapper<SysDictionaryData> eq = new LambdaQueryWrapper<SysDictionaryData>().eq(SysDictionaryData::getDictionaryId, dictionaryId);
         return count(eq);
     }
 
@@ -71,9 +71,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      * @return 字典值列表
      */
     @Override
-    public List<DictionaryData> getDictionaryDataByIdDictName(String dictionaryName) {
+    public List<SysDictionaryData> getDictionaryDataByIdDictName(String dictionaryName) {
         ParamsUtils.paramsNotIsNullOrBlank("字典名称不能为空", dictionaryName);
-        return dictionaryDataMapper.dictionaryDataService(dictionaryName);
+        return sysDictionaryDataMapper.dictionaryDataService(dictionaryName);
     }
 
     /**
@@ -87,9 +87,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
         if (noDuplicateKeys(request.getDataKey())) {
             throw new ServiceException("字典项键已存在!");
         }
-        DictionaryData dictionaryData = new DictionaryData();
-        BeanUtils.copyProperties(request, dictionaryData);
-        return save(dictionaryData);
+        SysDictionaryData sysDictionaryData = new SysDictionaryData();
+        BeanUtils.copyProperties(request, sysDictionaryData);
+        return save(sysDictionaryData);
     }
 
     /**
@@ -99,9 +99,9 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      * @return 字典项
      */
     @Override
-    public DictionaryData getDictionaryById(Long id) {
+    public SysDictionaryData getDictionaryById(Long id) {
         ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
-        LambdaQueryWrapper<DictionaryData> eq = new LambdaQueryWrapper<DictionaryData>().eq(DictionaryData::getId, id);
+        LambdaQueryWrapper<SysDictionaryData> eq = new LambdaQueryWrapper<SysDictionaryData>().eq(SysDictionaryData::getId, id);
         return getOne(eq);
     }
 
@@ -116,10 +116,10 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
         if (noDuplicateKeys(request.getDataKey())) {
             throw new ServiceException("字典项键已存在!");
         }
-        DictionaryData dictionaryData = new DictionaryData();
-        BeanUtils.copyProperties(request, dictionaryData);
-        log.info("更新字典项:{}", dictionaryData);
-        int result = dictionaryDataMapper.updateDictionaryDataByDictName(dictionaryData, request.getDictName());
+        SysDictionaryData sysDictionaryData = new SysDictionaryData();
+        BeanUtils.copyProperties(request, sysDictionaryData);
+        log.info("更新字典项:{}", sysDictionaryData);
+        int result = sysDictionaryDataMapper.updateDictionaryDataByDictName(sysDictionaryData, request.getDictName());
         return result > 0;
     }
 
@@ -130,7 +130,7 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      */
     @Override
     public void deleteDictionaryData(List<Long> ids) {
-        dictionaryDataMapper.deleteDictionaryItem(ids);
+        sysDictionaryDataMapper.deleteDictionaryItem(ids);
     }
 
     /**
@@ -140,10 +140,10 @@ public class DictionaryDataServiceImpl extends ServiceImpl<DictionaryDataMapper,
      * @return 字典项
      */
     @Override
-    public Page<DictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request) {
+    public Page<SysDictionaryData> getDictDataByDictionaryName(Long id, DictionaryDataRequest request) {
         ParamsUtils.minValidParam(id, "字典ID不能小于等于零!");
-        Page<DictionaryData> dictionaryDataPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return dictionaryDataMapper.getDictDataByDictionaryName(dictionaryDataPage, id, request);
+        Page<SysDictionaryData> dictionaryDataPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysDictionaryDataMapper.getDictDataByDictionaryName(dictionaryDataPage, id, request);
     }
 }
 

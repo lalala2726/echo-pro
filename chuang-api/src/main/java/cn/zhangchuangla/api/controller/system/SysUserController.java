@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.ParamsUtils;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -13,7 +13,6 @@ import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
-import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,8 +39,21 @@ public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
-    private final SysPermissionsService sysPermissionsService;
 
+
+    /**
+     * 获取用户信息
+     *
+     * @return 用户信息
+     */
+    @GetMapping("/profile")
+    @Operation(summary = "获取用户信息")
+    public AjaxResult userProfile() {
+        Long currentUserId = SecurityUtils.getUserId();
+        SysUser sysUser = sysUserService.getUserInfoByUserId(currentUserId);
+
+        return success();
+    }
 
     /**
      * 获取用户列表
@@ -129,7 +141,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(name = "用户ID", required = true)
                                       @PathVariable("id") Long id) {
-        ParamsUtils.minValidParam(id, "用户ID不能小于等于零!");
+        if (id == null || id <= 0) return error("用户ID不能小于等于0");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         List<SysRole> roleList = sysRoleService.getRoleListByUserId(userId);

@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.common;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.IdUtil;
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.Base64;
-import cn.zhangchuangla.common.utils.UUIDUtils;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,8 +47,7 @@ public class CaptchaController extends BaseController {
     @Operation(summary = "获取验证码")
     public AjaxResult getCaptcha() {
         // 保存验证码信息
-        String uuid = UUIDUtils.simpleUUID();
-
+        String uuid = IdUtil.simpleUUID();
         AjaxResult ajax = AjaxResult.success();
         String capStr, code;
         BufferedImage image;

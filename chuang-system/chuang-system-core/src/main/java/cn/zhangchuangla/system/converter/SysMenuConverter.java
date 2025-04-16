@@ -14,13 +14,13 @@ import org.mapstruct.Mapping;
  * @since 2024/5/26
  */
 @Mapper(componentModel = "spring")
-public interface MenuConverter {
+public interface SysMenuConverter {
 
 
     MenuVo toVo(SysMenu entity);
 
     @Mapping(target = "params", ignore = true)
-    MenuAddRequest toForm(SysMenu entity);
+    MenuAddRequest toAddRequest(SysMenu entity);
 
     //忽略params属性
     @Mapping(target = "params", ignore = true)

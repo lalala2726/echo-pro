@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.enums.StatusEnum;
 import cn.zhangchuangla.common.model.entity.KeyValue;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.system.converter.MenuConverter;
+import cn.zhangchuangla.system.converter.SysMenuConverter;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         implements SysMenuService {
 
-    private final MenuConverter menuConverter;
+    private final SysMenuConverter sysMenuConverter;
 
     private final SysRoleService roleMenuService;
 
@@ -93,7 +93,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .stream()
                 .filter(menu -> menu.getParentId().equals(parentId))
                 .map(entity -> {
-                    MenuVo menuVO = menuConverter.toVo(entity);
+                    MenuVo menuVO = sysMenuConverter.toVo(entity);
                     List<MenuVo> children = buildMenuTree(entity.getId(), sysMenuList);
                     menuVO.setChildren(children);
                     return menuVO;
@@ -255,7 +255,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (Objects.equals(menuAddRequest.getParentId(), menuAddRequest.getId())) {
             throw new RuntimeException("父级菜单不能为当前菜单");
         }
-        SysMenu entity = menuConverter.toEntity(menuAddRequest);
+        SysMenu entity = sysMenuConverter.toEntity(menuAddRequest);
         String treePath = generateMenuTreePath(menuAddRequest.getParentId());
         entity.setTreePath(treePath);
 
@@ -354,7 +354,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     public MenuAddRequest getMenuForm(Long id) {
         SysMenu entity = this.getById(id);
         Assert.isTrue(entity != null, "菜单不存在");
-        MenuAddRequest formData = menuConverter.toForm(entity);
+        MenuAddRequest formData = sysMenuConverter.toAddRequest(entity);
         // 路由参数字符串 {"id":"1","name":"张三"} 转换为 [{key:"id", value:"1"}, {key:"name", value:"张三"}]
         String params = null;
         if (entity != null) {

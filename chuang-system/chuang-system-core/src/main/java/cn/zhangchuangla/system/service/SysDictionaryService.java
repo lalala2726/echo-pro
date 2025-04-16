@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.system.model.entity.Dictionary;
+import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.UpdateDictionaryRequest;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author zhangchuang
  */
-public interface DictionaryService extends IService<Dictionary> {
+public interface SysDictionaryService extends IService<SysDictionary> {
 
 
     /**
@@ -38,7 +38,7 @@ public interface DictionaryService extends IService<Dictionary> {
      * @param id 字典id
      * @return 字典
      */
-    Dictionary getDictionaryById(Long id);
+    SysDictionary getDictionaryById(Long id);
 
     /**
      * 更新字典
@@ -61,7 +61,7 @@ public interface DictionaryService extends IService<Dictionary> {
      * @param request 请求参数
      * @return 返回分页列表
      */
-    Page<Dictionary> getDictionaryList(DictionaryRequest request);
+    Page<SysDictionary> getDictionaryList(DictionaryRequest request);
 
     /**
      * 根据字典名称查询字典是否存在, 不包含当前字典

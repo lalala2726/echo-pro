@@ -12,7 +12,7 @@ import java.util.Date;
  * created on 2025/3/20 13:09
  */
 @Data
-public class OnlineUser {
+public class SysOnlineUser {
 
     /**
      * 会话ID

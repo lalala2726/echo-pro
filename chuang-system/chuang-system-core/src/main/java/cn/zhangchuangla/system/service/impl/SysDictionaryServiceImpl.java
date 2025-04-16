@@ -1,13 +1,13 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.system.mapper.DictionaryMapper;
-import cn.zhangchuangla.system.model.entity.Dictionary;
+import cn.zhangchuangla.system.mapper.SysDictionaryMapper;
+import cn.zhangchuangla.system.model.entity.SysDictionary;
 import cn.zhangchuangla.system.model.request.dictionary.AddDictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.DictionaryRequest;
 import cn.zhangchuangla.system.model.request.dictionary.UpdateDictionaryRequest;
-import cn.zhangchuangla.system.service.DictionaryDataService;
-import cn.zhangchuangla.system.service.DictionaryService;
+import cn.zhangchuangla.system.service.SysDictionaryDataService;
+import cn.zhangchuangla.system.service.SysDictionaryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -27,11 +27,11 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Dictionary>
-        implements DictionaryService {
+public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, SysDictionary>
+        implements SysDictionaryService {
 
-    private final DictionaryDataService dictionaryDataService;
-    private final DictionaryMapper dictionaryMapper;
+    private final SysDictionaryDataService sysDictionaryDataService;
+    private final SysDictionaryMapper sysDictionaryMapper;
 
 
     /**
@@ -41,9 +41,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      * @return 返回分页列表
      */
     @Override
-    public Page<Dictionary> getDictionaryList(DictionaryRequest request) {
-        Page<Dictionary> dictionaryPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return dictionaryMapper.getDictionaryList(dictionaryPage, request);
+    public Page<SysDictionary> getDictionaryList(DictionaryRequest request) {
+        Page<SysDictionary> dictionaryPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysDictionaryMapper.getDictionaryList(dictionaryPage, request);
     }
 
     /**
@@ -54,7 +54,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public boolean isNameExistExceptCurrent(Long id, String name) {
-        Long count = dictionaryMapper.getDictionaryCountExcludeCurrentId(id, name);
+        Long count = sysDictionaryMapper.getDictionaryCountExcludeCurrentId(id, name);
         log.info("count:{}", count);
         return count > 0;
     }
@@ -68,7 +68,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      */
     @Override
     public boolean isNameExist(String name) {
-        LambdaQueryWrapper<Dictionary> eq = new LambdaQueryWrapper<Dictionary>().eq(Dictionary::getName, name);
+        LambdaQueryWrapper<SysDictionary> eq = new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getName, name);
         return this.count(eq) > 0;
     }
 
@@ -82,9 +82,9 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
         if (isNameExist(request.getName())) {
             throw new ServiceException("字典名称已存在");
         }
-        Dictionary dictionary = new Dictionary();
-        BeanUtils.copyProperties(request, dictionary);
-        save(dictionary);
+        SysDictionary sysDictionary = new SysDictionary();
+        BeanUtils.copyProperties(request, sysDictionary);
+        save(sysDictionary);
     }
 
     /**
@@ -94,8 +94,8 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
      * @return 字典
      */
     @Override
-    public Dictionary getDictionaryById(Long id) {
-        LambdaQueryWrapper<Dictionary> eq = new LambdaQueryWrapper<Dictionary>().eq(Dictionary::getId, id);
+    public SysDictionary getDictionaryById(Long id) {
+        LambdaQueryWrapper<SysDictionary> eq = new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getId, id);
         return getOne(eq);
     }
 
@@ -110,10 +110,10 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
         if (isNameExistExceptCurrent(request.getId(), request.getName())) {
             throw new ServiceException("字典名称已存在");
         }
-        Dictionary dictionary = new Dictionary();
-        BeanUtils.copyProperties(request, dictionary);
-        LambdaQueryWrapper<Dictionary> eq = new LambdaQueryWrapper<Dictionary>().eq(Dictionary::getId, request.getId());
-        return update(dictionary, eq);
+        SysDictionary sysDictionary = new SysDictionary();
+        BeanUtils.copyProperties(request, sysDictionary);
+        LambdaQueryWrapper<SysDictionary> eq = new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getId, request.getId());
+        return update(sysDictionary, eq);
     }
 
     /**
@@ -125,7 +125,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
     @Transactional
     public void deleteDictionary(List<Long> ids) {
         ids.forEach(id -> {
-            long countByDictionaryId = dictionaryDataService.getCountByDictionaryId(id);
+            long countByDictionaryId = sysDictionaryDataService.getCountByDictionaryId(id);
             if (countByDictionaryId > 0) {
                 throw new ServiceException("该字典下有字典项，不能删除");
             }
