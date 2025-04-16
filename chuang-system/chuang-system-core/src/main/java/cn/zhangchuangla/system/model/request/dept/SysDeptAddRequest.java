@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.request.department;
+package cn.zhangchuangla.system.model.request.dept;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

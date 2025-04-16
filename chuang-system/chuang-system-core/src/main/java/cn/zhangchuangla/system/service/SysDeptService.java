@@ -1,9 +1,9 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysDept;
-import cn.zhangchuangla.system.model.request.department.SysDeptAddRequest;
-import cn.zhangchuangla.system.model.request.department.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.department.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
 import cn.zhangchuangla.system.model.vo.dept.DeptTree;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -62,7 +62,7 @@ public interface SysDeptService extends IService<SysDept> {
      *
      * @param id 部门ID
      */
-    boolean departmentHasSubordinates(Integer id);
+    boolean deptHasSubordinates(Integer id);
 
     /**
      * 删除部门，支持批量删除
