@@ -2,7 +2,7 @@ package cn.zhangchuangla.infrastructure.aspect;
 
 import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.ServletUtils;
@@ -107,20 +107,20 @@ public class OperationLogAspect {
     private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {
             // 获取当前登录用户
-            LoginUser loginUser = SecurityUtils.getLoginUser();
+            SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
 
             // 构建操作日志对象
             SysOperationLog sysOperationLog = new SysOperationLog();
             sysOperationLog.setModule(controllerOperationLog.title());
             sysOperationLog.setOperationType(controllerOperationLog.businessType().name());
-            sysOperationLog.setUserId(loginUser != null ? loginUser.getUserId() : null);
-            sysOperationLog.setUserName(loginUser != null ? loginUser.getUsername() : SysRolesConstant.ANONYMOUS);
+            sysOperationLog.setUserId(sysUserDetails != null ? sysUserDetails.getUserId() : null);
+            sysOperationLog.setUserName(sysUserDetails != null ? sysUserDetails.getUsername() : SysRolesConstant.ANONYMOUS);
 
             // 获取 HTTP 请求对象
             HttpServletRequest request = ServletUtils.getRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
-            sysOperationLog.setOperationIp(IPUtils.getClientIp(request));
+            sysOperationLog.setOperationIp(IPUtils.getIpAddr(request));
             sysOperationLog.setRequestMethod(request.getMethod());
 
             // 计算方法执行耗时

@@ -83,7 +83,10 @@ public enum ResponseCode {
     TOO_MANY_REQUESTS(42902, "请求过于频繁"),
     // endregion
 
-    FILE_OPERATION_ERROR(50001, "文件操作失败");
+    FILE_OPERATION_ERROR(50001, "文件操作失败"),
+    ACCESS_TOKEN_INVALID(50002, "访问令牌无效或已过期"),
+    REFRESH_TOKEN_INVALID(50003, "刷新令牌无效或已过期"),
+    ACCESS_UNAUTHORIZED(5004, "未授权访问");
 
     /**
      * 状态码

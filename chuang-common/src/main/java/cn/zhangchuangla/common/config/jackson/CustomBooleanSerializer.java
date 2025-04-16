@@ -8,8 +8,10 @@ import java.io.IOException;
 
 /**
  * 自定义 Boolean 类型序列化器，如果是false，则不输出任何内容
+ * 使用方法 @JsonSerialize(using = CustomBooleanSerializer.class)
  *
  * @author Chuang
+ * <p>
  * <p>
  * created on 2025/3/31 13:56
  */

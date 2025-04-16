@@ -26,8 +26,8 @@ spring:
       database: 0
       password: zhangchuang2726
 mybatis-plus:
-  #  configuration:
-  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: cn.zhangchuangla.**.entity
   mapper-locations:
     - classpath*:mapper/**/**.xml
@@ -39,14 +39,14 @@ mybatis-plus:
       logic-not-delete-value: 0     # 逻辑未删除值
 
 
-token:
+security:
   expire: 300000
   secret: zhangchuang2726zhangchuang2726zhangchuang2726
   header: Authorization
-user:
-  password:
+  password-config:
     lock-time: 3
     max-retry-count: 5
-  login:
-    #最大登录会话数,0代表不限制,过大的会话数会影响登录性能
-    max-login-session: 0
+  session:
+    access-token-expire-time: 7200
+    refresh-token-expire-time: 2592000
+    single-login: true

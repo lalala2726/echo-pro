@@ -1,7 +1,7 @@
 package cn.zhangchuangla.infrastructure.interceptor;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
+import cn.zhangchuangla.common.constant.RedisConstants;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.AccessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.TooManyRequestException;
@@ -104,7 +104,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 
             // 如果执行结果为0，表示超过访问限制
             if (result == 0) {
-                String ip = IPUtils.getClientIp(request);
+                String ip = IPUtils.getIpAddr(request);
                 String uri = request.getRequestURI();
                 log.warn("接口访问频率超限 - IP: {}, URI: {}, 限制: {}次/{}秒, 限流类型: {}",
                         ip, uri, maxCount, limitPeriod, limitType.getDescription());
@@ -142,32 +142,32 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
         switch (limitType) {
             // IP限流模式
             case IP -> {
-                String ipAddress = IPUtils.getClientIp(request);
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                String ipAddress = IPUtils.getIpAddr(request);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
             // 用户ID限流模式
             case USER -> {
                 // 尝试获取当前登录用户
                 try {
-                    LoginUser loginUser = SecurityUtils.getLoginUser();
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_USER).append(baseKey)
-                            .append(":").append(loginUser.getUserId());
+                    SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_USER).append(baseKey)
+                            .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 未登录用户，默认降级为IP限流
-                    String ipAddress = IPUtils.getClientIp(request);
-                    keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                    String ipAddress = IPUtils.getIpAddr(request);
+                    keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
                     log.debug("用户未登录，降级为IP限流: {}", ipAddress);
                 }
             }
             // 自定义参数限流模式（此处使用URI作为自定义参数）
             case CUSTOM -> {
                 String uri = request.getRequestURI();
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
             }
             default -> {
                 // 默认采用IP限流
-                String ipAddress = IPUtils.getClientIp(request);
-                keyBuilder.append(RedisKeyConstant.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
+                String ipAddress = IPUtils.getIpAddr(request);
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
         }
 

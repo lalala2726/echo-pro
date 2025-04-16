@@ -6,13 +6,11 @@ import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.storage.component.TencentCOSHandler;
 import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.TencentCOSOperationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * 腾讯云COS 操作服务实现类
@@ -23,19 +21,11 @@ import java.util.concurrent.Executors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TencentCOSOperationServiceImpl implements TencentCOSOperationService {
 
     private final SysFileConfigLoader sysFileConfigLoader;
 
-    // 线程池用于高级操作
-    private final ExecutorService threadPool;
-
-    @Autowired
-    public TencentCOSOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
-        this.sysFileConfigLoader = sysFileConfigLoader;
-        // 创建线程池用于文件操作
-        this.threadPool = Executors.newFixedThreadPool(16);
-    }
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {

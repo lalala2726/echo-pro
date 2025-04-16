@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
-import cn.zhangchuangla.common.core.model.entity.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -16,9 +16,9 @@ import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,17 +32,12 @@ import java.util.Objects;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         implements SysUserService {
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
-
-    @Autowired
-    public SysUserServiceImpl(SysUserMapper sysUserMapper, SysUserRoleService sysUserRoleService) {
-        this.sysUserMapper = sysUserMapper;
-        this.sysUserRoleService = sysUserRoleService;
-    }
 
 
     /**
@@ -260,9 +255,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (userId == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
-        boolean admin = loginUser.getSysUser().isSuperAdmin();
-        Long currentId = loginUser.getUserId();
+        SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
+        boolean admin = sysUserDetails.getSysUser().isSuperAdmin();
+        Long currentId = sysUserDetails.getUserId();
         if (admin || Objects.equals(currentId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
         }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.infrastructure.helper;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.enums.AccessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.TooManyRequestException;
@@ -68,8 +68,8 @@ public class AccessLimitHelper {
     public boolean checkWithIp(String key, int maxCount, int period) {
         try {
             HttpServletRequest request = ServletUtils.getRequest();
-            String ip = IPUtils.getClientIp(request);
-            String redisKey = RedisKeyConstant.ACCESS_LIMIT_IP + key + ":" + ip;
+            String ip = IPUtils.getIpAddr(request);
+            String redisKey = RedisConstants.ACCESS_LIMIT_IP + key + ":" + ip;
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于IP限流异常: {}", e.getMessage(), e);
@@ -88,7 +88,7 @@ public class AccessLimitHelper {
      */
     public boolean checkWithUserId(String key, String userId, int maxCount, int period) {
         try {
-            String redisKey = RedisKeyConstant.ACCESS_LIMIT_USER + key + ":" + userId;
+            String redisKey = RedisConstants.ACCESS_LIMIT_USER + key + ":" + userId;
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于用户ID限流异常: {}", e.getMessage(), e);
@@ -107,7 +107,7 @@ public class AccessLimitHelper {
      */
     public boolean checkWithCustomId(String key, String customId, int maxCount, int period) {
         try {
-            String redisKey = RedisKeyConstant.ACCESS_LIMIT_CUSTOM + key + ":" + customId;
+            String redisKey = RedisConstants.ACCESS_LIMIT_CUSTOM + key + ":" + customId;
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于自定义标识限流异常: {}", e.getMessage(), e);
@@ -132,10 +132,10 @@ public class AccessLimitHelper {
             // 根据限流类型选择不同前缀
             String prefix;
             switch (limitType) {
-                case IP -> prefix = RedisKeyConstant.ACCESS_LIMIT_IP;
-                case USER -> prefix = RedisKeyConstant.ACCESS_LIMIT_USER;
-                case CUSTOM -> prefix = RedisKeyConstant.ACCESS_LIMIT_CUSTOM;
-                default -> prefix = RedisKeyConstant.ACCESS_LIMIT_IP;
+                case IP -> prefix = RedisConstants.ACCESS_LIMIT_IP;
+                case USER -> prefix = RedisConstants.ACCESS_LIMIT_USER;
+                case CUSTOM -> prefix = RedisConstants.ACCESS_LIMIT_CUSTOM;
+                default -> prefix = RedisConstants.ACCESS_LIMIT_IP;
             }
 
             String redisKey = prefix + key + ":" + uniqueId;

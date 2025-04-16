@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
@@ -38,7 +37,6 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public List<SysUserRole> getUserRoleByUserId(Long userId) {
-        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
         LambdaQueryWrapper<SysUserRole> sysUserRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysUserRoleLambdaQueryWrapper.eq(SysUserRole::getUserId, userId);
         return list(sysUserRoleLambdaQueryWrapper);
@@ -54,8 +52,6 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
         if (userId == null || userId <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于零");
         }
-        //删除redis缓存
-        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
         sysUserRoleMapper.deleteUserRoleByUserId(userId);
     }
 
@@ -67,7 +63,6 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void addUserRoleAssociation(List<Long> roleId, Long userId) {
-        redisCache.deleteObject(RedisKeyConstant.USER_ROLE + userId);
         roleId.forEach(role -> {
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(role);

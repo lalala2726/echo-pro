@@ -12,8 +12,8 @@ import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,15 +24,12 @@ import java.util.List;
  * @author zhangchuang
  */
 @Service
+@RequiredArgsConstructor
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         implements SysDeptService {
 
     private final SysDeptMapper sysDeptMapper;
 
-    @Autowired
-    public SysDeptServiceImpl(SysDeptMapper sysDeptMapper) {
-        this.sysDeptMapper = sysDeptMapper;
-    }
 
     /**
      * 部门列表
@@ -145,11 +142,11 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * 递归构建部门树
      *
      * @param parentId 父部门ID
-     * @param allDepts 所有部门列表
+     * @param allDept  所有部门列表
      * @return 部门树列表
      */
-    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDepts) {
-        return allDepts.stream()
+    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDept) {
+        return allDept.stream()
                 .filter(dept -> {
                     // 处理可能的 null 值情况
                     Long deptParentId = dept.getParentId();
@@ -160,7 +157,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                     node.setId(dept.getDeptId());
                     node.setLabel(dept.getDeptName());
                     // 递归查找子节点
-                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDepts);
+                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDept);
                     if (!children.isEmpty()) {
                         node.setChildren(children);
                     }

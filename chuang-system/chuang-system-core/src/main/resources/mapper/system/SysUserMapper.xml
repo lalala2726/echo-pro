@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.system.mapper.SysUserMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.dto.SysUserDeptDto">
+    <resultMap id="UserDeptMap" type="cn.zhangchuangla.system.model.dto.SysUserDeptDto">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
@@ -24,6 +24,25 @@
         <association property="sysDept" javaType="SysDept" resultMap="deptResult"/>
     </resultMap>
 
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.security.model.SysUser">
+        <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
     <resultMap id="deptResult" type="SysDept">
         <id property="deptId" column="dept_dept_id"/>
         <result property="parentId" column="parent_id"/>
@@ -37,7 +56,7 @@
         <result property="description" column="description"/>
     </resultMap>
 
-    <select id="listUser" resultMap="BaseResultMap">
+    <select id="listUser" resultMap="UserDeptMap">
         select user.user_id as user_id,
         user.username as username,
         user.nick_name as nick_name,

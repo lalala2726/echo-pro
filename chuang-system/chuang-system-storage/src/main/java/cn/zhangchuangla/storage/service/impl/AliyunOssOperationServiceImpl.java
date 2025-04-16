@@ -6,8 +6,8 @@ import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.storage.component.AliyunOSSStorageHandler;
 import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,14 +21,11 @@ import java.io.IOException;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AliyunOssOperationServiceImpl implements AliyunOssOperationService {
 
     private final SysFileConfigLoader sysFileConfigLoader;
 
-    @Autowired
-    public AliyunOssOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader) {
-        this.sysFileConfigLoader = sysFileConfigLoader;
-    }
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {

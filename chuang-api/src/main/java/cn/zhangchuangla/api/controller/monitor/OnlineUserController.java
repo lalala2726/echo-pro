@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.monitor;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.model.entity.LoginUser;
 import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -17,9 +17,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +35,10 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/monitor/online")
 @Tag(name = "在线用户管理")
+@RequiredArgsConstructor
 public class OnlineUserController extends BaseController {
 
     private final RedisCache redisCache;
-
-    @Autowired
-    public OnlineUserController(RedisCache redisCache) {
-        this.redisCache = redisCache;
-    }
 
 
     /**
@@ -55,12 +51,13 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public TableDataResult onlineUserList(OnlineUserListRequest request) {
-        Collection<String> keys = redisCache.keys(RedisKeyConstant.LOGIN_TOKEN_KEY + "*");
+        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
+        Collection<String> keys = redisCache.keys(replace);
         ArrayList<OnlineUser> onlineUsers = new ArrayList<>();
         keys.forEach(key -> {
-            LoginUser loginUser = redisCache.getCacheObject(key);
+            OnlineLoginUser sysUserDetails = redisCache.getCacheObject(key);
             OnlineUser onlineUser = new OnlineUser();
-            BeanUtils.copyProperties(loginUser, onlineUser);
+            BeanUtils.copyProperties(sysUserDetails, onlineUser);
             onlineUsers.add(onlineUser);
         });
         Page<OnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineUsers.size(), onlineUsers);
@@ -82,7 +79,8 @@ public class OnlineUserController extends BaseController {
         if (sessionId == null) {
             return error(ResponseCode.PARAM_NOT_NULL);
         }
-        redisCache.deleteObject(RedisKeyConstant.LOGIN_TOKEN_KEY + sessionId);
+        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "");
+        redisCache.deleteObject(replace + sessionId);
         return success();
     }
 }

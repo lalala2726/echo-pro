@@ -6,8 +6,8 @@ import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.storage.component.MinioStorageHandler;
 import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
 import cn.zhangchuangla.storage.service.MinioOperationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,16 +19,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MinioOperationServiceImpl implements MinioOperationService {
 
     private final SysFileConfigLoader sysFileConfigLoader;
     private final MinioStorageHandler minioStorageHandler;
 
-    @Autowired
-    public MinioOperationServiceImpl(SysFileConfigLoader sysFileConfigLoader, MinioStorageHandler minioStorageHandler) {
-        this.sysFileConfigLoader = sysFileConfigLoader;
-        this.minioStorageHandler = minioStorageHandler;
-    }
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {

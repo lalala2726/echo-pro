@@ -1,12 +1,10 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author zhangchuang
@@ -14,21 +12,13 @@ import java.util.List;
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
     /**
-     * 分页查询菜单权限
+     * 获取菜单路由列表
      *
-     * @param sysMenuPage        分页对象
-     * @param sysMenuListRequest 查询参数
-     * @return 分页数据
+     * @param roleCodes 角色编码集合
      */
-    Page<SysMenu> listMenu(Page<SysMenu> sysMenuPage, @Param("request") SysMenuListRequest sysMenuListRequest);
+    //perfect 待完善
+    List<SysMenu> getMenusByRoleCodes(Set<String> roleCodes);
 
-    /**
-     * 根据用户id查询菜单
-     *
-     * @param userId 用户ID
-     * @return 菜单列表
-     */
-    List<SysMenu> getMenuUserId(@Param("userId") Long userId);
 }
 
 

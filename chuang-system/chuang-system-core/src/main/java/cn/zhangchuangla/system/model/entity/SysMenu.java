@@ -1,147 +1,112 @@
 package cn.zhangchuangla.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 菜单权限表实体
+ * 菜单实体
  *
- * @author zhangchuang
+ * @author Ray.Hao
+ * @since 2023/3/6
  */
-@Data
 @TableName("sys_menu")
-@Schema(description = "菜单权限表")
-public class SysMenu implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+@Getter
+@Setter
+public class SysMenu {
 
     /**
      * 菜单ID
      */
-    @TableId(value = "menu_id", type = IdType.AUTO)
-    @Schema(description = "菜单ID")
-    private Long menuId;
-
-    /**
-     * 菜单名称
-     */
-    @Schema(description = "菜单名称")
-    private String menuName;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
     /**
      * 父菜单ID
      */
-    @Schema(description = "父菜单ID")
     private Long parentId;
 
     /**
-     * 显示顺序
+     * 菜单名称
      */
-    @Schema(description = "显示顺序")
-    private Integer orderNum;
-
+    private String name;
 
     /**
-     * 重定向地址
+     * 菜单类型(1-菜单；2-目录；3-外链；4-按钮权限)
      */
-    @Schema(description = "重定向地址")
-    private String redirect;
-
+    private Integer type;
 
     /**
-     * 标题
+     * 路由名称（Vue Router 中定义的路由名称）
      */
-    @Schema(description = "标题")
-    private String title;
-    /**
-     * 路由地址
-     */
-    @Schema(description = "路由地址")
-    private String path;
+    private String routeName;
 
     /**
-     * 组件路径
+     * 路由路径（Vue Router 中定义的 URL 路径）
      */
-    @Schema(description = "组件路径")
+    private String routePath;
+
+    /**
+     * 组件路径(vue页面完整路径，省略.vue后缀)
+     */
     private String component;
-
-    /**
-     * 是否外链（0是 1否）
-     */
-    @Schema(description = "是否外链（0是 1否）")
-    private String isFrame;
-
-    /**
-     * 是否缓存（0缓存 1不缓存）
-     */
-    @Schema(description = "是否缓存（0缓存 1不缓存）")
-    private String isCache;
-
-    /**
-     * 菜单类型（M目录 C菜单 F按钮）
-     */
-    @Schema(description = "菜单类型（M目录 C菜单 F按钮）")
-    private String menuType;
-
-    /**
-     * 菜单状态（0显示 1隐藏）
-     */
-    @Schema(description = "菜单状态（0显示 1隐藏）")
-    private String visible;
-
-    /**
-     * 菜单状态（0正常 1停用）
-     */
-    @Schema(description = "菜单状态（0正常 1停用）")
-    private String status;
 
     /**
      * 权限标识
      */
-    @Schema(description = "权限标识")
-    private String perms;
+    private String perm;
+
+    /**
+     * 显示状态(1:显示;0:隐藏)
+     */
+    private Integer visible;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 
     /**
      * 菜单图标
      */
-    @Schema(description = "菜单图标")
     private String icon;
 
     /**
-     * 创建者
+     * 跳转路径
      */
-    @Schema(description = "创建者")
-    private String createBy;
+    private String redirect;
 
     /**
-     * 创建时间
+     * 父节点路径，以英文逗号(,)分割
      */
-    @Schema(description = "创建时间")
+    private String treePath;
+
+    /**
+     * 【菜单】是否开启页面缓存(1:开启;0:关闭)
+     */
+    private Integer keepAlive;
+
+    /**
+     * 【目录】只有一个子路由是否始终显示(1:是 0:否)
+     */
+    private Integer alwaysShow;
+
+    /**
+     * 路由参数
+     */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    private String params;
+
+
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-    /**
-     * 更新者
-     */
-    @Schema(description = "更新者")
-    private String updateBy;
 
     /**
      * 更新时间
      */
-    @Schema(description = "更新时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
 }

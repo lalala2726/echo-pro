@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.loader;
 
-import cn.zhangchuangla.common.config.AppConfig;
+import cn.zhangchuangla.common.config.property.AppProperty;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ProfileException;
@@ -11,8 +11,8 @@ import cn.zhangchuangla.storage.model.entity.SysFileConfig;
 import cn.zhangchuangla.storage.service.SysFileConfigService;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -24,17 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SysFileConfigLoader {
 
     private final SysFileConfigService sysFileConfigService;
-    private final AppConfig appConfig;
+    private final AppProperty appProperty;
     private final Map<String, String> sysFileConfigCache = new ConcurrentHashMap<>(4);
-
-    @Autowired
-    public SysFileConfigLoader(SysFileConfigService sysFileConfigService, AppConfig appConfig) {
-        this.sysFileConfigService = sysFileConfigService;
-        this.appConfig = appConfig;
-    }
 
     /**
      * 系统启动时加载配置
@@ -87,7 +82,7 @@ public class SysFileConfigLoader {
      */
     private void autoSetLocalStorage() {
         try {
-            String uploadPath = appConfig.getUploadPath();
+            String uploadPath = appProperty.getUploadPath();
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }

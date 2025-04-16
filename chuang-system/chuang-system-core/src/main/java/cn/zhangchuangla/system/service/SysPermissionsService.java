@@ -17,11 +17,19 @@ public interface SysPermissionsService extends IService<SysPermissions> {
     /**
      * 根据角色名称查询权限集合
      *
+     * @param roleName 角色名称集合
+     * @return 返回角色权限集合
+     */
+    Set<String> getPermissionsByRoleName(Set<String> roleName);
+
+
+    /**
+     * 根据角色名称查询权限集合
+     *
      * @param roleName 角色名称
      * @return 返回角色权限集合
      */
     Set<String> getPermissionsByRoleName(String roleName);
-
 
     /**
      * 根据用户id查询权限集合
@@ -30,13 +38,6 @@ public interface SysPermissionsService extends IService<SysPermissions> {
      * @return 返回用户权限集合
      */
     Set<String> getPermissionsByUserId(Long id);
-
-    /**
-     * 保存用户权限到Redis
-     *
-     * @param userId 用户ID
-     */
-    void saveUserPermissionsToRedis(Long userId, final long expireTime);
 
     /**
      * 获取权限列表

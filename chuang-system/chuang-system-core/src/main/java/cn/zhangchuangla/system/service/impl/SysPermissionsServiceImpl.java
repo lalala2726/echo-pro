@@ -1,23 +1,23 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.RedisKeyConstant;
-import cn.zhangchuangla.common.core.model.entity.UserPermissions;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.security.model.UserPermissions;
 import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysPermissionsMapper;
 import cn.zhangchuangla.system.model.entity.SysPermissions;
 import cn.zhangchuangla.system.model.request.permissions.SysPermissionsListRequest;
 import cn.zhangchuangla.system.service.SysPermissionsService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -27,19 +27,35 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper, SysPermissions>
         implements SysPermissionsService {
 
     // 权限过期时间，单位天
-    private final static long permissionExpireTime = 15;
+    private final static int permissionExpireTime = 15;
     private final SysPermissionsMapper sysPermissionsMapper;
     private final RedisCache redisCache;
 
-    @Autowired
-    public SysPermissionsServiceImpl(SysPermissionsMapper sysPermissionsMapper, RedisCache redisCache) {
-        this.sysPermissionsMapper = sysPermissionsMapper;
-        this.redisCache = redisCache;
+
+    /**
+     * 根据角色名称获取权限
+     *
+     * @param roleName 角色名称
+     * @return 权限集合
+     */
+    @Override
+    public Set<String> getPermissionsByRoleName(Set<String> roleName) {
+        Set<String> roleSet = new HashSet<>();
+        roleName.forEach(role -> {
+            Set<String> permissionsByRoleName = getPermissionsByRoleName(role);
+            if (CollectionUtil.isNotEmpty(permissionsByRoleName)) {
+                roleSet.addAll(permissionsByRoleName);
+            }
+        });
+        log.info("获取权限:{}", roleSet);
+        return roleSet;
     }
+
 
     /**
      * 根据角色名称获取权限
@@ -49,13 +65,18 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
      */
     @Override
     public Set<String> getPermissionsByRoleName(String roleName) {
-        if (StringUtils.isEmpty(roleName)) {
-            return Set.of();
+        //1.从Redis缓存中取数据，如果缓存中没有，则从数据库中查询，然后将数据存入缓存
+        Set<String> roleSet = redisCache.getCacheObject(RedisConstants.Auth.PERMISSIONS_PREFIX + roleName);
+        if (roleSet == null || CollectionUtil.isEmpty(roleSet)) {
+            //2.从数据库中查询权限
+            List<SysPermissions> permissionsListByRoleName = sysPermissionsMapper.getPermissionsListByRoleName(roleName);
+            //3.将权限信息存入Redis缓存
+            roleSet = permissionsListByRoleName.stream()
+                    .map(SysPermissions::getPermissionsKey)
+                    .collect(Collectors.toSet());
         }
-        List<SysPermissions> permissionsList = sysPermissionsMapper.getPermissionsListByRoleName(roleName);
-        return permissionsList.stream()
-                .map(SysPermissions::getPermissionsKey)
-                .collect(Collectors.toSet());
+        return roleSet;
+
     }
 
     /**
@@ -67,13 +88,8 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
     @Override
     public Set<String> getPermissionsByUserId(Long id) {
         //如果是管理员将拥有全部权限
-        if (SecurityUtils.isSuperAdmin()) {
+        if (SecurityUtils.isAdmin()) {
             return Set.of("*.*.*");
-        }
-        //优先从Redis中获取权限信息，如果没有，则从数据库中获取并将权限信息缓存到Redis中
-        UserPermissions userPermissions = redisCache.getCacheObject(RedisKeyConstant.USER_PERMISSIONS + id);
-        if (userPermissions != null) {
-            return userPermissions.getPermissions();
         }
         List<SysPermissions> permissionsList = sysPermissionsMapper.getPermissionsByUserId(id);
         Set<String> userPermission = permissionsList.stream()
@@ -82,28 +98,9 @@ public class SysPermissionsServiceImpl extends ServiceImpl<SysPermissionsMapper,
         UserPermissions userPermissionsRedis = new UserPermissions();
         userPermissionsRedis.setUserId(id);
         userPermissionsRedis.setPermissions(userPermission);
-        redisCache.setCacheObject(RedisKeyConstant.USER_PERMISSIONS + id, userPermissionsRedis, permissionExpireTime, TimeUnit.DAYS);
         return userPermission;
     }
 
-    /**
-     * 保存用户权限到Redis
-     *
-     * @param userId     用户ID
-     * @param expireTime 过期时间,单位天
-     */
-    @Override
-    public void saveUserPermissionsToRedis(Long userId, long expireTime) {
-        try {
-            Set<String> permissions = getPermissionsByUserId(userId);
-            UserPermissions userPermissions = new UserPermissions();
-            userPermissions.setUserId(userId);
-            userPermissions.setPermissions(permissions);
-            redisCache.setCacheObject(RedisKeyConstant.USER_PERMISSIONS + userId, userPermissions, expireTime, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.error("保存用户权限到Redis失败", e);
-        }
-    }
 
     /**
      * 分页查询权限列表
