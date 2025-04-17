@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "字典接口")
-public class DictController extends BaseController {
+public class SysDictController extends BaseController {
 
 
 }
