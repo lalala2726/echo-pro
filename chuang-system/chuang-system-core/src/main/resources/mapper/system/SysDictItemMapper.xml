@@ -18,4 +18,14 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateBy" column="update_by"/>
     </resultMap>
+    <select id="listSpecifyDictData" resultMap="BaseResultMap">
+        select *
+        from sys_dict_item
+        where dict_code = #{dictCode}
+    </select>
+
+    <select id="listDictData" resultMap="BaseResultMap">
+        select *
+        from sys_dict_item
+    </select>
 </mapper>
