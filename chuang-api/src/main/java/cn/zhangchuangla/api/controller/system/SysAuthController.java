@@ -1,6 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -44,6 +46,7 @@ public class SysAuthController extends BaseController {
     private final SysRoleService sysRoleService;
     private final SysMenuService sysMenuService;
     private final SysUserConverter sysUserConverter;
+    private final RedisCache redisCache;
 
     /**
      * 登录
@@ -56,7 +59,11 @@ public class SysAuthController extends BaseController {
     public AjaxResult login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
-        log.info("登录请求参数：{}", request);
+        // 1. 校验验证码
+        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
+        if (!loginRequest.getCaptchaCode().equals(code)) {
+            return error("验证码错误");
+        }
         AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
         return success(authenticationToken);
     }
