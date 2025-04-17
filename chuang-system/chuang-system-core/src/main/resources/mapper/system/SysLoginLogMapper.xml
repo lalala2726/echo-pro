@@ -20,4 +20,12 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
+    <update id="cleanLoginLog">
+        truncate table sys_login_log
+    </update>
+    <select id="listLoginLog" resultMap="BaseResultMap">
+        select *
+        from sys_login_log
+    </select>
+
 </mapper>

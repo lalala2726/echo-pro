@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysOperationLogMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysOperationLog">
-        <id property="logId" column="log_id"/>
+        <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
         <result property="module" column="module"/>
@@ -22,5 +22,14 @@
         <result property="costTime" column="cost_time"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+
+    <update id="cleanLoginLog">
+        truncate table sys_operation_log
+    </update>
+
+    <select id="listOperationLog" resultMap="BaseResultMap">
+        select *
+        from sys_operation_log
+    </select>
 
 </mapper>

@@ -79,6 +79,23 @@ public class SecurityUtils {
     }
 
     /**
+     * 固定时间比较两个字符串，防止时间侧信道攻击
+     */
+    public static boolean constantTimeEquals(String a, String b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (a.length() != b.length()) {
+            return false;
+        }
+        int result = 0;
+        for (int i = 0; i < a.length(); i++) {
+            result |= a.charAt(i) ^ b.charAt(i);
+        }
+        return result == 0;
+    }
+
+    /**
      * 获取当前请求对象
      */
     private static HttpServletRequest getRequest() {

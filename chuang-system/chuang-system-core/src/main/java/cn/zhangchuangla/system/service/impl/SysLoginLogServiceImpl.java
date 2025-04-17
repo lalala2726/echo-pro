@@ -5,9 +5,12 @@ import cn.zhangchuangla.common.model.entity.ClientInfo;
 import cn.zhangchuangla.common.utils.ClientUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
+import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
 import cn.zhangchuangla.system.service.SysLoginLogService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +24,11 @@ import java.util.Date;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLoginLog>
         implements SysLoginLogService {
+
+    private final SysLoginLogMapper sysLoginLogMapper;
 
     /**
      * 记录登录日志
@@ -57,6 +63,42 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
                 .createBy(Constants.SYSTEM_CREATE)
                 .build();
         save(sysLoginLog);
+    }
+
+    /**
+     * 分页查询登录日志
+     *
+     * @param request 查询参数
+     * @return 登录日志列表
+     */
+    @Override
+    public Page<SysLoginLog> listLoginLog(SysLoginLogListRequest request) {
+        Page<SysLoginLog> sysLoginLogPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysLoginLogMapper.listLoginLog(sysLoginLogPage);
+    }
+
+
+    /**
+     * 清空登录日志
+     *
+     * @return 是否成功
+     */
+    @Override
+    public boolean cleanLoginLog() {
+        //删除所有日志
+        sysLoginLogMapper.cleanLoginLog();
+        return true;
+    }
+
+    /**
+     * 根据ID获取登录日志
+     *
+     * @param id 主键
+     * @return 是否成功
+     */
+    @Override
+    public SysLoginLog getLoginLogById(Long id) {
+        return getById(id);
     }
 }
 

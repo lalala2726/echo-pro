@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServerController extends BaseController {
 
 
+    public ServerController() {
+        super();
+    }
+
     /**
      * 服务器信息
      *

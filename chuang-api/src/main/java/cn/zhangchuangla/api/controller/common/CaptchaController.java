@@ -40,6 +40,10 @@ public class CaptchaController extends BaseController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    public CaptchaController() {
+        super();
+    }
+
     /**
      * 获取验证码
      *
