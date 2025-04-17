@@ -1,13 +1,17 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.utils.UserAgentUtils;
+import cn.zhangchuangla.common.model.entity.ClientInfo;
+import cn.zhangchuangla.common.utils.ClientUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.service.SysLoginLogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 
 /**
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
  * @author zhangchuang
  */
 @Service
+@Slf4j
 public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLoginLog>
         implements SysLoginLogService {
 
@@ -24,19 +29,33 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
      *
      * @param username           用户
      * @param httpServletRequest 请求参数
-     * @param loginStatus        是否登录成功
+     * @param isSuccess          是否登录成功
      */
     @Override
-    public void recordLoginLog(String username, HttpServletRequest httpServletRequest, Integer loginStatus) {
-        String header = httpServletRequest.getHeader("User-Agent");
-        SysLoginLog sysLoginLog = new SysLoginLog();
-        sysLoginLog.setStatus(loginStatus);
-        sysLoginLog.setUsername(username);
-        sysLoginLog.setIp(httpServletRequest.getRemoteAddr());
-        sysLoginLog.setAddress(httpServletRequest.getRemoteAddr());
-        sysLoginLog.setBrowser(UserAgentUtils.getBrowserManufacturer(header));
-        sysLoginLog.setOs(UserAgentUtils.getOsName(header));
-        sysLoginLog.setCreateBy(Constants.SYSTEM_CREATE);
+    public void recordLoginLog(String username, HttpServletRequest httpServletRequest, boolean isSuccess) {
+        ClientInfo deviceInfo = ClientUtils.getClientInfo(httpServletRequest);
+        log.info("用户名: {},登录: {},登录时间: {},系统名称: {}, IP地址: {}, 浏览器名称: {}, 设备版本: {}, 浏览器类型: {}, 设备类型: {}, 浏览器渲染引擎: {}, 区域: {}",
+                username,
+                isSuccess ? "登录成功" : "登录失败",
+                new Date(),
+                deviceInfo.getOsName(),
+                deviceInfo.getIp(),
+                deviceInfo.getBrowserName(),
+                deviceInfo.getOsVersion(),
+                deviceInfo.getBrowserType(),
+                deviceInfo.getDeviceType(),
+                deviceInfo.getBrowserRenderingEngine(),
+                deviceInfo.getRegion()
+        );
+        SysLoginLog sysLoginLog = SysLoginLog.builder()
+                .os(deviceInfo.getOsName())
+                .ip(deviceInfo.getIp())
+                .address(deviceInfo.getRegion())
+                .username(username)
+                .browser(deviceInfo.getBrowserName())
+                .status(isSuccess ? 0 : 1)
+                .createBy(Constants.SYSTEM_CREATE)
+                .build();
         save(sysLoginLog);
     }
 }

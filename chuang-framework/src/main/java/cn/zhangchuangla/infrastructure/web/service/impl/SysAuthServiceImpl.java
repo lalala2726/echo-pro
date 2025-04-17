@@ -8,12 +8,14 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.security.token.TokenManager;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
+import cn.zhangchuangla.system.service.SysLoginLogService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenManager tokenManager;
+    private final SysLoginLogService sysLoginLogService;
 
 
     /**
@@ -47,12 +50,18 @@ public class SysAuthServiceImpl implements SysAuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername().trim(), request.getPassword().trim());
 
         // 2. 执行认证（认证中）
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        Authentication authentication = null;
+        try {
+            authentication = authenticationManager.authenticate(authenticationToken);
+        } catch (AuthenticationException e) {
+            sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, false);
+        }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
         AuthenticationToken authenticationTokenResponse =
                 tokenManager.generateToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, true);
         return authenticationTokenResponse;
     }
 

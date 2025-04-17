@@ -18,9 +18,9 @@ public interface SysLoginLogService extends IService<SysLoginLog> {
      *
      * @param username           用户名
      * @param httpServletRequest 请求参数
-     * @param loginStatus        是否登录成功
+     * @param isSuccess          是否登录成功
      */
-    void recordLoginLog(String username, HttpServletRequest httpServletRequest, Integer loginStatus);
+    void recordLoginLog(String username, HttpServletRequest httpServletRequest, boolean isSuccess);
 
 }
 

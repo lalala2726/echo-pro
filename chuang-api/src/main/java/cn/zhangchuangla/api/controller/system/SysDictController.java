@@ -204,7 +204,6 @@ public class SysDictController extends BaseController {
     /**
      * 修改字典项
      *
-     * @param id      字典项ID
      * @param request 请求参数
      * @return 修改结果
      */
@@ -212,8 +211,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "修改字典项")
     @OperationLog(title = "字典项管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:update')")
-    public AjaxResult updateDictItem(@PathVariable("id") Long id, @Validated @RequestBody SysDictItemUpdateRequest request) {
-        if (id == null || id <= 0) return error("字典项ID不能为空");
+    public AjaxResult updateDictItem(@Validated @RequestBody SysDictItemUpdateRequest request) {
         boolean result = sysDictItemService.updateDictItem(request);
         return toAjax(result);
     }

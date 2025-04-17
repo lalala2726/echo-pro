@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.*;
 import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -25,7 +26,9 @@ import java.util.Objects;
  */
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandel {
+
 
     /**
      * 业务异常
