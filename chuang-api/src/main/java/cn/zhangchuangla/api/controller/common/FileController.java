@@ -9,8 +9,8 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
-import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.service.SysFileManagementService;
+import cn.zhangchuangla.storage.loader.StorageConfigLoader;
+import cn.zhangchuangla.storage.service.StorageManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class FileController extends BaseController {
 
-    private final SysFileConfigLoader sysFileConfigLoader;
+    private final StorageConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
-    private final SysFileManagementService sysFileManagementService;
+    private final StorageManagementService storageManagementService;
 
 
     /**
@@ -74,7 +74,7 @@ public class FileController extends BaseController {
                     .build();
 
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
-            sysFileManagementService.saveFileInfo(result);
+            storageManagementService.saveFileInfo(result);
             ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
             return ajax;
         } catch (IOException e) {
@@ -112,7 +112,7 @@ public class FileController extends BaseController {
                     .build();
             FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
             // 保存文件信息到数据库
-            sysFileManagementService.saveFileInfo(result);
+            storageManagementService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
             ajax.put(Constants.PREVIEW, result.getPreviewImageUrl());
         } catch (IOException e) {

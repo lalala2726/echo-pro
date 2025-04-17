@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.storage.component.MinioStorageHandler;
-import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.service.MinioOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MinioOperationServiceImpl implements MinioOperationService {
 
-    private final SysFileConfigLoader sysFileConfigLoader;
+    private final StorageConfigLoader sysFileConfigLoader;
     private final MinioStorageHandler minioStorageHandler;
 
 

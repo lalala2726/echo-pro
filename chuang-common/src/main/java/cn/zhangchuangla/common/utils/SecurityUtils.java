@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -41,6 +42,57 @@ public class SecurityUtils {
             throw new ServiceException(ResponseCode.UNAUTHORIZED, "用户未登录");
         }
         return (SysUserDetails) authentication.getPrincipal();
+    }
+
+    /**
+     * 生成BCryptPasswordEncoder密码
+     *
+     * @param password 密码
+     * @return 加密字符串
+     */
+    public static String encryptPassword(String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
+
+    /**
+     * 判断密码是否相同
+     *
+     * @param rawPassword     真实密码
+     * @param encodedPassword 加密后字符
+     * @return 结果
+     */
+    public static boolean matchesPassword(String rawPassword, String encodedPassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+
+    /**
+     * 是否拥有某个角色
+     *
+     * @return true代表有，false代表无
+     */
+    public static boolean hasRole(String role) {
+        return getRoles().contains(role);
+    }
+
+    /**
+     * 固定时间比较两个字符串，防止时间侧信道攻击
+     */
+    public static boolean constantTimeEquals(String a, String b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (a.length() != b.length()) {
+            return false;
+        }
+        int result = 0;
+        for (int i = 0; i < a.length(); i++) {
+            result |= a.charAt(i) ^ b.charAt(i);
+        }
+        return result == 0;
     }
 
     /**

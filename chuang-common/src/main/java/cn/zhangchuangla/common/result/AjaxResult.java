@@ -256,4 +256,18 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(new Date());
     }
+
+    /**
+     * 警告返回（带消息）
+     *
+     * @param message 返回消息
+     * @return AjaxResult
+     */
+    public static AjaxResult warning(String message) {
+        AjaxResult ajaxResult = new AjaxResult();
+        ajaxResult.put(MSG_TAG, message);
+        ajaxResult.put(CODE_TAG, ResponseCode.WARNING.getCode());
+        ajaxResult.put(TIME_TAG, getCurrentTime());
+        return ajaxResult;
+    }
 }

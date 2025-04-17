@@ -1,18 +1,14 @@
 package cn.zhangchuangla.system.model.vo.user;
 
-import cn.zhangchuangla.common.base.BaseVO;
-import cn.zhangchuangla.system.model.entity.SysDept;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "用户VO", description = "返回前端展示的数据")
-public class UserListVo extends BaseVO {
+public class UserListVo {
 
     /**
      * ID
@@ -90,8 +86,10 @@ public class UserListVo extends BaseVO {
     private String remark;
 
     /**
-     * 部门对象
+     * 部门名称
      */
-    @Schema(description = "部门对象")
-    private SysDept sysDept;
+    @Schema(description = "部门名称")
+    private String deptName;
+
+
 }

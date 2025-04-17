@@ -9,11 +9,11 @@ import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
-import cn.zhangchuangla.storage.model.entity.SysFileConfig;
+import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigUpdateRequest;
-import cn.zhangchuangla.storage.model.vo.manage.SysFileManagementListVo;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.vo.manage.StorageFileManagementListVo;
 import org.mapstruct.Mapper;
 
 /**
@@ -30,7 +30,7 @@ public interface StorageConverter {
      * @param request 文件配置添加请求参数
      * @return SysFileConfig 实体类
      */
-    SysFileConfig toSysFileConfig(SysFileConfigAddRequest request);
+    StorageConfig toSysFileConfig(StorageConfigAddRequest request);
 
     /**
      * 将腾讯云对象存储配置请求类 转换为 TencentCOSConfigEntity 实体类
@@ -70,7 +70,7 @@ public interface StorageConverter {
      * @param request 文件配置更新请求参数
      * @return SysFileConfig 实体类
      */
-    SysFileConfig toEntity(SysFileConfigUpdateRequest request);
+    StorageConfig toEntity(StorageConfigUpdateRequest request);
 
     /**
      * 将文件配置实体类 转换为文件传输数据传输对象
@@ -86,5 +86,5 @@ public interface StorageConverter {
      * @param sysFileManagement 文件配置实体类
      * @return 文件配置请求参数
      */
-    SysFileManagementListVo toSysFileManagementListVo(SysFileManagement sysFileManagement);
+    StorageFileManagementListVo toSysFileManagementListVo(SysFileManagement sysFileManagement);
 }

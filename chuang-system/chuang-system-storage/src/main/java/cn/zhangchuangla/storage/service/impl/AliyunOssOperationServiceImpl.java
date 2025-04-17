@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.storage.component.AliyunOSSStorageHandler;
-import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
+import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.service.AliyunOssOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AliyunOssOperationServiceImpl implements AliyunOssOperationService {
 
-    private final SysFileConfigLoader sysFileConfigLoader;
+    private final StorageConfigLoader sysFileConfigLoader;
 
 
     @Override

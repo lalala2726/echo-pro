@@ -7,8 +7,8 @@ import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
 import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
-import cn.zhangchuangla.storage.model.vo.manage.SysFileManagementListVo;
-import cn.zhangchuangla.storage.service.SysFileManagementService;
+import cn.zhangchuangla.storage.model.vo.manage.StorageFileManagementListVo;
+import cn.zhangchuangla.storage.service.StorageManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ import java.util.List;
 public class SysFileManageController extends BaseController {
 
 
-    private final SysFileManagementService sysFileManagementService;
+    private final StorageManagementService storageManagementService;
     private final StorageConverter storageConverter;
 
 
@@ -47,14 +47,14 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult listFileManage(SysFileManagementListRequest request) {
-        Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileManage(request);
-        ArrayList<SysFileManagementListVo> sysFileManagementListVos = new ArrayList<>();
+        Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
+        ArrayList<StorageFileManagementListVo> storageFileManagementListVos = new ArrayList<>();
         sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
-            SysFileManagementListVo sysFileManagementListVo = storageConverter.toSysFileManagementListVo(sysFileManagement);
-            sysFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
-            sysFileManagementListVos.add(sysFileManagementListVo);
+            StorageFileManagementListVo storageFileManagementListVo = storageConverter.toSysFileManagementListVo(sysFileManagement);
+            storageFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
+            storageFileManagementListVos.add(storageFileManagementListVo);
         });
-        return getTableData(sysFileManagementPage, sysFileManagementListVos);
+        return getTableData(sysFileManagementPage, storageFileManagementListVos);
     }
 
     /**
@@ -67,9 +67,9 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult listFileTrash(SysFileManagementListRequest request) {
-        Page<SysFileManagement> sysFileManagementPage = sysFileManagementService.listFileTrash(request);
-        List<SysFileManagementListVo> sysFileManagementListVos = copyListProperties(sysFileManagementPage, SysFileManagementListVo.class);
-        return getTableData(sysFileManagementPage, sysFileManagementListVos);
+        Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileTrash(request);
+        List<StorageFileManagementListVo> storageFileManagementListVos = copyListProperties(sysFileManagementPage, StorageFileManagementListVo.class);
+        return getTableData(sysFileManagementPage, storageFileManagementListVos);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SysFileManageController extends BaseController {
     @OperationLog(title = "文件资源管理", businessType = BusinessType.RECOVER)
     public AjaxResult recoverFile(@PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件ID不能为空!");
-        boolean result = sysFileManagementService.recoverFile(id);
+        boolean result = storageManagementService.recoverFile(id);
         return toAjax(result);
     }
 
@@ -107,7 +107,7 @@ public class SysFileManageController extends BaseController {
             checkParam(id == null || id <= 0, "文件ID不能为空!");
         });
         checkParam(ids.size() > 100, "最多只能删除100个文件!");
-        boolean result = sysFileManagementService.removeFile(ids, isPermanently);
+        boolean result = storageManagementService.removeFile(ids, isPermanently);
         return toAjax(result);
     }
 }

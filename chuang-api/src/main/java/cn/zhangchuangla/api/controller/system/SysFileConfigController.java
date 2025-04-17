@@ -9,11 +9,11 @@ import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.storage.loader.SysFileConfigLoader;
-import cn.zhangchuangla.storage.model.entity.SysFileConfig;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigListRequest;
-import cn.zhangchuangla.storage.model.vo.config.SysFileConfigListVo;
-import cn.zhangchuangla.storage.service.SysFileConfigService;
+import cn.zhangchuangla.storage.loader.StorageConfigLoader;
+import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
+import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,8 +37,8 @@ import java.util.Objects;
 public class SysFileConfigController extends BaseController {
 
 
-    private final SysFileConfigService sysFileConfigService;
-    private final SysFileConfigLoader sysFileConfigLoader;
+    private final StorageConfigService storageConfigService;
+    private final StorageConfigLoader sysFileConfigLoader;
 
 
     /**
@@ -51,10 +51,10 @@ public class SysFileConfigController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult listSysFileConfig(SysFileConfigListRequest request) {
-        Page<SysFileConfig> sysFileConfigPage = sysFileConfigService.listSysFileConfig(request);
-        List<SysFileConfigListVo> sysFileConfigListVos = copyListProperties(sysFileConfigPage, SysFileConfigListVo.class);
-        return getTableData(sysFileConfigPage, sysFileConfigListVos);
+    public AjaxResult listSysFileConfig(StorageConfigListRequest request) {
+        Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
+        List<StorageFileConfigListVo> storageFileConfigListVos = copyListProperties(sysFileConfigPage, StorageFileConfigListVo.class);
+        return getTableData(sysFileConfigPage, storageFileConfigListVos);
     }
 
     /**
@@ -74,7 +74,7 @@ public class SysFileConfigController extends BaseController {
         if (!StringUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = sysFileConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.saveFileConfig(request);
 
         return toAjax(result);
     }
@@ -97,7 +97,7 @@ public class SysFileConfigController extends BaseController {
         if (!StringUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = sysFileConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);
     }
 
@@ -118,7 +118,7 @@ public class SysFileConfigController extends BaseController {
         if (!StringUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = sysFileConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);
     }
 
@@ -134,7 +134,7 @@ public class SysFileConfigController extends BaseController {
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult setIsMasterConfig(@PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
-        boolean result = sysFileConfigService.setMasterConfig(id);
+        boolean result = storageConfigService.setMasterConfig(id);
         // 刷新缓存
         if (result) refreshCache();
         return toAjax(result);
@@ -172,7 +172,7 @@ public class SysFileConfigController extends BaseController {
             checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID), String.format("ID为 %s 是默认配置！无法删除:",
                     StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID));
         });
-        boolean result = sysFileConfigService.deleteFileConfig(ids);
+        boolean result = storageConfigService.deleteFileConfig(ids);
         return toAjax(result);
     }
 

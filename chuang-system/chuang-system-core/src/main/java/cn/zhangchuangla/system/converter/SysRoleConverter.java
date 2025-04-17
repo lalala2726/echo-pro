@@ -4,8 +4,8 @@ import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
-import cn.zhangchuangla.system.model.vo.permission.SysRoleVo;
 import cn.zhangchuangla.system.model.vo.post.SysPostVo;
+import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import org.mapstruct.Mapper;
 
 /**

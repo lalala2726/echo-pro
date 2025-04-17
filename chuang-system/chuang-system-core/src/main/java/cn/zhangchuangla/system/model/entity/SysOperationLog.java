@@ -13,11 +13,12 @@ import java.util.Date;
 @TableName(value = "sys_operation_log")
 @Data
 public class SysOperationLog {
+    //todo 增加操作地点
     /**
-     *
+     * 主键
      */
     @TableId(type = IdType.AUTO)
-    private Long logId;
+    private Long id;
 
     /**
      * 用户ID

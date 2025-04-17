@@ -12,4 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommonController extends BaseController {
 
+    public CommonController() {
+        super();
+    }
 }

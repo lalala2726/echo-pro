@@ -2,9 +2,11 @@ package cn.zhangchuangla.api.controller.common;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.IdUtil;
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.infrastructure.annotation.AccessLimit;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/captcha")
 @Tag(name = "验证码相关")
-
 public class CaptchaController extends BaseController {
 
 
@@ -38,6 +40,10 @@ public class CaptchaController extends BaseController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    public CaptchaController() {
+        super();
+    }
+
     /**
      * 获取验证码
      *
@@ -45,10 +51,11 @@ public class CaptchaController extends BaseController {
      */
     @GetMapping
     @Operation(summary = "获取验证码")
+    @AccessLimit(maxCount = 20)
     public AjaxResult getCaptcha() {
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
-        AjaxResult ajax = AjaxResult.success();
+        HashMap<String, String> ajax = new HashMap<>(2);
         String capStr, code;
         BufferedImage image;
 
@@ -69,8 +76,8 @@ public class CaptchaController extends BaseController {
             return AjaxResult.error(e.getMessage());
         }
 
-        ajax.put("uuid", uuid);
-        ajax.put("img", Base64.encode(os.toByteArray()));
-        return ajax;
+        ajax.put("captchaKey", uuid);
+        ajax.put("captchaBase64", Constants.BASE64_CODE + Base64.encode(os.toByteArray()));
+        return success(ajax);
     }
 }

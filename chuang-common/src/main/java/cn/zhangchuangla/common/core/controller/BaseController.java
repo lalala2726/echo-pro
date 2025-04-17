@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.function.Predicate;
  * <p>
  * created on 2025/3/20 19:09
  */
+@Component
 public class BaseController {
 
 
@@ -44,6 +46,7 @@ public class BaseController {
         return targetList;
     }
 
+
     /**
      * 将 Page<T> 转换为 List<V>，使用 BeanUtils 进行属性拷贝
      *
@@ -65,7 +68,7 @@ public class BaseController {
     protected TableDataResult getTableData(Page<?> page) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(page.getRecords());
+        tableDataResult.setList(page.getRecords());
         tableDataResult.setCurrentTime(System.currentTimeMillis());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
@@ -81,7 +84,7 @@ public class BaseController {
     protected AjaxResult getTableData(Page<?> page, List<?> vo) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(vo);
+        tableDataResult.setList(vo);
         tableDataResult.setCurrentTime(System.currentTimeMillis());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
@@ -178,6 +181,10 @@ public class BaseController {
         return AjaxResult.success(message);
     }
 
+    protected AjaxResult warning(String message) {
+        return AjaxResult.warning(message);
+    }
+
     /**
      * 失败返回
      *
@@ -205,11 +212,33 @@ public class BaseController {
      * @param conditionSupplier 条件
      * @param errorMessage      错误信息
      */
-    public void checkParam(boolean conditionSupplier, String errorMessage) {
+    protected void checkParam(boolean conditionSupplier, String errorMessage) {
         if (conditionSupplier) {
             throw new ParamException(errorMessage);
         }
     }
+
+    /**
+     * 加密密码
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    protected String encryptPassword(String password) {
+        return SecurityUtils.encryptPassword(password);
+    }
+
+    /**
+     * 验证密码是否匹配
+     *
+     * @param rawPassword     密码
+     * @param encodedPassword 密码
+     * @return 是否匹配
+     */
+    protected boolean matchesPassword(String rawPassword, String encodedPassword) {
+        return SecurityUtils.matchesPassword(rawPassword, encodedPassword);
+    }
+
 
     /**
      * 验证条件是否为true（函数方法）
@@ -217,7 +246,7 @@ public class BaseController {
      * @param condition    条件
      * @param errorMessage 错误信息
      */
-    public void checkParam(Predicate<?> condition, String errorMessage) {
+    protected void checkParam(Predicate<?> condition, String errorMessage) {
         if (condition.test(null)) {
             throw new ParamException(errorMessage);
         }

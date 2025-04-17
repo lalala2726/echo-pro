@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * 文件上传记录表
  */
-@TableName(value = "sys_file_management")
+@TableName(value = "storage_file_management")
 @Data
 @Builder
 @NoArgsConstructor

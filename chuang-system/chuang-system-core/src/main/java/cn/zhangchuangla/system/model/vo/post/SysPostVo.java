@@ -1,17 +1,17 @@
 package cn.zhangchuangla.system.model.vo.post;
 
-import cn.zhangchuangla.common.base.BaseVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * 岗位表
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "岗位视图对象")
-public class SysPostVo extends BaseVO {
+public class SysPostVo {
 
     /**
      * 岗位ID
@@ -45,7 +45,28 @@ public class SysPostVo extends BaseVO {
 
 
     /**
-     * 是否删除(0-未删除,1-已删除)
+     * 创建时间
      */
-    private Integer isDeleted;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Schema(description = "创建时间")
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @Schema(description = "更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
+
+    /**
+     * 创建人
+     */
+    @Schema(description = "新增者")
+    private String createBy;
+
+    /**
+     * 更新人
+     */
+    @Schema(description = "更新者")
+    private String updateBy;
 }
