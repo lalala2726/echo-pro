@@ -16,6 +16,7 @@ import cn.zhangchuangla.system.service.SysDictItemService;
 import cn.zhangchuangla.system.service.SysDictService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,7 +50,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public AjaxResult listDict(SysDictListRequest request) {
+    public AjaxResult listDict(@Parameter(description = "字典列表请求类") SysDictListRequest request) {
         Page<SysDict> sysDict = sysDictService.listDict(request);
         List<SysDictListVo> sysDictListVos = copyListProperties(sysDict, SysDictListVo.class);
         return success(getTableData(sysDict, sysDictListVos));
@@ -65,7 +66,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "新增字典")
     @OperationLog(title = "字典管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:dict:add')")
-    public AjaxResult addDict(@Validated @RequestBody SysDictAddRequest request) {
+    public AjaxResult addDict(@Parameter(description = "字典添加请求类")
+                              @Validated @RequestBody SysDictAddRequest request) {
         // 校验字典编码是否存在
         if (sysDictService.isDictCodeExist(request.getDictCode())) return error("字典编码已存在");
         boolean result = sysDictService.addDict(request);
@@ -81,7 +83,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典选项")
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
-    public AjaxResult getDict(@PathVariable("id") Long id) {
+    public AjaxResult getDict(@Parameter(description = "字典ID") @PathVariable("id") Long id) {
         SysDict sysDict = sysDictService.getDictById(id);
         SysDictVo sysDictVo = sysDictConverter.toSysDictVo(sysDict);
         return success(sysDictVo);
@@ -97,7 +99,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "删除字典")
     @OperationLog(title = "字典管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
-    public AjaxResult deleteDict(@PathVariable List<Long> ids) {
+    public AjaxResult deleteDict(@Parameter(description = "字典ID，支持支持批量删除，如果删除时候其中一项删除失败，数据将会回滚")
+                                 @PathVariable List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典ID不能为空!"));
         // 删除字典
         boolean result = sysDictService.deleteDict(ids);
@@ -114,7 +117,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "修改字典")
     @OperationLog(title = "字典管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:dict:update')")
-    public AjaxResult updateDict(@Validated @RequestBody SysDictUpdateRequest request) {
+    public AjaxResult updateDict(@Parameter(description = "字典更新请求类")
+                                 @Validated @RequestBody SysDictUpdateRequest request) {
         boolean result = sysDictService.updateDict(request);
         return toAjax(result);
     }
@@ -133,7 +137,8 @@ public class SysDictController extends BaseController {
     @GetMapping("/{dictCode}/items/list")
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
-    public AjaxResult listDictData(@PathVariable("dictCode") String dictCode, @Validated SysDictItemListRequest request) {
+    public AjaxResult listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
+                                   @Validated @Parameter(description = "字典项列表查询请求类") SysDictItemListRequest request) {
         if (dictCode.isEmpty()) return error("字典编码不能为空");
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(dictCode, request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
@@ -149,7 +154,8 @@ public class SysDictController extends BaseController {
     @GetMapping("/items/list")
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
-    public AjaxResult listDictData(@Validated SysDictItemListRequest request) {
+    public AjaxResult listDictData(@Parameter(description = "字典项列表请求类")
+                                   @Validated SysDictItemListRequest request) {
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
         return success(getTableData(sysDictItemPage, sysDictItemListVos));
@@ -164,7 +170,8 @@ public class SysDictController extends BaseController {
     @GetMapping("/{dictCode}/items")
     @Operation(summary = "查询字典项列表")
     @PreAuthorize("@ss.hasPermission('system:dict-item:query')")
-    public AjaxResult getDictItems(@PathVariable("dictCode") String dictCode) {
+    public AjaxResult getDictItems(@Parameter(description = "字典编码")
+                                   @PathVariable("dictCode") String dictCode) {
         if (dictCode.isEmpty()) return error("字典编码不能为空");
         List<SysDictItem> sysDictItems = sysDictItemService.getDictItems(dictCode);
         return success(sysDictItems);
@@ -180,7 +187,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "新增字典项")
     @OperationLog(title = "字典项管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:dict-item:add')")
-    public AjaxResult addDictItem(@Validated @RequestBody SysDictItemAddRequest request) {
+    public AjaxResult addDictItem(@Parameter(description = "字典项添加请求类")
+                                  @Validated @RequestBody SysDictItemAddRequest request) {
         boolean result = sysDictItemService.addDictItem(request);
         return toAjax(result);
     }
@@ -194,7 +202,7 @@ public class SysDictController extends BaseController {
     @GetMapping("/items/{id}")
     @Operation(summary = "获取字典项")
     @PreAuthorize("@ss.hasPermission('system:dict-item:query')")
-    public AjaxResult getDictItemById(@PathVariable("id") Long id) {
+    public AjaxResult getDictItemById(@Parameter(description = "字典项ID") @PathVariable("id") Long id) {
         if (id == null || id <= 0) return error("字典项ID不能为空");
         SysDictItem sysDictItem = sysDictItemService.getDictItemById(id);
         SysDictItemVo sysDictItemVo = sysDictConverter.toSysDictItemVo(sysDictItem);
@@ -211,7 +219,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "修改字典项")
     @OperationLog(title = "字典项管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:update')")
-    public AjaxResult updateDictItem(@Validated @RequestBody SysDictItemUpdateRequest request) {
+    public AjaxResult updateDictItem(@Parameter(description = "字典项更新请求类")
+                                     @Validated @RequestBody SysDictItemUpdateRequest request) {
         boolean result = sysDictItemService.updateDictItem(request);
         return toAjax(result);
     }
@@ -226,7 +235,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "删除字典项")
     @OperationLog(title = "字典项管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:remove')")
-    public AjaxResult deleteDictItem(@PathVariable List<Long> ids) {
+    public AjaxResult deleteDictItem(@Parameter(description = "删除字典项，支持批量删除，删除时如果一项删除失败数据将会回滚")
+                                     @PathVariable List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典项ID不能为空!"));
         boolean result = sysDictItemService.deleteDictItem(ids);
         return toAjax(result);

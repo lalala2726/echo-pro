@@ -10,6 +10,7 @@ import lombok.Data;
  * 字典项表
  */
 @Data
+@Schema(description = "字典项更新请求类")
 public class SysDictItemUpdateRequest {
 
     /**

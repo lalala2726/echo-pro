@@ -46,7 +46,7 @@ public interface SysDeptService extends IService<SysDept> {
      * @param id 部门ID
      * @return 部门信息
      */
-    SysDept getDeptById(Integer id);
+    SysDept getDeptById(Long id);
 
 
     /**
@@ -62,7 +62,7 @@ public interface SysDeptService extends IService<SysDept> {
      *
      * @param id 部门ID
      */
-    boolean deptHasSubordinates(Integer id);
+    boolean deptHasSubordinates(Long id);
 
     /**
      * 删除部门，支持批量删除
@@ -70,7 +70,7 @@ public interface SysDeptService extends IService<SysDept> {
      * @param ids 部门ID集合
      * @return 操作结果
      */
-    boolean removeDeptById(List<Integer> ids);
+    boolean removeDeptById(List<Long> ids);
 
     /**
      * 构建部门树

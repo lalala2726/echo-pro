@@ -7,9 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 字典表
+ * 字典更新请求类
  */
 @Data
+@Schema(description = "字典更新请求类")
 public class SysDictUpdateRequest {
 
     /**

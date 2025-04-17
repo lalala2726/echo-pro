@@ -12,6 +12,7 @@ import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.service.StorageManagementService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 /**
+ * 文件相关接口
+ * 提供文件上传等功能
+ *
  * @author zhangchuang
  * Created on 2025/4/3 21:23
  */
-
-//test 待测试
 @RequestMapping("/common/file")
 @RestController
 @Tag(name = "文件相关")
@@ -40,7 +42,6 @@ public class FileController extends BaseController {
     private final StorageFactory storageFactory;
     private final StorageManagementService storageManagementService;
 
-
     /**
      * 智能文件上传
      * 如果检测是图片，将进行压缩处理并上传两个版本
@@ -51,8 +52,8 @@ public class FileController extends BaseController {
     @PostMapping("/upload")
     @Operation(summary = "普通文件上传")
     @OperationLog(title = "文件上传", businessType = BusinessType.UPLOAD)
-    public AjaxResult upload(
-            @RequestParam("file") MultipartFile file) {
+    public AjaxResult upload(@Parameter(description = "上传的文件")
+                             @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return error("请选择一个文件上传");
         }
@@ -86,18 +87,18 @@ public class FileController extends BaseController {
         }
     }
 
-
     /**
      * 图片上传
      * 进行压缩处理并上传两个版本
      *
-     * @param file 上传的文件
+     * @param file 上传的图片文件
      * @return 上传结果
      */
     @OperationLog(title = "图片上传", businessType = BusinessType.UPLOAD)
     @Operation(summary = "图片上传")
     @PostMapping("/image/upload")
-    public AjaxResult imageUpload(@RequestParam("file") MultipartFile file) {
+    public AjaxResult imageUpload(@Parameter(description = "上传的图片文件")
+                                  @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return error("请选择一个图片上传");
         }

@@ -20,6 +20,7 @@ import cn.zhangchuangla.system.service.SysOperationLogService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,13 +47,13 @@ public class SysLogController extends BaseController {
     /**
      * 获取登录日志列表
      *
-     * @param request 查询参数
+     * @param request 登录日志列表查询参数
      * @return 登录日志列表
      */
     @GetMapping("/login/list")
     @Operation(summary = "获取登录日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
-    public AjaxResult listLoginLog(SysLoginLogListRequest request) {
+    public AjaxResult listLoginLog(@Parameter(description = "登录日志列表查询参数") SysLoginLogListRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
         return success(getTableData(sysLoginLogPage, sysLoginLogListVos));
@@ -61,28 +62,29 @@ public class SysLogController extends BaseController {
     /**
      * 获取操作日志列表
      *
-     * @param request 查询参数
+     * @param request 操作日志列表查询参数
      * @return 操作日志列表
      */
     @GetMapping("/operation/list")
     @Operation(summary = "获取操作日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
-    public AjaxResult listOperationLog(SysOperationLogListRequest request) {
+    public AjaxResult listOperationLog(@Parameter(description = "操作日志列表查询参数") SysOperationLogListRequest request) {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
-        List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage, SysOperationLogListVo.class);
+        List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
+                SysOperationLogListVo.class);
         return success(getTableData(sysOperationLogPage, sysOperationLogListVos));
     }
 
     /**
      * 获取登录日志详情
      *
-     * @param id 日志ID
+     * @param id 登录日志ID
      * @return 登录日志详情
      */
     @GetMapping("/login/{id}")
     @Operation(summary = "获取登录日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult getLoginLogById(@PathVariable Long id) {
+    public AjaxResult getLoginLogById(@Parameter(description = "登录日志ID") @PathVariable Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
         SysLoginLogVo sysLoginLogVo = sysLogConverter.toSysLoginLogVo(sysLoginLog);
         return success(sysLoginLogVo);
@@ -91,30 +93,32 @@ public class SysLogController extends BaseController {
     /**
      * 获取操作日志详情
      *
-     * @param id 日志ID
+     * @param id 操作日志ID
      * @return 操作日志详情
      */
     @GetMapping("/operation/{id}")
     @Operation(summary = "获取操作日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult getOperationLogById(@PathVariable Long id) {
+    public AjaxResult getOperationLogById(@Parameter(description = "操作日志ID") @PathVariable Long id) {
         SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
         SysOperationLogVo sysOperationLogVo = sysLogConverter.toSysOperationLogVo(sysOperationLog);
         return success(sysOperationLogVo);
     }
 
-
     /**
      * 清空登录日志
      *
+     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/login")
     @Operation(summary = "清空登录日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult cleanLoginLog(@RequestParam("password") String password) {
-        if (password.isEmpty()) return error("您还没有输入密码！");
+    public AjaxResult cleanLoginLog(@Parameter(description = "当前用户密码")
+                                    @RequestParam("password") String password) {
+        if (password.isEmpty())
+            return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {
             return warning("当前用户密码不正确！");
         }
@@ -122,18 +126,20 @@ public class SysLogController extends BaseController {
         return toAjax(result);
     }
 
-
     /**
      * 清空操作日志
      *
+     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/operation")
     @Operation(summary = "清空操作日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult cleanOperationLog(@RequestParam("password") String password) {
-        if (password.isEmpty()) return error("您还没有输入密码！");
+    public AjaxResult cleanOperationLog(@Parameter(description = "当前用户密码")
+                                        @RequestParam("password") String password) {
+        if (password.isEmpty())
+            return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {
             return warning("当前用户密码不正确！");
         }
@@ -157,6 +163,4 @@ public class SysLogController extends BaseController {
         return SecurityUtils.constantTimeEquals(sysUser.getPassword(), encryptedInputPassword);
     }
 
-
 }
-

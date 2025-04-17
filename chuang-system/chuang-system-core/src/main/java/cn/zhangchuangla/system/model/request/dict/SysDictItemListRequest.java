@@ -8,10 +8,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 字典项表
+ *
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(description = "字典项列表请求类")
 public class SysDictItemListRequest extends BasePageRequest {
 
     /**

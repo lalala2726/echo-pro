@@ -79,7 +79,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @return 操作结果
      */
     @Override
-    public SysDept getDeptById(Integer id) {
+    public SysDept getDeptById(Long id) {
         return getById(id);
     }
 
@@ -102,7 +102,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @return true存在，false不存在
      */
     @Override
-    public boolean deptHasSubordinates(Integer id) {
+    public boolean deptHasSubordinates(Long id) {
         if (id != null) {
             LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().eq(SysDept::getParentId, id);
             return count(eq) > 0;
@@ -117,7 +117,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @return 操作结果
      */
     @Override
-    public boolean removeDeptById(List<Integer> ids) {
+    public boolean removeDeptById(List<Long> ids) {
         ids.forEach(id -> {
             if (deptHasSubordinates(id)) {
                 throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "该部门下有子部门，不能删除！");

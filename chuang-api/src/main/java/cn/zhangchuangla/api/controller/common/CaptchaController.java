@@ -24,15 +24,16 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 验证码相关接口
+ * 提供获取验证码的功能
+ *
  * @author Chuang
- * <p>
  * created on 2025/4/2 14:39
  */
 @RestController
 @RequestMapping("/captcha")
 @Tag(name = "验证码相关")
 public class CaptchaController extends BaseController {
-
 
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
@@ -47,7 +48,7 @@ public class CaptchaController extends BaseController {
     /**
      * 获取验证码
      *
-     * @return 返回验证码对应的UUID
+     * @return 返回验证码对应的UUID和Base64图片
      */
     @GetMapping
     @Operation(summary = "获取验证码")
