@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "sys_dict")
 @Data
 public class SysDict extends BaseEntity {
+
     /**
      * 主键
      */

@@ -1,5 +1,7 @@
-package cn.zhangchuangla.system.model.vo.dept;
+package cn.zhangchuangla.system.model.vo.dict;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,40 +9,31 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 部门视图
+ * 字典表
  */
 @Data
-public class SysDeptVo {
+public class SysDictVo {
 
     /**
-     * 部门ID
+     * 主键
      */
-    @Schema(name = "部门ID")
-    private Integer id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
     /**
-     * 部门名称
+     * 类型编码
      */
-    @Schema(name = "部门名称")
+    private String dictCode;
+
+    /**
+     * 类型名称
+     */
     private String name;
 
     /**
-     * 父部门ID
+     * 状态(0:正常;1:禁用)
      */
-    @Schema(name = "父部门ID")
-    private Integer parentId;
-
-    /**
-     * 部门负责人
-     */
-    @Schema(name = "部门负责人")
-    private Integer managerId;
-
-    /**
-     * 部门描述
-     */
-    @Schema(description = "部门描述")
-    private String description;
+    private Integer status;
 
     /**
      * 创建时间
@@ -67,5 +60,6 @@ public class SysDeptVo {
      */
     @Schema(description = "更新者")
     private String updateBy;
+
 
 }

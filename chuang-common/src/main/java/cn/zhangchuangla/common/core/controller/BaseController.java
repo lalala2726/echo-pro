@@ -178,6 +178,10 @@ public class BaseController {
         return AjaxResult.success(message);
     }
 
+    protected AjaxResult warning(String message) {
+        return AjaxResult.warning(message);
+    }
+
     /**
      * 失败返回
      *
@@ -210,6 +214,7 @@ public class BaseController {
             throw new ParamException(errorMessage);
         }
     }
+
 
     /**
      * 验证条件是否为true（函数方法）

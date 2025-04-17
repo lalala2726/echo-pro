@@ -16,5 +16,9 @@
         <result property="updateBy" column="update_by"/>
         <result property="isDeleted" column="is_deleted"/>
     </resultMap>
+    <select id="listDict" resultMap="BaseResultMap">
+        select *
+        from sys_dict
+    </select>
 
 </mapper>

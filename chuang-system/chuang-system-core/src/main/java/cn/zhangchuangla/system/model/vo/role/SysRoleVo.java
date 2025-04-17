@@ -1,5 +1,7 @@
-package cn.zhangchuangla.system.model.vo.dept;
+package cn.zhangchuangla.system.model.vo.role;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,40 +9,35 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 部门视图
+ * 角色VO
  */
 @Data
-public class SysDeptVo {
+@Schema(name = "角色视图对象", description = "返回前端展示的数据")
+public class SysRoleVo {
+    /**
+     * 主键
+     */
+    @Schema(description = "主键")
+    @TableId(type = IdType.AUTO)
+    private Long roleId;
 
     /**
-     * 部门ID
+     * 角色名
      */
-    @Schema(name = "部门ID")
-    private Integer id;
+    @Schema(description = "角色名")
+    private String roleName;
 
     /**
-     * 部门名称
+     * 角色权限标识
      */
-    @Schema(name = "部门名称")
-    private String name;
+    @Schema(description = "角色权限标识")
+    private String roleKey;
 
     /**
-     * 父部门ID
+     * 显示顺序
      */
-    @Schema(name = "父部门ID")
-    private Integer parentId;
-
-    /**
-     * 部门负责人
-     */
-    @Schema(name = "部门负责人")
-    private Integer managerId;
-
-    /**
-     * 部门描述
-     */
-    @Schema(description = "部门描述")
-    private String description;
+    @Schema(description = "显示顺序")
+    private Integer roleSort;
 
     /**
      * 创建时间
@@ -67,5 +64,6 @@ public class SysDeptVo {
      */
     @Schema(description = "更新者")
     private String updateBy;
+
 
 }
