@@ -19,7 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 /**
  * Token认证拦截器
@@ -83,22 +82,33 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        // 获取白名单数组
-        String[] staticResourcesWhitelist = SecurityConstants.STATIC_RESOURCES_WHITELIST;
-        String[] swaggerWhitelist = SecurityConstants.SWAGGER_WHITELIST;
-        String[] whitelist = SecurityConstants.WHITELIST;
-
-        // 合并所有白名单路径
-        String[] combinedWhitelist = Stream.of(staticResourcesWhitelist, swaggerWhitelist, whitelist)
-                .flatMap(Arrays::stream)
-                .toArray(String[]::new);
-
-        // 路径匹配器（支持 Ant 风格匹配）
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        // 判断当前请求路径是否匹配白名单规则
-        return Arrays.stream(combinedWhitelist)
-                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+        // 检查普通白名单
+        if (isPathMatchAny(path, SecurityConstants.WHITELIST, pathMatcher)) {
+            return true;
+        }
+
+        // 检查静态资源白名单
+        if (isPathMatchAny(path, SecurityConstants.STATIC_RESOURCES_WHITELIST, pathMatcher)) {
+            return true;
+        }
+
+        // 检查Swagger白名单
+        return isPathMatchAny(path, SecurityConstants.SWAGGER_WHITELIST, pathMatcher);
+    }
+
+    /**
+     * 检查路径是否匹配任一白名单规则
+     *
+     * @param path        请求路径
+     * @param patterns    匹配模式数组
+     * @param pathMatcher 路径匹配器
+     * @return 是否匹配
+     */
+    private boolean isPathMatchAny(String path, String[] patterns, AntPathMatcher pathMatcher) {
+        return Arrays.stream(patterns)
+                .anyMatch(pattern -> pathMatcher.match(pattern, path.trim()));
     }
 
 }

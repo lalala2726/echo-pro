@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "注册接口")
 @RequiredArgsConstructor
-public class RegisterController extends BaseController {
+public class SysRegisterController extends BaseController {
 
     private final RegisterService registerService;
 

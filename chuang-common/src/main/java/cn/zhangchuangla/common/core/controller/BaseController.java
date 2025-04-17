@@ -65,7 +65,7 @@ public class BaseController {
     protected TableDataResult getTableData(Page<?> page) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(page.getRecords());
+        tableDataResult.setList(page.getRecords());
         tableDataResult.setCurrentTime(System.currentTimeMillis());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
@@ -81,7 +81,7 @@ public class BaseController {
     protected AjaxResult getTableData(Page<?> page, List<?> vo) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(vo);
+        tableDataResult.setList(vo);
         tableDataResult.setCurrentTime(System.currentTimeMillis());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());

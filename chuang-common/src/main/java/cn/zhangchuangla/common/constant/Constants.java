@@ -10,6 +10,11 @@ package cn.zhangchuangla.common.constant;
  */
 public class Constants {
 
+
+    /**
+     * 验证码相关
+     */
+    public static final String BASE64_CODE = "data:image/png;base64,";
     /**
      * JSON 序列化白名单
      */

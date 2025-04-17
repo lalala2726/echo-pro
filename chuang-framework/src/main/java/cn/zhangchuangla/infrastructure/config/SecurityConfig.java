@@ -94,13 +94,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // 禁用 HTTP Basic 认证，避免弹窗式登录
                 // 过滤请求
                 .authorizeHttpRequests(auth -> auth
-                        // 明确允许登录和注册接口
                         .requestMatchers(SecurityConstants.WHITELIST).permitAll()
-                        // Swagger相关资源
                         .requestMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
-                        // 静态资源允许访问
                         .requestMatchers(SecurityConstants.STATIC_RESOURCES_WHITELIST).permitAll()
-                        // 添加自定义匿名访问的URL
                         .requestMatchers(anonymousUrls.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()  // 其他请求需要认证
                 )
