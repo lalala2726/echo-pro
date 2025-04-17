@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SysFileManagementListVo {
+public class StorageFileManagementListVo {
 
     /**
      * 主键ID

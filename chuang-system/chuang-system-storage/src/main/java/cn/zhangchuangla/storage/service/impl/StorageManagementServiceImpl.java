@@ -12,7 +12,7 @@ import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.mapper.SysFileManagementMapper;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
 import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
-import cn.zhangchuangla.storage.service.SysFileManagementService;
+import cn.zhangchuangla.storage.service.StorageManagementService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,8 +32,8 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SysFileManagementServiceImpl extends ServiceImpl<SysFileManagementMapper, SysFileManagement>
-        implements SysFileManagementService {
+public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementMapper, SysFileManagement>
+        implements StorageManagementService {
 
     private final SysFileManagementMapper sysFileManagementMapper;
     private final StorageFactory storageFactory;

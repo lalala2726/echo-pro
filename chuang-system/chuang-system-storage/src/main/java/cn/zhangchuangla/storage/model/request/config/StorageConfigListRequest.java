@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "文件列表请求类")
-public class SysFileConfigListRequest extends BasePageRequest {
+public class StorageConfigListRequest extends BasePageRequest {
 
     /**
      * 参数名称

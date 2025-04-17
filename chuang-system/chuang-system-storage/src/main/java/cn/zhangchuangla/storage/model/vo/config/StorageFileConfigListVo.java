@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "文件配置列表视图")
-public class SysFileConfigListVo {
+public class StorageFileConfigListVo {
 
     /**
      * 主键ID

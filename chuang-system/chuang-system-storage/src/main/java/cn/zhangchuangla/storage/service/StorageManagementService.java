@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * author zhangchuang
  */
-public interface SysFileManagementService extends IService<SysFileManagement> {
+public interface StorageManagementService extends IService<SysFileManagement> {
 
     /**
      * 保存文件信息

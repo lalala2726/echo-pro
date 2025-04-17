@@ -10,12 +10,12 @@ import lombok.*;
  * 文件配置表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_file_config")
+@TableName(value = "storage_config")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SysFileConfig extends BaseEntity {
+public class StorageConfig extends BaseEntity {
 
     /**
      * 主键

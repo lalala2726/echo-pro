@@ -7,8 +7,8 @@ import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
 import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.storage.model.entity.SysFileConfig;
-import cn.zhangchuangla.storage.service.SysFileConfigService;
+import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SysFileConfigLoader {
+public class StorageConfigLoader {
 
-    private final SysFileConfigService sysFileConfigService;
+    private final StorageConfigService storageConfigService;
     private final AppProperty appProperty;
     private final Map<String, String> sysFileConfigCache = new ConcurrentHashMap<>(4);
 
@@ -39,7 +39,7 @@ public class SysFileConfigLoader {
         sysFileConfigCache.clear();
         log.info("开始从数据库中加载主要配置");
 
-        SysFileConfig config = sysFileConfigService.getMasterConfig();
+        StorageConfig config = storageConfigService.getMasterConfig();
         if (config == null) {
             //未找到主要配置，自动降级为本地存储
             log.error("没有找到主要配置，自动设置为本地存储");
@@ -63,8 +63,8 @@ public class SysFileConfigLoader {
     /**
      * 按存储类型缓存配置
      */
-    public void cacheSysFileConfigByStorageType(SysFileConfig sysFileConfig) {
-        String storageType = sysFileConfig.getStorageType();
+    public void cacheSysFileConfigByStorageType(StorageConfig storageConfig) {
+        String storageType = storageConfig.getStorageType();
         sysFileConfigCache.put(StorageConstants.CURRENT_DEFAULT_UPLOAD_TYPE, storageType);
 
         switch (storageType) {
@@ -75,7 +75,7 @@ public class SysFileConfigLoader {
             default -> throw new ProfileException(ResponseCode.PROFILE_ERROR, "未知的存储类型: " + storageType);
         }
 
-        initCommonConfig(sysFileConfig);
+        initCommonConfig(storageConfig);
     }
 
     /**
@@ -137,7 +137,7 @@ public class SysFileConfigLoader {
     /**
      * 初始化通用配置项（动态 Key 存储）
      */
-    private void initCommonConfig(SysFileConfig config) {
+    private void initCommonConfig(StorageConfig config) {
         String storageType = config.getStorageType();
         sysFileConfigCache.put(storageType, config.getStorageValue());
         sysFileConfigCache.put(StorageConstants.STORAGE_KEY, config.getStorageKey());

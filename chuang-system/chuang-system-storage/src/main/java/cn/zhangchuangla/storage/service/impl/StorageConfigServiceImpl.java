@@ -12,11 +12,11 @@ import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
-import cn.zhangchuangla.storage.model.entity.SysFileConfig;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigListRequest;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigUpdateRequest;
-import cn.zhangchuangla.storage.service.SysFileConfigService;
+import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,8 +35,8 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, SysFileConfig>
-        implements SysFileConfigService {
+public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, StorageConfig>
+        implements StorageConfigService {
 
     private final SysFileConfigMapper sysFileConfigMapper;
     private final StorageConverter storageConverter;
@@ -48,8 +48,8 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 文件配置列表
      */
     @Override
-    public Page<SysFileConfig> listSysFileConfig(SysFileConfigListRequest request) {
-        Page<SysFileConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
+    public Page<StorageConfig> listSysFileConfig(StorageConfigListRequest request) {
+        Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysFileConfigMapper.listSysFileConfig(sysFileConfigPage, request);
     }
 
@@ -60,7 +60,7 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 文件配置信息
      */
     @Override
-    public SysFileConfig getSysFileConfigById(Integer id) {
+    public StorageConfig getSysFileConfigById(Integer id) {
         return getById(id);
     }
 
@@ -85,12 +85,12 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean saveFileConfig(SysFileConfigAddRequest request) {
+    public boolean saveFileConfig(StorageConfigAddRequest request) {
         if (isStorageKeyExist(request.getStorageKey())) {
             throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
         }
-        SysFileConfig sysFileConfig = storageConverter.toSysFileConfig(request);
-        return save(sysFileConfig);
+        StorageConfig storageConfig = storageConverter.toSysFileConfig(request);
+        return save(storageConfig);
     }
 
     /**
@@ -162,13 +162,13 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (isNameExist(storageName)) {
             throw new ServiceException(String.format("存储名称【%s】已存在", storageKey));
         }
-        SysFileConfig sysFileConfig = SysFileConfig.builder()
+        StorageConfig storageConfig = StorageConfig.builder()
                 .storageName(storageName)
                 .storageKey(storageKey)
                 .storageValue(value)
                 .storageType(storageType)
                 .build();
-        return save(sysFileConfig);
+        return save(storageConfig);
     }
 
     /**
@@ -178,12 +178,12 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean updateFileConfigById(SysFileConfigUpdateRequest request) {
+    public boolean updateFileConfigById(StorageConfigUpdateRequest request) {
         if (isStorageKeyExist(request.getStorageKey())) {
             throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
         }
-        SysFileConfig sysFileConfig = storageConverter.toEntity(request);
-        return updateById(sysFileConfig);
+        StorageConfig storageConfig = storageConverter.toEntity(request);
+        return updateById(storageConfig);
     }
 
 
@@ -195,8 +195,8 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean isStorageKeyExist(String storageKey) {
-        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getStorageKey, storageKey);
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
+                .eq(StorageConfig::getStorageKey, storageKey);
         return count(eq) > 0;
     }
 
@@ -208,9 +208,9 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean isMaster(Integer id) {
-        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getId, id)
-                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
+                .eq(StorageConfig::getId, id)
+                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
     }
 
@@ -220,9 +220,9 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 主配置
      */
     @Override
-    public SysFileConfig getMasterConfig() {
-        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+    public StorageConfig getMasterConfig() {
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
+                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
 
@@ -234,8 +234,8 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean isNameExist(String storageName) {
-        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>()
-                .eq(SysFileConfig::getStorageName, storageName);
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
+                .eq(StorageConfig::getStorageName, storageName);
         long count = count(eq);
         return count > 0;
     }
@@ -249,13 +249,13 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public boolean setMasterConfig(Long id) {
         // 取消当前主配置
-        SysFileConfig currentMasterConfig = getMasterConfig();
+        StorageConfig currentMasterConfig = getMasterConfig();
         if (currentMasterConfig != null) {
             currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
             updateById(currentMasterConfig);
         }
         // 设置新的主配置
-        SysFileConfig newMasterConfig = getById(id);
+        StorageConfig newMasterConfig = getById(id);
         if (newMasterConfig == null) {
             throw new ServiceException("文件配置不存在");
         }
@@ -271,8 +271,8 @@ public class SysFileConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean deleteFileConfig(List<Long> ids) {
-        LambdaQueryWrapper<SysFileConfig> eq = new LambdaQueryWrapper<SysFileConfig>().eq(SysFileConfig::getId, ids);
-        List<SysFileConfig> list = list(eq);
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>().eq(StorageConfig::getId, ids);
+        List<StorageConfig> list = list(eq);
         list.forEach(sysFileConfig -> {
             if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(sysFileConfig.getIsMaster())) {
                 throw new ServiceException(String.format("文件配置【%s】为当前主配置，不能删除", sysFileConfig.getStorageName()));

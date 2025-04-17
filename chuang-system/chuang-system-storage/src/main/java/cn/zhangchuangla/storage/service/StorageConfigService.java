@@ -4,10 +4,10 @@ import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
-import cn.zhangchuangla.storage.model.entity.SysFileConfig;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigListRequest;
-import cn.zhangchuangla.storage.model.request.config.SysFileConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author zhangchuang
  */
-public interface SysFileConfigService extends IService<SysFileConfig> {
+public interface StorageConfigService extends IService<StorageConfig> {
 
 
     /**
@@ -27,7 +27,7 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @param request 查询参数
      * @return 返回文件配置列表
      */
-    Page<SysFileConfig> listSysFileConfig(SysFileConfigListRequest request);
+    Page<StorageConfig> listSysFileConfig(StorageConfigListRequest request);
 
 
     /**
@@ -36,7 +36,7 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @param id 文件配置id
      * @return 文件配置对象
      */
-    SysFileConfig getSysFileConfigById(Integer id);
+    StorageConfig getSysFileConfigById(Integer id);
 
 
     /**
@@ -54,7 +54,7 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean saveFileConfig(SysFileConfigAddRequest request);
+    boolean saveFileConfig(StorageConfigAddRequest request);
 
 
     /**
@@ -98,7 +98,7 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean updateFileConfigById(SysFileConfigUpdateRequest request);
+    boolean updateFileConfigById(StorageConfigUpdateRequest request);
 
     /**
      * 判断存储key是否存在
@@ -122,7 +122,7 @@ public interface SysFileConfigService extends IService<SysFileConfig> {
      *
      * @return 返回主配置
      */
-    SysFileConfig getMasterConfig();
+    StorageConfig getMasterConfig();
 
 
     /**
