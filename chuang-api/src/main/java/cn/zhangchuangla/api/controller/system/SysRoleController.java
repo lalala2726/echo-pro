@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,8 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermission('system:role:list')")
-    public AjaxResult list(@Parameter(description = "角色列表查询参数") @Validated SysRoleQueryRequest request) {
+    public AjaxResult list(@Parameter(description = "角色列表查询参数")
+                           @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
         List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
         return getTableData(page, sysRoleVos);

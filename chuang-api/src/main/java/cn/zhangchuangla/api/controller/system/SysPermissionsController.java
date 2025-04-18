@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +41,8 @@ public class SysPermissionsController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取权限列表")
     @PreAuthorize("@ss.hasPermission('system:permission:list')")
-    public AjaxResult listPermissions(@Parameter(description = "权限列表查询参数") SysPermissionsListRequest request) {
+    public AjaxResult listPermissions(@Parameter(description = "权限列表查询参数")
+                                      @ParameterObject SysPermissionsListRequest request) {
         Page<SysPermissions> page = sysPermissionsService.listPermissions(request);
         List<SysPermissionsListVo> sysPermissionsListVos = copyListProperties(page, SysPermissionsListVo.class);
         return getTableData(page, sysPermissionsListVos);

@@ -23,7 +23,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,7 +55,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/login/list")
     @Operation(summary = "获取登录日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
-    public AjaxResult listLoginLog(@Parameter(description = "登录日志列表查询参数") SysLoginLogListRequest request) {
+    public AjaxResult listLoginLog(@Parameter(description = "登录日志列表查询参数")
+                                   @Validated @ParameterObject SysLoginLogListRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
         return success(getTableData(sysLoginLogPage, sysLoginLogListVos));
@@ -68,7 +71,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/operation/list")
     @Operation(summary = "获取操作日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
-    public AjaxResult listOperationLog(@Parameter(description = "操作日志列表查询参数") SysOperationLogListRequest request) {
+    public AjaxResult listOperationLog(@Parameter(description = "操作日志列表查询参数")
+                                       @Validated @ParameterObject SysOperationLogListRequest request) {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
         List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
                 SysOperationLogListVo.class);

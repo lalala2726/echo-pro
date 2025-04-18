@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public AjaxResult listDict(@Parameter(description = "字典列表请求类") SysDictListRequest request) {
+    public AjaxResult listDict(@Parameter(description = "字典列表请求类")
+                               @Validated @ParameterObject SysDictListRequest request) {
         Page<SysDict> sysDict = sysDictService.listDict(request);
         List<SysDictListVo> sysDictListVos = copyListProperties(sysDict, SysDictListVo.class);
         return success(getTableData(sysDict, sysDictListVos));
@@ -138,7 +140,8 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
     public AjaxResult listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
-                                   @Validated @Parameter(description = "字典项列表查询请求类") SysDictItemListRequest request) {
+                                   @Parameter(description = "字典项列表查询请求类")
+                                   @ParameterObject @Validated SysDictItemListRequest request) {
         if (dictCode.isEmpty()) return error("字典编码不能为空");
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(dictCode, request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
@@ -155,7 +158,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
     public AjaxResult listDictData(@Parameter(description = "字典项列表请求类")
-                                   @Validated SysDictItemListRequest request) {
+                                       @Validated @ParameterObject SysDictItemListRequest request) {
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
         return success(getTableData(sysDictItemPage, sysDictItemListVos));

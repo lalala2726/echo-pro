@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -49,7 +50,8 @@ public class SysDeptController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dept:list')")
     @Operation(summary = "部门列表")
-    public AjaxResult listDept(@Parameter(description = "部门列表查询参数") SysDeptListRequest request) {
+    public AjaxResult listDept(@Parameter(description = "部门列表查询参数")
+                               @Validated @ParameterObject SysDeptListRequest request) {
         Page<SysDept> page = sysDeptService.listDept(request);
         List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
         return getTableData(page, sysDeptListVos);

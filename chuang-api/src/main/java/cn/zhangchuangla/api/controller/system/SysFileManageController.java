@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,7 +47,8 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public AjaxResult listFileManage(@Parameter(description = "文件资源列表查询参数") SysFileManagementListRequest request) {
+    public AjaxResult listFileManage(@Parameter(description = "文件资源列表查询参数")
+                                     @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
         ArrayList<StorageFileManagementListVo> storageFileManagementListVos = new ArrayList<>();
         sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
@@ -66,7 +69,8 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/trash/list")
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public AjaxResult listFileTrash(@Parameter(description = "文件资源回收站查询参数") SysFileManagementListRequest request) {
+    public AjaxResult listFileTrash(@Parameter(description = "文件资源回收站查询参数")
+                                    @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileTrash(request);
         List<StorageFileManagementListVo> storageFileManagementListVos = copyListProperties(sysFileManagementPage,
                 StorageFileManagementListVo.class);

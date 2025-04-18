@@ -19,8 +19,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -51,8 +53,8 @@ public class OnlineUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
-    public TableDataResult onlineUserList(
-            @Parameter(description = "在线用户列表查询参数") OnlineUserListRequest request) {
+    public TableDataResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
+                                          @Validated @ParameterObject OnlineUserListRequest request) {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
         ArrayList<SysOnlineUser> sysOnlineUsers = new ArrayList<>();
