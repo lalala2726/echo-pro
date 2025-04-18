@@ -5,10 +5,10 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysRoleMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysRole">
-        <id property="roleId" column="id"/>
+        <id property="id" column="id"/>
         <result property="roleName" column="role_name"/>
         <result property="roleKey" column="role_key"/>
-        <result property="roleSort" column="role_sort"/>
+        <result property="sort" column="sort"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="createBy" column="create_by"/>
@@ -19,7 +19,7 @@
     <select id="getRoleListByUserId" resultMap="BaseResultMap">
         select *
         from sys_role
-        where sys_role.role_id in (select sys_user_role.role_id
+        where sys_role.id in (select sys_user_role.role_id
                                    from sys_user_role
                                    where sys_user_role.user_id = #{userId})
     </select>

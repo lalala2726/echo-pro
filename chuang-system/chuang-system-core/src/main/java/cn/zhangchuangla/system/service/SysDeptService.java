@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
@@ -78,4 +79,11 @@ public interface SysDeptService extends IService<SysDept> {
      * @return 部门树
      */
     List<DeptTree> buildTree();
+
+    /**
+     * 获取部门下拉列表
+     *
+     * @return 部门下拉列表
+     */
+    List<Option<Long>> getDeptOptions();
 }

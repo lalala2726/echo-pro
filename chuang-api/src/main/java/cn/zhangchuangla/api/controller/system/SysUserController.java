@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,7 +69,11 @@ public class SysUserController extends BaseController {
     public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
                                    @Validated @ParameterObject UserRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
-        List<UserListVo> userListVos = copyListProperties(userPage, UserListVo.class);
+        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        userPage.getRecords().forEach(user -> {
+            UserListVo userInfoVo = sysUserConverter.toUserInfoVo(user);
+            userListVos.add(userInfoVo);
+        });
         return getTableData(userPage, userListVos);
     }
 

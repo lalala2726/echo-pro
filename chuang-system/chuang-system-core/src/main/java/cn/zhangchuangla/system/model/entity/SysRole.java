@@ -19,7 +19,7 @@ public class SysRole extends BaseEntity {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    private Long roleId;
+    private Long id;
 
     /**
      * 角色名
@@ -27,12 +27,12 @@ public class SysRole extends BaseEntity {
     private String roleName;
 
     /**
-     * 角色权限
+     * 角色权限字符串
      */
     private String roleKey;
 
     /**
      * 显示顺序
      */
-    private Integer roleSort;
+    private Integer sort;
 }

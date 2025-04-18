@@ -62,4 +62,13 @@ public interface SysUserConverter {
      * @return 用户信息视图对象
      */
     UserInfoVo toUserInfoVo(SysUser sysUser);
+
+    /**
+     * 将用户部门数据传输对象转换为用户信息视图对象
+     *
+     * @param sysUser 用户部门数据传输对象
+     * @return 用户信息视图对象
+     */
+    @Mapping(target = "deptName", source = "sysDept.deptName")
+    UserListVo toUserInfoVo(SysUserDeptDto sysUser);
 }

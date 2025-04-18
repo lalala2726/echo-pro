@@ -29,7 +29,7 @@ import java.util.List;
  * <p>
  * created on 2025/4/8 16:25
  */
-@Tag(name = "文件资源管理")
+@Tag(name = "文件资源")
 @RestController
 @RequestMapping("/file/manage")
 @RequiredArgsConstructor
@@ -87,7 +87,7 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:recover')")
     @Operation(summary = "恢复文件")
     @PutMapping("/recover/{id}")
-    @OperationLog(title = "文件资源管理", businessType = BusinessType.RECOVER)
+    @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
     public AjaxResult recoverFile(@Parameter(description = "文件ID") @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件ID不能为空!");
         boolean result = storageManagementService.recoverFile(id);
@@ -104,7 +104,7 @@ public class SysFileManageController extends BaseController {
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPermission('ststem:file-manage:list')")
     @Operation(summary = "删除文件")
-    @OperationLog(title = "文件资源管理", businessType = BusinessType.DELETE)
+    @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult removeFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                  @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
         if (isPermanently == null)

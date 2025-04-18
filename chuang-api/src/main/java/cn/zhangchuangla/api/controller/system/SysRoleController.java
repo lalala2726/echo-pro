@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
@@ -57,6 +58,19 @@ public class SysRoleController extends BaseController {
         Page<SysRole> page = sysRoleService.RoleList(request);
         List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
         return getTableData(page, sysRoleVos);
+    }
+
+    /**
+     * 获取角色选项
+     *
+     * @return 角色选项列表
+     */
+    @GetMapping("/options")
+    @Operation(summary = "获取角色选项")
+    @PreAuthorize("@ss.hasPermission('system:role:options')")
+    public AjaxResult roleOptions() {
+        List<Option<Long>> options = sysRoleService.getRoleOptions();
+        return success(options);
     }
 
     /**

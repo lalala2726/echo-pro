@@ -2,6 +2,7 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysDeptConverter;
@@ -55,6 +56,19 @@ public class SysDeptController extends BaseController {
         Page<SysDept> page = sysDeptService.listDept(request);
         List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
         return getTableData(page, sysDeptListVos);
+    }
+
+    /**
+     * 获取部门下拉列表
+     *
+     * @return 部门下拉列表
+     */
+    @GetMapping("/options")
+    @PreAuthorize("@ss.hasPermission('system:dept:options')")
+    @Operation(summary = "部门下拉列表")
+    public AjaxResult getDeptOptions() {
+        List<Option<Long>> deptOptions = sysDeptService.getDeptOptions();
+        return success(deptOptions);
     }
 
     /**

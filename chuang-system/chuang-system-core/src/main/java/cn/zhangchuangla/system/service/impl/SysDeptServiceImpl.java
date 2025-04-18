@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -135,6 +136,22 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
     public List<DeptTree> buildTree() {
         List<SysDept> deptList = list();
         return buildDeptTreeRecursive(0L, deptList);
+    }
+
+    /**
+     * 获取部门下拉列表
+     *
+     * @return 部门下拉列表
+     */
+    @Override
+    public List<Option<Long>> getDeptOptions() {
+        List<SysDept> list = list();
+        if (list != null && !list.isEmpty()) {
+            return list.stream()
+                    .map(dept -> new Option<>(dept.getDeptId(), dept.getDeptName()))
+                    .toList();
+        }
+        return null;
     }
 
     /**

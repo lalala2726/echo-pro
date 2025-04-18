@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
@@ -80,4 +81,12 @@ public interface SysRoleService extends IService<SysRole> {
      * 刷新权限缓存(所有角色)
      */
     void refreshRolePermsCache();
+
+
+    /**
+     * 获取部门下拉列表
+     *
+     * @return 下拉列表
+     */
+    List<Option<Long>> getRoleOptions();
 }

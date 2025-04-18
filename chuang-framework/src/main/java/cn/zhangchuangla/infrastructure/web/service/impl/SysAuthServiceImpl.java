@@ -3,6 +3,7 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -50,11 +50,13 @@ public class SysAuthServiceImpl implements SysAuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername().trim(), request.getPassword().trim());
 
         // 2. 执行认证（认证中）
-        Authentication authentication = null;
+        Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(authenticationToken);
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
+            log.error("用户名:{},登录失败！", request.getUsername(), e);
             sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, false);
+            throw new LoginException(ResponseCode.LOGIN_ERROR, "登录失败!");
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）

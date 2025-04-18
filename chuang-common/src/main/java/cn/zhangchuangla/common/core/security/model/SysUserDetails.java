@@ -48,46 +48,12 @@ public class SysUserDetails implements UserDetails, Serializable {
      */
     private Long deptId;
 
-    /**
-     * 登录IP地址
-     */
-    private String ip;
-
-    /**
-     * 登录地点
-     */
-    private String address;
-
-    /**
-     * 会话ID
-     */
-    private String sessionId;
-
-    /**
-     * 登录时间
-     */
-    private long loginTime;
-
-    /**
-     * 过期时间
-     */
-    private long expireTime;
-
-    /**
-     * 浏览器信息
-     */
-    private String browser;
-
-    /**
-     * 操作系统信息
-     */
-    private String os;
-
 
     /**
      * 用户角色权限集合
      */
     private Collection<SimpleGrantedAuthority> authorities;
+
 
     public SysUserDetails() {
 
