@@ -21,7 +21,7 @@ public class LoginRequest {
     @NotBlank(message = "用户名不能为空!")
     @Size(min = 5, max = 20, message = "用户名长度在5-20位之间!")
     @Pattern(regexp = "^[a-zA-Z0-9_-]{5,20}$", message = "用户名只能是字母、数字、下划线、减号!")
-    @Schema(description = "用户名")
+    @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
 
     /**
@@ -30,7 +30,20 @@ public class LoginRequest {
     @NotBlank(message = "密码不能为空!")
     @Size(min = 8, max = 20, message = "密码长度在8-20位之间!")
     @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+-]{8,20}$", message = "密码格式不正确!")
-    @Schema(description = "密码")
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
+    /**
+     * 验证码KEY
+     */
+    @NotBlank(message = "验证码KEY不能为空!")
+    @Schema(description = "验证码KEY", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String captchaKey;
+
+    /**
+     * 验证码
+     */
+    @NotBlank(message = "验证码不能为空!")
+    @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String captchaCode;
 }

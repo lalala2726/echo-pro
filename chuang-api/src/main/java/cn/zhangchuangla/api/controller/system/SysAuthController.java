@@ -1,6 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -38,14 +40,13 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SysAuthController extends BaseController {
 
-
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
     private final SysPermissionsService sysPermissionsService;
     private final SysRoleService sysRoleService;
     private final SysMenuService sysMenuService;
     private final SysUserConverter sysUserConverter;
-
+    private final RedisCache redisCache;
 
     /**
      * 登录
@@ -55,10 +56,14 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/login")
     @Operation(summary = "登录")
-    public AjaxResult login(@Parameter(name = "登录参数", required = true)
-                            @Validated @RequestBody LoginRequest loginRequest,
-                            @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
-        log.info("登录请求参数：{}", request);
+    public AjaxResult login(
+            @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
+            @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
+        // 1. 校验验证码
+        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
+        if (!loginRequest.getCaptchaCode().equals(code)) {
+            return error("验证码错误");
+        }
         AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
         return success(authenticationToken);
     }
@@ -77,7 +82,6 @@ public class SysAuthController extends BaseController {
         return success(newAuthenticationToken);
     }
 
-
     /**
      * 获取用户路由
      *
@@ -90,11 +94,11 @@ public class SysAuthController extends BaseController {
         return success(routeList);
     }
 
-
     /**
      * 获取用户信息
+     * 获取当前登录用户的详细信息，包括用户基本信息、角色集合、权限集合等
      *
-     * @return 用户信息
+     * @return 用户信息，包括user、roles、permissions等
      */
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
@@ -122,6 +126,5 @@ public class SysAuthController extends BaseController {
         sysAuthService.logout();
         return success();
     }
-
 
 }

@@ -5,13 +5,14 @@ import cn.hutool.core.util.IdUtil;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.AccessLimit;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,30 +25,28 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 验证码相关接口
+ * 提供获取验证码的功能
+ *
  * @author Chuang
- * <p>
  * created on 2025/4/2 14:39
  */
 @RestController
 @RequestMapping("/captcha")
 @Tag(name = "验证码相关")
+@RequiredArgsConstructor
 public class CaptchaController extends BaseController {
-
 
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisCache redisCache;
 
-    public CaptchaController() {
-        super();
-    }
 
     /**
      * 获取验证码
      *
-     * @return 返回验证码对应的UUID
+     * @return 返回验证码对应的UUID和Base64图片
      */
     @GetMapping
     @Operation(summary = "获取验证码")
@@ -67,7 +66,7 @@ public class CaptchaController extends BaseController {
 
         // 将验证码存储到redis中，有效期2分钟
         String verifyKey = RedisConstants.CAPTCHA_CODE + uuid;
-        redisTemplate.opsForValue().set(verifyKey, code, 2, TimeUnit.MINUTES);
+        redisCache.setCacheObject(verifyKey, code, 2, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();
         try {

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.common.utils;
 
 import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.common.model.entity.IPEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -116,6 +117,50 @@ public class IPUtils {
             log.error("IpRegionUtil ERROR, {}", e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * 根据IP地址获取地理位置信息
+     *
+     * @param ip IP地址
+     * @return IPEntity对象，包含国家、省/州、城市和ISP信息
+     */
+    public static IPEntity getRegionEntity(String ip) {
+        String region = getRegion(ip);
+        IPEntity ipEntity = new IPEntity();
+
+        if (region != null && !region.isEmpty()) {
+            String[] parts = region.split("\\|");
+            if (parts.length >= 5) {
+                // 处理国家信息
+                ipEntity.setCountry("0".equals(parts[0]) ? "" : parts[0]);
+
+                // 处理区域信息（省/州和城市合并，中间用空格间隔）
+                String areaStr = "0".equals(parts[2]) ? "" : parts[2];
+                String regionStr = "0".equals(parts[3]) ? "" : parts[3];
+
+                // 设置区域（省/州）
+                ipEntity.setArea(areaStr);
+
+                // 合并区域详情（区域+城市，用空格分隔）
+                StringBuilder regionBuilder = new StringBuilder();
+                if (!areaStr.isEmpty()) {
+                    regionBuilder.append(areaStr);
+                }
+                if (!regionStr.isEmpty()) {
+                    if (regionBuilder.length() > 0) {
+                        regionBuilder.append(" ");
+                    }
+                    regionBuilder.append(regionStr);
+                }
+                ipEntity.setRegion(regionBuilder.toString());
+
+                // 设置ISP信息
+                ipEntity.setISP("0".equals(parts[4]) ? "" : parts[4]);
+            }
+        }
+
+        return ipEntity;
     }
 
     @PostConstruct

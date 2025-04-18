@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 服务器监控接口
+ * 提供服务器运行状态信息
+ *
  * @author Chuang
  * created on 2025/3/19 19:56
  */
@@ -19,15 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "服务器监控")
 public class ServerController extends BaseController {
 
-
     public ServerController() {
         super();
     }
 
     /**
-     * 服务器信息
+     * 获取服务器信息
      *
-     * @return AjaxResult
+     * @return 服务器信息
      */
     @GetMapping
     @Operation(summary = "服务器信息")

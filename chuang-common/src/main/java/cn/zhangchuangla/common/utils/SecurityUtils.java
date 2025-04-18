@@ -57,11 +57,11 @@ public class SecurityUtils {
 
 
     /**
-     * 判断密码是否相同
+     * 判断密码是否相同,这边原始的密码是明文的不需要额外加密
      *
      * @param rawPassword     真实密码
      * @param encodedPassword 加密后字符
-     * @return 结果
+     * @return true代表相同，false代表不同
      */
     public static boolean matchesPassword(String rawPassword, String encodedPassword) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -78,22 +78,6 @@ public class SecurityUtils {
         return getRoles().contains(role);
     }
 
-    /**
-     * 固定时间比较两个字符串，防止时间侧信道攻击
-     */
-    public static boolean constantTimeEquals(String a, String b) {
-        if (a == null || b == null) {
-            return false;
-        }
-        if (a.length() != b.length()) {
-            return false;
-        }
-        int result = 0;
-        for (int i = 0; i < a.length(); i++) {
-            result |= a.charAt(i) ^ b.charAt(i);
-        }
-        return result == 0;
-    }
 
     /**
      * 获取当前请求对象

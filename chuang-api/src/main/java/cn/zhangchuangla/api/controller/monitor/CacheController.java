@@ -20,8 +20,10 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
+ * 缓存监控接口
+ * 提供Redis缓存相关监控信息
+ *
  * @author Chuang
- * <p>
  * created on 2025/3/20 09:55
  */
 @RestController
@@ -32,11 +34,10 @@ public class CacheController extends BaseController {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-
     /**
      * 获取 Redis 基本信息
      *
-     * @return AjaxResult
+     * @return Redis基本信息、数据库大小、命令统计
      */
     @GetMapping
     @Operation(summary = "Redis基本信息")
@@ -71,7 +72,8 @@ public class CacheController extends BaseController {
      * @return Properties
      */
     private Properties getRedisCommandStats() {
-        return (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
+        return (Properties) redisTemplate
+                .execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
     }
 
     /**

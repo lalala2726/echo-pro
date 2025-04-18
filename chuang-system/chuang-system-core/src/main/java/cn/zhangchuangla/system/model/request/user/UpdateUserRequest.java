@@ -54,7 +54,7 @@ public class UpdateUserRequest {
      * 昵称
      */
     @Schema(description = "昵称", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String nickName;
+    private String nickname;
 
     /**
      * 邮箱

@@ -2,6 +2,9 @@ package cn.zhangchuangla.system.model.request.log;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,18 +22,22 @@ public class SysLoginLogListRequest extends BasePageRequest {
      * 主键
      */
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Min(value = 1, message = "主键不能小于1")
     private Long id;
 
     /**
      * 用户名
      */
     @Schema(description = "用户名", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Size(max = 64, min = 1, message = "用户名长度在1-64个字符")
     private String username;
 
     /**
      * 账号状态
      */
     @Schema(description = "账号状态", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Min(value = 0, message = "账号状态不能小于0")
+    @Max(value = 1, message = "账号状态不能大于1")
     private Integer status;
 
     /**

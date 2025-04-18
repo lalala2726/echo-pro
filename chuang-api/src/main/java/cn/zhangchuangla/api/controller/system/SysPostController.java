@@ -14,8 +14,10 @@ import cn.zhangchuangla.system.model.vo.post.SysPostVo;
 import cn.zhangchuangla.system.service.SysPostService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,17 +38,17 @@ public class SysPostController extends BaseController {
     private final SysPostService sysPostService;
     private final SysRoleConverter sysRoleConverter;
 
-
     /**
      * 岗位列表
      *
-     * @param request 请求参数
+     * @param request 岗位列表查询参数
      * @return 返回岗位列表
      */
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
-    public AjaxResult listPost(SysPostListRequest request) {
+    public AjaxResult listPost(@Parameter(description = "岗位列表查询参数")
+                               @Validated @ParameterObject SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
@@ -55,30 +57,31 @@ public class SysPostController extends BaseController {
     /**
      * 添加岗位
      *
-     * @param request 请求参数
+     * @param request 添加岗位请求参数
      * @return 操作结果
      */
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:post:add')")
     @Operation(summary = "添加岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.INSERT)
-    public AjaxResult addPost(@Validated @RequestBody SysPostAddRequest request) {
+    public AjaxResult addPost(@Parameter(description = "添加岗位请求参数")
+                              @Validated @RequestBody SysPostAddRequest request) {
         boolean result = sysPostService.addPost(request);
         return toAjax(result);
     }
 
-
     /**
      * 删除岗位,支持批量删除
      *
-     * @param ids 岗位id集合
+     * @param ids 岗位ID集合，支持批量删除
      * @return 操作结果
      */
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPermission('system:post:remove')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
-    public AjaxResult removePost(@PathVariable("ids") List<Integer> ids) {
+    public AjaxResult removePost(@Parameter(description = "岗位ID集合，支持批量删除")
+                                 @PathVariable("ids") List<Integer> ids) {
         checkParam(ids == null, "id不能为空");
         boolean result = sysPostService.removePost(ids);
         return toAjax(result);
@@ -87,14 +90,15 @@ public class SysPostController extends BaseController {
     /**
      * 修改岗位
      *
-     * @param request 请求参数
+     * @param request 修改岗位请求参数
      * @return 操作结果
      */
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:post:edit')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
-    public AjaxResult editPost(@Validated @RequestBody SysPostUpdateRequest request) {
+    public AjaxResult editPost(@Parameter(description = "修改岗位请求参数")
+                               @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.editPost(request));
     }
 
@@ -107,7 +111,8 @@ public class SysPostController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
-    public AjaxResult getPostById(@PathVariable("id") Integer id) {
+    public AjaxResult getPostById(@Parameter(description = "岗位ID")
+                                  @PathVariable("id") Integer id) {
         checkParam(id == null, "id不能为空");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = sysRoleConverter.toSysPostVo(post);

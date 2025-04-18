@@ -37,7 +37,7 @@ public class UserProfileVo {
      * 昵称
      */
     @Schema(description = "昵称")
-    private String nickName;
+    private String nickname;
 
     /**
      * 头像

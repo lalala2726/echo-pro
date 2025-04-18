@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 字典表
+ * 字典添加请求类
  */
 @Data
 @Schema(description = "字典添加请求类")
