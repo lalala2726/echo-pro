@@ -14,6 +14,7 @@
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
+
     <delete id="deleteUserRoleByUserId">
         delete
         from sys_user_role

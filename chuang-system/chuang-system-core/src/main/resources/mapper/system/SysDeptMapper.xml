@@ -18,7 +18,7 @@
     </resultMap>
     <select id="listDepartment" resultMap="BaseResultMap">
         SELECT
-        *
+        dept_id, dept_name, parent_id, manager_id, description, create_time, update_time, create_by, update_by, remark
         FROM sys_dept
         <where>
             <if test="request != null">

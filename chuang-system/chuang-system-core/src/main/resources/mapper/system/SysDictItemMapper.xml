@@ -18,14 +18,67 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateBy" column="update_by"/>
     </resultMap>
+
     <select id="listSpecifyDictData" resultMap="BaseResultMap">
-        select *
+        select id, dict_code, value, label, tag_type, status, sort, remark, create_time, create_by, update_time,
+        update_by
         from sys_dict_item
-        where dict_code = #{dictCode}
+        <where>
+            <if test="request != null">
+                <if test="request.id != null">
+                    and id = #{request.id}
+                </if>
+                <if test="request.dictCode != null and request.dictCode != ''">
+                    and dict_code like concat('%', #{request.dictCode}, '%')
+                </if>
+                <if test="request.value != null and request.value != ''">
+                    and value like concat('%', #{request.value}, '%')
+                </if>
+                <if test="request.label != null and request.label != ''">
+                    and label like concat('%', #{request.label}, '%')
+                </if>
+                <if test="request.tagType != null and request.tagType != ''">
+                    and tag_type = #{request.tagType}
+                </if>
+                <if test="request.status != null">
+                    and status = #{request.status}
+                </if>
+                <if test="request.sort != null">
+                    and sort = #{request.sort}
+                </if>
+            </if>
+            and dict_code = #{dictCode}
+        </where>
     </select>
 
     <select id="listDictData" resultMap="BaseResultMap">
-        select *
+        select id, dict_code, value, label, tag_type, status, sort, remark, create_time, create_by, update_time,
+        update_by
         from sys_dict_item
+        <where>
+            <if test="request != null">
+                <if test="request.id != null">
+                    and id = #{request.id}
+                </if>
+                <if test="request.dictCode != null and request.dictCode != ''">
+                    and dict_code like concat('%', #{request.dictCode}, '%')
+                </if>
+                <if test="request.value != null and request.value != ''">
+                    and value like concat('%', #{request.value}, '%')
+                </if>
+                <if test="request.label != null and request.label != ''">
+                    and label like concat('%', #{request.label}, '%')
+                </if>
+                <if test="request.tagType != null and request.tagType != ''">
+                    and tag_type = #{request.tagType}
+                </if>
+                <if test="request.status != null">
+                    and status = #{request.status}
+                </if>
+                <if test="request.sort != null">
+                    and sort = #{request.sort}
+                </if>
+            </if>
+        </where>
     </select>
 </mapper>

@@ -23,9 +23,43 @@
     <update id="cleanLoginLog">
         truncate table sys_login_log
     </update>
+
     <select id="listLoginLog" resultMap="BaseResultMap">
-        select *
+        select id, username, status, ip, address, browser, os, create_time, update_time, create_by, update_by,
+        is_deleted, remark
         from sys_login_log
+        <where>
+            <if test="request != null">
+                <if test="request.id != null">
+                    and id = #{request.id}
+                </if>
+                <if test="request.username != null and request.username != ''">
+                    and username like concat('%', #{request.username}, '%')
+                </if>
+                <if test="request.status != null">
+                    and status = #{request.status}
+                </if>
+                <if test="request.ip != null and request.ip != ''">
+                    and ip like concat('%', #{request.ip}, '%')
+                </if>
+                <if test="request.address != null and request.address != ''">
+                    and address like concat('%', #{request.address}, '%')
+                </if>
+                <if test="request.browser != null and request.browser != ''">
+                    and browser like concat('%', #{request.browser}, '%')
+                </if>
+                <if test="request.os != null and request.os != ''">
+                    and os like concat('%', #{request.os}, '%')
+                </if>
+                <if test="request.createTime != null">
+                    and DATE(create_time) = DATE(#{request.createTime})
+                </if>
+                <if test="request.remark != null and request.remark != ''">
+                    and remark like concat('%', #{request.remark}, '%')
+                </if>
+            </if>
+        </where>
+        order by create_time desc
     </select>
 
 </mapper>

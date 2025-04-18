@@ -18,7 +18,7 @@ public interface SysConfigMapper extends BaseMapper<SysConfig> {
      * @param request       查询参数
      * @return 返回分页数据
      */
-    Page<SysConfig> listSysConfig(Page<SysConfig> sysConfigPage, @Param("request") SysConfigListRequest request);
+    Page<SysConfig> listSysConfig(Page<SysConfig> sysConfigPage, @Param("request") SysConfigListRequest sysConfigListRequest);
 }
 
 

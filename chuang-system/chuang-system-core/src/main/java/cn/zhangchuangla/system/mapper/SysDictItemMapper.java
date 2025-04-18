@@ -4,6 +4,7 @@ import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author zhangchuang
@@ -18,7 +19,8 @@ public interface SysDictItemMapper extends BaseMapper<SysDictItem> {
      * @param request  查询参数
      * @return 分页数据
      */
-    Page<SysDictItem> listSpecifyDictData(Page<SysDictItem> page, String dictCode, SysDictItemListRequest request);
+    Page<SysDictItem> listSpecifyDictData(Page<SysDictItem> page, @Param("dictCode") String dictCode,
+                                          @Param("request") SysDictItemListRequest request);
 
     /**
      * 分页查询字典数据
@@ -27,7 +29,7 @@ public interface SysDictItemMapper extends BaseMapper<SysDictItem> {
      * @param request 查询参数
      * @return 分页数据
      */
-    Page<SysDictItem> listDictData(Page<SysDictItem> page, SysDictItemListRequest request);
+    Page<SysDictItem> listDictData(Page<SysDictItem> page, @Param("request") SysDictItemListRequest request);
 }
 
 

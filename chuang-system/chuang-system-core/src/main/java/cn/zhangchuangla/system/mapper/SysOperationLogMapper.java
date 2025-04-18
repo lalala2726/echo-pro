@@ -4,14 +4,26 @@ import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.request.log.SysOperationLogListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author zhangchuang
  */
 public interface SysOperationLogMapper extends BaseMapper<SysOperationLog> {
 
-    Page<SysOperationLog> listOperationLog(Page<SysOperationLog> sysOperationLogPage, SysOperationLogListRequest request);
+    /**
+     * 分页查询操作日志
+     *
+     * @param page    分页对象
+     * @param request 查询参数
+     * @return 返回分页数据
+     */
+    Page<SysOperationLog> listOperationLog(Page<SysOperationLog> page,
+                                           @Param("request") SysOperationLogListRequest request);
 
+    /**
+     * 清空操作日志
+     */
     void cleanLoginLog();
 }
 

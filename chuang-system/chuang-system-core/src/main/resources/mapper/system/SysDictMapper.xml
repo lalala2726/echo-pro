@@ -17,8 +17,25 @@
         <result property="isDeleted" column="is_deleted"/>
     </resultMap>
     <select id="listDict" resultMap="BaseResultMap">
-        select *
+        select id, dict_code, name, status, remark, create_time, create_by, update_time, update_by, is_deleted
         from sys_dict
+        <where>
+            <if test="request != null">
+                <if test="request.id != null">
+                    and id = #{request.id}
+                </if>
+                <if test="request.dictCode != null and request.dictCode != ''">
+                    and dict_code like concat('%', #{request.dictCode}, '%')
+                </if>
+                <if test="request.name != null and request.name != ''">
+                    and name like concat('%', #{request.name}, '%')
+                </if>
+                <if test="request.status != null">
+                    and status = #{request.status}
+                </if>
+            </if>
+        </where>
+        order by create_time desc
     </select>
 
 </mapper>
