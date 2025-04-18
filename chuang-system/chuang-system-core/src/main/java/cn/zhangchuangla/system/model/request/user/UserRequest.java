@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,10 +27,17 @@ public class UserRequest extends BasePageRequest {
     private String username;
 
     /**
+     * 部门ID
+     */
+    @Schema(description = "部门ID")
+    @Min(value = 1, message = "部门ID不能小于1")
+    private Long deptId;
+
+    /**
      * 昵称
      */
     @Schema(description = "昵称")
-    private String nickName;
+    private String nickname;
 
     /**
      * 邮箱

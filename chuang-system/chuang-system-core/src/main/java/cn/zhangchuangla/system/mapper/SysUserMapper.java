@@ -15,11 +15,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     /**
      * 分页查询用户信息
      *
-     * @param page    枫叶对象
-     * @param request 查询参数
+     * @param page        枫叶对象
+     * @param userRequest 查询参数
      * @return 返回分页结果
      */
-    Page<SysUserDeptDto> listUser(Page<SysUserDeptDto> page, @Param("request") UserRequest request);
+    Page<SysUserDeptDto> listUser(Page<SysUserDeptDto> page, @Param("request") UserRequest userRequest);
 
     /**
      * 查询指定用户以外的指定邮箱数量

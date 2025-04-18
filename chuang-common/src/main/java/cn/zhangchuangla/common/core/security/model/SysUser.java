@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_users")
+@TableName(value = "sys_user")
 @Data
 @Schema(name = "用户实体类")
 public class SysUser extends BaseEntity {
@@ -44,7 +44,7 @@ public class SysUser extends BaseEntity {
      * 昵称
      */
     @Schema(description = "昵称")
-    private String nickName;
+    private String nickname;
 
     /**
      * 头像

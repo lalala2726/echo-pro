@@ -21,11 +21,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +44,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 获取用户信息
-     * 获取当前登录用户的详细信息，包括个人资料、角色和权限等
+     * 获取当前登录用户的详细信息，包括个人资料
      *
      * @return 用户个人资料信息
      */
@@ -57,7 +57,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 获取用户列表
-     * 根据查询条件分页获取系统用户列表，需要特定权限才能访问
+     * 根据查询条件分页获取系统用户列表
      *
      * @param request 包含分页、排序和筛选条件的用户查询参数
      * @return 分页用户列表结果
@@ -66,19 +66,15 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                               @Validated UserRequest request) {
+                                   @Validated @ParameterObject UserRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
-        ArrayList<UserListVo> userListVos = new ArrayList<>();
-        userPage.getRecords().forEach(item -> {
-            UserListVo userListVo = sysUserConverter.toUserListVo(item);
-            userListVos.add(userListVo);
-        });
+        List<UserListVo> userListVos = copyListProperties(userPage, UserListVo.class);
         return getTableData(userPage, userListVos);
     }
 
     /**
      * 添加用户
-     * 创建新的系统用户，需要特定角色权限才能访问
+     * 创建新的系统用户
      *
      * @param request 用户添加请求参数，包含用户基本信息
      * @return 添加结果，成功返回用户ID
@@ -89,7 +85,7 @@ public class SysUserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
                               @Validated @RequestBody AddUserRequest request) {
-        return toAjax(sysUserService.addUserInfo(request));
+        return success(sysUserService.addUserInfo(request));
     }
 
     /**
