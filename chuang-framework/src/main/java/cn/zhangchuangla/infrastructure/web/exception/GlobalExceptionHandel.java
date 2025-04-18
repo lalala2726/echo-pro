@@ -11,6 +11,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -138,6 +139,25 @@ public class GlobalExceptionHandel {
     public AjaxResult tooManyRequestExceptionHandel(TooManyRequestException exception) {
         log.error("请求过于频繁", exception);
         return AjaxResult.error(ResponseCode.TOO_MANY_REQUESTS, exception.getMessage());
+    }
+
+    /**
+     * 却少请求参数
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public AjaxResult missingServletRequestParameterExceptionHandel(MissingServletRequestParameterException exception) {
+        log.error("缺少请求参数", exception);
+        String message = exception.getMessage();
+        String paramName = "";
+        if (message.contains("'")) {
+            // 提取单引号中的参数名称，如 'password'
+            int start = message.indexOf("'") + 1;
+            int end = message.indexOf("'", start);
+            if (end > start) {
+                paramName = message.substring(start, end);
+            }
+        }
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, "缺少请求参数: " + paramName);
     }
 
     /**

@@ -120,7 +120,7 @@ public class SysLogController extends BaseController {
         if (password.isEmpty())
             return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {
-            return warning("当前用户密码不正确！");
+            return error("当前用户密码不正确！");
         }
         boolean result = sysLoginLogService.cleanLoginLog();
         return toAjax(result);
@@ -141,7 +141,7 @@ public class SysLogController extends BaseController {
         if (password.isEmpty())
             return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {
-            return warning("当前用户密码不正确！");
+            return error("当前用户密码不正确！");
         }
         boolean result = sysOperationLogService.cleanLoginLog();
         return toAjax(result);
@@ -151,16 +151,15 @@ public class SysLogController extends BaseController {
      * 验证当前用户密码是否正确,某些场景下需要验证当前用户的密码
      *
      * @param rawPassword 明文密码
-     * @return 是否正确
+     * @return true代表密码不正确，false代表密码正确
      */
     private boolean verifyCurrentUserPassword(String rawPassword) {
         Long currentUserId = SecurityUtils.getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(currentUserId);
         if (sysUser == null || sysUser.getPassword() == null) {
-            return false;
+            return true;
         }
-        String encryptedInputPassword = encryptPassword(rawPassword);
-        return SecurityUtils.constantTimeEquals(sysUser.getPassword(), encryptedInputPassword);
+        return !SecurityUtils.matchesPassword(rawPassword, sysUser.getPassword());
     }
 
 }
