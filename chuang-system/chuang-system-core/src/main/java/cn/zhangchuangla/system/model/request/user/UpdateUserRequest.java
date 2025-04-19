@@ -36,7 +36,7 @@ public class UpdateUserRequest {
      * 性别
      */
     @Schema(description = "性别", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Integer gender;
+    private String gender;
 
     /**
      * 手机号

@@ -89,4 +89,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 下拉列表
      */
     List<Option<Long>> getRoleOptions();
+
+    /**
+     * 根据用户ID获取角色ID集合
+     *
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    Set<Long> getUserRoleIdByUserId(Long userId);
 }

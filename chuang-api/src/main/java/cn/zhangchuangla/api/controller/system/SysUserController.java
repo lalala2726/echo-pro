@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.user.AddUserRequest;
 import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
 import cn.zhangchuangla.system.model.request.user.UserRequest;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户管理控制器
@@ -151,14 +151,13 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
                                       @PathVariable("id") Long id) {
-        if (id == null || id <= 0)
-            return error("用户ID不能小于等于0");
+        checkParam(id == null || id < 0, "用户ID不能小于0");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
-        List<SysRole> roleList = sysRoleService.getRoleListByUserId(userId);
+        Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
-        userInfoVo.setRoles(roleList);
-        return success();
+        userInfoVo.setRoleIds(roleId);
+        return success(userInfoVo);
     }
 
 }

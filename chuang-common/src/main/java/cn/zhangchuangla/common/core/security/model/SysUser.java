@@ -56,7 +56,7 @@ public class SysUser extends BaseEntity {
      * 性别
      */
     @Schema(description = "性别")
-    private Integer gender;
+    private String gender;
 
     /**
      * 手机号

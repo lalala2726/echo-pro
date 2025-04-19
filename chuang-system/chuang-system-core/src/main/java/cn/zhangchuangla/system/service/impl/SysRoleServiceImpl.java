@@ -164,6 +164,24 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return null;
     }
 
+    /**
+     * 根据用户id获取角色id集合
+     *
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    @Override
+    public Set<Long> getUserRoleIdByUserId(Long userId) {
+        if (userId <= 0) throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
+        List<SysRole> roleList = getRoleListByUserId(userId);
+        if (roleList == null) {
+            return null;
+        }
+        return roleList.stream()
+                .map(SysRole::getId)
+                .collect(Collectors.toSet());
+    }
+
 }
 
 
