@@ -27,6 +27,12 @@ public class UserInfoVo {
     private Set<Long> roleIds;
 
     /**
+     * 部门ID
+     */
+    @Schema(description = "所属部门ID")
+    private Long deptId;
+
+    /**
      * 用户名
      */
     @Schema(description = "用户名")
@@ -49,7 +55,7 @@ public class UserInfoVo {
      * 性别
      */
     @Schema(description = "性别")
-    private String gender;
+    private Integer gender;
 
     /**
      * 手机号

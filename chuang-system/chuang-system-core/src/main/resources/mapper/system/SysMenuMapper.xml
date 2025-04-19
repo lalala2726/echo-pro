@@ -28,7 +28,24 @@
 
 
     <select id="getMenusByRoleCodes" resultType="cn.zhangchuangla.system.model.entity.SysMenu">
-        select *
+        select id,
+               parent_id,
+               tree_path,
+               name,
+               type,
+               route_name,
+               route_path,
+               component,
+               perm,
+               always_show,
+               keep_alive,
+               visible,
+               sort,
+               icon,
+               redirect,
+               create_time,
+               update_time,
+               params
         from sys_menu
     </select>
 </mapper>

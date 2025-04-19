@@ -158,7 +158,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         List<SysRole> roleList = list();
         if (roleList != null && !roleList.isEmpty()) {
             return roleList.stream()
-                    .map(role -> new Option<>(role.getId(), role.getRoleName()))
+                    .map(role -> new Option<>(role.getRoleId(), role.getRoleName()))
                     .collect(Collectors.toList());
         }
         return null;
@@ -178,7 +178,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             return null;
         }
         return roleList.stream()
-                .map(SysRole::getId)
+                .map(SysRole::getRoleId)
                 .collect(Collectors.toSet());
     }
 

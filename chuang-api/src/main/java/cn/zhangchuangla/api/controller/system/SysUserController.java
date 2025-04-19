@@ -147,7 +147,7 @@ public class SysUserController extends BaseController {
      * @return 用户详细信息
      */
     @GetMapping("/{id}")
-    @Operation(summary = "根据id获取用户信息")
+    @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
                                       @PathVariable("id") Long id) {

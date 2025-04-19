@@ -57,7 +57,7 @@ public class UserRequest extends BasePageRequest {
      * 性别
      */
     @Schema(description = "性别")
-    private String gender;
+    private Integer gender;
 
     /**
      * 状态

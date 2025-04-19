@@ -16,10 +16,10 @@ import lombok.EqualsAndHashCode;
 public class SysRole extends BaseEntity {
 
     /**
-     * 主键
+     * 角色ID
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long roleId;
 
     /**
      * 角色名

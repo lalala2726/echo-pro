@@ -47,7 +47,7 @@ public class AddUserRequest {
      * 性别
      */
     @Schema(description = "性别")
-    private String gender;
+    private Integer gender;
 
     /**
      * 手机号

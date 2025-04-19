@@ -57,7 +57,7 @@ public class SysUserDeptDto extends BaseEntity {
      * 性别
      */
     @Schema(description = "性别")
-    private String gender;
+    private Integer gender;
 
     /**
      * 手机号
