@@ -6,13 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_user")
 @Data
 @Schema(name = "用户实体类")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SysUser extends BaseEntity {
 
     /**

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -9,10 +10,11 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.AddUserRequest;
-import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
-import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.request.user.UserAddRequest;
+import cn.zhangchuangla.system.model.request.user.UserListRequest;
+import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 用户实现类
@@ -40,6 +43,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysUserConverter sysUserConverter;
+    private final SysRoleService sysRoleService;
 
 
     /**
@@ -49,7 +53,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @return 分页数据
      */
     @Override
-    public Page<SysUserDeptDto> listUser(UserRequest request) {
+    public Page<SysUserDeptDto> listUser(UserListRequest request) {
         Page<SysUserDeptDto> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysUserMapper.listUser(sysUserPage, request);
     }
@@ -61,7 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @return 添加成功返回用户ID，失败返回-1
      */
     @Override
-    public Long addUserInfo(AddUserRequest request) {
+    public Long addUserInfo(UserAddRequest request) {
         if (request == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR);
         }
@@ -207,7 +211,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUserInfoById(UpdateUserRequest request) {
+    public void updateUserInfoById(UserUpdateRequest request) {
         ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
         List<Long> roles = request.getRoles();
         //修改用户信息
@@ -277,6 +281,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         log.info("获取用户信息:{}", user);
         userProfileVo.setDeptName("开发部门");
         return userProfileVo;
+    }
+
+    /**
+     * 根据ID重置密码
+     *
+     * @param password 新密码
+     * @return 操作结果
+     */
+    @Override
+    public boolean resetPassword(String password, Long userId) {
+        password = SecurityUtils.encryptPassword(password);
+        Long currentUserId = SecurityUtils.getUserId();
+        //不允许用户重置自己密码
+        if (Objects.equals(currentUserId, userId)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置当前用户密码");
+        }
+        //不允许用户重置管理员密码
+        Set<String> role = sysRoleService.getUserRoleSetByUserId(userId);
+        if (role.contains(SysRolesConstant.SUPER_ADMIN)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置超级管理员密码");
+        }
+        SysUser sysUser = SysUser.builder()
+                .userId(userId)
+                .password(password)
+                .build();
+        return updateById(sysUser);
     }
 }
 

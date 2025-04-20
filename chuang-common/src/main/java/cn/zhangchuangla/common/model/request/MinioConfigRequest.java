@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.model.request;
 
+import cn.zhangchuangla.common.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -38,8 +39,7 @@ public class MinioConfigRequest {
      */
     @Schema(description = "访问端点", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "访问端点不能为空")
-    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
-            message = "访问端点域名格式不正确")
+    @Pattern(regexp = RegularConstants.Storage.domain, message = "访问端点域名格式不正确")
     private String endpoint;
 
     /**
@@ -59,7 +59,7 @@ public class MinioConfigRequest {
      * 存储桶名称
      */
     @Schema(description = "存储桶名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$",
+    @Pattern(regexp = RegularConstants.Storage.bucketName,
             message = "存储桶名称只能包含小写字母、数字、点号和短横线，且必须以小写字母或数字开头和结尾，长度在 3 到 63 个字符之间")
     @NotBlank(message = "存储桶名称不能为空")
     private String bucketName;
@@ -68,7 +68,7 @@ public class MinioConfigRequest {
      * 文件访问域名
      */
     @Schema(description = "文件访问路径,如果为空将直接返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+    @Pattern(regexp = RegularConstants.Storage.domain,
             message = "文件访问域名格式不正确")
     private String fileDomain;
 

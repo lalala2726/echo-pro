@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.request.user.UserListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -16,10 +16,10 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * 分页查询用户信息
      *
      * @param page        枫叶对象
-     * @param userRequest 查询参数
+     * @param userListRequest 查询参数
      * @return 返回分页结果
      */
-    Page<SysUserDeptDto> listUser(Page<SysUserDeptDto> page, @Param("request") UserRequest userRequest);
+    Page<SysUserDeptDto> listUser(Page<SysUserDeptDto> page, @Param("request") UserListRequest userListRequest);
 
     /**
      * 查询指定用户以外的指定邮箱数量

@@ -2,8 +2,8 @@ package cn.zhangchuangla.system.converter;
 
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.AddUserRequest;
-import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
+import cn.zhangchuangla.system.model.request.user.UserAddRequest;
+import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
@@ -36,7 +36,7 @@ public interface SysUserConverter {
      * @param request 用户添加请求
      * @return 用户实体类
      */
-    SysUser toEntity(AddUserRequest request);
+    SysUser toEntity(UserAddRequest request);
 
     /**
      * 将用户更新请求转换为实体类
@@ -44,7 +44,7 @@ public interface SysUserConverter {
      * @param request 用户更新请求
      * @return 用户实体类
      */
-    SysUser toEntity(UpdateUserRequest request);
+    SysUser toEntity(UserUpdateRequest request);
 
     /**
      * 将用户部门数据传输对象转换为用户列表视图对象

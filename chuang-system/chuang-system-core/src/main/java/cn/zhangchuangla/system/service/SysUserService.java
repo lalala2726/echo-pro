@@ -2,9 +2,9 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.AddUserRequest;
-import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
-import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.request.user.UserAddRequest;
+import cn.zhangchuangla.system.model.request.user.UserListRequest;
+import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +23,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      * @return 分页数据
      */
-    Page<SysUserDeptDto> listUser(UserRequest request);
+    Page<SysUserDeptDto> listUser(UserListRequest request);
 
 
     /**
@@ -32,7 +32,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      * @return 用户主键
      */
-    Long addUserInfo(AddUserRequest request);
+    Long addUserInfo(UserAddRequest request);
 
     /**
      * 判断用户名是否存在
@@ -104,7 +104,7 @@ public interface SysUserService extends IService<SysUser> {
      *
      * @param request 请求参数
      */
-    void updateUserInfoById(UpdateUserRequest request);
+    void updateUserInfoById(UserUpdateRequest request);
 
 
     /**
@@ -128,4 +128,13 @@ public interface SysUserService extends IService<SysUser> {
      * @return 用户个人中心信息
      */
     UserProfileVo getUserProfile();
+
+    /**
+     * 根据用户ID重置密码
+     *
+     * @param password 新密码
+     * @param userId   用户ID
+     * @return 操作结果
+     */
+    boolean resetPassword(String password, Long userId);
 }

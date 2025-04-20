@@ -1,5 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.zhangchuangla.common.constant.RegularConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -7,9 +8,9 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.AddUserRequest;
-import cn.zhangchuangla.system.model.request.user.UpdateUserRequest;
-import cn.zhangchuangla.system.model.request.user.UserRequest;
+import cn.zhangchuangla.system.model.request.user.UserAddRequest;
+import cn.zhangchuangla.system.model.request.user.UserListRequest;
+import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +35,7 @@ import java.util.Set;
  * 用户管理控制器
  * 提供用户的增删改查等功能
  */
+@Slf4j
 @Tag(name = "用户管理")
 @RestController
 @RequestMapping("/system/user")
@@ -67,7 +70,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                                   @Validated @ParameterObject UserRequest request) {
+                                   @Validated @ParameterObject UserListRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
@@ -89,7 +92,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
-                              @Validated @RequestBody AddUserRequest request) {
+                                  @Validated @RequestBody UserAddRequest request) {
         return success(sysUserService.addUserInfo(request));
     }
 
@@ -125,7 +128,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
-                                         @Validated @RequestBody UpdateUserRequest request) {
+                                             @Validated @RequestBody UserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         // 参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
@@ -137,6 +140,25 @@ public class SysUserController extends BaseController {
         // 业务逻辑
         sysUserService.updateUserInfoById(request);
         return success();
+    }
+
+    /**
+     * 重置用户密码
+     * 根据用户ID重置用户的登录密码
+     *
+     * @return 重置操作结果
+     */
+    @PutMapping("/password/{id}")
+    @Operation(summary = "根据用户ID重置密码")
+    @OperationLog(title = "用户管理", businessType = BusinessType.RESET_PWD)
+    @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
+    public AjaxResult resetPassword(@PathVariable("id") Long id, @RequestParam("password") String password) {
+        checkParam(id == null || id <= 0, "用户ID不能小于等于0");
+        if (!password.matches(RegularConstants.User.password)) {
+            return error("密码格式不正确");
+        }
+        boolean result = sysUserService.resetPassword(password, id);
+        return success(result);
     }
 
     /**
