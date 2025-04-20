@@ -15,7 +15,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     /**
      * 分页查询用户信息
      *
-     * @param page        枫叶对象
+     * @param page            枫叶对象
      * @param userListRequest 查询参数
      * @return 返回分页结果
      */

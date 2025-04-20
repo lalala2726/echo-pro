@@ -71,6 +71,7 @@ public interface SysDeptService extends IService<SysDept> {
      * @return 操作结果
      */
     boolean removeDeptById(List<Long> ids);
+
     /**
      * 获取部门下拉列表
      *
