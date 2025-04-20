@@ -1,5 +1,6 @@
 package cn.zhangchuangla.infrastructure.model.request;
 
+import cn.zhangchuangla.common.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -29,20 +30,20 @@ public class RegisterRequest {
      */
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
-
+    @Pattern(regexp = RegularConstants.User.password, message = "密码格式不正确")
     private String password;
 
     /**
      * 邮箱
      */
     @Schema(description = "邮箱")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", message = "邮箱格式不正确")
+    @Pattern(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机
      */
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机格式不正确")
+    @Pattern(regexp = RegularConstants.User.phone, message = "手机格式不正确")
     @Schema(description = "手机")
     private String phone;
 }

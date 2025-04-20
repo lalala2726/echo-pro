@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         implements SysRoleService {
 
@@ -143,6 +146,40 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public void refreshRolePermsCache() {
         //todo 待开发
+    }
+
+    /**
+     * 获取部门下拉列表
+     *
+     * @return 下拉列表
+     */
+    @Override
+    public List<Option<Long>> getRoleOptions() {
+        List<SysRole> roleList = list();
+        if (roleList != null && !roleList.isEmpty()) {
+            return roleList.stream()
+                    .map(role -> new Option<>(role.getRoleId(), role.getRoleName()))
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    /**
+     * 根据用户id获取角色id集合
+     *
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    @Override
+    public Set<Long> getUserRoleIdByUserId(Long userId) {
+        if (userId <= 0) throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
+        List<SysRole> roleList = getRoleListByUserId(userId);
+        if (roleList == null) {
+            return null;
+        }
+        return roleList.stream()
+                .map(SysRole::getRoleId)
+                .collect(Collectors.toSet());
     }
 
 }

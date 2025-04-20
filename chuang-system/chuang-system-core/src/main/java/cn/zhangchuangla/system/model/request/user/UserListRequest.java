@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
+import cn.zhangchuangla.common.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -18,12 +19,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "用户查询参数", description = "用户查询参数")
-public class UserRequest extends BasePageRequest {
+public class UserListRequest extends BasePageRequest {
 
     /**
      * 用户名
      */
     @Schema(description = "用户名")
+    @Pattern(regexp = RegularConstants.User.username)
     private String username;
 
     /**
@@ -43,13 +45,13 @@ public class UserRequest extends BasePageRequest {
      * 邮箱
      */
     @Schema(description = "邮箱")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", message = "邮箱格式不正确")
+    @Pattern(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机号
      */
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    @Pattern(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
     @Schema(description = "手机号")
     private String phone;
 

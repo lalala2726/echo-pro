@@ -207,7 +207,7 @@ public class BaseController {
 
 
     /**
-     * 验证是否为true
+     * 如果表达式为true则抛出异常
      *
      * @param conditionSupplier 条件
      * @param errorMessage      错误信息

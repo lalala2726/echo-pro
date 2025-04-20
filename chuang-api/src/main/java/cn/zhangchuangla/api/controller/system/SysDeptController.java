@@ -2,6 +2,7 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysDeptConverter;
@@ -9,7 +10,6 @@ import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
-import cn.zhangchuangla.system.model.vo.dept.DeptTree;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import cn.zhangchuangla.system.service.SysDeptService;
@@ -56,6 +56,7 @@ public class SysDeptController extends BaseController {
         List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
         return getTableData(page, sysDeptListVos);
     }
+
 
     /**
      * 新增部门
@@ -105,16 +106,16 @@ public class SysDeptController extends BaseController {
     }
 
     /**
-     * 部门树
+     * 部门下拉列表
      *
-     * @return 部门树
+     * @return 部门下拉列表
      */
-    @GetMapping("/tree")
+    @GetMapping("/options")
     @PreAuthorize("@ss.hasPermission('system:dept:tree')")
-    @Operation(summary = "部门树")
+    @Operation(summary = "部门下拉列表")
     public AjaxResult treeDept() {
-        List<DeptTree> deptList = sysDeptService.buildTree();
-        return success(deptList);
+        List<Option<Long>> deptOptions = sysDeptService.getDeptOptions();
+        return success(deptOptions);
     }
 
     /**

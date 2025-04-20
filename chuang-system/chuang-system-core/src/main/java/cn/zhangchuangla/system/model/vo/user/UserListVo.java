@@ -34,6 +34,7 @@ public class UserListVo {
     @Schema(description = "性别")
     private Integer gender;
 
+
     /**
      * 邮箱
      */

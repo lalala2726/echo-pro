@@ -1,10 +1,9 @@
 package cn.zhangchuangla.system.model.vo.user;
 
-import cn.zhangchuangla.system.model.entity.SysRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author zhangchuang
@@ -22,10 +21,16 @@ public class UserInfoVo {
 
 
     /**
-     * 角色列表
+     * 角色ID集合
      */
-    @Schema(description = "角色")
-    private List<SysRole> roles;
+    @Schema(description = "角色ID集合")
+    private Set<Long> roleIds;
+
+    /**
+     * 部门ID
+     */
+    @Schema(description = "所属部门ID")
+    private Long deptId;
 
     /**
      * 用户名

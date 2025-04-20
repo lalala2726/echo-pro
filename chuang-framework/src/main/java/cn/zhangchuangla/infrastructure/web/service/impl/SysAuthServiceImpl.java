@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -50,11 +49,13 @@ public class SysAuthServiceImpl implements SysAuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername().trim(), request.getPassword().trim());
 
         // 2. 执行认证（认证中）
-        Authentication authentication = null;
+        Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(authenticationToken);
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
+            log.error("用户名:{},登录失败！", request.getUsername(), e);
             sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, false);
+            throw e;
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）

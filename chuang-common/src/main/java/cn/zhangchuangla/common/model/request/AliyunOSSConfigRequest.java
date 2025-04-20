@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.model.request;
 
+import cn.zhangchuangla.common.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -65,7 +66,7 @@ public class AliyunOSSConfigRequest {
     /**
      * 域名
      */
-    @Pattern(regexp = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$",
+    @Pattern(regexp = RegularConstants.Storage.domain,
             message = "访问端点域名格式不正确")
     @Schema(description = "文件访问路径,如果为空将直接返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String fileDomain;

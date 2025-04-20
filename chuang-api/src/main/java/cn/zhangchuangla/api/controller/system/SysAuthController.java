@@ -120,7 +120,7 @@ public class SysAuthController extends BaseController {
      *
      * @return 操作结果
      */
-    @PostMapping("/logout")
+    @DeleteMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout() {
         sysAuthService.logout();

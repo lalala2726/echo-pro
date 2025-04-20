@@ -37,11 +37,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CaptchaController extends BaseController {
 
+    private final RedisCache redisCache;
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
-
-    private final RedisCache redisCache;
-
 
     /**
      * 获取验证码

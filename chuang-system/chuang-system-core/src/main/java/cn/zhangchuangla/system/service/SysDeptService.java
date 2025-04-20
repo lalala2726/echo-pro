@@ -1,10 +1,10 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
-import cn.zhangchuangla.system.model.vo.dept.DeptTree;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -73,9 +73,10 @@ public interface SysDeptService extends IService<SysDept> {
     boolean removeDeptById(List<Long> ids);
 
     /**
-     * 构建部门树
+     * 获取部门下拉列表
      *
-     * @return 部门树
+     * @return 部门下拉列表
      */
-    List<DeptTree> buildTree();
+    List<Option<Long>> getDeptOptions();
 }
+

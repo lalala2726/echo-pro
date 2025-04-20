@@ -16,8 +16,33 @@
         <result property="remark" column="remark"/>
     </resultMap>
     <select id="listSysConfig" resultMap="BaseResultMap">
-        select *
+        select
+        id,
+        config_name,
+        config_key,
+        config_value,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark
         from sys_config
+        <where>
+            <if test="request !=null">
+                <if test="request.configName != null and request.configName != ''">
+                    and config_name like concat('%', #{request.configName}, '%')
+                </if>
+                <if test="request.configKey != null and request.configKey != ''">
+                    and config_key = #{request.configKey}
+                </if>
+                <if test="request.configValue != null and request.configValue != ''">
+                    and config_value = #{request.configValue}
+                </if>
+                <if test="request.remark != null and request.remark != ''">
+                    and remark like concat('%', #{request.remark}, '%')
+                </if>
+            </if>
+        </where>
     </select>
 
 </mapper>

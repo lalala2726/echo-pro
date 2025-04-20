@@ -28,8 +28,37 @@
     </update>
 
     <select id="listOperationLog" resultMap="BaseResultMap">
-        select *
+        select id, user_id, user_name, module, request_method, operation_ip, operation_result, operation_type,
+        request_url, method_name, params, result_code, error_msg, cost_time, create_time
         from sys_operation_log
+        <where>
+            <if test="request != null">
+                <if test="request.id != null">
+                    and id = #{request.id}
+                </if>
+                <if test="request.userId != null">
+                    and user_id = #{request.userId}
+                </if>
+                <if test="request.userName != null and request.userName != ''">
+                    and user_name like concat('%', #{request.userName}, '%')
+                </if>
+                <if test="request.requestMethod != null and request.requestMethod != ''">
+                    and request_method = #{request.requestMethod}
+                </if>
+                <if test="request.operationIp != null and request.operationIp != ''">
+                    and operation_ip like concat('%', #{request.operationIp}, '%')
+                </if>
+                <if test="request.operationResult != null and request.operationResult != ''">
+                    and operation_result = #{request.operationResult}
+                </if>
+                <if test="request.module != null and request.module != ''">
+                    and module like concat('%', #{request.module}, '%')
+                </if>
+                <if test="request.createTime != null">
+                    and create_time = #{request.createTime}
+                </if>
+            </if>
+        </where>
     </select>
 
 </mapper>

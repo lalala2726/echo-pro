@@ -47,4 +47,5 @@ public interface SysRoleConverter {
      * @return 角色视图对象
      */
     SysRoleVo toSysRoleVo(SysRole sysRole);
+
 }

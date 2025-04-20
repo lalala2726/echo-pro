@@ -1,12 +1,14 @@
 package cn.zhangchuangla.common.exception;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
+import lombok.Getter;
 
 /**
  * @author Chuang
  * <p>
  * created on 2025/1/12 11:32
  */
+@Getter
 public class ParamException extends RuntimeException {
 
     private final Integer code;

@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 下拉选项对象
- *
- * @author haoxr
- * @since 2022/1/22
+ * @author Chuang
+ * <p>
+ * created on 2025/4/19 12:29
  */
 @Schema(description = "下拉选项对象")
 @Data

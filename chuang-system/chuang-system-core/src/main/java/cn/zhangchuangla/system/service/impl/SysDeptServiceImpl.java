@@ -2,13 +2,13 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
-import cn.zhangchuangla.system.model.vo.dept.DeptTree;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -126,15 +126,20 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         return removeByIds(ids);
     }
 
+
     /**
-     * 构建部门树
+     * 获取部门下拉列表
      *
-     * @return 部门树
+     * @return 部门下拉列表
      */
     @Override
-    public List<DeptTree> buildTree() {
-        List<SysDept> deptList = list();
-        return buildDeptTreeRecursive(0L, deptList);
+    public List<Option<Long>> getDeptOptions() {
+        List<SysDept> list = list();
+        if (list != null && !list.isEmpty()) {
+            return buildDeptTreeRecursive(0L, list);
+        }
+        return List.of();
+
     }
 
     /**
@@ -144,7 +149,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @param allDept  所有部门列表
      * @return 部门树列表
      */
-    private List<DeptTree> buildDeptTreeRecursive(Long parentId, List<SysDept> allDept) {
+    private List<Option<Long>> buildDeptTreeRecursive(Long parentId, List<SysDept> allDept) {
         return allDept.stream()
                 .filter(dept -> {
                     // 处理可能的 null 值情况
@@ -152,11 +157,11 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                     return deptParentId != null && deptParentId.equals(parentId);
                 })
                 .map(dept -> {
-                    DeptTree node = new DeptTree();
-                    node.setId(dept.getDeptId());
+                    Option<Long> node = new Option<>();
+                    node.setValue(dept.getDeptId());
                     node.setLabel(dept.getDeptName());
                     // 递归查找子节点
-                    List<DeptTree> children = buildDeptTreeRecursive(dept.getDeptId(), allDept);
+                    List<Option<Long>> children = buildDeptTreeRecursive(dept.getDeptId(), allDept);
                     if (!children.isEmpty()) {
                         node.setChildren(children);
                     }

@@ -87,7 +87,9 @@ public enum ResponseCode {
     FILE_OPERATION_ERROR(50001, "文件操作失败"),
     ACCESS_TOKEN_INVALID(50002, "访问令牌无效或已过期"),
     REFRESH_TOKEN_INVALID(50003, "刷新令牌无效或已过期"),
-    ACCESS_UNAUTHORIZED(5004, "未授权访问");
+    ACCESS_UNAUTHORIZED(5004, "未授权访问"),
+    UPDATE_ERROR(4005, "更新信息失败"),
+    INVALID_ROLE_ID(4006, "角色ID无效");
 
     /**
      * 状态码

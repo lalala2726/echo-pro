@@ -74,7 +74,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
     @Override
     public Page<SysLoginLog> listLoginLog(SysLoginLogListRequest request) {
         Page<SysLoginLog> sysLoginLogPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysLoginLogMapper.listLoginLog(sysLoginLogPage);
+        return sysLoginLogMapper.listLoginLog(sysLoginLogPage, request);
     }
 
 
