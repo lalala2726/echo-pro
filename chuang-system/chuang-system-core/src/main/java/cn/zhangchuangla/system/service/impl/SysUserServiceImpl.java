@@ -2,7 +2,6 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUser;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.ParamsUtils;
@@ -10,10 +9,12 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
+import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.user.UserAddRequest;
 import cn.zhangchuangla.system.model.request.user.UserListRequest;
 import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.service.SysDeptService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -44,6 +45,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserRoleService sysUserRoleService;
     private final SysUserConverter sysUserConverter;
     private final SysRoleService sysRoleService;
+    private final SysDeptService sysDeptService;
 
 
     /**
@@ -212,25 +214,48 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserInfoById(UserUpdateRequest request) {
-        ParamsUtils.minValidParam(request.getUserId(), "用户ID不能小于等于0");
-        List<Long> roles = request.getRoles();
-        //修改用户信息
-        SysUser sysUser = sysUserConverter.toEntity(request);
-        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().
-                eq(SysUser::getUserId, request.getUserId());
-        update(sysUser, eq);
-        //修改用户角色
-        //1.删除角色所关联的全部角色信息
+        if (request == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "请求参数不能为空");
+        }
+
+        List<Long> roles = request.getRoleIds();
+        Long deptId = request.getDeptId();
         Long userId = request.getUserId();
+
+        // 部门ID校验
+        if (deptId != null && deptId > 0) {
+            SysDept dept = sysDeptService.getDeptById(deptId);
+            if (dept == null) {
+                throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("部门ID:<%s>不存在！", deptId));
+            }
+        }
+
+        // 修改用户信息
+        SysUser sysUser = sysUserConverter.toEntity(request);
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getUserId, userId);
+
+        boolean update = update(sysUser, eq);
+        if (!update) {
+            throw new ServiceException(ResponseCode.UPDATE_ERROR, "用户信息更新失败");
+        }
+
+        // 删除角色所关联的全部角色信息
         if (userId != null) {
             sysUserRoleService.deleteUserRoleAssociation(userId);
         }
-        //2.添加新的角色信息
+
+        // 添加新的角色信息
         if (roles != null && !roles.isEmpty()) {
-            roles.stream().distinct().forEach(role -> {
-                ParamsUtils.minValidParam(role, "角色ID不能小于等于0");
-            });
-            sysUserRoleService.addUserRoleAssociation(roles, request.getUserId());
+            for (Long role : roles) {
+                try {
+                    ParamsUtils.minValidParam(role, "角色ID不能小于等于0");
+                } catch (Exception e) {
+                    log.error("update role info failed", e);
+                    throw new ServiceException(ResponseCode.INVALID_ROLE_ID, "无效的角色ID: " + role);
+                }
+            }
+            sysUserRoleService.addUserRoleAssociation(roles, userId);
         }
     }
 
@@ -260,11 +285,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (userId == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
-        SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
-        boolean admin = sysUserDetails.getSysUser().isSuperAdmin();
-        Long currentId = sysUserDetails.getUserId();
-        if (admin || Objects.equals(currentId, userId)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改当前用户信息");
+        Long currentUserId = SecurityUtils.getUserId();
+        if (Objects.equals(currentUserId, userId)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改自己的信息！");
+        }
+        Set<String> roles = SecurityUtils.getRoles();
+        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员信息");
         }
     }
 
@@ -291,7 +318,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean resetPassword(String password, Long userId) {
-        password = SecurityUtils.encryptPassword(password);
         Long currentUserId = SecurityUtils.getUserId();
         //不允许用户重置自己密码
         if (Objects.equals(currentUserId, userId)) {
@@ -309,7 +335,3 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return updateById(sysUser);
     }
 }
-
-
-
-

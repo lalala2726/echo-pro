@@ -30,7 +30,7 @@ public class RegisterRequest {
      */
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
-
+    @Pattern(regexp = RegularConstants.User.password, message = "密码格式不正确")
     private String password;
 
     /**

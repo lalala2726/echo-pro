@@ -79,3 +79,4 @@ public interface SysDeptService extends IService<SysDept> {
      */
     List<Option<Long>> getDeptOptions();
 }
+

@@ -157,6 +157,7 @@ public class SysUserController extends BaseController {
         if (!password.matches(RegularConstants.User.password)) {
             return error("密码格式不正确");
         }
+        password = encryptPassword(password);
         boolean result = sysUserService.resetPassword(password, id);
         return success(result);
     }

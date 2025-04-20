@@ -86,11 +86,5 @@ public class SysUser extends BaseEntity {
     private String isDeleted;
 
 
-    /**
-     * 是否为超级管理员
-     */
-    public boolean isSuperAdmin() {
-        return this.userId == 1L;
-    }
 
 }

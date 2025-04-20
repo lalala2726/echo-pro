@@ -14,10 +14,10 @@ public interface RegularConstants {
      * 用户相关正则表达式
      */
     interface User {
-        String password = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
+        String password = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z0-9!@#¥%&*（）——+]{8,20}$";
         String username = "^[a-zA-Z0-9_]{5,20}$";
         String phone = "^1[3-9]\\d{9}$";
-        String email = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        String email = "\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}";
     }
 
     /**

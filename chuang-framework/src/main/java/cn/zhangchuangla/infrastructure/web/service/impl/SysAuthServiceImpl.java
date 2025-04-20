@@ -3,7 +3,6 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
@@ -56,7 +55,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         } catch (Exception e) {
             log.error("用户名:{},登录失败！", request.getUsername(), e);
             sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, false);
-            throw new LoginException(ResponseCode.LOGIN_ERROR, "登录失败!");
+            throw e;
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
