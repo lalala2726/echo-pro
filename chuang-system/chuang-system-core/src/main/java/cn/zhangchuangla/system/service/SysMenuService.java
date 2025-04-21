@@ -9,6 +9,7 @@ import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author zhangchuang
@@ -61,5 +62,23 @@ public interface SysMenuService extends IService<SysMenu> {
      * @param id 菜单ID
      */
     boolean deleteMenu(Long id);
+
+
+    /**
+     * 根据角色名称查询权限
+     *
+     * @param roleName 角色名称
+     * @return 权限列表
+     */
+    Set<String> getPermissionsByRoleName(String roleName);
+
+    /**
+     * 根据角色名称集合查询权限
+     *
+     * @param roleSet 角色名称集合
+     * @return 权限列表
+     */
+    Set<String> getPermissionsByRoleName(Set<String> roleSet);
+
 
 }

@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.security.context.PermissionContextHolder;
-import cn.zhangchuangla.system.service.SysPermissionsService;
+import cn.zhangchuangla.system.service.SysMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PermissionAuth {
 
-    private final SysPermissionsService sysPermissionsService;
+
+    private final SysMenuService sysMenuService;
 
     /**
      * 判断当前用户是否拥有指定的权限
@@ -45,36 +46,12 @@ public class PermissionAuth {
             return false;
         }
         Set<String> roles = SecurityUtils.getRoles();
-        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
+        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
         PermissionContextHolder.setContext(permission);
         log.info("用户 [{}] 权限校验: 权限标识 [{}]，用户权限：{}", sysUserDetails.getUsername(), permission, permissions);
         return isAllow(permissions, permission);
     }
 
-    /**
-     * 判断当前用户是否至少拥有其中一个权限
-     *
-     * @param permissions 需要校验的权限列表
-     * @return true - 至少拥有一个权限，false - 一个都没有
-     */
-    public boolean hasAnyPermission(String... permissions) {
-        if (isSuperAdmin() || isSuperAdmin() || permissions == null || permissions.length == 0) {
-            return true;
-        }
-        SysUserDetails sysUserDetails = getLoginUser();
-        if (sysUserDetails == null) {
-            log.warn("未找到登录用户信息，无法进行多权限校验");
-            return false;
-        }
-        Set<String> userPermissions = sysPermissionsService.getPermissionsByUserId(sysUserDetails.getUserId());
-        for (String permission : permissions) {
-            if (userPermissions.contains(StringUtils.trim(permission))) {
-                log.info("用户 [{}] 拥有权限 [{}]，返回 true", sysUserDetails.getUsername(), permission);
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * 判断当前用户是否拥有指定角色

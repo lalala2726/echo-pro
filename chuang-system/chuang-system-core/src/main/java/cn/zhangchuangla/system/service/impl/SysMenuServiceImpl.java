@@ -7,6 +7,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.RedisConstants;
+import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.MenuTypeEnum;
 import cn.zhangchuangla.common.enums.StatusEnum;
 import cn.zhangchuangla.common.model.entity.KeyValue;
@@ -45,9 +48,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         implements SysMenuService {
 
     private final SysMenuConverter sysMenuConverter;
-
     private final SysRoleService roleMenuService;
-
+    private final SysMenuMapper sysMenuMapper;
+    private final RedisCache redisCache;
 
     /**
      * 菜单列表
@@ -401,6 +404,57 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         }
         return result;
 
+    }
+
+
+    /**
+     * 根据角色名称获取权限
+     *
+     * @param roleName 角色名称
+     * @return 返回权限集合
+     */
+    @Override
+    public Set<String> getPermissionsByRoleName(String roleName) {
+        // 如果角色名称是超级管理员，则返回所有权限
+        if (SysRolesConstant.SUPER_ADMIN.equals(roleName)) {
+            return Set.of(Constants.ALL_PERMISSION);
+        }
+        // 如果角色名称不是超级管理员，则查询权限，这边先从缓存中获取如果缓存中没有，则查询数据库
+        Set<String> cacheSet = redisCache.getCacheSet(StrUtil.format(RedisConstants.Auth.ROLE_PERMISSIONS_PREFIX, roleName));
+        if (cacheSet != null) {
+            return cacheSet;
+        }
+        // 如果缓存中没有，则查询数据库,并将角色关联的权限信息保存到缓存中
+        List<SysMenu> sysMenus = sysMenuMapper.getPermissionsByRoleName(roleName);
+        Set<String> collect = sysMenus.stream()
+                .map(SysMenu::getPermission)
+                .collect(Collectors.toSet());
+        redisCache.setCacheSet(StrUtil.format(RedisConstants.Auth.ROLE_PERMISSIONS_PREFIX), collect);
+        return collect;
+    }
+
+    /**
+     * 根据角色名称集合获取权限
+     *
+     * @param roleSet 角色名称集合
+     * @return 返回权限集合
+     */
+    @Override
+    public Set<String> getPermissionsByRoleName(Set<String> roleSet) {
+        // 如果角色名称其中一项是超级管理员将返回所有权限
+        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+            return Set.of(Constants.ALL_PERMISSION);
+        }
+        //如果角色名称集合不包含超级管理员，则查询权限，然后合并相同的
+        Set<String> permissions = new HashSet<>();
+        for (String roleName : roleSet) {
+            List<SysMenu> sysMenus = sysMenuMapper.getPermissionsByRoleName(roleName);
+            Set<String> rolePermissions = sysMenus.stream()
+                    .map(SysMenu::getPermission)
+                    .collect(Collectors.toSet());
+            permissions.addAll(rolePermissions);
+        }
+        return permissions;
     }
 
 

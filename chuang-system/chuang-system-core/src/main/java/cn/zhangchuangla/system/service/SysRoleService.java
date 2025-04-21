@@ -97,4 +97,5 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 角色ID集合
      */
     Set<Long> getUserRoleIdByUserId(Long userId);
+
 }

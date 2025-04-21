@@ -12,7 +12,6 @@ import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysPermissionsService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,9 +41,8 @@ public class SysAuthController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
-    private final SysPermissionsService sysPermissionsService;
-    private final SysRoleService sysRoleService;
     private final SysMenuService sysMenuService;
+    private final SysRoleService sysRoleService;
     private final SysUserConverter sysUserConverter;
     private final RedisCache redisCache;
 
@@ -107,7 +105,7 @@ public class SysAuthController extends BaseController {
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
         Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysPermissionsService.getPermissionsByRoleName(roles);
+        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
