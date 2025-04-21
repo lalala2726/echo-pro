@@ -22,6 +22,7 @@ import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.MenuQueryRequest;
 import cn.zhangchuangla.system.model.vo.menu.MenuVo;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
+import cn.zhangchuangla.system.model.vo.permission.PermissionListVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -166,29 +167,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return buildRoutes(Constants.ROOT_NODE_ID, sysMenuList);
     }
 
-    /**
-     * 递归生成菜单路由层级列表
-     *
-     * @param parentId    父级ID
-     * @param sysMenuList 菜单列表
-     * @return 路由层级列表
-     */
-    private List<RouteVo> buildRoutes(Long parentId, List<SysMenu> sysMenuList) {
-        List<RouteVo> routeList = new ArrayList<>();
-
-        for (SysMenu sysMenu : sysMenuList) {
-            if (sysMenu.getParentId().equals(parentId)) {
-                RouteVo routeVO = toRouteVo(sysMenu);
-                List<RouteVo> children = buildRoutes(sysMenu.getId(), sysMenuList);
-                if (!children.isEmpty()) {
-                    routeVO.setChildren(children);
-                }
-                routeList.add(routeVO);
-            }
-        }
-
-        return routeList;
-    }
 
     /**
      * 根据RouteBO创建RouteVO
@@ -457,9 +435,74 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return permissions;
     }
 
+    /**
+     * 获取系统中所有的可用的权限
+     *
+     * @return 权限列表
+     */
+    @Override
+    public List<PermissionListVo> listPermission() {
+        List<SysMenu> list = list();
+        return buildPermissionList(0, list);
+    }
 
+    /**
+     * 递归生成菜单路由层级列表
+     *
+     * @param parentId    父级ID
+     * @param sysMenuList 菜单列表
+     * @return 路由层级列表
+     */
+    private List<RouteVo> buildRoutes(Long parentId, List<SysMenu> sysMenuList) {
+        List<RouteVo> routeList = new ArrayList<>();
+
+        for (SysMenu sysMenu : sysMenuList) {
+            if (sysMenu.getParentId().equals(parentId)) {
+                RouteVo routeVO = toRouteVo(sysMenu);
+                List<RouteVo> children = buildRoutes(sysMenu.getId(), sysMenuList);
+                if (!children.isEmpty()) {
+                    routeVO.setChildren(children);
+                }
+                routeList.add(routeVO);
+            }
+        }
+
+        return routeList;
+    }
+
+    /**
+     * 递归构建权限列表
+     *
+     * @param parentId    父级ID
+     * @param sysMenuList 菜单列表
+     * @return 权限列表
+     */
+    private List<PermissionListVo> buildPermissionList(long parentId, List<SysMenu> sysMenuList) {
+        List<PermissionListVo> permissionList = new ArrayList<>();
+        for (SysMenu sysMenu : sysMenuList) {
+            if (sysMenu.getParentId().equals(parentId)) {
+                PermissionListVo permissionListVo = createPermissionListVo(sysMenu, sysMenuList);
+                permissionListVo.setParentId(parentId);
+                permissionList.add(permissionListVo);
+            }
+        }
+        return permissionList;
+    }
+
+    /**
+     * 创建权限列表VO
+     *
+     * @param sysMenu     菜单实体
+     * @param sysMenuList 菜单列表
+     * @return 权限列表VO
+     */
+    private PermissionListVo createPermissionListVo(SysMenu sysMenu, List<SysMenu> sysMenuList) {
+        PermissionListVo permissionListVo = new PermissionListVo();
+        permissionListVo.setMenuId(sysMenu.getId());
+        permissionListVo.setMenuName(sysMenu.getName());
+        permissionListVo.setMenuType(sysMenu.getType());
+        List<PermissionListVo> children = buildPermissionList(sysMenu.getId(), sysMenuList);
+        permissionListVo.setChildren(children);
+        return permissionListVo;
+    }
 }
-
-
-
-

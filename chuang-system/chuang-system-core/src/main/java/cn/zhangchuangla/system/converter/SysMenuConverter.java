@@ -26,5 +26,4 @@ public interface SysMenuConverter {
     @Mapping(target = "params", ignore = true)
     SysMenu toEntity(MenuAddRequest menuAddRequest);
 
-
 }

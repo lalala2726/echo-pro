@@ -27,13 +27,13 @@ public class RouteVo {
     /**
      * 路由组件路径
      */
-    @Schema(description = "组件路径", example = "system/user/index")
+    @Schema(description = "组件路径")
     private String component;
 
     /**
      * 路由重定向路径
      */
-    @Schema(description = "跳转链接", example = "https://www.youlai.tech")
+    @Schema(description = "跳转链接")
     private String redirect;
 
     /**
