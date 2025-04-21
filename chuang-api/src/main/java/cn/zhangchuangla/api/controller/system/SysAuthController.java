@@ -74,7 +74,7 @@ public class SysAuthController extends BaseController {
      * @param refreshToken 刷新令牌
      * @return 新的token
      */
-    @PostMapping
+    @PostMapping("/refreshToken")
     @Operation(summary = "刷新令牌")
     public AjaxResult refreshToken(@Parameter(name = "刷新令牌", required = true)
                                    @RequestParam String refreshToken) {
