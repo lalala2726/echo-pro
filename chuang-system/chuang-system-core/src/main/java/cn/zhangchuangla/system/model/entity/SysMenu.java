@@ -56,7 +56,7 @@ public class SysMenu {
     /**
      * 权限标识
      */
-    private String perm;
+    private String permission;
 
     /**
      * 显示状态(1:显示;0:隐藏)
