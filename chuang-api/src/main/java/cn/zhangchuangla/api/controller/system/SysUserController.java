@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.constant.RegularConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -70,8 +69,8 @@ public class SysUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
-    public TableDataResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                                    @Validated @ParameterObject UserListRequest request) {
+    public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
+                               @Validated @ParameterObject UserListRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {

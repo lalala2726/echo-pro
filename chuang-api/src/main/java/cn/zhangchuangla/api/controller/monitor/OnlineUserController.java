@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -53,8 +52,8 @@ public class OnlineUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
-    public TableDataResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
-                                          @Validated @ParameterObject OnlineUserListRequest request) {
+    public AjaxResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
+                                     @Validated @ParameterObject OnlineUserListRequest request) {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
         ArrayList<SysOnlineUser> sysOnlineUsers = new ArrayList<>();

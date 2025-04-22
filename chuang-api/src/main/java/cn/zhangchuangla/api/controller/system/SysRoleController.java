@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.model.entity.Option;
@@ -54,7 +53,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermission('system:role:list')")
-    public TableDataResult list(@Parameter(description = "角色列表查询参数")
+    public AjaxResult list(@Parameter(description = "角色列表查询参数")
                            @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
         List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);

@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
@@ -48,8 +47,8 @@ public class SysPostController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
-    public TableDataResult listPost(@Parameter(description = "岗位列表查询参数")
-                                    @Validated @ParameterObject SysPostListRequest request) {
+    public AjaxResult listPost(@Parameter(description = "岗位列表查询参数")
+                               @Validated @ParameterObject SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
