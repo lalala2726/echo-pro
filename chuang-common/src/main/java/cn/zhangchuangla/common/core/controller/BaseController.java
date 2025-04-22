@@ -65,14 +65,13 @@ public class BaseController {
      *
      * @param page 分页对象
      */
-    protected TableDataResult getTableData(Page<?> page) {
+    protected AjaxResult getTableData(Page<?> page) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setList(page.getRecords());
-        tableDataResult.setCurrentTime(System.currentTimeMillis());
+        tableDataResult.setRows(page.getRecords());
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
-        return tableDataResult;
+        return success(tableDataResult);
     }
 
     /**
@@ -84,8 +83,7 @@ public class BaseController {
     protected AjaxResult getTableData(Page<?> page, List<?> vo) {
         TableDataResult tableDataResult = new TableDataResult();
         tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setList(vo);
-        tableDataResult.setCurrentTime(System.currentTimeMillis());
+        tableDataResult.setRows(vo);
         tableDataResult.setPageNum(page.getCurrent());
         tableDataResult.setPageSize(page.getSize());
         return success(tableDataResult);

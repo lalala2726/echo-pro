@@ -2,7 +2,6 @@ package cn.zhangchuangla.infrastructure.web.service.impl;
 
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
-import cn.zhangchuangla.common.exception.LoginException;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +34,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         SysUser sysUser = sysUserService.getUserInfoByUsername(username);
-        if (sysUser == null) {
-            log.error("用户名:{},不存在", username);
-            throw new LoginException("账号或者密码错误");
-        }
         Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(sysUser.getUserId());
         log.info("用户权限信息:{}", roleSet);
         return new SysUserDetails(sysUser, roleSet);

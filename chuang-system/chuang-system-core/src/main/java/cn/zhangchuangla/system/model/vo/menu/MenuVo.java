@@ -84,7 +84,7 @@ public class MenuVo {
      * 按钮权限标识
      */
     @Schema(description = "按钮权限标识")
-    private String perm;
+    private String permission;
 
     /**
      * 子菜单

@@ -51,7 +51,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (StrUtil.isNotBlank(authorizationHeader)) {
 
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
-                boolean isValidToken = tokenManager.validateToken(authorizationHeader);
+                boolean isValidToken = tokenManager.validateAccessToken(authorizationHeader);
                 log.info("当前请求令牌有效性：{}", isValidToken);
                 if (!isValidToken) {
                     ResponseUtils.writeErrMsg(response, ResponseCode.ACCESS_TOKEN_INVALID);

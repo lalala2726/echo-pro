@@ -1,13 +1,11 @@
 package cn.zhangchuangla.common.core.page;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,51 +37,10 @@ public class TableDataResult implements Serializable {
      */
     private long pageSize;
 
-
-    /**
-     * 当前时间戳
-     */
-    private long currentTime;
-
     /**
      * 列表数据
      */
-    private List<?> list;
+    private List<?> rows;
 
-
-    /**
-     * 分页构造器
-     *
-     * @param page 分页对象
-     */
-    public TableDataResult(Page<?> page) {
-        this.total = page.getTotal();
-        this.pageNum = page.getCurrent();
-        this.pageSize = page.getSize();
-        this.list = page.getRecords();
-        this.currentTime = System.currentTimeMillis();
-    }
-
-    /**
-     * 默认成功构造器
-     *
-     * @param total    总记录数
-     * @param pageNum  当前页码
-     * @param pageSize 每页记录数
-     * @param list     列表数据
-     */
-    public TableDataResult(long total, long pageNum, long pageSize, List<?> list) {
-        this.total = total;
-        this.pageNum = pageNum;
-        this.pageSize = pageSize;
-        this.list = list;
-        this.currentTime = System.currentTimeMillis();
-    }
-
-    /**
-     * 空数据构造器，默认返回成功状态
-     */
-    public static TableDataResult empty() {
-        return new TableDataResult(0, 1, 10, Collections.emptyList());
-    }
 }
+

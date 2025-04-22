@@ -70,7 +70,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                                   @Validated @ParameterObject UserListRequest request) {
+                               @Validated @ParameterObject UserListRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {

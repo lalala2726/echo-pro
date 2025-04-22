@@ -64,7 +64,7 @@ public class MenuAddRequest {
      * 权限标识
      */
     @Schema(description = "权限标识")
-    private String perm;
+    private String permission;
 
     /**
      * 显示状态(1:显示;0:隐藏)

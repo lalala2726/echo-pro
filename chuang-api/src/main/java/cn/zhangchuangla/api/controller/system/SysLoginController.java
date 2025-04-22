@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,8 @@ import java.util.Set;
 @RestController
 @Slf4j
 @Tag(name = "登录接口")
-@RequestMapping("/auth")
 @RequiredArgsConstructor
-public class SysAuthController extends BaseController {
+public class SysLoginController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
@@ -72,10 +72,10 @@ public class SysAuthController extends BaseController {
      * @param refreshToken 刷新令牌
      * @return 新的token
      */
-    @PostMapping("/refreshToken")
+    @PostMapping("/login/refreshToken")
     @Operation(summary = "刷新令牌")
-    public AjaxResult refreshToken(@Parameter(name = "刷新令牌", required = true)
-                                   @RequestParam String refreshToken) {
+    public AjaxResult refreshToken(@Parameter(description = "刷新令牌", required = true)
+                                   @ParameterObject @RequestParam("refreshToken") String refreshToken) {
         AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
         return success(newAuthenticationToken);
     }
@@ -86,7 +86,7 @@ public class SysAuthController extends BaseController {
      * @return 用户路由
      */
     @Operation(summary = "菜单路由列表")
-    @GetMapping("/routes")
+    @GetMapping("/login/routes")
     public AjaxResult getCurrentUserRoutes() {
         List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
         return success(routeList);
@@ -118,7 +118,7 @@ public class SysAuthController extends BaseController {
      *
      * @return 操作结果
      */
-    @DeleteMapping("/logout")
+    @DeleteMapping("/login/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout() {
         sysAuthService.logout();

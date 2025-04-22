@@ -16,10 +16,10 @@ public class SecurityConstants {
      * 接口白名单,设置后不台不需要认证直接可以访问
      */
     public static final String[] WHITELIST = {
-            "/auth/login",
+            "/login",
             "/captcha",
             "/register",
-            "/auth/refreshToken"
+            "/refreshToken"
     };
 
     /**

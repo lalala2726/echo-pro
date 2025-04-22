@@ -1,10 +1,10 @@
 package cn.zhangchuangla.system.model.request.user;
 
+import cn.zhangchuangla.common.annoation.ValidRegex;
 import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.common.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,7 +25,7 @@ public class UserListRequest extends BasePageRequest {
      * 用户名
      */
     @Schema(description = "用户名")
-    @Pattern(regexp = RegularConstants.User.username)
+    @ValidRegex(regexp = RegularConstants.User.username)
     private String username;
 
     /**
@@ -45,13 +45,13 @@ public class UserListRequest extends BasePageRequest {
      * 邮箱
      */
     @Schema(description = "邮箱")
-    @Pattern(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机号
      */
-    @Pattern(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
     @Schema(description = "手机号")
     private String phone;
 

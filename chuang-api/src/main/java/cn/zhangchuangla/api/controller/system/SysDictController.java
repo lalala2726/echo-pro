@@ -2,6 +2,8 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysDictConverter;
@@ -55,7 +57,7 @@ public class SysDictController extends BaseController {
                                @Validated @ParameterObject SysDictListRequest request) {
         Page<SysDict> sysDict = sysDictService.listDict(request);
         List<SysDictListVo> sysDictListVos = copyListProperties(sysDict, SysDictListVo.class);
-        return success(getTableData(sysDict, sysDictListVos));
+        return getTableData(sysDict, sysDictListVos);
     }
 
     /**
@@ -142,10 +144,10 @@ public class SysDictController extends BaseController {
     public AjaxResult listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
                                    @Parameter(description = "字典项列表查询请求类")
                                    @ParameterObject @Validated SysDictItemListRequest request) {
-        if (dictCode.isEmpty()) return error("字典编码不能为空");
+        if (dictCode.isEmpty()) throw new ParamException(ResponseCode.PARAM_NOT_NULL, "字典编码不能为空！");
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(dictCode, request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
-        return success(getTableData(sysDictItemPage, sysDictItemListVos));
+        return getTableData(sysDictItemPage, sysDictItemListVos);
     }
 
     /**

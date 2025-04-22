@@ -59,7 +59,7 @@ public class SysLogController extends BaseController {
                                    @Validated @ParameterObject SysLoginLogListRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
-        return success(getTableData(sysLoginLogPage, sysLoginLogListVos));
+        return getTableData(sysLoginLogPage, sysLoginLogListVos);
     }
 
     /**
@@ -76,7 +76,7 @@ public class SysLogController extends BaseController {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
         List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
                 SysOperationLogListVo.class);
-        return success(getTableData(sysOperationLogPage, sysOperationLogListVos));
+        return getTableData(sysOperationLogPage, sysOperationLogListVos);
     }
 
     /**
