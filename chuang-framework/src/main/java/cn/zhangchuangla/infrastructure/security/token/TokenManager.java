@@ -31,20 +31,28 @@ public interface TokenManager {
     Authentication parseToken(String token);
 
     /**
-     * 校验 Token 是否有效
+     * 校验 访问令牌 是否有效
      *
      * @param token JWT Token
      * @return 是否有效
      */
-    boolean validateToken(String token);
+    boolean validateAccessToken(String token);
+
+    /**
+     * 校验刷新令牌是否有效
+     *
+     * @param token 刷新令牌
+     * @return 是否有效 true 有效 false 无效
+     */
+    boolean validateRefreshToken(String token);
 
     /**
      * 刷新 Token
      *
-     * @param token 刷新令牌
+     * @param refreshToken 刷新令牌
      * @return 认证 Token 响应
      */
-    AuthenticationToken refreshToken(String token);
+    AuthenticationToken refreshToken(String refreshToken);
 
     /**
      * 令 Token 失效

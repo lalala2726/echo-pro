@@ -127,14 +127,26 @@ public class RedisTokenManager implements TokenManager {
     }
 
     /**
-     * 校验 Token 是否有效
+     * 校验访问令牌是否有效
      *
      * @param token 访问令牌
      * @return 是否有效
      */
     @Override
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
         return redisCache.hasKey(formatTokenKey(token));
+    }
+
+    /**
+     * 校验刷新令牌是否有效
+     *
+     * @param refreshToken 刷新令牌
+     * @return 是否有效
+     */
+    @Override
+    public boolean validateRefreshToken(String refreshToken) {
+        String format = StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_USER, refreshToken);
+        return redisCache.hasKey(format);
     }
 
     /**
@@ -150,7 +162,7 @@ public class RedisTokenManager implements TokenManager {
             throw new ServiceException(ResponseCode.REFRESH_TOKEN_INVALID);
         }
 
-        String oldAccessToken = (String) redisCache.getCacheObject(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()));
+        String oldAccessToken = redisCache.getCacheObject(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()));
 
         // 删除旧的访问令牌记录
         if (oldAccessToken != null) {

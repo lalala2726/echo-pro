@@ -48,7 +48,7 @@ public class TableDataResult implements Serializable {
     /**
      * 列表数据
      */
-    private List<?> list;
+    private List<?> rows;
 
 
     /**
@@ -60,7 +60,7 @@ public class TableDataResult implements Serializable {
         this.total = page.getTotal();
         this.pageNum = page.getCurrent();
         this.pageSize = page.getSize();
-        this.list = page.getRecords();
+        this.rows = page.getRecords();
         this.currentTime = System.currentTimeMillis();
     }
 
@@ -70,13 +70,13 @@ public class TableDataResult implements Serializable {
      * @param total    总记录数
      * @param pageNum  当前页码
      * @param pageSize 每页记录数
-     * @param list     列表数据
+     * @param rows     列表数据
      */
-    public TableDataResult(long total, long pageNum, long pageSize, List<?> list) {
+    public TableDataResult(long total, long pageNum, long pageSize, List<?> rows) {
         this.total = total;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
-        this.list = list;
+        this.rows = rows;
         this.currentTime = System.currentTimeMillis();
     }
 

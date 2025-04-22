@@ -1,6 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
@@ -51,11 +52,11 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public AjaxResult listDict(@Parameter(description = "字典列表请求类")
-                               @Validated @ParameterObject SysDictListRequest request) {
+    public TableDataResult listDict(@Parameter(description = "字典列表请求类")
+                                    @Validated @ParameterObject SysDictListRequest request) {
         Page<SysDict> sysDict = sysDictService.listDict(request);
         List<SysDictListVo> sysDictListVos = copyListProperties(sysDict, SysDictListVo.class);
-        return success(getTableData(sysDict, sysDictListVos));
+        return getTableData(sysDict, sysDictListVos);
     }
 
     /**

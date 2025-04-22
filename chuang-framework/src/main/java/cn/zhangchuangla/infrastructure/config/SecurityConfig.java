@@ -102,6 +102,8 @@ public class SecurityConfig {
                 )
                 // 添加JWT filter
                 .addFilterBefore(new TokenAuthenticationFilter(tokenManager), UsernamePasswordAuthenticationFilter.class)
+                //禁用默认的注销功能
+                .logout(AbstractHttpConfigurer::disable)
                 .build();
     }
 

@@ -443,7 +443,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<PermissionListVo> listPermission() {
         List<SysMenu> list = list();
-        return buildPermissionList(0, list);
+        return buildPermissionList(Constants.ROOT_NODE_ID, list);
     }
 
     /**
