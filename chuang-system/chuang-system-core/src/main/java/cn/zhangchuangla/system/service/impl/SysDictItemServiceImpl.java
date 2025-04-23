@@ -109,6 +109,19 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     public boolean deleteDictItem(List<Long> ids) {
         return removeByIds(ids);
     }
+
+    /**
+     * 获取字典项列表
+     *
+     * @param dictCode 字典编码
+     * @return 字典项列表
+     */
+    @Override
+    public List<SysDictItem> getDictItemOptionVo(String dictCode) {
+        LambdaQueryWrapper<SysDictItem> sysDictItemLambdaQueryWrapper = new LambdaQueryWrapper<SysDictItem>()
+                .eq(SysDictItem::getDictCode, dictCode);
+        return list(sysDictItemLambdaQueryWrapper);
+    }
 }
 
 

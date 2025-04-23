@@ -15,12 +15,12 @@ public class BasePageRequest {
      * 当前页码
      */
 
-    @Schema(description = "当前页码", defaultValue = "1", requiredMode = Schema.RequiredMode.AUTO, example = "1")
-    private Long pageNum = 1L;
+    @Schema(description = "当前页码", type = "integer", format = "int32", defaultValue = "1", requiredMode = Schema.RequiredMode.AUTO, example = "1")
+    private Integer pageNum = 1;
 
     /**
      * 每页数量
      */
-    @Schema(description = "当前页码", defaultValue = "10", requiredMode = Schema.RequiredMode.AUTO, example = "10")
-    private Long pageSize = 10L;
+    @Schema(description = "当前页码", type = "integer", format = "int32", defaultValue = "10", requiredMode = Schema.RequiredMode.AUTO, example = "10")
+    private Integer pageSize = 10;
 }

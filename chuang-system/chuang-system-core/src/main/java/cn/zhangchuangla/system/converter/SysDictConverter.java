@@ -6,9 +6,12 @@ import cn.zhangchuangla.system.model.request.dict.SysDictAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictUpdateRequest;
+import cn.zhangchuangla.system.model.vo.dict.SysDictItemOptionVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictItemVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictVo;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * @author Chuang
@@ -66,4 +69,11 @@ public interface SysDictConverter {
      * @return 字典项 视图对象
      */
     SysDictItemVo toSysDictItemVo(SysDictItem sysDictItem);
+
+    /**
+     * 将 字典 实体类 转换为 字典 视图对象列表
+     *
+     * @return 字典 视图对象列表
+     */
+    List<SysDictItemOptionVo> toSysDictItemOptionVo(List<SysDictItem> sysDictItems);
 }

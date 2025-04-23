@@ -3,6 +3,8 @@ package cn.zhangchuangla.system.model.vo.dict;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * 字典表
  */
@@ -32,5 +34,11 @@ public class SysDictListVo {
      */
     @Schema(description = "状态(0:正常;1:禁用)")
     private Integer status;
+
+    /**
+     * 创建时间
+     */
+    @Schema(description = "创建时间")
+    private Date createTime;
 
 }

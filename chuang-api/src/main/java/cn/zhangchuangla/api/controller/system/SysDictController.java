@@ -10,10 +10,7 @@ import cn.zhangchuangla.system.converter.SysDictConverter;
 import cn.zhangchuangla.system.model.entity.SysDict;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.*;
-import cn.zhangchuangla.system.model.vo.dict.SysDictItemListVo;
-import cn.zhangchuangla.system.model.vo.dict.SysDictItemVo;
-import cn.zhangchuangla.system.model.vo.dict.SysDictListVo;
-import cn.zhangchuangla.system.model.vo.dict.SysDictVo;
+import cn.zhangchuangla.system.model.vo.dict.*;
 import cn.zhangchuangla.system.service.SysDictItemService;
 import cn.zhangchuangla.system.service.SysDictService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -94,7 +91,7 @@ public class SysDictController extends BaseController {
     }
 
     /**
-     * 删除字典
+     * 删除字典，支持批量删除
      *
      * @param ids 字典ID列表
      * @return 删除结果
@@ -138,7 +135,7 @@ public class SysDictController extends BaseController {
      * @param request  查询参数
      * @return 字典项列表
      */
-    @GetMapping("/{dictCode}/items/list")
+    @GetMapping("/items/list/{dictCode}")
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
     public AjaxResult listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
@@ -172,7 +169,7 @@ public class SysDictController extends BaseController {
      * @param dictCode 字典编码
      * @return 字典项列表
      */
-    @GetMapping("/{dictCode}/items")
+    @GetMapping("/items/{dictCode}")
     @Operation(summary = "查询字典项列表")
     @PreAuthorize("@ss.hasPermission('system:dict-item:query')")
     public AjaxResult getDictItems(@Parameter(description = "字典编码")
@@ -180,6 +177,22 @@ public class SysDictController extends BaseController {
         if (dictCode.isEmpty()) return error("字典编码不能为空");
         List<SysDictItem> sysDictItems = sysDictItemService.getDictItems(dictCode);
         return success(sysDictItems);
+    }
+
+    /**
+     * 获取字典项选项列表
+     *
+     * @param dictCode 字典编码
+     * @return 字典项选项列表
+     */
+    @GetMapping("/items/options/{dictCode}")
+    @Operation(summary = "获取字典项选项")
+    public AjaxResult getDictItemOptions(@Parameter(description = "字典编码")
+                                         @PathVariable("dictCode") String dictCode) {
+        if (dictCode.isEmpty()) return error("字典编码不能为空");
+        List<SysDictItem> sysDictItems = sysDictItemService.getDictItemOptionVo(dictCode);
+        List<SysDictItemOptionVo> sysDictItemOptionVo = sysDictConverter.toSysDictItemOptionVo(sysDictItems);
+        return success(sysDictItemOptionVo);
     }
 
     /**
@@ -220,7 +233,7 @@ public class SysDictController extends BaseController {
      * @param request 请求参数
      * @return 修改结果
      */
-    @PutMapping("/items/")
+    @PutMapping("/items")
     @Operation(summary = "修改字典项")
     @OperationLog(title = "字典项管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:update')")
