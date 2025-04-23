@@ -93,6 +93,15 @@ public class SysUserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
                                   @Validated @RequestBody UserAddRequest request) {
+        if (!request.getUsername().isEmpty()) {
+            checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
+        }
+        if (!request.getPhone().isEmpty()) {
+            checkParam(sysUserService.isPhoneExist(request.getPhone()), "手机号已存在");
+        }
+        if (!request.getEmail().isEmpty()) {
+            checkParam(sysUserService.isEmailExist(request.getEmail()), "邮箱已存在");
+        }
         return success(sysUserService.addUserInfo(request));
     }
 

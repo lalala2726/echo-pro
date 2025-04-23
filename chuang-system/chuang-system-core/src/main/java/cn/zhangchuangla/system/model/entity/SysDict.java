@@ -36,7 +36,6 @@ public class SysDict extends BaseEntity {
      */
     private Integer status;
 
-
     /**
      * 是否删除(1-删除，0-未删除)
      */

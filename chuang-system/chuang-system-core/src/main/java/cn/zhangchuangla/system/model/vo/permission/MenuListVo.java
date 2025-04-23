@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PermissionListVo {
+public class MenuListVo {
 
     /**
      * 菜单ID
@@ -43,7 +43,7 @@ public class PermissionListVo {
      * 子菜单
      */
     @Schema(description = "子菜单")
-    private List<PermissionListVo> children;
+    private List<MenuListVo> children;
 
 
 }

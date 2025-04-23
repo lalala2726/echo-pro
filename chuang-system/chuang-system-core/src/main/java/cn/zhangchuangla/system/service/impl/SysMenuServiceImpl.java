@@ -22,7 +22,7 @@ import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.MenuQueryRequest;
 import cn.zhangchuangla.system.model.vo.menu.MenuVo;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
-import cn.zhangchuangla.system.model.vo.permission.PermissionListVo;
+import cn.zhangchuangla.system.model.vo.permission.MenuListVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -441,7 +441,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 权限列表
      */
     @Override
-    public List<PermissionListVo> listPermission() {
+    public List<MenuListVo> listPermission() {
         List<SysMenu> list = list();
         return buildPermissionList(Constants.ROOT_NODE_ID, list);
     }
@@ -477,13 +477,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @param sysMenuList 菜单列表
      * @return 权限列表
      */
-    private List<PermissionListVo> buildPermissionList(long parentId, List<SysMenu> sysMenuList) {
-        List<PermissionListVo> permissionList = new ArrayList<>();
+    private List<MenuListVo> buildPermissionList(long parentId, List<SysMenu> sysMenuList) {
+        List<MenuListVo> permissionList = new ArrayList<>();
         for (SysMenu sysMenu : sysMenuList) {
             if (sysMenu.getParentId().equals(parentId)) {
-                PermissionListVo permissionListVo = createPermissionListVo(sysMenu, sysMenuList);
-                permissionListVo.setParentId(parentId);
-                permissionList.add(permissionListVo);
+                MenuListVo menuListVo = createPermissionListVo(sysMenu, sysMenuList);
+                menuListVo.setParentId(parentId);
+                permissionList.add(menuListVo);
             }
         }
         return permissionList;
@@ -496,13 +496,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @param sysMenuList 菜单列表
      * @return 权限列表VO
      */
-    private PermissionListVo createPermissionListVo(SysMenu sysMenu, List<SysMenu> sysMenuList) {
-        PermissionListVo permissionListVo = new PermissionListVo();
-        permissionListVo.setMenuId(sysMenu.getId());
-        permissionListVo.setMenuName(sysMenu.getName());
-        permissionListVo.setMenuType(sysMenu.getType());
-        List<PermissionListVo> children = buildPermissionList(sysMenu.getId(), sysMenuList);
-        permissionListVo.setChildren(children);
-        return permissionListVo;
+    private MenuListVo createPermissionListVo(SysMenu sysMenu, List<SysMenu> sysMenuList) {
+        MenuListVo menuListVo = new MenuListVo();
+        menuListVo.setMenuId(sysMenu.getId());
+        menuListVo.setMenuName(sysMenu.getName());
+        menuListVo.setMenuType(sysMenu.getType());
+        List<MenuListVo> children = buildPermissionList(sysMenu.getId(), sysMenuList);
+        menuListVo.setChildren(children);
+        return menuListVo;
     }
 }

@@ -30,7 +30,7 @@ public interface SysUserRoleService extends IService<SysUserRole> {
 
 
     /**
-     * 添加用户角色关联,使用此方法前请先调用removeUserRoleAssociation方法删除用户角色关联
+     * 添加用户角色关联
      *
      * @param roleId 角色ID列表
      * @param userId 用户ID

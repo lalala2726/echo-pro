@@ -78,5 +78,6 @@ public interface SysDeptService extends IService<SysDept> {
      * @return 部门下拉列表
      */
     List<Option<Long>> getDeptOptions();
+
 }
 

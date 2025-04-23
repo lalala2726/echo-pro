@@ -32,7 +32,6 @@ public class SysDictAddRequest {
      */
     @Schema(description = "状态(0:正常;1:禁用)", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @Range(min = 0, max = 1, message = "状态只能为0或1")
-    @NotBlank(message = "状态不能为空")
     private Integer status;
 
 }

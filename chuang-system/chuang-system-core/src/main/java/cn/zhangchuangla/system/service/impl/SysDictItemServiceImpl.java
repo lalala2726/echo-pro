@@ -122,6 +122,19 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
                 .eq(SysDictItem::getDictCode, dictCode);
         return list(sysDictItemLambdaQueryWrapper);
     }
+
+    /**
+     * 判断字典项是否存在
+     *
+     * @param dictCode 字典编码
+     * @return true 存在，false 不存在
+     */
+    @Override
+    public boolean isDictItemExistByDictCode(String dictCode) {
+        LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>()
+                .eq(SysDictItem::getDictCode, dictCode);
+        return count(eq) > 0;
+    }
 }
 
 
