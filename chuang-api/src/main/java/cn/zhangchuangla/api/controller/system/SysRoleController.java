@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -56,8 +57,8 @@ public class SysRoleController extends BaseController {
     public AjaxResult list(@Parameter(description = "角色列表查询参数")
                            @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.RoleList(request);
-        List<SysRoleVo> sysRoleVos = copyListProperties(page, SysRoleVo.class);
-        return getTableData(page, sysRoleVos);
+        List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
+        return getTableData(page, sysRoleListVos);
     }
 
     /**
