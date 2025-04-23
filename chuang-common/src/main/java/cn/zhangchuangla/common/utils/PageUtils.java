@@ -22,7 +22,7 @@ public class PageUtils {
      * @param <T>      数据类型
      * @return 分页后的 Page 对象
      */
-    public static <T> Page<T> getPage(Long pageNum, Long pageSize, Integer total, List<T> data) {
+    public static <T> Page<T> getPage(int pageNum, int pageSize, int total, List<T> data) {
         Page<T> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);

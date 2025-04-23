@@ -71,4 +71,12 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @return 是否删除成功
      */
     boolean deleteDictItem(List<Long> ids);
+
+    /**
+     * 根据字典编码获取字典项列表
+     *
+     * @param dictCode 字典编码
+     * @return 字典项列表
+     */
+    List<SysDictItem> getDictItemOptionVo(String dictCode);
 }

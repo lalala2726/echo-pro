@@ -52,7 +52,7 @@ public class SysLoginController extends BaseController {
      * @param request 请求参数
      * @return token
      */
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     @Operation(summary = "登录")
     public AjaxResult login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
@@ -72,7 +72,7 @@ public class SysLoginController extends BaseController {
      * @param refreshToken 刷新令牌
      * @return 新的token
      */
-    @PostMapping("/login/refreshToken")
+    @PostMapping("/auth/refreshToken")
     @Operation(summary = "刷新令牌")
     public AjaxResult refreshToken(@Parameter(description = "刷新令牌", required = true)
                                    @ParameterObject @RequestParam("refreshToken") String refreshToken) {
@@ -86,7 +86,7 @@ public class SysLoginController extends BaseController {
      * @return 用户路由
      */
     @Operation(summary = "菜单路由列表")
-    @GetMapping("/login/routes")
+    @GetMapping("/auth/routes")
     public AjaxResult getCurrentUserRoutes() {
         List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
         return success(routeList);
@@ -98,7 +98,7 @@ public class SysLoginController extends BaseController {
      *
      * @return 用户信息，包括user、roles、permissions等
      */
-    @GetMapping("/getUserInfo")
+    @GetMapping("/auth/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult getInfo() {
         HashMap<String, Object> ajax = new HashMap<>(4);
@@ -118,7 +118,7 @@ public class SysLoginController extends BaseController {
      *
      * @return 操作结果
      */
-    @DeleteMapping("/login/logout")
+    @DeleteMapping("/auth/logout")
     @Operation(summary = "退出登录")
     public AjaxResult logout() {
         sysAuthService.logout();

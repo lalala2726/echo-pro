@@ -15,14 +15,14 @@ public class SysConfigUpdateRequest {
     /**
      * 主键ID
      */
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "主键ID", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
     @Min(value = 1, message = "主键ID不能小于1")
     private Integer id;
 
     /**
      * 参数名称
      */
-    @Schema(description = "参数名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "参数名称不能为空")
     private String configName;
 
@@ -30,14 +30,14 @@ public class SysConfigUpdateRequest {
      * 参数键名
      */
     @NotBlank(message = "参数键名不能为空")
-    @Schema(description = "参数键名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数键名", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String configKey;
 
     /**
      * 参数键值
      */
     @NotBlank(message = "参数键值不能为空")
-    @Schema(description = "参数键值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数键值", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String configValue;
 
 }

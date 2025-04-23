@@ -16,16 +16,16 @@ public class SysRoleUpdateRequest {
     /**
      * 主键
      */
-    @Schema(description = "角色ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "角色ID", type = "int", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "主键不能为空")
-    @Min(value = 1L, message = "主键不能小于1")
+    @Min(value = 1, message = "主键不能小于1")
     private Long id;
 
     /**
      * 角色名
      */
     @NotBlank(message = "角色名不能为空")
-    @Schema(description = "角色名")
+    @Schema(description = "角色名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String name;
 
 

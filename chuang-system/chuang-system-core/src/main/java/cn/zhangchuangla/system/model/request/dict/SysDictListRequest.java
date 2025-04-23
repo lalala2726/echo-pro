@@ -19,25 +19,25 @@ public class SysDictListRequest extends BasePageRequest {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "主键ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long id;
 
     /**
      * 类型编码
      */
-    @Schema(description = "类型编码", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "类型编码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String dictCode;
 
     /**
      * 类型名称
      */
-    @Schema(description = "类型名称", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "类型名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String name;
 
     /**
      * 状态(0:正常;1:禁用)
      */
-    @Schema(description = "状态(0:正常;1:禁用)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "状态(0:正常;1:禁用)", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer status;
 
 
