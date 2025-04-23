@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.constant.SystemMessageConstant;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -94,20 +93,21 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 删除角色信息
+     * 删除角色信息,支持批量删除
      *
-     * @param id 角色ID
+     * @param ids 角色ID
      * @return 删除结果
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{ids}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
-    public AjaxResult deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
-        if (sysRoleService.removeById(id)) {
-            return success(SystemMessageConstant.DELETE_SUCCESS);
-        }
-        return error(SystemMessageConstant.DELETE_FAIL);
+    public AjaxResult deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
+        ids.forEach(id -> {
+            checkParam(id == null || id <= 0, "角色ID不能小于等于0");
+        });
+        boolean result = sysRoleService.deleteRoleInfo(ids);
+        return toAjax(result);
     }
 
     /**
@@ -138,8 +138,14 @@ public class SysRoleController extends BaseController {
     @OperationLog(title = "角色管理", businessType = BusinessType.INSERT)
     public AjaxResult addRoleInfo(@Parameter(description = "添加角色请求参数")
                                   @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
-        sysRoleService.addRoleInfo(roleAddRequest);
-        return AjaxResult.success();
+        if (sysRoleService.isRoleKeyExist(roleAddRequest.getRoleName())) {
+            return error("角色标识符已经存在");
+        }
+        if (sysRoleService.isRoleNameExist(roleAddRequest.getRoleKey())) {
+            return error("角色名称已经存在");
+        }
+        boolean result = sysRoleService.addRoleInfo(roleAddRequest);
+        return toAjax(result);
     }
 
 }

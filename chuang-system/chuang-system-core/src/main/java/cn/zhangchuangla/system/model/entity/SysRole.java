@@ -35,4 +35,6 @@ public class SysRole extends BaseEntity {
      * 显示顺序
      */
     private Integer sort;
+
+
 }

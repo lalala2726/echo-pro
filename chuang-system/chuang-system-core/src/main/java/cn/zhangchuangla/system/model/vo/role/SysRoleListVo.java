@@ -34,10 +34,16 @@ public class SysRoleListVo {
     private String roleKey;
 
     /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
+
+    /**
      * 显示顺序
      */
     @Schema(description = "显示顺序")
-    private Integer roleSort;
+    private Integer sort;
 
     /**
      * 创建时间

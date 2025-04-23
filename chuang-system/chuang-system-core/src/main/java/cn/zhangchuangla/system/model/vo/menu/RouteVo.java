@@ -15,7 +15,7 @@ import java.util.Map;
  */
 @Schema(description = "路由对象")
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RouteVo {
 
     /**

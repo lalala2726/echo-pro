@@ -162,7 +162,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                     .orderByAsc(SysMenu::getSort)
             );
         } else {
-            sysMenuList = this.baseMapper.getMenusByRoleCodes(roleCodes);
+            List<SysMenu> menusByRoleCodes = this.baseMapper.getMenusByRoleCodes(roleCodes);
+            sysMenuList = menusByRoleCodes.stream()
+                    .filter(menu -> !MenuTypeEnum.BUTTON.getValue().equals(menu.getType()))
+                    .collect(Collectors.toList());
         }
         return buildRoutes(Constants.ROOT_NODE_ID, sysMenuList);
     }

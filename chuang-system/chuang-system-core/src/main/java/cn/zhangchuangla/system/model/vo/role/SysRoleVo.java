@@ -12,7 +12,7 @@ import java.util.Date;
  * 角色VO
  */
 @Data
-@Schema(name = "角色视图对象", description = "返回前端展示的数据")
+@Schema(name = "角色列表视图对象", description = "返回前端展示的数据")
 public class SysRoleVo {
     /**
      * 主键
@@ -37,7 +37,13 @@ public class SysRoleVo {
      * 显示顺序
      */
     @Schema(description = "显示顺序")
-    private Integer roleSort;
+    private Integer sort;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 
     /**
      * 创建时间
@@ -45,25 +51,6 @@ public class SysRoleVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Schema(description = "创建时间")
     private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    @Schema(description = "更新时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    @Schema(description = "新增者")
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    @Schema(description = "更新者")
-    private String updateBy;
 
 
 }
