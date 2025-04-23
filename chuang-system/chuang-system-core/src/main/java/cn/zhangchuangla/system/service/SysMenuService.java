@@ -6,7 +6,7 @@ import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.MenuQueryRequest;
 import cn.zhangchuangla.system.model.vo.menu.MenuVo;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
-import cn.zhangchuangla.system.model.vo.permission.PermissionListVo;
+import cn.zhangchuangla.system.model.vo.permission.MenuListVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -87,5 +87,6 @@ public interface SysMenuService extends IService<SysMenu> {
      *
      * @return 权限列表
      */
-    List<PermissionListVo> listPermission();
+    List<MenuListVo> listPermission();
+
 }

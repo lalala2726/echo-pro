@@ -57,7 +57,7 @@
                   <option name="fileName" value="${domain.fileName}Mapper" />
                   <option name="fileNameWithSuffix" value="${domain.fileName}Mapper.xml" />
                   <option name="modulePath" value="$PROJECT_DIR$/chuang-system/chuang-system-core" />
-                  <option name="packageName" value="${domain.basePackage}.mapper" />
+                  <option name="packageName" value="mapper" />
                 </ModuleInfoGo>
               </list>
             </option>
@@ -68,12 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysDict" />
-                  <option name="tableName" value="sys_dict" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="SysDictItem" />
-                  <option name="tableName" value="sys_dict_item" />
+                  <option name="className" value="SysRoleMenu" />
+                  <option name="tableName" value="sys_role_menu" />
                 </TableUIInfo>
               </list>
             </option>

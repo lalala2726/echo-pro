@@ -79,4 +79,12 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @return 字典项列表
      */
     List<SysDictItem> getDictItemOptionVo(String dictCode);
+
+    /**
+     * 判断字典项是否存在
+     *
+     * @param dictCode 字典编码
+     * @return true 存在，false 不存在
+     */
+    boolean isDictItemExistByDictCode(String dictCode);
 }

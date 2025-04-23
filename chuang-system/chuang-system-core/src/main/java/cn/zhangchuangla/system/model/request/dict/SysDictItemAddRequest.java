@@ -44,7 +44,6 @@ public class SysDictItemAddRequest {
      * 状态（1-正常，0-禁用）
      */
     @Schema(description = "状态（1-正常，0-禁用）", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "状态不能为空")
     @Range(min = 0, max = 1, message = "状态只能为0或1")
     private Integer status;
 

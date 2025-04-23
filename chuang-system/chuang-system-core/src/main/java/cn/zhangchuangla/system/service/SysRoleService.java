@@ -51,7 +51,7 @@ public interface SysRoleService extends IService<SysRole> {
      *
      * @param roleAddRequest 请求参数
      */
-    void addRoleInfo(SysRoleAddRequest roleAddRequest);
+    boolean addRoleInfo(SysRoleAddRequest roleAddRequest);
 
     /**
      * 判断角色名是否存在
@@ -98,4 +98,11 @@ public interface SysRoleService extends IService<SysRole> {
      */
     Set<Long> getUserRoleIdByUserId(Long userId);
 
+    /**
+     * 删除角色信息，支持批量删除
+     *
+     * @param ids 角色ID集合
+     * @return 删除结果
+     */
+    boolean deleteRoleInfo(List<Long> ids);
 }

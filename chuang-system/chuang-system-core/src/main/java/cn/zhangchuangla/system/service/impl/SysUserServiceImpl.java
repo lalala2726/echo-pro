@@ -68,14 +68,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public Long addUserInfo(UserAddRequest request) {
-        if (request == null) {
-            throw new ServiceException(ResponseCode.PARAM_ERROR);
-        }
         SysUser sysUser = sysUserConverter.toEntity(request);
+        // 部门ID校验
+        Long deptId = request.getDeptId();
+        if (deptId != null && deptId > 0) {
+            SysDept dept = sysDeptService.getDeptById(deptId);
+            if (dept == null) {
+                throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("部门ID:<%s>不存在！", deptId));
+            }
+        }
+        // 角色ID校验
+        List<Long> roleIds = request.getRoleIds();
+        if (roleIds != null && !roleIds.isEmpty()) {
+            for (Long roleId : roleIds) {
+                try {
+                    ParamsUtils.minValidParam(roleId, "角色ID不能小于等于0");
+                } catch (Exception e) {
+                    log.error("add role info failed", e);
+                    throw new ServiceException(ResponseCode.INVALID_ROLE_ID, "无效的角色ID: " + roleId);
+                }
+            }
+        }
+        //存入数据库
         if (!save(sysUser)) {
             return -1L;
         }
-        return sysUser.getUserId();
+        Long userId = sysUser.getUserId();
+        //添加用户角色关联
+        if (roleIds != null && !roleIds.isEmpty()) {
+            sysUserRoleService.addUserRoleAssociation(roleIds, userId);
+        }
+        return userId;
     }
 
     /**
@@ -289,10 +312,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改自己的信息！");
         }
-        Set<String> roles = SecurityUtils.getRoles();
-        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员信息");
+        Set<String> userRoles = sysRoleService.getUserRoleSetByUserId(userId);
+        if (userRoles.contains(SysRolesConstant.SUPER_ADMIN)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员的信息！");
         }
+
     }
 
     /**

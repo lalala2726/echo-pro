@@ -7,6 +7,7 @@ import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.model.vo.post.SysPostVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * @author Chuang
@@ -22,6 +23,7 @@ public interface SysRoleConverter {
      * @param roleAddRequest 角色添加请求
      * @return 角色实体类
      */
+    @Mapping(source = "remark", target = "remark")
     SysRole toEntity(SysRoleAddRequest roleAddRequest);
 
     /**
@@ -30,6 +32,7 @@ public interface SysRoleConverter {
      * @param roleAddRequest 角色更新请求
      * @return 角色实体类
      */
+    @Mapping(source = "remark", target = "remark")
     SysRole toEntity(SysRoleUpdateRequest roleAddRequest);
 
     /**

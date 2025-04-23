@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Schema(name = "角色列表视图对象", description = "返回前端展示的数据")
-public class SysRoleVo {
+public class SysRoleListVo {
     /**
      * 主键
      */
@@ -34,16 +34,16 @@ public class SysRoleVo {
     private String roleKey;
 
     /**
-     * 显示顺序
-     */
-    @Schema(description = "显示顺序")
-    private Integer sort;
-
-    /**
      * 备注
      */
     @Schema(description = "备注")
     private String remark;
+
+    /**
+     * 显示顺序
+     */
+    @Schema(description = "显示顺序")
+    private Integer sort;
 
     /**
      * 创建时间

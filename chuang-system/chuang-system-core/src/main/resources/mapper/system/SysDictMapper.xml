@@ -34,6 +34,7 @@
                     and status = #{request.status}
                 </if>
             </if>
+            and is_deleted = 0
         </where>
         order by create_time desc
     </select>

@@ -34,7 +34,13 @@ public class SysRoleAddRequest {
      * 角色排序
      */
     @Schema(description = "角色排序", type = "integer", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Integer roleSort;
+    private Integer sort;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String remark;
 
 
 }

@@ -7,6 +7,7 @@ import cn.zhangchuangla.system.model.entity.SysDict;
 import cn.zhangchuangla.system.model.request.dict.SysDictAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictListRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictUpdateRequest;
+import cn.zhangchuangla.system.service.SysDictItemService;
 import cn.zhangchuangla.system.service.SysDictService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,6 +29,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict>
         implements SysDictService {
 
     private final SysDictMapper sysDictMapper;
+    private final SysDictItemService sysDictItemService;
     private final SysDictConverter sysDictConverter;
 
 
@@ -92,9 +94,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict>
         return getById(id);
     }
 
+    /**
+     * 删除字典，支持批量删除
+     *
+     * @param ids 字典ID集合
+     * @return 更新结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteDict(List<Long> ids) {
+        //检查是否存在字典项
+        ids.forEach(id -> {
+            SysDict dictById = getDictById(id);
+            boolean dictItemExistByDictCode = sysDictItemService.isDictItemExistByDictCode(dictById.getDictCode());
+            if (dictItemExistByDictCode) {
+                throw new ServiceException(String.format("字典: %s 存在字典项，不能删除", dictById.getName()));
+            }
+        });
         // 删除字典
         return removeByIds(ids);
     }

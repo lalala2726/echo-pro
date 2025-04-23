@@ -62,4 +62,10 @@ public class SysDictItemUpdateRequest {
     @Min(value = 0, message = "排序不能小于0")
     private Integer sort;
 
+    /**
+     * 备注
+     */
+    @Schema(description = "备注", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String remark;
+
 }

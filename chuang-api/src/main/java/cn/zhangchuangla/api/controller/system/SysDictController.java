@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +31,7 @@ import java.util.List;
  * <p>
  * created on 2025/4/17 13:33
  */
+@Slf4j
 @RequestMapping("/system/dict")
 @RequiredArgsConstructor
 @RestController
@@ -101,7 +103,7 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
     public AjaxResult deleteDict(@Parameter(description = "字典ID，支持支持批量删除，如果删除时候其中一项删除失败，数据将会回滚")
-                                 @PathVariable List<Long> ids) {
+                                     @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典ID不能为空!"));
         // 删除字典
         boolean result = sysDictService.deleteDict(ids);
@@ -217,7 +219,7 @@ public class SysDictController extends BaseController {
      * @param id 字典项ID
      * @return 字典项详情
      */
-    @GetMapping("/items/{id}")
+    @GetMapping("/item/{id}")
     @Operation(summary = "获取字典项")
     @PreAuthorize("@ss.hasPermission('system:dict-item:query')")
     public AjaxResult getDictItemById(@Parameter(description = "字典项ID") @PathVariable("id") Long id) {
@@ -254,7 +256,7 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典项管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:remove')")
     public AjaxResult deleteDictItem(@Parameter(description = "删除字典项，支持批量删除，删除时如果一项删除失败数据将会回滚")
-                                     @PathVariable List<Long> ids) {
+                                         @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典项ID不能为空!"));
         boolean result = sysDictItemService.deleteDictItem(ids);
         return toAjax(result);

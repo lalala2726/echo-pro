@@ -10,6 +10,7 @@ import cn.zhangchuangla.system.model.vo.dict.SysDictItemOptionVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictItemVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictVo;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -68,6 +69,8 @@ public interface SysDictConverter {
      * @param sysDictItem 字典项实体类
      * @return 字典项 视图对象
      */
+    @Mapping(source = "createTime", target = "createTime")
+    @Mapping(source = "remark", target = "remark")
     SysDictItemVo toSysDictItemVo(SysDictItem sysDictItem);
 
     /**
@@ -76,4 +79,5 @@ public interface SysDictConverter {
      * @return 字典 视图对象列表
      */
     List<SysDictItemOptionVo> toSysDictItemOptionVo(List<SysDictItem> sysDictItems);
+
 }

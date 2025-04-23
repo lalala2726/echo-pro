@@ -2,7 +2,6 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
@@ -17,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -46,8 +46,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Page<SysRole> RoleList(SysRoleQueryRequest request) {
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
-                .like(request.getName() != null && !request.getName().isEmpty(),
-                        SysRole::getRoleName, request.getName());
+                .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
+                        SysRole::getRoleName, request.getRoleName());
 
         return page(new Page<>(request.getPageNum(), request.getPageSize()), roleLambdaQueryWrapper);
     }
@@ -87,15 +87,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @param roleAddRequest 请求参数
      */
     @Override
-    public void addRoleInfo(SysRoleAddRequest roleAddRequest) {
-        if (isRoleNameExist(roleAddRequest.getRoleName())) {
-            throw new ServiceException("角色名称已存在");
-        }
-        if (isRoleKeyExist(roleAddRequest.getRoleKey())) {
-            throw new ServiceException("角色权限字符串已存在");
-        }
+    public boolean addRoleInfo(SysRoleAddRequest roleAddRequest) {
         SysRole sysRole = sysRoleConverter.toEntity(roleAddRequest);
-        save(sysRole);
+        return save(sysRole);
     }
 
     /**
@@ -138,7 +132,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
-        //test 这边需要待测试
+        //todo 超级管理不允许修改
         SysRole sysRole = sysRoleConverter.toEntity(request);
         return updateById(sysRole);
     }
@@ -180,6 +174,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return roleList.stream()
                 .map(SysRole::getRoleId)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 删除角色信息，支持批量删除
+     *
+     * @param ids 角色ID
+     * @return 删除结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteRoleInfo(List<Long> ids) {
+        //todo 超级管理员不允许删除
+        return removeByIds(ids);
     }
 
 }
