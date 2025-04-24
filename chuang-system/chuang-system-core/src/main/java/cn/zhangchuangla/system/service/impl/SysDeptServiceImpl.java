@@ -46,6 +46,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (isDeptNameExist(request.getDeptName())) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
+        if (request.getParentId() == null || request.getParentId() == 0) {
+            request.setParentId(0L);
+        }
         SysDept sysDept = sysDeptConverter.toEntity(request);
         return save(sysDept);
     }

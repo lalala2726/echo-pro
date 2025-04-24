@@ -66,10 +66,8 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dept:add')")
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
-    public AjaxResult addDept(@Parameter(description = "部门添加请求参数") @Validated @RequestBody SysDeptAddRequest request) {
-        if (request.getParentId() != null) {
-            checkParam(sysDeptService.getById(request.getParentId()) == null, "父部门不存在！");
-        }
+    public AjaxResult addDept(@Parameter(description = "部门添加请求参数")
+                              @Validated @RequestBody SysDeptAddRequest request) {
         return toAjax(sysDeptService.addDept(request));
     }
 

@@ -25,7 +25,6 @@ public class SysDeptAddRequest {
      * 父部门ID
      */
     @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Size(max = 50, message = "父部门ID不能超过50个字符")
     private Long parentId;
 
     /**
