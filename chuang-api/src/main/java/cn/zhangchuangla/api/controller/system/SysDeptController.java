@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -64,7 +63,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PostMapping
-    @PostAuthorize("@ss.hasPermission('system:dept:add')")
+    @PreAuthorize("@ss.hasPermission('system:dept:add')")
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
     public AjaxResult addDept(@Parameter(description = "部门添加请求参数") @Validated @RequestBody SysDeptAddRequest request) {
@@ -81,7 +80,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PostAuthorize("@ss.hasPermission('system:dept:edit')")
+    @PreAuthorize("@ss.hasPermission('system:dept:edit')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDept(@Parameter(description = "部门修改请求参数")
@@ -96,7 +95,7 @@ public class SysDeptController extends BaseController {
      * @return 部门信息
      */
     @GetMapping("/{id}")
-    @PostAuthorize("@ss.hasPermission('system:dept:query')")
+    @PreAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
     public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
         checkParam(id == null, "部门ID不能为空！");
@@ -127,7 +126,7 @@ public class SysDeptController extends BaseController {
     @DeleteMapping("/{ids}")
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
-    @PostAuthorize("@ss.hasPermission('system:dept:remove')")
+    @PreAuthorize("@ss.hasPermission('system:dept:remove')")
     public AjaxResult removeDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {
