@@ -3,17 +3,22 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,12 +31,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author zhangchuang
  * Created on 2025/4/3 21:39
  */
-
 @RestController
 @RequestMapping("/system/file/config")
 @Tag(name = "文件配置")
@@ -40,9 +45,11 @@ public class SysFileConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
     private final StorageConfigLoader sysFileConfigLoader;
+    private final StorageConverter storageConverter;
 
     /**
      * 文件配置列表
+     * 这边转换的值一定要和保存的类一致 {@link cn.zhangchuangla.system.service.impl.SysConfigServiceImpl}
      *
      * @param request 文件配置列表查询参数
      * @return 文件配置列表
@@ -54,8 +61,18 @@ public class SysFileConfigController extends BaseController {
     public AjaxResult listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                         @Validated @ParameterObject StorageConfigListRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
-        List<StorageFileConfigListVo> storageFileConfigListVos = copyListProperties(sysFileConfigPage,
-                StorageFileConfigListVo.class);
+        List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
+            StorageFileConfigListVo storageFileConfigListVo = storageConverter.toStorageFileConfigListVo(item);
+            switch (item.getStorageType()) {
+                case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
+                        JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));
+                case StorageConstants.MINIO -> storageFileConfigListVo.setMinioConfig(
+                        JSON.parseObject(item.getStorageValue(), MinioConfigEntity.class));
+                case StorageConstants.TENCENT_COS -> storageFileConfigListVo.setTencentCOSConfig(
+                        JSON.parseObject(item.getStorageValue(), TencentCOSConfigEntity.class));
+            }
+            return storageFileConfigListVo;
+        }).collect(Collectors.toList());
         return getTableData(sysFileConfigPage, storageFileConfigListVos);
     }
 
@@ -81,6 +98,7 @@ public class SysFileConfigController extends BaseController {
 
         return toAjax(result);
     }
+
 
     /**
      * 新增阿里云OSS配置

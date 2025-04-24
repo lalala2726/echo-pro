@@ -18,8 +18,19 @@
         <result property="remark" column="remark"/>
     </resultMap>
     <select id="listSysFileConfig" resultMap="BaseResultMap">
-        select *
-        from sys_file_config
+        select id,
+               storage_name,
+               storage_key,
+               storage_value,
+               storage_type,
+               is_master,
+               enable_trash,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               remark
+        from storage_config
     </select>
 
 </mapper>

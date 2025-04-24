@@ -13,8 +13,10 @@ import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.model.vo.manage.StorageFileManagementListVo;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * @author Chuang
@@ -87,4 +89,13 @@ public interface StorageConverter {
      * @return 文件配置请求参数
      */
     StorageFileManagementListVo toSysFileManagementListVo(SysFileManagement sysFileManagement);
+
+    /**
+     * 将文件配置实体类 转换为文件配置列表请求参数
+     *
+     * @param item 文件配置实体类
+     * @return 文件配置列表请求参数
+     */
+    @Mapping(source = "isMaster", target = "isMaster")
+    StorageFileConfigListVo toStorageFileConfigListVo(StorageConfig item);
 }
