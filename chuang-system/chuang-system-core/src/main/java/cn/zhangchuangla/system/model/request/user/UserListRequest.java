@@ -25,7 +25,6 @@ public class UserListRequest extends BasePageRequest {
      * 用户名
      */
     @Schema(description = "用户名")
-    @ValidRegex(regexp = RegularConstants.User.username)
     private String username;
 
     /**

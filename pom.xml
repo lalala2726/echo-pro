@@ -2,31 +2,20 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!-- 定义 POM 模型版本，固定为 4.0.0 -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 项目的组织或公司标识 -->
     <groupId>cn.zhangchuangla</groupId>
-    <!-- 项目的唯一标识符 -->
     <artifactId>chuang-backend</artifactId>
-    <!-- 项目的版本号 -->
     <version>1.0.0</version>
-    <!-- 项目的打包方式，这里是 pom，表示该项目是一个聚合项目 -->
     <packaging>pom</packaging>
 
-    <!-- 定义项目包含的子模块 -->
     <modules>
-        <!-- 通用工具模块 -->
         <module>chuang-common</module>
-        <!-- 系统功能模块 -->
         <module>chuang-system</module>
-        <!-- 框架相关模块 -->
         <module>chuang-framework</module>
-        <!-- API 接口模块 -->
         <module>chuang-api</module>
     </modules>
 
-    <!-- 统一版本管理，方便后续维护和升级 -->
     <properties>
         <!-- 应用程序版本号 -->
         <app.version>1.0.0</app.version>
@@ -40,16 +29,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Spring Boot 版本 -->
-        <spring.boot.version>3.2.1</spring.boot.version>
+        <spring.boot.version>3.2.5</spring.boot.version>
         <!-- Spring Security 版本 -->
-        <spring.security.version>5.6.0</spring.security.version>
+        <spring.security.version>6.2.2</spring.security.version>
 
         <!-- MyBatis-Plus 版本 -->
-        <mybatis.plus.version>3.5.8</mybatis.plus.version>
+        <mybatis.plus.version>3.5.10</mybatis.plus.version>
 
         <!-- 数据库相关依赖版本 -->
         <mysql.version>8.0.33</mysql.version>
-        <redis.version>3.2.1</redis.version>
+        <!-- 使用与Spring Boot 3.2.5兼容的Redis版本 -->
+        <redis.version>3.2.5</redis.version>
 
         <!-- 文件处理相关依赖版本 -->
         <thumbnailator.version>0.4.20</thumbnailator.version>
@@ -69,11 +59,13 @@
         <alibaba.fastjson.version>2.0.53</alibaba.fastjson.version>
         <alibaba.druid.starter.version>1.2.24</alibaba.druid.starter.version>
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
-        <jaxb.api.version>2.3.1</jaxb.api.version>
-        <javax.activation.version>1.1.1</javax.activation.version>
+        <!-- 更新 JAXB API 版本，兼容 Java 17 -->
+        <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
+        <!-- 更新 Java 激活框架版本，兼容 Java 17 -->
+        <javax.activation.version>1.2.0</javax.activation.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
-        <version.apache.tika>2.1.0</version.apache.tika>
+        <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <!-- IP 地区转换 -->
@@ -126,7 +118,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${redis.version}</version>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <!-- ===================== JWT & 安全性 ===================== -->
@@ -156,6 +148,13 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- MyBatis-Plus JSqlParser，提供分页插件支持 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
@@ -203,8 +202,8 @@
             <!-- ===================== 数据库 ===================== -->
             <!-- MySQL 数据库连接驱动 -->
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
             <!-- 阿里巴巴 Druid 数据库连接池 Spring Boot 3 启动器 -->
@@ -268,9 +267,9 @@
 
             <!-- Java 激活框架依赖 -->
             <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>${javax.activation.version}</version>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>2.1.2</version>
             </dependency>
             <!-- Spring Boot WebSocket 启动器，用于实现 WebSocket 通信 -->
             <dependency>
@@ -349,19 +348,16 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
-                        <!-- Lombok 必须在 MapStruct 之前 -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
-                        <!-- MapStruct 处理器 -->
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
                         </path>
-                        <!-- lombok-mapstruct-binding 解决 Lombok 与 MapStruct 的兼容性问题 -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
