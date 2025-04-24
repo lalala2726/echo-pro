@@ -1,14 +1,18 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +39,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleConverter sysRoleConverter;
+    private final SysRoleMenuService sysRoleMenuService;
 
 
     /**
@@ -185,7 +190,23 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteRoleInfo(List<Long> ids) {
-        //todo 超级管理员不允许删除
+        if (ids == null || ids.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
+        }
+
+        // 检查是否包含超级管理员角色
+        List<SysRole> roles = listByIds(ids);
+        if (roles.stream().anyMatch(role -> SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许删除");
+        }
+
+        // 检查角色是否已分配菜单
+        LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
+        List<SysRoleMenu> list = sysRoleMenuService.list(eq);
+        if (list != null && !list.isEmpty()) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "角色已分配用户，不能删除");
+        }
+
         return removeByIds(ids);
     }
 
