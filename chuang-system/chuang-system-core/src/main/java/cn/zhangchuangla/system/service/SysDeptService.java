@@ -69,7 +69,7 @@ public interface SysDeptService extends IService<SysDept> {
      * @param ids 部门ID集合
      * @return 操作结果
      */
-    boolean removeDeptById(List<Long> ids);
+    boolean deleteDeptById(List<Long> ids);
 
     /**
      * 获取部门下拉列表

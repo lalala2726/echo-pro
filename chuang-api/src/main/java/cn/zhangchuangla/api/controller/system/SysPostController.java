@@ -80,10 +80,10 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:remove')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
-    public AjaxResult removePost(@Parameter(description = "岗位ID集合，支持批量删除")
+    public AjaxResult deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
                                  @PathVariable("ids") List<Integer> ids) {
         checkParam(ids == null, "id不能为空");
-        boolean result = sysPostService.removePost(ids);
+        boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
     }
 
@@ -94,12 +94,12 @@ public class SysPostController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PreAuthorize("@ss.hasPermission('system:post:edit')")
+    @PreAuthorize("@ss.hasPermission('system:post:update')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
-    public AjaxResult editPost(@Parameter(description = "修改岗位请求参数")
+    public AjaxResult updatePost(@Parameter(description = "修改岗位请求参数")
                                @Validated @RequestBody SysPostUpdateRequest request) {
-        return toAjax(sysPostService.editPost(request));
+        return toAjax(sysPostService.updatePost(request));
     }
 
     /**

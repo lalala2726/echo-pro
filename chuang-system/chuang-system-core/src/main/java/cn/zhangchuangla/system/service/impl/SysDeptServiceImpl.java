@@ -115,7 +115,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @return 操作结果
      */
     @Override
-    public boolean removeDeptById(List<Long> ids) {
+    public boolean deleteDeptById(List<Long> ids) {
         ids.forEach(id -> {
             if (deptHasSubordinates(id)) {
                 throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "该部门下有子部门，不能删除！");

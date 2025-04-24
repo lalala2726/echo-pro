@@ -78,7 +78,7 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PreAuthorize("@ss.hasPermission('system:dept:edit')")
+    @PreAuthorize("@ss.hasPermission('system:dept:update')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateDept(@Parameter(description = "部门修改请求参数")
@@ -125,11 +125,11 @@ public class SysDeptController extends BaseController {
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
     @PreAuthorize("@ss.hasPermission('system:dept:remove')")
-    public AjaxResult removeDept(
+    public AjaxResult deleteDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {
         checkParam(ids == null, "部门ID不能为空！");
-        boolean result = sysDeptService.removeDeptById(ids);
+        boolean result = sysDeptService.deleteDeptById(ids);
         return toAjax(result);
     }
 }
