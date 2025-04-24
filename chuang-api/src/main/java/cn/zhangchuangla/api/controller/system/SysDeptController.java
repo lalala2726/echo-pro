@@ -9,7 +9,7 @@ import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import cn.zhangchuangla.system.service.SysDeptService;
@@ -85,7 +85,7 @@ public class SysDeptController extends BaseController {
     @PostAuthorize("@ss.hasPermission('system:dept:edit')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数") @Validated @RequestBody SysDeptRequest request) {
+    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数") @Validated @RequestBody SysDeptUpdateRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
 

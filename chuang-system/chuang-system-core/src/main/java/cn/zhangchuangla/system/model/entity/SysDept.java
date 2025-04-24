@@ -14,11 +14,17 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "sys_dept")
 @Data
 public class SysDept extends BaseEntity {
+
     /**
      * 部门ID
      */
     @TableId(type = IdType.AUTO)
     private Long deptId;
+
+    /**
+     * 状态（0正常 1停用）
+     */
+    private Integer status;
 
     /**
      * 部门名称

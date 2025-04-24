@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.converter;
 
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import org.mapstruct.Mapper;
 
@@ -28,7 +28,7 @@ public interface SysDeptConverter {
      * @param request 部门请求
      * @return 部门实体类
      */
-    SysDept toEntity(SysDeptRequest request);
+    SysDept toEntity(SysDeptUpdateRequest request);
 
     /**
      * 将部门实体类转换为部门视图对象

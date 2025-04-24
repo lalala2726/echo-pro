@@ -8,7 +8,7 @@ import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,7 +40,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public Page<SysDept> listDept(SysDeptListRequest request) {
-        Page<SysDept> sysDepartmentPage = new Page<>(request.getPageSize(), request.getPageNum());
+        Page<SysDept> sysDepartmentPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysDeptMapper.listDepartment(sysDepartmentPage, request);
     }
 
@@ -51,7 +51,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public boolean addDept(SysDeptAddRequest request) {
-        if (isDeptNameExist(request.getName())) {
+        if (isDeptNameExist(request.getDeptName())) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
         SysDept sysDept = sysDeptConverter.toEntity(request);
@@ -64,8 +64,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      * @param request 请求参数
      */
     @Override
-    public boolean updateDept(SysDeptRequest request) {
-        if (isDeptNameExist(request.getName())) {
+    public boolean updateDept(SysDeptUpdateRequest request) {
+        if (isDeptNameExist(request.getDeptName())) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
         SysDept sysDept = sysDeptConverter.toEntity(request);

@@ -19,19 +19,25 @@ public class SysDeptListRequest extends BasePageRequest {
      * 部门ID
      */
     @Schema(description = "部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Integer id;
+    private Integer deptId;
 
     /**
      * 部门名称
      */
     @Schema(description = "部门名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String name;
+    private String deptName;
 
     /**
      * 父部门ID
      */
-    @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Integer parentId;
+    @Schema(description = "父部门ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long parentId;
+
+    /**
+     * 部门创建时间
+     */
+    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Integer status;
 
     /**
      * 部门负责人

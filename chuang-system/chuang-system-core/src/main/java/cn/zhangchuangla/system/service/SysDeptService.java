@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -38,7 +38,7 @@ public interface SysDeptService extends IService<SysDept> {
      *
      * @param request 请求参数
      */
-    boolean updateDept(SysDeptRequest request);
+    boolean updateDept(SysDeptUpdateRequest request);
 
     /**
      * 根据ID查询部门信息

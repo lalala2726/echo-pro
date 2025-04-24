@@ -11,12 +11,11 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "部门修改请求类")
-public class SysDeptRequest {
+public class SysDeptUpdateRequest {
 
     @Schema(name = "部门ID", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "部门ID不能为空")
     @Min(value = 1, message = "部门ID不能小于1")
-    private Integer id;
+    private Long deptId;
 
     /**
      * 部门名称
@@ -24,21 +23,27 @@ public class SysDeptRequest {
     @NotBlank(message = "部门名称不能为空")
     @Size(max = 50, message = "部门名称不能超过50个字符")
     @Schema(description = "部门名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String name;
+    private String deptName;
 
     /**
      * 父部门ID
      */
     @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Size(max = 50, message = "父部门ID不能超过50个字符")
-    private Integer parentId;
+    private Long parentId;
+
+    /**
+     * 部门状态（0正常 1停用）
+     */
+    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long status;
 
     /**
      * 部门负责人
      */
     @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Size(max = 50, message = "部门负责人不能超过50个字符")
-    private Integer managerId;
+    private Long managerId;
 
     /**
      * 部门描述

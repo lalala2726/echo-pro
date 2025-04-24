@@ -10,6 +10,7 @@
         <result property="parentId" column="parent_id"/>
         <result property="managerId" column="manager_id"/>
         <result property="description" column="description"/>
+        <result property="status" column="status"/>
         <result property="createBy" column="create_by"/>
         <result property="updateBy" column="update_by"/>
         <result property="createTime" column="create_time"/>
@@ -18,18 +19,22 @@
     </resultMap>
     <select id="listDepartment" resultMap="BaseResultMap">
         SELECT
-        dept_id, dept_name, parent_id, manager_id, description, create_time, update_time, create_by, update_by, remark
+        dept_id, dept_name, parent_id, manager_id,status, description, create_time, update_time, create_by, update_by,
+        remark
         FROM sys_dept
         <where>
             <if test="request != null">
-                <if test="request.id != null">
-                    AND dept_id = #{request.id}
+                <if test="request.deptId != null">
+                    AND dept_id = #{request.deptId}
                 </if>
-                <if test="request.name != null and request.name != ''">
-                    AND dept_name LIKE concat('%', #{request.name}, '%')
+                <if test="request.deptName != null and request.deptName != ''">
+                    AND dept_name LIKE concat('%', #{request.deptName}, '%')
                 </if>
                 <if test="request.parentId != null">
                     AND parent_id = #{request.parentId}
+                </if>
+                <if test="request.status != null">
+                    AND status = #{status}
                 </if>
                 <if test="request.managerId != null">
                     AND manager_id = #{request.managerId}
