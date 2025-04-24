@@ -39,7 +39,6 @@ public class SysFileManagementListRequest extends BasePageRequest {
     @Schema(description = "文件MD5值，用于文件完整性校验", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String fileMd5;
 
-
     /**
      * 文件扩展名
      */
