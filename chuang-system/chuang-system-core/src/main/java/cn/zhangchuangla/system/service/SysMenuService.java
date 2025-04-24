@@ -2,8 +2,8 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
-import cn.zhangchuangla.system.model.request.menu.MenuQueryRequest;
+import cn.zhangchuangla.system.model.request.menu.MenuForm;
+import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.vo.menu.MenuVo;
 import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.permission.MenuListVo;
@@ -21,7 +21,7 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 获取菜单表格列表
      */
-    List<MenuVo> listMenus(MenuQueryRequest queryParams);
+    List<MenuVo> listMenus(SysMenuListRequest request);
 
     /**
      * 获取菜单下拉列表
@@ -33,9 +33,9 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 新增菜单
      *
-     * @param menuAddRequest 菜单表单对象
+     * @param menuForm 菜单表单对象
      */
-    boolean saveMenu(MenuAddRequest menuAddRequest);
+    boolean saveMenu(MenuForm menuForm);
 
     /**
      * 获取路由列表
@@ -55,7 +55,7 @@ public interface SysMenuService extends IService<SysMenu> {
      *
      * @param id 菜单ID
      */
-    MenuAddRequest getMenuForm(Long id);
+    MenuForm getMenuForm(Long id);
 
     /**
      * 删除菜单
@@ -63,7 +63,6 @@ public interface SysMenuService extends IService<SysMenu> {
      * @param id 菜单ID
      */
     boolean deleteMenu(Long id);
-
 
     /**
      * 根据角色名称查询权限

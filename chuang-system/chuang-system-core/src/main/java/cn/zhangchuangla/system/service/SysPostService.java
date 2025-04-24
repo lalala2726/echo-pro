@@ -39,7 +39,7 @@ public interface SysPostService extends IService<SysPost> {
      * @param ids 岗位ID集合
      * @return 操作结果
      */
-    boolean removePost(List<Integer> ids);
+    boolean deletePost(List<Integer> ids);
 
     /**
      * 根据ID获取岗位信息
@@ -55,7 +55,7 @@ public interface SysPostService extends IService<SysPost> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean editPost(SysPostUpdateRequest request);
+    boolean updatePost(SysPostUpdateRequest request);
 
     /**
      * 判断岗位编码是否存在

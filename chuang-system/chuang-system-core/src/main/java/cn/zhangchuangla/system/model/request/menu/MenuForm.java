@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.request.menu;
 
 import cn.zhangchuangla.common.model.entity.KeyValue;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
@@ -8,14 +9,12 @@ import org.hibernate.validator.constraints.Range;
 import java.util.List;
 
 /**
- * 菜单表单对象
- *
- * @author Ray.Hao
- * @since 2024/06/23
+ * 菜单视图对象
  */
-@Schema(description = "菜单表单对象")
+@Schema(description = "菜单视图对象")
 @Data
-public class MenuAddRequest {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class MenuForm {
 
 
     /**
@@ -37,7 +36,7 @@ public class MenuAddRequest {
     private String name;
 
     /**
-     * 菜单类型（1-菜单 2-目录 3-外链 4-按钮）
+     * 菜单类型
      */
     @Schema(description = "菜单类型（1-菜单 2-目录 3-外链 4-按钮）")
     private Integer type;
@@ -55,13 +54,13 @@ public class MenuAddRequest {
     private String routePath;
 
     /**
-     * 组件路径(vue页面完整路径，省略.vue后缀)
+     * 组件路径
      */
     @Schema(description = "组件路径(vue页面完整路径，省略.vue后缀)")
     private String component;
 
     /**
-     * 权限标识
+     * 按钮权限标识
      */
     @Schema(description = "权限标识")
     private String permission;
@@ -74,7 +73,7 @@ public class MenuAddRequest {
     private Integer visible;
 
     /**
-     * 排序(数字越小排名越靠前)
+     * 排序
      */
     @Schema(description = "排序(数字越小排名越靠前)")
     private Integer sort;
@@ -92,7 +91,7 @@ public class MenuAddRequest {
     private String redirect;
 
     /**
-     * 【菜单】是否开启页面缓存(1:开启;0:关闭)
+     * 父节点路径，以英文逗号(,)分割
      */
     @Schema(description = "【菜单】是否开启页面缓存", example = "1")
     private Integer keepAlive;
@@ -108,4 +107,5 @@ public class MenuAddRequest {
      */
     @Schema(description = "路由参数")
     private List<KeyValue> params;
+
 }

@@ -4,8 +4,7 @@ import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -19,12 +18,12 @@ public interface SysDeptService extends IService<SysDept> {
 
 
     /**
-     * 部门列表
+     * 获取部门列表
      *
      * @param request 请求参数
-     * @return 返回分页列表
+     * @return 部门列表
      */
-    Page<SysDept> listDept(SysDeptListRequest request);
+    List<SysDept> listDept(SysDeptListRequest request);
 
     /**
      * 新增部门
@@ -38,7 +37,7 @@ public interface SysDeptService extends IService<SysDept> {
      *
      * @param request 请求参数
      */
-    boolean updateDept(SysDeptRequest request);
+    boolean updateDept(SysDeptUpdateRequest request);
 
     /**
      * 根据ID查询部门信息
@@ -70,7 +69,7 @@ public interface SysDeptService extends IService<SysDept> {
      * @param ids 部门ID集合
      * @return 操作结果
      */
-    boolean removeDeptById(List<Long> ids);
+    boolean deleteDeptById(List<Long> ids);
 
     /**
      * 获取部门下拉列表

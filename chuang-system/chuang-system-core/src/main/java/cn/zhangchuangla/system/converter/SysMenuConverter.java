@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.converter;
 
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.MenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.MenuForm;
 import cn.zhangchuangla.system.model.vo.menu.MenuVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,13 +17,14 @@ import org.mapstruct.Mapping;
 public interface SysMenuConverter {
 
 
+    @Mapping(source = "permission", target = "permission")
     MenuVo toVo(SysMenu entity);
-
-    @Mapping(target = "params", ignore = true)
-    MenuAddRequest toAddRequest(SysMenu entity);
 
     //忽略params属性
     @Mapping(target = "params", ignore = true)
-    SysMenu toEntity(MenuAddRequest menuAddRequest);
+    SysMenu toEntity(MenuForm menuForm);
 
+
+    @Mapping(target = "params", ignore = true)
+    MenuForm toForm(SysMenu entity);
 }

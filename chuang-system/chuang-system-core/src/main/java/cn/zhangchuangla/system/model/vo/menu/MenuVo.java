@@ -7,11 +7,13 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 菜单视图对象
+ * 菜单表单对象
+ *
+ * @author Ray.Hao
+ * @since 2024/06/23
  */
-@Schema(description = "菜单视图对象")
+@Schema(description = "菜单表单对象")
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MenuVo {
 
     /**
@@ -57,19 +59,19 @@ public class MenuVo {
     private String component;
 
     /**
-     * 菜单排序(数字越小排名越靠前)
+     * 菜单排序
      */
     @Schema(description = "菜单排序(数字越小排名越靠前)")
     private Integer sort;
 
     /**
-     * 菜单是否可见(1:显示;0:隐藏)
+     * 菜单是否可见
      */
     @Schema(description = "菜单是否可见(1:显示;0:隐藏)")
     private Integer visible;
 
     /**
-     * ICON
+     * 菜单图标
      */
     @Schema(description = "ICON")
     private String icon;
@@ -81,16 +83,15 @@ public class MenuVo {
     private String redirect;
 
     /**
-     * 按钮权限标识
+     * 父节点路径
      */
     @Schema(description = "按钮权限标识")
     private String permission;
 
     /**
-     * 子菜单
+     * 路由参数
      */
     @Schema(description = "子菜单")
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private List<MenuVo> children;
-
 }

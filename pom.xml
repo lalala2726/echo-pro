@@ -17,31 +17,17 @@
     </modules>
 
     <properties>
-        <!-- 应用程序版本号 -->
         <app.version>1.0.0</app.version>
-        <!-- Java 版本 -->
         <java.version>17</java.version>
-        <!-- Maven 编译源文件使用的 Java 版本 -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
-        <!-- Maven 编译目标文件使用的 Java 版本 -->
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <!-- 项目构建的源文件编码格式 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- Spring Boot 版本 -->
         <spring.boot.version>3.2.5</spring.boot.version>
-        <!-- Spring Security 版本 -->
         <spring.security.version>6.2.2</spring.security.version>
-
-        <!-- MyBatis-Plus 版本 -->
         <mybatis.plus.version>3.5.10</mybatis.plus.version>
-
-        <!-- 数据库相关依赖版本 -->
         <mysql.version>8.0.33</mysql.version>
-        <!-- 使用与Spring Boot 3.2.5兼容的Redis版本 -->
         <redis.version>3.2.5</redis.version>
-
-        <!-- 文件处理相关依赖版本 -->
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <minio.version>8.5.17</minio.version>
@@ -59,9 +45,7 @@
         <alibaba.fastjson.version>2.0.53</alibaba.fastjson.version>
         <alibaba.druid.starter.version>1.2.24</alibaba.druid.starter.version>
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
-        <!-- 更新 JAXB API 版本，兼容 Java 17 -->
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
-        <!-- 更新 Java 激活框架版本，兼容 Java 17 -->
         <javax.activation.version>1.2.0</javax.activation.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>

@@ -20,9 +20,9 @@ public class BaseEntity implements Serializable {
     private Date createTime;
 
     /**
-     * 删除时间
+     * 修改时间
      */
-    @Schema(description = "删除时间")
+    @Schema(description = "修改时间")
     private Date updateTime;
 
     /**

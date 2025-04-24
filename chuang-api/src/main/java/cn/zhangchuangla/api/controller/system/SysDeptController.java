@@ -9,17 +9,15 @@ import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import cn.zhangchuangla.system.service.SysDeptService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +50,9 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "部门列表")
     public AjaxResult listDept(@Parameter(description = "部门列表查询参数")
                                @Validated @ParameterObject SysDeptListRequest request) {
-        Page<SysDept> page = sysDeptService.listDept(request);
-        List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
-        return getTableData(page, sysDeptListVos);
+        List<SysDept> sysDept = sysDeptService.listDept(request);
+        List<SysDeptListVo> sysDeptListVo = sysDeptConverter.toSysDeptListVo(sysDept);
+        return success(sysDeptListVo);
     }
 
 
@@ -65,13 +63,11 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PostMapping
-    @PostAuthorize("@ss.hasPermission('system:dept:add')")
+    @PreAuthorize("@ss.hasPermission('system:dept:add')")
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
-    public AjaxResult addDept(@Parameter(description = "部门添加请求参数") @Validated @RequestBody SysDeptAddRequest request) {
-        if (request.getParentId() != null) {
-            checkParam(sysDeptService.getById(request.getParentId()) == null, "父部门不存在！");
-        }
+    public AjaxResult addDept(@Parameter(description = "部门添加请求参数")
+                              @Validated @RequestBody SysDeptAddRequest request) {
         return toAjax(sysDeptService.addDept(request));
     }
 
@@ -82,10 +78,11 @@ public class SysDeptController extends BaseController {
      * @return 操作结果
      */
     @PutMapping
-    @PostAuthorize("@ss.hasPermission('system:dept:edit')")
+    @PreAuthorize("@ss.hasPermission('system:dept:update')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数") @Validated @RequestBody SysDeptRequest request) {
+    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数")
+                                 @Validated @RequestBody SysDeptUpdateRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
 
@@ -96,9 +93,9 @@ public class SysDeptController extends BaseController {
      * @return 部门信息
      */
     @GetMapping("/{id}")
-    @PostAuthorize("@ss.hasPermission('system:dept:query')")
+    @PreAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
-    public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable Long id) {
+    public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
         checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
         SysDeptVo sysDeptVo = sysDeptConverter.toSysDeptVo(dept);
@@ -127,12 +124,12 @@ public class SysDeptController extends BaseController {
     @DeleteMapping("/{ids}")
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
-    @PostAuthorize("@ss.hasPermission('system:dept:remove')")
-    public AjaxResult removeDept(
+    @PreAuthorize("@ss.hasPermission('system:dept:remove')")
+    public AjaxResult deleteDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {
         checkParam(ids == null, "部门ID不能为空！");
-        boolean result = sysDeptService.removeDeptById(ids);
+        boolean result = sysDeptService.deleteDeptById(ids);
         return toAjax(result);
     }
 }

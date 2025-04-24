@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 菜单实体
@@ -99,6 +100,11 @@ public class SysMenu {
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String params;
 
+    /**
+     * 子菜单列表
+     */
+    @TableField(exist = false)
+    private List<SysMenu> children;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

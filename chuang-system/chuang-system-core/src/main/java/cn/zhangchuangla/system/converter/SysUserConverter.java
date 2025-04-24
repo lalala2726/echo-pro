@@ -49,11 +49,11 @@ public interface SysUserConverter {
     /**
      * 将用户部门数据传输对象转换为用户列表视图对象
      *
-     * @param item 用户部门数据传输对象
+     * @param sysUserDeptDto 用户部门数据传输对象
      * @return 用户列表视图对象
      */
     @Mapping(target = "deptName", source = "sysDept.deptName")
-    UserListVo toUserListVo(SysUserDeptDto item);
+    UserListVo toUserListVo(SysUserDeptDto sysUserDeptDto);
 
     /**
      * 将用户对象转换为用户信息视图对象

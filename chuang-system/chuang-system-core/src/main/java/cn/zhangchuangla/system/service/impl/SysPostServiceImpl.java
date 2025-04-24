@@ -67,7 +67,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      * @return 操作结果
      */
     @Override
-    public boolean removePost(List<Integer> ids) {
+    public boolean deletePost(List<Integer> ids) {
         return removeByIds(ids);
     }
 
@@ -89,7 +89,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      * @return 操作结果
      */
     @Override
-    public boolean editPost(SysPostUpdateRequest request) {
+    public boolean updatePost(SysPostUpdateRequest request) {
         SysPost sysPost = sysPostConverter.toEntity(request);
         return updateById(sysPost);
     }

@@ -2,9 +2,12 @@ package cn.zhangchuangla.system.converter;
 
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
+import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * @author Chuang
@@ -28,7 +31,7 @@ public interface SysDeptConverter {
      * @param request 部门请求
      * @return 部门实体类
      */
-    SysDept toEntity(SysDeptRequest request);
+    SysDept toEntity(SysDeptUpdateRequest request);
 
     /**
      * 将部门实体类转换为部门视图对象
@@ -37,4 +40,12 @@ public interface SysDeptConverter {
      * @return 部门视图对象
      */
     SysDeptVo toSysDeptVo(SysDept dept);
+
+    /**
+     * 将部门实体类列表转换为部门视图对象列表
+     *
+     * @param sysDept 部门实体类列表
+     * @return 部门视图对象列表
+     */
+    List<SysDeptListVo> toSysDeptListVo(List<SysDept> sysDept);
 }
