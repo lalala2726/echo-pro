@@ -5,7 +5,6 @@ import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -19,12 +18,12 @@ public interface SysDeptService extends IService<SysDept> {
 
 
     /**
-     * 部门列表
+     * 获取部门列表
      *
      * @param request 请求参数
-     * @return 返回分页列表
+     * @return 部门列表
      */
-    Page<SysDept> listDept(SysDeptListRequest request);
+    List<SysDept> listDept(SysDeptListRequest request);
 
     /**
      * 新增部门

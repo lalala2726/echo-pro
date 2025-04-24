@@ -29,7 +29,6 @@ public class SysDeptUpdateRequest {
      * 父部门ID
      */
     @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Size(max = 50, message = "父部门ID不能超过50个字符")
     private Long parentId;
 
     /**
@@ -42,8 +41,7 @@ public class SysDeptUpdateRequest {
      * 部门负责人
      */
     @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Size(max = 50, message = "部门负责人不能超过50个字符")
-    private Long managerId;
+    private String manager;
 
     /**
      * 部门描述

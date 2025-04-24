@@ -13,7 +13,6 @@ import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
 import cn.zhangchuangla.system.service.SysDeptService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,9 +51,9 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "部门列表")
     public AjaxResult listDept(@Parameter(description = "部门列表查询参数")
                                @Validated @ParameterObject SysDeptListRequest request) {
-        Page<SysDept> page = sysDeptService.listDept(request);
-        List<SysDeptListVo> sysDeptListVos = copyListProperties(page, SysDeptListVo.class);
-        return getTableData(page, sysDeptListVos);
+        List<SysDept> sysDept = sysDeptService.listDept(request);
+        List<SysDeptListVo> sysDeptListVo = sysDeptConverter.toSysDeptListVo(sysDept);
+        return success(sysDeptListVo);
     }
 
 
@@ -85,7 +84,8 @@ public class SysDeptController extends BaseController {
     @PostAuthorize("@ss.hasPermission('system:dept:edit')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数") @Validated @RequestBody SysDeptUpdateRequest request) {
+    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数")
+                                 @Validated @RequestBody SysDeptUpdateRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
 
@@ -98,7 +98,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/{id}")
     @PostAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
-    public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable Long id) {
+    public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
         checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
         SysDeptVo sysDeptVo = sysDeptConverter.toSysDeptVo(dept);

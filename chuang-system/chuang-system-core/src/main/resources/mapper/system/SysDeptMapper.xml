@@ -8,7 +8,7 @@
         <id property="deptId" column="dept_id"/>
         <result property="deptName" column="dept_name"/>
         <result property="parentId" column="parent_id"/>
-        <result property="managerId" column="manager_id"/>
+        <result property="manager" column="manager"/>
         <result property="description" column="description"/>
         <result property="status" column="status"/>
         <result property="createBy" column="create_by"/>
@@ -19,7 +19,7 @@
     </resultMap>
     <select id="listDepartment" resultMap="BaseResultMap">
         SELECT
-        dept_id, dept_name, parent_id, manager_id,status, description, create_time, update_time, create_by, update_by,
+        dept_id, dept_name, parent_id, manager,status, description, create_time, update_time, create_by, update_by,
         remark
         FROM sys_dept
         <where>
@@ -36,8 +36,8 @@
                 <if test="request.status != null">
                     AND status = #{status}
                 </if>
-                <if test="request.managerId != null">
-                    AND manager_id = #{request.managerId}
+                <if test="request.manager != null">
+                    AND manager = #{request.manager}
                 </if>
                 <if test="request.description != null and request.description != ''">
                     AND description LIKE concat('%', #{request.description}, '%')

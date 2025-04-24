@@ -16,31 +16,36 @@ public class SysDeptVo {
      * 部门ID
      */
     @Schema(name = "部门ID")
-    private Integer id;
+    private Long deptId;
 
     /**
      * 部门名称
      */
     @Schema(name = "部门名称")
-    private String name;
+    private String deptName;
 
     /**
      * 父部门ID
      */
     @Schema(name = "父部门ID")
-    private Integer parentId;
+    private Long parentId;
 
     /**
      * 部门负责人
      */
     @Schema(name = "部门负责人")
-    private Integer managerId;
+    private String manager;
 
     /**
      * 部门描述
      */
     @Schema(description = "部门描述")
     private String description;
+
+    /**
+     * 状态（0正常 1停用）
+     */
+    private Integer status;
 
     /**
      * 创建时间

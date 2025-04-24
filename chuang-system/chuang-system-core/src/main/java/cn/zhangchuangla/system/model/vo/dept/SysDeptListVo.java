@@ -45,7 +45,7 @@ public class SysDeptListVo {
      * 部门负责人
      */
     @Schema(description = "部门负责人")
-    private Long managerId;
+    private String manager;
 
     /**
      * 部门描述

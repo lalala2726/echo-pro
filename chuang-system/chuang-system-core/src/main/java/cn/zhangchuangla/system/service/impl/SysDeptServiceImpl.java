@@ -11,7 +11,6 @@ import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,16 +31,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
     private final SysDeptConverter sysDeptConverter;
 
 
-    /**
-     * 部门列表
-     *
-     * @param request 请求参数
-     * @return 返回分页列表
-     */
     @Override
-    public Page<SysDept> listDept(SysDeptListRequest request) {
-        Page<SysDept> sysDepartmentPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysDeptMapper.listDepartment(sysDepartmentPage, request);
+    public List<SysDept> listDept(SysDeptListRequest request) {
+        return sysDeptMapper.listDepartment(request);
     }
 
     /**
@@ -65,7 +57,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public boolean updateDept(SysDeptUpdateRequest request) {
-        if (isDeptNameExist(request.getDeptName())) {
+        LambdaQueryWrapper<SysDept> ne = new LambdaQueryWrapper<SysDept>()
+                .eq(SysDept::getDeptName, request.getDeptName())
+                .ne(SysDept::getDeptId, request.getDeptId());
+        if (count(ne) > 0) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
         SysDept sysDept = sysDeptConverter.toEntity(request);

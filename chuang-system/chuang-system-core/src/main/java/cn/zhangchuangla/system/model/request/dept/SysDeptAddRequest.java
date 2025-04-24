@@ -39,7 +39,7 @@ public class SysDeptAddRequest {
      */
     @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Size(max = 50, message = "部门负责人不能超过50个字符")
-    private Long managerId;
+    private String manager;
 
     /**
      * 部门描述

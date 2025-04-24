@@ -43,7 +43,7 @@ public class SysDeptListRequest extends BasePageRequest {
      * 部门负责人
      */
     @Schema(description = "部门负责人", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Long managerId;
+    private String manager;
 
     /**
      * 部门描述
