@@ -26,6 +26,12 @@
             <artifactId>chuang-system-core</artifactId>
         </dependency>
 
+        <!-- 添加MyBatis-Plus JSqlParser依赖，解决分页插件问题 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+        </dependency>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
