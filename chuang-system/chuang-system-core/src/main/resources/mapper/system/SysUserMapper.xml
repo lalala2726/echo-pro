@@ -2,8 +2,10 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="cn.zhangchuangla.system.mapper.SysUserMapper">
 
+    <!-- 用户 + 部门组合 DTO 映射 -->
     <resultMap id="UserDeptMap" type="cn.zhangchuangla.system.model.dto.SysUserDeptDto">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
@@ -24,6 +26,7 @@
         <association property="sysDept" javaType="SysDept" resultMap="deptResult"/>
     </resultMap>
 
+    <!-- 基础用户信息映射 -->
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.security.model.SysUser">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
@@ -43,47 +46,55 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
+    <!-- 部门信息映射 -->
     <resultMap id="deptResult" type="SysDept">
         <id property="deptId" column="dept_dept_id"/>
-        <result property="parentId" column="parent_id"/>
         <result property="deptName" column="dept_name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="manager" column="manager"/>
+        <result property="description" column="description"/>
         <result property="createTime" column="dept_create_time"/>
         <result property="updateTime" column="dept_update_time"/>
         <result property="createBy" column="dept_create_by"/>
         <result property="updateBy" column="dept_update_by"/>
         <result property="remark" column="dept_remark"/>
-        <result property="managerId" column="manager_id"/>
-        <result property="description" column="description"/>
     </resultMap>
 
-    <select id="listUser" resultMap="UserDeptMap">
-        select user.user_id as user_id,
-        user.username as username,
-        user.nickname as nickname,
-        user.email as email,
-        user.dept_id as dept_id,
-        user.phone as phone,
-        user.gender as gender,
-        user.avatar as avatar,
-        user.status as status,
-        user.create_time as create_time,
-        user.update_time as update_time,
-        user.create_by as create_by,
-        user.update_by as update_by,
-        user.is_deleted as is_deleted,
-        user.remark as remark,
-        dept.dept_id as dept_dept_id,
-        dept.dept_name as dept_name,
-        dept.parent_id as parent_id,
-        dept.manager_id as manager_id,
-        dept.description as description,
-        dept.create_time as dept_create_time,
-        dept.update_time as dept_update_time,
-        dept.create_by as dept_create_by,
-        dept.update_by as dept_update_by,
-        dept.remark as dept_remark
+    <!-- 可复用 SELECT 字段 -->
+    <sql id="baseSelect">
+        select user.user_id     as user_id,
+               user.username    as username,
+               user.password    as password,
+               user.nickname    as nickname,
+               user.avatar      as avatar,
+               user.gender      as gender,
+               user.phone       as phone,
+               user.email       as email,
+               user.dept_id     as dept_id,
+               user.status      as status,
+               user.create_time as create_time,
+               user.update_time as update_time,
+               user.create_by   as create_by,
+               user.update_by   as update_by,
+               user.is_deleted  as is_deleted,
+               user.remark      as remark,
+               dept.dept_id     as dept_dept_id,
+               dept.dept_name   as dept_name,
+               dept.parent_id   as parent_id,
+               dept.manager     as manager,
+               dept.description as description,
+               dept.create_time as dept_create_time,
+               dept.update_time as dept_update_time,
+               dept.create_by   as dept_create_by,
+               dept.update_by   as dept_update_by,
+               dept.remark      as dept_remark
         from sys_user user
-        left join sys_dept dept on user.dept_id = dept.dept_id
+                 left join sys_dept dept on user.dept_id = dept.dept_id
+    </sql>
+
+    <!-- 用户列表查询 -->
+    <select id="listUser" resultMap="UserDeptMap">
+        <include refid="baseSelect"/>
         <where>
             <if test="request != null">
                 <if test="request.deptId != null">
@@ -113,14 +124,17 @@
             </if>
             and user.is_deleted = 0
         </where>
-
     </select>
+
+    <!-- 校验邮箱重复 -->
     <select id="countOtherUserEmails" resultType="java.lang.Integer">
         select count(*)
         from sys_user
         where email = #{email}
           and user_id != #{userId}
     </select>
+
+    <!-- 校验手机号重复 -->
     <select id="isPhoneExist" resultType="java.lang.Integer">
         select count(*)
         from sys_user
@@ -128,10 +142,10 @@
           and user_id != #{userId}
     </select>
 
+    <!-- 根据用户名查询用户信息 -->
     <select id="getUserInfoByUsername" resultMap="BaseResultMap">
-        select *
-        from sys_user
-        where username = #{username}
-          and is_deleted = 0
+        <include refid="baseSelect"/>
+        where user.username = #{username}
+        and user.is_deleted = 0
     </select>
 </mapper>

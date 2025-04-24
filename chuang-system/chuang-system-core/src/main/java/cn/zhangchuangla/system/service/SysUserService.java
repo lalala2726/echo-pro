@@ -104,7 +104,7 @@ public interface SysUserService extends IService<SysUser> {
      *
      * @param request 请求参数
      */
-    void updateUserInfoById(UserUpdateRequest request);
+    boolean updateUserInfoById(UserUpdateRequest request);
 
 
     /**

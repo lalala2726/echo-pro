@@ -236,7 +236,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUserInfoById(UserUpdateRequest request) {
+    public boolean updateUserInfoById(UserUpdateRequest request) {
         if (request == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "请求参数不能为空");
         }
@@ -255,6 +255,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
         // 修改用户信息
         SysUser sysUser = sysUserConverter.toEntity(request);
+        sysUser.setRemark(request.getRemark());
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUserId, userId);
 
@@ -280,6 +281,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             }
             sysUserRoleService.addUserRoleAssociation(roles, userId);
         }
+        return true;
     }
 
     /**

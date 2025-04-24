@@ -78,6 +78,7 @@ public class SysUser extends BaseEntity {
     @Schema(description = "状态")
     private Integer status;
 
+
     /**
      * 逻辑删除
      */

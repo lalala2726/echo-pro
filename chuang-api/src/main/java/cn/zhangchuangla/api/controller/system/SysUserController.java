@@ -147,8 +147,8 @@ public class SysUserController extends BaseController {
             checkParam(sysUserService.isEmailExist(request.getEmail(), request.getUserId()), "邮箱已经存在");
         }
         // 业务逻辑
-        sysUserService.updateUserInfoById(request);
-        return success();
+        boolean result = sysUserService.updateUserInfoById(request);
+        return toAjax(result);
     }
 
     /**
