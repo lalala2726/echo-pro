@@ -49,15 +49,20 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult listFileManage(@Parameter(description = "文件资源列表查询参数")
                                      @Validated @ParameterObject SysFileManagementListRequest request) {
-        Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
-        ArrayList<StorageFileManagementListVo> storageFileManagementListVos = new ArrayList<>();
-        sysFileManagementPage.getRecords().forEach(sysFileManagement -> {
-            StorageFileManagementListVo storageFileManagementListVo = storageConverter
-                    .toSysFileManagementListVo(sysFileManagement);
-            storageFileManagementListVo.setIsIncludePreviewImage(!sysFileManagement.getPreviewImageUrl().isEmpty());
-            storageFileManagementListVos.add(storageFileManagementListVo);
-        });
-        return getTableData(sysFileManagementPage, storageFileManagementListVos);
+        Page<SysFileManagement> page = storageManagementService.listFileManage(request);
+
+        List<StorageFileManagementListVo> resultList = page.getRecords().stream()
+                .map(file -> {
+                    StorageFileManagementListVo vo = storageConverter.toSysFileManagementListVo(file);
+                    // 如果预览图URL存在则设置到VO中
+                    if (file.getPreviewImageUrl() != null) {
+                        vo.setPreviewImageUrl(file.getPreviewImageUrl());
+                    }
+                    return vo;
+                })
+                .toList();
+
+        return getTableData(page, resultList);
     }
 
     /**
@@ -107,8 +112,9 @@ public class SysFileManageController extends BaseController {
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                  @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
-        if (isPermanently == null)
+        if (isPermanently == null) {
             return error("是否删除文件不能为空！");
+        }
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件ID不能为空!");
         });
