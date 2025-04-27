@@ -6,7 +6,6 @@ import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.security.context.PermissionContextHolder;
-import cn.zhangchuangla.system.service.SysMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ import java.util.Set;
 public class PermissionAuth {
 
 
-    private final SysMenuService sysMenuService;
+//    private final SysMenuService sysMenuService;
 
     /**
      * 判断当前用户是否拥有指定的权限
@@ -46,10 +45,12 @@ public class PermissionAuth {
             return false;
         }
         Set<String> roles = SecurityUtils.getRoles();
-        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
+//        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
         PermissionContextHolder.setContext(permission);
-        log.info("用户 [{}] 权限校验: 权限标识 [{}]，用户权限：{}", sysUserDetails.getUsername(), permission, permissions);
-        return isAllow(permissions, permission);
+//        log.info("用户 [{}] 权限校验: 权限标识 [{}]，用户权限：{}", sysUserDetails.getUsername(), permission, permissions);
+//        return isAllow(permissions, permission);
+        //fixme 待修复
+        return false;
     }
 
 

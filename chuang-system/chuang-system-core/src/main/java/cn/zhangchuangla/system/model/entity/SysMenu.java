@@ -1,28 +1,43 @@
 package cn.zhangchuangla.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * 菜单实体
+ * 系统菜单权限表
  *
- * @author Ray.Hao
- * @since 2023/3/6
+ * @author zhangchuang
  */
-@TableName("sys_menu")
-@Getter
-@Setter
+@TableName(value = "sys_menu")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysMenu {
 
     /**
      * 菜单ID
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableField(value = "menu_id")
+    private Long menuId;
+
+    /**
+     * 菜单名称
+     */
+    private String menuName;
+
+    /**
+     * 父菜单名称
+     */
+    private String parentName;
 
     /**
      * 父菜单ID
@@ -30,44 +45,60 @@ public class SysMenu {
     private Long parentId;
 
     /**
-     * 菜单名称
+     * 显示顺序
      */
-    private String name;
+    private Integer orderNum;
 
     /**
-     * 菜单类型(1-菜单；2-目录；3-外链；4-按钮权限)
+     * 路由地址
      */
-    private Integer type;
+    private String path;
 
     /**
-     * 路由名称（Vue Router 中定义的路由名称）
-     */
-    private String routeName;
-
-    /**
-     * 路由路径（Vue Router 中定义的 URL 路径）
-     */
-    private String routePath;
-
-    /**
-     * 组件路径(vue页面完整路径，省略.vue后缀)
+     * 组件路径
      */
     private String component;
 
     /**
-     * 权限标识
+     * 路由参数
      */
-    private String permission;
+    private String query;
 
     /**
-     * 显示状态(1:显示;0:隐藏)
+     * 路由名称
+     * 默认和路由地址相同的驼峰格式（注意：因为vue3版本的router会删除名称相同路由，为避免名字的冲突，特殊情况可以自定义）
      */
-    private Integer visible;
+    private String routeName;
 
     /**
-     * 排序
+     * 是否为外链（0是 1否）
      */
-    private Integer sort;
+    private String isFrame;
+
+    /**
+     * 是否缓存（0缓存 1不缓存）
+     */
+    private String isCache;
+
+    /**
+     * 菜单类型（M目录 C菜单 F按钮）
+     */
+    private String menuType;
+
+    /**
+     * 显示状态（0显示 1隐藏）
+     */
+    private String visible;
+
+    /**
+     * 菜单状态（0正常 1停用）
+     */
+    private String status;
+
+    /**
+     * 权限标识字符串
+     */
+    private String perms;
 
     /**
      * 菜单图标
@@ -75,44 +106,25 @@ public class SysMenu {
     private String icon;
 
     /**
-     * 跳转路径
-     */
-    private String redirect;
-
-    /**
-     * 父节点路径，以英文逗号(,)分割
-     */
-    private String treePath;
-
-    /**
-     * 【菜单】是否开启页面缓存(1:开启;0:关闭)
-     */
-    private Integer keepAlive;
-
-    /**
-     * 【目录】只有一个子路由是否始终显示(1:是 0:否)
-     */
-    private Integer alwaysShow;
-
-    /**
-     * 路由参数
-     */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS)
-    private String params;
-
-    /**
      * 子菜单列表
      */
     @TableField(exist = false)
-    private List<SysMenu> children;
-
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private List<SysMenu> children = new ArrayList<>();
 
     /**
-     * 更新时间
+     * 请求参数
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    @TableField(exist = false)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Map<String, Object> params;
 
+    /**
+     * 获取请求参数
+     */
+    public Map<String, Object> getParams() {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 }

@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysRoleMenu" />
-                  <option name="tableName" value="sys_role_menu" />
+                  <option name="className" value="SysMenu" />
+                  <option name="tableName" value="sys_menu" />
                 </TableUIInfo>
               </list>
             </option>

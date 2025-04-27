@@ -9,9 +9,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
-import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +38,6 @@ public class SysLoginController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
-    private final SysMenuService sysMenuService;
     private final SysRoleService sysRoleService;
     private final SysUserConverter sysUserConverter;
     private final RedisCache redisCache;
@@ -88,8 +84,7 @@ public class SysLoginController extends BaseController {
     @Operation(summary = "菜单路由列表")
     @GetMapping("/auth/routes")
     public AjaxResult getCurrentUserRoutes() {
-        List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
-        return success(routeList);
+        return success();
     }
 
     /**
@@ -105,11 +100,9 @@ public class SysLoginController extends BaseController {
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
         Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
         return success(ajax);
     }
 
