@@ -7,8 +7,6 @@ import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.util.List;
 import java.util.Set;
@@ -44,7 +42,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param userId 用户ID
      * @return 返回Set集合
      */
-    Set<String> getUserRoleSetByUserId(Long userId);
+    Set<String> getRoleSetByUserId(Long userId);
 
     /**
      * 添加角色信息
@@ -59,7 +57,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param roleName 角色名称
      * @return true 存在，false不存在
      */
-    boolean isRoleNameExist(@NotBlank(message = "角色名不能为空") @Size(max = 50, message = "角色名不能超过50个字符") String roleName);
+    boolean isRoleNameExist(String roleName);
 
     /**
      * 判断角色权限字符串是否存在
@@ -67,7 +65,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param roleKey 角色权限字符串
      * @return true 存在，false不存在
      */
-    boolean isRoleKeyExist(@NotBlank(message = "角色权限字符串不能为空") @Size(min = 2, max = 50, message = "角色权限字符串长度必须介于 2 和 50 之间") String roleKey);
+    boolean isRoleKeyExist(String roleKey);
 
     /**
      * 修改角色信息
@@ -105,4 +103,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 删除结果
      */
     boolean deleteRoleInfo(List<Long> ids);
+
+    /**
+     * 根据角色ID集合获取角色权限字符串集合
+     *
+     * @param roleId 角色ID集合
+     * @return 角色权限字符串集合
+     */
+    Set<String> getRoleSetByRoleId(List<Long> roleId);
 }

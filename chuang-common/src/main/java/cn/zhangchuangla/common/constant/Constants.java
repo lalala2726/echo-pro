@@ -93,7 +93,7 @@ public class Constants {
      * 其他常量
      */
     public static final long IS_PARENT_NODE = 0L;
-    public static final String IS_CACHE = "1";
+    public static final Integer IS_CACHE = 1;
     public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
     public static final int IS_FILE_UPLOAD_MASTER = 1;
     public static final String ORIGINAL = "original";

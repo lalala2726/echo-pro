@@ -21,5 +21,40 @@
         <result property="perms" column="perms" jdbcType="VARCHAR"/>
         <result property="icon" column="icon" jdbcType="VARCHAR"/>
     </resultMap>
+    <select id="listMenuByRoleId" resultMap="MenuResultMap">
+        select *
+        from sys_menu
+        join sys_role_menu on sys_menu.menu_id = sys_role_menu.menu_id
+        where sys_role_menu.role_id in
+        <foreach item="roleId" collection="roleIds" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </select>
+    <select id="listMenuByUserId" resultMap="MenuResultMap">
+        select m.menu_id,
+               m.menu_name,
+               m.parent_id,
+               m.order_num,
+               m.path,
+               m.component,
+               m.query,
+               m.route_name,
+               m.is_frame,
+               m.is_cache,
+               m.menu_type,
+               m.visible,
+               m.status,
+               m.perms,
+               m.icon,
+               m.create_by,
+               m.create_time,
+               m.update_by,
+               m.update_time,
+               m.remark
+        from sys_menu m
+                 join sys_role_menu rm on m.menu_id = rm.menu_id
+                 join sys_user_role ur on rm.role_id = ur.role_id
+        where ur.user_id = #{userId}
+    </select>
 
 </mapper>
