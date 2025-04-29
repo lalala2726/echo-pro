@@ -2,15 +2,11 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
-import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.request.menu.AssignedMenuIdsRequest;
 import cn.zhangchuangla.system.model.request.menu.MenuForm;
 import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
-import cn.zhangchuangla.system.model.vo.menu.MenuVo;
-import cn.zhangchuangla.system.model.vo.permission.MenuListVo;
-import cn.zhangchuangla.system.model.vo.permission.MenuTreeVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleMenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,8 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 菜单管理控制器
@@ -47,12 +41,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "根据角色ID获取菜单树形结构")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
     public AjaxResult getMenuTreeByRoleId(@PathVariable("roleId") Long roleId) {
-        List<MenuListVo> menuTree = sysMenuService.listPermission();
-        List<Long> selectedMenuId = sysRoleMenuService.getSelectedMenuIdByRoleId(roleId);
-        MenuTreeVo menuTreeVo = new MenuTreeVo();
-        menuTreeVo.setMenuListVo(menuTree);
-        menuTreeVo.setSelectedMenuId(selectedMenuId);
-        return AjaxResult.success(menuTreeVo);
+        return success();
     }
 
     /**
@@ -65,8 +54,7 @@ public class SysMenuController extends BaseController {
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public AjaxResult updateRoleMenus(@RequestBody AssignedMenuIdsRequest assignedMenuIdsRequest) {
-        boolean result = sysRoleMenuService.updateRoleMenus(assignedMenuIdsRequest);
-        return success(result);
+        return success();
     }
 
     /**
@@ -79,8 +67,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "获取菜单列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
     public AjaxResult listMenus(SysMenuListRequest request) {
-        List<MenuVo> menuList = sysMenuService.listMenus(request);
-        return success(menuList);
+        return success();
     }
 
     /**
@@ -94,8 +81,7 @@ public class SysMenuController extends BaseController {
     public AjaxResult listMenuOptions(
             @Parameter(description = "是否只查询父级菜单")
             @RequestParam(required = false, defaultValue = "false", value = "onlyParent") boolean onlyParent) {
-        List<Option<Long>> menus = sysMenuService.listMenuOptions(onlyParent);
-        return success(menus);
+        return success();
     }
 
     /**
@@ -107,8 +93,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/{id}/form")
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public AjaxResult getMenuForm(@Parameter(description = "菜单ID") @PathVariable("id") Long id) {
-        MenuForm menuForm = sysMenuService.getMenuForm(id);
-        return success(menuForm);
+        return success();
     }
 
     /**
@@ -121,8 +106,7 @@ public class SysMenuController extends BaseController {
     @OperationLog(title = "菜单管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
     public AjaxResult addMenu(@RequestBody MenuForm menuForm) {
-        boolean result = sysMenuService.saveMenu(menuForm);
-        return toAjax(result);
+        return success();
     }
 
     /**
@@ -136,8 +120,7 @@ public class SysMenuController extends BaseController {
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
     public AjaxResult updateMenu(@RequestBody MenuForm menuForm) {
-        boolean result = sysMenuService.saveMenu(menuForm);
-        return toAjax(result);
+        return success();
     }
 
     /**
@@ -152,8 +135,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public AjaxResult deleteMenu(@Parameter(description = "菜单ID，多个以英文(,)分割")
                                  @PathVariable("id") Long id) {
-        boolean result = sysMenuService.deleteMenu(id);
-        return toAjax(result);
+        return success();
     }
 
     /**
@@ -171,8 +153,7 @@ public class SysMenuController extends BaseController {
             @Parameter(description = "菜单ID")
             @PathVariable Long menuId, @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible
     ) {
-        boolean result = sysMenuService.updateMenuVisible(menuId, visible);
-        return toAjax(result);
+        return success();
     }
 
 
