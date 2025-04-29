@@ -25,7 +25,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param request 查询参数
      * @return 分页列表
      */
-    Page<SysRole> RoleList(SysRoleQueryRequest request);
+    Page<SysRole> roleList(SysRoleQueryRequest request);
 
     /**
      * 根据用户id获取角色列表

@@ -49,7 +49,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @return 分页列表
      */
     @Override
-    public Page<SysRole> RoleList(SysRoleQueryRequest request) {
+    public Page<SysRole> roleList(SysRoleQueryRequest request) {
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
                 .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
                         SysRole::getRoleName, request.getRoleName());

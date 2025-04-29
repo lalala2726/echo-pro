@@ -4,9 +4,6 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.system.model.request.menu.AssignedMenuIdsRequest;
-import cn.zhangchuangla.system.model.request.menu.MenuForm;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleMenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,20 +50,19 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "保存角色菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
-    public AjaxResult updateRoleMenus(@RequestBody AssignedMenuIdsRequest assignedMenuIdsRequest) {
+    public AjaxResult updateRoleMenus() {
         return success();
     }
 
     /**
      * 获取菜单列表
      *
-     * @param request 查询参数
      * @return 菜单列表
      */
     @GetMapping("/list")
     @Operation(summary = "获取菜单列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult listMenus(SysMenuListRequest request) {
+    public AjaxResult listMenus() {
         return success();
     }
 
@@ -105,21 +101,20 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "添加菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
-    public AjaxResult addMenu(@RequestBody MenuForm menuForm) {
+    public AjaxResult addMenu() {
         return success();
     }
 
     /**
      * 修改菜单
      *
-     * @param menuForm 菜单表单对象
      * @return 菜单列表
      */
     @PutMapping
     @Operation(summary = "修改菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
-    public AjaxResult updateMenu(@RequestBody MenuForm menuForm) {
+    public AjaxResult updateMenu() {
         return success();
     }
 

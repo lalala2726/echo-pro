@@ -86,6 +86,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
+
     /**
      * 判断两个字符串是否相等（支持null安全）
      *

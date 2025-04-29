@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 菜单路由视图对象
+ * 路由对象
  *
- * @author haoxr
- * @since 2020/11/28
+ * @author Chuang
+ * <p>
+ * created on 2025年4月29日 22:14:26
  */
 @Schema(description = "路由对象")
 @Data
@@ -66,17 +67,4 @@ public class RouteVo {
      */
     private List<RouteVo> children;
 
-    /**
-     * 构造函数（用于创建带有完整参数的路由对象）
-     */
-    public RouteVo(String name, String path, boolean hidden, String redirect, String component, String query, Boolean alwaysShow, MetaVo meta) {
-        this.name = name;
-        this.path = path;
-        this.hidden = hidden;
-        this.redirect = redirect;
-        this.component = component;
-        this.query = query;
-        this.alwaysShow = alwaysShow;
-        this.meta = meta;
-    }
 }

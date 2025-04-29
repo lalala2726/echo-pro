@@ -98,7 +98,7 @@ public class SysPostController extends BaseController {
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
     public AjaxResult updatePost(@Parameter(description = "修改岗位请求参数")
-                                     @Validated @RequestBody SysPostUpdateRequest request) {
+                                 @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.updatePost(request));
     }
 

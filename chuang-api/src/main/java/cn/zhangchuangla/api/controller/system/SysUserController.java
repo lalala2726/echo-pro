@@ -92,7 +92,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
-                                  @Validated @RequestBody UserAddRequest request) {
+                              @Validated @RequestBody UserAddRequest request) {
         if (!request.getUsername().isEmpty()) {
             checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         }
@@ -137,7 +137,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
-                                             @Validated @RequestBody UserUpdateRequest request) {
+                                         @Validated @RequestBody UserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         // 参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
