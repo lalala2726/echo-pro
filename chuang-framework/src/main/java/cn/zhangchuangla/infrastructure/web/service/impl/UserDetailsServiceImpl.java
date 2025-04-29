@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         SysUser sysUser = sysUserService.getUserInfoByUsername(username);
-        Set<String> roleSet = sysRoleService.getUserRoleSetByUserId(sysUser.getUserId());
+        Set<String> roleSet = sysRoleService.getRoleSetByUserId(sysUser.getUserId());
         log.info("用户权限信息:{}", roleSet);
         return new SysUserDetails(sysUser, roleSet);
     }

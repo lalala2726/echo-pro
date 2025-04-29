@@ -37,7 +37,7 @@ import java.util.HashMap;
 @Tag(name = "文件相关")
 @Slf4j
 @RequiredArgsConstructor
-public class FileController extends BaseController {
+public class SysFileController extends BaseController {
 
     private final StorageConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;

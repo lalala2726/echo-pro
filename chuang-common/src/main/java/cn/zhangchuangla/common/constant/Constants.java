@@ -10,6 +10,7 @@ package cn.zhangchuangla.common.constant;
  */
 public class Constants {
 
+    public static final String WWW = "www.";
 
     /**
      * 验证码相关
@@ -92,7 +93,7 @@ public class Constants {
      * 其他常量
      */
     public static final long IS_PARENT_NODE = 0L;
-    public static final String IS_CACHE = "1";
+    public static final Integer IS_CACHE = 1;
     public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
     public static final int IS_FILE_UPLOAD_MASTER = 1;
     public static final String ORIGINAL = "original";
@@ -107,4 +108,56 @@ public class Constants {
     public static final String NOT_LOGIN = "NOT_LOGIN";
     public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
     public static final Long ROOT_NODE_ID = 0L;
+
+    /**
+     * 菜单常量
+     */
+    public static final class MenuConstants {
+        /**
+         * 顶级菜单ID
+         */
+        public static final Long TOP_MENU_ID = 0L;
+        /**
+         * 是否为外链（0是 1否）
+         */
+        public static final String IS_EXTERNAL_LINK = "0";
+        public static final String NOT_EXTERNAL_LINK = "1";
+        /**
+         * 路由组件
+         */
+        public static final String LAYOUT = "Layout";
+        public static final String PARENT_VIEW = "ParentView";
+        public static final String INNER_LINK = "InnerLink";
+        /**
+         * 菜单类型（M目录 C菜单 F按钮）
+         */
+        public static final String TYPE_DIRECTORY = "M";
+        public static final String TYPE_MENU = "C";
+        public static final String TYPE_BUTTON = "F";
+        /**
+         * 菜单状态（0显示 1隐藏）
+         */
+        public static final String VISIBLE = "0";
+        public static final String HIDDEN = "1";
+        /**
+         * 菜单状态（0正常 1停用）
+         */
+        public static final String STATUS_NORMAL = "0";
+        public static final String STATUS_DISABLED = "1";
+        /**
+         * 是否缓存（0缓存 1不缓存）
+         */
+        public static final String CACHE = "0";
+        public static final String NOT_CACHE = "1";
+        /**
+         * URL前缀
+         */
+        public static final String HTTP = "http://";
+        public static final String HTTPS = "https://";
+        public static final String WWW = "www.";
+        /**
+         * 默认路由地址
+         */
+        public static final String NO_REDIRECT = "noRedirect";
+    }
 }

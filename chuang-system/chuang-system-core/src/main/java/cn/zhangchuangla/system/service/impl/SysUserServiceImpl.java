@@ -314,7 +314,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改自己的信息！");
         }
-        Set<String> userRoles = sysRoleService.getUserRoleSetByUserId(userId);
+        Set<String> userRoles = sysRoleService.getRoleSetByUserId(userId);
         if (userRoles.contains(SysRolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员的信息！");
         }
@@ -350,7 +350,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置当前用户密码");
         }
         //不允许用户重置管理员密码
-        Set<String> role = sysRoleService.getUserRoleSetByUserId(userId);
+        Set<String> role = sysRoleService.getRoleSetByUserId(userId);
         if (role.contains(SysRolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置超级管理员密码");
         }

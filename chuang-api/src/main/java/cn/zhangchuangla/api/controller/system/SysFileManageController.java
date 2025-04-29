@@ -19,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,20 +48,20 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult listFileManage(@Parameter(description = "文件资源列表查询参数")
                                      @Validated @ParameterObject SysFileManagementListRequest request) {
-        Page<SysFileManagement> page = storageManagementService.listFileManage(request);
+        Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
 
-        List<StorageFileManagementListVo> resultList = page.getRecords().stream()
-                .map(file -> {
-                    StorageFileManagementListVo vo = storageConverter.toSysFileManagementListVo(file);
-                    // 如果预览图URL存在则设置到VO中
-                    if (file.getPreviewImageUrl() != null) {
-                        vo.setPreviewImageUrl(file.getPreviewImageUrl());
-                    }
-                    return vo;
+        // 使用流式处理优化代码
+        List<StorageFileManagementListVo> storageFileManagementListVos = sysFileManagementPage.getRecords().stream()
+                .map(sysFileManagement -> {
+                    StorageFileManagementListVo storageFileManagementListVo = storageConverter
+                            .toSysFileManagementListVo(sysFileManagement);
+                    String previewImageUrl = sysFileManagement.getPreviewImageUrl();
+                    storageFileManagementListVo.setIsIncludePreviewImage(previewImageUrl != null && previewImageUrl.contains("preview"));
+                    return storageFileManagementListVo;
                 })
                 .toList();
 
-        return getTableData(page, resultList);
+        return getTableData(sysFileManagementPage, storageFileManagementListVos);
     }
 
     /**
@@ -112,12 +111,9 @@ public class SysFileManageController extends BaseController {
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                  @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
-        if (isPermanently == null) {
+        if (isPermanently == null)
             return error("是否删除文件不能为空！");
-        }
-        ids.forEach(id -> {
-            checkParam(id == null || id <= 0, "文件ID不能为空!");
-        });
+        ids.forEach(id -> checkParam(id == null || id <= 0, "文件ID不能为空!"));
         checkParam(ids.size() > 100, "最多只能删除100个文件!");
         boolean result = storageManagementService.removeFile(ids, isPermanently);
         return toAjax(result);
