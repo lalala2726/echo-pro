@@ -4,16 +4,14 @@ import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Route;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +53,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 返回前端需要的路由界面
      */
     @Override
-    public List<RouteVo> buildMenus(List<SysMenu> menus) {
+    public List<RouterVo> buildMenus(List<SysMenu> menus) {
         return buildMenus(menus, 0L);
     }
 
@@ -66,22 +64,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @param parentId 父级ID
      * @return 返回前端需要的路由界面
      */
-    private List<RouteVo> buildMenus(List<SysMenu> sysMenus, Long parentId) {
+    private List<RouterVo> buildMenus(List<SysMenu> sysMenus, Long parentId) {
         return sysMenus.stream()
                 // 过滤掉按钮类型菜单
                 .filter(sysMenu -> !Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType()))
                 .filter(sysMenu -> sysMenu.getParentId().equals(parentId))
                 .map(sysMenu -> {
-                    RouteVo routeVo = new RouteVo();
+                    RouterVo routerVo = new RouterVo();
                     String component = getComponent(sysMenu);
                     String path = getPath(sysMenu);
 
-                    routeVo.setComponent(component);
-                    routeVo.setPath(path);
-                    routeVo.setName(sysMenu.getMenuName());
+                    routerVo.setComponent(component);
+                    routerVo.setPath(path);
+                    routerVo.setName(sysMenu.getMenuName());
                     // 递归构建子菜单
-                    routeVo.setChildren(buildMenus(sysMenus, sysMenu.getMenuId()));
-                    return routeVo;
+                    routerVo.setChildren(buildMenus(sysMenus, sysMenu.getMenuId()));
+                    return routerVo;
                 })
                 .toList();
     }

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -29,5 +29,5 @@ public interface SysMenuService extends IService<SysMenu> {
      * @param menus 菜单列表
      * @return 返回前端需要的路由界面
      */
-    List<RouteVo> buildMenus(List<SysMenu> menus);
+    List<RouterVo> buildMenus(List<SysMenu> menus);
 }

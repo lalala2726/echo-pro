@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RouteVo {
+public class RouterVo {
 
     /**
      * 路由名字
@@ -65,6 +65,6 @@ public class RouteVo {
     /**
      * 子路由
      */
-    private List<RouteVo> children;
+    private List<RouterVo> children;
 
 }

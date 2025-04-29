@@ -10,7 +10,7 @@ import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Chuang
@@ -91,8 +90,8 @@ public class SysLoginController extends BaseController {
     public AjaxResult getCurrentUserRoutes() {
         Long userId = getUserId();
         List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(userId);
-        List<RouteVo> routeVos = sysMenuService.buildMenus(menuListByUserId);
-        return success(routeVos);
+        List<RouterVo> routerVos = sysMenuService.buildMenus(menuListByUserId);
+        return success(routerVos);
     }
 
     /**
