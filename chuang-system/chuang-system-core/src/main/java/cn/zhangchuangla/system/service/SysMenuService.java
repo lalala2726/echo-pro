@@ -13,7 +13,6 @@ import java.util.List;
  */
 public interface SysMenuService extends IService<SysMenu> {
 
-
     /**
      * 根据用户ID查询菜单列表
      *
@@ -22,7 +21,6 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     List<SysMenu> getMenuListByUserId(Long userId);
 
-
     /**
      * 构造前端需要的路由界面
      *
@@ -30,4 +28,84 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 返回前端需要的路由界面
      */
     List<RouterVo> buildMenus(List<SysMenu> menus);
+
+    /**
+     * 根据菜单ID查询信息
+     *
+     * @param menuId 菜单ID
+     * @return 菜单信息
+     */
+    SysMenu getMenuById(Long menuId);
+
+    /**
+     * 查询菜单列表
+     *
+     * @param sysMenu 菜单信息
+     * @return 菜单列表
+     */
+    List<SysMenu> selectMenuList(SysMenu sysMenu);
+
+    /**
+     * 根据用户ID查询菜单树信息
+     *
+     * @param userId 用户ID
+     * @return 菜单列表
+     */
+    List<SysMenu> selectMenuTreeByUserId(Long userId);
+
+    /**
+     * 根据角色ID查询菜单树信息
+     *
+     * @param roleId 角色ID
+     * @return 选中菜单列表
+     */
+    List<Long> selectMenuListByRoleId(Long roleId);
+
+    /**
+     * 新增菜单
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    boolean insertMenu(SysMenu menu);
+
+    /**
+     * 修改菜单
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    boolean updateMenu(SysMenu menu);
+
+    /**
+     * 删除菜单
+     *
+     * @param menuId 菜单ID
+     * @return 结果
+     */
+    boolean deleteMenuById(Long menuId);
+
+    /**
+     * 校验菜单名称是否唯一
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    boolean checkMenuNameUnique(SysMenu menu);
+
+    /**
+     * 是否存在菜单子节点
+     *
+     * @param menuId 菜单ID
+     * @return 结果 true 存在 false 不存在
+     */
+    boolean hasChildByMenuId(Long menuId);
+
+    /**
+     * 查询菜单是否存在角色
+     *
+     * @param menuId 菜单ID
+     * @return 结果 true 存在 false 不存在
+     */
+    boolean checkMenuExistRole(Long menuId);
 }

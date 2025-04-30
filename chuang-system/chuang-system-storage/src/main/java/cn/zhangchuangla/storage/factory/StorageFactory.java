@@ -46,7 +46,7 @@ public class StorageFactory {
 
         if (operation == null) {
             log.warn("未找到类型为 [{}] 的存储服务，将使用本地存储作为默认服务", storageType);
-            return localOperationService; // 默认使用本地存储
+            return localOperationService;
         }
         return operation;
     }

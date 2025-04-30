@@ -37,7 +37,7 @@ import java.util.List;
 @Slf4j
 @Tag(name = "登录接口")
 @RequiredArgsConstructor
-public class SysLoginController extends BaseController {
+public class SysAuthController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
@@ -58,10 +58,10 @@ public class SysLoginController extends BaseController {
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         // 1. 校验验证码
-        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
-        if (!loginRequest.getCaptchaCode().equals(code)) {
-            return error("验证码错误");
-        }
+//        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
+//        if (!loginRequest.getCaptchaCode().equals(code)) {
+//            return error("验证码错误");
+//        }
         AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
         return success(authenticationToken);
     }

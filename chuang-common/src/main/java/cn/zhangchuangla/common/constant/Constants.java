@@ -130,8 +130,8 @@ public class Constants {
         /**
          * 是否缓存（0缓存 1不缓存）
          */
-        public static final String CACHE = "0";
-        public static final String NOT_CACHE = "1";
+        public static final Integer CACHE = 0;
+        public static final Integer NOT_CACHE = 1;
 
     }
 }

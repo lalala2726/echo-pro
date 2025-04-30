@@ -1,20 +1,22 @@
 package cn.zhangchuangla.system.model.vo.menu;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 菜单表单对象
+ * 菜单元数据对象
  *
  * @author Ray.Hao
  * @since 2024/06/23
  */
-@Schema(description = "菜单表单对象")
+@Schema(description = "菜单元数据对象")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MetaVo {
 
     /**
@@ -28,12 +30,77 @@ public class MetaVo {
     private String icon;
 
     /**
+     * 是否在菜单中显示
+     */
+    private Boolean showLink;
+
+    /**
+     * 菜单排序，值越高排的越后（只针对顶级路由）
+     */
+    private Integer rank;
+
+    /**
      * 设置为true，则不会被 <keep-alive>缓存
      */
-    private boolean noCache;
+    private Boolean noCache;
 
     /**
      * 内链地址（http(s)://开头）
      */
     private String link;
+
+    /**
+     * 菜单名称右侧的额外图标
+     */
+    private String extraIcon;
+
+    /**
+     * 是否显示父级菜单
+     */
+    private Boolean showParent;
+
+    /**
+     * 页面级别权限设置
+     */
+    private String[] roles;
+
+    /**
+     * 按钮级别权限设置
+     */
+    private String[] auths;
+
+    /**
+     * 是否缓存该路由页面
+     */
+    private Boolean keepAlive;
+
+    /**
+     * 需要内嵌的iframe链接地址
+     */
+    private String frameSrc;
+
+    /**
+     * 内嵌的iframe页面是否开启首次加载动画
+     */
+    private Boolean frameLoading;
+
+    /**
+     * 当前菜单名称或自定义信息禁止添加到标签页
+     */
+    private Boolean hiddenTag;
+
+    /**
+     * 将某个菜单激活
+     */
+    private String activePath;
+
+    /**
+     * 显示在标签页的最大数量
+     */
+    private Integer dynamicLevel;
+
+    /**
+     * 页面加载动画配置
+     */
+    private TransitionVo transition;
 }

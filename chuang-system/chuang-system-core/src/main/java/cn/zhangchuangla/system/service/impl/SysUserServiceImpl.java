@@ -295,7 +295,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
         SysUser user = getOne(eq);
         if (user == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("用户名:<%s>不存在！", username));
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("用户名:%s不存在！", username));
         }
         return user;
     }

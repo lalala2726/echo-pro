@@ -37,14 +37,14 @@ public class LoginRequest {
     /**
      * 验证码KEY
      */
-    @NotBlank(message = "验证码KEY不能为空!")
+//    @NotBlank(message = "验证码KEY不能为空!")
     @Schema(description = "验证码KEY", requiredMode = Schema.RequiredMode.REQUIRED)
     private String captchaKey;
 
     /**
      * 验证码
      */
-    @NotBlank(message = "验证码不能为空!")
+//    @NotBlank(message = "验证码不能为空!")
     @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED)
     private String captchaCode;
 }
