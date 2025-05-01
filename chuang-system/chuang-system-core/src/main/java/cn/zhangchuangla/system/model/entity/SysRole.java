@@ -31,6 +31,9 @@ public class SysRole extends BaseEntity {
      */
     private String roleKey;
 
+
+    private boolean menuCheckStrictly;
+
     /**
      * 显示顺序
      */

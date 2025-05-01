@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * 文件相关接口
@@ -36,7 +37,7 @@ import java.io.IOException;
 @Tag(name = "文件相关")
 @Slf4j
 @RequiredArgsConstructor
-public class FileController extends BaseController {
+public class SysFileController extends BaseController {
 
     private final StorageConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
@@ -59,7 +60,7 @@ public class FileController extends BaseController {
         }
 
         try {
-            AjaxResult ajax = AjaxResult.success();
+            HashMap<String, String> ajax = new HashMap<>();
             String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
             log.info("当前使用的存储类型: {}", currentDefaultUploadType);
 
@@ -77,7 +78,7 @@ public class FileController extends BaseController {
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
             storageManagementService.saveFileInfo(result);
             ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
-            return ajax;
+            return success(ajax);
         } catch (IOException e) {
             log.error("文件读取失败", e);
             return error("文件读取失败: " + e.getMessage());
@@ -102,7 +103,7 @@ public class FileController extends BaseController {
         if (file.isEmpty()) {
             return error("请选择一个图片上传");
         }
-        AjaxResult ajax = AjaxResult.success();
+        HashMap<String, String> ajax = new HashMap<>();
         String currentDefaultUploadType = sysFileConfigLoader.getCurrentDefaultUploadType();
         StorageOperation storageOperation = storageFactory.getStorageOperation(currentDefaultUploadType);
         try {
@@ -119,6 +120,6 @@ public class FileController extends BaseController {
         } catch (IOException e) {
             return error("文件读取失败: " + e.getMessage());
         }
-        return ajax;
+        return success(ajax);
     }
 }

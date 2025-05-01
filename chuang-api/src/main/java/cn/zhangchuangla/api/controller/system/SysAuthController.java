@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
@@ -9,7 +8,8 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
 import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
+import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Chuang
@@ -37,7 +36,7 @@ import java.util.Set;
 @Slf4j
 @Tag(name = "登录接口")
 @RequiredArgsConstructor
-public class SysLoginController extends BaseController {
+public class SysAuthController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
@@ -58,10 +57,10 @@ public class SysLoginController extends BaseController {
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         // 1. 校验验证码
-        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
-        if (!loginRequest.getCaptchaCode().equals(code)) {
-            return error("验证码错误");
-        }
+//        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
+//        if (!loginRequest.getCaptchaCode().equals(code)) {
+//            return error("验证码错误");
+//        }
         AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
         return success(authenticationToken);
     }
@@ -88,8 +87,10 @@ public class SysLoginController extends BaseController {
     @Operation(summary = "菜单路由列表")
     @GetMapping("/auth/routes")
     public AjaxResult getCurrentUserRoutes() {
-        List<RouteVo> routeList = sysMenuService.getCurrentUserRoutes();
-        return success(routeList);
+        Long userId = getUserId();
+        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(userId);
+        List<RouterVo> routerVos = sysMenuService.buildMenus(menuListByUserId);
+        return success(routerVos);
     }
 
     /**
@@ -104,12 +105,11 @@ public class SysLoginController extends BaseController {
         HashMap<String, Object> ajax = new HashMap<>(4);
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
-        Set<String> permissions = sysMenuService.getPermissionsByRoleName(roles);
+//        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
+//        ajax.put("roles", roles);
+//        ajax.put("permissions", permissions);
         return success(ajax);
     }
 

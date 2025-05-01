@@ -20,46 +20,30 @@ public class Constants {
      */
     public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
 
-    /**
-     * Token 相关常量
-     */
-    public static final String TOKEN = "token";
-    public static final String LOGIN_USER_KEY = "login_user_key";
-    public static final String USERNAME = "username";
-    public static final String COLON = ":";
-
-    /**
-     * 响应信息常量
-     */
-    public static final String MESSAGE = "message";
-    public static final String DATA = "data";
-    public static final String CODE = "code";
-    public static final String TIME = "TIME";
 
     /**
      * 账号状态常量
      */
-    public static final Integer ACCOUNT_LOCK_KEY = 1; // 账号封禁
-    public static final Integer ACCOUNT_UNLOCK_KEY = 0; // 账号正常
+    public static final Integer ACCOUNT_LOCK_KEY = 1;
+    public static final Integer ACCOUNT_UNLOCK_KEY = 0;
 
     /**
      * 登录状态常量
      */
-    public static final Integer LOGIN_SUCCESS = 0; // 登录成功
-    public static final Integer LOGIN_FAIL = 1; // 登录失败
+    public static final Integer LOGIN_SUCCESS = 0;
+    public static final Integer LOGIN_FAIL = 1;
 
     /**
      * 系统相关常量
      */
     public static final String SYSTEM_CREATE = "系统自动创建";
     public static final String RESOURCE_PREFIX = "/profile";
-    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15; // 用户权限缓存过期时间（分钟）
+    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15;
 
     /**
      * 权限相关常量
      */
-    public static final String ALL_PERMISSION = "*:*:*"; // 拥有所有权限
-
+    public static final String ALL_PERMISSION = "*:*:*";
     /**
      * 系统默认标识常量
      */
@@ -68,31 +52,31 @@ public class Constants {
     /**
      * 菜单相关常量
      */
-    public static final String IS_MENU_EXTERNAL_LINK = "0"; // 是否为外链（0是）
-    public static final String IS_NOT_MENU_EXTERNAL_LINK = "1"; // 是否不是外链（1否）
-    public static final String MENU_TYPE_DIRECTORY = "M"; // 菜单类型（目录）
-    public static final String MENU_TYPE_MENU = "C"; // 菜单类型（菜单）
-    public static final String MENU_TYPE_BUTTON = "F"; // 菜单类型（按钮）
+    public static final String IS_MENU_EXTERNAL_LINK = "0";
+    public static final String IS_NOT_MENU_EXTERNAL_LINK = "1";
+    public static final String MENU_TYPE_DIRECTORY = "M";
+    public static final String MENU_TYPE_MENU = "C";
+    public static final String MENU_TYPE_BUTTON = "F";
 
     /**
      * 组件标识常量
      */
-    public static final String LAYOUT = "Layout"; // Layout 组件标识
-    public static final String INNER_LINK = "InnerLink"; // InnerLink 组件标识
+    public static final String LAYOUT = "Layout";
+    public static final String INNER_LINK = "InnerLink";
 
     /**
      * HTTP 相关常量
      */
     public static final String HTTP = "http://";
     public static final String HTTPS = "https://";
-    public static final String PARENT_VIEW = "ParentView";
-    public static final String IS_HIDDEN = "1";
+    public static final String WWW = "www.";
+
 
     /**
      * 其他常量
      */
     public static final long IS_PARENT_NODE = 0L;
-    public static final String IS_CACHE = "1";
+    public static final Integer IS_CACHE = 1;
     public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
     public static final int IS_FILE_UPLOAD_MASTER = 1;
     public static final String ORIGINAL = "original";
@@ -107,4 +91,55 @@ public class Constants {
     public static final String NOT_LOGIN = "NOT_LOGIN";
     public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
     public static final Long ROOT_NODE_ID = 0L;
+
+
+    public interface CommonConstants {
+        String ENABLE = "0";
+        String DISABLE = "1";
+    }
+
+    /**
+     * 菜单常量
+     */
+    public interface MenuConstants {
+        /**
+         * 顶级菜单ID
+         */
+        Long TOP_MENU_ID = 0L;
+        /**
+         * 是否为外链（0是 1否）
+         */
+        String IS_EXTERNAL_LINK = "0";
+        String NOT_EXTERNAL_LINK = "1";
+        /**
+         * 路由组件
+         */
+        String LAYOUT = "Layout";
+        String PARENT_VIEW = "ParentView";
+        String INNER_LINK = "InnerLink";
+        /**
+         * 菜单类型（M目录 C菜单 F按钮）
+         */
+        String TYPE_DIRECTORY = "M";
+        String TYPE_MENU = "C";
+        String TYPE_BUTTON = "F";
+        /**
+         * 菜单状态（0显示 1隐藏）
+         */
+        String VISIBLE = "0";
+        String HIDDEN = "1";
+        /**
+         * 菜单状态（0正常 1停用）
+         */
+        String STATUS_NORMAL = "0";
+        String STATUS_DISABLED = "1";
+        /**
+         * 是否缓存（0缓存 1不缓存）
+         */
+        Integer CACHE = 0;
+        Integer NOT_CACHE = 1;
+
+        String STATUS_DISABLE = "1";
+        String MENU_TYPE_DIR = "M";
+    }
 }

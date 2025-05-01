@@ -6,54 +6,119 @@
 
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysMenu">
-        <id property="id" column="id"/>
+        <id property="menuId" column="menu_id"/>
+        <result property="menuName" column="menu_name"/>
         <result property="parentId" column="parent_id"/>
-        <result property="treePath" column="tree_path"/>
-        <result property="name" column="name"/>
-        <result property="type" column="type"/>
-        <result property="routeName" column="route_name"/>
-        <result property="routePath" column="route_path"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="path" column="path"/>
         <result property="component" column="component"/>
-        <result property="permission" column="permission"/>
-        <result property="alwaysShow" column="always_show"/>
-        <result property="keepAlive" column="keep_alive"/>
+        <result property="query" column="query"/>
+        <result property="routeName" column="route_name"/>
+        <result property="isFrame" column="is_frame"/>
+        <result property="isCache" column="is_cache"/>
+        <result property="menuType" column="menu_type"/>
         <result property="visible" column="visible"/>
-        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="permission" column="permission"/>
         <result property="icon" column="icon"/>
-        <result property="redirect" column="redirect"/>
+        <result property="sort" column="sort"/>
+        <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
-        <result property="params" column="params"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
+    <select id="getMenuListByUserId" resultMap="BaseResultMap">
+        select m.menu_id     AS menu_id,
+               m.menu_name   AS menu_name,
+               m.parent_id   AS parent_id,
+               m.order_num   AS order_num,
+               m.path        AS path,
+               m.component   AS component,
+               m.query       AS query,
+               m.route_name  AS route_name,
+               m.is_frame    AS is_frame,
+               m.is_cache    AS is_cache,
+               m.menu_type   AS menu_type,
+               m.visible     AS visible,
+               m.status      AS status,
+               m.permission  AS permission,
+               m.icon        AS icon,
+               m.sort        AS sort,
+               m.create_by   AS create_by,
+               m.create_time AS create_time,
+               m.update_by   AS update_by,
+               m.update_time AS update_time,
+               m.remark      AS remark
+        from sys_menu m
+                 inner join sys_role_menu rm on m.menu_id = rm.menu_id
+                 inner join sys_user_role ur on rm.role_id = ur.role_id
+        where ur.user_id = #{userId}
+          and m.visible = 1
+        order by m.sort
+    </select>
 
-    <select id="getMenusByRoleCodes" resultMap="BaseResultMap">
-        select id,
-               parent_id,
-               tree_path,
-               name,
-               type,
-               route_name,
-               route_path,
-               component,
-               permission,
-               always_show,
-               keep_alive,
-               visible,
-               sort,
-               icon,
-               redirect,
-               create_time,
-               update_time,
-               params
-        from sys_menu
+    <select id="selectMenuListByRoleId" resultType="java.lang.Long">
+        select m.menu_id
+        from sys_menu m
+                 inner join sys_role_menu rm on m.menu_id = rm.menu_id
+        where rm.role_id = #{roleId}
+          and m.visible = 1
+        order by m.sort
     </select>
-    <select id="getPermissionsByRoleName" resultMap="BaseResultMap">
-        select *
-        from sys_menu
-                 join sys_role_menu on sys_menu.id = sys_role_menu.menu_id
-        where sys_role_menu.role_id = (select role_id
-                                       from sys_role
-                                       where role_key = #{roleKey})
+
+    <select id="selectMenuListByUserId" resultMap="BaseResultMap">
+        SELECT DISTINCT m.menu_id,
+                        m.parent_id,
+                        m.menu_name,
+                        m.path,
+                        m.component,
+                        m.query,
+                        m.route_name,
+                        m.visible,
+                        m.status,
+                        m.is_frame,
+                        m.is_cache,
+                        m.menu_type,
+                        m.icon,
+                        m.sort,
+                        m.permission,
+                        m.create_by,
+                        m.create_time,
+                        m.update_by,
+                        m.update_time,
+                        m.remark
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+                 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+                 LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
+        WHERE ur.user_id = #{userId}
+          AND m.status = '0'
+          AND ro.status = '0'
+        ORDER BY m.parent_id, m.sort
     </select>
+    <select id="selectMenuList" resultMap="BaseResultMap">
+        SELECT m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.route_name,
+        m.visible, m.status, m.is_frame, m.is_cache, m.menu_type, m.icon, m.sort,
+        m.permission, m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+        FROM sys_menu m
+        <where>
+            <if test="menuName != null and menuName != ''">
+                AND m.menu_name LIKE CONCAT('%', #{menuName}, '%')
+            </if>
+            <if test="visible != null and visible != ''">
+                AND m.visible = #{visible}
+            </if>
+            <if test="status != null and status != ''">
+                AND m.status = #{status}
+            </if>
+            <if test="menuType != null and menuType != ''">
+                AND m.menu_type = #{menuType}
+            </if>
+        </where>
+        ORDER BY m.parent_id, m.sort
+    </select>
+
+
 </mapper>

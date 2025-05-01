@@ -4,9 +4,47 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.system.mapper.SysRoleMenuMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysRoleMenu">
+    <resultMap id="RoleMenuResultMap" type="cn.zhangchuangla.system.model.entity.SysRoleMenu">
         <result property="roleId" column="role_id" jdbcType="BIGINT"/>
         <result property="menuId" column="menu_id" jdbcType="BIGINT"/>
     </resultMap>
 
+    <select id="countRoleMenuByMenuId" resultType="Integer" parameterType="Long">
+        select count(1)
+        from sys_role_menu
+        where menu_id = #{menuId}
+    </select>
+
+    <select id="checkMenuExistRole" resultType="java.lang.Integer" parameterType="java.lang.Long">
+        select count(1)
+        from sys_role_menu
+        where menu_id = #{menuId}
+    </select>
+
+    <select id="selectMenuListByRoleId" resultType="java.lang.Long">
+        SELECT DISTINCT m.menu_id
+        FROM sys_menu m
+                 INNER JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        WHERE rm.role_id = #{roleId}
+          AND m.menu_id NOT IN (SELECT m.parent_id
+                                FROM sys_menu m
+                                         INNER JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+                                WHERE rm.role_id = #{roleId}
+                                  AND m.parent_id != 0)
+        ORDER BY m.parent_id, m.sort
+    </select>
+
+
+    <delete id="deleteRoleMenuByRoleId" parameterType="Long">
+        delete
+        from sys_role_menu
+        where role_id = #{roleId}
+    </delete>
+
+    <insert id="batchInsertRoleMenu">
+        insert into sys_role_menu(role_id, menu_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.menuId})
+        </foreach>
+    </insert>
 </mapper>

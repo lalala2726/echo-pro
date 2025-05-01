@@ -49,7 +49,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @return 分页列表
      */
     @Override
-    public Page<SysRole> RoleList(SysRoleQueryRequest request) {
+    public Page<SysRole> roleList(SysRoleQueryRequest request) {
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
                 .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
                         SysRole::getRoleName, request.getRoleName());
@@ -75,7 +75,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @return 角色列表
      */
     @Override
-    public Set<String> getUserRoleSetByUserId(Long userId) {
+    public Set<String> getRoleSetByUserId(Long userId) {
         if (userId <= 0) throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
         List<SysRole> roleListByUserId = getRoleListByUserId(userId);
         if (roleListByUserId == null) {
@@ -208,6 +208,25 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         }
 
         return removeByIds(ids);
+    }
+
+    /**
+     * 根据角色ID集合获取角色权限字符串集合
+     *
+     * @param roleId 角色ID集合
+     * @return 角色权限字符串集合
+     */
+    @Override
+    public Set<String> getRoleSetByRoleId(List<Long> roleId) {
+        if (roleId == null || roleId.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID集合不能为空");
+        }
+        LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        sysRoleLambdaQueryWrapper.in(SysRole::getRoleId, roleId);
+        List<SysRole> roles = list(sysRoleLambdaQueryWrapper);
+        return roles.stream()
+                .map(SysRole::getRoleKey)
+                .collect(Collectors.toSet());
     }
 
 }

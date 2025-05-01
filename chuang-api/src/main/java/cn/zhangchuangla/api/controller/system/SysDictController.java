@@ -103,7 +103,7 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
     public AjaxResult deleteDict(@Parameter(description = "字典ID，支持支持批量删除，如果删除时候其中一项删除失败，数据将会回滚")
-                                     @PathVariable("ids") List<Long> ids) {
+                                 @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典ID不能为空!"));
         // 删除字典
         boolean result = sysDictService.deleteDict(ids);
@@ -159,7 +159,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
     public AjaxResult listDictData(@Parameter(description = "字典项列表请求类")
-                                       @Validated @ParameterObject SysDictItemListRequest request) {
+                                   @Validated @ParameterObject SysDictItemListRequest request) {
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
         return success(getTableData(sysDictItemPage, sysDictItemListVos));
@@ -256,7 +256,7 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典项管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:dict-item:remove')")
     public AjaxResult deleteDictItem(@Parameter(description = "删除字典项，支持批量删除，删除时如果一项删除失败数据将会回滚")
-                                         @PathVariable("ids") List<Long> ids) {
+                                     @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典项ID不能为空!"));
         boolean result = sysDictItemService.deleteDictItem(ids);
         return toAjax(result);

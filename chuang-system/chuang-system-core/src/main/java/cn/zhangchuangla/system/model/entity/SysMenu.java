@@ -1,11 +1,13 @@
 package cn.zhangchuangla.system.model.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import cn.zhangchuangla.common.base.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 
 /**
  * 菜单实体
@@ -16,13 +18,18 @@ import java.util.List;
 @TableName("sys_menu")
 @Getter
 @Setter
-public class SysMenu {
+public class SysMenu extends BaseEntity {
 
     /**
      * 菜单ID
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long menuId;
+
+    /**
+     * 菜单名称
+     */
+    private String menuName;
 
     /**
      * 父菜单ID
@@ -30,29 +37,54 @@ public class SysMenu {
     private Long parentId;
 
     /**
-     * 菜单名称
+     * 显示顺序
      */
-    private String name;
+    private Integer orderNum;
 
     /**
-     * 菜单类型(1-菜单；2-目录；3-外链；4-按钮权限)
+     * 路由地址
      */
-    private Integer type;
+    private String path;
 
     /**
-     * 路由名称（Vue Router 中定义的路由名称）
+     * 组件路径
+     */
+    private String component;
+
+    /**
+     * 路由参数
+     */
+    private String query;
+
+    /**
+     * 路由名称
      */
     private String routeName;
 
     /**
-     * 路由路径（Vue Router 中定义的 URL 路径）
+     * 是否为外链（0是 1否）
      */
-    private String routePath;
+    private Integer isFrame;
 
     /**
-     * 组件路径(vue页面完整路径，省略.vue后缀)
+     * 是否缓存（0缓存 1不缓存）
      */
-    private String component;
+    private Integer isCache;
+
+    /**
+     * 菜单类型（M目录 C菜单 F按钮）
+     */
+    private String menuType;
+
+    /**
+     * 菜单状态（0显示 1隐藏）
+     */
+    private String visible;
+
+    /**
+     * 菜单状态（0正常 1停用）
+     */
+    private String status;
 
     /**
      * 权限标识
@@ -60,9 +92,9 @@ public class SysMenu {
     private String permission;
 
     /**
-     * 显示状态(1:显示;0:隐藏)
+     * 菜单图标
      */
-    private Integer visible;
+    private String icon;
 
     /**
      * 排序
@@ -70,49 +102,27 @@ public class SysMenu {
     private Integer sort;
 
     /**
-     * 菜单图标
+     * 创建者
      */
-    private String icon;
+    private String createBy;
 
     /**
-     * 跳转路径
+     * 创建时间
      */
-    private String redirect;
+    private Date createTime;
 
     /**
-     * 父节点路径，以英文逗号(,)分割
+     * 更新者
      */
-    private String treePath;
-
-    /**
-     * 【菜单】是否开启页面缓存(1:开启;0:关闭)
-     */
-    private Integer keepAlive;
-
-    /**
-     * 【目录】只有一个子路由是否始终显示(1:是 0:否)
-     */
-    private Integer alwaysShow;
-
-    /**
-     * 路由参数
-     */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS)
-    private String params;
-
-    /**
-     * 子菜单列表
-     */
-    @TableField(exist = false)
-    private List<SysMenu> children;
-
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private String updateBy;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
+    /**
+     * 备注
+     */
+    private String remark;
 }

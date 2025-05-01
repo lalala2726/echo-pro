@@ -41,7 +41,6 @@ public class SysPostListRequest extends BasePageRequest {
      * 排序
      */
     @Schema(name = "排序", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Min(value = 1, message = "排序不能小于1")
     private Integer sort;
 
     /**

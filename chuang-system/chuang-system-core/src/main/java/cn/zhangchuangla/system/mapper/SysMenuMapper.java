@@ -5,28 +5,34 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 /**
+ * 菜单表数据访问层
+ *
  * @author zhangchuang
  */
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
     /**
-     * 获取菜单路由列表
+     * 根据用户ID查询菜单列表
      *
-     * @param roleCodes 角色编码集合
+     * @param userId 用户ID
+     * @return 菜单列表
      */
-    //perfect 待完善
-    List<SysMenu> getMenusByRoleCodes(Set<String> roleCodes);
+    List<SysMenu> getMenuListByUserId(@Param("userId") Long userId);
+
 
     /**
-     * 根据角色名称获取权限信息
+     * 根据角色ID查询菜单ID列表
      *
-     * @param roleName 角色名称(此处所指为角色的标识符，例如“admin”“user”等)
-     * @return 权限信息
+     * @param roleId 角色ID
+     * @return 菜单ID列表
      */
-    List<SysMenu> getPermissionsByRoleName(@Param("roleKey") String roleName);
+    List<Long> selectMenuListByRoleId(Long roleId);
+
+    List<SysMenu> selectMenuListByUserId(Long userId);
+
+    List<SysMenu> selectMenuList(SysMenu menu);
 }
 
 

@@ -2,90 +2,127 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.MenuForm;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
-import cn.zhangchuangla.system.model.vo.menu.MenuVo;
-import cn.zhangchuangla.system.model.vo.menu.RouteVo;
-import cn.zhangchuangla.system.model.vo.permission.MenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
-import java.util.Set;
 
 /**
+ * 菜单服务接口
+ *
  * @author zhangchuang
  */
 public interface SysMenuService extends IService<SysMenu> {
 
-
     /**
-     * 获取菜单表格列表
-     */
-    List<MenuVo> listMenus(SysMenuListRequest request);
-
-    /**
-     * 获取菜单下拉列表
+     * 根据用户ID查询菜单列表
      *
-     * @param onlyParent 是否只查询父级菜单
+     * @param userId 用户ID
+     * @return 菜单列表
      */
-    List<Option<Long>> listMenuOptions(boolean onlyParent);
+    List<SysMenu> getMenuListByUserId(Long userId);
+
+    /**
+     * 构造前端需要的路由界面
+     *
+     * @param menus 菜单列表
+     * @return 返回前端需要的路由界面
+     */
+    List<RouterVo> buildMenus(List<SysMenu> menus);
+
+    /**
+     * 根据菜单ID查询信息
+     *
+     * @param menuId 菜单ID
+     * @return 菜单信息
+     */
+    SysMenu getMenuById(Long menuId);
+
+    /**
+     * 查询菜单列表
+     *
+     * @param sysMenu 菜单信息
+     * @return 菜单列表
+     */
+    List<SysMenu> selectMenuList(SysMenu sysMenu);
+
+    /**
+     * 根据用户ID查询菜单树信息
+     *
+     * @param userId 用户ID
+     * @return 菜单列表
+     */
+    List<SysMenu> selectMenuTreeByUserId(Long userId);
+
+    /**
+     * 构建前端选择菜单树（Option结构）
+     *
+     * @param menus 菜单列表
+     * @return Option树列表
+     */
+    List<Option<Long>> buildMenuTree(List<SysMenu> menus);
+
+    /**
+     * 构建前端选项树
+     *
+     * @param menus 菜单列表
+     * @return 选项树
+     */
+    List<Option<Long>> buildMenuOptionTree(List<SysMenu> menus);
+
+    /**
+     * 根据角色ID查询菜单树信息
+     *
+     * @param roleId 角色ID
+     * @return 选中菜单列表
+     */
+    List<Long> selectMenuListByRoleId(Long roleId);
 
     /**
      * 新增菜单
      *
-     * @param menuForm 菜单表单对象
+     * @param menu 菜单信息
+     * @return 结果
      */
-    boolean saveMenu(MenuForm menuForm);
+    boolean insertMenu(SysMenu menu);
 
     /**
-     * 获取路由列表
-     */
-    List<RouteVo> getCurrentUserRoutes();
-
-    /**
-     * 修改菜单显示状态
+     * 修改菜单
      *
-     * @param menuId  菜单ID
-     * @param visible 是否显示(1-显示 0-隐藏)
+     * @param menu 菜单信息
+     * @return 结果
      */
-    boolean updateMenuVisible(Long menuId, Integer visible);
-
-    /**
-     * 获取菜单表单数据
-     *
-     * @param id 菜单ID
-     */
-    MenuForm getMenuForm(Long id);
+    boolean updateMenu(SysMenu menu);
 
     /**
      * 删除菜单
      *
-     * @param id 菜单ID
+     * @param menuId 菜单ID
+     * @return 结果
      */
-    boolean deleteMenu(Long id);
+    boolean deleteMenuById(Long menuId);
 
     /**
-     * 根据角色名称查询权限
+     * 校验菜单名称是否唯一
      *
-     * @param roleName 角色名称
-     * @return 权限列表
+     * @param menu 菜单信息
+     * @return 结果
      */
-    Set<String> getPermissionsByRoleName(String roleName);
+    boolean checkMenuNameUnique(SysMenu menu);
 
     /**
-     * 根据角色名称集合查询权限
+     * 是否存在菜单子节点
      *
-     * @param roleSet 角色名称集合
-     * @return 权限列表
+     * @param menuId 菜单ID
+     * @return 结果 true 存在 false 不存在
      */
-    Set<String> getPermissionsByRoleName(Set<String> roleSet);
-
+    boolean hasChildByMenuId(Long menuId);
 
     /**
-     * 获取系统中所有的可用的权限
+     * 查询菜单是否存在角色
      *
-     * @return 权限列表
+     * @param menuId 菜单ID
+     * @return 结果 true 存在 false 不存在
      */
-    List<MenuListVo> listPermission();
-
+    boolean checkMenuExistRole(Long menuId);
 }

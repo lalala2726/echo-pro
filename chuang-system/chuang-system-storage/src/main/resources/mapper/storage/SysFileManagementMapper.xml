@@ -28,7 +28,7 @@
     </resultMap>
     <select id="listFileManage" resultMap="BaseResultMap">
         select *
-        from sys_file_management
+        from storage_file_management
         where is_trash = 0
         and is_deleted = 0
         <if test="request.originalName != null and request.originalName != ''">
@@ -44,7 +44,7 @@
     </select>
     <select id="listFileTrash" resultMap="BaseResultMap">
         select *
-        from sys_file_management
+        from storage_file_management
         where is_trash = 1
         and is_deleted = 0
         <if test="request.originalName != null and request.originalName != ''">

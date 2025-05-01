@@ -167,5 +167,4 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                 })
                 .toList();
     }
-
 }

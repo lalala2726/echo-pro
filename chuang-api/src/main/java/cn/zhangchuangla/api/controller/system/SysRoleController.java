@@ -55,7 +55,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:list')")
     public AjaxResult list(@Parameter(description = "角色列表查询参数")
                            @Validated @ParameterObject SysRoleQueryRequest request) {
-        Page<SysRole> page = sysRoleService.RoleList(request);
+        Page<SysRole> page = sysRoleService.roleList(request);
         List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
         return getTableData(page, sysRoleListVos);
     }

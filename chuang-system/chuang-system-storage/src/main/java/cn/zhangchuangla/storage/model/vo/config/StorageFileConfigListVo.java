@@ -1,5 +1,9 @@
 package cn.zhangchuangla.storage.model.vo.config;
 
+import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -35,10 +39,29 @@ public class StorageFileConfigListVo {
     private String storageType;
 
     /**
-     * 存储值
+     * 是否主配置 1-是 0-否
      */
-    @Schema(description = "存储值")
-    private String storageValue;
+    @Schema(description = "是否主配置，1-是 0-否")
+    private Integer isMaster;
+
+
+    /**
+     * Minio配置
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private MinioConfigEntity minioConfig;
+
+    /**
+     * 阿里云配置
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private AliyunOSSConfigEntity aliyunOSSConfig;
+
+    /**
+     * 腾讯云配置
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private TencentCOSConfigEntity tencentCOSConfig;
 
     /**
      * 备注
