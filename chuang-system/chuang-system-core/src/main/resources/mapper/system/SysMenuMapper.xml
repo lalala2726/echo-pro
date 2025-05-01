@@ -58,6 +58,7 @@
           and m.visible = 1
         order by m.sort
     </select>
+
     <select id="selectMenuListByRoleId" resultType="java.lang.Long">
         select m.menu_id
         from sys_menu m
@@ -65,6 +66,58 @@
         where rm.role_id = #{roleId}
           and m.visible = 1
         order by m.sort
+    </select>
+
+    <select id="selectMenuListByUserId" resultMap="BaseResultMap">
+        SELECT DISTINCT m.menu_id,
+                        m.parent_id,
+                        m.menu_name,
+                        m.path,
+                        m.component,
+                        m.query,
+                        m.route_name,
+                        m.visible,
+                        m.status,
+                        m.is_frame,
+                        m.is_cache,
+                        m.menu_type,
+                        m.icon,
+                        m.sort,
+                        m.permission,
+                        m.create_by,
+                        m.create_time,
+                        m.update_by,
+                        m.update_time,
+                        m.remark
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+                 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+                 LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
+        WHERE ur.user_id = #{userId}
+          AND m.status = '0'
+          AND ro.status = '0'
+        ORDER BY m.parent_id, m.sort
+    </select>
+    <select id="selectMenuList" resultMap="BaseResultMap">
+        SELECT m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.route_name,
+        m.visible, m.status, m.is_frame, m.is_cache, m.menu_type, m.icon, m.sort,
+        m.permission, m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+        FROM sys_menu m
+        <where>
+            <if test="menuName != null and menuName != ''">
+                AND m.menu_name LIKE CONCAT('%', #{menuName}, '%')
+            </if>
+            <if test="visible != null and visible != ''">
+                AND m.visible = #{visible}
+            </if>
+            <if test="status != null and status != ''">
+                AND m.status = #{status}
+            </if>
+            <if test="menuType != null and menuType != ''">
+                AND m.menu_type = #{menuType}
+            </if>
+        </where>
+        ORDER BY m.parent_id, m.sort
     </select>
 
 

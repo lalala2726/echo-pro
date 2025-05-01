@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;

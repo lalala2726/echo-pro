@@ -35,6 +35,10 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
      * @return 结果
      */
     int batchInsertRoleMenu(List<SysRoleMenu> roleMenuList);
+
+    int checkMenuExistRole(Long menuId);
+
+    List<Long> selectMenuListByRoleId(Long roleId);
 }
 
 

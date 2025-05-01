@@ -4,6 +4,7 @@
     <data-source source="LOCAL" name="开发服务器" uuid="7aa13fa2-d2f3-4fef-b3c4-0f9230f1b3b0">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://192.168.10.110:3306</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * 菜单元数据对象
  *
@@ -59,10 +61,6 @@ public class MetaVo {
      */
     private Boolean showParent;
 
-    /**
-     * 页面级别权限设置
-     */
-    private String[] roles;
 
     /**
      * 按钮级别权限设置
@@ -95,12 +93,14 @@ public class MetaVo {
     private String activePath;
 
     /**
+     * 角色权限
+     */
+    private Set<String> roles;
+
+    /**
      * 显示在标签页的最大数量
      */
     private Integer dynamicLevel;
 
-    /**
-     * 页面加载动画配置
-     */
-    private TransitionVo transition;
+
 }

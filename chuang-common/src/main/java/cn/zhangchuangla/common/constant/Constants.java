@@ -92,46 +92,54 @@ public class Constants {
     public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
     public static final Long ROOT_NODE_ID = 0L;
 
+
+    public interface CommonConstants {
+        String ENABLE = "0";
+        String DISABLE = "1";
+    }
+
     /**
      * 菜单常量
      */
-    public static interface MenuConstants {
+    public interface MenuConstants {
         /**
          * 顶级菜单ID
          */
-        public static final Long TOP_MENU_ID = 0L;
+        Long TOP_MENU_ID = 0L;
         /**
          * 是否为外链（0是 1否）
          */
-        public static final String IS_EXTERNAL_LINK = "0";
-        public static final String NOT_EXTERNAL_LINK = "1";
+        String IS_EXTERNAL_LINK = "0";
+        String NOT_EXTERNAL_LINK = "1";
         /**
          * 路由组件
          */
-        public static final String LAYOUT = "Layout";
-        public static final String PARENT_VIEW = "ParentView";
-        public static final String INNER_LINK = "InnerLink";
+        String LAYOUT = "Layout";
+        String PARENT_VIEW = "ParentView";
+        String INNER_LINK = "InnerLink";
         /**
          * 菜单类型（M目录 C菜单 F按钮）
          */
-        public static final String TYPE_DIRECTORY = "M";
-        public static final String TYPE_MENU = "C";
-        public static final String TYPE_BUTTON = "F";
+        String TYPE_DIRECTORY = "M";
+        String TYPE_MENU = "C";
+        String TYPE_BUTTON = "F";
         /**
          * 菜单状态（0显示 1隐藏）
          */
-        public static final String VISIBLE = "0";
-        public static final String HIDDEN = "1";
+        String VISIBLE = "0";
+        String HIDDEN = "1";
         /**
          * 菜单状态（0正常 1停用）
          */
-        public static final String STATUS_NORMAL = "0";
-        public static final String STATUS_DISABLED = "1";
+        String STATUS_NORMAL = "0";
+        String STATUS_DISABLED = "1";
         /**
          * 是否缓存（0缓存 1不缓存）
          */
-        public static final Integer CACHE = 0;
-        public static final Integer NOT_CACHE = 1;
+        Integer CACHE = 0;
+        Integer NOT_CACHE = 1;
 
+        String STATUS_DISABLE = "1";
+        String MENU_TYPE_DIR = "M";
     }
 }

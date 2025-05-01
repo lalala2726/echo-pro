@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -52,6 +53,22 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 菜单列表
      */
     List<SysMenu> selectMenuTreeByUserId(Long userId);
+
+    /**
+     * 构建前端选择菜单树（Option结构）
+     *
+     * @param menus 菜单列表
+     * @return Option树列表
+     */
+    List<Option<Long>> buildMenuTree(List<SysMenu> menus);
+
+    /**
+     * 构建前端选项树
+     *
+     * @param menus 菜单列表
+     * @return 选项树
+     */
+    List<Option<Long>> buildMenuOptionTree(List<SysMenu> menus);
 
     /**
      * 根据角色ID查询菜单树信息
