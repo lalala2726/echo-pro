@@ -29,7 +29,7 @@ import java.util.HashMap;
  * 文件相关接口
  * 提供文件上传等功能
  *
- * @author zhangchuang
+ * @author Chuang
  * Created on 2025/4/3 21:23
  */
 @RequestMapping("/common/file")

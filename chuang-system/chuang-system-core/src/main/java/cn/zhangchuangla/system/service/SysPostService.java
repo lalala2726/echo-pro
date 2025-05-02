@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 岗位服务接口
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysPostService extends IService<SysPost> {
 

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 /**
  * 操作日志服务实现类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Service
 @RequiredArgsConstructor

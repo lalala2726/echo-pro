@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 文件配置接口
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface StorageConfigService extends IService<StorageConfig> {
 

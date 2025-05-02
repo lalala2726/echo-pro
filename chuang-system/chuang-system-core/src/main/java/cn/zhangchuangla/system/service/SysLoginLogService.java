@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 /**
  * 登录日志接口
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysLoginLogService extends IService<SysLoginLog> {
 

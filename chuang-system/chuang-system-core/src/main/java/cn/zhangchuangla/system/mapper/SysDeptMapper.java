@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysDeptMapper extends BaseMapper<SysDept> {
 

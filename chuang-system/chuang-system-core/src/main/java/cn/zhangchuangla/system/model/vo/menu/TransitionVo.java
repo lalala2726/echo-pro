@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * 页面过渡动画配置
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Schema(description = "页面过渡动画配置")
 @Data

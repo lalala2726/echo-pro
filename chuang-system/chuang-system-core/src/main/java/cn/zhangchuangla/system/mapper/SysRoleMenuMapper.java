@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 角色和菜单关联表数据访问层接口
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 

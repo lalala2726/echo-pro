@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
 

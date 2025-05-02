@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * 图片处理工具类
  *
- * @author zhangchuang
+ * @author Chuang
  * Created on 2025/3/22
  */
 @Slf4j

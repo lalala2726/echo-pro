@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysDictItemService extends IService<SysDictItem> {
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
  * 角色权限服务实现类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Service
 public class SysRolePermissionsServiceImpl extends ServiceImpl<SysRolePermissionsMapper, SysRolePermissions>

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysPostMapper extends BaseMapper<SysPost> {
 

@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * 菜单添加请求
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(description = "菜单添加请求")
@@ -20,21 +20,21 @@ public class MenuAddRequest {
      */
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
-    @Schema(description = "菜单名称", required = true)
+    @Schema(description = "菜单名称")
     private String menuName;
 
     /**
      * 父菜单ID
      */
     @NotNull(message = "父菜单ID不能为空")
-    @Schema(description = "父菜单ID", required = true)
+    @Schema(description = "父菜单ID")
     private Long parentId;
 
     /**
      * 显示顺序
      */
     @NotNull(message = "显示顺序不能为空")
-    @Schema(description = "显示顺序", required = true)
+    @Schema(description = "显示顺序")
     private Integer orderNum;
 
     /**
@@ -77,7 +77,7 @@ public class MenuAddRequest {
      * 菜单类型（M目录 C菜单 F按钮）
      */
     @NotBlank(message = "菜单类型不能为空")
-    @Schema(description = "菜单类型（M目录 C菜单 F按钮）", required = true)
+    @Schema(description = "菜单类型（M目录 C菜单 F按钮）")
     private String menuType;
 
     /**

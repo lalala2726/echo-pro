@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * 登录日志服务实现类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Service
 @Slf4j
