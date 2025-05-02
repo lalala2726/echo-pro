@@ -19,7 +19,8 @@ public class SecurityConstants {
             "/auth/login",
             "/captcha",
             "/register",
-            "/auth/refreshToken"
+            "/auth/refreshToken",
+            "/auth/routes"
     };
 
     /**

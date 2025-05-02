@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -53,8 +54,8 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermission('system:role:list')")
-    public AjaxResult list(@Parameter(description = "角色列表查询参数")
-                           @Validated @ParameterObject SysRoleQueryRequest request) {
+    public TableDataResult list(@Parameter(description = "角色列表查询参数")
+                                @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.roleList(request);
         List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
         return getTableData(page, sysRoleListVos);
@@ -68,7 +69,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/options")
     @Operation(summary = "获取角色选项")
     @PreAuthorize("@ss.hasPermission('system:role:options')")
-    public AjaxResult roleOptions() {
+    public AjaxResult<List<Option<Long>>> roleOptions() {
         List<Option<Long>> options = sysRoleService.getRoleOptions();
         return success(options);
     }
@@ -83,7 +84,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:info')")
-    public AjaxResult getRoleInfoById(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
+    public AjaxResult<SysRoleVo> getRoleInfoById(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
         SysRole sysRole = sysRoleService.getById(id);
         if (sysRole == null) {
             return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "角色不存在");
@@ -102,7 +103,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
-    public AjaxResult deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
+    public AjaxResult<Void> deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "角色ID不能小于等于0");
         });
@@ -120,8 +121,8 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "修改角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:update')")
     @OperationLog(title = "角色管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateRoleInfo(@Parameter(description = "修改角色信息请求参数")
-                                     @Validated @RequestBody SysRoleUpdateRequest request) {
+    public AjaxResult<Void> updateRoleInfo(@Parameter(description = "修改角色信息请求参数")
+                                           @Validated @RequestBody SysRoleUpdateRequest request) {
         boolean result = sysRoleService.updateRoleInfo(request);
         return toAjax(result);
     }
@@ -136,8 +137,8 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "添加角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:add')")
     @OperationLog(title = "角色管理", businessType = BusinessType.INSERT)
-    public AjaxResult addRoleInfo(@Parameter(description = "添加角色请求参数")
-                                  @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
+    public AjaxResult<Void> addRoleInfo(@Parameter(description = "添加角色请求参数")
+                                        @Validated @RequestBody SysRoleAddRequest roleAddRequest) {
         if (sysRoleService.isRoleKeyExist(roleAddRequest.getRoleName())) {
             return error("角色标识符已经存在");
         }

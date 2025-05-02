@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
@@ -54,7 +55,7 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/profile")
     @Operation(summary = "获取用户信息")
-    public AjaxResult userProfile() {
+    public AjaxResult<UserProfileVo> userProfile() {
         UserProfileVo profileVo = sysUserService.getUserProfile();
         return success(profileVo);
     }
@@ -69,8 +70,8 @@ public class SysUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
-    public AjaxResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                               @Validated @ParameterObject UserListRequest request) {
+    public TableDataResult listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
+                                    @Validated @ParameterObject UserListRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
@@ -91,8 +92,8 @@ public class SysUserController extends BaseController {
     @Operation(summary = "添加用户")
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
-    public AjaxResult addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
-                              @Validated @RequestBody UserAddRequest request) {
+    public AjaxResult<Long> addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
+                                    @Validated @RequestBody UserAddRequest request) {
         if (!request.getUsername().isEmpty()) {
             checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         }
@@ -116,8 +117,8 @@ public class SysUserController extends BaseController {
     @Operation(summary = "删除用户")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
-    public AjaxResult deleteUserById(@Parameter(description = "用户ID列表，支持批量删除", required = true)
-                                     @PathVariable("ids") List<Long> ids) {
+    public AjaxResult<Void> deleteUserById(@Parameter(description = "用户ID列表，支持批量删除", required = true)
+                                           @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "用户ID不能为空!");
         });
@@ -136,8 +137,8 @@ public class SysUserController extends BaseController {
     @Operation(summary = "修改用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
-                                         @Validated @RequestBody UserUpdateRequest request) {
+    public AjaxResult<Void> updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
+                                               @Validated @RequestBody UserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         // 参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
@@ -161,7 +162,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "根据用户ID重置密码")
     @OperationLog(title = "用户管理", businessType = BusinessType.RESET_PWD)
     @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
-    public AjaxResult resetPassword(@PathVariable("id") Long id, @RequestParam("password") String password) {
+    public AjaxResult<Boolean> resetPassword(@PathVariable("id") Long id, @RequestParam("password") String password) {
         checkParam(id == null || id <= 0, "用户ID不能小于等于0");
         if (!password.matches(RegularConstants.User.password)) {
             return error("密码格式不正确");
@@ -181,8 +182,8 @@ public class SysUserController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
-    public AjaxResult getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
-                                      @PathVariable("id") Long id) {
+    public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
+                                                  @PathVariable("id") Long id) {
         checkParam(id == null || id < 0, "用户ID不能小于0");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();

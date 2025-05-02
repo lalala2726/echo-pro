@@ -4,8 +4,6 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
-import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysRoleMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SysMenuController extends BaseController {
 
-    private final SysMenuService sysMenuService;
-    private final SysRoleMenuService sysRoleMenuService;
 
     /**
      * 根据角色ID获取菜单树形结构
@@ -37,7 +33,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/getMenuTreeByRoleId/{roleId}")
     @Operation(summary = "根据角色ID获取菜单树形结构")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult getMenuTreeByRoleId(@PathVariable("roleId") Long roleId) {
+    public AjaxResult<Void> getMenuTreeByRoleId(@PathVariable("roleId") Long roleId) {
         return success();
     }
 
@@ -50,7 +46,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "保存角色菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
-    public AjaxResult updateRoleMenus() {
+    public AjaxResult<Void> updateRoleMenus() {
         return success();
     }
 
@@ -62,7 +58,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取菜单列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult listMenus() {
+    public AjaxResult<Void> listMenus() {
         return success();
     }
 
@@ -74,7 +70,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/options")
     @Operation(summary = "获取菜单下拉列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult listMenuOptions(
+    public AjaxResult<Void> listMenuOptions(
             @Parameter(description = "是否只查询父级菜单")
             @RequestParam(required = false, defaultValue = "false", value = "onlyParent") boolean onlyParent) {
         return success();
@@ -88,7 +84,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "菜单表单数据")
     @GetMapping("/{id}/form")
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
-    public AjaxResult getMenuForm(@Parameter(description = "菜单ID") @PathVariable("id") Long id) {
+    public AjaxResult<Void> getMenuForm(@Parameter(description = "菜单ID") @PathVariable("id") Long id) {
         return success();
     }
 
@@ -101,7 +97,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "添加菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
-    public AjaxResult addMenu() {
+    public AjaxResult<Void> addMenu() {
         return success();
     }
 
@@ -114,7 +110,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "修改菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
-    public AjaxResult updateMenu() {
+    public AjaxResult<Void> updateMenu() {
         return success();
     }
 
@@ -128,8 +124,8 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "删除菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
-    public AjaxResult deleteMenu(@Parameter(description = "菜单ID，多个以英文(,)分割")
-                                 @PathVariable("id") Long id) {
+    public AjaxResult<Void> deleteMenu(@Parameter(description = "菜单ID，多个以英文(,)分割")
+                                    @PathVariable("id") Long id) {
         return success();
     }
 
@@ -144,7 +140,7 @@ public class SysMenuController extends BaseController {
     @PatchMapping("/{menuId}")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
-    public AjaxResult updateMenuVisible(
+    public AjaxResult<Void> updateMenuVisible(
             @Parameter(description = "菜单ID")
             @PathVariable Long menuId, @Parameter(description = "显示状态(1:显示;0:隐藏)") Integer visible
     ) {

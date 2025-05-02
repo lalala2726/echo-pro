@@ -1,10 +1,10 @@
 package cn.zhangchuangla.common.core.controller;
 
-import cn.zhangchuangla.common.core.page.TableDataResult;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -65,28 +65,18 @@ public class BaseController {
      *
      * @param page 分页对象
      */
-    protected AjaxResult getTableData(Page<?> page) {
-        TableDataResult tableDataResult = new TableDataResult();
-        tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(page.getRecords());
-        tableDataResult.setPageNum(page.getCurrent());
-        tableDataResult.setPageSize(page.getSize());
-        return success(tableDataResult);
+    protected TableDataResult getTableData(Page<?> page) {
+        return TableDataResult.build(page);
     }
 
     /**
      * 封装分页数据,如果想要返回VO必须传入VO对象,否则返回的数据总数和页码不正确
      *
      * @param page 分页对象
-     * @param vo   VO对象
+     * @param rows 列表数据
      */
-    protected AjaxResult getTableData(Page<?> page, List<?> vo) {
-        TableDataResult tableDataResult = new TableDataResult();
-        tableDataResult.setTotal(page.getTotal());
-        tableDataResult.setRows(vo);
-        tableDataResult.setPageNum(page.getCurrent());
-        tableDataResult.setPageSize(page.getSize());
-        return success(tableDataResult);
+    protected TableDataResult getTableData(Page<?> page, List<?> rows) {
+        return TableDataResult.build(page, rows);
     }
 
     /**
@@ -122,7 +112,7 @@ public class BaseController {
      *
      * @return AjaxResult
      */
-    protected AjaxResult success() {
+    protected <T> AjaxResult<T> success() {
         return AjaxResult.success();
     }
 
@@ -131,14 +121,14 @@ public class BaseController {
      *
      * @return AjaxResult
      */
-    protected AjaxResult error() {
+    protected <T> AjaxResult<T> error() {
         return AjaxResult.error();
     }
 
     /**
      * 返回结果,根据boolean值返回成功或者失败
      */
-    protected AjaxResult toAjax(boolean result) {
+    protected <T> AjaxResult<T> toAjax(boolean result) {
         return result ? success() : error();
     }
 
@@ -148,7 +138,7 @@ public class BaseController {
      * @param result int值
      * @return 结果
      */
-    protected AjaxResult toAjax(int result) {
+    protected <T> AjaxResult<T> toAjax(int result) {
         return result > 0 ? success() : error();
     }
 
@@ -158,14 +148,14 @@ public class BaseController {
      * @param result long值
      * @return 结果
      */
-    protected AjaxResult toAjax(long result) {
+    protected <T> AjaxResult<T> toAjax(long result) {
         return result > 0 ? success() : error();
     }
 
     /**
      * 成功返回
      */
-    protected AjaxResult success(Object data) {
+    protected <T> AjaxResult<T> success(T data) {
         return AjaxResult.success(data);
     }
 
@@ -175,11 +165,11 @@ public class BaseController {
      * @param message 消息
      * @return AjaxResult
      */
-    protected AjaxResult success(String message) {
+    protected <T> AjaxResult<T> success(String message) {
         return AjaxResult.success(message);
     }
 
-    protected AjaxResult warning(String message) {
+    protected <T> AjaxResult<T> warning(String message) {
         return AjaxResult.warning(message);
     }
 
@@ -188,7 +178,7 @@ public class BaseController {
      *
      * @param message 消息
      */
-    protected AjaxResult error(String message) {
+    protected <T> AjaxResult<T> error(String message) {
         return AjaxResult.error(message);
     }
 
@@ -199,7 +189,7 @@ public class BaseController {
      * @param responseCode 响应枚举
      * @return 结果
      */
-    protected AjaxResult error(ResponseCode responseCode) {
+    protected <T> AjaxResult<T> error(ResponseCode responseCode) {
         return AjaxResult.error(responseCode);
     }
 

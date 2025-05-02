@@ -3,6 +3,7 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.model.entity.SysFileManagement;
@@ -46,8 +47,8 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public AjaxResult listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                     @Validated @ParameterObject SysFileManagementListRequest request) {
+    public TableDataResult listFileManage(@Parameter(description = "文件资源列表查询参数")
+                                          @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
 
         // 使用流式处理优化代码
@@ -73,8 +74,8 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/trash/list")
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public AjaxResult listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                    @Validated @ParameterObject SysFileManagementListRequest request) {
+    public TableDataResult listFileTrash(@Parameter(description = "文件资源回收站查询参数")
+                                         @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileTrash(request);
         List<StorageFileManagementListVo> storageFileManagementListVos = copyListProperties(sysFileManagementPage,
                 StorageFileManagementListVo.class);
@@ -92,7 +93,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "恢复文件")
     @PutMapping("/recover/{id}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
-    public AjaxResult recoverFile(@Parameter(description = "文件ID") @PathVariable("id") Long id) {
+    public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件ID不能为空!");
         boolean result = storageManagementService.recoverFile(id);
         return toAjax(result);
@@ -109,8 +110,8 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('ststem:file-manage:list')")
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
-    public AjaxResult deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
-                                 @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
+    public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
+                                    @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
         if (isPermanently == null)
             return error("是否删除文件不能为空！");
         ids.forEach(id -> checkParam(id == null || id <= 0, "文件ID不能为空!"));

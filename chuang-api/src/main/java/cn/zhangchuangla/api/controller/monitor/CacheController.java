@@ -42,7 +42,7 @@ public class CacheController extends BaseController {
     @GetMapping
     @Operation(summary = "Redis基本信息")
     @PreAuthorize("@ss.hasPermission('monitor:cache:list')")
-    public AjaxResult list() {
+    public AjaxResult<Map<String, Object>> list() {
         // 执行 Redis 命令
         Properties info = getRedisInfo();
         Properties commandStats = getRedisCommandStats();

@@ -49,7 +49,7 @@ public class CaptchaController extends BaseController {
     @GetMapping
     @Operation(summary = "获取验证码")
     @AccessLimit(maxCount = 20)
-    public AjaxResult getCaptcha() {
+    public AjaxResult<HashMap<String, String>> getCaptcha() {
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
         HashMap<String, String> ajax = new HashMap<>(2);

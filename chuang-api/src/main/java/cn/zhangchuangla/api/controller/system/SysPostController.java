@@ -3,6 +3,7 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysPost;
@@ -47,8 +48,8 @@ public class SysPostController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
-    public AjaxResult listPost(@Parameter(description = "岗位列表查询参数")
-                               @Validated @ParameterObject SysPostListRequest request) {
+    public TableDataResult listPost(@Parameter(description = "岗位列表查询参数")
+                                    @Validated @ParameterObject SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
@@ -64,8 +65,8 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:add')")
     @Operation(summary = "添加岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.INSERT)
-    public AjaxResult addPost(@Parameter(description = "添加岗位请求参数")
-                              @Validated @RequestBody SysPostAddRequest request) {
+    public AjaxResult<Void> addPost(@Parameter(description = "添加岗位请求参数")
+                                 @Validated @RequestBody SysPostAddRequest request) {
         boolean result = sysPostService.addPost(request);
         return toAjax(result);
     }
@@ -80,8 +81,8 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:remove')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
-    public AjaxResult deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
-                                 @PathVariable("ids") List<Integer> ids) {
+    public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
+                                    @PathVariable("ids") List<Integer> ids) {
         checkParam(ids == null, "id不能为空");
         boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
@@ -97,8 +98,8 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:update')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
-    public AjaxResult updatePost(@Parameter(description = "修改岗位请求参数")
-                                 @Validated @RequestBody SysPostUpdateRequest request) {
+    public AjaxResult<Void> updatePost(@Parameter(description = "修改岗位请求参数")
+                                    @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.updatePost(request));
     }
 
@@ -111,8 +112,8 @@ public class SysPostController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
-    public AjaxResult getPostById(@Parameter(description = "岗位ID")
-                                  @PathVariable("id") Integer id) {
+    public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID")
+                                             @PathVariable("id") Integer id) {
         checkParam(id == null, "id不能为空");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = sysRoleConverter.toSysPostVo(post);

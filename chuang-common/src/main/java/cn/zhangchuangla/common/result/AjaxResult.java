@@ -1,24 +1,21 @@
 package cn.zhangchuangla.common.result;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 
 /**
+ * 通用API响应结果封装类
+ *
  * @author Chuang
- * <p>
- * created on 2025/1/5 13:56
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class AjaxResult extends HashMap<String, Object> implements Serializable {
+@JsonInclude(JsonInclude.Include.NON_NULL) // 仅序列化非空字段
+public class AjaxResult<T> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -26,248 +23,151 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
     /**
      * 状态码
      */
-    private static final String CODE_TAG = "code";
+    @Schema(description = "状态码", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer code;
 
     /**
      * 返回消息
      */
-    private static final String MSG_TAG = "message";
+    @Schema(description = "返回消息", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String message;
 
     /**
-     * 时间
+     * 时间戳 (毫秒)
      */
-    private static final String TIME_TAG = "time";
+    @Schema(description = "时间戳 (毫秒)", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long timestamp;
 
     /**
      * 返回数据
      */
-    private static final String DATA_TAG = "data";
+    @Schema(description = "返回数据")
+    private T data;
+
+    // --- 私有构造函数 ---
 
     /**
-     * 时间戳
-     */
-    private static final String CURRENT_TIME = "currentTime";
-
-    /**
-     * 默认构造函数，成功返回
-     */
-    public AjaxResult() {
-        this.put(CODE_TAG, ResponseCode.SUCCESS.getCode());
-        this.put(MSG_TAG, ResponseCode.SUCCESS.getMessage());
-        this.put(TIME_TAG, getCurrentTime());
-        this.put(CURRENT_TIME, System.currentTimeMillis());
-    }
-
-    /**
-     * 构造函数
+     * 基础构造函数，初始化核心字段
      *
-     * @param code 响应码枚举
-     */
-    public AjaxResult(ResponseCode code) {
-        this.put(CODE_TAG, code.getCode());
-        this.put(TIME_TAG, getCurrentTime());
-        this.put(MSG_TAG, code.getMessage());
-        this.put(CURRENT_TIME, System.currentTimeMillis());
-
-    }
-
-    /**
-     * 构造函数
-     *
-     * @param code 响应码枚举
-     * @param data 返回的数据
-     */
-    public AjaxResult(ResponseCode code, Object data) {
-        this.put(CODE_TAG, code.getCode());
-        this.put(MSG_TAG, code.getMessage());
-        this.put(TIME_TAG, getCurrentTime());
-        this.put(DATA_TAG, data);
-        this.put(CURRENT_TIME, System.currentTimeMillis());
-    }
-
-    /**
-     * 成功返回（带消息）
-     *
-     * @param msg 返回消息
-     * @return AjaxResult
-     */
-    public static AjaxResult success(String msg) {
-        AjaxResult result = new AjaxResult(ResponseCode.SUCCESS);
-        result.put(MSG_TAG, msg);
-        return result;
-    }
-
-    /**
-     * 成功返回（不带消息）
-     *
-     * @return AjaxResult
-     */
-    public static AjaxResult success() {
-        AjaxResult result = new AjaxResult(ResponseCode.SUCCESS);
-        result.put(MSG_TAG, ResponseCode.SUCCESS.getMessage());
-        return result;
-    }
-
-
-    /**
-     * 成功返回（带数据）
-     *
-     * @param data 返回的数据
-     * @return AjaxResult
-     */
-    public static AjaxResult success(Object data) {
-        return new AjaxResult(ResponseCode.SUCCESS, data);
-    }
-
-    /**
-     * 表格返回
-     *
-     * @param page 分页对象
-     * @param vo   VO对象数据
-     * @return 返回分页的列表信息
-     */
-    public static <T> AjaxResult table(Page<T> page, Object vo) {
-        return getAjaxResult(vo, page.getTotal(), page.getSize(), page.getCurrent(), page);
-    }
-
-    /**
-     * 表格返回
-     *
+     * @param code    状态码
+     * @param message 消息
      * @param data    数据
-     * @param total   总数
-     * @param size    每页显示的条数
-     * @param current 当前页码
-     * @param page    page信息
-     * @param <T>     返回的对象信息
-     * @return AjaxResult
      */
-    private static <T> AjaxResult getAjaxResult(Object data, long total, long size, long current, Page<T> page) {
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put("code", ResponseCode.SUCCESS.getCode());
-        ajaxResult.put("message", ResponseCode.SUCCESS.getMessage());
-        ajaxResult.put("data", data);
-        ajaxResult.put("pageNum", current);
-        ajaxResult.put("pageSize", size);
-        ajaxResult.put("total", total);
-        ajaxResult.put("time", getCurrentTime());
-        return ajaxResult;
-    }
-
-
-    /**
-     * 判断是否成功
-     *
-     * @param value 参数
-     * @return AjaxResult
-     */
-    public static AjaxResult isSuccess(boolean value) {
-        if (!value) return AjaxResult.error(ResponseCode.ERROR);
-        return new AjaxResult(ResponseCode.SUCCESS);
+    private AjaxResult(Integer code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+        this.timestamp = System.currentTimeMillis();
     }
 
     /**
-     * 判断是否成功
+     * 通过 ResponseCode 枚举和数据构造
      *
-     * @param val 参数
-     * @return AjaxResult
+     * @param responseCode ResponseCode 枚举实例
+     * @param data         数据
      */
-    public static AjaxResult toSuccess(Long val) {
-        if (val < 0) return AjaxResult.error(ResponseCode.ERROR);
-        return new AjaxResult(ResponseCode.SUCCESS);
+    private AjaxResult(ResponseCode responseCode, T data) {
+        this(responseCode.getCode(), responseCode.getMessage(), data);
     }
 
     /**
-     * 判断是否成功
+     * 通过 ResponseCode 枚举构造 (无数据)
      *
-     * @param val 参数
-     * @return AjaxResult
+     * @param responseCode ResponseCode 枚举实例
      */
-    public static AjaxResult toSuccess(Integer val) {
-        if (val < 0) return AjaxResult.error(ResponseCode.ERROR);
-        return new AjaxResult(ResponseCode.SUCCESS);
+    private AjaxResult(ResponseCode responseCode) {
+        this(responseCode, null); // data 为 null
+    }
+
+    // --- 静态工厂方法 (推荐使用) ---
+
+    /**
+     * 成功返回 (无消息，无数据)
+     */
+    public static <T> AjaxResult<T> success() {
+        return new AjaxResult<>(ResponseCode.SUCCESS);
     }
 
     /**
-     * 失败返回（带消息）
+     * 成功返回 (带自定义消息，无数据)
      *
-     * @param msg 返回消息
-     * @return AjaxResult
+     * @param message 自定义成功消息
      */
-    public static AjaxResult error(String msg) {
-        AjaxResult result = new AjaxResult(ResponseCode.ERROR);
-        result.put(MSG_TAG, msg);
-        return result;
+    public static <T> AjaxResult<T> success(String message) {
+        return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, null);
     }
 
     /**
-     * 失败返回（使用指定的响应码）
+     * 成功返回 (使用默认消息，带数据)
      *
-     * @param code 响应码枚举
-     * @return AjaxResult
+     * @param data 返回的数据
      */
-    public static AjaxResult error(ResponseCode code) {
-        return new AjaxResult(code);
+    public static <T> AjaxResult<T> success(T data) {
+        return new AjaxResult<>(ResponseCode.SUCCESS, data);
     }
 
     /**
-     * 失败返回（不带消息）
+     * 成功返回 (带自定义消息和数据)
      *
-     * @return AjaxResult
+     * @param message 自定义成功消息
+     * @param data    返回的数据
      */
-    public static AjaxResult error() {
-        return new AjaxResult(ResponseCode.ERROR);
+    public static <T> AjaxResult<T> success(String message, T data) {
+        return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, data);
     }
 
     /**
-     * 失败返回（带消息和响应码）
-     *
-     * @param msg  返回消息
-     * @param code 错误代码
-     * @return AjaxResult
+     * 失败返回 (使用默认错误码和消息，无数据)
      */
-    public static AjaxResult error(String msg, Integer code) {
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put(MSG_TAG, msg);
-        ajaxResult.put(CODE_TAG, code);
-        ajaxResult.put(TIME_TAG, getCurrentTime());
-        return ajaxResult;
+    public static <T> AjaxResult<T> error() {
+        return new AjaxResult<>(ResponseCode.ERROR);
     }
 
     /**
-     * 错误返回（带消息和响应码）
+     * 失败返回 (使用默认错误码，带自定义消息，无数据)
      *
-     * @param responseCode 状态码
-     * @param message      错误信息
+     * @param message 自定义错误消息
      */
-    public static AjaxResult error(ResponseCode responseCode, String message) {
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put(MSG_TAG, message);
-        ajaxResult.put(CODE_TAG, responseCode.getCode());
-        ajaxResult.put(TIME_TAG, getCurrentTime());
-        return ajaxResult;
+    public static <T> AjaxResult<T> error(String message) {
+        return new AjaxResult<>(ResponseCode.ERROR.getCode(), message, null);
     }
 
     /**
-     * 获取当前时间，格式为 yyyy-MM-dd HH:mm:ss
+     * 失败返回 (使用指定的 ResponseCode，无数据)
      *
-     * @return 当前时间的字符串
+     * @param responseCode 响应码枚举
      */
-    private static String getCurrentTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(new Date());
+    public static <T> AjaxResult<T> error(ResponseCode responseCode) {
+        return new AjaxResult<>(responseCode);
     }
 
     /**
-     * 警告返回（带消息）
+     * 失败返回 (使用指定的 ResponseCode 和自定义消息，无数据)
      *
-     * @param message 返回消息
-     * @return AjaxResult
+     * @param responseCode 响应码枚举
+     * @param message      自定义错误消息 (将覆盖枚举中的默认消息)
      */
-    public static AjaxResult warning(String message) {
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put(MSG_TAG, message);
-        ajaxResult.put(CODE_TAG, ResponseCode.WARNING.getCode());
-        ajaxResult.put(TIME_TAG, getCurrentTime());
-        return ajaxResult;
+    public static <T> AjaxResult<T> error(ResponseCode responseCode, String message) {
+        return new AjaxResult<>(responseCode.getCode(), message, null);
     }
+
+    /**
+     * 失败返回 (使用指定的自定义错误码和自定义消息，无数据)
+     *
+     * @param code    自定义错误码
+     * @param message 自定义错误消息
+     */
+    public static <T> AjaxResult<T> error(Integer code, String message) {
+        return new AjaxResult<>(code, message, null);
+    }
+
+    /**
+     * 警告返回 (使用默认警告码，带自定义消息，无数据)
+     *
+     * @param message 自定义警告消息
+     */
+    public static <T> AjaxResult<T> warning(String message) {
+        return new AjaxResult<>(ResponseCode.WARNING.getCode(), message, null);
+    }
+
 }
