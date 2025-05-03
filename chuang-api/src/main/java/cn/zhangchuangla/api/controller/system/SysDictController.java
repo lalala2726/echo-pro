@@ -53,7 +53,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "获取字典列表")
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public TableDataResult listDict(@Parameter(description = "字典列表请求类")
+    public AjaxResult<TableDataResult> listDict(@Parameter(description = "字典列表请求类")
                                     //todo 待添加
                                     @Validated @ParameterObject SysDictListRequest request) {
         Page<SysDict> sysDict = sysDictService.listDict(request);
@@ -142,8 +142,8 @@ public class SysDictController extends BaseController {
     @GetMapping("/items/list/{dictCode}")
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
-    public TableDataResult listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
-                                        @Parameter(description = "字典项列表查询请求类")
+    public AjaxResult<TableDataResult> listDictData(@PathVariable("dictCode") @Parameter(description = "字典编码") String dictCode,
+                                                    @Parameter(description = "字典项列表查询请求类")
                                         @ParameterObject @Validated SysDictItemListRequest request) {
         if (dictCode.isEmpty()) throw new ParamException(ResponseCode.PARAM_NOT_NULL, "字典编码不能为空！");
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(dictCode, request);
@@ -160,7 +160,7 @@ public class SysDictController extends BaseController {
     @GetMapping("/items/list")
     @Operation(summary = "获取字典项分页")
     @PreAuthorize("@ss.hasPermission('system:dict-item:list')")
-    public TableDataResult listDictData(@Parameter(description = "字典项列表请求类")
+    public AjaxResult<TableDataResult> listDictData(@Parameter(description = "字典项列表请求类")
                                         @Validated @ParameterObject SysDictItemListRequest request) {
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictData(request);
         List<SysDictItemListVo> sysDictItemListVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);

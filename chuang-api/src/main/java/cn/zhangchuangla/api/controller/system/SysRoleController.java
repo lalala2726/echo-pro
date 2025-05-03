@@ -54,7 +54,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermission('system:role:list')")
-    public TableDataResult list(@Parameter(description = "角色列表查询参数")
+    public AjaxResult<TableDataResult> list(@Parameter(description = "角色列表查询参数")
                                 @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.roleList(request);
         List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
@@ -104,9 +104,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> {
-            checkParam(id == null || id <= 0, "角色ID不能小于等于0");
-        });
+        ids.forEach(id -> checkParam(id == null || id <= 0, "角色ID不能小于等于0"));
         boolean result = sysRoleService.deleteRoleInfo(ids);
         return toAjax(result);
     }

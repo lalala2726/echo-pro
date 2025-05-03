@@ -53,8 +53,8 @@ public class SysFileController extends BaseController {
     @PostMapping("/upload")
     @Operation(summary = "普通文件上传")
     @OperationLog(title = "文件上传", businessType = BusinessType.UPLOAD)
-    public AjaxResult upload(@Parameter(description = "上传的文件")
-                             @RequestParam("file") MultipartFile file) {
+    public AjaxResult<HashMap<String, String>> upload(@Parameter(description = "上传的文件")
+                                                      @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return error("请选择一个文件上传");
         }
@@ -98,8 +98,8 @@ public class SysFileController extends BaseController {
     @OperationLog(title = "图片上传", businessType = BusinessType.UPLOAD)
     @Operation(summary = "图片上传")
     @PostMapping("/image/upload")
-    public AjaxResult imageUpload(@Parameter(description = "上传的图片文件")
-                                  @RequestParam("file") MultipartFile file) {
+    public AjaxResult<HashMap<String, String>> imageUpload(@Parameter(description = "上传的图片文件")
+                                                           @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return error("请选择一个图片上传");
         }

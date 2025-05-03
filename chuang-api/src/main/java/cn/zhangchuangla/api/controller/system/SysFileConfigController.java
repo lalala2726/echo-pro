@@ -59,7 +59,7 @@ public class SysFileConfigController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public TableDataResult listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
+    public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                              @Validated @ParameterObject StorageConfigListRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {

@@ -79,7 +79,7 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "强制退出登录")
     @OperationLog(title = "在线用户管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('monitor:online-user:delete')")
-    public AjaxResult forceLogout(
+    public AjaxResult<Void> forceLogout(
             @PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
         if (sessionId == null) {
             return error(ResponseCode.PARAM_NOT_NULL);

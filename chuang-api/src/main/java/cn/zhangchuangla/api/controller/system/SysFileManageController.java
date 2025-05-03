@@ -47,7 +47,7 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public TableDataResult listFileManage(@Parameter(description = "文件资源列表查询参数")
+    public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
                                           @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
 
@@ -74,7 +74,7 @@ public class SysFileManageController extends BaseController {
     @GetMapping("/trash/list")
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
-    public TableDataResult listFileTrash(@Parameter(description = "文件资源回收站查询参数")
+    public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
                                          @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileTrash(request);
         List<StorageFileManagementListVo> storageFileManagementListVos = copyListProperties(sysFileManagementPage,

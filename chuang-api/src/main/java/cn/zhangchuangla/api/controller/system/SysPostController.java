@@ -48,7 +48,7 @@ public class SysPostController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
-    public TableDataResult listPost(@Parameter(description = "岗位列表查询参数")
+    public AjaxResult<TableDataResult> listPost(@Parameter(description = "岗位列表查询参数")
                                     @Validated @ParameterObject SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);

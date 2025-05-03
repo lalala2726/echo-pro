@@ -94,12 +94,18 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
+    /**
+     * 参数异常
+     */
     @ExceptionHandler(ParamException.class)
     public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
         log.error("参数异常:", exception);
         return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
     }
 
+    /**
+     * 权限不足
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
         log.error("权限不足:{}", exception.getMessage());
@@ -116,6 +122,9 @@ public class GlobalExceptionHandel {
                 Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
+    /**
+     * 资源不存在
+     */
     @ExceptionHandler(NoResourceFoundException.class)
     public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
         log.error("资源不存在：{}", exception.toString());
@@ -150,7 +159,6 @@ public class GlobalExceptionHandel {
         String message = exception.getMessage();
         String paramName = "";
         if (message.contains("'")) {
-            // 提取单引号中的参数名称，如 'password'
             int start = message.indexOf("'") + 1;
             int end = message.indexOf("'", start);
             if (end > start) {
