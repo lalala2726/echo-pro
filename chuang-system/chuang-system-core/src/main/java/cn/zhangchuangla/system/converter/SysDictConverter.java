@@ -1,14 +1,5 @@
 package cn.zhangchuangla.system.converter;
 
-import cn.zhangchuangla.system.model.entity.SysDict;
-import cn.zhangchuangla.system.model.entity.SysDictItem;
-import cn.zhangchuangla.system.model.request.dict.SysDictAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictUpdateRequest;
-import cn.zhangchuangla.system.model.vo.dict.SysDictItemOptionVo;
-import cn.zhangchuangla.system.model.vo.dict.SysDictItemVo;
-import cn.zhangchuangla.system.model.vo.dict.SysDictVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

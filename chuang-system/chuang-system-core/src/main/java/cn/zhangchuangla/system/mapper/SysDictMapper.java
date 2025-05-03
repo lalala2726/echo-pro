@@ -1,7 +1,5 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.system.model.entity.SysDict;
-import cn.zhangchuangla.system.model.request.dict.SysDictListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;

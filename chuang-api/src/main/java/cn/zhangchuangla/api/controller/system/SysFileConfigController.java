@@ -60,7 +60,7 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
-                                             @Validated @ParameterObject StorageConfigListRequest request) {
+                                                         @Validated @ParameterObject StorageConfigListRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = storageConverter.toStorageFileConfigListVo(item);
@@ -88,7 +88,7 @@ public class SysFileConfigController extends BaseController {
     @PostMapping("/add/minio")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult<Void> saveMinioConfig(@Parameter(description = "Minio配置请求参数")
-                                         @Validated @RequestBody MinioConfigRequest request) {
+                                            @Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
@@ -112,7 +112,7 @@ public class SysFileConfigController extends BaseController {
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult<Void> saveAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
-                                             @Validated @RequestBody AliyunOSSConfigRequest request) {
+                                                @Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
@@ -134,7 +134,7 @@ public class SysFileConfigController extends BaseController {
     @PostMapping("/add/tencent")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
     public AjaxResult<Void> saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
-                                              @Validated @RequestBody TencentCOSConfigRequest request) {
+                                                 @Validated @RequestBody TencentCOSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getRegion();
         request.setRegion(StringUtils.removeTrailingSlash(endpoint));
@@ -156,7 +156,7 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult<Void> setIsMasterConfig(@Parameter(description = "文件配置ID")
-                                           @PathVariable("id") Long id) {
+                                              @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
         boolean result = storageConfigService.setMasterConfig(id);
         // 刷新缓存
@@ -190,7 +190,7 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, isSaveRequestData = false)
     public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
-                                          @PathVariable("ids") List<Long> ids) {
+                                             @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件配置ID不能为空!");
             checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID),

@@ -125,7 +125,7 @@ public class SysMenuController extends BaseController {
     @OperationLog(title = "菜单管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public AjaxResult<Void> deleteMenu(@Parameter(description = "菜单ID，多个以英文(,)分割")
-                                    @PathVariable("id") Long id) {
+                                       @PathVariable("id") Long id) {
         return success();
     }
 

@@ -48,7 +48,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                          @Validated @ParameterObject SysFileManagementListRequest request) {
+                                                      @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileManage(request);
 
         // 使用流式处理优化代码
@@ -75,7 +75,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                         @Validated @ParameterObject SysFileManagementListRequest request) {
+                                                     @Validated @ParameterObject SysFileManagementListRequest request) {
         Page<SysFileManagement> sysFileManagementPage = storageManagementService.listFileTrash(request);
         List<StorageFileManagementListVo> storageFileManagementListVos = copyListProperties(sysFileManagementPage,
                 StorageFileManagementListVo.class);
@@ -111,7 +111,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
-                                    @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
+                                       @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
         if (isPermanently == null)
             return error("是否删除文件不能为空！");
         ids.forEach(id -> checkParam(id == null || id <= 0, "文件ID不能为空!"));
