@@ -75,7 +75,7 @@ public class BaseController {
      * @param page 分页对象
      * @param rows 列表数据
      */
-    protected TableDataResult getTableData(Page<?> page, List<?> rows) {
+    protected AjaxResult<TableDataResult> getTableData(Page<?> page, List<?> rows) {
         return TableDataResult.build(page, rows);
     }
 
@@ -169,6 +169,12 @@ public class BaseController {
         return AjaxResult.success(message);
     }
 
+    /**
+     * 警告返回
+     *
+     * @param message 消息
+     * @return AjaxResult
+     */
     protected <T> AjaxResult<T> warning(String message) {
         return AjaxResult.warning(message);
     }
@@ -237,6 +243,32 @@ public class BaseController {
     protected void checkParam(Predicate<?> condition, String errorMessage) {
         if (condition.test(null)) {
             throw new ParamException(errorMessage);
+        }
+    }
+
+    /**
+     * 校验参数对象是否为 null
+     *
+     * @param param     要校验的参数
+     * @param paramName 参数名 (用于错误消息)
+     * @throws ParamException 如果 param 为 null
+     */
+    protected void checkParamNotNull(Object param, String paramName) {
+        if (param == null) {
+            throw new ParamException(paramName + " cannot be null");
+        }
+    }
+
+    /**
+     * 校验字符串参数是否为空 (null 或 "")
+     *
+     * @param param     要校验的字符串参数
+     * @param paramName 参数名 (用于错误消息)
+     * @throws ParamException 如果 param 为空
+     */
+    protected void checkParamNotBlank(String param, String paramName) {
+        if (param == null || param.trim().isEmpty()) {
+            throw new ParamException(paramName + " cannot be blank");
         }
     }
 

@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,66 +39,64 @@ public class CacheController extends BaseController {
     @GetMapping
     @Operation(summary = "Redis基本信息")
     @PreAuthorize("@ss.hasPermission('monitor:cache:list')")
-    public AjaxResult<Map<String, Object>> list() {
-        // 执行 Redis 命令
-        Properties info = getRedisInfo();
-        Properties commandStats = getRedisCommandStats();
-        Long dbSize = getRedisDbSize();
+    public AjaxResult<Map<String, Object>> getRedisInfo() {
+        Map<String, Object> result = new HashMap<>(4);
+        try {
+            Properties info = getRedisBaseInfo();
+            Properties commandStats = getCommandStats();
+            Long dbSize = getDbSize();
 
-        // 组装结果
-        Map<String, Object> result = new HashMap<>(3);
-        result.put("info", info);
-        result.put("dbSize", dbSize);
-        result.put("commandStats", buildCommandStats(commandStats));
+            result.put("info", info);
+            result.put("dbSize", dbSize);
+            result.put("commandStats", parseCommandStats(commandStats));
 
-        return success(result);
+            return success(result);
+        } catch (Exception e) {
+            return error("获取Redis信息失败: " + e.getMessage());
+        }
+    }
+
+/**
+ * 获取 Redis 基础信息
+ */
+private Properties getRedisBaseInfo() {
+    return redisTemplate.execute((RedisCallback<Properties>) connection ->
+            Optional.ofNullable(connection.serverCommands().info())
+                    .orElseGet(Properties::new));
+}
+
+/**
+ * 获取 Redis 命令统计
+ */
+private Properties getCommandStats() {
+    return redisTemplate.execute((RedisCallback<Properties>) connection ->
+            Optional.ofNullable(connection.serverCommands().info("commandstats"))
+                    .orElseGet(Properties::new));
+}
+
+    /**
+     * 获取数据库大小
+     */
+    private Long getDbSize() {
+        return redisTemplate.execute((RedisCallback<Long>) connection ->
+                Optional.ofNullable(connection.serverCommands().dbSize())
+                        .orElse(0L));
     }
 
     /**
-     * 获取 Redis 基本信息
-     *
-     * @return Properties
+     * 解析命令统计信息
      */
-    private Properties getRedisInfo() {
-        return (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info());
+    private List<Map<String, String>> parseCommandStats(Properties commandStats) {
+        return Optional.of(commandStats)
+                .map(stats -> stats.stringPropertyNames().stream()
+                        .map(key -> {
+                            Map<String, String> data = new HashMap<>(2);
+                            String property = stats.getProperty(key);
+                            data.put("name", StringUtils.removeStart(key, "cmdstat_"));
+                            data.put("value", StringUtils.substringBetween(property, "calls=", ",usec"));
+                            return data;
+                        })
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
-
-    /**
-     * 获取 Redis 命令统计信息
-     *
-     * @return Properties
-     */
-    private Properties getRedisCommandStats() {
-        return (Properties) redisTemplate
-                .execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
-    }
-
-    /**
-     * 获取 Redis 数据库大小
-     *
-     * @return 数据库大小
-     */
-    private Long getRedisDbSize() {
-        return (Long) redisTemplate.execute((RedisCallback<Object>) connection -> connection.dbSize());
-    }
-
-    /**
-     * 构建 Redis 命令统计数据
-     *
-     * @param commandStats Redis 命令统计信息
-     * @return List<Map < String, String>>
-     */
-    private List<Map<String, String>> buildCommandStats(Properties commandStats) {
-        return commandStats.stringPropertyNames()
-                .stream()
-                .map(key -> {
-                    Map<String, String> data = new HashMap<>(2);
-                    String property = commandStats.getProperty(key);
-                    data.put("name", StringUtils.removeStart(key, "cmdstat_"));
-                    data.put("value", StringUtils.substringBetween(property, "calls=", ",usec"));
-                    return data;
-                })
-                .collect(Collectors.toList());
-    }
-
 }
