@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysRoleMenuService extends IService<SysRoleMenu> {
 

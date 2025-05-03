@@ -10,6 +10,7 @@ import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
@@ -34,7 +35,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  * Created on 2025/4/3 21:39
  */
 @RestController
@@ -58,8 +59,8 @@ public class SysFileConfigController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
-                                        @Validated @ParameterObject StorageConfigListRequest request) {
+    public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
+                                             @Validated @ParameterObject StorageConfigListRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = storageConverter.toStorageFileConfigListVo(item);
@@ -86,8 +87,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/minio")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult saveMinioConfig(@Parameter(description = "Minio配置请求参数")
-                                      @Validated @RequestBody MinioConfigRequest request) {
+    public AjaxResult<Void> saveMinioConfig(@Parameter(description = "Minio配置请求参数")
+                                         @Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
@@ -110,8 +111,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult saveAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
-                                          @Validated @RequestBody AliyunOSSConfigRequest request) {
+    public AjaxResult<Void> saveAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
+                                             @Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
@@ -132,8 +133,8 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:add')")
     @PostMapping("/add/tencent")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
-                                           @Validated @RequestBody TencentCOSConfigRequest request) {
+    public AjaxResult<Void> saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
+                                              @Validated @RequestBody TencentCOSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getRegion();
         request.setRegion(StringUtils.removeTrailingSlash(endpoint));
@@ -154,8 +155,8 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "设置主配置")
     @PreAuthorize("@ss.hasPermission('system:file-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult setIsMasterConfig(@Parameter(description = "文件配置ID")
-                                        @PathVariable("id") Long id) {
+    public AjaxResult<Void> setIsMasterConfig(@Parameter(description = "文件配置ID")
+                                           @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
         boolean result = storageConfigService.setMasterConfig(id);
         // 刷新缓存
@@ -173,7 +174,7 @@ public class SysFileConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-config:refreshCache')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult refreshCache() {
+    public AjaxResult<Void> refreshCache() {
         String currentConfigName = sysFileConfigLoader.refreshCache();
         return AjaxResult.success(currentConfigName);
     }
@@ -188,8 +189,8 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "删除文件配置")
     @PreAuthorize("@ss.hasPermission('system:file-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, isSaveRequestData = false)
-    public AjaxResult deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
-                                       @PathVariable("ids") List<Long> ids) {
+    public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
+                                          @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件配置ID不能为空!");
             checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID),

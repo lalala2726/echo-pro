@@ -37,8 +37,8 @@ public class SysRegisterController extends BaseController {
      */
     @PostMapping("/register")
     @Operation(summary = "注册")
-    public AjaxResult register(@Parameter(description = "注册参数", required = true)
-                               @Validated @RequestBody RegisterRequest request) {
+    public AjaxResult<Long> register(@Parameter(description = "注册参数", required = true)
+                                     @Validated @RequestBody RegisterRequest request) {
         request.setUsername(request.getUsername().trim());
         request.setPassword(request.getPassword().trim());
         Long userId = registerService.register(request);

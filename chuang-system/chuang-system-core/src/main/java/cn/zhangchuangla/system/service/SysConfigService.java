@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 系统配置接口
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface SysConfigService extends IService<SysConfig> {
 

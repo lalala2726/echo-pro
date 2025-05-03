@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 菜单查询请求
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(description = "菜单查询请求")

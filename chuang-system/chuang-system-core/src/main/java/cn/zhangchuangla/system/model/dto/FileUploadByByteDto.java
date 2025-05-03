@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 用于传递文件上传的参数
  *
- * @author zhangchuang
+ * @author Chuang
  * Created on 2025/3/22 23:07
  */
 @Data

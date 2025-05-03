@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 @Mapper
 public interface SysRoleMapper extends BaseMapper<SysRole> {

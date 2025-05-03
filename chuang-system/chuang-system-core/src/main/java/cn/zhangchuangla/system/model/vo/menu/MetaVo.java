@@ -36,10 +36,6 @@ public class MetaVo {
      */
     private Boolean showLink;
 
-    /**
-     * 菜单排序，值越高排的越后（只针对顶级路由）
-     */
-    private Integer rank;
 
     /**
      * 设置为true，则不会被 <keep-alive>缓存

@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * 系统配置服务接口实现类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Service
 @RequiredArgsConstructor

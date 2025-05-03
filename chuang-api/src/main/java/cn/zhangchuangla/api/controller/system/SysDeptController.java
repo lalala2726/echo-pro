@@ -48,8 +48,8 @@ public class SysDeptController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:dept:list')")
     @Operation(summary = "部门列表")
-    public AjaxResult listDept(@Parameter(description = "部门列表查询参数")
-                               @Validated @ParameterObject SysDeptListRequest request) {
+    public AjaxResult<List<SysDeptListVo>> listDept(@Parameter(description = "部门列表查询参数")
+                                                    @Validated @ParameterObject SysDeptListRequest request) {
         List<SysDept> sysDept = sysDeptService.listDept(request);
         List<SysDeptListVo> sysDeptListVo = sysDeptConverter.toSysDeptListVo(sysDept);
         return success(sysDeptListVo);
@@ -66,8 +66,8 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dept:add')")
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
-    public AjaxResult addDept(@Parameter(description = "部门添加请求参数")
-                              @Validated @RequestBody SysDeptAddRequest request) {
+    public AjaxResult<Void> addDept(@Parameter(description = "部门添加请求参数")
+                                 @Validated @RequestBody SysDeptAddRequest request) {
         return toAjax(sysDeptService.addDept(request));
     }
 
@@ -81,8 +81,8 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dept:update')")
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
-    public AjaxResult updateDept(@Parameter(description = "部门修改请求参数")
-                                 @Validated @RequestBody SysDeptUpdateRequest request) {
+    public AjaxResult<Void> updateDept(@Parameter(description = "部门修改请求参数")
+                                    @Validated @RequestBody SysDeptUpdateRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
 
@@ -95,7 +95,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
-    public AjaxResult getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
+    public AjaxResult<SysDeptVo> getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
         checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
         SysDeptVo sysDeptVo = sysDeptConverter.toSysDeptVo(dept);
@@ -110,7 +110,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/options")
     @PreAuthorize("@ss.hasPermission('system:dept:tree')")
     @Operation(summary = "部门下拉列表")
-    public AjaxResult treeDept() {
+    public AjaxResult<List<Option<Long>>> treeDept() {
         List<Option<Long>> deptOptions = sysDeptService.getDeptOptions();
         return success(deptOptions);
     }
@@ -125,7 +125,7 @@ public class SysDeptController extends BaseController {
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
     @PreAuthorize("@ss.hasPermission('system:dept:remove')")
-    public AjaxResult deleteDept(
+    public AjaxResult<Void> deleteDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {
         checkParam(ids == null, "部门ID不能为空！");

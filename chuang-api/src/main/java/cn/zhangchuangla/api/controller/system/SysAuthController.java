@@ -53,7 +53,7 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/auth/login")
     @Operation(summary = "登录")
-    public AjaxResult login(
+    public AjaxResult<AuthenticationToken> login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
         // 1. 校验验证码
@@ -73,8 +73,8 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/auth/refreshToken")
     @Operation(summary = "刷新令牌")
-    public AjaxResult refreshToken(@Parameter(description = "刷新令牌", required = true)
-                                   @ParameterObject @RequestParam("refreshToken") String refreshToken) {
+    public AjaxResult<AuthenticationToken> refreshToken(@Parameter(description = "刷新令牌", required = true)
+                                                        @ParameterObject @RequestParam("refreshToken") String refreshToken) {
         AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
         return success(newAuthenticationToken);
     }
@@ -86,9 +86,8 @@ public class SysAuthController extends BaseController {
      */
     @Operation(summary = "菜单路由列表")
     @GetMapping("/auth/routes")
-    public AjaxResult getCurrentUserRoutes() {
-        Long userId = getUserId();
-        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(userId);
+    public AjaxResult<List<RouterVo>> getCurrentUserRoutes() {
+        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(1L);
         List<RouterVo> routerVos = sysMenuService.buildMenus(menuListByUserId);
         return success(routerVos);
     }
@@ -101,7 +100,7 @@ public class SysAuthController extends BaseController {
      */
     @GetMapping("/auth/getUserInfo")
     @Operation(summary = "获取用户信息")
-    public AjaxResult getInfo() {
+    public AjaxResult<HashMap<String, Object>> getInfo() {
         HashMap<String, Object> ajax = new HashMap<>(4);
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
@@ -120,7 +119,7 @@ public class SysAuthController extends BaseController {
      */
     @DeleteMapping("/auth/logout")
     @Operation(summary = "退出登录")
-    public AjaxResult logout() {
+    public AjaxResult<Void> logout() {
         sysAuthService.logout();
         return success();
     }

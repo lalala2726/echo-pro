@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  * Created on 2025/3/1 17:45
  */
 @Tag(name = "欢迎页")

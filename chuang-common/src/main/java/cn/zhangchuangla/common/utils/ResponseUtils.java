@@ -29,9 +29,7 @@ public class ResponseUtils {
      * @param resultCode 响应结果码
      */
     public static void writeErrMsg(HttpServletResponse response, ResponseCode resultCode) {
-        int status = getHttpStatus(resultCode);
 
-        response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 

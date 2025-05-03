@@ -34,7 +34,7 @@ public class ServerController extends BaseController {
     @GetMapping
     @Operation(summary = "服务器信息")
     @PreAuthorize("@ss.hasPermission('monitor:server:list')")
-    public AjaxResult getInfo() {
+    public AjaxResult<Server> getInfo() {
         Server server = new Server();
         server.copyInfo();
         return success(server);

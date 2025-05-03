@@ -76,7 +76,7 @@ public class RedisTokenManager implements TokenManager {
         return AuthenticationToken.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(securityProperties.getSession().getAccessTokenExpireTime())
+                .expires(securityProperties.getSession().getAccessTokenExpireTime())
                 .build();
     }
 
@@ -177,7 +177,7 @@ public class RedisTokenManager implements TokenManager {
         return AuthenticationToken.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(accessTtl)
+                .expires(accessTtl)
                 .build();
     }
 

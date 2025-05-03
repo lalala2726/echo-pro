@@ -22,6 +22,6 @@ public class AuthenticationToken {
     private String refreshToken;
 
     @Schema(description = "过期时间(单位：秒)")
-    private Integer expiresIn;
+    private Integer expires;
 
 }

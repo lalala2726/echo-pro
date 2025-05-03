@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysOnlineUser;
@@ -52,8 +53,8 @@ public class OnlineUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
-    public AjaxResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
-                                     @Validated @ParameterObject OnlineUserListRequest request) {
+    public TableDataResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
+                                          @Validated @ParameterObject OnlineUserListRequest request) {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
         ArrayList<SysOnlineUser> sysOnlineUsers = new ArrayList<>();
@@ -78,7 +79,7 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "强制退出登录")
     @OperationLog(title = "在线用户管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('monitor:online-user:delete')")
-    public AjaxResult forceLogout(
+    public AjaxResult<Void> forceLogout(
             @PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
         if (sessionId == null) {
             return error(ResponseCode.PARAM_NOT_NULL);
