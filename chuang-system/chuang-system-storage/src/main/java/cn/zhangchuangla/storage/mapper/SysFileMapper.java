@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.mapper;
 
-import cn.zhangchuangla.storage.model.entity.SysFileManagement;
-import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
+import cn.zhangchuangla.storage.model.entity.SysFile;
+import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * @author Chuang
  */
-public interface SysFileManagementMapper extends BaseMapper<SysFileManagement> {
+public interface SysFileMapper extends BaseMapper<SysFile> {
 
     /**
      * 文件列表
@@ -18,7 +18,7 @@ public interface SysFileManagementMapper extends BaseMapper<SysFileManagement> {
      * @param request 请求参数
      * @return 结果
      */
-    Page<SysFileManagement> listFileManage(Page<SysFileManagement> page, @Param("request") SysFileManagementListRequest request);
+    Page<SysFile> listFileManage(Page<SysFile> page, @Param("request") SysFileListRequest request);
 
     /**
      * 文件回收列表
@@ -27,7 +27,7 @@ public interface SysFileManagementMapper extends BaseMapper<SysFileManagement> {
      * @param request               请求参数
      * @return 结果
      */
-    Page<SysFileManagement> listFileTrash(Page<SysFileManagement> sysFileManagementPage, @Param("request") SysFileManagementListRequest request);
+    Page<SysFile> listFileTrash(Page<SysFile> sysFileManagementPage, @Param("request") SysFileListRequest request);
 }
 
 

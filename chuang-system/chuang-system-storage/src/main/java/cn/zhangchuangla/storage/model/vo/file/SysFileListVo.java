@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage.model.vo.manage;
+package cn.zhangchuangla.storage.model.vo.file;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class StorageFileManagementListVo {
+public class SysFileListVo {
 
     /**
      * 主键ID
