@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/file/manage")
 @RequiredArgsConstructor
-public class SysFileManageController extends BaseController {
+public class SysFileController extends BaseController {
 
     private final StorageFileService storageFileService;
     private final StorageConverter storageConverter;
