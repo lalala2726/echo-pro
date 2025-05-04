@@ -1,18 +1,201 @@
 package cn.zhangchuangla.system.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.zhangchuangla.system.model.entity.SysDictItem;
-import cn.zhangchuangla.system.service.SysDictItemService;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
+import cn.zhangchuangla.system.model.entity.SysDictItem;
+import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
+import cn.zhangchuangla.system.service.SysDictItemService;
+import cn.zhangchuangla.system.service.SysDictTypeService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-/**
-* @author Chuang
-*/
-@Service
-public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDictItem>
-    implements SysDictItemService{
+import java.util.List;
 
+/**
+ * 字典项 服务实现层
+ *
+ * @author Chuang
+ */
+@Service
+@RequiredArgsConstructor
+public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDictItem>
+        implements SysDictItemService {
+
+    private final SysDictItemMapper sysDictItemMapper;
+    private final SysDictTypeService sysDictTypeService; // 注入 SysDictTypeService 用于校验
+
+    /**
+     * 获取字典项列表
+     *
+     * @param page    分页
+     * @param request 请求
+     * @return 分页结果
+     */
+    @Override
+    public Page<SysDictItem> listDictItem(Page<SysDictItem> page, SysDictItemListRequest request) {
+        // MyBatis Plus分页会自动处理page参数，无需手动创建 new Page<>()
+        // 直接调用Mapper方法进行查询
+        return sysDictItemMapper.listDictItem(page, request);
+    }
+
+    /**
+     * 根据id获取字典项
+     *
+     * @param id id
+     * @return 字典项
+     */
+    @Override
+    public SysDictItem getDictItemById(Long id) {
+        return sysDictItemMapper.selectById(id);
+    }
+
+    /**
+     * 添加字典项
+     *
+     * @param request 请求
+     * @return 是否添加成功
+     */
+    @Override
+    public boolean addDictItem(SysDictItemAddRequest request) {
+        // 检查字典类型是否存在
+        if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
+        }
+
+        // 检查同一字典类型下字典项值是否重复
+        if (isDictItemValueExist(request.getDictType(), request.getItemValue(), null)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR,"同一字典类型下字典项值不能重复: " + request.getItemValue());
+        }
+
+        SysDictItem sysDictItem = new SysDictItem();
+        BeanUtils.copyProperties(request, sysDictItem);
+
+        // 设置排序值
+        if (sysDictItem.getSortOrder() == null) {
+            // 默认排序值可以设置为 0 或其他合理值
+            sysDictItem.setSortOrder(0);
+        }
+
+        return sysDictItemMapper.insert(sysDictItem) > 0;
+    }
+
+    /**
+     * 更新字典项
+     *
+     * @param request 请求
+     * @return 是否更新成功
+     */
+    @Override
+    public boolean updateDictItem(SysDictItemUpdateRequest request) {
+        // 检查字典项是否存在
+        SysDictItem existDictItem = sysDictItemMapper.selectById(request.getId());
+        if (existDictItem == null) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR,"字典项不存在");
+        }
+
+        // 如果修改了字典类型，检查新的字典类型是否存在
+        if (!existDictItem.getDictType().equals(request.getDictType())) {
+            if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR,"字典类型不存在: " + request.getDictType());
+            }
+        }
+
+        // 检查同一字典类型下字典项值是否重复 (排除自身)
+        if (isDictItemValueExist(request.getDictType(), request.getItemValue(), request.getId())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR,"同一字典类型下字典项值不能重复: " + request.getItemValue());
+        }
+
+        SysDictItem sysDictItem = new SysDictItem();
+        BeanUtils.copyProperties(request, sysDictItem);
+
+        return sysDictItemMapper.updateById(sysDictItem) > 0;
+    }
+
+    /**
+     * 删除字典项
+     *
+     * @param ids id列表
+     * @return 是否删除成功
+     */
+    @Override
+    public boolean deleteDictItem(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return false;
+        }
+        return sysDictItemMapper.deleteByIds(ids) > 0;
+    }
+
+    /**
+     * 根据字典类型编码删除字典项
+     *
+     * @param dictTypes 字典类型编码列表
+     * @return 是否删除成功
+     */
+    @Override
+    public boolean deleteDictItemByDictType(List<String> dictTypes) {
+        if (dictTypes == null || dictTypes.isEmpty()) {
+            return false;
+        }
+        LambdaQueryWrapper<SysDictItem> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(SysDictItem::getDictType, dictTypes);
+        // 返回删除的记录数是否大于0
+        return sysDictItemMapper.delete(queryWrapper) > 0;
+    }
+
+    /**
+     * 根据旧的字典类型编码更新为新的字典类型编码
+     *
+     * @param oldDictType 旧字典类型编码
+     * @param newDictType 新字典类型编码
+     * @return 是否更新成功
+     */
+    @Override
+    public boolean updateDictItemDictType(String oldDictType, String newDictType) {
+        if (StringUtils.isAnyBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
+            return false; // 无需更新或参数无效
+        }
+
+        LambdaUpdateWrapper<SysDictItem> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(SysDictItem::getDictType, oldDictType)
+                .set(SysDictItem::getDictType, newDictType);
+
+        // 返回影响的行数是否大于0
+        return update(updateWrapper);
+    }
+
+    /**
+     * 检查同一字典类型下字典项值是否重复
+     *
+     * @param dictType  字典类型编码
+     * @param itemValue 字典项值
+     * @param itemId    字典项ID (更新时排除自身)
+     * @return true 重复, false 不重复
+     */
+    @Override
+    public boolean isDictItemValueExist(String dictType, String itemValue, Long itemId) {
+        if (StringUtils.isAnyBlank(dictType, itemValue)) {
+            // 关键参数为空，无法判断，或者认为不重复
+            return false;
+        }
+        LambdaQueryWrapper<SysDictItem> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(SysDictItem::getDictType, dictType)
+                .eq(SysDictItem::getItemValue, itemValue);
+        // 如果是更新操作，排除当前项自身
+        if (itemId != null) {
+            queryWrapper.ne(SysDictItem::getId, itemId);
+        }
+        return sysDictItemMapper.selectCount(queryWrapper) > 0;
+    }
 }
 
 

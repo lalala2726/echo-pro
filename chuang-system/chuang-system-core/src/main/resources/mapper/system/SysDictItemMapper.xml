@@ -18,4 +18,25 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
+    <select id="listDictItem" resultMap="BaseResultMap">
+        SELECT
+        id, dict_type, item_label, item_value, sort_order, status, remark,
+        create_by, update_by, create_time, update_time
+        FROM sys_dict_item
+        <where>
+            <if test="request.dictType != null and request.dictType != ''">
+                AND dict_type = #{request.dictType}
+            </if>
+            <if test="request.itemLabel != null and request.itemLabel != ''">
+                AND item_label LIKE CONCAT('%', #{request.itemLabel}, '%')
+            </if>
+            <if test="request.itemValue != null and request.itemValue != ''">
+                AND item_value LIKE CONCAT('%', #{request.itemValue}, '%')
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
 </mapper>

@@ -1,18 +1,20 @@
 package cn.zhangchuangla.system.model.entity;
 
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典类型表
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_dict_type")
 @Data
-public class SysDictType {
+public class SysDictType extends BaseEntity {
+
     /**
      * 主键ID
      */
@@ -32,30 +34,6 @@ public class SysDictType {
     /**
      * 状态：0启用，1禁用
      */
-    private Integer status;
+    private String status;
 
-    /**
-     * 备注
-     */
-    private String remark;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
 }
