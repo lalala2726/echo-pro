@@ -9,7 +9,6 @@ import java.util.Date;
 
 /**
  * 系统字典项表
- *
  */
 @TableName(value = "sys_dict_item")
 @Data

@@ -63,7 +63,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     @Override
     public boolean addDictType(SysDictTypeAddRequest request) {
         if (isDictTypeExist(request.getDictType())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,"字典类型已存在: " + request.getDictType());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
 
         SysDictType sysDictType = new SysDictType();

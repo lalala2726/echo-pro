@@ -74,7 +74,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
 
         // 检查同一字典类型下字典项值是否重复
         if (isDictItemValueExist(request.getDictType(), request.getItemValue(), null)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,"同一字典类型下字典项值不能重复: " + request.getItemValue());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
         SysDictItem sysDictItem = new SysDictItem();
@@ -100,19 +100,19 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         // 检查字典项是否存在
         SysDictItem existDictItem = sysDictItemMapper.selectById(request.getId());
         if (existDictItem == null) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,"字典项不存在");
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典项不存在");
         }
 
         // 如果修改了字典类型，检查新的字典类型是否存在
         if (!existDictItem.getDictType().equals(request.getDictType())) {
             if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR,"字典类型不存在: " + request.getDictType());
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
             }
         }
 
         // 检查同一字典类型下字典项值是否重复 (排除自身)
         if (isDictItemValueExist(request.getDictType(), request.getItemValue(), request.getId())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,"同一字典类型下字典项值不能重复: " + request.getItemValue());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
         SysDictItem sysDictItem = new SysDictItem();

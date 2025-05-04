@@ -76,9 +76,10 @@ public interface SysDictItemService extends IService<SysDictItem> {
 
     /**
      * 检查同一字典类型下字典项值是否重复
-     * @param dictType 字典类型编码
+     *
+     * @param dictType  字典类型编码
      * @param itemValue 字典项值
-     * @param itemId 字典项ID (更新时排除自身)
+     * @param itemId    字典项ID (更新时排除自身)
      * @return true 重复, false 不重复
      */
     boolean isDictItemValueExist(String dictType, String itemValue, Long itemId);

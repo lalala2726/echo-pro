@@ -162,13 +162,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                     if (Constants.CommonConstants.DISABLE.equals(menu.getStatus())) {
                         option.setTag("停用");
                     }
-
                     // 递归获取子菜单
                     List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
                     if (!children.isEmpty()) {
                         option.setChildren(children);
                     }
-
                     return option;
                 })
                 // 按照排序字段排序
