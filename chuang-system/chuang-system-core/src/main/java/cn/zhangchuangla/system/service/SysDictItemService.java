@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
@@ -23,7 +24,7 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @param request 请求
      * @return 分页结果
      */
-    Page<SysDictItem> listDictItem(Page<SysDictItem> page,String dictType, SysDictItemListRequest request);
+    Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemListRequest request);
 
     /**
      * 根据id获取字典项
@@ -61,18 +62,16 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * 根据字典类型编码删除字典项
      *
      * @param dictTypes 字典类型编码列表
-     * @return 是否删除成功
      */
-    boolean deleteDictItemByDictType(List<String> dictTypes);
+    void deleteDictItemByDictType(List<String> dictTypes);
 
     /**
      * 根据旧的字典类型编码更新为新的字典类型编码
      *
      * @param oldDictType 旧字典类型编码
      * @param newDictType 新字典类型编码
-     * @return 是否更新成功
      */
-    boolean updateDictItemDictType(String oldDictType, String newDictType);
+    void updateDictItemDictType(String oldDictType, String newDictType);
 
     /**
      * 检查同一字典类型下字典项值是否重复
@@ -83,4 +82,12 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @return true 重复, false 不重复
      */
     boolean isDictItemValueExist(String dictType, String itemValue, Long itemId);
+
+    /**
+     * 根据字典类型编码获取字典项列表
+     *
+     * @param dictType 字典类型编码
+     * @return 字典项列表
+     */
+    List<Option<String>> getDictItemOption(String dictType);
 }

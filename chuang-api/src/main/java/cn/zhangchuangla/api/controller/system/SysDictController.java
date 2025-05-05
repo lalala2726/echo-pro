@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
@@ -147,6 +148,23 @@ public class SysDictController extends BaseController {
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page,dictType ,request);
         List<SysDictItemVo> sysDictItemVos = copyListProperties(sysDictItemPage, SysDictItemVo.class);
         return getTableData(sysDictItemPage, sysDictItemVos);
+    }
+
+    /**
+     * 获取字典项选项
+     *
+     * @param dictType 字典类型编码
+     * @return 字典项选项
+     */
+    @GetMapping("/item/{dictType}/option")
+    @Operation(summary = "字典项选项")
+    public AjaxResult<List<Option<String>>> getDictItemOption(@PathVariable("dictType") String dictType) {
+        if (StringUtils.isBlank(dictType)) {
+            return error("字典类型编码不能为空!");
+        }
+        List<Option<String>> options = sysDictItemService.getDictItemOption(dictType);
+        return success(options);
+
     }
 
     /**

@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.converter.SysDictConverter;
@@ -117,17 +118,16 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * 根据字典类型编码删除字典项
      *
      * @param dictTypes 字典类型编码列表
-     * @return 是否删除成功
      */
     @Override
-    public boolean deleteDictItemByDictType(List<String> dictTypes) {
+    public void deleteDictItemByDictType(List<String> dictTypes) {
         if (dictTypes == null || dictTypes.isEmpty()) {
-            return false;
+            return;
         }
         LambdaQueryWrapper<SysDictItem> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(SysDictItem::getDictType, dictTypes);
         // 返回删除的记录数是否大于0
-        return sysDictItemMapper.delete(queryWrapper) > 0;
+        sysDictItemMapper.delete(queryWrapper);
     }
 
     /**
@@ -135,19 +135,18 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      *
      * @param oldDictType 旧字典类型编码
      * @param newDictType 新字典类型编码
-     * @return 是否更新成功
      */
     @Override
-    public boolean updateDictItemDictType(String oldDictType, String newDictType) {
+    public void updateDictItemDictType(String oldDictType, String newDictType) {
         if (StringUtils.isAnyBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
-            return false;
+            return;
         }
         LambdaUpdateWrapper<SysDictItem> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(SysDictItem::getDictType, oldDictType)
                 .set(SysDictItem::getDictType, newDictType);
 
         // 返回影响的行数是否大于0
-        return update(updateWrapper);
+        update(updateWrapper);
     }
 
     /**
@@ -172,6 +171,24 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
             queryWrapper.ne(SysDictItem::getId, itemId);
         }
         return sysDictItemMapper.selectCount(queryWrapper) > 0;
+    }
+
+    /**
+     * 根据字典类型编码获取字典项列表
+     *
+     * @param dictType 字典类型编码
+     * @return 字典项列表
+     */
+    @Override
+    public List<Option<String>> getDictItemOption(String dictType) {
+        if (StringUtils.isBlank(dictType)) {
+            return List.of();
+        }
+        LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictType, dictType);
+        List<SysDictItem> list = list(eq);
+        return list.stream().map(item ->
+                new Option<>(item.getItemValue(), item.getItemLabel())
+        ).toList();
     }
 }
 
