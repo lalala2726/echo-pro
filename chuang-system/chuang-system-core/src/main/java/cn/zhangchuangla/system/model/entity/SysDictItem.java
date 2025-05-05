@@ -1,54 +1,71 @@
 package cn.zhangchuangla.system.model.entity;
 
-import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
- * 字典项表
+ * 系统字典项表
  */
-@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_dict_item")
 @Data
-public class SysDictItem extends BaseEntity {
-
+public class SysDictItem {
     /**
-     * 主键
+     * 主键ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 关联字典编码，与sys_dict表中的dict_code对应
+     * 所属字典类型编码
      */
-    private String dictCode;
+    private String dictType;
+
+    /**
+     * 字典项名称
+     */
+    private String itemLabel;
 
     /**
      * 字典项值
      */
-    private String value;
+    private String itemValue;
 
     /**
-     * 字典项标签
+     * 排序值
      */
-    private String label;
+    private Integer sortOrder;
 
     /**
-     * 标签类型，用于前端样式展示（如success、warning等）
+     * 状态：0启用，1禁用
      */
-    private String tagType;
+    private String status;
 
     /**
-     * 状态（1-正常，0-禁用）
+     * 备注
      */
-    private Integer status;
+    private String remark;
 
     /**
-     * 排序
+     * 创建者
      */
-    private Integer sort;
+    private String createBy;
 
+    /**
+     * 更新者
+     */
+    private String updateBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

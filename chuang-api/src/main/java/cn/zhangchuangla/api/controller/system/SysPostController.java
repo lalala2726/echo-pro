@@ -49,7 +49,7 @@ public class SysPostController extends BaseController {
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
     public AjaxResult<TableDataResult> listPost(@Parameter(description = "岗位列表查询参数")
-                                    @Validated @ParameterObject SysPostListRequest request) {
+                                                @Validated @ParameterObject SysPostListRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);
@@ -66,7 +66,7 @@ public class SysPostController extends BaseController {
     @Operation(summary = "添加岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addPost(@Parameter(description = "添加岗位请求参数")
-                                 @Validated @RequestBody SysPostAddRequest request) {
+                                    @Validated @RequestBody SysPostAddRequest request) {
         boolean result = sysPostService.addPost(request);
         return toAjax(result);
     }
@@ -82,7 +82,7 @@ public class SysPostController extends BaseController {
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
-                                    @PathVariable("ids") List<Integer> ids) {
+                                       @PathVariable("ids") List<Integer> ids) {
         checkParam(ids == null, "id不能为空");
         boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
@@ -99,7 +99,7 @@ public class SysPostController extends BaseController {
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
     public AjaxResult<Void> updatePost(@Parameter(description = "修改岗位请求参数")
-                                    @Validated @RequestBody SysPostUpdateRequest request) {
+                                       @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.updatePost(request));
     }
 

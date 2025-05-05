@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictTypeMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictType">
+        <id property="id" column="id"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="listDictType" resultMap="BaseResultMap">
+        SELECT
+        id, dict_type, dict_name, status, remark, create_by, update_by, create_time, update_time
+        FROM
+        sys_dict_type
+        <where>
+            <if test="request.dictType != null and request.dictType != ''">
+                AND dict_type LIKE CONCAT('%', #{request.dictType}, '%')
+            </if>
+            <if test="request.dictName != null and request.dictName != ''">
+                AND dict_name LIKE CONCAT('%', #{request.dictName}, '%')
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

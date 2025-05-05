@@ -10,11 +10,11 @@ import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.entity.SysFileManagement;
+import cn.zhangchuangla.storage.model.entity.SysFile;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
-import cn.zhangchuangla.storage.model.vo.manage.StorageFileManagementListVo;
+import cn.zhangchuangla.storage.model.vo.file.SysFileListVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -80,15 +80,15 @@ public interface StorageConverter {
      * @param fileManagement 文件配置实体类
      * @return 文件传输数据传输对象
      */
-    FileTransferDto toFileTransferDto(SysFileManagement fileManagement);
+    FileTransferDto toFileTransferDto(SysFile fileManagement);
 
     /**
      * 将文件配置实体类 转换为文件配置请求参数
      *
-     * @param sysFileManagement 文件配置实体类
+     * @param sysFile 文件配置实体类
      * @return 文件配置请求参数
      */
-    StorageFileManagementListVo toSysFileManagementListVo(SysFileManagement sysFileManagement);
+    SysFileListVo toSysFileManagementListVo(SysFile sysFile);
 
     /**
      * 将文件配置实体类 转换为文件配置列表请求参数

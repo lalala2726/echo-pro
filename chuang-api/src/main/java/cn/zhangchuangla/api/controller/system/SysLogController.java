@@ -57,7 +57,7 @@ public class SysLogController extends BaseController {
     @Operation(summary = "获取登录日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
     public AjaxResult<TableDataResult> listLoginLog(@Parameter(description = "登录日志列表查询参数")
-                                        @Validated @ParameterObject SysLoginLogListRequest request) {
+                                                    @Validated @ParameterObject SysLoginLogListRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
         return getTableData(sysLoginLogPage, sysLoginLogListVos);
@@ -73,7 +73,7 @@ public class SysLogController extends BaseController {
     @Operation(summary = "获取操作日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
     public AjaxResult<TableDataResult> listOperationLog(@Parameter(description = "操作日志列表查询参数")
-                                            @Validated @ParameterObject SysOperationLogListRequest request) {
+                                                        @Validated @ParameterObject SysOperationLogListRequest request) {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
         List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
                 SysOperationLogListVo.class);
@@ -121,7 +121,7 @@ public class SysLogController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanLoginLog(@Parameter(description = "当前用户密码")
-                                       @RequestParam("password") String password) {
+                                          @RequestParam("password") String password) {
         if (password.isEmpty())
             return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {
@@ -142,7 +142,7 @@ public class SysLogController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanOperationLog(@Parameter(description = "当前用户密码")
-                                           @RequestParam("password") String password) {
+                                              @RequestParam("password") String password) {
         if (password.isEmpty())
             return error("您还没有输入密码！");
         if (verifyCurrentUserPassword(password)) {

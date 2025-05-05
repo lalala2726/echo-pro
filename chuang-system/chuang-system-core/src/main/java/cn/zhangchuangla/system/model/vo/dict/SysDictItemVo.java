@@ -1,87 +1,53 @@
 package cn.zhangchuangla.system.model.vo.dict;
 
+import cn.zhangchuangla.common.base.BaseVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
- * 字典项表
+ * 系统字典项表
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "字典项视图对象")
-public class SysDictItemVo {
+@Schema(description = "系统字典项视图对象")
+public class SysDictItemVo extends BaseVo {
 
     /**
-     * 主键
+     * 主键ID
      */
-    @Schema(description = "主键")
+    @Schema(description = "主键ID", type = "integer", format = "int64")
     private Long id;
 
     /**
-     * 关联字典编码
+     * 所属字典类型编码
      */
-    @Schema(description = "关联字典编码")
-    private String dictCode;
+    @Schema(description = "所属字典类型编码", type = "string")
+    private String dictType;
+
+    /**
+     * 字典项名称
+     */
+    @Schema(description = "字典项名称", type = "string")
+    private String itemLabel;
 
     /**
      * 字典项值
      */
-    @Schema(description = "字典项值")
-    private String value;
+    @Schema(description = "字典项值", type = "string")
+    private String itemValue;
 
     /**
-     * 字典项标签
+     * 排序值
      */
-    @Schema(description = "字典项标签")
-    private String label;
-
-    /**
-     * 标签类型
-     */
-    @Schema(description = "标签类型")
-    private String tagType;
-
-    /**
-     * 状态
-     */
-    @Schema(description = "状态")
-    private Integer status;
-
-    /**
-     * 排序
-     */
-    @Schema(description = "排序")
+    @Schema(description = "排序值", type = "integer")
     private Integer sort;
 
     /**
-     * 创建时间
+     * 状态：0启用，1禁用
      */
-    @Schema(name = "创建时间")
-    private Date createTime;
+    @Schema(description = "状态：0启用，1禁用", type = "string")
+    private String status;
 
-    /**
-     * 删除时间
-     */
-    @Schema(name = "删除时间")
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    @Schema(name = "创建人")
-    private String createBy;
-
-    /**
-     * 修改人
-     */
-    @Schema(name = "修改人")
-    private String updateBy;
-
-    /**
-     * 备注
-     */
-    @Schema(name = "备注")
-    private String remark;
 
 }

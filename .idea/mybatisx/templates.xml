@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysMenu" />
-                  <option name="tableName" value="sys_menu" />
+                  <option name="className" value="SysDictType" />
+                  <option name="tableName" value="sys_dict_type" />
                 </TableUIInfo>
               </list>
             </option>

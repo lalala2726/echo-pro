@@ -48,9 +48,8 @@ public class StorageUtils {
      *
      * @param fileTransferDto 文件传输对象
      * @param configObject    配置对象
-     * @return 文件名
      */
-    public static String validateUploadParams(FileTransferDto fileTransferDto, Object configObject) {
+    public static void validateUploadParams(FileTransferDto fileTransferDto, Object configObject) {
         if (configObject == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "存储服务配置不能为空！");
         }
@@ -60,7 +59,6 @@ public class StorageUtils {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
         }
 
-        return fileTransferDto.getOriginalName();
     }
 
     /**
@@ -118,7 +116,7 @@ public class StorageUtils {
                 // 去除路径中的反斜杠
                 String sanitizedArg = arg.replace("\\", "/");
                 // 如果路径不以斜杠开头，则添加斜杠
-                if (pathBuilder.length() > 0 && !sanitizedArg.startsWith("/")) {
+                if (!pathBuilder.isEmpty() && !sanitizedArg.startsWith("/")) {
                     pathBuilder.append("/");
                 }
                 pathBuilder.append(sanitizedArg);
@@ -258,10 +256,9 @@ public class StorageUtils {
      * @param fileTransferDto 文件传输对象
      * @param storageType     存储类型
      * @param bucketName      桶名称
-     * @return 填充后的文件传输对象
      */
-    public static FileTransferDto fillFileTransferInfo(FileTransferDto fileTransferDto, String storageType,
-                                                       String bucketName) {
+    public static void fillFileTransferInfo(FileTransferDto fileTransferDto, String storageType,
+                                            String bucketName) {
         if (fileTransferDto == null || fileTransferDto.getBytes() == null
                 || fileTransferDto.getOriginalName() == null) {
             throw new FileException(ResponseCode.FileUploadFailed, "文件数据或文件名不能为空！");
@@ -285,7 +282,6 @@ public class StorageUtils {
         fileTransferDto.setStorageType(storageType);
         fileTransferDto.setBucketName(bucketName);
 
-        return fileTransferDto;
     }
 
     /**

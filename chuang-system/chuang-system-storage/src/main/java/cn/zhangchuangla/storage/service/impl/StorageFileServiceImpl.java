@@ -9,10 +9,10 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
-import cn.zhangchuangla.storage.mapper.SysFileManagementMapper;
-import cn.zhangchuangla.storage.model.entity.SysFileManagement;
-import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
-import cn.zhangchuangla.storage.service.StorageManagementService;
+import cn.zhangchuangla.storage.mapper.SysFileMapper;
+import cn.zhangchuangla.storage.model.entity.SysFile;
+import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
+import cn.zhangchuangla.storage.service.StorageFileService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,10 +32,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementMapper, SysFileManagement>
-        implements StorageManagementService {
+public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
+        implements StorageFileService {
 
-    private final SysFileManagementMapper sysFileManagementMapper;
+    private final SysFileMapper sysFileMapper;
     private final StorageFactory storageFactory;
     private final StorageConverter storageConverter;
 
@@ -49,7 +49,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
     public void saveFileInfo(FileTransferDto fileTransferDto) {
         Long userId = SecurityUtils.getUserId();
         String userName = SecurityUtils.getUsername();
-        SysFileManagement sysFileManagement = SysFileManagement.builder()
+        SysFile sysFile = SysFile.builder()
                 .originalName(fileTransferDto.getOriginalName())
                 .contentType(fileTransferDto.getContentType())
                 .fileSize(fileTransferDto.getFileSize())
@@ -65,7 +65,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
                 .uploaderName(userName)
                 .uploadTime(new Date())
                 .build();
-        save(sysFileManagement);
+        save(sysFile);
     }
 
     /**
@@ -75,9 +75,9 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @return 分页结果
      */
     @Override
-    public Page<SysFileManagement> listFileManage(SysFileManagementListRequest request) {
-        Page<SysFileManagement> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysFileManagementMapper.listFileManage(sysFileManagementPage, request);
+    public Page<SysFile> listFileManage(SysFileListRequest request) {
+        Page<SysFile> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysFileMapper.listFileManage(sysFileManagementPage, request);
     }
 
     /**
@@ -95,7 +95,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
         }
 
         for (Long id : ids) {
-            SysFileManagement fileManagement = getFileManageById(id);
+            SysFile fileManagement = getFileManageById(id);
             if (fileManagement == null) {
                 log.warn("文件不存在，ID: {}", id);
                 throw new FileException(ResponseCode.RESULT_IS_NULL, "文件不存在，ID: " + id);
@@ -156,7 +156,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @param previewTrashPath  预览图文件在回收站的路径（可能为null）
      */
     private void updateFileTrashStatus(Long id, String originalTrashPath, String previewTrashPath) {
-        SysFileManagement sysFileManagement = SysFileManagement.builder()
+        SysFile sysFile = SysFile.builder()
                 .id(id)
                 .isTrash(StorageConstants.IS_TRASH)  // 设置为"在回收站"
                 .originalTrashPath(originalTrashPath) // 记录原始文件回收站路径
@@ -164,7 +164,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
                 .updateTime(new Date())
                 .build();
 
-        if (!updateById(sysFileManagement)) {
+        if (!updateById(sysFile)) {
             log.warn("更新文件回收站状态失败，ID: {}", id);
         }
     }
@@ -175,7 +175,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @param fileManagement 文件管理实体
      * @return 文件传输DTO
      */
-    private FileTransferDto convertToFileTransferDto(SysFileManagement fileManagement) {
+    private FileTransferDto convertToFileTransferDto(SysFile fileManagement) {
         return storageConverter.toFileTransferDto(fileManagement);
     }
 
@@ -186,10 +186,10 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @return 文件信息
      */
     @Override
-    public SysFileManagement getFileManageById(Long id) {
-        LambdaQueryWrapper<SysFileManagement> eq = new LambdaQueryWrapper<SysFileManagement>()
-                .eq(SysFileManagement::getId, id)
-                .eq(SysFileManagement::getIsTrash, StorageConstants.IS_NOT_DELETED);
+    public SysFile getFileManageById(Long id) {
+        LambdaQueryWrapper<SysFile> eq = new LambdaQueryWrapper<SysFile>()
+                .eq(SysFile::getId, id)
+                .eq(SysFile::getIsTrash, StorageConstants.IS_NOT_DELETED);
         return getOne(eq);
     }
 
@@ -200,9 +200,9 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
      * @return 分页结果
      */
     @Override
-    public Page<SysFileManagement> listFileTrash(SysFileManagementListRequest request) {
-        Page<SysFileManagement> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysFileManagementMapper.listFileTrash(sysFileManagementPage, request);
+    public Page<SysFile> listFileTrash(SysFileListRequest request) {
+        Page<SysFile> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysFileMapper.listFileTrash(sysFileManagementPage, request);
     }
 
     /**
@@ -215,11 +215,11 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
     @Transactional(rollbackFor = Exception.class)
     public boolean recoverFile(Long id) {
         // 获取回收站中的文件记录
-        LambdaQueryWrapper<SysFileManagement> eq = new LambdaQueryWrapper<SysFileManagement>()
-                .eq(SysFileManagement::getId, id)
-                .eq(SysFileManagement::getIsTrash, StorageConstants.IS_TRASH);
+        LambdaQueryWrapper<SysFile> eq = new LambdaQueryWrapper<SysFile>()
+                .eq(SysFile::getId, id)
+                .eq(SysFile::getIsTrash, StorageConstants.IS_TRASH);
 
-        SysFileManagement fileManagement = getOne(eq);
+        SysFile fileManagement = getOne(eq);
 
         if (fileManagement == null) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件不存在或未在回收站中");
@@ -254,7 +254,7 @@ public class StorageManagementServiceImpl extends ServiceImpl<SysFileManagementM
 
             if (recoverResult) {
                 // 恢复成功，更新数据库状态
-                SysFileManagement updateEntity = SysFileManagement.builder()
+                SysFile updateEntity = SysFile.builder()
                         .id(id)
                         .isTrash(StorageConstants.IS_NOT_TRASH) // 设置为"不在回收站"
                         .originalTrashPath(null) // 清空回收站路径

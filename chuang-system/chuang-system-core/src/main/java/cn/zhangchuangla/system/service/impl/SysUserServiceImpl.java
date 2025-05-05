@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.utils.ParamsUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
@@ -79,16 +78,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
         // 角色ID校验
         List<Long> roleIds = request.getRoleIds();
-        if (roleIds != null && !roleIds.isEmpty()) {
-            for (Long roleId : roleIds) {
-                try {
-                    ParamsUtils.minValidParam(roleId, "角色ID不能小于等于0");
-                } catch (Exception e) {
-                    log.error("add role info failed", e);
-                    throw new ServiceException(ResponseCode.INVALID_ROLE_ID, "无效的角色ID: " + roleId);
-                }
-            }
-        }
         //存入数据库
         if (!save(sysUser)) {
             return -1L;
@@ -138,8 +127,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean isEmailExist(String email, Long userId) {
-        ParamsUtils.paramsNotIsNullOrBlank("邮箱不能为空", email);
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
         Integer count = sysUserMapper.countOtherUserEmails(email, userId);
         return count > 0;
     }
@@ -167,8 +154,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean isPhoneExist(String phone, Long userId) {
-        ParamsUtils.paramsNotIsNullOrBlank("手机号不能为空", phone);
-        ParamsUtils.minValidParam(userId, "用户ID不能小于等于零");
         Integer count = sysUserMapper.isPhoneExist(phone, userId);
         return count > 0;
     }
@@ -181,7 +166,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public SysUser getSysUserByUsername(String username) {
-        ParamsUtils.paramsNotIsNullOrBlank("用户名不能为空", username);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
         SysUser user = getOne(eq);
         log.info("从数据库找到的用户:{}", user);
@@ -199,7 +183,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public SysUser getUserInfoByUserId(Long userId) {
-        ParamsUtils.minValidParam(userId, "用户ID不能为空");
         LambdaQueryWrapper<SysUser> sysUserLambdaQueryWrapper = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, userId);
         SysUser user = getOne(sysUserLambdaQueryWrapper);
         if (user == null) {
@@ -270,17 +253,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
 
         // 添加新的角色信息
-        if (roles != null && !roles.isEmpty()) {
-            for (Long role : roles) {
-                try {
-                    ParamsUtils.minValidParam(role, "角色ID不能小于等于0");
-                } catch (Exception e) {
-                    log.error("update role info failed", e);
-                    throw new ServiceException(ResponseCode.INVALID_ROLE_ID, "无效的角色ID: " + role);
-                }
-            }
-            sysUserRoleService.addUserRoleAssociation(roles, userId);
-        }
+        sysUserRoleService.addUserRoleAssociation(roles, userId);
         return true;
     }
 

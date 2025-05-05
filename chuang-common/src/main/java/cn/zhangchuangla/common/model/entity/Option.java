@@ -35,6 +35,7 @@ public class Option<T> {
     @JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
     private boolean disabled;
 
+
     public Option(T value, String label) {
         this.value = value;
         this.label = label;

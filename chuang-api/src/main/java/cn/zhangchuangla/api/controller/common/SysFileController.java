@@ -10,7 +10,7 @@ import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
-import cn.zhangchuangla.storage.service.StorageManagementService;
+import cn.zhangchuangla.storage.service.StorageFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +41,7 @@ public class SysFileController extends BaseController {
 
     private final StorageConfigLoader sysFileConfigLoader;
     private final StorageFactory storageFactory;
-    private final StorageManagementService storageManagementService;
+    private final StorageFileService storageFileService;
 
     /**
      * 智能文件上传
@@ -76,7 +76,7 @@ public class SysFileController extends BaseController {
                     .build();
 
             FileTransferDto result = storageOperation.fileUpload(fileTransferDto);
-            storageManagementService.saveFileInfo(result);
+            storageFileService.saveFileInfo(result);
             ajax.put(StorageConstants.FILE_URL, result.getOriginalFileUrl());
             return success(ajax);
         } catch (IOException e) {
@@ -114,7 +114,7 @@ public class SysFileController extends BaseController {
                     .build();
             FileTransferDto result = storageOperation.imageUpload(fileTransferDto);
             // 保存文件信息到数据库
-            storageManagementService.saveFileInfo(result);
+            storageFileService.saveFileInfo(result);
             ajax.put(Constants.ORIGINAL, result.getOriginalFileUrl());
             ajax.put(Constants.PREVIEW, result.getPreviewImageUrl());
         } catch (IOException e) {

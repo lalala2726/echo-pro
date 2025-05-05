@@ -13,12 +13,12 @@ import java.util.Date;
 /**
  * 文件上传记录表
  */
-@TableName(value = "storage_file_management")
+@TableName(value = "storage_file")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SysFileManagement {
+public class SysFile {
 
     /**
      * 主键ID

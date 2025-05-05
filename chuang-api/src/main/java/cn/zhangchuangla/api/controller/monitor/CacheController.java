@@ -56,23 +56,23 @@ public class CacheController extends BaseController {
         }
     }
 
-/**
- * 获取 Redis 基础信息
- */
-private Properties getRedisBaseInfo() {
-    return redisTemplate.execute((RedisCallback<Properties>) connection ->
-            Optional.ofNullable(connection.serverCommands().info())
-                    .orElseGet(Properties::new));
-}
+    /**
+     * 获取 Redis 基础信息
+     */
+    private Properties getRedisBaseInfo() {
+        return redisTemplate.execute((RedisCallback<Properties>) connection ->
+                Optional.ofNullable(connection.serverCommands().info())
+                        .orElseGet(Properties::new));
+    }
 
-/**
- * 获取 Redis 命令统计
- */
-private Properties getCommandStats() {
-    return redisTemplate.execute((RedisCallback<Properties>) connection ->
-            Optional.ofNullable(connection.serverCommands().info("commandstats"))
-                    .orElseGet(Properties::new));
-}
+    /**
+     * 获取 Redis 命令统计
+     */
+    private Properties getCommandStats() {
+        return redisTemplate.execute((RedisCallback<Properties>) connection ->
+                Optional.ofNullable(connection.serverCommands().info("commandstats"))
+                        .orElseGet(Properties::new));
+    }
 
     /**
      * 获取数据库大小

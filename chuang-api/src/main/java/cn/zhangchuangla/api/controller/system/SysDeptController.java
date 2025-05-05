@@ -67,7 +67,7 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "新增部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addDept(@Parameter(description = "部门添加请求参数")
-                                 @Validated @RequestBody SysDeptAddRequest request) {
+                                    @Validated @RequestBody SysDeptAddRequest request) {
         return toAjax(sysDeptService.addDept(request));
     }
 
@@ -82,7 +82,7 @@ public class SysDeptController extends BaseController {
     @Operation(summary = "修改部门")
     @OperationLog(title = "部门管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateDept(@Parameter(description = "部门修改请求参数")
-                                    @Validated @RequestBody SysDeptUpdateRequest request) {
+                                       @Validated @RequestBody SysDeptUpdateRequest request) {
         return toAjax(sysDeptService.updateDept(request));
     }
 

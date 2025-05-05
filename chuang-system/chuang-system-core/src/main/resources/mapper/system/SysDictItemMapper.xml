@@ -6,79 +6,35 @@
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictItem">
         <id property="id" column="id"/>
-        <result property="dictCode" column="dict_code"/>
-        <result property="value" column="value"/>
-        <result property="label" column="label"/>
-        <result property="tagType" column="tag_type"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="itemLabel" column="item_label"/>
+        <result property="itemValue" column="item_value"/>
+        <result property="sortOrder" column="sort_order"/>
         <result property="status" column="status"/>
-        <result property="sort" column="sort"/>
         <result property="remark" column="remark"/>
-        <result property="createTime" column="create_time"/>
         <result property="createBy" column="create_by"/>
-        <result property="updateTime" column="update_time"/>
         <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <select id="listSpecifyDictData" resultMap="BaseResultMap">
-        select id, dict_code, value, label, tag_type, status, sort, remark, create_time, create_by, update_time,
-        update_by
-        from sys_dict_item
+    <select id="listDictItem" resultMap="BaseResultMap">
+        SELECT
+        id, dict_type, item_label, item_value, sort_order, status, remark,
+        create_by, update_by, create_time, update_time
+        FROM sys_dict_item
         <where>
-            <if test="request != null">
-                <if test="request.id != null">
-                    and id = #{request.id}
-                </if>
-                <if test="request.dictCode != null and request.dictCode != ''">
-                    and dict_code like concat('%', #{request.dictCode}, '%')
-                </if>
-                <if test="request.value != null and request.value != ''">
-                    and value like concat('%', #{request.value}, '%')
-                </if>
-                <if test="request.label != null and request.label != ''">
-                    and label like concat('%', #{request.label}, '%')
-                </if>
-                <if test="request.tagType != null and request.tagType != ''">
-                    and tag_type = #{request.tagType}
-                </if>
-                <if test="request.status != null">
-                    and status = #{request.status}
-                </if>
-                <if test="request.sort != null">
-                    and sort = #{request.sort}
-                </if>
+            <if test="request.itemLabel != null and request.itemLabel != ''">
+                AND item_label LIKE CONCAT('%', #{request.itemLabel}, '%')
             </if>
-            and dict_code = #{dictCode}
-        </where>
-    </select>
-
-    <select id="listDictData" resultMap="BaseResultMap">
-        select id, dict_code, value, label, tag_type, status, sort, remark, create_time, create_by, update_time,
-        update_by
-        from sys_dict_item
-        <where>
-            <if test="request != null">
-                <if test="request.id != null">
-                    and id = #{request.id}
-                </if>
-                <if test="request.dictCode != null and request.dictCode != ''">
-                    and dict_code like concat('%', #{request.dictCode}, '%')
-                </if>
-                <if test="request.value != null and request.value != ''">
-                    and value like concat('%', #{request.value}, '%')
-                </if>
-                <if test="request.label != null and request.label != ''">
-                    and label like concat('%', #{request.label}, '%')
-                </if>
-                <if test="request.tagType != null and request.tagType != ''">
-                    and tag_type = #{request.tagType}
-                </if>
-                <if test="request.status != null">
-                    and status = #{request.status}
-                </if>
-                <if test="request.sort != null">
-                    and sort = #{request.sort}
-                </if>
+            <if test="request.itemValue != null and request.itemValue != ''">
+                AND item_value LIKE CONCAT('%', #{request.itemValue}, '%')
             </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            and dict_type = #{dictType}
         </where>
+        ORDER BY sort_order ASC, create_time DESC
     </select>
 </mapper>

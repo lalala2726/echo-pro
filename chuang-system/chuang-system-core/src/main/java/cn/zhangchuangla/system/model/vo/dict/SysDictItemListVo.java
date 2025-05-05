@@ -6,64 +6,53 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 字典项表
+ * 系统字典项表
  */
 @Data
+@Schema(description = "系统字典项列表视图对象")
 public class SysDictItemListVo {
 
     /**
-     * 主键
+     * 主键ID
      */
-    @Schema(description = "主键ID")
+    @Schema(description = "主键ID", type = "integer", format = "int64")
     private Long id;
 
     /**
-     * 关联字典编码，与sys_dict表中的dict_code对应
+     * 所属字典类型编码
      */
-    @Schema(description = "关联字典编码")
-    private String dictCode;
+    @Schema(description = "所属字典类型编码", type = "string")
+    private String dictType;
+
+    /**
+     * 字典项名称
+     */
+    @Schema(description = "字典项名称", type = "string")
+    private String itemLabel;
 
     /**
      * 字典项值
      */
-    @Schema(description = "字典项值")
-    private String value;
+    @Schema(description = "字典项值", type = "string")
+    private String itemValue;
 
     /**
-     * 字典项标签
+     * 排序值
      */
-    @Schema(description = "字典项标签")
-    private String label;
-
-    /**
-     * 标签类型，用于前端样式展示（如success、warning等）
-     */
-    @Schema(description = "标签类型")
-    private String tagType;
-
-    /**
-     * 状态（1-正常，0-禁用）
-     */
-    @Schema(description = "状态（1-正常，0-禁用）")
-    private Integer status;
-
-    /**
-     * 排序
-     */
-    @Schema(description = "排序")
+    @Schema(description = "排序值", type = "integer")
     private Integer sort;
+
+    /**
+     * 状态：0启用，1禁用
+     */
+    @Schema(description = "状态：0启用，1禁用")
+    private String status;
 
     /**
      * 创建时间
      */
-    @Schema(description = "创建时间")
+    @Schema(description = "创建时间", type = "string")
     private Date createTime;
-
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
 
 
 }

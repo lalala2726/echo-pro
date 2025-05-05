@@ -1,57 +1,47 @@
 package cn.zhangchuangla.system.model.request.dict;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.hibernate.validator.constraints.Range;
 
 /**
- * 字典项添加请求类
+ * 系统字典项表
+ *
+ * @author Chuang
  */
 @Data
-@Schema(description = "字典项添加请求类")
+@Schema(description = "系统字典项添加请求对象")
 public class SysDictItemAddRequest {
 
+
     /**
-     * 关联字典编码
+     * 所属字典类型编码
      */
-    @Schema(description = "关联字典编码", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String dictCode;
+    @Schema(description = "所属字典类型编码", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String dictType;
+
+    /**
+     * 字典项名称
+     */
+    @Schema(description = "字典项名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String itemLabel;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "字典项不能为空")
-    private String value;
+    private String itemValue;
 
     /**
-     * 字典项标签
+     * 排序值
      */
-    @Schema(description = "字典项标签", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "字典项标签不能为空")
-    private String label;
-
-    /**
-     * 标签类型
-     */
-    @Schema(description = "标签类型", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "标签类型不能为空")
-    private String tagType;
-
-    /**
-     * 状态（1-正常，0-禁用）
-     */
-    @Schema(description = "状态（1-正常，0-禁用）", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Range(min = 0, max = 1, message = "状态只能为0或1")
-    private Integer status;
-
-    /**
-     * 排序
-     */
-    @Schema(description = "排序", type = "integer", requiredMode = Schema.RequiredMode.AUTO)
-    @Min(value = 0, message = "排序值不能小于0")
+    @Schema(description = "排序值", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer sort;
+
+    /**
+     * 状态：0启用，1禁用
+     */
+    @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String status;
+
 
 }

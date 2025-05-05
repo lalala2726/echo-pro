@@ -12,24 +12,14 @@ import org.apache.ibatis.annotations.Param;
 public interface SysDictItemMapper extends BaseMapper<SysDictItem> {
 
     /**
-     * 获取指定字典下的字典项分页
+     * 查询字典项列表
      *
-     * @param page     分页对象
-     * @param dictCode 字典编码
-     * @param request  查询参数
-     * @return 分页数据
+     * @param sysDictItemPage 分页对象
+     * @param request         查询参数
+     * @return 字典项列表
      */
-    Page<SysDictItem> listSpecifyDictData(Page<SysDictItem> page, @Param("dictCode") String dictCode,
-                                          @Param("request") SysDictItemListRequest request);
-
-    /**
-     * 分页查询字典数据
-     *
-     * @param page    分页对象
-     * @param request 查询参数
-     * @return 分页数据
-     */
-    Page<SysDictItem> listDictData(Page<SysDictItem> page, @Param("request") SysDictItemListRequest request);
+    Page<SysDictItem> listDictItem(Page<SysDictItem> sysDictItemPage, @Param("dictType") String dictType,
+                                   @Param("request") SysDictItemListRequest request);
 }
 
 

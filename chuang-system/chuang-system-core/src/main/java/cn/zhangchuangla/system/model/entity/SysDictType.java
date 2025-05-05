@@ -8,36 +8,32 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 字典表
+ * 系统字典类型表
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_dict")
+@TableName(value = "sys_dict_type")
 @Data
-public class SysDict extends BaseEntity {
+public class SysDictType extends BaseEntity {
 
     /**
-     * 主键
+     * 主键ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 类型编码
+     * 字典类型编码
      */
-    private String dictCode;
+    private String dictType;
 
     /**
-     * 类型名称
+     * 字典名称
      */
-    private String name;
+    private String dictName;
 
     /**
-     * 状态(0:正常;1:禁用)
+     * 状态：0启用，1禁用
      */
-    private Integer status;
+    private String status;
 
-    /**
-     * 是否删除(1-删除，0-未删除)
-     */
-    private Integer isDeleted;
 }

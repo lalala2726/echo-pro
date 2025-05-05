@@ -28,13 +28,13 @@ public class BaseEntity implements Serializable {
     /**
      * 创建人
      */
-    @Schema(description = "创建人")
+    @Schema(description = "创建者")
     private String createBy;
 
     /**
      * 修改人
      */
-    @Schema(description = "修改人")
+    @Schema(description = "修改者")
     private String updateBy;
 
     /**

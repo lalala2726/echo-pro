@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage.model.request.manage;
+package cn.zhangchuangla.storage.model.request.file;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +13,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "文件管理列表请求参数")
-public class SysFileManagementListRequest extends BasePageRequest {
+public class SysFileListRequest extends BasePageRequest {
 
     /**
      * 文件名

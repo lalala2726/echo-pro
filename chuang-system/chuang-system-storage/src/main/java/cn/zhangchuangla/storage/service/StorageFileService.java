@@ -1,8 +1,8 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
-import cn.zhangchuangla.storage.model.entity.SysFileManagement;
-import cn.zhangchuangla.storage.model.request.manage.SysFileManagementListRequest;
+import cn.zhangchuangla.storage.model.entity.SysFile;
+import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * author zhangchuang
  */
-public interface StorageManagementService extends IService<SysFileManagement> {
+public interface StorageFileService extends IService<SysFile> {
 
     /**
      * 保存文件信息
@@ -26,7 +26,7 @@ public interface StorageManagementService extends IService<SysFileManagement> {
      * @param request 查询参数
      * @return 分页结果
      */
-    Page<SysFileManagement> listFileManage(SysFileManagementListRequest request);
+    Page<SysFile> listFileManage(SysFileListRequest request);
 
     /**
      * 删除文件
@@ -44,7 +44,7 @@ public interface StorageManagementService extends IService<SysFileManagement> {
      * @param id 文件id
      * @return 文件信息
      */
-    SysFileManagement getFileManageById(Long id);
+    SysFile getFileManageById(Long id);
 
     /**
      * 查询回收站文件列表
@@ -52,7 +52,7 @@ public interface StorageManagementService extends IService<SysFileManagement> {
      * @param request 查询参数
      * @return 分页结果
      */
-    Page<SysFileManagement> listFileTrash(SysFileManagementListRequest request);
+    Page<SysFile> listFileTrash(SysFileListRequest request);
 
     /**
      * 恢复文件
