@@ -23,7 +23,7 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @param request 请求
      * @return 分页结果
      */
-    Page<SysDictItem> listDictItem(Page<SysDictItem> page, SysDictItemListRequest request);
+    Page<SysDictItem> listDictItem(Page<SysDictItem> page,String dictType, SysDictItemListRequest request);
 
     /**
      * 根据id获取字典项

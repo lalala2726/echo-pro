@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/file/manage")
 @RequiredArgsConstructor
-public class SysFileController extends BaseController {
+public class SysFileManageController extends BaseController {
 
     private final StorageFileService storageFileService;
     private final StorageConverter storageConverter;
@@ -112,8 +112,6 @@ public class SysFileController extends BaseController {
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                        @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
-        if (isPermanently == null)
-            return error("是否删除文件不能为空！");
         ids.forEach(id -> checkParam(id == null || id <= 0, "文件ID不能为空!"));
         checkParam(ids.size() > 100, "最多只能删除100个文件!");
         boolean result = storageFileService.removeFile(ids, isPermanently);

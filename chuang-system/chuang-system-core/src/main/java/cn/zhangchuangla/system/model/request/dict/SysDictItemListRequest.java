@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典项表
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,11 +20,6 @@ public class SysDictItemListRequest extends BasePageRequest {
     @Schema(description = "主键ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long id;
 
-    /**
-     * 所属字典类型编码
-     */
-    @Schema(description = "所属字典类型编码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String dictType;
 
     /**
      * 字典项名称

@@ -2,21 +2,21 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.system.converter.SysDictConverter;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
 import cn.zhangchuangla.system.service.SysDictItemService;
-import cn.zhangchuangla.system.service.SysDictTypeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         implements SysDictItemService {
 
     private final SysDictItemMapper sysDictItemMapper;
-    private final SysDictTypeService sysDictTypeService; // 注入 SysDictTypeService 用于校验
+    private final SysDictConverter sysDictConverter;
 
     /**
      * 获取字典项列表
@@ -42,10 +42,8 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * @return 分页结果
      */
     @Override
-    public Page<SysDictItem> listDictItem(Page<SysDictItem> page, SysDictItemListRequest request) {
-        // MyBatis Plus分页会自动处理page参数，无需手动创建 new Page<>()
-        // 直接调用Mapper方法进行查询
-        return sysDictItemMapper.listDictItem(page, request);
+    public Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemListRequest request) {
+        return sysDictItemMapper.listDictItem(page, dictType, request);
     }
 
     /**
@@ -67,26 +65,14 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public boolean addDictItem(SysDictItemAddRequest request) {
-        // 检查字典类型是否存在
-        if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
-        }
-
         // 检查同一字典类型下字典项值是否重复
         if (isDictItemValueExist(request.getDictType(), request.getItemValue(), null)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
-        SysDictItem sysDictItem = new SysDictItem();
-        BeanUtils.copyProperties(request, sysDictItem);
-
-        // 设置排序值
-        if (sysDictItem.getSortOrder() == null) {
-            // 默认排序值可以设置为 0 或其他合理值
-            sysDictItem.setSortOrder(0);
-        }
-
-        return sysDictItemMapper.insert(sysDictItem) > 0;
+        SysDictItem sysDictItem = sysDictConverter.toEntity(request);
+        sysDictItem.setCreateBy(SecurityUtils.getUsername());
+        return save(sysDictItem);
     }
 
     /**
@@ -103,21 +89,13 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典项不存在");
         }
 
-        // 如果修改了字典类型，检查新的字典类型是否存在
-        if (!existDictItem.getDictType().equals(request.getDictType())) {
-            if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
-            }
-        }
-
         // 检查同一字典类型下字典项值是否重复 (排除自身)
         if (isDictItemValueExist(request.getDictType(), request.getItemValue(), request.getId())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
-        SysDictItem sysDictItem = new SysDictItem();
-        BeanUtils.copyProperties(request, sysDictItem);
-
+        SysDictItem sysDictItem = sysDictConverter.toEntity(request);
+        sysDictItem.setUpdateBy(SecurityUtils.getUsername());
         return sysDictItemMapper.updateById(sysDictItem) > 0;
     }
 
@@ -162,9 +140,8 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     @Override
     public boolean updateDictItemDictType(String oldDictType, String newDictType) {
         if (StringUtils.isAnyBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
-            return false; // 无需更新或参数无效
+            return false;
         }
-
         LambdaUpdateWrapper<SysDictItem> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(SysDictItem::getDictType, oldDictType)
                 .set(SysDictItem::getDictType, newDictType);

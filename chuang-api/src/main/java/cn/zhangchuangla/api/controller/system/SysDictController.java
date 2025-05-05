@@ -2,8 +2,11 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.entity.SysDictType;
@@ -131,13 +134,17 @@ public class SysDictController extends BaseController {
      * @param request 字典项列表查询参数
      * @return 字典项列表
      */
-    @GetMapping("/item/list")
+    @GetMapping("/item/{dictType}/list")
     @Operation(summary = "字典项列表")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public AjaxResult<TableDataResult> listDictItem(@Parameter(description = "字典项列表查询参数")
+    public AjaxResult<TableDataResult> listDictItem(@PathVariable("dictType") String dictType,
+                                                    @Parameter(description = "字典项列表查询参数")
                                                     @Validated @ParameterObject SysDictItemListRequest request) {
+        if (StringUtils.isBlank(dictType)) {
+            return error("字典类型编码不能为空!");
+        }
         Page<SysDictItem> page = new Page<>(request.getPageNum(), request.getPageSize());
-        Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page, request);
+        Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page,dictType ,request);
         List<SysDictItemVo> sysDictItemVos = copyListProperties(sysDictItemPage, SysDictItemVo.class);
         return getTableData(sysDictItemPage, sysDictItemVos);
     }
@@ -173,6 +180,10 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典项", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addDictItem(@Parameter(description = "字典项添加请求参数")
                                         @Validated @RequestBody SysDictItemAddRequest request) {
+        // 检查字典类型是否存在
+        if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
+        }
         boolean result = sysDictItemService.addDictItem(request);
         return toAjax(result);
     }
