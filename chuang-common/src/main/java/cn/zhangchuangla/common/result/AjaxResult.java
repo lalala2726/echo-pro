@@ -76,7 +76,7 @@ public class AjaxResult<T> implements Serializable {
      * @param responseCode ResponseCode 枚举实例
      */
     private AjaxResult(ResponseCode responseCode) {
-        this(responseCode, null); // data 为 null
+        this(responseCode, null);
     }
 
     // --- 静态工厂方法 (推荐使用) ---

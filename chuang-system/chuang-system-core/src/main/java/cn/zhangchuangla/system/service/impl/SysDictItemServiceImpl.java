@@ -187,7 +187,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictType, dictType);
         List<SysDictItem> list = list(eq);
         return list.stream().map(item ->
-                new Option<>(item.getItemValue(), item.getItemLabel())
+                new Option<>(item.getItemValue(), item.getItemLabel(),item.getTag())
         ).toList();
     }
 }

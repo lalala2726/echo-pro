@@ -143,8 +143,9 @@ public class SysLogController extends BaseController {
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanOperationLog(@Parameter(description = "当前用户密码")
                                               @RequestParam("password") String password) {
-        if (password.isEmpty())
+        if (password.isEmpty()) {
             return error("您还没有输入密码！");
+        }
         if (verifyCurrentUserPassword(password)) {
             return error("当前用户密码不正确！");
         }
