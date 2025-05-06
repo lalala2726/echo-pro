@@ -31,16 +31,16 @@ public class SysLoginLogVo {
     private Integer status;
 
     /**
-     * ip
+     * ip地址
      */
-    @Schema(description = "ip")
-    private String ip;
+    @Schema(description = "IP地址")
+    private String address;
 
     /**
-     * 地址
+     * 区域
      */
-    @Schema(description = "地址")
-    private String address;
+    @Schema(description = "区域")
+    private String region;
 
     /**
      * 浏览器
@@ -55,32 +55,16 @@ public class SysLoginLogVo {
     private String os;
 
     /**
-     * 创建时间
+     * 登录时间
      */
-    @Schema(description = "创建时间")
-    private Date createTime;
+    @Schema(description = "登录时间")
+    private Date loginTime;
 
-    /**
-     * 更新时间
-     */
-    @Schema(description = "更新时间")
-    private Date updateTime;
 
     /**
      * 创建人
      */
-    @Schema(description = "创建人")
+    @Schema(description = "创建者")
     private String createBy;
 
-    /**
-     * 更新人
-     */
-    @Schema(description = "更新人")
-    private String updateBy;
-
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
 }

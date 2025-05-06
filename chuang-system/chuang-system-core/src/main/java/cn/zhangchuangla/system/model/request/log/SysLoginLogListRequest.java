@@ -40,16 +40,16 @@ public class SysLoginLogListRequest extends BasePageRequest {
     private Integer status;
 
     /**
-     * ip
+     * ip地址
      */
     @Schema(description = "ip", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String ip;
+    private String address;
 
     /**
-     * 地址
+     * 地区
      */
     @Schema(description = "地址", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String address;
+    private String region;
 
     /**
      * 浏览器
@@ -67,11 +67,6 @@ public class SysLoginLogListRequest extends BasePageRequest {
      * 创建时间
      */
     @Schema(description = "创建时间", type = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Date createTime;
+    private Date loginTime;
 
-    /**
-     * 备注
-     */
-    @Schema(description = "备注", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String remark;
 }

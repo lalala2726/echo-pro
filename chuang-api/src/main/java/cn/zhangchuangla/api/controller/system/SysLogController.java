@@ -89,7 +89,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/login/{id}")
     @Operation(summary = "获取登录日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID") @PathVariable Long id) {
+    public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
+                                                     @PathVariable("id") Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
         SysLoginLogVo sysLoginLogVo = sysLogConverter.toSysLoginLogVo(sysLoginLog);
         return success(sysLoginLogVo);
@@ -104,7 +105,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/operation/{id}")
     @Operation(summary = "获取操作日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID") @PathVariable Long id) {
+    public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
+                                                             @PathVariable("id") Long id) {
         SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
         SysOperationLogVo sysOperationLogVo = sysLogConverter.toSysOperationLogVo(sysOperationLog);
         return success(sysOperationLogVo);

@@ -35,13 +35,13 @@ public class SysLoginLogListVo {
      * ip
      */
     @Schema(description = "ip")
-    private String ip;
+    private String address;
 
     /**
      * 地址
      */
     @Schema(description = "地址")
-    private String address;
+    private String region;
 
     /**
      * 浏览器
@@ -59,35 +59,13 @@ public class SysLoginLogListVo {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private Date createTime;
+    private Date loginTime;
+
 
     /**
-     * 更新时间
+     * 创建者
      */
-    @Schema(description = "更新时间")
-    private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    @Schema(description = "创建人")
+    @Schema(description = "创建者")
     private String createBy;
 
-    /**
-     * 更新人
-     */
-    @Schema(description = "更新人")
-    private String updateBy;
-
-    /**
-     * 是否删除
-     */
-    @Schema(description = "是否删除")
-    private Integer isDeleted;
-
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
 }

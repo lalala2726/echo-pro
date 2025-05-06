@@ -162,7 +162,8 @@ public class SysUserController extends BaseController {
     @Operation(summary = "根据用户ID重置密码")
     @OperationLog(title = "用户管理", businessType = BusinessType.RESET_PWD)
     @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
-    public AjaxResult<Boolean> resetPassword(@PathVariable("id") Long id, @RequestParam("password") String password) {
+    public AjaxResult<Boolean> resetPassword(@PathVariable("id") Long id,
+                                             @RequestParam("password") String password) {
         checkParam(id == null || id <= 0, "用户ID不能小于等于0");
         if (!password.matches(RegularConstants.User.password)) {
             return error("密码格式不正确");

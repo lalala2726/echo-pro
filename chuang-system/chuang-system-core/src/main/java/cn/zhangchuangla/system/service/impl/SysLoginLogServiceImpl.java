@@ -55,7 +55,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
         );
         SysLoginLog sysLoginLog = SysLoginLog.builder()
                 .os(deviceInfo.getOsName())
-                .ip(deviceInfo.getIp())
+                .address(deviceInfo.getIp())
                 .address(deviceInfo.getRegion())
                 .username(username)
                 .browser(deviceInfo.getBrowserName())
