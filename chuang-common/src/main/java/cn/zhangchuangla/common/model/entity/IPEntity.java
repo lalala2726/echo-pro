@@ -11,6 +11,11 @@ import lombok.Data;
 public class IPEntity {
 
     /**
+     * IP地址
+     */
+    private String ip;
+
+    /**
      * 国家
      */
     private String country;
