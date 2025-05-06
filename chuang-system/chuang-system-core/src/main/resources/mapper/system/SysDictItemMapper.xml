@@ -10,17 +10,18 @@
         <result property="itemLabel" column="item_label"/>
         <result property="itemValue" column="item_value"/>
         <result property="sortOrder" column="sort_order"/>
+        <result property="tag" column="tag"/>
         <result property="status" column="status"/>
-        <result property="remark" column="remark"/>
         <result property="createBy" column="create_by"/>
         <result property="updateBy" column="update_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
     <select id="listDictItem" resultMap="BaseResultMap">
         SELECT
-        id, dict_type, item_label, item_value, sort_order, status, remark,
+        id, dict_type, item_label, item_value, sort_order, status, tag,remark,
         create_by, update_by, create_time, update_time
         FROM sys_dict_item
         <where>

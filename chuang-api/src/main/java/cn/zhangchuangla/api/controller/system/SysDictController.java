@@ -145,7 +145,7 @@ public class SysDictController extends BaseController {
             return error("字典类型编码不能为空!");
         }
         Page<SysDictItem> page = new Page<>(request.getPageNum(), request.getPageSize());
-        Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page,dictType ,request);
+        Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page, dictType, request);
         List<SysDictItemVo> sysDictItemVos = copyListProperties(sysDictItemPage, SysDictItemVo.class);
         return getTableData(sysDictItemPage, sysDictItemVos);
     }
@@ -156,7 +156,7 @@ public class SysDictController extends BaseController {
      * @param dictType 字典类型编码
      * @return 字典项选项
      */
-    @GetMapping("/item/{dictType}/option")
+    @GetMapping("/item/option/{dictType}")
     @Operation(summary = "字典项选项")
     public AjaxResult<List<Option<String>>> getDictItemOption(@PathVariable("dictType") String dictType) {
         if (StringUtils.isBlank(dictType)) {

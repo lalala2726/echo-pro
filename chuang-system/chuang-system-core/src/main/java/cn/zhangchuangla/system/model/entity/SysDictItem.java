@@ -1,18 +1,22 @@
 package cn.zhangchuangla.system.model.entity;
 
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典项表
+ *
+ * @author Chuang
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_dict_item")
 @Data
-public class SysDictItem {
+public class SysDictItem extends BaseEntity {
+
     /**
      * 主键ID
      */
@@ -35,6 +39,11 @@ public class SysDictItem {
     private String itemValue;
 
     /**
+     * 回显样式
+     */
+    private String tag;
+
+    /**
      * 排序值
      */
     private Integer sortOrder;
@@ -44,28 +53,4 @@ public class SysDictItem {
      */
     private String status;
 
-    /**
-     * 备注
-     */
-    private String remark;
-
-    /**
-     * 创建者
-     */
-    private String createBy;
-
-    /**
-     * 更新者
-     */
-    private String updateBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
 }
