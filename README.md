@@ -12,7 +12,7 @@ App-Backend 是一个基于 Spring Boot 的企业级后台管理系统，采用�
 - **安全框架**：Spring Security + JWT
 - **持久层**：MyBatis Plus + MySQL
 - **缓存技术**：Redis
-- **文件存储**：本地存储 + MinIO + 阿里云OSS（可配置）
+- **文件存储**：本地存储 + MinIO + 阿里云OSS + 腾讯云COS
 - **数据校验**：Spring Validation
 - **日志管理**：SLF4J
 - **API文档**：Swagger / OpenAPI
@@ -20,10 +20,10 @@ App-Backend 是一个基于 Spring Boot 的企业级后台管理系统，采用�
 
 ### 前端技术
 
-- Vue.js / React（前端仓库）
+- Vue.js
 - Axios
-- Element UI / Ant Design
-- Vuex / Redux
+- Element Plus
+- Pinia
 
 ## 系统架构
 
@@ -31,14 +31,13 @@ App-Backend 是一个基于 Spring Boot 的企业级后台管理系统，采用�
 
 ```
 app-backend/
-├── admin/              # 管理模块，控制器与接口
-├── common/             # 公共模块，常量、工具类等
-├── framework/          # 框架模块，配置与扩展
-│   └── security/       # 安全框架配置
-├── system/             # 系统模块，核心业务逻辑
-│   ├── service/        # 服务层
-│   ├── mapper/         # 数据访问层
-│   └── model/          # 实体类与DTO
+├── chuang-api/               # 接口模块，包含控制器等入口层代码
+├── chuang-common/            # 公共模块，存放常量、工具类、通用配置等
+├── chuang-framework/         # 框架模块，封装安全、权限等框架扩展功能
+│   └── security/             # 安全框架相关配置与扩展实现
+├── chuang-system/            # 系统模块，核心业务模块聚合层
+│   ├── chuang-system-core/   # 用户管理、系统配置等核心业务逻辑
+│   └── chuang-system-storage/# 文件上传、文件管理等存储相关逻辑
 ```
 
 ### 架构设计
@@ -59,9 +58,10 @@ app-backend/
    - 多级缓存策略
 
 4. **文件存储架构**
-   - 多存储源支持（本地、MinIO、阿里云OSS）
+   - 多存储源支持（本地、MinIO、阿里云OSS，腾讯云）
    - 文件管理与元数据记录
    - 图片处理与压缩
+   - 动态切换文件存储
 
 ## 核心功能
 
