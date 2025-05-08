@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * Created on 2025/4/3 21:39
  */
 @RestController
-@RequestMapping("/system/file")
+@RequestMapping("/system/file/config")
 @Tag(name = "文件配置")
 @RequiredArgsConstructor
 public class SysFileConfigController extends BaseController {

@@ -56,7 +56,7 @@
                  inner join sys_user_role ur on rm.role_id = ur.role_id
         where ur.user_id = #{userId}
           and m.visible = 1
-        order by m.sort
+        order by m.sort asc
     </select>
 
     <select id="selectMenuListByRoleId" resultType="java.lang.Long">
@@ -117,7 +117,7 @@
                 AND m.menu_type = #{menuType}
             </if>
         </where>
-        ORDER BY m.parent_id, m.sort
+        ORDER BY m.parent_id, m.sort asc
     </select>
 
 

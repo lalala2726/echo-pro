@@ -12,7 +12,7 @@
         <result property="region" column="region"/>
         <result property="browser" column="browser"/>
         <result property="os" column="os"/>
-        <result property="loginTime" column="loginTime"/>
+        <result property="loginTime" column="login_time"/>
         <result property="createBy" column="create_by"/>
     </resultMap>
 
@@ -21,38 +21,16 @@
     </update>
 
     <select id="listLoginLog" resultMap="BaseResultMap">
-        select id, username, status, ip, address, browser, os, create_time, update_time, create_by, update_by,
-        is_deleted, remark
+        select id,
+               username,
+               status,
+               address,
+               region,
+               browser,
+               os,
+               login_time,
+               create_by
         from sys_login_log
-        <where>
-            <if test="request != null">
-                <if test="request.id != null">
-                    and id = #{request.id}
-                </if>
-                <if test="request.username != null and request.username != ''">
-                    and username like concat('%', #{request.username}, '%')
-                </if>
-                <if test="request.status != null">
-                    and status = #{request.status}
-                </if>
-                <if test="request.address != null and request.address != ''">
-                    and address like concat('%', #{address}, '%')
-                </if>
-                <if test="request.region != null and request.region != ''">
-                    and region like concat('%', #{region}, '%')
-                </if>
-                <if test="request.browser != null and request.browser != ''">
-                    and browser like concat('%', #{request.browser}, '%')
-                </if>
-                <if test="request.os != null and request.os != ''">
-                    and os like concat('%', #{request.os}, '%')
-                </if>
-                <if test="request.loginTime != null">
-                    and DATE(login_time) = DATE(#{request.loginTime})
-                </if>
-            </if>
-        </where>
-        order by login_time desc
     </select>
 
 </mapper>

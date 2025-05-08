@@ -27,17 +27,8 @@ public class AppController {
      */
     @GetMapping("/")
     @Schema(name = "欢迎页")
-    public AjaxResult getAppConfig() {
-        String name = appProperty.getName();
-        String version = appProperty.getVersion();
-        StringBuffer append = new StringBuffer()
-                .append("欢迎访问:")
-                .append(name)
-                .append("，版本号：")
-                .append(version)
-                .append("，系统描述：")
-                .append(appProperty.getDescription());
-        return AjaxResult.success(append);
+    public AjaxResult<Void> getAppConfig() {
+        return AjaxResult.success("欢迎访问！");
     }
 
 }

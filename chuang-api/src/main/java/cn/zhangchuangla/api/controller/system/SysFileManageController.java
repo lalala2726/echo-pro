@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Tag(name = "文件资源")
 @RestController
-@RequestMapping("/file/manage")
+@RequestMapping("/system/file/manage")
 @RequiredArgsConstructor
 public class SysFileManageController extends BaseController {
 

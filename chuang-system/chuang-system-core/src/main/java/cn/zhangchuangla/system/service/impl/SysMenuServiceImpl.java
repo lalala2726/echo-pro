@@ -48,7 +48,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
         Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
         if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
-            return list();
+            LambdaQueryWrapper<SysMenu> orderByAsc = new LambdaQueryWrapper<SysMenu>().orderByAsc(SysMenu::getSort);
+            return list(orderByAsc);
         }
         //fixme 这边应该是通过角色查询菜单，但是这里没有
         return menuMapper.selectMenuListByUserId(userId);
