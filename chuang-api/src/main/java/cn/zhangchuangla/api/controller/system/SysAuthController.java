@@ -68,14 +68,14 @@ public class SysAuthController extends BaseController {
     /**
      * 刷新token
      *
-     * @param refreshToken 刷新令牌
+     * @param request 刷新令牌
      * @return 新的token
      */
     @PostMapping("/auth/refreshToken")
     @Operation(summary = "刷新令牌")
     public AjaxResult<AuthenticationToken> refreshToken(@Parameter(description = "刷新令牌", required = true)
-                                                        @ParameterObject @RequestParam("refreshToken") String refreshToken) {
-        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
+                                                            @ParameterObject @RequestBody AuthenticationToken request) {
+        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request.getRefreshToken());
         return success(newAuthenticationToken);
     }
 
