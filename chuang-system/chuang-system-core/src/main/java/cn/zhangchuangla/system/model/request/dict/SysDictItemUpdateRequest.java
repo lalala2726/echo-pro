@@ -43,6 +43,7 @@ public class SysDictItemUpdateRequest {
     /**
      * 状态：0启用，1禁用
      */
+    @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String status;
 
 
