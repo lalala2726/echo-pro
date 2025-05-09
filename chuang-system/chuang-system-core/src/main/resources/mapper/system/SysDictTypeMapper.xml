@@ -17,21 +17,16 @@
     </resultMap>
 
     <select id="listDictType" resultMap="BaseResultMap">
-        SELECT
-        id, dict_type, dict_name, status, remark, create_by, update_by, create_time, update_time
-        FROM
-        sys_dict_type
-        <where>
-            <if test="request.dictType != null and request.dictType != ''">
-                AND dict_type LIKE CONCAT('%', #{request.dictType}, '%')
-            </if>
-            <if test="request.dictName != null and request.dictName != ''">
-                AND dict_name LIKE CONCAT('%', #{request.dictName}, '%')
-            </if>
-            <if test="request.status != null">
-                AND status = #{request.status}
-            </if>
-        </where>
+        SELECT id,
+               dict_type,
+               dict_name,
+               status,
+               create_time,
+               update_time,
+               create_by,
+               update_by,
+               remark
+        FROM sys_dict_type
         ORDER BY create_time DESC
     </select>
 

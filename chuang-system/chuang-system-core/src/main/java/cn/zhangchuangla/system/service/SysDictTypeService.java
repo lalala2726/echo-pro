@@ -65,14 +65,5 @@ public interface SysDictTypeService extends IService<SysDictType> {
      */
     boolean isDictTypeExist(String dictType);
 
-    /**
-     * 检查字典类型编码是否存在
-     *
-     * @param dictType   字典类型编码
-     * @param dictTypeId 需要排除的字典类型ID
-     * @return true 存在，false 不存在
-     */
-    boolean isDictTypeExist(String dictType, Long dictTypeId);
-
 
 }

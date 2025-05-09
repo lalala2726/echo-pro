@@ -35,6 +35,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     private final SysDictItemMapper sysDictItemMapper;
     private final SysDictConverter sysDictConverter;
 
+
     /**
      * 获取字典项列表
      *
@@ -67,14 +68,17 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     @Override
     public boolean addDictItem(SysDictItemAddRequest request) {
         // 检查同一字典类型下字典项值是否重复
-        if (isDictItemValueExist(request.getDictType(), request.getItemValue(), null)) {
+        LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>()
+                .eq(SysDictItem::getDictType, request.getDictType())
+                .eq(SysDictItem::getItemValue, request.getItemValue());
+        if (sysDictItemMapper.selectCount(eq) > 0) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
-
-        SysDictItem sysDictItem = sysDictConverter.toEntity(request);
+        SysDictItem sysDictItem = sysDictConverter.toSysDictItem(request);
         sysDictItem.setCreateBy(SecurityUtils.getUsername());
         return save(sysDictItem);
     }
+
 
     /**
      * 更新字典项
@@ -95,7 +99,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
-        SysDictItem sysDictItem = sysDictConverter.toEntity(request);
+        SysDictItem sysDictItem = sysDictConverter.toSysDictItem(request);
         sysDictItem.setUpdateBy(SecurityUtils.getUsername());
         return sysDictItemMapper.updateById(sysDictItem) > 0;
     }
@@ -187,7 +191,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictType, dictType);
         List<SysDictItem> list = list(eq);
         return list.stream().map(item ->
-                new Option<>(item.getItemValue(), item.getItemLabel(),item.getTag())
+                new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag())
         ).toList();
     }
 }

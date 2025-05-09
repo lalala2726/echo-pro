@@ -18,24 +18,34 @@ public interface SysDictConverter {
 
 
     /**
-     * 将 更新请求对象 转换为 实体对象
+     * 字典类型添加请求转换为字典类型实体
      *
-     * @param request 请求对象
-     * @return 实体对象
+     * @param request 字典类型添加请求
+     * @return 字典类型实体
      */
-    SysDictType toEntity(SysDictTypeUpdateRequest request);
+    SysDictType toSysDictType(SysDictTypeAddRequest request);
 
     /**
-     * 将 添加请求对象 转换为 实体对象
+     * 字典项更新请求转换为字典项实体
      *
-     * @param request 请求对象
-     * @return 实体对象
+     * @param request 字典项更新请求
+     * @return 字典项实体
      */
-    SysDictType toEntity(SysDictTypeAddRequest request);
+    SysDictType toSysDictType(SysDictTypeUpdateRequest request);
 
+    /**
+     * 字典项更新请求转换为字典项实体
+     *
+     * @param request 字典项更新请求
+     * @return 字典项实体
+     */
+    SysDictItem toSysDictItem(SysDictItemUpdateRequest request);
 
-    SysDictItem toEntity(SysDictItemAddRequest request);
-
-
-    SysDictItem toEntity(SysDictItemUpdateRequest request);
+    /**
+     * 字典项添加请求转换为字典项实体
+     *
+     * @param request 字典项添加请求
+     * @return 字典项实体
+     */
+    SysDictItem toSysDictItem(SysDictItemAddRequest request);
 }
