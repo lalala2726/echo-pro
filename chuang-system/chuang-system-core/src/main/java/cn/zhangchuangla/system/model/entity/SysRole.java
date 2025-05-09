@@ -31,7 +31,6 @@ public class SysRole extends BaseEntity {
      */
     private String roleKey;
 
-
     /**
      * 显示顺序
      */

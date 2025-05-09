@@ -34,6 +34,6 @@ public class SysDictType extends BaseEntity {
     /**
      * 状态：0启用，1禁用
      */
-    private String status;
+    private Integer status;
 
 }
