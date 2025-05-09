@@ -1,12 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.infrastructure.annotation.RequiresSecondAuth;
 import cn.zhangchuangla.system.converter.SysLogConverter;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
@@ -115,21 +114,14 @@ public class SysLogController extends BaseController {
     /**
      * 清空登录日志
      *
-     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/login")
-    @Operation(summary = "清空登录日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
+    @Operation(summary = "清空登录日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult<Void> cleanLoginLog(@Parameter(description = "当前用户密码")
-                                          @RequestParam("password") String password) {
-        if (password.isEmpty()) {
-            return error("您还没有输入密码！");
-        }
-        if (verifyCurrentUserPassword(password)) {
-            return error("当前用户密码不正确！");
-        }
+    @RequiresSecondAuth()
+    public AjaxResult<Void> cleanLoginLog() {
         boolean result = sysLoginLogService.cleanLoginLog();
         return toAjax(result);
     }
@@ -137,38 +129,17 @@ public class SysLogController extends BaseController {
     /**
      * 清空操作日志
      *
-     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/operation")
-    @Operation(summary = "清空操作日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
+    @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult<Void> cleanOperationLog(@Parameter(description = "当前用户密码")
-                                              @RequestParam("password") String password) {
-        if (password.isEmpty()) {
-            return error("您还没有输入密码！");
-        }
-        if (verifyCurrentUserPassword(password)) {
-            return error("当前用户密码不正确！");
-        }
+    @RequiresSecondAuth()
+    public AjaxResult<Void> cleanOperationLog() {
         boolean result = sysOperationLogService.cleanLoginLog();
         return toAjax(result);
     }
 
-    /**
-     * 验证当前用户密码是否正确,某些场景下需要验证当前用户的密码
-     *
-     * @param rawPassword 明文密码
-     * @return true代表密码不正确，false代表密码正确
-     */
-    private boolean verifyCurrentUserPassword(String rawPassword) {
-        Long currentUserId = SecurityUtils.getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(currentUserId);
-        if (sysUser == null || sysUser.getPassword() == null) {
-            return true;
-        }
-        return !SecurityUtils.matchesPassword(rawPassword, sysUser.getPassword());
-    }
 
 }

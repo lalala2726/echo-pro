@@ -61,7 +61,6 @@ public class SysLoginLogListVo {
     @Schema(description = "创建时间")
     private Date loginTime;
 
-
     /**
      * 创建者
      */
