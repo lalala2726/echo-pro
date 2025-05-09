@@ -15,6 +15,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface OperationLog {
+
+
     /**
      * 模块
      */
@@ -38,7 +40,7 @@ public @interface OperationLog {
     /**
      * 是否保存响应的参数
      */
-    boolean isSaveResponseData() default true;
+    boolean isSaveResponseData() default false;
 
     /**
      * 排除指定的请求参数

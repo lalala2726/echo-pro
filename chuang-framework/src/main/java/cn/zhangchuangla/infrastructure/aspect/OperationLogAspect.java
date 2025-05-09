@@ -1,6 +1,5 @@
 package cn.zhangchuangla.infrastructure.aspect;
 
-import cn.zhangchuangla.common.constant.HttpStatusConstant;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.IPUtils;
@@ -134,11 +133,11 @@ public class OperationLogAspect {
             // 记录返回结果或异常信息
             if (exception != null) {
                 // 记录异常信息
-                sysOperationLog.setResultCode(HttpStatusConstant.INTERNAL_SERVER_ERROR); // HTTP 500 代表服务器内部错误
                 sysOperationLog.setErrorMsg(exception.getMessage());
+                sysOperationLog.setOperationStatus(1);
             } else {
                 // 记录成功地返回结果
-                sysOperationLog.setResultCode(HttpStatusConstant.SUCCESS); // HTTP 200 代表成功
+                sysOperationLog.setOperationStatus(0);
                 if (controllerOperationLog.isSaveResponseData() && jsonResult != null) {
                     sysOperationLog.setOperationResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
                 }

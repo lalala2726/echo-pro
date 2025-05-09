@@ -37,6 +37,12 @@ public class SysOperationLogVo {
     private String requestMethod;
 
     /**
+     * 操作状态 (0成功1失败2未知)
+     */
+    @Schema(description = "操作状态 (0成功1失败2未知)")
+    private Integer operationStatus;
+
+    /**
      * 操作IP
      */
     @Schema(description = "操作IP")

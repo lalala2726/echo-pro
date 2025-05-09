@@ -41,6 +41,11 @@ public class SysOperationLog {
     private String operationIp;
 
     /**
+     * 操作状态 (0成功1失败2未知)
+     */
+    private Integer operationStatus;
+
+    /**
      * 操作结果
      */
     private String operationResult;
@@ -70,10 +75,6 @@ public class SysOperationLog {
      */
     private String params;
 
-    /**
-     * 响应状态码
-     */
-    private Integer resultCode;
 
     /**
      * 错误信息
