@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.UserAddRequest;

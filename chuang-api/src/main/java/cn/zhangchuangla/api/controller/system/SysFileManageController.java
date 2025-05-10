@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.model.entity.SysFile;
 import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;

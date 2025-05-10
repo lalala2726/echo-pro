@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.*;

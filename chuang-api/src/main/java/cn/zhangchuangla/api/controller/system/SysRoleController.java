@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;

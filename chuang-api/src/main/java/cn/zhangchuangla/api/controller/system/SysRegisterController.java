@@ -2,8 +2,8 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.infrastructure.model.request.RegisterRequest;
-import cn.zhangchuangla.infrastructure.web.service.RegisterService;
+import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.web.service.RegisterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

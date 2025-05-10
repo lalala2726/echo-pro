@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;

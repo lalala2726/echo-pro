@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
