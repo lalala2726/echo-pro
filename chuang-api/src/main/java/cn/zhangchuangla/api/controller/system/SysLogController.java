@@ -137,10 +137,8 @@ public class SysLogController extends BaseController {
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN, isSaveResponseData = true)
     @RequiresSecondAuth()
     public AjaxResult<Void> cleanOperationLog() {
-        log.info("接收到清空操作日志请求");
-        // 不直接调用service方法，由OperationLogAspect中的异步工厂处理
-        // 直接返回成功结果，实际操作由异步工厂完成
-        return success("操作已提交处理，日志清空将在后台异步执行");
+        boolean result = sysOperationLogService.cleanOperationLog();
+        return toAjax(result);
     }
 
 
