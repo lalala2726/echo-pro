@@ -65,7 +65,7 @@ public class BaseController {
      *
      * @param page 分页对象
      */
-    protected TableDataResult getTableData(Page<?> page) {
+    protected AjaxResult<TableDataResult> getTableData(Page<?> page) {
         return TableDataResult.build(page);
     }
 

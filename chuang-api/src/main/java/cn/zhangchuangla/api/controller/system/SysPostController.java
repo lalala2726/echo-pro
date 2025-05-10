@@ -82,7 +82,7 @@ public class SysPostController extends BaseController {
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
-                                       @PathVariable("ids") List<Integer> ids) {
+                                           @PathVariable("ids") List<Long> ids) {
         checkParam(ids == null, "id不能为空");
         boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
@@ -113,7 +113,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID")
-                                             @PathVariable("id") Integer id) {
+                                                 @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = sysRoleConverter.toSysPostVo(post);

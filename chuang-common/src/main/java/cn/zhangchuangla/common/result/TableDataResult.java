@@ -68,13 +68,13 @@ public class TableDataResult implements Serializable {
      * @param page 分页对象
      * @return TableDataResult 实例
      */
-    public static TableDataResult build(Page<?> page) {
-        return new TableDataResult(
+    public static AjaxResult<TableDataResult> build(Page<?> page) {
+        return AjaxResult.success(new TableDataResult(
                 page.getRecords(),
                 page.getTotal(),
                 page.getSize(),
                 page.getCurrent()
-        );
+        ));
     }
 
     /**

@@ -57,7 +57,6 @@ public class SysAuthServiceImpl implements SysAuthService {
             sysLoginLogService.recordLoginLog(request.getUsername(), httpServletRequest, false);
             throw e;
         }
-
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
         AuthenticationToken authenticationTokenResponse =
                 tokenManager.generateToken(authentication);
