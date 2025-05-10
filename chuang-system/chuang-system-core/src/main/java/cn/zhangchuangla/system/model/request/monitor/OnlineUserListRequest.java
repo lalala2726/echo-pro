@@ -68,22 +68,5 @@ public class OnlineUserListRequest extends BasePageRequest {
     @Schema(description = "登录时间", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String loginTime;
 
-    /**
-     * 账户是否过期
-     */
-    @Schema(description = "账户是否过期", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private boolean accountNonExpired;
-
-    /**
-     * 账户是否被锁定
-     */
-    @Schema(description = "账户是否被锁定", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private boolean accountNonLocked;
-
-    /**
-     * 账户密码是否过期
-     */
-    @Schema(description = "账户密码是否过期", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private boolean enabled;
 
 }

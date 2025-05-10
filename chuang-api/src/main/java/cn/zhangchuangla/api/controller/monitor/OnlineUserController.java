@@ -5,12 +5,10 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.enums.BusinessType;
-import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.model.entity.SysOnlineUser;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,19 +51,19 @@ public class OnlineUserController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
-    public TableDataResult onlineUserList(@Parameter(description = "在线用户列表查询参数")
-                                          @Validated @ParameterObject OnlineUserListRequest request) {
+    public AjaxResult<TableDataResult> onlineUserList(@Parameter(description = "在线用户列表查询参数")
+                                                      @Validated @ParameterObject OnlineUserListRequest request) {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
-        ArrayList<SysOnlineUser> sysOnlineUsers = new ArrayList<>();
+        ArrayList<OnlineLoginUser> onlineLoginUsers = new ArrayList<>();
         keys.forEach(key -> {
             OnlineLoginUser sysUserDetails = redisCache.getCacheObject(key);
-            SysOnlineUser sysOnlineUser = new SysOnlineUser();
-            BeanUtils.copyProperties(sysUserDetails, sysOnlineUser);
-            sysOnlineUsers.add(sysOnlineUser);
+            OnlineLoginUser onlineLoginUser = new OnlineLoginUser();
+            BeanUtils.copyProperties(sysUserDetails, onlineLoginUser);
+            onlineLoginUsers.add(onlineLoginUser);
         });
-        Page<SysOnlineUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), sysOnlineUsers.size(),
-                sysOnlineUsers);
+        Page<OnlineLoginUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineLoginUsers.size(),
+                onlineLoginUsers);
         return getTableData(page);
     }
 
@@ -81,9 +79,6 @@ public class OnlineUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('monitor:online-user:delete')")
     public AjaxResult<Void> forceLogout(
             @PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
-        if (sessionId == null) {
-            return error(ResponseCode.PARAM_NOT_NULL);
-        }
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "");
         redisCache.deleteObject(replace + sessionId);
         return success();
