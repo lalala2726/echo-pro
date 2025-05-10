@@ -20,12 +20,13 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
      */
     Page<SysOperationLog> listOperationLog(SysOperationLogListRequest request);
 
+
     /**
      * 清空操作日志
      *
      * @return 是否成功
      */
-    boolean cleanLoginLog();
+    boolean cleanOperationLog();
 
     /**
      * 获取操作日志详情

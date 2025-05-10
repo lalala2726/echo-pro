@@ -38,7 +38,7 @@ public class OperationLogAspect {
     /**
      * 默认排除的敏感字段，防止敏感信息被记录
      */
-    private static final List<String> EXCLUDE_PROPERTIES = Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword");
+    private static final List<String> EXCLUDE_PROPERTIES = Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword", "accessToken", "accessKey", "secretKey");
 
     /**
      * 线程变量，记录方法执行的开始时间，用于计算方法耗时
@@ -103,6 +103,7 @@ public class OperationLogAspect {
      * @param exception              如果方法抛出异常，则包含异常信息
      * @param jsonResult             如果方法执行成功，则包含返回结果
      */
+    //fixme 此次需要使用异步工厂保存数据库的信息并且在此处无法保存响应参数
     private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {
             // 获取当前登录用户
@@ -127,7 +128,7 @@ public class OperationLogAspect {
 
             // 记录请求参数
             if (controllerOperationLog.isSaveRequestData()) {
-                sysOperationLog.setParams(getRequestParams(joinPoint, controllerOperationLog.excludeParamNames()));
+                sysOperationLog.setRequestParams(getRequestParams(joinPoint, controllerOperationLog.excludeParamNames()));
             }
 
             // 记录返回结果或异常信息
@@ -139,7 +140,7 @@ public class OperationLogAspect {
                 // 记录成功地返回结果
                 sysOperationLog.setOperationStatus(0);
                 if (controllerOperationLog.isSaveResponseData() && jsonResult != null) {
-                    sysOperationLog.setOperationResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
+                    sysOperationLog.setResponseResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
                 }
             }
             // 设置创建时间

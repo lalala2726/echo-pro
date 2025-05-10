@@ -17,7 +17,6 @@ import cn.zhangchuangla.system.model.vo.log.SysOperationLogListVo;
 import cn.zhangchuangla.system.model.vo.log.SysOperationLogVo;
 import cn.zhangchuangla.system.service.SysLoginLogService;
 import cn.zhangchuangla.system.service.SysOperationLogService;
-import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,7 +42,6 @@ public class SysLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
     private final SysOperationLogService sysOperationLogService;
-    private final SysUserService sysUserService;
     private final SysLogConverter sysLogConverter;
 
     /**
@@ -137,7 +135,7 @@ public class SysLogController extends BaseController {
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     @RequiresSecondAuth()
     public AjaxResult<Void> cleanOperationLog() {
-        boolean result = sysOperationLogService.cleanLoginLog();
+        boolean result = sysOperationLogService.cleanOperationLog();
         return toAjax(result);
     }
 

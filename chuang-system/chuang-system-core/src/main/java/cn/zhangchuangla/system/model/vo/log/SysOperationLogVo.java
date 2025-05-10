@@ -52,7 +52,7 @@ public class SysOperationLogVo {
      * 操作结果
      */
     @Schema(description = "操作结果")
-    private String operationResult;
+    private String responseResult;
 
     /**
      * 操作模块
@@ -82,13 +82,8 @@ public class SysOperationLogVo {
      * 请求参数
      */
     @Schema(description = "请求参数")
-    private String params;
+    private String requestParams;
 
-    /**
-     * 响应状态码
-     */
-    @Schema(description = "响应状态码")
-    private Integer resultCode;
 
     /**
      * 错误信息

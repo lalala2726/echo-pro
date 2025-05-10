@@ -34,13 +34,14 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
         return sysOperationLogMapper.listOperationLog(sysOperationLogPage, request);
     }
 
+
     /**
      * 清空操作日志
      *
      * @return 是否成功
      */
     @Override
-    public boolean cleanLoginLog() {
+    public boolean cleanOperationLog() {
         sysOperationLogMapper.cleanLoginLog();
         return true;
     }

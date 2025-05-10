@@ -9,15 +9,13 @@
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
         <result property="module" column="module"/>
-        <result property="params" column="params"/>
-        <result property="params" column="params"/>
+        <result property="requestParams" column="request_params"/>
         <result property="operationStatus" column="operation_status"/>
         <result property="operationIp" column="operation_ip"/>
-        <result property="operationResult" column="operation_result"/>
+        <result property="responseResult" column="response_result"/>
         <result property="operationType" column="operation_type"/>
         <result property="requestUrl" column="request_url"/>
         <result property="methodName" column="method_name"/>
-        <result property="params" column="params"/>
         <result property="errorMsg" column="error_msg"/>
         <result property="costTime" column="cost_time"/>
         <result property="createTime" column="create_time"/>
@@ -28,8 +26,8 @@
     </update>
 
     <select id="listOperationLog" resultMap="BaseResultMap">
-        select id, user_id, user_name, module, operation_status, request_method, operation_ip, operation_result,
-        operation_type, request_url, method_name, params, error_msg, cost_time, create_time from
+        select id, user_id, user_name, module, operation_status, request_method, operation_ip, response_result,
+        operation_type, request_url, method_name, request_params, error_msg, cost_time, create_time from
         sys_operation_log
         <where>
             <if test="request != null">
@@ -49,7 +47,7 @@
                     and operation_ip like concat('%', #{request.operationIp}, '%')
                 </if>
                 <if test="request.operationResult != null and request.operationResult != ''">
-                    and operation_result = #{request.operationResult}
+                    and response_result = #{request.operationResult}
                 </if>
                 <if test="request.module != null and request.module != ''">
                     and module like concat('%', #{request.module}, '%')

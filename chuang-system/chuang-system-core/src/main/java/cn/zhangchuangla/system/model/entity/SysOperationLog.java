@@ -48,7 +48,7 @@ public class SysOperationLog {
     /**
      * 操作结果
      */
-    private String operationResult;
+    private String responseResult;
 
     /**
      * 操作模块
@@ -73,8 +73,7 @@ public class SysOperationLog {
     /**
      * 请求参数
      */
-    private String params;
-
+    private String requestParams;
 
     /**
      * 错误信息

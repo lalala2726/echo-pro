@@ -5,6 +5,7 @@ import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.vo.log.SysLoginLogVo;
 import cn.zhangchuangla.system.model.vo.log.SysOperationLogVo;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * @author Chuang
@@ -28,5 +29,7 @@ public interface SysLogConverter {
      * @param sysOperationLog 操作日志
      * @return 操作日志视图对象
      */
+    @Mapping(source = "requestParams", target = "requestParams")
+    @Mapping(source = "responseResult", target = "responseResult")
     SysOperationLogVo toSysOperationLogVo(SysOperationLog sysOperationLog);
 }
