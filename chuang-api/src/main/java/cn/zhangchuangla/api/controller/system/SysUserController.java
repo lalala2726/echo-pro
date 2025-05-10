@@ -170,7 +170,7 @@ public class SysUserController extends BaseController {
         }
         password = encryptPassword(password);
         boolean result = sysUserService.resetPassword(password, id);
-        return success(result);
+        return toAjax(result);
     }
 
     /**

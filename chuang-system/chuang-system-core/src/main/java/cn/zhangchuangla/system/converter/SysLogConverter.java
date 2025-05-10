@@ -31,5 +31,6 @@ public interface SysLogConverter {
      */
     @Mapping(source = "requestParams", target = "requestParams")
     @Mapping(source = "responseResult", target = "responseResult")
+    @Mapping(source = "operationRegion", target = "operationRegion")
     SysOperationLogVo toSysOperationLogVo(SysOperationLog sysOperationLog);
 }

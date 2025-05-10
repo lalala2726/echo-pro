@@ -7,7 +7,9 @@ import cn.zhangchuangla.system.service.SysOperationLogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 操作日志服务实现类
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMapper, SysOperationLog>
         implements SysOperationLogService {
 
@@ -41,6 +44,7 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
      * @return 是否成功
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean cleanOperationLog() {
         sysOperationLogMapper.cleanLoginLog();
         return true;

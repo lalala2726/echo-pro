@@ -41,6 +41,11 @@ public class SysOperationLog {
     private String operationIp;
 
     /**
+     * 操作地点
+     */
+    private String operationRegion;
+
+    /**
      * 操作状态 (0成功1失败2未知)
      */
     private Integer operationStatus;

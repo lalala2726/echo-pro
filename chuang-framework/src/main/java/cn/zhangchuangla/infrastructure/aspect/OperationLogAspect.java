@@ -6,8 +6,9 @@ import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.ServletUtils;
 import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.infrastructure.manager.AsyncManager;
+import cn.zhangchuangla.infrastructure.manager.factory.AsyncFactory;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
-import cn.zhangchuangla.system.service.SysOperationLogService;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -46,16 +47,9 @@ public class OperationLogAspect {
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
 
     /**
-     * 日志操作服务，用于持久化操作日志
+     * 标记当前线程是否是清空日志的操作，用于防止递归调用
      */
-    private final SysOperationLogService sysOperationLogService;
-
-    /**
-     * 构造方法注入日志服务
-     */
-    public OperationLogAspect(SysOperationLogService sysOperationLogService) {
-        this.sysOperationLogService = sysOperationLogService;
-    }
+    private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
 
     /**
      * 在方法执行前记录开始时间
@@ -67,6 +61,15 @@ public class OperationLogAspect {
     public void doBefore(JoinPoint joinPoint, OperationLog controllerOperationLog) {
         // 记录当前方法开始执行的时间
         TIME_THREADLOCAL.set(System.currentTimeMillis());
+
+        // 检查是否是清空日志的操作
+        String methodName = joinPoint.getSignature().getName();
+        if (methodName.contains("cleanLoginLog") || methodName.contains("cleanOperationLog")) {
+            IS_CLEANING_LOG.set(true);
+            log.info("检测到清空日志操作: {}, 标记为清空日志线程", methodName);
+        } else {
+            IS_CLEANING_LOG.set(false);
+        }
     }
 
     /**
@@ -103,9 +106,36 @@ public class OperationLogAspect {
      * @param exception              如果方法抛出异常，则包含异常信息
      * @param jsonResult             如果方法执行成功，则包含返回结果
      */
-    //fixme 此次需要使用异步工厂保存数据库的信息并且在此处无法保存响应参数
     private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {
+            // 检查当前是否是清空日志的操作，如果是则特殊处理
+            Boolean isCleaningLog = IS_CLEANING_LOG.get();
+            if (isCleaningLog != null && isCleaningLog) {
+                log.info("当前是清空日志操作，跳过日志记录以防止递归调用");
+
+                // 对于清空日志操作，我们可以选择不记录日志，或者使用其他方式记录，如直接输出到控制台
+                String methodName = joinPoint.getSignature().getName();
+                SysUserDetails user = SecurityUtils.getLoginUser();
+                String username = user != null ? user.getUsername() : "未知用户";
+
+                log.info("======= 清空日志操作 =======");
+                log.info("操作人: {}", username);
+                log.info("操作方法: {}", methodName);
+                log.info("操作时间: {}", new Date());
+                log.info("操作状态: {}", exception == null ? "成功" : "失败");
+                if (exception != null) {
+                    log.info("错误信息: {}", exception.getMessage());
+                }
+                log.info("===========================");
+
+                // 使用异步工厂执行清空操作，但不记录日志
+                if (methodName.contains("cleanOperationLog")) {
+                    AsyncManager.me().execute(AsyncFactory.cleanOperationLog());
+                }
+
+                return; // 跳过后续的日志记录逻辑
+            }
+
             // 获取当前登录用户
             SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
 
@@ -120,7 +150,9 @@ public class OperationLogAspect {
             HttpServletRequest request = ServletUtils.getRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
-            sysOperationLog.setOperationIp(IPUtils.getIpAddr(request));
+            String ipAddr = IPUtils.getIpAddr(request);
+            sysOperationLog.setOperationIp(ipAddr);
+            sysOperationLog.setOperationRegion(IPUtils.getRegion(ipAddr));
             sysOperationLog.setRequestMethod(request.getMethod());
 
             // 计算方法执行耗时
@@ -140,19 +172,30 @@ public class OperationLogAspect {
                 // 记录成功地返回结果
                 sysOperationLog.setOperationStatus(0);
                 if (controllerOperationLog.isSaveResponseData() && jsonResult != null) {
-                    sysOperationLog.setResponseResult(Optional.of(jsonResult).map(JSON::toJSONString).orElse("{}"));
+                    // 确保记录响应结果
+                    try {
+                        String jsonString = JSON.toJSONString(jsonResult);
+                        sysOperationLog.setResponseResult(jsonString);
+                        log.debug("记录响应结果: {}", jsonString);
+                    } catch (Exception e) {
+                        log.error("转换响应结果为JSON时出错: {}", e.getMessage(), e);
+                        sysOperationLog.setResponseResult("Error converting result: " + e.getMessage());
+                    }
                 }
             }
             // 设置创建时间
             sysOperationLog.setCreateTime(new Date());
-            // 将日志存储到数据库
-            sysOperationLogService.save(sysOperationLog);
+
+            // 使用异步管理器和异步工厂记录日志，不再直接调用SysOperationLogService
+            AsyncManager.me().execute(AsyncFactory.recordOperationLog(sysOperationLog));
+            log.debug("操作日志已提交异步处理: {}", sysOperationLog.getModule());
 
         } catch (Exception e) {
             log.error("记录操作日志时发生异常: ", e);
         } finally {
             // 清理线程变量，防止内存泄漏
             TIME_THREADLOCAL.remove();
+            IS_CLEANING_LOG.remove();
         }
     }
 

@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -38,6 +39,7 @@ import java.util.List;
 @RequestMapping("/system/log")
 @RequiredArgsConstructor
 @Tag(name = "系统日志")
+@Slf4j
 public class SysLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
@@ -132,11 +134,13 @@ public class SysLogController extends BaseController {
     @DeleteMapping("/operation")
     @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
-    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
+    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN, isSaveResponseData = true)
     @RequiresSecondAuth()
     public AjaxResult<Void> cleanOperationLog() {
-        boolean result = sysOperationLogService.cleanOperationLog();
-        return toAjax(result);
+        log.info("接收到清空操作日志请求");
+        // 不直接调用service方法，由OperationLogAspect中的异步工厂处理
+        // 直接返回成功结果，实际操作由异步工厂完成
+        return success("操作已提交处理，日志清空将在后台异步执行");
     }
 
 
