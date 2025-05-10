@@ -49,6 +49,12 @@ public class SysOperationLogListVo {
     private String operationIp;
 
     /**
+     * 操作地区
+     */
+    @Schema(description = "操作地区")
+    private String operationRegion;
+
+    /**
      * 操作结果
      */
     @Schema(description = "操作结果")
