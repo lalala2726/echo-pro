@@ -1,5 +1,6 @@
 package cn.zhangchuangla.api.controller.monitor;
 
+import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
@@ -18,7 +19,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,12 +56,16 @@ public class OnlineUserController extends BaseController {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
         Collection<String> keys = redisCache.keys(replace);
         ArrayList<OnlineLoginUser> onlineLoginUsers = new ArrayList<>();
+
+        // 获取所有在线用户
         keys.forEach(key -> {
-            OnlineLoginUser sysUserDetails = redisCache.getCacheObject(key);
-            OnlineLoginUser onlineLoginUser = new OnlineLoginUser();
-            BeanUtils.copyProperties(sysUserDetails, onlineLoginUser);
-            onlineLoginUsers.add(onlineLoginUser);
+            OnlineLoginUser onlineUser = redisCache.getCacheObject(key);
+            if (onlineUser != null && matchesFilter(onlineUser, request)) {
+                onlineLoginUsers.add(onlineUser);
+            }
         });
+
+        // 分页处理
         Page<OnlineLoginUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineLoginUsers.size(),
                 onlineLoginUsers);
         return getTableData(page);
@@ -82,5 +86,54 @@ public class OnlineUserController extends BaseController {
         String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "");
         redisCache.deleteObject(replace + sessionId);
         return success();
+    }
+
+    /**
+     * 根据查询条件过滤在线用户
+     *
+     * @param user    在线用户信息
+     * @param request 查询请求参数
+     * @return 是否匹配过滤条件
+     */
+    private boolean matchesFilter(OnlineLoginUser user, OnlineUserListRequest request) {
+        // 会话ID匹配
+        if (StrUtil.isNotBlank(request.getSessionId()) &&
+                !request.getSessionId().equals(user.getSessionId())) {
+            return false;
+        }
+
+        // 用户名匹配
+        if (StrUtil.isNotBlank(request.getUsername()) &&
+                !request.getUsername().equals(user.getUsername())) {
+            return false;
+        }
+
+        // 用户ID匹配
+        if (request.getUserId() != null &&
+                !request.getUserId().equals(user.getUserId())) {
+            return false;
+        }
+
+        // IP地址匹配
+        if (StrUtil.isNotBlank(request.getIp()) &&
+                !request.getIp().equals(user.getIP())) {
+            return false;
+        }
+
+        // 登录地点匹配
+        if (StrUtil.isNotBlank(request.getRegion()) &&
+                !request.getRegion().equals(user.getRegion())) {
+            return false;
+        }
+
+        // 浏览器匹配
+        if (StrUtil.isNotBlank(request.getBrowser()) &&
+                !request.getBrowser().equals(user.getBrowser())) {
+            return false;
+        }
+
+        // 操作系统匹配
+        return !StrUtil.isNotBlank(request.getOs()) ||
+                request.getOs().equals(user.getOs());
     }
 }

@@ -48,7 +48,7 @@ public class OnlineUserListRequest extends BasePageRequest {
      * 登录地点
      */
     @Schema(description = "登录地点", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String address;
+    private String region;
 
     /**
      * 浏览器
@@ -62,11 +62,6 @@ public class OnlineUserListRequest extends BasePageRequest {
     @Schema(description = "操作系统", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String os;
 
-    /**
-     * 登录时间
-     */
-    @Schema(description = "登录时间", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String loginTime;
 
 
 }
