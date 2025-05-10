@@ -5,8 +5,8 @@ import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.infrastructure.model.request.LoginRequest;
-import cn.zhangchuangla.infrastructure.web.service.SysAuthService;
+import cn.zhangchuangla.framework.model.request.LoginRequest;
+import cn.zhangchuangla.framework.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
@@ -68,14 +68,14 @@ public class SysAuthController extends BaseController {
     /**
      * 刷新token
      *
-     * @param refreshToken 刷新令牌
+     * @param request 刷新令牌
      * @return 新的token
      */
     @PostMapping("/auth/refreshToken")
     @Operation(summary = "刷新令牌")
     public AjaxResult<AuthenticationToken> refreshToken(@Parameter(description = "刷新令牌", required = true)
-                                                        @ParameterObject @RequestParam("refreshToken") String refreshToken) {
-        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(refreshToken);
+                                                            @ParameterObject @RequestBody AuthenticationToken request) {
+        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request.getRefreshToken());
         return success(newAuthenticationToken);
     }
 

@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.infrastructure.annotation.AccessLimit;
+import cn.zhangchuangla.framework.annotation.AccessLimit;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

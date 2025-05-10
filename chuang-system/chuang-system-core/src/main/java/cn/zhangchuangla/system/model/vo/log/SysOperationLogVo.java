@@ -37,16 +37,28 @@ public class SysOperationLogVo {
     private String requestMethod;
 
     /**
+     * 操作状态 (0成功1失败2未知)
+     */
+    @Schema(description = "操作状态 (0成功1失败2未知)")
+    private Integer operationStatus;
+
+    /**
      * 操作IP
      */
     @Schema(description = "操作IP")
     private String operationIp;
 
     /**
+     * 操作地点
+     */
+    @Schema(description = "地点")
+    private String operationRegion;
+
+    /**
      * 操作结果
      */
     @Schema(description = "操作结果")
-    private String operationResult;
+    private String responseResult;
 
     /**
      * 操作模块
@@ -76,13 +88,8 @@ public class SysOperationLogVo {
      * 请求参数
      */
     @Schema(description = "请求参数")
-    private String params;
+    private String requestParams;
 
-    /**
-     * 响应状态码
-     */
-    @Schema(description = "响应状态码")
-    private Integer resultCode;
 
     /**
      * 错误信息

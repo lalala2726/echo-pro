@@ -31,6 +31,12 @@ public class SysOperationLogListVo {
     private String userName;
 
     /**
+     * 操作状态 (0成功1失败2未知)
+     */
+    @Schema(description = "操作状态 (0成功1失败2未知)")
+    private Integer operationStatus;
+
+    /**
      * 请求方式
      */
     @Schema(description = "请求方式")

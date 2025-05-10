@@ -13,7 +13,7 @@ import java.util.Date;
 @TableName(value = "sys_operation_log")
 @Data
 public class SysOperationLog {
-    //todo 增加操作地点
+
     /**
      * 主键
      */
@@ -41,9 +41,19 @@ public class SysOperationLog {
     private String operationIp;
 
     /**
+     * 操作地点
+     */
+    private String operationRegion;
+
+    /**
+     * 操作状态 (0成功1失败2未知)
+     */
+    private Integer operationStatus;
+
+    /**
      * 操作结果
      */
-    private String operationResult;
+    private String responseResult;
 
     /**
      * 操作模块
@@ -68,12 +78,7 @@ public class SysOperationLog {
     /**
      * 请求参数
      */
-    private String params;
-
-    /**
-     * 响应状态码
-     */
-    private Integer resultCode;
+    private String requestParams;
 
     /**
      * 错误信息

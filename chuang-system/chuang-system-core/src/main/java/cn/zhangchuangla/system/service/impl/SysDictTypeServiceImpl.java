@@ -67,8 +67,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         if (isDictTypeExist(request.getDictType())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
-
-        SysDictType sysDictType = sysDictConverter.toEntity(request);
+        SysDictType sysDictType = sysDictConverter.toSysDictType(request);
         sysDictType.setCreateBy(SecurityUtils.getUsername());
         return save(sysDictType);
     }
@@ -82,19 +81,13 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateDictType(SysDictTypeUpdateRequest request) {
-        SysDictType existDictType = getById(request.getId());
-        if (existDictType == null) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在");
+        LambdaQueryWrapper<SysDictType> ne = new LambdaQueryWrapper<SysDictType>()
+                .eq(SysDictType::getDictType, request.getDictType())
+                .ne(SysDictType::getId, request.getId());
+        if (count(ne) > 0) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
-
-        if (!existDictType.getDictType().equals(request.getDictType())) {
-            if (isDictTypeExist(request.getDictType(), request.getId())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
-            }
-            sysDictItemService.updateDictItemDictType(existDictType.getDictType(), request.getDictType());
-        }
-
-        SysDictType sysDictType = sysDictConverter.toEntity(request);
+        SysDictType sysDictType = sysDictConverter.toSysDictType(request);
         sysDictType.setUpdateBy(SecurityUtils.getUsername());
         return updateById(sysDictType);
     }
@@ -144,25 +137,6 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         return count(eq) > 0;
     }
 
-    /**
-     * 判断字典类型是否存在 (排除指定ID)
-     *
-     * @param dictType   字典类型
-     * @param dictTypeId 字典类型ID
-     * @return true存在，false不存在
-     */
-    @Override
-    public boolean isDictTypeExist(String dictType, Long dictTypeId) {
-        if (StringUtils.isBlank(dictType)) {
-            return false;
-        }
-        LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<SysDictType>()
-                .eq(SysDictType::getDictType, dictType);
-        if (dictTypeId != null) {
-            queryWrapper.ne(SysDictType::getId, dictTypeId);
-        }
-        return count(queryWrapper) > 0;
-    }
 }
 
 

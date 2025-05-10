@@ -46,11 +46,11 @@ public class SysDictItem extends BaseEntity {
     /**
      * 排序值
      */
-    private Integer sortOrder;
+    private Integer sort;
 
     /**
      * 状态：0启用，1禁用
      */
-    private String status;
+    private Integer status;
 
 }

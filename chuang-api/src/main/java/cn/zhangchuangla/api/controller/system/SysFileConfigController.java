@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * Created on 2025/4/3 21:39
  */
 @RestController
-@RequestMapping("/system/file")
+@RequestMapping("/system/file/config")
 @Tag(name = "文件配置")
 @RequiredArgsConstructor
 public class SysFileConfigController extends BaseController {

@@ -1,12 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
-import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.RequiresSecondAuth;
 import cn.zhangchuangla.system.converter.SysLogConverter;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
@@ -18,12 +17,12 @@ import cn.zhangchuangla.system.model.vo.log.SysOperationLogListVo;
 import cn.zhangchuangla.system.model.vo.log.SysOperationLogVo;
 import cn.zhangchuangla.system.service.SysLoginLogService;
 import cn.zhangchuangla.system.service.SysOperationLogService;
-import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -40,11 +39,11 @@ import java.util.List;
 @RequestMapping("/system/log")
 @RequiredArgsConstructor
 @Tag(name = "系统日志")
+@Slf4j
 public class SysLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
     private final SysOperationLogService sysOperationLogService;
-    private final SysUserService sysUserService;
     private final SysLogConverter sysLogConverter;
 
     /**
@@ -89,7 +88,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/login/{id}")
     @Operation(summary = "获取登录日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID") @PathVariable Long id) {
+    public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
+                                                     @PathVariable("id") Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
         SysLoginLogVo sysLoginLogVo = sysLogConverter.toSysLoginLogVo(sysLoginLog);
         return success(sysLoginLogVo);
@@ -104,7 +104,8 @@ public class SysLogController extends BaseController {
     @GetMapping("/operation/{id}")
     @Operation(summary = "获取操作日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID") @PathVariable Long id) {
+    public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
+                                                             @PathVariable("id") Long id) {
         SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
         SysOperationLogVo sysOperationLogVo = sysLogConverter.toSysOperationLogVo(sysOperationLog);
         return success(sysOperationLogVo);
@@ -113,21 +114,14 @@ public class SysLogController extends BaseController {
     /**
      * 清空登录日志
      *
-     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/login")
-    @Operation(summary = "清空登录日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
+    @Operation(summary = "清空登录日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult<Void> cleanLoginLog(@Parameter(description = "当前用户密码")
-                                          @RequestParam("password") String password) {
-        if (password.isEmpty()) {
-            return error("您还没有输入密码！");
-        }
-        if (verifyCurrentUserPassword(password)) {
-            return error("当前用户密码不正确！");
-        }
+    @RequiresSecondAuth()
+    public AjaxResult<Void> cleanLoginLog() {
         boolean result = sysLoginLogService.cleanLoginLog();
         return toAjax(result);
     }
@@ -135,38 +129,17 @@ public class SysLogController extends BaseController {
     /**
      * 清空操作日志
      *
-     * @param password 当前用户密码
      * @return 清空结果
      */
     @DeleteMapping("/operation")
-    @Operation(summary = "清空操作日志", description = "为了系统安全系统不会提供单条或多条数据删除服务，只能清空所有数据，并且需要输入当前用户密码进行验证")
+    @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
-    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    public AjaxResult<Void> cleanOperationLog(@Parameter(description = "当前用户密码")
-                                              @RequestParam("password") String password) {
-        if (password.isEmpty()) {
-            return error("您还没有输入密码！");
-        }
-        if (verifyCurrentUserPassword(password)) {
-            return error("当前用户密码不正确！");
-        }
-        boolean result = sysOperationLogService.cleanLoginLog();
+    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN, isSaveResponseData = true)
+    @RequiresSecondAuth()
+    public AjaxResult<Void> cleanOperationLog() {
+        boolean result = sysOperationLogService.cleanOperationLog();
         return toAjax(result);
     }
 
-    /**
-     * 验证当前用户密码是否正确,某些场景下需要验证当前用户的密码
-     *
-     * @param rawPassword 明文密码
-     * @return true代表密码不正确，false代表密码正确
-     */
-    private boolean verifyCurrentUserPassword(String rawPassword) {
-        Long currentUserId = SecurityUtils.getUserId();
-        SysUser sysUser = sysUserService.getUserInfoByUserId(currentUserId);
-        if (sysUser == null || sysUser.getPassword() == null) {
-            return true;
-        }
-        return !SecurityUtils.matchesPassword(rawPassword, sysUser.getPassword());
-    }
 
 }

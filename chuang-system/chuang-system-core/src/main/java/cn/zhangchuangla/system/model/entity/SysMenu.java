@@ -84,7 +84,7 @@ public class SysMenu extends BaseEntity {
     /**
      * 菜单状态（0正常 1停用）
      */
-    private String status;
+    private Integer status;
 
     /**
      * 权限标识

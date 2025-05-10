@@ -9,7 +9,7 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.PageUtils;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysOnlineUser;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

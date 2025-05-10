@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典项表
+ *
  * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
@@ -42,7 +43,7 @@ public class SysDictItemListRequest extends BasePageRequest {
     /**
      * 状态：0启用，1禁用
      */
+    @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String status;
-
 
 }

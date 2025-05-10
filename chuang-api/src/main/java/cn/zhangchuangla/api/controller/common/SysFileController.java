@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.infrastructure.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;

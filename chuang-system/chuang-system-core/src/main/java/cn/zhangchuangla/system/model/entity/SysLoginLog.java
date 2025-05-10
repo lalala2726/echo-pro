@@ -36,16 +36,15 @@ public class SysLoginLog {
      */
     private Integer status;
 
-
     /**
-     * ip
-     */
-    private String ip;
-
-    /**
-     * 地址
+     * IP地址
      */
     private String address;
+
+    /**
+     * 地区
+     */
+    private String region;
 
     /**
      * 浏览器
@@ -58,32 +57,13 @@ public class SysLoginLog {
     private String os;
 
     /**
-     * 创建时间
+     * 登录时间
      */
-    private Date createTime;
+    private Date loginTime;
 
     /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 创建人
+     * 创建者
      */
     private String createBy;
 
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDeleted;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

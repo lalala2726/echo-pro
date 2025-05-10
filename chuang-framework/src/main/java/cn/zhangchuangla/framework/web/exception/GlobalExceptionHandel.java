@@ -1,0 +1,181 @@
+package cn.zhangchuangla.framework.web.exception;
+
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.*;
+import cn.zhangchuangla.common.result.AjaxResult;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.Objects;
+
+/**
+ * 全局异常处理
+ *
+ * @author Chuang
+ * <p>
+ * created on 2025/1/11 10:10
+ */
+@RestControllerAdvice
+@Slf4j
+@RequiredArgsConstructor
+public class GlobalExceptionHandel {
+
+
+    /**
+     * 业务异常
+     */
+    @ExceptionHandler(ServiceException.class)
+    public AjaxResult<Void> serviceExceptionHandel(ServiceException exception) {
+        log.error("业务异常", exception);
+        return AjaxResult.error(exception.getMessage());
+    }
+
+    /**
+     * 请求方法不支持
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
+        log.error("请求方法不支持", exception);
+        return AjaxResult.error(ResponseCode.NOT_SUPPORT);
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
+        log.error("请求参数非法: ", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
+    }
+
+    /**
+     * 登录异常
+     */
+    @ExceptionHandler(LoginException.class)
+    public AjaxResult<Void> loginExceptionHandel(LoginException exception) {
+        log.error("登录异常:", exception);
+        return AjaxResult.error(ResponseCode.LOGIN_ERROR, exception.getMessage());
+    }
+
+    /**
+     * 认证异常
+     */
+    @ExceptionHandler(AccountException.class)
+    public AjaxResult<Void> accountExceptionExceptionHandel(Exception exception) {
+        log.error("认证异常", exception);
+        return AjaxResult.error(ResponseCode.ACCOUNT_ERROR, exception.getMessage());
+    }
+
+    /**
+     * 认证失败
+     */
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public AjaxResult<Void> InternalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
+        log.error("认证失败:", exception);
+        return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
+    }
+
+    /**
+     * 账号被锁定
+     */
+    @ExceptionHandler(LockedException.class)
+    public AjaxResult<Void> lockedExceptionHandel(LockedException exception) {
+        log.error("账号被锁定:", exception);
+        return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(ParamException.class)
+    public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
+        log.error("参数异常:", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
+    }
+
+    /**
+     * 权限不足
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
+        log.error("权限不足:{}", exception.getMessage());
+        return AjaxResult.error(ResponseCode.ACCESS_DENIED);
+    }
+
+    /**
+     * 参数校验失败
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public AjaxResult<Void> methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
+        log.error("参数校验失败:", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR,
+                Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+    }
+
+    /**
+     * 资源不存在
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
+        log.error("资源不存在：{}", exception.toString());
+        String message = String.format("资源不存在: %s", request.getRequestURI());
+        return AjaxResult.error(ResponseCode.NOT_FOUND, message);
+    }
+
+    /**
+     * 配置文件异常
+     */
+    @ExceptionHandler(ProfileException.class)
+    public AjaxResult<Void> profileExceptionHandel(ProfileException exception) {
+        log.error("配置异常:", exception);
+        return AjaxResult.error(ResponseCode.PROFILE_ERROR, exception.getMessage());
+    }
+
+    /**
+     * 访问过于频繁
+     */
+    @ExceptionHandler(TooManyRequestException.class)
+    public AjaxResult<Void> tooManyRequestExceptionHandel(TooManyRequestException exception) {
+        log.error("请求过于频繁", exception);
+        return AjaxResult.error(ResponseCode.TOO_MANY_REQUESTS, exception.getMessage());
+    }
+
+    /**
+     * 却少请求参数
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public AjaxResult<Void> missingServletRequestParameterExceptionHandel(MissingServletRequestParameterException exception) {
+        log.error("缺少请求参数", exception);
+        String message = exception.getMessage();
+        String paramName = "";
+        if (message.contains("'")) {
+            int start = message.indexOf("'") + 1;
+            int end = message.indexOf("'", start);
+            if (end > start) {
+                paramName = message.substring(start, end);
+            }
+        }
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, "缺少请求参数: " + paramName);
+    }
+
+    /**
+     * 系统异常
+     */
+    @ExceptionHandler(Exception.class)
+    public AjaxResult<Void> exceptionHandel(Exception exception) {
+        log.error("系统异常", exception);
+        return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
+    }
+
+
+}
