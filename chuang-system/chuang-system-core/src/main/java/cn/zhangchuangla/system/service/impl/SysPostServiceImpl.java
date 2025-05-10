@@ -67,7 +67,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      * @return 操作结果
      */
     @Override
-    public boolean deletePost(List<Integer> ids) {
+    public boolean deletePost(List<Long> ids) {
         return removeByIds(ids);
     }
 
@@ -78,7 +78,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      * @return 操作结果
      */
     @Override
-    public SysPost getPostById(Integer id) {
+    public SysPost getPostById(Long id) {
         return getById(id);
     }
 
