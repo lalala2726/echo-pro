@@ -2,6 +2,8 @@ package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.annoation.ValidRegex;
 import cn.zhangchuangla.common.constant.RegularConstants;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -90,6 +92,7 @@ public class UserAddRequest {
      * 状态
      */
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.AUTO)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.request.dept;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -31,6 +33,7 @@ public class SysDeptAddRequest {
      * 部门状态（0正常 1停用）
      */
     @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

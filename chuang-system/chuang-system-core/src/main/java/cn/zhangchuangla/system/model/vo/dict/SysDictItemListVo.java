@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.vo.dict;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -30,6 +32,13 @@ public class SysDictItemListVo {
     @Schema(description = "字典项名称", type = "string")
     private String itemLabel;
 
+
+    /**
+     * 前端回显类型
+     */
+    @Schema(description = "前端回显类型", type = "string")
+    private String tag;
+
     /**
      * 字典项值
      */
@@ -46,7 +55,9 @@ public class SysDictItemListVo {
      * 状态：0启用，1禁用
      */
     @Schema(description = "状态：0启用，1禁用")
-    private String status;
+    @JsonSerialize(using = ToStringSerializer.class)
+
+    private Integer status;
 
     /**
      * 创建时间

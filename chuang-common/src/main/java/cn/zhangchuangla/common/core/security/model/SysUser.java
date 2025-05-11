@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -76,6 +78,7 @@ public class SysUser extends BaseEntity {
      * 状态
      */
     @Schema(description = "状态")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
 

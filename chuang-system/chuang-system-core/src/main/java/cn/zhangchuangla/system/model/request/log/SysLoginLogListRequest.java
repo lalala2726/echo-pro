@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.request.log;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -37,6 +39,7 @@ public class SysLoginLogListRequest extends BasePageRequest {
      */
     @Schema(description = "账号状态", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Range(min = 0, max = 1, message = "账号状态只能为0或1")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

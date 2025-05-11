@@ -3,6 +3,8 @@ package cn.zhangchuangla.system.model.request.user;
 import cn.zhangchuangla.common.annoation.ValidRegex;
 import cn.zhangchuangla.common.base.BasePageRequest;
 import cn.zhangchuangla.common.constant.RegularConstants;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -64,6 +66,7 @@ public class UserListRequest extends BasePageRequest {
      * 状态
      */
     @Schema(description = "状态")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
