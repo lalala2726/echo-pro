@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -15,7 +17,10 @@ import java.util.List;
 @Schema(description = "下拉选项对象")
 @Data
 @NoArgsConstructor
-public class Option<T> {
+public class Option<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -2430627728459706234L;
 
     @Schema(description = "选项的值")
     private T value;
