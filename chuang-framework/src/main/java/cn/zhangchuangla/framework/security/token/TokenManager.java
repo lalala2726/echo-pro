@@ -65,12 +65,5 @@ public interface TokenManager {
         // throw new UnsupportedOperationException("Not implemented");
     }
 
-
-    String generateToken(String sessionId, String username);
-
-    String getUsernameFromToken(String token);
-
-    String getSessionIdFromToken(String token);
-
     Claims getClaimsFromToken(String token);
 }

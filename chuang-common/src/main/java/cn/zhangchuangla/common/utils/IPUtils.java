@@ -33,10 +33,10 @@ public class IPUtils {
 
     // 注意：确保 ip2region.xdb 文件在指定的 classpath 路径下，或者调整加载方式
     private static final String DB_CLASSPATH_PATH = "/data/ip2region.xdb";
-    private static Searcher searcher;
     private static final String UNKNOWN_IP_INFO = "未知";
     private static final String PRIVATE_IP_INFO = "私网"; // 或 "内网"
     private static final String CGN_IP_INFO = "运营商NAT"; // 定义运营商NAT的标识
+    private static Searcher searcher;
 
     // --- IP 地址获取逻辑 (基本不变) ---
 

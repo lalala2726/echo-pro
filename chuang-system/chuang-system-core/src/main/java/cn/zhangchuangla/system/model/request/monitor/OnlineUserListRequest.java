@@ -63,5 +63,4 @@ public class OnlineUserListRequest extends BasePageRequest {
     private String os;
 
 
-
 }
