@@ -35,10 +35,10 @@ public class SysLoginLogListVo {
 
 
     /**
-     * ip
+     * 登录IP
      */
     @Schema(description = "ip")
-    private String address;
+    private String ip;
 
     /**
      * 地址

@@ -8,7 +8,7 @@
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="status" column="status"/>
-        <result property="address" column="address"/>
+        <result property="ip" column="ip"/>
         <result property="region" column="region"/>
         <result property="browser" column="browser"/>
         <result property="os" column="os"/>
@@ -24,7 +24,7 @@
         select id,
                username,
                status,
-               address,
+               ip,
                region,
                browser,
                os,
