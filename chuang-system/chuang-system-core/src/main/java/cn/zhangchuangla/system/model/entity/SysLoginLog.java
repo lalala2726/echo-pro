@@ -39,7 +39,7 @@ public class SysLoginLog {
     /**
      * IP地址
      */
-    private String address;
+    private String ip;
 
     /**
      * 地区

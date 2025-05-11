@@ -9,6 +9,7 @@ import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static cn.zhangchuangla.common.enums.ResponseCode.ACCESS_TOKEN_INVALID;
+
 /**
  * Redis Token 管理器
  * <p>
@@ -47,13 +50,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RedisTokenManager implements TokenManager {
 
-    private final SecurityProperties securityProperties;
-    private final RedisCache redisCache;
     private static final String CLAIM_KEY_SESSION_ID = "sessionId";
     private static final String CLAIM_KEY_USERNAME = "username";
     private static final String CLAIM_KEY_TOKEN_TYPE = "tokenType";
     private static final String TOKEN_TYPE_ACCESS = "access";
     private static final String TOKEN_TYPE_REFRESH = "refresh";
+    private final SecurityProperties securityProperties;
+    private final RedisCache redisCache;
     private SecretKey jwtSecretKey;
 
     @PostConstruct
@@ -162,8 +165,7 @@ public class RedisTokenManager implements TokenManager {
         String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
         boolean isValid = redisCache.hasKey(onlineUserKey);
         if (isValid) {
-            redisCache.expire(onlineUserKey, securityProperties.getSession().getAccessTokenExpireTime());
-            log.debug("验证访问令牌通过并续期成功，会话ID: {}，Key: {}", sessionId, onlineUserKey);
+            log.debug("验证访问令牌通过，会话ID: {}，Key: {}", sessionId, onlineUserKey);
         }
         return isValid;
     }
@@ -287,11 +289,6 @@ public class RedisTokenManager implements TokenManager {
         }
     }
 
-    @Override
-    public String generateToken(String sessionId, String username) {
-        return createJwt(sessionId, username, TOKEN_TYPE_ACCESS, securityProperties.getSession().getAccessTokenExpireTime() * 1000L);
-    }
-
     /**
      * 创建JWT。
      *
@@ -319,18 +316,12 @@ public class RedisTokenManager implements TokenManager {
                 .compact();
     }
 
-    @Override
-    public String getUsernameFromToken(String jwtToken) {
-        Claims claims = getClaimsFromToken(jwtToken);
-        return claims != null ? claims.get(CLAIM_KEY_USERNAME, String.class) : null;
-    }
-
-    @Override
-    public String getSessionIdFromToken(String jwtToken) {
-        Claims claims = getClaimsFromToken(jwtToken);
-        return claims != null ? claims.get(CLAIM_KEY_SESSION_ID, String.class) : null;
-    }
-
+    /**
+     * 从JWT中解析Claims。
+     *
+     * @param token JWT字符串
+     * @return Claims对象，包含JWT的声明信息
+     */
     @Override
     public Claims getClaimsFromToken(String token) {
         try {
@@ -341,26 +332,49 @@ public class RedisTokenManager implements TokenManager {
             return jwsClaims.getBody();
         } catch (ExpiredJwtException e) {
             log.warn("JWT已过期: {}, message: {}", token, e.getMessage());
+            throw new ParamException(ACCESS_TOKEN_INVALID);
         } catch (UnsupportedJwtException e) {
             log.warn("不支持的JWT格式: {}, message: {}", token, e.getMessage());
+            throw new ParamException(ACCESS_TOKEN_INVALID);
         } catch (MalformedJwtException e) {
             log.warn("JWT结构错误: {}, message: {}", token, e.getMessage());
+            throw new ParamException(ACCESS_TOKEN_INVALID);
         } catch (SignatureException e) {
             log.warn("JWT签名验证失败: {}, message: {}", token, e.getMessage());
+            throw new ParamException(ACCESS_TOKEN_INVALID);
         } catch (IllegalArgumentException e) {
             log.warn("JWT claims字符串为空: {}, message: {}", token, e.getMessage());
+            throw new ParamException(ACCESS_TOKEN_INVALID);
         }
-        return null;
     }
 
+    /**
+     * 构建在线用户信息的Redis Key
+     *
+     * @param sessionId 会话ID
+     * @return Redis Key
+     */
     private String formatOnlineUserKeyBySessionId(String sessionId) {
         return StrUtil.format(RedisConstants.Auth.ACCESS_TOKEN_USER, sessionId);
     }
 
+    /**
+     * 构建刷新令牌ID与访问令牌ID的映射Key
+     *
+     * @param refreshTokenId 刷新令牌ID
+     * @return 映射Key
+     */
     private String formatRefreshTokenMappingKey(String refreshTokenId) {
         return StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_MAPPING, refreshTokenId);
     }
 
+    /**
+     * 构建在线用户信息对象
+     *
+     * @param user          用户详情对象
+     * @param accessTokenId 会话ID
+     * @return 在线用户信息对象
+     */
     private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId) {
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
@@ -378,6 +392,11 @@ public class RedisTokenManager implements TokenManager {
                 .build();
     }
 
+    /**
+     * 设置在线用户的客户端信息
+     *
+     * @param onlineUser 在线用户信息
+     */
     private void setClientInfo(OnlineLoginUser onlineUser) {
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
@@ -395,6 +414,13 @@ public class RedisTokenManager implements TokenManager {
         onlineUser.setUserAgent(userAgent);
     }
 
+    /**
+     * 构建用户详情对象
+     *
+     * @param onlineUser  在线用户信息
+     * @param authorities 权限集合
+     * @return SysUserDetails 用户详情对象
+     */
     private SysUserDetails buildUserDetails(OnlineLoginUser onlineUser, Set<SimpleGrantedAuthority> authorities) {
         SysUserDetails userDetails = new SysUserDetails();
         userDetails.setUserId(onlineUser.getUserId());

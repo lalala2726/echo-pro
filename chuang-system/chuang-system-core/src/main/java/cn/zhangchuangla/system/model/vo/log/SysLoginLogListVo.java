@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.vo.log;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,14 +30,15 @@ public class SysLoginLogListVo {
      * 账号状态
      */
     @Schema(description = "账号状态")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
 
     /**
-     * ip
+     * 登录IP
      */
     @Schema(description = "ip")
-    private String address;
+    private String ip;
 
     /**
      * 地址

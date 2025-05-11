@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.vo.dict;
 
 import cn.zhangchuangla.common.base.BaseVo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,8 +48,9 @@ public class SysDictItemVo extends BaseVo {
     /**
      * 状态：0启用，1禁用
      */
-    @Schema(description = "状态：0启用，1禁用", type = "string")
-    private String status;
+    @Schema(description = "状态：0启用，1禁用", type = "integer")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer status;
 
 
 }

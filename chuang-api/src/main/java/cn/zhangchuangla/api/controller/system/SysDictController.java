@@ -12,6 +12,7 @@ import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.*;
+import cn.zhangchuangla.system.model.vo.dict.SysDictItemListVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictItemVo;
 import cn.zhangchuangla.system.model.vo.dict.SysDictTypeVo;
 import cn.zhangchuangla.system.service.SysDictItemService;
@@ -146,7 +147,7 @@ public class SysDictController extends BaseController {
         }
         Page<SysDictItem> page = new Page<>(request.getPageNum(), request.getPageSize());
         Page<SysDictItem> sysDictItemPage = sysDictItemService.listDictItem(page, dictType, request);
-        List<SysDictItemVo> sysDictItemVos = copyListProperties(sysDictItemPage, SysDictItemVo.class);
+        List<SysDictItemListVo> sysDictItemVos = copyListProperties(sysDictItemPage, SysDictItemListVo.class);
         return getTableData(sysDictItemPage, sysDictItemVos);
     }
 

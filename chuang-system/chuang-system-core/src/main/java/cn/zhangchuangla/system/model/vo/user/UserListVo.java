@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.vo.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -78,6 +80,7 @@ public class UserListVo {
      * 状态
      */
     @Schema(description = "状态")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

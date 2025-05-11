@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.model.request.dept;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +39,7 @@ public class SysDeptListRequest extends BasePageRequest {
      * 部门创建时间
      */
     @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.model.entity.ClientInfo;
-import cn.zhangchuangla.common.utils.ClientUtils;
+import cn.zhangchuangla.common.utils.IPUtils;
+import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
@@ -39,31 +39,46 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
      */
     @Override
     public void recordLoginLog(String username, HttpServletRequest httpServletRequest, boolean isSuccess) {
-        ClientInfo deviceInfo = ClientUtils.getClientInfo(httpServletRequest);
+        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+        UserAgentUtils.getDeviceManufacturer(userAgent);
+
+        String region = IPUtils.getRegion(ipAddr);
+        String osName = UserAgentUtils.getOsName(userAgent);
+        String browserName = UserAgentUtils.getBrowserName(userAgent);
+        String osVersion = UserAgentUtils.getOsVersion(userAgent);
+        String browserType = UserAgentUtils.getBrowserType(userAgent);
+        String deviceType = UserAgentUtils.getDeviceType(userAgent);
+        String browserRenderingEngine = UserAgentUtils.getBrowserRenderingEngine(userAgent);
+
         log.info("用户名: {},登录: {},登录时间: {},系统名称: {}, IP地址: {}, 浏览器名称: {}, 设备版本: {}, 浏览器类型: {}, 设备类型: {}, 浏览器渲染引擎: {}, 区域: {}",
                 username,
                 isSuccess ? "登录成功" : "登录失败",
                 new Date(),
-                deviceInfo.getOsName(),
-                deviceInfo.getIp(),
-                deviceInfo.getBrowserName(),
-                deviceInfo.getOsVersion(),
-                deviceInfo.getBrowserType(),
-                deviceInfo.getDeviceType(),
-                deviceInfo.getBrowserRenderingEngine(),
-                deviceInfo.getRegion()
+                osName,
+                ipAddr,
+                browserName,
+                osVersion,
+                browserType,
+                deviceType,
+                browserRenderingEngine,
+                region
         );
+
+
+        // 记录登录日志
         SysLoginLog sysLoginLog = SysLoginLog.builder()
-                .os(deviceInfo.getOsName())
-                .address(deviceInfo.getIp())
-                .address(deviceInfo.getRegion())
+                .os(osName)
+                .ip(ipAddr)
+                .region(region)
                 .username(username)
-                .browser(deviceInfo.getBrowserName())
+                .browser(browserName)
                 .status(isSuccess ? 0 : 1)
                 .createBy(Constants.SYSTEM_CREATE)
                 .build();
         save(sysLoginLog);
     }
+
 
     /**
      * 分页查询登录日志

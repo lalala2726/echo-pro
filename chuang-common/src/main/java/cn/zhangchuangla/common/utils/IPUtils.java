@@ -33,10 +33,11 @@ public class IPUtils {
 
     // 注意：确保 ip2region.xdb 文件在指定的 classpath 路径下，或者调整加载方式
     private static final String DB_CLASSPATH_PATH = "/data/ip2region.xdb";
-    private static Searcher searcher;
     private static final String UNKNOWN_IP_INFO = "未知";
-    private static final String PRIVATE_IP_INFO = "私网"; // 或 "内网"
+    private static final String PRIVATE_IP_INFO = "局域网"; // 或 "内网"
+    private static final String LOCALHOST_IO_INFO = "本机";
     private static final String CGN_IP_INFO = "运营商NAT"; // 定义运营商NAT的标识
+    private static Searcher searcher;
 
     // --- IP 地址获取逻辑 (基本不变) ---
 
@@ -253,15 +254,18 @@ public class IPUtils {
             return ipEntity;
         }
 
-        // 2. 判断是否为私网或 CGN 地址
+        // 2. 判断是否为私网、回环地址或 CGN 地址
         if (isPrivateOrCGNIP(ip)) {
-            // 判断是标准私网还是CGN
-            boolean isCGN = ip.startsWith("100.") && ip.split("\\.").length == 4 &&
+            String info;
+            if (ip.startsWith("127.")) {
+                info = LOCALHOST_IO_INFO;
+            } else if (ip.startsWith("100.") && ip.split("\\.").length == 4 &&
                     Integer.parseInt(ip.split("\\.")[1]) >= 64 &&
-                    Integer.parseInt(ip.split("\\.")[1]) <= 127;
-
-            String info = isCGN ? CGN_IP_INFO : PRIVATE_IP_INFO;
-
+                    Integer.parseInt(ip.split("\\.")[1]) <= 127) {
+                info = CGN_IP_INFO;
+            } else {
+                info = PRIVATE_IP_INFO;
+            }
             ipEntity.setCountry(info);
             return ipEntity;
         }
