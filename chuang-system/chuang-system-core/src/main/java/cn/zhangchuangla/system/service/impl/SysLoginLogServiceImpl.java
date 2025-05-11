@@ -70,7 +70,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
         SysLoginLog sysLoginLog = SysLoginLog.builder()
                 .os(osName)
                 .ip(ipAddr)
-                .ip(region)
+                .region(region)
                 .username(username)
                 .browser(browserName)
                 .status(isSuccess ? 0 : 1)
