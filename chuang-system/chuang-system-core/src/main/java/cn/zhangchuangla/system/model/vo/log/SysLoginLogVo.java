@@ -37,7 +37,7 @@ public class SysLoginLogVo {
      * ip地址
      */
     @Schema(description = "IP地址")
-    private String address;
+    private String ip;
 
     /**
      * 区域
