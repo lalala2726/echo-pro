@@ -76,8 +76,8 @@ public class RedisTokenManager implements TokenManager {
         String username = userDetails.getUsername();
         Long userId = userDetails.getUserId();
 
-        String accessTokenId = IdUtil.randomUUID(); // 这个ID将进入访问令牌并作为Redis Key的一部分
-        String refreshTokenId = IdUtil.randomUUID(); // 这个ID将进入刷新令牌并作为Redis Key的一部分
+        String accessTokenId = IdUtil.randomUUID();
+        String refreshTokenId = IdUtil.randomUUID();
 
         OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenId);
         setClientInfo(onlineLoginUser);

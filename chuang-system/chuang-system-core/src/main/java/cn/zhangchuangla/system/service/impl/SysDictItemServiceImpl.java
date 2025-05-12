@@ -187,6 +187,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * @param dictType 字典类型编码
      * @return 字典项列表
      */
+    //fixme 缓存这边待修复
     @Cacheable(value = RedisConstants.DICT_CACHE, key = "'item:' + #dictType", unless = "#result == null || #result.isEmpty()")
     @Override
     public List<Option<String>> getDictItemOption(String dictType) {

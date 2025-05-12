@@ -229,6 +229,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * 根据角色ID集合获取角色权限字符串集合
+     *
+     * @param roleId 角色ID集合
+     * @return 角色权限字符串集合
+     */
+    @Override
+    public Set<String> getRoleSetByRoleId(Long roleId) {
+        LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        sysRoleLambdaQueryWrapper.in(SysRole::getRoleId, roleId);
+        List<SysRole> roles = list(sysRoleLambdaQueryWrapper);
+        return roles.stream()
+                .map(SysRole::getRoleKey)
+                .collect(Collectors.toSet());
+    }
+
 }
 
 

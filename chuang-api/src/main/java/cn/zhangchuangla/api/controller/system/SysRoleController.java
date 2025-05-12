@@ -13,7 +13,9 @@ import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
+import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
+import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +46,7 @@ public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
     private final SysRoleConverter sysRoleConverter;
+    private final SysMenuService sysMenuService;
 
     /**
      * 获取角色列表
@@ -59,6 +62,33 @@ public class SysRoleController extends BaseController {
         Page<SysRole> page = sysRoleService.roleList(request);
         List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
         return getTableData(page, sysRoleListVos);
+    }
+
+    /**
+     * 根据角色ID获取角色权限
+     *
+     * @param roleId 角色ID
+     * @return 角色权限
+     */
+    @GetMapping("/getRolePermission/{roleId}")
+    @Operation(summary = "根据角色ID获取角色权限")
+    public AjaxResult<SysRolePermVo> getRolePermission(@Parameter(description = "角色ID")
+                                                       @PathVariable("roleId") Long roleId) {
+        SysRolePermVo result = sysMenuService.getRolePermByRoleId(roleId);
+        return success(result);
+    }
+
+    /**
+     * 更新角色权限
+     *
+     * @param roleId 角色ID
+     * @return 角色权限
+     */
+    @PutMapping("/updateRolePermission/{roleId}")
+    @Operation(summary = "更新角色权限信息")
+    private AjaxResult<Void> updateRolePermission(@Parameter(description = "角色ID")
+                                                  @PathVariable("roleId") Long roleId, List<Long> menuId) {
+        return success();
     }
 
     /**
