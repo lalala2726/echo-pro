@@ -22,16 +22,9 @@
     </select>
 
     <select id="selectMenuListByRoleId" resultType="java.lang.Long">
-        SELECT DISTINCT m.menu_id
-        FROM sys_menu m
-                 INNER JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-        WHERE rm.role_id = #{roleId}
-          AND m.menu_id NOT IN (SELECT m.parent_id
-                                FROM sys_menu m
-                                         INNER JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-                                WHERE rm.role_id = #{roleId}
-                                  AND m.parent_id != 0)
-        ORDER BY m.parent_id, m.sort
+        select menu_id
+        from sys_role_menu
+        where role_id = #{roleId}
     </select>
 
 

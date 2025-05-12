@@ -7,20 +7,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 菜单更新请求
+ * 菜单添加请求
  *
  * @author Chuang
  */
 @Data
-@Schema(description = "菜单更新请求")
-public class MenuUpdateRequest {
-
-    /**
-     * 菜单ID
-     */
-    @NotNull(message = "菜单ID不能为空")
-    @Schema(description = "菜单ID")
-    private Long menuId;
+@Schema(description = "菜单添加请求")
+public class SysMenuAddRequest {
 
     /**
      * 菜单名称

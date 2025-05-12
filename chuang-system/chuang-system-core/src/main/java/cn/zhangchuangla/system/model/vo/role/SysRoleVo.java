@@ -1,19 +1,20 @@
 package cn.zhangchuangla.system.model.vo.role;
 
+import cn.zhangchuangla.common.base.BaseVo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
  * 角色VO
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "角色列表视图对象", description = "返回前端展示的数据")
-public class SysRoleVo {
+public class SysRoleVo extends BaseVo {
+
     /**
      * 主键
      */
@@ -38,19 +39,6 @@ public class SysRoleVo {
      */
     @Schema(description = "显示顺序")
     private Integer sort;
-
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
-
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Schema(description = "创建时间")
-    private Date createTime;
 
 
 }

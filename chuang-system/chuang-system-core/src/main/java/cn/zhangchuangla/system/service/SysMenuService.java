@@ -2,7 +2,12 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -21,6 +26,14 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 菜单列表
      */
     List<SysMenu> getMenuListByUserId(Long userId);
+
+    /**
+     * 根据角色ID查询菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    List<Long> getRolePermSelectedByRoleId(Long roleId);
 
     /**
      * 构造前端需要的路由界面
@@ -89,10 +102,10 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 修改菜单
      *
-     * @param menu 菜单信息
+     * @param request 菜单信息
      * @return 结果
      */
-    boolean updateMenu(SysMenu menu);
+    boolean updateMenu(SysMenuUpdateRequest request);
 
     /**
      * 删除菜单
@@ -125,4 +138,45 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 结果 true 存在 false 不存在
      */
     boolean checkMenuExistRole(Long menuId);
+
+
+    /**
+     * 更新角色菜单权限
+     *
+     * @param request 菜单更新角色权限请求
+     * @return 结果
+     */
+    boolean updateRoleMenus(SysMenuUpdateRolePermRequest request);
+
+    /**
+     * 获取菜单路由列表
+     *
+     * @param onlyParent 是否只查询父级菜单
+     * @return 菜单路由列表
+     */
+    List<Option<String>> getMenuOptions(boolean onlyParent);
+
+    /**
+     * 添加菜单
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    boolean addMenu(SysMenuAddRequest request);
+
+    /**
+     * 根据角色ID获取菜单权限信息
+     *
+     * @param roleId 角色ID
+     * @return 菜单权限信息
+     */
+    SysRolePermVo getRolePermByRoleId(Long roleId);
+
+    /**
+     * 更新角色权限
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    boolean updateRolePermission(SysUpdateRolePermissionRequest request);
 }

@@ -3,14 +3,25 @@ package cn.zhangchuangla.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.model.entity.SysRoleMenu;
+import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.MetaVo;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuTreeList;
+import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.service.SysMenuService;
+import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,11 +40,14 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
+public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
+        implements SysMenuService {
 
     private final SysMenuMapper menuMapper;
     private final SysRoleMenuMapper roleMenuMapper;
     private final SysRoleService sysRoleService;
+    private final SysMenuMapper sysMenuMapper;
+    private final SysRoleMenuService sysRoleMenuService;
 
     /**
      * 根据用户ID查询菜单列表
@@ -118,11 +132,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                     option.setValue(menu.getMenuId());
                     option.setLabel(menu.getMenuName());
 
-                    // 设置标签类型（可选）
-                    if (Constants.CommonConstants.DISABLE.equals(menu.getStatus())) {
-                        option.setTag("停用");
-                    }
-
                     // 获取子菜单
                     List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
                     if (!children.isEmpty()) {
@@ -158,11 +167,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                     Option<Long> option = new Option<>();
                     option.setValue(menu.getMenuId());
                     option.setLabel(menu.getMenuName());
-
-                    // 设置标签类型（可选）
-                    if (Constants.CommonConstants.DISABLE.equals(menu.getStatus())) {
-                        option.setTag("停用");
-                    }
                     // 递归获取子菜单
                     List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
                     if (!children.isEmpty()) {
@@ -224,16 +228,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 修改菜单
      *
-     * @param menu 菜单信息
+     * @param request 菜单信息
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateMenu(SysMenu menu) {
-        if (menu == null || menu.getMenuId() == null) {
-            return false;
-        }
-        return updateById(menu);
+    public boolean updateMenu(SysMenuUpdateRequest request) {
+        return false;
     }
 
     /**
@@ -311,6 +312,182 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return roleMenuMapper.checkMenuExistRole(menuId) > 0;
     }
 
+
+    /**
+     * 更新角色菜单权限
+     *
+     * @param request 菜单更新请求
+     * @return 结果
+     */
+    @Override
+    public boolean updateRoleMenus(SysMenuUpdateRolePermRequest request) {
+        return false;
+    }
+
+    /**
+     * 获取菜单路由列表
+     *
+     * @return 菜单路由列表
+     */
+    @Override
+    public List<Option<String>> getMenuOptions(boolean onlyParent) {
+        return List.of();
+    }
+
+    /**
+     * 添加菜单
+     *
+     * @param request 菜单添加请求
+     * @return 结果
+     */
+    @Override
+    public boolean addMenu(SysMenuAddRequest request) {
+        return false;
+    }
+
+    /**
+     * 根据角色ID获取菜单权限信息
+     *
+     * @param roleId 角色ID
+     * @return 菜单权限信息
+     */
+    @Override
+    public SysRolePermVo getRolePermByRoleId(Long roleId) {
+        // 获取角色信息，若为空则抛出异常或返回默认值
+        SysRole role = Optional.ofNullable(sysRoleService.getById(roleId))
+                .orElseThrow(() -> new IllegalArgumentException("角色不存在，ID：" + roleId));
+
+        List<SysMenu> sysMenus = list();
+
+        List<SysMenuTreeList> menuTreeList = buildMenuTreeList(sysMenus);
+
+        List<Long> selected = getRolePermSelectedByRoleId(roleId);
+
+        return new SysRolePermVo(
+                roleId,
+                role.getRoleName(),
+                role.getRoleKey(),
+                menuTreeList,
+                selected
+        );
+    }
+
+    /**
+     * 构建菜单树列表 类型:{@link SysMenuTreeList}
+     *
+     * @param sysMenus 菜单列表
+     * @return 菜单树列表
+     */
+    private List<SysMenuTreeList> buildMenuTreeList(List<SysMenu> sysMenus) {
+        if (sysMenus == null || sysMenus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return sysMenus.stream()
+                .filter(menu -> menu.getParentId() == 0)
+                .map(menu -> {
+                    SysMenuTreeList treeList = new SysMenuTreeList();
+                    treeList.setMenuId(menu.getMenuId());
+                    treeList.setMenuName(menu.getMenuName());
+                    treeList.setMenuType(menu.getMenuType());
+                    treeList.setParentId(menu.getParentId());
+
+                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
+                    if (!children.isEmpty()) {
+                        treeList.setChildren(children);
+                    }
+
+                    return treeList;
+                })
+                .toList();
+    }
+
+
+    /**
+     * 更新角色权限
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
+        Long roleId = request.getRoleId();
+        SysRole sysRole = sysRoleService.getById(request.getRoleId());
+        if (SysRolesConstant.SUPER_ADMIN.contains(sysRole.getRoleKey())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+        }
+        // 删除原有的角色菜单权限
+        LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId);
+        sysRoleMenuService.remove(eq);
+        // 添加新的角色菜单权限
+        List<SysRoleMenu> roleMenus = request.getSelectedMenuId().stream()
+                .map(menuId -> {
+                    SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                    sysRoleMenu.setRoleId(roleId);
+                    sysRoleMenu.setMenuId(menuId);
+                    return sysRoleMenu;
+                })
+                .toList();
+        // 批量插入角色菜单权限
+        return sysRoleMenuService.saveBatch(roleMenus);
+    }
+
+
+    /**
+     * 递归获取子菜单 {@link SysMenuTreeList}
+     *
+     * @param sysMenus 菜单列表
+     * @param parentId 父菜单ID
+     * @return 子菜单列表
+     */
+    private List<SysMenuTreeList> getChildMenus(List<SysMenu> sysMenus, Long parentId) {
+        if (parentId == null || sysMenus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return sysMenus.stream()
+                .filter(menu -> parentId.equals(menu.getParentId()))
+                .map(menu -> {
+                    SysMenuTreeList sysMenuTreeList = new SysMenuTreeList();
+                    sysMenuTreeList.setMenuId(menu.getMenuId());
+                    sysMenuTreeList.setMenuName(menu.getMenuName());
+                    sysMenuTreeList.setMenuType(menu.getMenuType());
+
+                    // 递归获取子菜单
+                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
+                    if (!children.isEmpty()) {
+                        sysMenuTreeList.setChildren(children);
+                    }
+
+                    return sysMenuTreeList;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 根据角色ID获取已选中的菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    @Override
+    public List<Long> getRolePermSelectedByRoleId(Long roleId) {
+        if (roleId == null) {
+            return Collections.emptyList();
+        }
+        Set<String> roleSet = sysRoleService.getRoleSetByRoleId(roleId);
+        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+            // 如果是超级管理员，返回所有菜单ID
+            return list().stream()
+                    .map(SysMenu::getMenuId)
+                    .toList();
+        }
+        return roleMenuMapper.selectMenuListByRoleId(roleId);
+    }
+
+
     /**
      * 构造前端需要的路由界面
      *
@@ -333,6 +510,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .map(menu -> convertToRouter(menu, menus, "")) // 初始调用传入空父路径
                 .collect(Collectors.toList());
     }
+
 
     /**
      * 将菜单转换为路由对象
@@ -523,7 +701,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             // 目录类型，添加空的auths数组
             metaVo.setAuths(new String[]{""});
         }
-
         return metaVo;
     }
 

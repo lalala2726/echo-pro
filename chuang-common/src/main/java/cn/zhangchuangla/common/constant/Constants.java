@@ -94,8 +94,8 @@ public class Constants {
 
 
     public interface CommonConstants {
-        String ENABLE = "0";
-        String DISABLE = "1";
+        Integer ENABLE = 0;
+        Integer DISABLE = 1;
     }
 
     /**

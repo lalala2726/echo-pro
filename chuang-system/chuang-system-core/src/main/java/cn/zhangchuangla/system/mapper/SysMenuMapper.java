@@ -28,11 +28,24 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
      * @param roleId 角色ID
      * @return 菜单ID列表
      */
-    List<Long> selectMenuListByRoleId(Long roleId);
+    List<SysMenu> selectMenuListByRoleId(@Param("roleId") Long roleId);
 
-    List<SysMenu> selectMenuListByUserId(Long userId);
+    /**
+     * 根据用户ID查询菜单列表
+     *
+     * @param userId 角色ID
+     * @return 菜单列表
+     */
+    List<SysMenu> selectMenuListByUserId(@Param("userId") Long userId);
 
+    /**
+     * 查询菜单列表
+     *
+     * @param menu 查询参数
+     * @return 菜单列表
+     */
     List<SysMenu> selectMenuList(SysMenu menu);
+
 }
 
 
