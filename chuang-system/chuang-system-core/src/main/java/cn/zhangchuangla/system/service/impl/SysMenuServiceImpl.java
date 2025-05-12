@@ -3,20 +3,25 @@ package cn.zhangchuangla.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
+import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.MetaVo;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuTreeList;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.service.SysMenuService;
+import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -42,6 +47,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysRoleMenuMapper roleMenuMapper;
     private final SysRoleService sysRoleService;
     private final SysMenuMapper sysMenuMapper;
+    private final SysRoleMenuService sysRoleMenuService;
 
     /**
      * 根据用户ID查询菜单列表
@@ -347,33 +353,84 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public SysRolePermVo getRolePermByRoleId(Long roleId) {
-        SysRole role = sysRoleService.getById(roleId);
-        List<SysMenu> sysMenus;
-        if (role.getRoleKey().contains(SysRolesConstant.SUPER_ADMIN)) {
-            //如果是超级管理员返回所有菜单信息
-            sysMenus = list();
-        } else {
-            sysMenus = sysMenuMapper.selectMenuListByRoleId(roleId);
+        // 获取角色信息，若为空则抛出异常或返回默认值
+        SysRole role = Optional.ofNullable(sysRoleService.getById(roleId))
+                .orElseThrow(() -> new IllegalArgumentException("角色不存在，ID：" + roleId));
+
+        List<SysMenu> sysMenus = list();
+
+        List<SysMenuTreeList> menuTreeList = buildMenuTreeList(sysMenus);
+
+        List<Long> selected = getRolePermSelectedByRoleId(roleId);
+
+        return new SysRolePermVo(
+                roleId,
+                role.getRoleName(),
+                role.getRoleKey(),
+                menuTreeList,
+                selected
+        );
+    }
+
+    /**
+     * 构建菜单树列表 类型:{@link SysMenuTreeList}
+     *
+     * @param sysMenus 菜单列表
+     * @return 菜单树列表
+     */
+    private List<SysMenuTreeList> buildMenuTreeList(List<SysMenu> sysMenus) {
+        if (sysMenus == null || sysMenus.isEmpty()) {
+            return Collections.emptyList();
         }
-        //递归将值赋值给SysRolePermVo
-        List<SysMenuTreeList> list = sysMenus.stream()
+
+        return sysMenus.stream()
                 .filter(menu -> menu.getParentId() == 0)
                 .map(menu -> {
-                    SysMenuTreeList sysMenuTreeList = new SysMenuTreeList();
-                    sysMenuTreeList.setMenuId(menu.getMenuId());
-                    sysMenuTreeList.setMenuName(menu.getMenuName());
-                    sysMenuTreeList.setMenuType(menu.getMenuType());
-                    sysMenuTreeList.setParentId(menu.getParentId());
+                    SysMenuTreeList treeList = new SysMenuTreeList();
+                    treeList.setMenuId(menu.getMenuId());
+                    treeList.setMenuName(menu.getMenuName());
+                    treeList.setMenuType(menu.getMenuType());
+                    treeList.setParentId(menu.getParentId());
 
-                    //获取子菜单
-                    List<SysMenuTreeList> childMenus = getChildMenus(sysMenus, menu.getMenuId());
-                    if (!childMenus.isEmpty()) {
-                        sysMenuTreeList.setChildren(childMenus);
+                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
+                    if (!children.isEmpty()) {
+                        treeList.setChildren(children);
                     }
-                    return sysMenuTreeList;
-                }).toList();
-        List<Long> selected = this.getRolePermSelectedByRoleId(roleId);
-        return new SysRolePermVo(roleId, role.getRoleName(), role.getRoleKey(), list, selected);
+
+                    return treeList;
+                })
+                .toList();
+    }
+
+
+    /**
+     * 更新角色权限
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
+        Long roleId = request.getRoleId();
+        SysRole sysRole = sysRoleService.getById(request.getRoleId());
+        if (SysRolesConstant.SUPER_ADMIN.contains(sysRole.getRoleKey())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+        }
+        // 删除原有的角色菜单权限
+        LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId);
+        sysRoleMenuService.remove(eq);
+        // 添加新的角色菜单权限
+        List<SysRoleMenu> roleMenus = request.getSelectedMenuId().stream()
+                .map(menuId -> {
+                    SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                    sysRoleMenu.setRoleId(roleId);
+                    sysRoleMenu.setMenuId(menuId);
+                    return sysRoleMenu;
+                })
+                .toList();
+        // 批量插入角色菜单权限
+        return sysRoleMenuService.saveBatch(roleMenus);
     }
 
 

@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
@@ -48,6 +49,7 @@ public class SysRoleController extends BaseController {
     private final SysRoleConverter sysRoleConverter;
     private final SysMenuService sysMenuService;
 
+
     /**
      * 获取角色列表
      *
@@ -70,7 +72,7 @@ public class SysRoleController extends BaseController {
      * @param roleId 角色ID
      * @return 角色权限
      */
-    @GetMapping("/getRolePermission/{roleId}")
+    @GetMapping("/permission/{roleId}")
     @Operation(summary = "根据角色ID获取角色权限")
     public AjaxResult<SysRolePermVo> getRolePermission(@Parameter(description = "角色ID")
                                                        @PathVariable("roleId") Long roleId) {
@@ -81,14 +83,16 @@ public class SysRoleController extends BaseController {
     /**
      * 更新角色权限
      *
-     * @param roleId 角色ID
+     * @param request 角色权限更新请求
      * @return 角色权限
      */
-    @PutMapping("/updateRolePermission/{roleId}")
+    @PutMapping("/permission")
     @Operation(summary = "更新角色权限信息")
-    private AjaxResult<Void> updateRolePermission(@Parameter(description = "角色ID")
-                                                  @PathVariable("roleId") Long roleId, List<Long> menuId) {
-        return success();
+    @PreAuthorize("@ss.hasPermission('system:role:permission')")
+    @OperationLog(title = "角色权限管理", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> updateRolePermission(@RequestBody SysUpdateRolePermissionRequest request) {
+        boolean result = sysMenuService.updateRolePermission(request);
+        return toAjax(result);
     }
 
     /**

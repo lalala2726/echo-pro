@@ -83,7 +83,6 @@
         from sys_menu m
                  inner join sys_role_menu rm on m.menu_id = rm.menu_id
         where rm.role_id = #{roleId}
-          and m.visible = 1
         order by m.sort
     </select>
 

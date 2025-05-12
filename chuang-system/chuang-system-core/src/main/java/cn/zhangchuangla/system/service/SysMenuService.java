@@ -5,6 +5,7 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -26,6 +27,12 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     List<SysMenu> getMenuListByUserId(Long userId);
 
+    /**
+     * 根据角色ID查询菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
     List<Long> getRolePermSelectedByRoleId(Long roleId);
 
     /**
@@ -165,5 +172,11 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     SysRolePermVo getRolePermByRoleId(Long roleId);
 
-
+    /**
+     * 更新角色权限
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    boolean updateRolePermission(SysUpdateRolePermissionRequest request);
 }
