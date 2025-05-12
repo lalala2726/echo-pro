@@ -36,6 +36,7 @@ public class SysMenuTreeList {
      * 父菜单ID
      */
     @Schema(description = "父菜单ID")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Long parentId;
 
     /**

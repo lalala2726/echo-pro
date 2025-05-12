@@ -119,4 +119,5 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 角色权限字符串集合
      */
     Set<String> getRoleSetByRoleId(Long roleId);
+
 }

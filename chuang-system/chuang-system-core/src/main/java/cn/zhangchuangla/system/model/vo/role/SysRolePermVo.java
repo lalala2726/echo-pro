@@ -20,6 +20,24 @@ import java.util.List;
 public class SysRolePermVo {
 
     /**
+     * 角色ID
+     */
+    @Schema(description = "角色ID")
+    private Long roleId;
+
+    /**
+     * 角色名称
+     */
+    @Schema(description = "角色名称")
+    private String roleName;
+
+    /**
+     * 角色权限标识
+     */
+    @Schema(description = "角色权限标识")
+    private String roleKey;
+
+    /**
      * 菜单树
      */
     @Schema(description = "菜单树")

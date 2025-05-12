@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
@@ -346,9 +347,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public SysRolePermVo getRolePermByRoleId(Long roleId) {
-        Set<String> roleSet = sysRoleService.getRoleSetByRoleId(roleId);
+        SysRole role = sysRoleService.getById(roleId);
         List<SysMenu> sysMenus;
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (role.getRoleKey().contains(SysRolesConstant.SUPER_ADMIN)) {
             //如果是超级管理员返回所有菜单信息
             sysMenus = list();
         } else {
@@ -362,6 +363,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                     sysMenuTreeList.setMenuId(menu.getMenuId());
                     sysMenuTreeList.setMenuName(menu.getMenuName());
                     sysMenuTreeList.setMenuType(menu.getMenuType());
+                    sysMenuTreeList.setParentId(menu.getParentId());
 
                     //获取子菜单
                     List<SysMenuTreeList> childMenus = getChildMenus(sysMenus, menu.getMenuId());
@@ -371,7 +373,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                     return sysMenuTreeList;
                 }).toList();
         List<Long> selected = this.getRolePermSelectedByRoleId(roleId);
-        return new SysRolePermVo(list, selected);
+        return new SysRolePermVo(roleId, role.getRoleName(), role.getRoleKey(), list, selected);
     }
 
 
