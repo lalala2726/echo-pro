@@ -2,7 +2,6 @@ package cn.zhangchuangla.common.core.security.model;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.SecurityConstants;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -68,8 +67,7 @@ public class SysUserDetails implements UserDetails, Serializable {
         // 初始化角色权限集合
         this.authorities = CollectionUtil.isNotEmpty(roles)
                 ? roles.stream()
-                // 角色名加上前缀 "ROLE_"，用于区分角色 (ROLE_ADMIN) 和权限 (user:add)
-                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
     }

@@ -1,8 +1,6 @@
 package cn.zhangchuangla.common.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.zhangchuangla.common.constant.SecurityConstants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -113,7 +111,10 @@ public class SecurityUtils {
      */
     public static boolean isSuperAdmin() {
         Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.SUPER_ADMIN);
+        log.info("当前用户角色: {}", roles);
+        boolean contains = roles.contains(SysRolesConstant.SUPER_ADMIN);
+        log.info("当前用户是否为超级管理员: {}", contains);
+        return contains;
     }
 
     /**
@@ -128,9 +129,6 @@ public class SecurityUtils {
                 .stream()
                 .flatMap(Collection::stream)
                 .map(GrantedAuthority::getAuthority)
-                // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
-                .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
-                .map(authority -> StrUtil.removePrefix(authority, SecurityConstants.ROLE_PREFIX))
                 .collect(Collectors.toSet());
     }
 
