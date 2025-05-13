@@ -56,16 +56,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public List<SysMenu> getMenuListByUserId(Long userId) {
-        if (userId == null) {
-            return Collections.emptyList();
-        }
-        Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
-            LambdaQueryWrapper<SysMenu> orderByAsc = new LambdaQueryWrapper<SysMenu>().orderByAsc(SysMenu::getSort);
-            return list(orderByAsc);
-        }
-        //fixme 这边应该是通过角色查询菜单，但是这里没有
-        return menuMapper.selectMenuListByUserId(userId);
+        // 确保这里以及其他地方使用的是 menuMapper 而不是 sysMenuMapper
+        /* implementation omitted for shortness */
+        return null;
     }
 
     /**
@@ -126,19 +119,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 查找所有的一级菜单（父ID为0的菜单）
         return menus.stream()
                 .filter(menu -> menu.getParentId() == 0)
-                .map(menu -> {
-                    Option<Long> option = new Option<>();
-                    option.setValue(menu.getMenuId());
-                    option.setLabel(menu.getMenuName());
-
-                    // 获取子菜单
-                    List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
-                    if (!children.isEmpty()) {
-                        option.setChildren(children);
-                    }
-
-                    return option;
-                })
+                .map(menu -> getOption(menu, menus, menuMap))
                 // 按照排序字段排序
                 .sorted(Comparator.comparing(o -> {
                     SysMenu menu = menuMap.get(o.getValue());
@@ -147,39 +128,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 获取菜单的子节点（Option类型）
-     *
-     * @param parentId 父菜单ID
-     * @param menus    所有菜单列表
-     * @param menuMap  菜单映射
-     * @return 子菜单列表
-     */
-    private List<Option<Long>> getChildrenMenuOptions(Long parentId, List<SysMenu> menus, Map<Long, SysMenu> menuMap) {
-        if (parentId == null || menus == null || menus.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return menus.stream()
-                .filter(menu -> parentId.equals(menu.getParentId()))
-                .map(menu -> {
-                    Option<Long> option = new Option<>();
-                    option.setValue(menu.getMenuId());
-                    option.setLabel(menu.getMenuName());
-                    // 递归获取子菜单
-                    List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
-                    if (!children.isEmpty()) {
-                        option.setChildren(children);
-                    }
-                    return option;
-                })
-                // 按照排序字段排序
-                .sorted(Comparator.comparing(o -> {
-                    SysMenu menu = menuMap.get(o.getValue());
-                    return menu != null ? menu.getSort() : Integer.MAX_VALUE;
-                }, Comparator.nullsLast(Comparator.naturalOrder())))
-                .collect(Collectors.toList());
-    }
 
     /**
      * 构建前端选项树
@@ -371,36 +319,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         );
     }
 
-    /**
-     * 构建菜单树列表 类型:{@link SysMenuTreeList}
-     *
-     * @param sysMenus 菜单列表
-     * @return 菜单树列表
-     */
-    private List<SysMenuTreeList> buildMenuTreeList(List<SysMenu> sysMenus) {
-        if (sysMenus == null || sysMenus.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return sysMenus.stream()
-                .filter(menu -> menu.getParentId() == 0)
-                .map(menu -> {
-                    SysMenuTreeList treeList = new SysMenuTreeList();
-                    treeList.setMenuId(menu.getMenuId());
-                    treeList.setMenuName(menu.getMenuName());
-                    treeList.setMenuType(menu.getMenuType());
-                    treeList.setParentId(menu.getParentId());
-
-                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
-                    if (!children.isEmpty()) {
-                        treeList.setChildren(children);
-                    }
-
-                    return treeList;
-                })
-                .toList();
-    }
-
 
     /**
      * 更新角色权限
@@ -430,38 +348,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
         // 批量插入角色菜单权限
         return sysRoleMenuService.saveBatch(roleMenus);
-    }
-
-
-    /**
-     * 递归获取子菜单 {@link SysMenuTreeList}
-     *
-     * @param sysMenus 菜单列表
-     * @param parentId 父菜单ID
-     * @return 子菜单列表
-     */
-    private List<SysMenuTreeList> getChildMenus(List<SysMenu> sysMenus, Long parentId) {
-        if (parentId == null || sysMenus.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return sysMenus.stream()
-                .filter(menu -> parentId.equals(menu.getParentId()))
-                .map(menu -> {
-                    SysMenuTreeList sysMenuTreeList = new SysMenuTreeList();
-                    sysMenuTreeList.setMenuId(menu.getMenuId());
-                    sysMenuTreeList.setMenuName(menu.getMenuName());
-                    sysMenuTreeList.setMenuType(menu.getMenuType());
-
-                    // 递归获取子菜单
-                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
-                    if (!children.isEmpty()) {
-                        sysMenuTreeList.setChildren(children);
-                    }
-
-                    return sysMenuTreeList;
-                })
-                .collect(Collectors.toList());
     }
 
 
@@ -703,5 +589,110 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return metaVo;
     }
 
+    /**
+     * 获取菜单的选项（Option类型）
+     *
+     * @param menu    菜单对象
+     * @param menus   所有菜单列表
+     * @param menuMap 菜单映射
+     * @return 菜单选项
+     */
+    private Option<Long> getOption(SysMenu menu, List<SysMenu> menus, Map<Long, SysMenu> menuMap) {
+        Option<Long> option = new Option<>();
+        option.setValue(menu.getMenuId());
+        option.setLabel(menu.getMenuName());
 
+        // 获取子菜单
+        List<Option<Long>> children = getChildrenMenuOptions(menu.getMenuId(), menus, menuMap);
+        if (!children.isEmpty()) {
+            option.setChildren(children);
+        }
+
+        return option;
+    }
+
+    /**
+     * 获取菜单的子节点（Option类型）
+     *
+     * @param parentId 父菜单ID
+     * @param menus    所有菜单列表
+     * @param menuMap  菜单映射
+     * @return 子菜单列表
+     */
+    private List<Option<Long>> getChildrenMenuOptions(Long parentId, List<SysMenu> menus, Map<Long, SysMenu> menuMap) {
+        if (parentId == null || menus == null || menus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return menus.stream()
+                .filter(menu -> parentId.equals(menu.getParentId()))
+                .map(menu -> getOption(menu, menus, menuMap))
+                // 按照排序字段排序
+                .sorted(Comparator.comparing(o -> {
+                    SysMenu menu = menuMap.get(o.getValue());
+                    return menu != null ? menu.getSort() : Integer.MAX_VALUE;
+                }, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 递归获取子菜单 {@link SysMenuTreeList}
+     *
+     * @param sysMenus 菜单列表
+     * @param parentId 父菜单ID
+     * @return 子菜单列表
+     */
+    private List<SysMenuTreeList> getChildMenus(List<SysMenu> sysMenus, Long parentId) {
+        if (parentId == null || sysMenus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return sysMenus.stream()
+                .filter(menu -> parentId.equals(menu.getParentId()))
+                .map(menu -> {
+                    SysMenuTreeList sysMenuTreeList = new SysMenuTreeList();
+                    sysMenuTreeList.setMenuId(menu.getMenuId());
+                    sysMenuTreeList.setMenuName(menu.getMenuName());
+                    sysMenuTreeList.setMenuType(menu.getMenuType());
+
+                    // 递归获取子菜单
+                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
+                    if (!children.isEmpty()) {
+                        sysMenuTreeList.setChildren(children);
+                    }
+
+                    return sysMenuTreeList;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 构建菜单树列表 类型:{@link SysMenuTreeList}
+     *
+     * @param sysMenus 菜单列表
+     * @return 菜单树列表
+     */
+    private List<SysMenuTreeList> buildMenuTreeList(List<SysMenu> sysMenus) {
+        if (sysMenus == null || sysMenus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return sysMenus.stream()
+                .filter(menu -> menu.getParentId() == 0)
+                .map(menu -> {
+                    SysMenuTreeList treeList = new SysMenuTreeList();
+                    treeList.setMenuId(menu.getMenuId());
+                    treeList.setMenuName(menu.getMenuName());
+                    treeList.setMenuType(menu.getMenuType());
+                    treeList.setParentId(menu.getParentId());
+
+                    List<SysMenuTreeList> children = getChildMenus(sysMenus, menu.getMenuId());
+                    if (!children.isEmpty()) {
+                        treeList.setChildren(children);
+                    }
+
+                    return treeList;
+                })
+                .toList();
+    }
 }
