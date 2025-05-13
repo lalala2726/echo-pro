@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 菜单表数据访问层
@@ -46,6 +47,14 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
      */
     List<SysMenu> selectMenuList(SysMenu menu);
 
+
+    /**
+     * 根据角色ID查询权限列表
+     *
+     * @param roleSet 角色标签
+     * @return 权限列表
+     */
+    List<SysMenu> getUserPermissionListByRole(Set<String> roleSet);
 }
 
 

@@ -47,6 +47,23 @@ public interface RedisConstants {
     String DICT_CACHE = "dict:cache:";
 
     /**
+     * access-token-expire-time: 7200
+     * refresh-token-expire-time: 2592000
+     * single-login: false
+     */
+    //todo 将配置项放入Redis中可以动态修改
+    interface SystemConfig {
+        interface SessionConfig {
+            // 是否单点登录
+            boolean SINGLE_LOGIN = false;
+            // 访问令牌过期时间(单位秒)
+            int ACCESS_TOKEN_EXPIRE_TIME = 7200;
+            // 刷新令牌过期时间(单位秒)
+            int REFRESH_TOKEN_EXPIRE_TIME = 2592000;
+        }
+    }
+
+    /**
      * 认证模块
      */
     interface Auth {
@@ -74,6 +91,7 @@ public interface RedisConstants {
 
         // 角色权限缓存前缀
         String ROLE_PERMISSIONS_PREFIX = "auth:role_permissions:{}";
+        String ROLE_KEY = "auth:role:";
     }
 
 }

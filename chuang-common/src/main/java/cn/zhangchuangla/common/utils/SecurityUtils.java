@@ -1,27 +1,14 @@
 package cn.zhangchuangla.common.utils;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.zhangchuangla.common.constant.SecurityConstants;
-import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 安全工具类
@@ -32,17 +19,32 @@ import java.util.stream.Collectors;
 public class SecurityUtils {
 
     /**
-     * 获取用户
+     * 获取当前登录用户
      *
-     * @return LoginUser
+     * @return SysUserDetails 用户详情
      */
     public static SysUserDetails getLoginUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof SysUserDetails)) {
-            throw new ServiceException(ResponseCode.UNAUTHORIZED, "用户未登录");
+        try {
+            Authentication authentication = getAuthentication();
+            if (authentication == null) {
+                log.warn("获取用户信息失败：认证对象为空");
+                return null;
+            }
+
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof SysUserDetails) {
+                return (SysUserDetails) principal;
+            }
+
+            log.warn("获取用户信息失败：Principal类型不匹配，实际类型: {}",
+                    principal != null ? principal.getClass().getName() : "null");
+            return null;
+        } catch (Exception e) {
+            log.error("获取登录用户异常", e);
+            return null;
         }
-        return (SysUserDetails) authentication.getPrincipal();
     }
+
 
     /**
      * 生成BCryptPasswordEncoder密码
@@ -57,7 +59,7 @@ public class SecurityUtils {
 
 
     /**
-     * 判断密码是否相同,这边原始的密码是明文的不需要额外加密
+     * 判断密码是否相同
      *
      * @param rawPassword     真实密码
      * @param encodedPassword 加密后字符
@@ -68,77 +70,42 @@ public class SecurityUtils {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-
-    /**
-     * 是否拥有某个角色
-     *
-     * @return true代表有，false代表无
-     */
-    public static boolean hasRole(String role) {
-        return getRoles().contains(role);
-    }
-
-
-    /**
-     * 获取当前请求对象
-     */
-    private static HttpServletRequest getRequest() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return attributes != null ? attributes.getRequest() : null;
-    }
-
     /**
      * 获取Authentication
      */
     public static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            log.debug("当前线程安全上下文中Authentication为空");
+        }
+        return authentication;
     }
 
     /**
      * 获取用户名
      */
     public static String getUsername() {
-        return getLoginUser().getUsername();
+        SysUserDetails userDetails = getLoginUser();
+        return userDetails != null ? userDetails.getUsername() : "";
     }
 
     /**
      * 获取用户ID
      */
     public static Long getUserId() {
-        return getLoginUser().getUserId();
+        SysUserDetails userDetails = getLoginUser();
+        return userDetails != null ? userDetails.getUserId() : null;
     }
 
-    /**
-     * 判断是否为超级管理员
-     */
-    public static boolean isAdmin() {
-        Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.ADMIN);
-    }
-
-    /**
-     * 获取用户角色集合
-     *
-     * @return 角色集合
-     */
-    public static Set<String> getRoles() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .map(Authentication::getAuthorities)
-                .filter(CollectionUtil::isNotEmpty)
-                .stream()
-                .flatMap(Collection::stream)
-                .map(GrantedAuthority::getAuthority)
-                // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
-                .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
-                .map(authority -> StrUtil.removePrefix(authority, SecurityConstants.ROLE_PREFIX))
-                .collect(Collectors.toSet());
-    }
 
     /**
      * 获取当前请求的 Token
      */
     public static String getTokenFromRequest() {
-        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        HttpServletRequest request = getHttpServletRequest();
+        if (request == null) {
+            return null;
+        }
         return request.getHeader(HttpHeaders.AUTHORIZATION);
     }
 
@@ -148,6 +115,8 @@ public class SecurityUtils {
      * @return request
      */
     public static HttpServletRequest getHttpServletRequest() {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getRequest() : null;
     }
+
 }

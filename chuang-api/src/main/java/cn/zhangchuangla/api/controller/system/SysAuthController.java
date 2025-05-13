@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Chuang
@@ -41,9 +41,8 @@ public class SysAuthController extends BaseController {
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
     private final SysMenuService sysMenuService;
-    private final SysRoleService sysRoleService;
     private final SysUserConverter sysUserConverter;
-    private final RedisCache redisCache;
+    private final SysRoleService sysRoleService;
 
     /**
      * 登录
@@ -103,12 +102,13 @@ public class SysAuthController extends BaseController {
     public AjaxResult<HashMap<String, Object>> getInfo() {
         HashMap<String, Object> ajax = new HashMap<>(4);
         Long userId = getUserId();
+        Set<String> roles = sysRoleService.getRoleSetByUserId(userId);
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-//        Set<String> roles = sysRoleService.getUserRoleSetByUserId(userId);
+        Set<String> permissions = sysMenuService.getUserPermissionByRole(roles);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
-//        ajax.put("roles", roles);
-//        ajax.put("permissions", permissions);
+        ajax.put("roles", roles);
+        ajax.put("permissions", permissions);
         return success(ajax);
     }
 

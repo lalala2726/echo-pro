@@ -11,7 +11,6 @@ import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 在线用户管理接口
@@ -53,22 +53,27 @@ public class OnlineUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public AjaxResult<TableDataResult> onlineUserList(@Parameter(description = "在线用户列表查询参数")
                                                       @Validated @ParameterObject OnlineUserListRequest request) {
-        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
-        Collection<String> keys = redisCache.keys(replace);
-        ArrayList<OnlineLoginUser> onlineLoginUsers = new ArrayList<>();
+        String pattern = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
+        Collection<String> keys = redisCache.keys(pattern);
+        List<OnlineLoginUser> matchedUsers = new ArrayList<>();
 
-        // 获取所有在线用户
-        keys.forEach(key -> {
-            OnlineLoginUser onlineUser = redisCache.getCacheObject(key);
-            if (onlineUser != null && matchesFilter(onlineUser, request)) {
-                onlineLoginUsers.add(onlineUser);
+        // 过滤匹配的在线用户
+        for (String key : keys) {
+            OnlineLoginUser user = redisCache.getCacheObject(key);
+            if (user != null && matchesFilter(user, request)) {
+                matchedUsers.add(user);
             }
-        });
+        }
+        // 手动分页处理
+        int pageNum = request.getPageNum();
+        int pageSize = request.getPageSize();
+        int total = matchedUsers.size();
+        int start = (pageNum - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
 
-        // 分页处理
-        Page<OnlineLoginUser> page = PageUtils.getPage(request.getPageNum(), request.getPageSize(), onlineLoginUsers.size(),
-                onlineLoginUsers);
-        return getTableData(page);
+        List<OnlineLoginUser> paginatedList = matchedUsers.subList(start, end);
+
+        return TableDataResult.build(PageUtils.getPage(pageNum, pageSize, total, paginatedList));
     }
 
     /**
@@ -104,7 +109,7 @@ public class OnlineUserController extends BaseController {
 
         // 用户名匹配
         if (StrUtil.isNotBlank(request.getUsername()) &&
-                !request.getUsername().equals(user.getUsername())) {
+                !request.getUsername().contains(user.getUsername())) {
             return false;
         }
 
@@ -122,7 +127,7 @@ public class OnlineUserController extends BaseController {
 
         // 登录地点匹配
         if (StrUtil.isNotBlank(request.getRegion()) &&
-                !request.getRegion().equals(user.getRegion())) {
+                !request.getRegion().contains(user.getRegion())) {
             return false;
         }
 

@@ -42,4 +42,4 @@ security:
   session:
     access-token-expire-time: 7200
     refresh-token-expire-time: 2592000
-    single-login: true
+    single-login: false

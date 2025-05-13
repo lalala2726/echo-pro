@@ -13,6 +13,7 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.UserAgentUtils;
+import cn.zhangchuangla.system.service.SysRoleService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -23,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +56,7 @@ public class RedisTokenManager implements TokenManager {
 
     private final SecurityProperties securityProperties;
     private final RedisCache redisCache;
+    private final SysRoleService sysRoleService;
     private SecretKey jwtSecretKey;
 
     @PostConstruct
@@ -442,6 +443,9 @@ public class RedisTokenManager implements TokenManager {
      * @return OnlineLoginUser 对象
      */
     private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId) {
+
+        Set<String> roleSetByRoleId = sysRoleService.getRoleSetByRoleId(user.getUserId());
+
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest(); // 应检查是否为null
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
         String region = IPUtils.getRegion(ipAddr); // IPUtils.getRegion 可能需要处理 "Unknown" IP
@@ -453,9 +457,7 @@ public class RedisTokenManager implements TokenManager {
                 .region(region)
                 .deptId(user.getDeptId())
                 .userId(user.getUserId())
-                .roles(user.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toSet()));
+                .roles(roleSetByRoleId);
         // 如果计划在登出时清理刷新令牌，或者 OnlineLoginUser 需要知道它的 refreshTokenId
         // 可以在这里或生成token后set进去，例如：.refreshTokenId(generatedRefreshTokenId)
         return builder.build();

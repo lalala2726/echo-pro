@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -40,6 +42,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleConverter sysRoleConverter;
     private final SysRoleMenuService sysRoleMenuService;
+    private final RedisCache redisCache;
 
 
     /**
@@ -76,14 +79,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public Set<String> getRoleSetByUserId(Long userId) {
-        if (userId <= 0) throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
-        List<SysRole> roleListByUserId = getRoleListByUserId(userId);
-        if (roleListByUserId == null) {
-            return null;
+        if (userId <= 0) {
+            throw new ParamException(ResponseCode.INVALID_ROLE_ID, "用户ID无效");
         }
-        return roleListByUserId.stream()
-                .map(SysRole::getRoleKey)
-                .collect(Collectors.toSet());
+
+        String cacheKey = RedisConstants.Auth.ROLE_KEY + userId;
+
+        // 从缓存获取角色权限集合
+        Set<String> roleSet = redisCache.getCacheObject(cacheKey);
+        if (roleSet == null || roleSet.isEmpty()) {
+            List<SysRole> roleList = getRoleListByUserId(userId);
+            roleSet = roleList.stream()
+                    .map(SysRole::getRoleKey)
+                    .collect(Collectors.toSet());
+            redisCache.setCacheObject(cacheKey, roleSet);
+        }
+        return roleSet;
     }
 
     /**
