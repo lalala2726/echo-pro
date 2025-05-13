@@ -3,11 +3,9 @@ package cn.zhangchuangla.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
-import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
@@ -52,6 +50,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysRoleService sysRoleService;
     private final SysRoleMenuService sysRoleMenuService;
 
+
     /**
      * 根据用户ID查询菜单列表
      *
@@ -64,11 +63,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return Collections.emptyList();
         }
         // 获取用户角色集合
-        SysUserDetails loginUser = SecurityUtils.getLoginUser();
-        Set<String> rawRoles = loginUser.getRoles();
-        log.info("用户角色集合: {}", rawRoles);
-        boolean isSuperAdmin = SecurityUtils.isSuperAdmin();
-        if (isSuperAdmin) {
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
+        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
             return list();
         }
         return menuMapper.getMenuListByUserId(userId);

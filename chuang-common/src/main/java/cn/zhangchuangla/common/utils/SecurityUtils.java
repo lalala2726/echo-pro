@@ -57,6 +57,7 @@ public class SecurityUtils {
         return passwordEncoder.encode(password);
     }
 
+
     /**
      * 判断密码是否相同
      *
@@ -117,4 +118,5 @@ public class SecurityUtils {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return attributes != null ? attributes.getRequest() : null;
     }
+
 }

@@ -11,7 +11,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Spring Security 用户详情对象
@@ -47,10 +46,6 @@ public class SysUserDetails implements UserDetails, Serializable {
      */
     private Long deptId;
 
-    /**
-     * 用户角色原始集合（不含前缀）
-     */
-    private Set<String> roles;
 
     /**
      * 用户角色权限集合
@@ -137,13 +132,4 @@ public class SysUserDetails implements UserDetails, Serializable {
         return true;
     }
 
-    /**
-     * 判断是否有指定角色
-     *
-     * @param role 角色标识
-     * @return 是否拥有角色
-     */
-    public boolean hasRole(String role) {
-        return this.roles != null && this.roles.contains(role);
-    }
 }

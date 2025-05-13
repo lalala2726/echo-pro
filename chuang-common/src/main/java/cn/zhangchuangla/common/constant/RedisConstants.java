@@ -91,6 +91,7 @@ public interface RedisConstants {
 
         // 角色权限缓存前缀
         String ROLE_PERMISSIONS_PREFIX = "auth:role_permissions:{}";
+        String ROLE_KEY = "auth:role:";
     }
 
 }

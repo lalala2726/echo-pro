@@ -44,7 +44,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 log.warn("用户[{}]不存在", username);
                 throw new UsernameNotFoundException("用户不存在");
             }
-            // 创建并返回用户详情对象
             return new SysUserDetails(sysUser);
         } catch (UsernameNotFoundException e) {
             throw e;
