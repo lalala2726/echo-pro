@@ -109,7 +109,7 @@ public class OnlineUserController extends BaseController {
 
         // 用户名匹配
         if (StrUtil.isNotBlank(request.getUsername()) &&
-                !request.getUsername().equals(user.getUsername())) {
+                !request.getUsername().contains(user.getUsername())) {
             return false;
         }
 
@@ -127,7 +127,7 @@ public class OnlineUserController extends BaseController {
 
         // 登录地点匹配
         if (StrUtil.isNotBlank(request.getRegion()) &&
-                !request.getRegion().equals(user.getRegion())) {
+                !request.getRegion().contains(user.getRegion())) {
             return false;
         }
 
