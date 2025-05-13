@@ -46,7 +46,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysMenuMapper menuMapper;
     private final SysRoleMenuMapper roleMenuMapper;
     private final SysRoleService sysRoleService;
-    private final SysMenuMapper sysMenuMapper;
     private final SysRoleMenuService sysRoleMenuService;
 
     /**
