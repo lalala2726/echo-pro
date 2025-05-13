@@ -29,6 +29,14 @@ public interface SysMenuService extends IService<SysMenu> {
     List<SysMenu> getMenuListByUserId(Long userId);
 
     /**
+     * 根据角色标识符查询权限列表
+     *
+     * @param roleSet 角色标识符集合
+     * @return 权限列表
+     */
+    Set<String> getUserPermissionByRole(Set<String> roleSet);
+
+    /**
      * 根据角色ID查询菜单ID列表
      *
      * @param roleId 角色ID
@@ -181,11 +189,4 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     boolean updateRolePermission(SysUpdateRolePermissionRequest request);
 
-    /**
-     * 根据用户ID获取权限字符串集合
-     *
-     * @param userId 用户ID
-     * @return 权限字符串集合
-     */
-    Set<String> getUserPermissionByUserId(Long userId);
 }

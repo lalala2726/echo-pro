@@ -111,9 +111,9 @@ public class SecurityUtils {
     /**
      * 判断是否为超级管理员
      */
-    public static boolean isAdmin() {
+    public static boolean isSuperAdmin() {
         Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.ADMIN);
+        return roles.contains(SysRolesConstant.SUPER_ADMIN);
     }
 
     /**

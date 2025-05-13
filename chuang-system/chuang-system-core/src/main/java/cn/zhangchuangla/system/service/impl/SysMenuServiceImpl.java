@@ -360,14 +360,23 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 获取用户权限列表
      *
-     * @param userId 用户ID
+     * @param roleSet 角色标识符
      * @return 权限列表
      */
     @Override
-    public Set<String> getUserPermissionByUserId(Long userId) {
-        List<SysMenu> sysMenus = menuMapper.getUserPermissionByUserId(userId);
-        return sysMenus.stream().
-                map(SysMenu::getPermission)
+    public Set<String> getUserPermissionByRole(Set<String> roleSet) {
+        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+            // 如果是超级管理员，返回所有权限
+            return list().stream()
+                    .map(SysMenu::getPermission)
+                    .filter(StrUtil::isNotEmpty)
+                    .collect(Collectors.toSet());
+        }
+        //todo 按照用户角色权限信息可以缓存
+        //不是超级管理员按照角色权限进行查询菜单信息
+        List<SysMenu> userPermissionListByRole = menuMapper.getUserPermissionListByRole(roleSet);
+        return userPermissionListByRole.stream()
+                .map(SysMenu::getPermission)
                 .filter(StrUtil::isNotEmpty)
                 .collect(Collectors.toSet());
     }

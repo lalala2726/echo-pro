@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
@@ -11,7 +12,6 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +41,6 @@ public class SysAuthController extends BaseController {
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
     private final SysMenuService sysMenuService;
-    private final SysRoleService sysRoleService;
     private final SysUserConverter sysUserConverter;
 
     /**
@@ -101,10 +100,10 @@ public class SysAuthController extends BaseController {
     @Operation(summary = "获取用户信息")
     public AjaxResult<HashMap<String, Object>> getInfo() {
         HashMap<String, Object> ajax = new HashMap<>(4);
+        Set<String> roles = SecurityUtils.getRoles();
         Long userId = getUserId();
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> permissions = sysMenuService.getUserPermissionByUserId(userId);
-        Set<String> roles = sysRoleService.getRoleSetByUserId(userId);
+        Set<String> permissions = sysMenuService.getUserPermissionByRole(roles);
         UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
