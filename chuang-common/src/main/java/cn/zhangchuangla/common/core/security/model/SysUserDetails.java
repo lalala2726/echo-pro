@@ -1,9 +1,8 @@
 package cn.zhangchuangla.common.core.security.model;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.SecurityConstants;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,19 +10,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
+ * Spring Security 用户详情对象
+ *
  * @author Chuang
  * <p>
  * created on 2025/2/19 13:50
  */
 @Data
+@Slf4j
 public class SysUserDetails implements UserDetails, Serializable {
-
 
     @Serial
     private static final long serialVersionUID = -5777762905473897401L;
@@ -31,7 +30,7 @@ public class SysUserDetails implements UserDetails, Serializable {
     /**
      * 用户ID
      */
-    public Long userId;
+    private Long userId;
 
     /**
      * 用户信息
@@ -48,30 +47,29 @@ public class SysUserDetails implements UserDetails, Serializable {
      */
     private Long deptId;
 
+    /**
+     * 用户角色原始集合（不含前缀）
+     */
+    private Set<String> roles;
 
     /**
      * 用户角色权限集合
      */
     private Collection<SimpleGrantedAuthority> authorities;
 
-
     public SysUserDetails() {
-
     }
 
-    public SysUserDetails(SysUser sysUser, Set<String> roles) {
+    /**
+     * 构造方法
+     *
+     * @param sysUser 系统用户对象
+     */
+    public SysUserDetails(SysUser sysUser) {
         this.sysUser = sysUser;
         this.userId = sysUser.getUserId();
         this.deptId = sysUser.getDeptId();
         this.username = sysUser.getUsername();
-        // 初始化角色权限集合
-        // 初始化角色权限集合
-        this.authorities = CollectionUtil.isNotEmpty(roles)
-                ? roles.stream()
-                // 角色名加上前缀 "ROLE_"，用于区分角色 (ROLE_ADMIN) 和权限 (user:add)
-                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
     }
 
     @Override
@@ -137,5 +135,15 @@ public class SysUserDetails implements UserDetails, Serializable {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    /**
+     * 判断是否有指定角色
+     *
+     * @param role 角色标识
+     * @return 是否拥有角色
+     */
+    public boolean hasRole(String role) {
+        return this.roles != null && this.roles.contains(role);
     }
 }

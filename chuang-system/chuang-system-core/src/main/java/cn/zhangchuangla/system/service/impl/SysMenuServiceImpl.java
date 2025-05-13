@@ -3,9 +3,11 @@ package cn.zhangchuangla.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
@@ -26,6 +28,7 @@ import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         implements SysMenuService {
 
@@ -59,12 +63,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (userId == null) {
             return Collections.emptyList();
         }
-        Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
-            // 如果是超级管理员，返回所有菜单
+        // 获取用户角色集合
+        SysUserDetails loginUser = SecurityUtils.getLoginUser();
+        Set<String> rawRoles = loginUser.getRoles();
+        log.info("用户角色集合: {}", rawRoles);
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin();
+        if (isSuperAdmin) {
             return list();
         }
-        // 否则，返回用户拥有的菜单
         return menuMapper.getMenuListByUserId(userId);
     }
 
@@ -365,15 +371,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public Set<String> getUserPermissionByRole(Set<String> roleSet) {
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleSet == null) {
+            return Collections.emptySet();
+        }
+
+        // 调试角色信息
+        log.info("开始执行getUserPermissionByRole, 角色集合: {}", roleSet);
+
+        boolean containsSuperAdmin = roleSet.contains(SysRolesConstant.SUPER_ADMIN);
+        log.info("角色集合是否包含超级管理员: {}", containsSuperAdmin);
+
+        if (containsSuperAdmin) {
             // 如果是超级管理员，返回所有权限
+            log.info("用户具有超级管理员角色，返回所有权限");
             return list().stream()
                     .map(SysMenu::getPermission)
                     .filter(StrUtil::isNotEmpty)
                     .collect(Collectors.toSet());
         }
-        //todo 按照用户角色权限信息可以缓存
-        //不是超级管理员按照角色权限进行查询菜单信息
+
+        // 不是超级管理员按照角色权限进行查询菜单信息
+        log.info("用户不具有超级管理员角色，查询特定权限");
         List<SysMenu> userPermissionListByRole = menuMapper.getUserPermissionListByRole(roleSet);
         return userPermissionListByRole.stream()
                 .map(SysMenu::getPermission)
