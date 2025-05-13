@@ -56,9 +56,16 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public List<SysMenu> getMenuListByUserId(Long userId) {
-        // 确保这里以及其他地方使用的是 menuMapper 而不是 sysMenuMapper
-        /* implementation omitted for shortness */
-        return null;
+        if (userId == null) {
+            return Collections.emptyList();
+        }
+        Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
+        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+            // 如果是超级管理员，返回所有菜单
+            return list();
+        }
+        // 否则，返回用户拥有的菜单
+        return menuMapper.getMenuListByUserId(userId);
     }
 
     /**
@@ -348,6 +355,21 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
         // 批量插入角色菜单权限
         return sysRoleMenuService.saveBatch(roleMenus);
+    }
+
+    /**
+     * 获取用户权限列表
+     *
+     * @param userId 用户ID
+     * @return 权限列表
+     */
+    @Override
+    public Set<String> getUserPermissionByUserId(Long userId) {
+        List<SysMenu> sysMenus = menuMapper.getUserPermissionByUserId(userId);
+        return sysMenus.stream().
+                map(SysMenu::getPermission)
+                .filter(StrUtil::isNotEmpty)
+                .collect(Collectors.toSet());
     }
 
 

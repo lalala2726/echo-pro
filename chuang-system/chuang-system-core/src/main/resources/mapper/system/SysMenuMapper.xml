@@ -138,5 +138,37 @@
         ORDER BY m.parent_id, m.sort asc
     </select>
 
+    <select id="getUserPermissionByUserId" resultMap="BaseResultMap">
+        select menu_id,
+               menu_name,
+               parent_id,
+               order_num,
+               path,
+               component,
+               query,
+               route_name,
+               is_frame,
+               is_cache,
+               menu_type,
+               visible,
+               status,
+               permission,
+               icon,
+               sort,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               remark
+        from sys_menu
+        where menu_id in (select menu_id
+                          from sys_role_menu
+                          where role_id in (select role_id
+                                            from sys_user_role
+                                            where user_id = #{userId}))
+          and status = 0
+          and visible = 0
+    </select>
+
 
 </mapper>
