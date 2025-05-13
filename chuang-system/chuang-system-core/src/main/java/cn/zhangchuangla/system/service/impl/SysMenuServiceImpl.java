@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
@@ -59,8 +60,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (userId == null) {
             return Collections.emptyList();
         }
-        Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        boolean superAdmin = SecurityUtils.isSuperAdmin();
+        if (superAdmin) {
             // 如果是超级管理员，返回所有菜单
             return list();
         }
@@ -337,8 +338,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Transactional(rollbackFor = Exception.class)
     public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
         Long roleId = request.getRoleId();
-        SysRole sysRole = sysRoleService.getById(request.getRoleId());
-        if (SysRolesConstant.SUPER_ADMIN.contains(sysRole.getRoleKey())) {
+        boolean superAdmin = SecurityUtils.isSuperAdmin();
+        if (superAdmin) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         // 删除原有的角色菜单权限
@@ -393,8 +394,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (roleId == null) {
             return Collections.emptyList();
         }
-        Set<String> roleSet = sysRoleService.getRoleSetByRoleId(roleId);
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        boolean superAdmin = SecurityUtils.isSuperAdmin();
+        if (superAdmin) {
             // 如果是超级管理员，返回所有菜单ID
             return list().stream()
                     .map(SysMenu::getMenuId)
