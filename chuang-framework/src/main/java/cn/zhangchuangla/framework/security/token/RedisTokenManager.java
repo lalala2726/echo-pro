@@ -277,7 +277,7 @@ public class RedisTokenManager implements TokenManager {
 
         // 如果启用了单点登录，需要更新 USER_ACCESS_TOKEN 映射
         if (securityProperties.getSession().getSingleLogin()) {
-            redisCache.setCacheObject(StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, onlineUser.getUserId()), newAccessTokenId, securityProperties.getSession().getAccessTokenExpireTime());
+            redisCache.setCacheObject(RedisConstants.Auth.USER_ACCESS_TOKEN + onlineUser.getUserId(), newAccessTokenId, securityProperties.getSession().getAccessTokenExpireTime());
             log.debug("用户ID {} 的当前访问会话ID已更新为 {} (刷新流程)", onlineUser.getUserId(), newAccessTokenId);
         }
 
@@ -340,7 +340,7 @@ public class RedisTokenManager implements TokenManager {
         if (onlineUser != null) {
             Long userId = onlineUser.getUserId();
             // 清理单点登录的 userId -> accessTokenId 映射
-            String userCurrentAccessIdKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
+            String userCurrentAccessIdKey = RedisConstants.Auth.USER_ACCESS_TOKEN + userId;
             String currentMappedAccessTokenId = redisCache.getCacheObject(userCurrentAccessIdKey);
             if (sessionId.equals(currentMappedAccessTokenId)) { // 确保是当前会话被删除
                 redisCache.deleteObject(userCurrentAccessIdKey);
@@ -420,7 +420,7 @@ public class RedisTokenManager implements TokenManager {
      * @return Redis Key 字符串
      */
     private String formatOnlineUserKeyBySessionId(String sessionId) {
-        return StrUtil.format(RedisConstants.Auth.ACCESS_TOKEN_USER, sessionId);
+        return RedisConstants.Auth.ACCESS_TOKEN_USER + sessionId;
     }
 
     /**
@@ -431,7 +431,7 @@ public class RedisTokenManager implements TokenManager {
      * @return Redis Key 字符串
      */
     private String formatRefreshTokenMappingKey(String refreshTokenId) {
-        return StrUtil.format(RedisConstants.Auth.REFRESH_TOKEN_MAPPING, refreshTokenId);
+        return RedisConstants.Auth.REFRESH_TOKEN_MAPPING + refreshTokenId;
     }
 
     /**
@@ -472,7 +472,10 @@ public class RedisTokenManager implements TokenManager {
     private void setClientInfo(OnlineLoginUser onlineUser) {
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest(); // 应检查是否为null
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
-        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+        String userAgent = null;
+        if (httpServletRequest != null) {
+            userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+        }
         String osName = UserAgentUtils.getOsName(userAgent);
         String browserName = UserAgentUtils.getBrowserName(userAgent);
         String deviceManufacturer = UserAgentUtils.getDeviceManufacturer(userAgent);
@@ -514,7 +517,7 @@ public class RedisTokenManager implements TokenManager {
             return;
         }
 
-        String userPreviousAccessIdKey = StrUtil.format(RedisConstants.Auth.USER_ACCESS_TOKEN, userId);
+        String userPreviousAccessIdKey = RedisConstants.Auth.USER_ACCESS_TOKEN + userId;
         String previousAccessTokenId = redisCache.getCacheObject(userPreviousAccessIdKey);
 
         if (StrUtil.isNotBlank(previousAccessTokenId) && !previousAccessTokenId.equals(newAccessTokenId)) {
