@@ -13,11 +13,12 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.MetaVo;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuTreeList;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.service.SysMenuService;
@@ -145,7 +146,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 选项树
      */
     @Override
-    public List<Option<Long>> buildMenuOptionTree(List<SysMenu> menus) {
+    public List<Option<Long>> buildMenuOption(List<SysMenu> menus) {
         if (menus == null) {
             return Collections.emptyList();
         }
@@ -270,24 +271,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
 
     /**
-     * 更新角色菜单权限
-     *
-     * @param request 菜单更新请求
-     * @return 结果
-     */
-    @Override
-    public boolean updateRoleMenus(SysMenuUpdateRolePermRequest request) {
-        return false;
-    }
-
-    /**
      * 获取菜单路由列表
      *
      * @return 菜单路由列表
      */
     @Override
-    public List<Option<String>> getMenuOptions(boolean onlyParent) {
-        return List.of();
+    public List<Option<Long>> getMenuOptions(boolean onlyParent) {
+        LambdaQueryWrapper<SysMenu> sysMenuLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        sysMenuLambdaQueryWrapper.ne(SysMenu::getMenuType, Constants.MenuConstants.TYPE_BUTTON);
+        if (onlyParent) {
+            sysMenuLambdaQueryWrapper.eq(SysMenu::getParentId, 0);
+        }
+        List<SysMenu> list = list(sysMenuLambdaQueryWrapper);
+        return buildMenuOption(list);
     }
 
     /**
@@ -357,6 +353,74 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
         // 批量插入角色菜单权限
         return sysRoleMenuService.saveBatch(roleMenus);
+    }
+
+    /**
+     * 查询菜单列表
+     *
+     * @param request 请求参数
+     * @return 返回菜单列表
+     */
+    @Override
+    public List<SysMenuListVo> listMenu(SysMenuListRequest request) {
+        List<SysMenu> list = list();
+        return buildMenuList(list);
+    }
+
+    /**
+     * 构建菜单列表
+     *
+     * @param list 菜单列表
+     * @return 菜单列表视图对象
+     */
+    private List<SysMenuListVo> buildMenuList(List<SysMenu> list) {
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 创建菜单映射关系：parentId -> menuList
+        Map<Long, List<SysMenu>> parentChildMap = list.stream()
+                .filter(menu -> menu.getParentId() != null)
+                .collect(Collectors.groupingBy(SysMenu::getParentId));
+        return list.stream()
+                .filter(menu -> menu.getParentId() == 0) // 只处理一级菜单
+                .map(menu -> convertToVo(menu, parentChildMap))
+                .sorted(Comparator.comparing(SysMenuListVo::getOrderNum)) // 按显示顺序排序
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 将菜单转换为前端需要的视图对象
+     *
+     * @param menu           菜单对象
+     * @param parentChildMap 父子菜单映射
+     * @return 菜单视图对象
+     */
+    private SysMenuListVo convertToVo(SysMenu menu, Map<Long, List<SysMenu>> parentChildMap) {
+        SysMenuListVo vo = new SysMenuListVo();
+        vo.setMenuId(menu.getMenuId());
+        vo.setMenuName(menu.getMenuName());
+        vo.setParentId(menu.getParentId());
+        vo.setOrderNum(menu.getOrderNum());
+        vo.setRouteName(menu.getRouteName());
+        vo.setIsFrame(menu.getIsFrame());
+        vo.setIsCache(menu.getIsCache());
+        vo.setMenuType(menu.getMenuType());
+        vo.setVisible(menu.getVisible());
+        vo.setStatus(menu.getStatus());
+        vo.setIcon(menu.getIcon());
+        vo.setSort(menu.getSort());
+
+        // 如果有子菜单，递归转换
+        List<SysMenu> children = parentChildMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
+        if (!children.isEmpty()) {
+            vo.setChildren(children.stream()
+                    .map(child -> convertToVo(child, parentChildMap))
+                    .sorted(Comparator.comparing(SysMenuListVo::getOrderNum))
+                    .collect(Collectors.toList()));
+        }
+
+        return vo;
     }
 
 
