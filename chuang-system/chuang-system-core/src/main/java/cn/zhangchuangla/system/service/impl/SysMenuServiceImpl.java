@@ -198,20 +198,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return false;
         }
         SysMenu sysMenu = sysMenuConverter.toEntity(request);
-        //菜单名称必须唯一
-        if (!checkMenuNameUnique(sysMenu)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在");
-        }
-        //如果是外链，地址必须以http(s)://开头
-        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getIsFrame())) {
-            if (!StringUtils.isHttp(sysMenu.getPath())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "地址必须以http(s)://开头");
-            }
-        }
-        //父菜单不能选择自己
-        if (sysMenu.getMenuId().equals(sysMenu.getParentId())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己");
-        }
+        menuBaseCheck(sysMenu);
         //路由名称必须唯一并且首字母必须大写
         checkRouteNameIsLegal(sysMenu);
         //检验组件
@@ -224,6 +211,28 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String username = SecurityUtils.getUsername();
         sysMenu.setUpdateBy(username);
         return updateById(sysMenu);
+    }
+
+    /**
+     * 基本检查
+     *
+     * @param menu 菜单信息
+     */
+    private void menuBaseCheck(SysMenu menu) {
+        //菜单名称必须唯一
+        if (!checkMenuNameUnique(menu)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在");
+        }
+        //如果是外链，地址必须以http(s)://开头
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getIsFrame())) {
+            if (!StringUtils.isHttp(menu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "地址必须以http(s)://开头");
+            }
+        }
+        //父菜单不能选择自己
+        if (menu.getMenuId().equals(menu.getParentId())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己");
+        }
     }
 
     /**
