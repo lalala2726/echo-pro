@@ -5,10 +5,13 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysMenuConverter;
+import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +37,7 @@ import java.util.List;
 public class SysMenuController extends BaseController {
 
     private final SysMenuService sysMenuService;
+    private final SysMenuConverter sysMenuConverter;
 
 
     /**
@@ -78,6 +82,22 @@ public class SysMenuController extends BaseController {
     public AjaxResult<Void> addMenu(SysMenuAddRequest request) {
         boolean result = sysMenuService.addMenu(request);
         return toAjax(result);
+    }
+
+    /**
+     * 获取菜单详情
+     *
+     * @param id 菜单ID
+     * @return 菜单详情
+     */
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    @Operation(summary = "获取菜单详情")
+    @GetMapping("/{id}")
+    public AjaxResult<SysMenuVo> getMenuById(@Parameter(description = "菜单ID")
+                                             @PathVariable("id") Long id) {
+        SysMenu sysMenu = sysMenuService.getMenuById(id);
+        SysMenuVo sysMenuVo = sysMenuConverter.toSysMenuVo(sysMenu);
+        return success(sysMenuVo);
     }
 
     /**

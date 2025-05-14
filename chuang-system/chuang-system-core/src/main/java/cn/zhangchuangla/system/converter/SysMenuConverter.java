@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.converter;
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -24,4 +25,12 @@ public interface SysMenuConverter {
      * @return 菜单列表视图对象
      */
     List<SysMenuListVo> toSysMenuListVo(List<SysMenu> sysMenuList);
+
+    /**
+     * 将菜单对象转换为菜单视图对象
+     *
+     * @param sysMenu 菜单对象
+     * @return 菜单视图对象
+     */
+    SysMenuVo toSysMenuVo(SysMenu sysMenu);
 }
