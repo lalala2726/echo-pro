@@ -66,8 +66,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             log.warn("根据用户ID查询菜单列表时，用户ID为空");
             return Collections.emptyList();
         }
-        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
+        Set<String> roles = SecurityUtils.getRoles();
+        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
             log.info("用户ID {} 是超级管理员，返回所有有效菜单，并按父ID和排序值排序", userId);
             return list(new LambdaQueryWrapper<SysMenu>()
                     .orderByAsc(SysMenu::getParentId) // 先按父ID排序，保证父节点在前
