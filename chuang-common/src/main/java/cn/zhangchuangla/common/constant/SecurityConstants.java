@@ -13,14 +13,13 @@ public class SecurityConstants {
     public static final String ROLE_PREFIX = "ROLE_";
 
     /**
-     * 接口白名单,设置后不需要认证直接可以访问
+     * 接口白名单,设置后不需要认证直接可以访问，注意！一旦设置白名单系统中需要获取用户的信息将失效！
      */
     public static final String[] WHITELIST = {
             "/auth/login",
             "/captcha",
             "/register",
             "/auth/refreshToken",
-            "/auth/routes"
     };
 
     /**
