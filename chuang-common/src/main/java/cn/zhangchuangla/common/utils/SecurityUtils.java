@@ -1,6 +1,8 @@
 package cn.zhangchuangla.common.utils;
 
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Objects;
 
 /**
  * 安全工具类
@@ -19,32 +23,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class SecurityUtils {
 
     /**
-     * 获取当前登录用户
+     * 获取用户
      *
-     * @return SysUserDetails 用户详情
+     * @return LoginUser
      */
     public static SysUserDetails getLoginUser() {
-        try {
-            Authentication authentication = getAuthentication();
-            if (authentication == null) {
-                log.warn("获取用户信息失败：认证对象为空");
-                return null;
-            }
-
-            Object principal = authentication.getPrincipal();
-            if (principal instanceof SysUserDetails) {
-                return (SysUserDetails) principal;
-            }
-
-            log.warn("获取用户信息失败：Principal类型不匹配，实际类型: {}",
-                    principal != null ? principal.getClass().getName() : "null");
-            return null;
-        } catch (Exception e) {
-            log.error("获取登录用户异常", e);
-            return null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SysUserDetails)) {
+            throw new ServiceException(ResponseCode.UNAUTHORIZED, "用户未登录");
         }
+        return (SysUserDetails) authentication.getPrincipal();
     }
-
 
     /**
      * 生成BCryptPasswordEncoder密码
@@ -59,7 +48,7 @@ public class SecurityUtils {
 
 
     /**
-     * 判断密码是否相同
+     * 判断密码是否相同,这边原始的密码是明文的不需要额外加密
      *
      * @param rawPassword     真实密码
      * @param encodedPassword 加密后字符
@@ -70,31 +59,19 @@ public class SecurityUtils {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    /**
-     * 获取Authentication
-     */
-    public static Authentication getAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            log.debug("当前线程安全上下文中Authentication为空");
-        }
-        return authentication;
-    }
 
     /**
      * 获取用户名
      */
     public static String getUsername() {
-        SysUserDetails userDetails = getLoginUser();
-        return userDetails != null ? userDetails.getUsername() : "";
+        return getLoginUser().getUsername();
     }
 
     /**
      * 获取用户ID
      */
     public static Long getUserId() {
-        SysUserDetails userDetails = getLoginUser();
-        return userDetails != null ? userDetails.getUserId() : null;
+        return getLoginUser().getUserId();
     }
 
 
@@ -102,10 +79,7 @@ public class SecurityUtils {
      * 获取当前请求的 Token
      */
     public static String getTokenFromRequest() {
-        HttpServletRequest request = getHttpServletRequest();
-        if (request == null) {
-            return null;
-        }
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         return request.getHeader(HttpHeaders.AUTHORIZATION);
     }
 
@@ -115,8 +89,6 @@ public class SecurityUtils {
      * @return request
      */
     public static HttpServletRequest getHttpServletRequest() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return attributes != null ? attributes.getRequest() : null;
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }
-
 }
