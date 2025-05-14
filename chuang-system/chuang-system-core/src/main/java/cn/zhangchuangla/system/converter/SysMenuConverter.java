@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.converter;
 
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
@@ -42,4 +43,12 @@ public interface SysMenuConverter {
      * @return 菜单对象
      */
     SysMenu toEntity(SysMenuUpdateRequest request);
+
+    /**
+     * 将菜单添加请求转换为菜单对象
+     *
+     * @param request 菜单添加请求
+     * @return 菜单对象
+     */
+    SysMenu toEntity(SysMenuAddRequest request);
 }

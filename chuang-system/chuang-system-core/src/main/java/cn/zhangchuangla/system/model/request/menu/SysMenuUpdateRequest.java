@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.request.menu;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -17,13 +18,15 @@ public class SysMenuUpdateRequest {
      * 菜单ID
      */
     @Schema(description = "菜单ID", type = "string", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull
+    @NotNull(message = "菜单ID不能为空")
+    @Min(value = 0, message = "菜单ID不能小于0")
     private Long menuId;
 
     /**
      * 菜单名称
      */
     @Schema(description = "菜单名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @NotNull(message = "菜单名称不能为空")
     private String menuName;
 
     /**
@@ -42,6 +45,7 @@ public class SysMenuUpdateRequest {
      * 路由地址
      */
     @Schema(description = "路由地址", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @NotNull(message = "路由地址不能为空")
     private String path;
 
     /**
@@ -56,11 +60,6 @@ public class SysMenuUpdateRequest {
     @Schema(description = "路由参数", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String query;
 
-    /**
-     * 路由名称
-     */
-    @Schema(description = "路由名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String routeName;
 
     /**
      * 是否为外链（0是 1否）
