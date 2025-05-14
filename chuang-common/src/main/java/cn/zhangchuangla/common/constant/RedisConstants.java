@@ -81,7 +81,7 @@ public interface RedisConstants {
         String USER_REFRESH_TOKEN = "auth:user:refresh:";
 
         // 刷新令牌ID与访问令牌ID的映射 (refreshTokenId -> accessTokenId)
-        String REFRESH_TOKEN_MAPPING = "auth:token:refresh_mapping:{}";
+        String REFRESH_TOKEN_MAPPING = "auth:token:refresh_mapping:";
 
         // 黑名单 Token（用于退出登录或注销）
         String BLACKLIST_TOKEN = "auth:token:blacklist:";
