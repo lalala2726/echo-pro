@@ -27,10 +27,10 @@ public class LocalOperationServiceImpl implements LocalOperationService {
 
     @Override
     public FileTransferDto fileUpload(FileTransferDto fileTransferDto) {
-        String uploadPath = appProperty.getUploadPath();
+        String uploadPath = appProperty.getConfig().getUploadPath();
         String fileDomain;
         try {
-            fileDomain = appProperty.getFileDomain();
+            fileDomain = appProperty.getConfig().getFileDomain();
         } catch (NullPointerException e) {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
@@ -46,10 +46,10 @@ public class LocalOperationServiceImpl implements LocalOperationService {
      */
     @Override
     public FileTransferDto imageUpload(FileTransferDto fileTransferDto) {
-        String uploadPath = appProperty.getUploadPath();
+        String uploadPath = appProperty.getConfig().getUploadPath();
         String fileDomain;
         try {
-            fileDomain = appProperty.getFileDomain();
+            fileDomain = appProperty.getConfig().getFileDomain();
         } catch (NullPointerException e) {
             // 文件域名不是必填项，可以不配置，默认为空字符串
             fileDomain = "";
@@ -69,16 +69,16 @@ public class LocalOperationServiceImpl implements LocalOperationService {
         // 决定是否使用回收站
         // 如果强制使用回收站，则无论系统设置如何都使用回收站
         // 否则，根据系统设置决定
-        boolean enableTrash = forceTrash || appProperty.isEnableTrash();
+        boolean enableTrash = forceTrash || appProperty.getConfig().isEnableTrash();
 
         log.info("删除文件：{}, 强制使用回收站: {}, 系统启用回收站: {}, 最终决定: {}",
                 fileTransferDto.getOriginalName(),
                 forceTrash,
-                appProperty.isEnableTrash(),
+                appProperty.getConfig().isEnableTrash(),
                 enableTrash ? "移至回收站" : "永久删除");
 
         // 调用LocalStorageComponent的删除方法
-        return localStorageComponent.removeFile(appProperty.getUploadPath(), fileTransferDto, enableTrash);
+        return localStorageComponent.removeFile(appProperty.getConfig().getUploadPath(), fileTransferDto, enableTrash);
     }
 
     /**
@@ -101,6 +101,6 @@ public class LocalOperationServiceImpl implements LocalOperationService {
     @Override
     public boolean recoverFile(FileTransferDto fileTransferDto) {
         // 调用LocalStorageComponent的恢复方法
-        return localStorageComponent.recoverFile(appProperty.getUploadPath(), fileTransferDto);
+        return localStorageComponent.recoverFile(appProperty.getConfig().getUploadPath(), fileTransferDto);
     }
 }

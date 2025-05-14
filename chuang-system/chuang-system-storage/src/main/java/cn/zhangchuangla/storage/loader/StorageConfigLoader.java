@@ -83,7 +83,7 @@ public class StorageConfigLoader {
      */
     private void autoSetLocalStorage() {
         try {
-            String uploadPath = appProperty.getUploadPath();
+            String uploadPath = appProperty.getConfig().getUploadPath();
             if (uploadPath == null || uploadPath.isEmpty()) {
                 throw new ProfileException("本地存储路径为空！");
             }
