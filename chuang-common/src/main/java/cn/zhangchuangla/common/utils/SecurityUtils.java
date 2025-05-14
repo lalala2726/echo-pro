@@ -1,5 +1,9 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.common.constant.SecurityConstants;
+import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
@@ -7,12 +11,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 安全工具类
@@ -61,6 +70,31 @@ public class SecurityUtils {
 
 
     /**
+     * 是否拥有某个角色
+     *
+     * @return true代表有，false代表无
+     */
+    public static boolean hasRole(String role) {
+        return getRoles().contains(role);
+    }
+
+
+    /**
+     * 获取当前请求对象
+     */
+    private static HttpServletRequest getRequest() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getRequest() : null;
+    }
+
+    /**
+     * 获取Authentication
+     */
+    public static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    /**
      * 获取用户名
      */
     public static String getUsername() {
@@ -74,6 +108,31 @@ public class SecurityUtils {
         return getLoginUser().getUserId();
     }
 
+    /**
+     * 判断是否为超级管理员
+     */
+    public static boolean isSuperAdmin() {
+        Set<String> roles = getRoles();
+        return roles.contains(SysRolesConstant.SUPER_ADMIN);
+    }
+
+    /**
+     * 获取用户角色集合
+     *
+     * @return 角色集合
+     */
+    public static Set<String> getRoles() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getAuthorities)
+                .filter(CollectionUtil::isNotEmpty)
+                .stream()
+                .flatMap(Collection::stream)
+                .map(GrantedAuthority::getAuthority)
+                // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
+                .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
+                .map(authority -> StrUtil.removePrefix(authority, SecurityConstants.ROLE_PREFIX))
+                .collect(Collectors.toSet());
+    }
 
     /**
      * 获取当前请求的 Token

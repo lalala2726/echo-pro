@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * 自定义用户详情服务实现
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final SysUserService sysUserService;
+    private final SysRoleService sysRoleService;
 
     /**
      * 根据用户名获取用户信息
@@ -44,7 +48,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 log.warn("用户[{}]不存在", username);
                 throw new UsernameNotFoundException("用户不存在");
             }
-            return new SysUserDetails(sysUser);
+            Set<String> roleSet = sysRoleService.getRoleSetByUserId(sysUser.getUserId());
+            return new SysUserDetails(sysUser, roleSet);
         } catch (UsernameNotFoundException e) {
             throw e;
         } catch (Exception e) {
