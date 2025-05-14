@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.converter.SysMenuConverter;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
@@ -220,6 +221,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 Constants.MenuConstants.TYPE_BUTTON).contains(sysMenu.getMenuType())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单类型不合法");
         }
+        String username = SecurityUtils.getUsername();
+        sysMenu.setUpdateBy(username);
         return updateById(sysMenu);
     }
 
