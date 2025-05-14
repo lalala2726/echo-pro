@@ -2,6 +2,8 @@ app:
   config:
     upload-path: D:\DevelopUploads\personApp
     enable-trash: true
+  name: Chuang
+  version: 1.0.0
 #开发环境数据库文件
 server:
   port: 8080

@@ -40,7 +40,7 @@ public class ResourcesConfig implements WebMvcConfigurer {
      */
     private void configureLocalFileAccess(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                .addResourceLocations("file:" + appProperty.getUploadPath() + "/");
+                .addResourceLocations("file:" + appProperty.getConfig().getUploadPath() + "/");
     }
 
     /**

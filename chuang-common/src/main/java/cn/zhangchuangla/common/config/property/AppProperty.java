@@ -8,26 +8,43 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 软件系统配置
  */
-@ConfigurationProperties(prefix = "app.config")
+@ConfigurationProperties(prefix = "app")
 @Configuration
 @Data
 public class AppProperty {
 
+    /**
+     * 系统配置
+     */
+    private Config config;
 
     /**
-     * 本地上传路径
+     * 系统名称
      */
-    private String uploadPath;
+    private String name;
 
     /**
-     * 是否开启回收站
+     * 版本号
      */
-    private boolean enableTrash;
+    private String version;
 
-    /**
-     * 文件访问路径
-     */
-    private String fileDomain;
+    @Data
+    public static class Config {
+        /**
+         * 本地上传路径
+         */
+        private String uploadPath;
+
+        /**
+         * 是否开启回收站
+         */
+        private boolean enableTrash;
+
+        /**
+         * 文件访问路径
+         */
+        private String fileDomain;
+    }
 
 
 }
