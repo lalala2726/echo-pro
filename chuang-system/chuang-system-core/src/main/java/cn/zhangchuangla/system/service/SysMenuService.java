@@ -11,7 +11,6 @@ import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 菜单服务接口
@@ -28,13 +27,6 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     List<SysMenu> getMenuListByUserId(Long userId);
 
-    /**
-     * 根据角色标识符查询权限列表
-     *
-     * @param roleSet 角色标识符集合
-     * @return 权限列表
-     */
-    Set<String> getUserPermissionByRole(Set<String> roleSet);
 
     /**
      * 根据角色ID查询菜单ID列表
