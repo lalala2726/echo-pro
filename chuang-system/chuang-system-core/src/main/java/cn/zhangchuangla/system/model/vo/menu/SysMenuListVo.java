@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.vo.menu;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -39,7 +41,6 @@ public class SysMenuListVo {
     @Schema(description = "显示顺序")
     private Integer orderNum;
 
-
     /**
      * 路由名称
      */
@@ -50,12 +51,14 @@ public class SysMenuListVo {
      * 是否为外链（0是 1否）
      */
     @Schema(description = "是否为外链（0是 1否）")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer isFrame;
 
     /**
      * 是否缓存（0缓存 1不缓存）
      */
     @Schema(description = "是否缓存（0缓存 1不缓存）")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer isCache;
 
     /**
@@ -74,6 +77,7 @@ public class SysMenuListVo {
      * 菜单状态（0正常 1停用）
      */
     @Schema(description = "菜单状态（0正常 1停用）")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

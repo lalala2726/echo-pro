@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
 import cn.zhangchuangla.system.converter.SysUserConverter;
@@ -88,7 +89,10 @@ public class SysAuthController extends BaseController {
     @Operation(summary = "菜单路由列表")
     @GetMapping("/auth/routes")
     public AjaxResult<List<RouterVo>> getCurrentUserRoutes() {
-        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(1L);
+
+        Long userId = SecurityUtils.getUserId();
+        log.info("当前用户USERID:{}", userId);
+        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(userId);
         List<RouterVo> routerVos = sysMenuService.buildMenus(menuListByUserId);
         return success(routerVos);
     }

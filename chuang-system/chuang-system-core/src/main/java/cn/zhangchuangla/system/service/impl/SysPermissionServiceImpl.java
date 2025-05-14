@@ -147,14 +147,14 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         //根据角色ID查询用户关联的角色
-        Set<String> roleSet = sysRoleService.getRoleSetByUserId(userId);
+        Set<String> roles = SecurityUtils.getRoles();
         //判断是否包含超级管理员角色
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
             //如果是超级管理员，通过超级管理员角色标识符查询所有权限
             permissions = getUserPermissionByRole(SysRolesConstant.SUPER_ADMIN);
         } else {
             //否则，根据角色ID查询用户的权限列表
-            permissions = getUserPermissionByRole(roleSet);
+            permissions = getUserPermissionByRole(roles);
         }
 
         redisCache.setCacheObject(cacheKey, permissions);

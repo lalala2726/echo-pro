@@ -109,8 +109,8 @@ public class Constants {
         /**
          * 是否为外链（0是 1否）
          */
-        Integer IS_EXTERNAL_LINK = 0;
-        Integer NOT_EXTERNAL_LINK = 1;
+        Integer NOT_EXTERNAL_LINK = 0;
+        Integer IS_EXTERNAL_LINK = 1;
         /**
          * 路由组件
          */
@@ -141,5 +141,6 @@ public class Constants {
 
         String STATUS_DISABLE = "1";
         String MENU_TYPE_DIR = "M";
+        Integer CACHE_ENABLED = 1;
     }
 }

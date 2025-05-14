@@ -99,8 +99,14 @@ public class PermissionAuth {
         return roles.contains(SysRolesConstant.SUPER_ADMIN);
     }
 
+    /**
+     * 获取当前登录用户的角色集合,这边权限对实时性较高所以不使用缓存
+     *
+     * @return 角色集合
+     */
     private Set<String> getRoles() {
         Long userId = SecurityUtils.getUserId();
+        sysRoleService.getRoleSetByUserId(userId);
         return sysRoleService.getRoleSetByUserId(userId);
     }
 

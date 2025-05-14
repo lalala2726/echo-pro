@@ -5,6 +5,7 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuTreeList;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import org.mapstruct.Mapper;
 
@@ -51,4 +52,20 @@ public interface SysMenuConverter {
      * @return 菜单对象
      */
     SysMenu toEntity(SysMenuAddRequest request);
+
+    /**
+     * 将菜单对象转换为菜单树列表对象
+     *
+     * @param menu 菜单对象
+     * @return 菜单树列表对象
+     */
+    SysMenuTreeList toMenuTreeList(SysMenu menu);
+
+    /**
+     * 将菜单对象转换为菜单列表视图对象
+     *
+     * @param menu 菜单对象
+     * @return 菜单列表视图对象
+     */
+    SysMenuListVo toMenuListVo(SysMenu menu);
 }
