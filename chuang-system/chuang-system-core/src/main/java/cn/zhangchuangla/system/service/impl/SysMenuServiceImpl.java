@@ -88,30 +88,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return getById(menuId);
     }
 
-    /**
-     * 查询菜单列表
-     *
-     * @param menu 菜单查询条件
-     * @return 菜单列表
-     */
-    @Override
-    public List<SysMenu> selectMenuList(SysMenu menu) {
-        return menuMapper.selectMenuList(menu);
-    }
 
-    /**
-     * 根据用户ID查询菜单树信息
-     *
-     * @param userId 用户ID
-     * @return 菜单树结构列表
-     */
-    @Override
-    public List<SysMenu> selectMenuTreeByUserId(Long userId) {
-        if (userId == null) {
-            return Collections.emptyList();
-        }
-        return getMenuListByUserId(userId);
-    }
 
     /**
      * 构建前端选择菜单树（Option结构）
@@ -154,35 +131,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return Collections.emptyList();
         }
         return buildMenuTree(menus);
-    }
-
-    /**
-     * 根据角色ID查询菜单列表
-     *
-     * @param roleId 角色ID
-     * @return 菜单ID列表
-     */
-    @Override
-    public List<Long> selectMenuListByRoleId(Long roleId) {
-        if (roleId == null) {
-            return Collections.emptyList();
-        }
-        return roleMenuMapper.selectMenuListByRoleId(roleId);
-    }
-
-    /**
-     * 新增菜单
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean insertMenu(SysMenu menu) {
-        if (menu == null) {
-            return false;
-        }
-        return save(menu);
     }
 
     /**

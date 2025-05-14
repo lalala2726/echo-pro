@@ -53,21 +53,6 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     SysMenu getMenuById(Long menuId);
 
-    /**
-     * 查询菜单列表
-     *
-     * @param sysMenu 菜单信息
-     * @return 菜单列表
-     */
-    List<SysMenu> selectMenuList(SysMenu sysMenu);
-
-    /**
-     * 根据用户ID查询菜单树信息
-     *
-     * @param userId 用户ID
-     * @return 菜单列表
-     */
-    List<SysMenu> selectMenuTreeByUserId(Long userId);
 
     /**
      * 构建前端选择菜单树（Option结构）
@@ -84,21 +69,6 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     List<Option<Long>> buildMenuOption(List<SysMenu> menus);
 
-    /**
-     * 根据角色ID查询菜单树信息
-     *
-     * @param roleId 角色ID
-     * @return 选中菜单列表
-     */
-    List<Long> selectMenuListByRoleId(Long roleId);
-
-    /**
-     * 新增菜单
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    boolean insertMenu(SysMenu menu);
 
     /**
      * 修改菜单
