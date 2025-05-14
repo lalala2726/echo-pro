@@ -359,42 +359,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return sysRoleMenuService.saveBatch(roleMenus);
     }
 
-    /**
-     * 获取用户权限列表
-     *
-     * @param roleSet 角色标识符
-     * @return 权限列表
-     */
-    @Override
-    public Set<String> getUserPermissionByRole(Set<String> roleSet) {
-        if (roleSet == null) {
-            return Collections.emptySet();
-        }
-
-        // 调试角色信息
-        log.info("开始执行getUserPermissionByRole, 角色集合: {}", roleSet);
-
-        boolean containsSuperAdmin = roleSet.contains(SysRolesConstant.SUPER_ADMIN);
-        log.info("角色集合是否包含超级管理员: {}", containsSuperAdmin);
-
-        if (containsSuperAdmin) {
-            // 如果是超级管理员，返回所有权限
-            log.info("用户具有超级管理员角色，返回所有权限");
-            return list().stream()
-                    .map(SysMenu::getPermission)
-                    .filter(StrUtil::isNotEmpty)
-                    .collect(Collectors.toSet());
-        }
-
-        // 不是超级管理员按照角色权限进行查询菜单信息
-        log.info("用户不具有超级管理员角色，查询特定权限");
-        List<SysMenu> userPermissionListByRole = menuMapper.getUserPermissionListByRole(roleSet);
-        return userPermissionListByRole.stream()
-                .map(SysMenu::getPermission)
-                .filter(StrUtil::isNotEmpty)
-                .collect(Collectors.toSet());
-    }
-
 
     /**
      * 根据角色ID获取已选中的菜单ID列表

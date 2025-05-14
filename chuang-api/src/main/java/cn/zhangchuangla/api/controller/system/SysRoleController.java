@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import cn.zhangchuangla.system.service.SysMenuService;
+import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,7 @@ public class SysRoleController extends BaseController {
     private final SysRoleService sysRoleService;
     private final SysRoleConverter sysRoleConverter;
     private final SysMenuService sysMenuService;
+    private final SysPermissionService sysPermissionService;
 
 
     /**

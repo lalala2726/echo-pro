@@ -53,7 +53,7 @@ public class OnlineUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public AjaxResult<TableDataResult> onlineUserList(@Parameter(description = "在线用户列表查询参数")
                                                       @Validated @ParameterObject OnlineUserListRequest request) {
-        String pattern = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "*");
+        String pattern = RedisConstants.Auth.ACCESS_TOKEN_USER + "*";
         Collection<String> keys = redisCache.keys(pattern);
         List<OnlineLoginUser> matchedUsers = new ArrayList<>();
 
@@ -88,8 +88,7 @@ public class OnlineUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('monitor:online-user:delete')")
     public AjaxResult<Void> forceLogout(
             @PathVariable("sessionId") @Parameter(name = "会话ID", required = true) @NotBlank(message = "会话ID不能为空") String sessionId) {
-        String replace = RedisConstants.Auth.ACCESS_TOKEN_USER.replace("{}", "");
-        redisCache.deleteObject(replace + sessionId);
+        redisCache.deleteObject(RedisConstants.Auth.ACCESS_TOKEN_USER + sessionId);
         return success();
     }
 

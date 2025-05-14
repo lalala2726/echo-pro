@@ -69,25 +69,25 @@ public interface RedisConstants {
     interface Auth {
 
         // 存储访问令牌对应的用户信息（accessToken -> OnlineUser）
-        String ACCESS_TOKEN_USER = "auth:token:access:{}";
+        String ACCESS_TOKEN_USER = "auth:token:access:";
 
         // 存储刷新令牌对应的用户信息（refreshToken -> OnlineUser）
-        String REFRESH_TOKEN_USER = "auth:token:refresh:{}";
+        String REFRESH_TOKEN_USER = "auth:token:refresh:";
 
         // 用户与访问令牌的映射（userId -> accessToken）
-        String USER_ACCESS_TOKEN = "auth:user:access:{}";
+        String USER_ACCESS_TOKEN = "auth:user:access:";
 
         // 用户与刷新令牌的映射（userId -> refreshToken
-        String USER_REFRESH_TOKEN = "auth:user:refresh:{}";
+        String USER_REFRESH_TOKEN = "auth:user:refresh:";
 
         // 刷新令牌ID与访问令牌ID的映射 (refreshTokenId -> accessTokenId)
-        String REFRESH_TOKEN_MAPPING = "auth:token:refresh_mapping:{}";
+        String REFRESH_TOKEN_MAPPING = "auth:token:refresh_mapping:";
 
         // 黑名单 Token（用于退出登录或注销）
-        String BLACKLIST_TOKEN = "auth:token:blacklist:{}";
+        String BLACKLIST_TOKEN = "auth:token:blacklist:";
 
         // 权限前缀
-        String PERMISSIONS_PREFIX = "auth:permissions:{}";
+        String PERMISSIONS_PREFIX = "auth:permissions:";
 
         // 角色权限缓存前缀
         String ROLE_PERMISSIONS_PREFIX = "auth:role_permissions:{}";

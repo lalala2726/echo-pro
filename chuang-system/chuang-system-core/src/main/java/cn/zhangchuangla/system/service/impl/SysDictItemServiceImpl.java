@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
@@ -19,8 +18,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -144,7 +141,6 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * @param newDictType 新字典类型编码
      */
     @Override
-    @CacheEvict(value = RedisConstants.DICT_CACHE, key = "'item:' + #oldDictType")
     public void updateDictItemDictType(String oldDictType, String newDictType) {
         if (StringUtils.isAnyBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
             return;
@@ -187,8 +183,6 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * @param dictType 字典类型编码
      * @return 字典项列表
      */
-    //fixme 缓存这边待修复
-    @Cacheable(value = RedisConstants.DICT_CACHE, key = "'item:' + #dictType", unless = "#result == null || #result.isEmpty()")
     @Override
     public List<Option<String>> getDictItemOption(String dictType) {
         if (StringUtils.isBlank(dictType)) {
