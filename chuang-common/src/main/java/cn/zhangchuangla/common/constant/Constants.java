@@ -109,8 +109,8 @@ public class Constants {
         /**
          * 是否为外链（0是 1否）
          */
-        String IS_EXTERNAL_LINK = "0";
-        String NOT_EXTERNAL_LINK = "1";
+        Integer IS_EXTERNAL_LINK = 0;
+        Integer NOT_EXTERNAL_LINK = 1;
         /**
          * 路由组件
          */

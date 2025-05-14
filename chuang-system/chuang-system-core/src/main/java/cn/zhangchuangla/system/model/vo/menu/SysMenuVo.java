@@ -111,10 +111,4 @@ public class SysMenuVo extends BaseVo {
     @Schema(description = "排序")
     private Integer sort;
 
-    /**
-     * 创建者
-     */
-    @Schema(description = "创建者")
-    private String createBy;
-
 }

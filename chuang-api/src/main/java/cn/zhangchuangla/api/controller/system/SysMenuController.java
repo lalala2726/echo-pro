@@ -109,7 +109,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "修改菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
-    public AjaxResult<Void> updateMenu(SysMenuUpdateRequest request) {
+    public AjaxResult<Void> updateMenu(@RequestBody SysMenuUpdateRequest request) {
         boolean result = sysMenuService.updateMenu(request);
         return toAjax(result);
     }
