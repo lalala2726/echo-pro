@@ -87,7 +87,7 @@ public interface RedisConstants {
         String BLACKLIST_TOKEN = "auth:token:blacklist:{}";
 
         // 权限前缀
-        String PERMISSIONS_PREFIX = "auth:permissions:{}";
+        String PERMISSIONS_PREFIX = "auth:permissions:";
 
         // 角色权限缓存前缀
         String ROLE_PERMISSIONS_PREFIX = "auth:role_permissions:{}";

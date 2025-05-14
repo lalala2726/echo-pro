@@ -36,9 +36,10 @@ public interface SysPermissionService {
     Set<String> getUserPermissionByUserId(Long userId);
 
     /**
-     * 获取当前用户的权限列表,不传递用户ID默认获取当前登录用户的权限列表
+     * 根据用户id获取权限列表,如果不传递用户id，则默认获取当前登录用户的权限列表
      *
      * @return 权限列表
      */
     Set<String> getUserPermissionByUserId();
+
 }
