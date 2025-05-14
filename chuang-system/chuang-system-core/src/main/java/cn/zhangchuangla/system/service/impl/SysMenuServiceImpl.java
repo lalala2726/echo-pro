@@ -6,18 +6,21 @@ import cn.zhangchuangla.common.constant.SysRolesConstant;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
+import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.system.converter.SysMenuConverter;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.MetaVo;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuTreeList;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.service.SysMenuService;
@@ -49,6 +52,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysRoleMenuMapper roleMenuMapper;
     private final SysRoleService sysRoleService;
     private final SysRoleMenuService sysRoleMenuService;
+    private final SysMenuConverter sysMenuConverter;
 
 
     /**
@@ -145,7 +149,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 选项树
      */
     @Override
-    public List<Option<Long>> buildMenuOptionTree(List<SysMenu> menus) {
+    public List<Option<Long>> buildMenuOption(List<SysMenu> menus) {
         if (menus == null) {
             return Collections.emptyList();
         }
@@ -190,8 +194,81 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateMenu(SysMenuUpdateRequest request) {
-        return false;
+        if (request == null || request.getMenuId() == null) {
+            return false;
+        }
+        SysMenu sysMenu = sysMenuConverter.toEntity(request);
+        menuBaseCheck(sysMenu);
+        //检查父ID是否合法
+        checkPathIsLegal(sysMenu);
+        // 校验父ID是否合法
+        checkParentIdIsLegal(sysMenu);
+        //检验组件
+        checkComponentIsLegal(sysMenu);
+        //菜单类型必须是目录、菜单、按钮
+        if (!Arrays.asList(Constants.MenuConstants.TYPE_DIRECTORY, Constants.MenuConstants.TYPE_MENU,
+                Constants.MenuConstants.TYPE_BUTTON).contains(sysMenu.getMenuType())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单类型不合法");
+        }
+
+        //当组件发生变化时，重新生成路由名称
+        if (!sysMenu.getComponent().isEmpty()) {
+            String routeName = generateRouteName(sysMenu);
+            sysMenu.setRouteName(routeName);
+        }
+
+        String username = SecurityUtils.getUsername();
+        sysMenu.setUpdateBy(username);
+        return updateById(sysMenu);
     }
+
+    /**
+     * 基本检查
+     *
+     * @param menu 菜单信息
+     */
+    private void menuBaseCheck(SysMenu menu) {
+        if (hasChildByMenuId(menu.getMenuId())) {
+            if (!Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单下面有子菜单，菜单类型只能是目录");
+            }
+        }
+        //菜单名称必须唯一
+        if (checkMenuNameUnique(menu)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在");
+        }
+        //如果是外链，地址必须以http(s)://开头
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getIsFrame())) {
+            if (!StringUtils.isHttp(menu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "地址必须以http(s)://开头");
+            }
+        }
+        //父菜单不能选择自己
+        if (menu.getMenuId().equals(menu.getParentId())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己");
+        }
+    }
+
+    /**
+     * 检验组件地址是否合法，组件地址不能以 / 开头
+     *
+     * @param menu 菜单信息
+     */
+    private void checkComponentIsLegal(SysMenu menu) {
+        //只有菜单类型需要校验组件地址
+        if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType())) {
+            if (StringUtils.isBlank(menu.getComponent())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件地址不能为空");
+            }
+        }
+
+        // 组件地址如果存在，不能以斜杠开头
+        if (StringUtils.isNotBlank(menu.getComponent()) && menu.getComponent().startsWith("/")) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件地址不能以 / 开头");
+        }
+
+    }
+
 
     /**
      * 删除菜单
@@ -208,12 +285,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
         // 先检查是否有子菜单
         if (hasChildByMenuId(menuId)) {
-            return false;
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "请先删除子菜单");
         }
 
         // 检查是否被角色使用
         if (checkMenuExistRole(menuId)) {
-            return false;
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单已分配，不能删除");
         }
 
         return removeById(menuId);
@@ -223,12 +300,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * 校验菜单名称是否唯一
      *
      * @param menu 菜单信息
-     * @return 结果
+     * @return true 唯一 false 不唯一
      */
     @Override
     public boolean checkMenuNameUnique(SysMenu menu) {
         if (menu == null || StrUtil.isEmpty(menu.getMenuName())) {
-            return false;
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称不能为空");
         }
 
         Long menuId = Objects.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
@@ -236,7 +313,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .eq(SysMenu::getMenuName, menu.getMenuName())
                 .eq(SysMenu::getParentId, menu.getParentId()));
 
-        return existMenu == null || existMenu.getMenuId().equals(menuId);
+        return existMenu != null && !existMenu.getMenuId().equals(menuId);
     }
 
     /**
@@ -270,24 +347,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
 
     /**
-     * 更新角色菜单权限
-     *
-     * @param request 菜单更新请求
-     * @return 结果
-     */
-    @Override
-    public boolean updateRoleMenus(SysMenuUpdateRolePermRequest request) {
-        return false;
-    }
-
-    /**
      * 获取菜单路由列表
      *
      * @return 菜单路由列表
      */
     @Override
-    public List<Option<String>> getMenuOptions(boolean onlyParent) {
-        return List.of();
+    public List<Option<Long>> getMenuOptions(boolean onlyParent) {
+        LambdaQueryWrapper<SysMenu> sysMenuLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        sysMenuLambdaQueryWrapper.ne(SysMenu::getMenuType, Constants.MenuConstants.TYPE_BUTTON);
+        if (onlyParent) {
+            sysMenuLambdaQueryWrapper.eq(SysMenu::getParentId, 0);
+        }
+        List<SysMenu> list = list(sysMenuLambdaQueryWrapper);
+        return buildMenuOption(list);
     }
 
     /**
@@ -298,7 +370,155 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean addMenu(SysMenuAddRequest request) {
-        return false;
+        SysMenu sysMenu = sysMenuConverter.toEntity(request);
+        // 当前菜单类型为目录并且父ID为0时，设置组件为布局
+        if (Constants.MenuConstants.TYPE_DIRECTORY.equals(request.getMenuType())
+                && request.getParentId() == 0) {
+            request.setComponent(Constants.MenuConstants.LAYOUT);
+        }
+
+        //基本校验
+        menuBaseCheck(sysMenu);
+        //检查路由是否合法
+        checkPathIsLegal(sysMenu);
+        // 校验父ID是否合法
+        checkParentIdIsLegal(sysMenu);
+        // 校验组件是否合法
+        checkComponentIsLegal(sysMenu);
+
+        //根据组件生成路由名称
+        String routeName = generateRouteName(sysMenu);
+        sysMenu.setRouteName(routeName);
+
+        //菜单类型必须是目录、菜单、按钮
+        if (!Arrays.asList(Constants.MenuConstants.TYPE_DIRECTORY, Constants.MenuConstants.TYPE_MENU,
+                Constants.MenuConstants.TYPE_BUTTON).contains(sysMenu.getMenuType())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单类型不合法");
+        }
+
+        String username = SecurityUtils.getUsername();
+        sysMenu.setCreateBy(username);
+        return save(sysMenu);
+    }
+
+    /**
+     * 生成唯一的路由名称
+     *
+     * @param menu 菜单信息
+     * @return 路由名称
+     */
+    public String generateRouteName(SysMenu menu) {
+        if (menu == null) {
+            return "";
+        }
+
+        if (!Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType())) {
+            // 非菜单类型直接返回空
+            return "";
+        }
+
+        if (menu.getComponent().isBlank()) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单类型为菜单时，组件不能为空");
+        }
+
+        checkComponentIsLegal(menu); // 校验组件路径是否合法
+
+        String baseRouteName = buildRouteNameFromComponent(menu.getComponent());
+
+        // 确保唯一性（避免递归死循环）
+        return ensureRouteNameUnique(baseRouteName, menu.getMenuId());
+    }
+
+    /**
+     * 从组件路径生成基础的路由名称（首字母大写，忽略 index）
+     */
+    private String buildRouteNameFromComponent(String component) {
+        String[] parts = component.split("/");
+        StringBuilder routeName = new StringBuilder();
+
+        int end = parts.length;
+        if (end > 0 && "index".equalsIgnoreCase(parts[end - 1])) {
+            end--; // 忽略末尾的 index
+        }
+
+        for (int i = 0; i < end; i++) {
+            String part = parts[i];
+            if (!part.isEmpty()) {
+                routeName.append(capitalize(part));
+            }
+        }
+
+        return routeName.toString();
+    }
+
+    /**
+     * 确保路由名称唯一，如已存在则添加随机数后缀，最多尝试10次
+     */
+    private String ensureRouteNameUnique(String baseName, Long currentMenuId) {
+        final int MAX_RETRIES = 10;
+        Long menuId = Optional.ofNullable(currentMenuId).orElse(-1L);
+        String routeName = baseName;
+
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<SysMenu>()
+                    .eq(SysMenu::getRouteName, routeName)
+                    .ne(SysMenu::getMenuId, menuId);
+            SysMenu existMenu = getOne(queryWrapper);
+
+            if (existMenu == null) {
+                return routeName; // 唯一，返回
+            }
+
+            log.info("路由名称已存在：{}，重新生成中...", routeName);
+            routeName = baseName + new Random().nextInt(1000);
+        }
+
+        throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成唯一路由名称失败，请稍后重试");
+    }
+
+    /**
+     * 首字母大写（安全处理）
+     */
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    /**
+     * 检查路径是否合法
+     *
+     * @param sysMenu 菜单信息
+     */
+    private void checkPathIsLegal(SysMenu sysMenu) {
+        if (sysMenu == null) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单信息不能为空");
+        }
+
+        // 如果不是外链且不是按钮类型，则必须填写路由地址
+        if (!Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getIsFrame())
+                && !Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType())) {
+            if (StringUtils.isBlank(sysMenu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "路由地址不能为空");
+            }
+        }
+    }
+
+    /**
+     * 检查父ID是否合法
+     *
+     * @param menu 菜单信息
+     */
+    private void checkParentIdIsLegal(SysMenu menu) {
+        if (menu.getParentId() == null) {
+            menu.setParentId(0L);
+        }
+        //如果父ID不为空那么校验父ID是否存在
+        if (menu.getParentId() != 0) {
+            SysMenu parentMenu = getById(menu.getParentId());
+            if (parentMenu == null) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "父菜单不存在");
+            }
+        }
     }
 
     /**
@@ -357,6 +577,74 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
         // 批量插入角色菜单权限
         return sysRoleMenuService.saveBatch(roleMenus);
+    }
+
+    /**
+     * 查询菜单列表
+     *
+     * @param request 请求参数
+     * @return 返回菜单列表
+     */
+    @Override
+    public List<SysMenuListVo> listMenu(SysMenuListRequest request) {
+        List<SysMenu> list = list();
+        return buildMenuList(list);
+    }
+
+    /**
+     * 构建菜单列表
+     *
+     * @param list 菜单列表
+     * @return 菜单列表视图对象
+     */
+    private List<SysMenuListVo> buildMenuList(List<SysMenu> list) {
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 创建菜单映射关系：parentId -> menuList
+        Map<Long, List<SysMenu>> parentChildMap = list.stream()
+                .filter(menu -> menu.getParentId() != null)
+                .collect(Collectors.groupingBy(SysMenu::getParentId));
+        return list.stream()
+                .filter(menu -> menu.getParentId() == 0) // 只处理一级菜单
+                .map(menu -> convertToVo(menu, parentChildMap))
+                .sorted(Comparator.comparing(SysMenuListVo::getOrderNum)) // 按显示顺序排序
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 将菜单转换为前端需要的视图对象
+     *
+     * @param menu           菜单对象
+     * @param parentChildMap 父子菜单映射
+     * @return 菜单视图对象
+     */
+    private SysMenuListVo convertToVo(SysMenu menu, Map<Long, List<SysMenu>> parentChildMap) {
+        SysMenuListVo vo = new SysMenuListVo();
+        vo.setMenuId(menu.getMenuId());
+        vo.setMenuName(menu.getMenuName());
+        vo.setParentId(menu.getParentId());
+        vo.setOrderNum(menu.getOrderNum());
+        vo.setRouteName(menu.getRouteName());
+        vo.setIsFrame(menu.getIsFrame());
+        vo.setIsCache(menu.getIsCache());
+        vo.setMenuType(menu.getMenuType());
+        vo.setVisible(menu.getVisible());
+        vo.setStatus(menu.getStatus());
+        vo.setIcon(menu.getIcon());
+        vo.setSort(menu.getSort());
+
+        // 如果有子菜单，递归转换
+        List<SysMenu> children = parentChildMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
+        if (!children.isEmpty()) {
+            vo.setChildren(children.stream()
+                    .map(child -> convertToVo(child, parentChildMap))
+                    .sorted(Comparator.comparing(SysMenuListVo::getOrderNum))
+                    .collect(Collectors.toList()));
+        }
+
+        return vo;
     }
 
 

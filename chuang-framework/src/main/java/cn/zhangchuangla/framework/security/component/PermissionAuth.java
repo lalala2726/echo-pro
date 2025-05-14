@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.service.SysMenuService;
+import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class PermissionAuth {
 
     private final SysMenuService sysMenuService;
     private final SysRoleService sysRoleService;
+    private final SysPermissionService sysPermissionService;
 
     /**
      * 判断当前用户是否拥有指定的权限
@@ -38,7 +40,9 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     public boolean hasPermission(String permission) {
-        return true;
+        Set<String> roles = getRoles();
+        Set<String> userPermissionByRole = sysPermissionService.getUserPermissionByRole(roles);
+        return userPermissionByRole.contains(permission);
     }
 
 

@@ -3,10 +3,11 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -79,10 +80,9 @@ public interface SysMenuService extends IService<SysMenu> {
     /**
      * 构建前端选项树
      *
-     * @param menus 菜单列表
      * @return 选项树
      */
-    List<Option<Long>> buildMenuOptionTree(List<SysMenu> menus);
+    List<Option<Long>> buildMenuOption(List<SysMenu> menus);
 
     /**
      * 根据角色ID查询菜单树信息
@@ -140,22 +140,13 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     boolean checkMenuExistRole(Long menuId);
 
-
-    /**
-     * 更新角色菜单权限
-     *
-     * @param request 菜单更新角色权限请求
-     * @return 结果
-     */
-    boolean updateRoleMenus(SysMenuUpdateRolePermRequest request);
-
     /**
      * 获取菜单路由列表
      *
      * @param onlyParent 是否只查询父级菜单
      * @return 菜单路由列表
      */
-    List<Option<String>> getMenuOptions(boolean onlyParent);
+    List<Option<Long>> getMenuOptions(boolean onlyParent);
 
     /**
      * 添加菜单
@@ -180,5 +171,13 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     boolean updateRolePermission(SysUpdateRolePermissionRequest request);
+
+    /**
+     * 更新角色权限
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    List<SysMenuListVo> listMenu(SysMenuListRequest request);
 
 }

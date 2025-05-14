@@ -5,15 +5,21 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.system.converter.SysMenuConverter;
+import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRolePermRequest;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,22 +38,22 @@ import java.util.List;
 public class SysMenuController extends BaseController {
 
     private final SysMenuService sysMenuService;
+    private final SysMenuConverter sysMenuConverter;
 
 
     /**
-     * 更改角色菜单的权限
+     * 获取菜单列表
      *
+     * @param request 菜单列表查询参数
      * @return 菜单列表
      */
-    @PutMapping("/updateRoleMenus")
-    @Operation(summary = "保存角色菜单")
-    @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
-    @PreAuthorize("@ss.hasPermission('system:menu:update')")
-    public AjaxResult<Void> updateRoleMenus(SysMenuUpdateRolePermRequest request) {
-        boolean result = sysMenuService.updateRoleMenus(request);
-        return toAjax(result);
+    @GetMapping("/list")
+    @Operation(summary = "获取菜单列表")
+    @PreAuthorize("@ss.hasPermission('system:menu:list')")
+    public AjaxResult<List<SysMenuListVo>> listMenu(@ParameterObject SysMenuListRequest request) {
+        List<SysMenuListVo> sysMenuListVo = sysMenuService.listMenu(request);
+        return success(sysMenuListVo);
     }
-
 
     /**
      * 获取菜单路由列表
@@ -57,10 +63,10 @@ public class SysMenuController extends BaseController {
     @GetMapping("/options")
     @Operation(summary = "获取菜单下拉列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult<List<Option<String>>> listMenuOptions(
+    public AjaxResult<List<Option<Long>>> listMenuOptions(
             @Parameter(description = "是否只查询父级菜单")
             @RequestParam(required = false, defaultValue = "false", value = "onlyParent") boolean onlyParent) {
-        List<Option<String>> options = sysMenuService.getMenuOptions(onlyParent);
+        List<Option<Long>> options = sysMenuService.getMenuOptions(onlyParent);
         return success(options);
     }
 
@@ -74,9 +80,25 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "添加菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.INSERT)
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
-    public AjaxResult<Void> addMenu(SysMenuAddRequest request) {
+    public AjaxResult<Void> addMenu(@RequestBody @Validated SysMenuAddRequest request) {
         boolean result = sysMenuService.addMenu(request);
         return toAjax(result);
+    }
+
+    /**
+     * 获取菜单详情
+     *
+     * @param id 菜单ID
+     * @return 菜单详情
+     */
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    @Operation(summary = "获取菜单详情")
+    @GetMapping("/{id}")
+    public AjaxResult<SysMenuVo> getMenuById(@Parameter(description = "菜单ID")
+                                             @PathVariable("id") Long id) {
+        SysMenu sysMenu = sysMenuService.getMenuById(id);
+        SysMenuVo sysMenuVo = sysMenuConverter.toSysMenuVo(sysMenu);
+        return success(sysMenuVo);
     }
 
     /**
@@ -88,7 +110,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "修改菜单")
     @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@ss.hasPermission('system:menu:edit')")
-    public AjaxResult<Void> updateMenu(SysMenuUpdateRequest request) {
+    public AjaxResult<Void> updateMenu(@RequestBody @Validated SysMenuUpdateRequest request) {
         boolean result = sysMenuService.updateMenu(request);
         return toAjax(result);
     }
