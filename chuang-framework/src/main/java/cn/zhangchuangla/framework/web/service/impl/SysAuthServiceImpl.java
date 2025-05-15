@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * 该类实现了用户登录的逻辑，包括验证用户身份和生成token。
  *
  * @author Chuang
- *         created on 2025/2/19 14:10
+ * created on 2025/2/19 14:10
  */
 @Slf4j
 @Service

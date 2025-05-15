@@ -41,10 +41,6 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单权限服务实现类。
- * <p>
- * 负责处理菜单相关的业务逻辑，包括菜单的增删改查、权限构建、路由构建以及菜单树的生成等。
- * 重点处理了“内嵌iframe”和“外部链接跳转”两种外链模式的路由生成逻辑，以符合前端期望。
- * </p>
  *
  * @author Chuang
  */
@@ -673,25 +669,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * 3. 删除该角色原有的所有菜单权限；
      * 4. 如果新的菜单ID列表不为空，则为每个菜单ID创建一个新的 SysRoleMenu 对象，并批量保存到数据库中；
      * 5. 如果没有提供新的菜单ID，则直接返回 true 表示成功清除了该角色的所有权限。</p>
-     *
-     * <p><b>参数说明：</b></p>
-     * <ul>
-     *     <li>{@code request} - 包含角色ID和菜单ID列表的请求对象，不能为 null。</li>
-     * </ul>
-     *
-     * <p><b>返回值说明：</b></p>
-     * <ul>
-     *     <li>如果更新成功或清除了权限，返回 true；</li>
-     *     <li>如果更新过程中出现错误（如角色不存在、超级管理员权限被尝试修改等），则抛出 ServiceException 并返回 false。</li>
-     * </ul>
-     *
-     * <p><b>异常处理：</b></p>
-     * <ul>
-     *     <li>当角色不存在时，抛出 OPERATION_ERROR 类型的 ServiceException；</li>
-     *     <li>当尝试修改超级管理员角色权限时，同样抛出 OPERATION_ERROR 类型的 ServiceException。</li>
-     * </ul>
-     *
-     * <p><b>事务管理：</b> 此方法使用了事务控制，确保在任何失败情况下都能回滚以保持数据一致性。</p>
      *
      * @param request 包含角色ID和菜单ID列表的请求对象。
      * @return 如果操作成功完成，返回 true；否则返回 false。
