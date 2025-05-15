@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -130,7 +132,28 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * {@inheritDoc}
+     * 更新菜单信息。
+     *
+     * <p>该方法用于更新系统中的菜单信息。主要流程包括：
+     * <ul>
+     *     <li>校验请求对象及菜单ID是否为空，若为空则记录警告并返回 false；</li>
+     *     <li>将请求对象转换为 SysMenu 实体对象；</li>
+     *     <li>如果菜单类型是目录且父菜单ID为空或为0，并且组件路径为空，则设置默认的布局组件（LAYOUT）；</li>
+     *     <li>配置路由名称，确保其符合规范；</li>
+     *     <li>对菜单进行基础规则校验，包括组件路径、路由路径、父菜单ID等；</li>
+     *     <li>检查菜单类型是否合法，仅允许目录（M）、菜单（C）和按钮（F）三种类型；</li>
+     *     <li>设置更新人信息，并记录日志；</li>
+     *     <li>保存菜单信息到数据库，并返回操作结果。</li>
+     * </ul>
+     * </p>
+     *
+     * @param request 包含菜单更新信息的请求对象，不能为 null。
+     *                - menuId: 菜单ID，必须不为 null 且大于等于 0；
+     *                - menuName: 菜单名称，必须不为空；
+     *                - path: 路由地址，必须不为空；
+     *                - 其他字段可选，具体参考 SysMenuUpdateRequest 类定义。
+     * @return 如果更新成功返回 true，否则返回 false。
+     * @throws ServiceException 如果在更新过程中出现任何业务逻辑错误，例如参数校验失败、菜单类型不合法等。
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -168,8 +191,25 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 对菜单实体进行基础规则校验。
      *
-     * @param menu 待校验的 {@link SysMenu} 实体。
-     * @throws ServiceException 如果任一校验规则不通过。
+     * <p>此方法用于验证菜单实体对象的基本业务规则，包括：
+     * <ul>
+     *     <li>组件路径不能为外部链接（HTTP/HTTPS）；</li>
+     *     <li>如果该菜单存在子菜单，则菜单类型必须是目录（M）；</li>
+     *     <li>菜单名称在同级目录下必须唯一；</li>
+     *     <li>根据菜单配置的外链模式，分别对路由名称和路径进行格式校验；
+     *         支持两种外链模式：外部链接跳转和内嵌iframe。</li>
+     *     <li>上级菜单不能选择自身作为父级节点，防止循环引用。</li>
+     * </ul>
+     *
+     * <p><b>参数说明：</b></p>
+     * <ul>
+     *     <li>{@code menu} - 待校验的 {@link SysMenu} 实体对象，不能为 null。</li>
+     * </ul>
+     *
+     * <p><b>异常说明：</b></p>
+     * <ul>
+     *     <li>当任意一项校验不通过时，抛出 {@link ServiceException} 异常，并附带相应的错误提示信息。</li>
+     * </ul>
      */
     private void menuBaseCheck(SysMenu menu) {
         if (StrUtil.isNotBlank(menu.getComponent()) && (menu.getComponent().contains(Constants.HTTP) || menu.getComponent().contains(Constants.HTTPS))) {
@@ -203,9 +243,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由名称不应是HTTP(S)链接，应为内部路由名。");
             }
         }
-        // 如果 external_link 和 is_frame 都不是1，则为普通内部菜单，此处不需额外校验外链。
-        // 如果 external_link=1 且 is_frame=1，以 external_link=1 的逻辑为准。
-
         if (menu.getMenuId() != null && menu.getMenuId().equals(menu.getParentId())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己。");
         }
@@ -237,7 +274,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * {@inheritDoc}
+     * 删除菜单信息
+     *
+     * <p>根据提供的菜单ID删除对应的菜单项。在删除前会进行以下检查：
+     * <ul>
+     *   <li>如果菜单ID为空，则记录警告并返回false。</li>
+     *   <li>如果该菜单下存在子菜单，则抛出ServiceException异常，提示用户先删除子菜单。</li>
+     *   <li>如果该菜单已被分配给任何角色，则抛出ServiceException异常，提示菜单已分配，不能直接删除。</li>
+     * </ul>
+     *
+     * @param menuId 需要删除的菜单的ID
+     * @return 如果删除成功则返回true，否则返回false
+     * @throws ServiceException 如果菜单存在子菜单或已被分配给角色时抛出异常
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -259,6 +307,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
+     * 检查菜单的名字是否唯一
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -283,6 +333,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
+     * 检查菜单的角色是否存在
      * {@inheritDoc}
      */
     @Override
@@ -292,6 +343,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
+     * 获取菜单的列表
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -308,6 +361,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     /**
      * {@inheritDoc}
+     *
+     * <p>此方法用于添加一个新的菜单项到系统中。主要流程包括：
+     * <ul>
+     *     <li>校验请求对象是否为空，若为空则记录警告并返回 false；</li>
+     *     <li>将请求对象转换为 SysMenu 实体对象；</li>
+     *     <li>如果菜单类型是目录且父菜单ID为空或为0，并且组件路径为空，则设置默认的布局组件（LAYOUT）；</li>
+     *     <li>配置路由名称，确保其符合规范；</li>
+     *     <li>对菜单进行基础规则校验，包括组件路径、路由路径、父菜单ID等；</li>
+     *     <li>检查菜单类型是否合法，仅允许目录（M）、菜单（C）和按钮（F）三种类型；</li>
+     *     <li>设置创建人信息，并记录日志；</li>
+     *     <li>保存菜单信息到数据库，并返回操作结果。</li>
+     * </ul>
+     * </p>
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -408,7 +474,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             if (StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) {
                 // 用户已提供合法的内部路由名
                 baseRouteName = capitalize(menu.getRouteName().replaceAll("[^a-zA-Z0-9]", ""));
-            } else { // 用户未提供，或提供了URL（不应如此），则基于菜单名生成
+            } else {
+                // 用户未提供，或提供了URL（不应如此），则基于菜单名生成
                 baseRouteName = capitalize(menu.getMenuName().replaceAll("[^a-zA-Z0-9]", ""));
             }
             if (StrUtil.isBlank(baseRouteName)) { // 如果菜单名全是特殊字符
@@ -558,6 +625,15 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     /**
      * {@inheritDoc}
+     *
+     * <p>此方法用于根据角色ID获取该角色的权限菜单树信息。主要流程包括：
+     * <ul>
+     *     <li>根据角色ID查询角色信息，若不存在则抛出异常；</li>
+     *     <li>查询系统中所有的菜单，并按父菜单ID和排序字段进行升序排列；</li>
+     *     <li>将扁平化的菜单列表构建成树形结构的菜单权限对象（SysMenuTreeList）；</li>
+     *     <li>获取该角色已分配的菜单ID列表；</li>
+     *     <li>最终返回封装好的 SysRolePermVo 对象，包含角色信息、菜单树及已选中的菜单ID。</li>
+     * </ul>
      */
     @Override
     public SysRolePermVo getRolePermByRoleId(Long roleId) {
@@ -575,7 +651,37 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * {@inheritDoc}
+     * 更新角色的菜单权限信息。
+     *
+     * <p>该方法会根据传入的请求对象更新指定角色关联的菜单权限。具体操作流程如下：
+     * 1. 首先检查角色是否存在，若不存在则抛出异常；
+     * 2. 如果是超级管理员角色（super_admin），则禁止修改其权限并抛出异常；
+     * 3. 删除该角色原有的所有菜单权限；
+     * 4. 如果新的菜单ID列表不为空，则为每个菜单ID创建一个新的 SysRoleMenu 对象，并批量保存到数据库中；
+     * 5. 如果没有提供新的菜单ID，则直接返回 true 表示成功清除了该角色的所有权限。</p>
+     *
+     * <p><b>参数说明：</b></p>
+     * <ul>
+     *     <li>{@code request} - 包含角色ID和菜单ID列表的请求对象，不能为 null。</li>
+     * </ul>
+     *
+     * <p><b>返回值说明：</b></p>
+     * <ul>
+     *     <li>如果更新成功或清除了权限，返回 true；</li>
+     *     <li>如果更新过程中出现错误（如角色不存在、超级管理员权限被尝试修改等），则抛出 ServiceException 并返回 false。</li>
+     * </ul>
+     *
+     * <p><b>异常处理：</b></p>
+     * <ul>
+     *     <li>当角色不存在时，抛出 OPERATION_ERROR 类型的 ServiceException；</li>
+     *     <li>当尝试修改超级管理员角色权限时，同样抛出 OPERATION_ERROR 类型的 ServiceException。</li>
+     * </ul>
+     *
+     * <p><b>事务管理：</b> 此方法使用了事务控制，确保在任何失败情况下都能回滚以保持数据一致性。</p>
+     *
+     * @param request 包含角色ID和菜单ID列表的请求对象。
+     * @return 如果操作成功完成，返回 true；否则返回 false。
+     * @throws ServiceException 如果角色不存在或者尝试修改超级管理员角色权限。
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -606,8 +712,26 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return true;
     }
 
+
     /**
-     * {@inheritDoc}
+     * 根据请求参数查询菜单信息并构建成树形结构的菜单列表视图对象。
+     * <p>
+     * 此方法用于获取满足条件的菜单数据，并将这些数据转换为适合前端展示的树形结构。
+     * 支持根据菜单名称进行模糊匹配，同时按照父菜单ID和排序字段进行升序排列。
+     * 最终通过 buildTreeFormattedMenuList 方法将扁平化的菜单列表组装成具有层级关系的 SysMenuListVo 列表。
+     *
+     * @param request 包含查询条件的 SysMenuListRequest 请求对象，可能为 null。
+     *                - menuName：菜单名称，支持模糊匹配；
+     *                - 其他字段可扩展，但当前未使用。
+     * @return 构建完成的 SysMenuListVo 树形列表，每个节点包含菜单的基本信息以及子菜单列表（如有）。
+     * <p>
+     * 流程说明：
+     * 1. 创建 LambdaQueryWrapper 查询包装器，用于构建动态查询条件；
+     * 2. 如果请求对象不为空且 menuName 不为空或空白字符串，则添加对菜单名称的模糊查询条件；
+     * 3. 添加排序条件：先按 parentId 升序，再按 sort 升序，以确保结果按层级和顺序排列；
+     * 4. 执行查询，获取所有符合条件的 SysMenu 实体列表；
+     * 5. 调用 buildTreeFormattedMenuList 方法，将扁平化菜单列表递归构建成树形结构；
+     * 6. 返回最终的 SysMenuListVo 列表，供前端展示使用。
      */
     @Override
     public List<SysMenuListVo> listMenu(SysMenuListRequest request) {
@@ -663,6 +787,25 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     /**
      * {@inheritDoc}
+     *
+     * <p>此方法用于根据角色ID获取该角色已分配的菜单权限ID列表。主要流程包括：
+     * <ul>
+     *     <li>校验传入的角色ID是否为空，若为空则返回空列表并记录警告日志；</li>
+     *     <li>通过角色ID查询对应的角色标识集合（roleKey）；</li>
+     *     <li>如果角色包含超级管理员标识，则返回系统中所有菜单的ID；</li>
+     *     <li>否则，调用数据访问层获取该角色关联的菜单ID列表。</li>
+     * </ul>
+     *
+     * <p><b>关键点说明：</b></p>
+     * <ul>
+     *     <li>{@link SysRolesConstant#SUPER_ADMIN} 是超级管理员角色标识，拥有所有菜单权限；</li>
+     *     <li>通过 {@link SysRoleService#getRoleSetByRoleId(Long)} 获取角色标识集合；</li>
+     *     <li>通过 {@link SysMenuMapper#selectMenuListByRoleId(Long)} 查询角色对应的菜单ID列表。</li>
+     * </ul>
+     *
+     * @param roleId 角色ID，用于查询该角色的菜单权限。
+     * @return 返回与角色ID关联的菜单ID列表。如果角色为超级管理员，则返回所有菜单ID；
+     * 如果角色ID为空或未找到相关菜单，则返回空列表。
      */
     @Override
     public List<Long> getRolePermSelectedByRoleId(Long roleId) {
@@ -680,6 +823,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * 此方法用于将给定的菜单列表构建为前端所需的路由对象列表（RouterVo）。主要流程包括：
+     * 1. 过滤掉按钮类型的菜单项；
+     * 2. 按照父级菜单ID和排序字段对菜单进行排序；
+     * 3. 构建父子菜单关系映射，以便后续递归处理；
+     * 4. 从顶级菜单开始递归生成对应的 RouterVo 对象，并过滤掉无效或空值；
+     * 5. 返回最终的路由对象列表。
+     * </p>
+     *
+     * <p>关键点说明：</p>
+     * <ul>
+     *     <li>{@link Constants.MenuConstants#TYPE_BUTTON} 类型的菜单会被排除，因为它们不需要在前端路由中展示。</li>
+     *     <li>菜单会根据 parentId 和 sort 字段排序，确保构建的路由结构符合预期层级顺序。</li>
+     *     <li>通过 parentChildrenMap 建立了父菜单与子菜单之间的关联，便于递归处理。</li>
+     *     <li>递归调用 convertToRouterVoRecursive 方法将每个菜单节点转换为对应的 RouterVo 实例。</li>
+     * </ul>
      */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
@@ -688,6 +847,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return Collections.emptyList();
         }
 
+        // 过滤掉按钮类型菜单，并根据 parentId 和 sort 排序
         List<SysMenu> processableMenus = menus.stream()
                 .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getMenuType()))
                 .sorted(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
@@ -699,6 +859,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return Collections.emptyList();
         }
 
+        // 构建父子关系映射并按排序字段对每个子集进行排序
         Map<Long, List<SysMenu>> parentChildrenMap = processableMenus.stream()
                 .filter(menu -> menu.getParentId() != null)
                 .collect(Collectors.groupingBy(SysMenu::getParentId));
@@ -707,6 +868,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 childrenList.sort(Comparator.comparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
         );
 
+        // 递归转换为 RouterVo 树形结构
         return processableMenus.stream()
                 .filter(menu -> menu.getParentId() != null && menu.getParentId() == 0L)
                 .map(menu -> convertToRouterVoRecursive(menu, parentChildrenMap, ""))
@@ -730,23 +892,17 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         boolean isKeepAlive = false;
 
         // 情况1: "外部链接跳转"模式 (external_link = 1)
-        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
-            // menu.getPath() 此时应为内部路径段，如 "vite", "anything"
-            // menu.getRouteName() 此时应为完整的外部URL，如 "https://vitejs.dev"
-            routerPathValue = buildInternalPathStructure(parentPath, menu.getPath());
-            // routerNameValue 已初始化为 menu.getRouteName() (即外部URL)
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())
+                && Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame())) {
+            routerPathValue = buildAndNormalizePathSegmentStructure(parentPath, menu.getPath());
             meta.setFrameSrc(null); // 外部跳转链接不使用frameSrc
-            isKeepAlive = Constants.MenuConstants.CACHE_ENABLED.equals(menu.getIsCache()); // 或对于外部跳转默认为false
             componentPathValue = null; // 外部跳转链接无组件
             log.debug("外部链接跳转: path='{}', name (URL)='{}'", routerPathValue, routerNameValue);
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, external_link != 1, 且 menu.path 是 HTTP(S) URL)
         else if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath())) {
-            meta.setFrameSrc(menu.getPath()); // menu.path作为iframe的源
-            isKeepAlive = true;               // iframe通常建议缓存
-
-            // router.path 应为内部路径，可基于内部routeName或ID生成
-            // menu.getRouteName() 此时应为内部路由名，如 "MyViteIframe"
+            meta.setFrameSrc(menu.getPath());
+            isKeepAlive = true;
             String segment = StrUtil.isNotBlank(menu.getRouteName()) ? menu.getRouteName() : "iframe-" + menu.getMenuId();
             routerPathValue = buildInternalPathStructure(parentPath, segment);
             componentPathValue = getComponentPathForRouter(menu);
@@ -863,9 +1019,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     /**
      * 构建内部路由的路径结构。
      *
-     * @param parentPath  父级完整内部路径。
+     * <p>此方法用于根据父级路由路径和当前菜单的路径段生成完整的内部路由路径。
+     * 它会处理多种情况，包括绝对路径、相对路径以及空路径的情况，并确保最终路径格式正确且唯一。</p>
+     *
+     * @param parentPath  父级完整内部路径。可以为空或以 '/' 开头。
      * @param pathSegment 当前菜单的路径段 (来自 menu.getPath())。
+     *                    如果路径段以 '/' 开头，则视为绝对路径，直接使用；
+     *                    否则将基于父路径进行拼接。
      * @return 拼接并规范化后的完整内部路径。
+     *
+     * <pre>{@code
+     * 示例：
+     * buildInternalPathStructure("/", "user") => "/user"
+     * buildInternalPathStructure("/user", "detail") => "/user/detail"
+     * buildInternalPathStructure("", "home") => "/home"
+     * buildInternalPathStructure("/settings/", "profile") => "/settings/profile"
+     * }</pre>
      */
     private String buildInternalPathStructure(String parentPath, String pathSegment) {
         String segment = StrUtil.trimToEmpty(pathSegment);
@@ -889,6 +1058,86 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (StrUtil.isBlank(segment) && (StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
             return "/";
         }
+        return StrUtil.isBlank(fullPath) ? "/" : fullPath;
+    }
+
+    /**
+     * 构建并规范化路由路径结构。
+     * <p>
+     * 此方法接收父级路径和当前的路径段输入。
+     * 如果当前路径段输入是一个HTTP(S)链接，它会尝试提取主机名并将其转换为大驼峰形式作为实际的路径段。
+     * 如果不是HTTP(S)链接，则直接使用该输入（去除首尾空格）。
+     * 然后，将处理后的路径段与父路径智能拼接（处理绝对/相对路径情况）。
+     * 最后，对生成的完整路径进行规范化，包括去除多余的斜杠和末尾斜杠（根路径除外）。
+     * </p>
+     *
+     * @param parentPath   父级路由路径。如果为 {@code null} 或空字符串，则视为根路径 "/"。
+     * @param segmentInput 当前菜单的路径段输入。这可能是普通的内部路径段（如 "user", "/system/user"），
+     */
+    private String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
+        String actualSegment; // 经过处理后的、将用于拼接的路径段
+
+        // 1. 处理 segmentInput，特别是当它是HTTP(S)链接时
+        if (StringUtils.isHttp(segmentInput)) { // 假设 StringUtils.isHttp 存在且能正确判断
+            try {
+                URI uri = new URI(segmentInput);
+                String host = uri.getHost(); // 例如：www.baidu.com
+                if (StrUtil.isNotBlank(host)) {
+                    // 将 host (e.g., "www.example.com") 转换为大驼峰 (e.g., "WwwExampleCom")
+                    String[] parts = host.split("\\.");
+                    StringBuilder hostCamelCase = new StringBuilder();
+                    for (String part : parts) {
+                        if (!part.isEmpty()) {
+                            hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
+                                    .append(part.substring(1).toLowerCase()); // 转为标准驼峰，如WwwBaiduCom
+                        }
+                    }
+                    actualSegment = hostCamelCase.toString();
+                    if (StrUtil.isBlank(actualSegment)) { // 如果host解析后为空，使用默认段
+                        log.warn("无法从HTTP链接 {} 解析出有效的主机名作为路径段，将使用默认段。", segmentInput);
+                        actualSegment = "ExternalLinkPath"; // 或其他默认值
+                    }
+                } else {
+                    log.warn("HTTP链接 {} 无有效主机名，将使用默认路径段。", segmentInput);
+                    actualSegment = "ExternalHostMissing"; // 或其他默认值
+                }
+            } catch (URISyntaxException e) {
+                log.warn("解析HTTP链接 {} 失败，将使用默认路径段: {}", segmentInput, e.getMessage());
+                actualSegment = "InvalidExternalLink"; // 无效URL时的默认段
+            }
+        } else {
+            actualSegment = StrUtil.trimToEmpty(segmentInput); // 普通路径段，去除首尾空格
+        }
+
+        // 2. 路径拼接逻辑
+        String fullPath;
+        // 如果处理后的 actualSegment 是绝对路径 (以 / 开头)，则直接使用它
+        if (actualSegment.startsWith("/")) {
+            fullPath = actualSegment;
+        }
+        // 否则，它是相对路径，需要与 parentPath 拼接
+        else {
+            String normalizedParentPath = StrUtil.isBlank(parentPath) ? "/" : parentPath;
+            if ("/".equals(normalizedParentPath)) {
+                // 如果父路径是根，或者处理后的段是空（意味着只显示父路径），则直接拼接
+                fullPath = StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
+            } else {
+                // 确保父路径以 "/" 结尾
+                String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
+                fullPath = formattedParent + actualSegment;
+            }
+        }
+
+        // 3. 规范化路径
+        // 替换一个或多个斜杠为一个斜杠
+        fullPath = fullPath.replaceAll("/{2,}", "/");
+
+        // 移除路径末尾的斜杠 (除非路径本身就是根路径 "/")
+        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 1);
+        }
+
+        // 如果最终路径为空（例如父路径和段都为空或无效），则默认为根路径 "/"
         return StrUtil.isBlank(fullPath) ? "/" : fullPath;
     }
 
