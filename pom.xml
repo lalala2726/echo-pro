@@ -22,7 +22,6 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <spring.boot.version>3.2.5</spring.boot.version>
         <spring.security.version>6.2.2</spring.security.version>
         <mybatis.plus.version>3.5.10</mybatis.plus.version>
@@ -201,6 +200,13 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${alibaba.fastjson.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.13.1</version>
             </dependency>
 
             <!-- ===================== 工具类 ===================== -->

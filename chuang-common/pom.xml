@@ -33,6 +33,11 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
         <!-- HTTP客户端 -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

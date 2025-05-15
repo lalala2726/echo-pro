@@ -28,8 +28,8 @@ public class RedisConfig {
         RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // 创建FastJson2JsonRedisSerializer序列化器，用于处理值序列化
-        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
+        // 创建GsonRedisSerializer序列化器，用于处理值序列化
+        GsonRedisSerializer serializer = new GsonRedisSerializer(Object.class);
 
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         template.setKeySerializer(new StringRedisSerializer());
