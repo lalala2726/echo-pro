@@ -67,6 +67,11 @@ public class SysMenu extends BaseEntity {
     private Integer isFrame;
 
     /**
+     * 是否外链
+     */
+    private Integer externalLink;
+
+    /**
      * 是否缓存（0缓存 1不缓存）
      */
     private Integer isCache;
