@@ -44,7 +44,7 @@ import java.util.Set;
  * 该类配置了Spring Security的相关设置，包括认证、授权和过滤器链。
  *
  * @author Chuang
- *         created on 2024/04/23 16:48
+ * created on 2024/04/23 16:48
  */
 @Slf4j
 @Configuration
@@ -95,6 +95,8 @@ public class SecurityConfig {
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                         .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                        //如果您的应用需要从 CDN 加载脚本、样式、字体或图片，或者需要连接到其他域的 WebSocket，您需要相应地调整 policyDirectives。
+                        // 例如，添加 script-src 'self' https://cdn.example.com;。
                         .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';")))
                 // 关闭 CSRF、表单登录、Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
@@ -179,6 +181,7 @@ public class SecurityConfig {
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 设置允许跨域的路径
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
