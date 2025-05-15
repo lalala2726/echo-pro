@@ -170,6 +170,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             sysMenu.setComponent(Constants.MenuConstants.LAYOUT);
         }
 
+        // 检查外链模式
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(request.getExternalLink())) {
+            if (!Constants.MenuConstants.IS_FRAME.equals(request.getIsFrame())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "只有内嵌链接模式才支持外部链接跳转。");
+            }
+        }
+
         // 必须先配置路由名称，因为基础校验（特别是外链）依赖于 path 和 routeName 的最终意图
         configureRouteName(sysMenu);
         menuBaseCheck(sysMenu);
@@ -388,6 +395,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 && (request.getParentId() == null || request.getParentId() == 0L)
                 && StrUtil.isBlank(sysMenu.getComponent())) {
             sysMenu.setComponent(Constants.MenuConstants.LAYOUT);
+        }
+        // 检查外链模式
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(request.getExternalLink())) {
+            if (!Constants.MenuConstants.IS_FRAME.equals(request.getIsFrame())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "只有内嵌链接模式才支持外部链接跳转。");
+            }
         }
 
         configureRouteName(sysMenu);

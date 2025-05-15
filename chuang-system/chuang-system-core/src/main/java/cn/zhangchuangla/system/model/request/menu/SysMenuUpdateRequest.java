@@ -42,6 +42,12 @@ public class SysMenuUpdateRequest {
     private Integer orderNum;
 
     /**
+     * 是否外部跳转（0否 1是）
+     */
+    @Schema(description = "是否外部跳转（0否 1是）", type = "string", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Integer externalLink;
+
+    /**
      * 路由地址
      */
     @Schema(description = "路由地址", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
