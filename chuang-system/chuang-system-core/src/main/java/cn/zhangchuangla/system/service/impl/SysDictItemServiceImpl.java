@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.system.converter.SysDictConverter;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
@@ -18,6 +17,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +33,6 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         implements SysDictItemService {
 
     private final SysDictItemMapper sysDictItemMapper;
-    private final SysDictConverter sysDictConverter;
 
 
     /**
@@ -74,7 +73,8 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         if (sysDictItemMapper.selectCount(eq) > 0) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
-        SysDictItem sysDictItem = sysDictConverter.toSysDictItem(request);
+        SysDictItem sysDictItem = new SysDictItem();
+        BeanUtils.copyProperties(request, sysDictItem);
         sysDictItem.setCreateBy(SecurityUtils.getUsername());
         return save(sysDictItem);
     }
@@ -99,7 +99,8 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "同一字典类型下字典项值不能重复: " + request.getItemValue());
         }
 
-        SysDictItem sysDictItem = sysDictConverter.toSysDictItem(request);
+        SysDictItem sysDictItem = new SysDictItem();
+        BeanUtils.copyProperties(request, sysDictItem);
         sysDictItem.setUpdateBy(SecurityUtils.getUsername());
         return sysDictItemMapper.updateById(sysDictItem) > 0;
     }

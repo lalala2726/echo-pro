@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.converter.SysMenuConverter;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
@@ -18,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,6 @@ import java.util.List;
 public class SysMenuController extends BaseController {
 
     private final SysMenuService sysMenuService;
-    private final SysMenuConverter sysMenuConverter;
 
 
     /**
@@ -97,7 +96,8 @@ public class SysMenuController extends BaseController {
     public AjaxResult<SysMenuVo> getMenuById(@Parameter(description = "菜单ID")
                                              @PathVariable("id") Long id) {
         SysMenu sysMenu = sysMenuService.getMenuById(id);
-        SysMenuVo sysMenuVo = sysMenuConverter.toSysMenuVo(sysMenu);
+        SysMenuVo sysMenuVo = new SysMenuVo();
+        BeanUtils.copyProperties(sysMenu, sysMenuVo);
         return success(sysMenuVo);
     }
 

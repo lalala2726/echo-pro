@@ -6,7 +6,6 @@ import cn.zhangchuangla.common.exception.FileException;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.core.StorageOperation;
 import cn.zhangchuangla.storage.factory.StorageFactory;
 import cn.zhangchuangla.storage.mapper.SysFileMapper;
@@ -18,6 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +37,6 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
 
     private final SysFileMapper sysFileMapper;
     private final StorageFactory storageFactory;
-    private final StorageConverter storageConverter;
 
 
     /**
@@ -176,7 +175,9 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
      * @return 文件传输DTO
      */
     private FileTransferDto convertToFileTransferDto(SysFile fileManagement) {
-        return storageConverter.toFileTransferDto(fileManagement);
+        FileTransferDto fileTransferDto = new FileTransferDto();
+        BeanUtils.copyProperties(fileTransferDto, fileManagement);
+        return fileTransferDto;
     }
 
     /**

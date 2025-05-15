@@ -1,11 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.model.entity.SysFile;
 import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
 import cn.zhangchuangla.storage.model.vo.file.SysFileListVo;
@@ -36,7 +36,6 @@ import java.util.List;
 public class SysFileManageController extends BaseController {
 
     private final StorageFileService storageFileService;
-    private final StorageConverter storageConverter;
 
     /**
      * 文件资源列表
@@ -54,8 +53,8 @@ public class SysFileManageController extends BaseController {
         // 使用流式处理优化代码
         List<SysFileListVo> sysFileListVos = sysFileManagementPage.getRecords().stream()
                 .map(sysFileManagement -> {
-                    SysFileListVo sysFileListVo = storageConverter
-                            .toSysFileManagementListVo(sysFileManagement);
+                    SysFileListVo sysFileListVo = new SysFileListVo();
+                    BeanUtil.copyProperties(sysFileManagement, sysFileListVo);
                     String previewImageUrl = sysFileManagement.getPreviewImageUrl();
                     sysFileListVo.setIsIncludePreviewImage(previewImageUrl != null && previewImageUrl.contains("preview"));
                     return sysFileListVo;

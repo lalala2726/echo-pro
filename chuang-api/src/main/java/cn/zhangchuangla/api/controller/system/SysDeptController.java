@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
@@ -18,10 +17,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,6 @@ import java.util.List;
 public class SysDeptController extends BaseController {
 
     private final SysDeptService sysDeptService;
-    private final SysDeptConverter sysDeptConverter;
 
     /**
      * 获取部门列表信息
@@ -51,7 +51,8 @@ public class SysDeptController extends BaseController {
     public AjaxResult<List<SysDeptListVo>> listDept(@Parameter(description = "部门列表查询参数")
                                                     @Validated @ParameterObject SysDeptListRequest request) {
         List<SysDept> sysDept = sysDeptService.listDept(request);
-        List<SysDeptListVo> sysDeptListVo = sysDeptConverter.toSysDeptListVo(sysDept);
+        List<SysDeptListVo> sysDeptListVo = new ArrayList<>();
+        BeanUtils.copyProperties(sysDept, sysDeptListVo);
         return success(sysDeptListVo);
     }
 
@@ -98,7 +99,8 @@ public class SysDeptController extends BaseController {
     public AjaxResult<SysDeptVo> getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
         checkParam(id == null, "部门ID不能为空！");
         SysDept dept = sysDeptService.getDeptById(id);
-        SysDeptVo sysDeptVo = sysDeptConverter.toSysDeptVo(dept);
+        SysDeptVo sysDeptVo = new SysDeptVo();
+        BeanUtils.copyProperties(dept, sysDeptVo);
         return success(sysDeptVo);
     }
 

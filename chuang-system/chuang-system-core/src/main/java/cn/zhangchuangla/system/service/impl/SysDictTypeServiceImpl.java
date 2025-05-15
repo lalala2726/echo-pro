@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.system.converter.SysDictConverter;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
@@ -16,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,6 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     private final SysDictTypeMapper dictTypeMapper;
     private final SysDictItemService sysDictItemService;
-    private final SysDictConverter sysDictConverter;
 
     /**
      * 获取字典类型列表
@@ -67,7 +66,8 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         if (isDictTypeExist(request.getDictType())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
-        SysDictType sysDictType = sysDictConverter.toSysDictType(request);
+        SysDictType sysDictType = new SysDictType();
+        BeanUtils.copyProperties(request, sysDictType);
         sysDictType.setCreateBy(SecurityUtils.getUsername());
         return save(sysDictType);
     }
@@ -87,7 +87,8 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         if (count(ne) > 0) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
-        SysDictType sysDictType = sysDictConverter.toSysDictType(request);
+        SysDictType sysDictType = new SysDictType();
+        BeanUtils.copyProperties(request, sysDictType);
         sysDictType.setUpdateBy(SecurityUtils.getUsername());
         return updateById(sysDictType);
     }

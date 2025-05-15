@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -14,7 +13,6 @@ import cn.zhangchuangla.system.model.request.user.UserListRequest;
 import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysDeptService;
-import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -22,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +41,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
-    private final SysUserConverter sysUserConverter;
-    private final SysRoleService sysRoleService;
     private final SysDeptService sysDeptService;
 
 
@@ -67,7 +64,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public Long addUserInfo(UserAddRequest request) {
-        SysUser sysUser = sysUserConverter.toEntity(request);
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
         // 部门ID校验
         Long deptId = request.getDeptId();
         if (deptId != null && deptId > 0) {
@@ -237,7 +235,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
 
         // 修改用户信息
-        SysUser sysUser = sysUserConverter.toEntity(request);
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
         sysUser.setRemark(request.getRemark());
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUserId, userId);
@@ -303,7 +302,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public UserProfileVo getUserProfile() {
         Long currentUserId = SecurityUtils.getUserId();
         SysUser user = getUserInfoByUserId(currentUserId);
-        UserProfileVo userProfileVo = sysUserConverter.toUserProfileVo(user);
+        UserProfileVo userProfileVo = new UserProfileVo();
+        BeanUtils.copyProperties(user, userProfileVo);
         log.info("获取用户信息:{}", user);
         userProfileVo.setDeptName("开发部门");
         return userProfileVo;

@@ -3,7 +3,6 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
-import cn.zhangchuangla.system.converter.SysDeptConverter;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
@@ -13,6 +12,7 @@ import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +28,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         implements SysDeptService {
 
     private final SysDeptMapper sysDeptMapper;
-    private final SysDeptConverter sysDeptConverter;
 
 
     @Override
@@ -49,7 +48,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (request.getParentId() == null || request.getParentId() == 0) {
             request.setParentId(0L);
         }
-        SysDept sysDept = sysDeptConverter.toEntity(request);
+        SysDept sysDept = new SysDept();
+        BeanUtils.copyProperties(request, sysDept);
         return save(sysDept);
     }
 
@@ -66,7 +66,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (count(ne) > 0) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
-        SysDept sysDept = sysDeptConverter.toEntity(request);
+        SysDept sysDept = new SysDept();
+        BeanUtils.copyProperties(request, sysDept);
         return updateById(sysDept);
     }
 

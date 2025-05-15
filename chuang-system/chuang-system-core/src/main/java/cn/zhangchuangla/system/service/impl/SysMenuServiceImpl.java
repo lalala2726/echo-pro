@@ -8,7 +8,6 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.common.utils.StringUtils;
-import cn.zhangchuangla.system.converter.SysMenuConverter;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
@@ -30,6 +29,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +54,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysRoleMenuMapper roleMenuMapper;
     private final SysRoleService sysRoleService;
     private final SysRoleMenuService sysRoleMenuService;
-    private final SysMenuConverter sysMenuConverter;
 
     /**
      * {@inheritDoc}
@@ -158,7 +157,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             log.warn("更新菜单失败：请求对象或菜单ID为空。");
             return false;
         }
-        SysMenu sysMenu = sysMenuConverter.toEntity(request);
+        SysMenu sysMenu = new SysMenu();
+        BeanUtils.copyProperties(request, sysMenu);
 
         if (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType())
                 && (sysMenu.getParentId() == null || sysMenu.getParentId() == 0L)
@@ -385,7 +385,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             log.warn("添加菜单失败：请求对象为空。");
             return false;
         }
-        SysMenu sysMenu = sysMenuConverter.toEntity(request);
+        SysMenu sysMenu = new SysMenu();
+        BeanUtils.copyProperties(request, sysMenu);
 
         if (Constants.MenuConstants.TYPE_DIRECTORY.equals(request.getMenuType())
                 && (request.getParentId() == null || request.getParentId() == 0L)
@@ -765,7 +766,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 包含子节点层级结构的 {@link SysMenuListVo} 对象。
      */
     private SysMenuListVo convertToSysMenuListVoRecursive(SysMenu menu, Map<Long, List<SysMenu>> parentChildrenMap) {
-        SysMenuListVo vo = sysMenuConverter.toMenuListVo(menu);
+        SysMenuListVo vo = new SysMenuListVo();
+        BeanUtils.copyProperties(menu, vo);
         List<SysMenu> childrenEntities = parentChildrenMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
 
         if (!childrenEntities.isEmpty()) {
@@ -1204,7 +1206,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .filter(menu -> parentId.equals(menu.getParentId()))
                 // 假设 allMenus 已经排序，或者 childrenList 在 map.forEach 中排序
                 .map(menu -> {
-                    SysMenuTreeList treeNode = sysMenuConverter.toMenuTreeList(menu);
+                    SysMenuTreeList treeNode = new SysMenuTreeList();
+                    BeanUtils.copyProperties(menu, treeNode);
                     // treeNode.setSort(menu.getSort()); // 如果 SysMenuTreeList 需要 sort
                     List<SysMenuTreeList> grandChildren = getChildrenAsMenuTreeList(allMenus, menu.getMenuId());
                     if (!grandChildren.isEmpty()) treeNode.setChildren(grandChildren);
@@ -1223,7 +1226,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return allMenus.stream()
                 .filter(menu -> menu.getParentId() == 0L)
                 .map(menu -> {
-                    SysMenuTreeList treeNode = sysMenuConverter.toMenuTreeList(menu);
+                    SysMenuTreeList treeNode = new SysMenuTreeList();
+                    BeanUtils.copyProperties(menu, treeNode);
                     List<SysMenuTreeList> children = getChildrenAsMenuTreeList(allMenus, menu.getMenuId());
                     if (!children.isEmpty()) treeNode.setChildren(children);
                     return treeNode;
