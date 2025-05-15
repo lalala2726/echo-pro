@@ -47,7 +47,7 @@ public class SysUserDetails implements UserDetails, Serializable {
      * 部门ID
      */
     private Long deptId;
-
+    
 
     /**
      * 用户角色权限集合
@@ -59,6 +59,12 @@ public class SysUserDetails implements UserDetails, Serializable {
 
     }
 
+    /**
+     * 构造函数
+     *
+     * @param sysUser 用户信息
+     * @param roles   角色集合
+     */
     public SysUserDetails(SysUser sysUser, Set<String> roles) {
         this.sysUser = sysUser;
         this.userId = sysUser.getUserId();

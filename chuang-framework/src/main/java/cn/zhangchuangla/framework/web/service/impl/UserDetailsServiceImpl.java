@@ -49,6 +49,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 throw new UsernameNotFoundException("用户不存在");
             }
             Set<String> roleSet = sysRoleService.getRoleSetByUserId(sysUser.getUserId());
+            log.info("用户[{}]角色集合: {}", username, roleSet);
             return new SysUserDetails(sysUser, roleSet);
         } catch (UsernameNotFoundException e) {
             throw e;

@@ -63,17 +63,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<SysMenu> getMenuListByUserId(Long userId) {
         if (userId == null) {
-            log.warn("根据用户ID查询菜单列表时，用户ID为空");
             return Collections.emptyList();
         }
         Set<String> roles = SecurityUtils.getRoles();
         if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
-            log.info("用户ID {} 是超级管理员，返回所有有效菜单，并按父ID和排序值排序", userId);
             return list(new LambdaQueryWrapper<SysMenu>()
                     .orderByAsc(SysMenu::getParentId) // 先按父ID排序，保证父节点在前
                     .orderByAsc(SysMenu::getSort));   // 再按自定义排序值排序
         }
-        log.debug("用户ID {} 非超级管理员，根据权限查询菜单", userId);
         List<SysMenu> userMenus = menuMapper.getMenuListByUserId(userId);
         userMenus.sort(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
                 .thenComparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())));
