@@ -108,7 +108,7 @@ public class GlobalExceptionHandel {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
-        log.error("权限不足:{}", exception.getMessage());
+        log.error("权限不足", exception);
         return AjaxResult.error(ResponseCode.ACCESS_DENIED);
     }
 

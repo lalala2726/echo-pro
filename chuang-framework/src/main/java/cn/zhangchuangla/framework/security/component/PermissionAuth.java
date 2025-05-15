@@ -40,7 +40,11 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     public boolean hasPermission(String permission) {
-        Set<String> roles = getRoles();
+        Set<String> roles = SecurityUtils.getRoles();
+        // 如果是超级管理员，直接返回 true
+        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+            return true;
+        }
         Set<String> userPermissionByRole = sysPermissionService.getUserPermissionByRole(roles);
         return userPermissionByRole.contains(permission);
     }
