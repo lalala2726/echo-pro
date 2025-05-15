@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.UserAddRequest;
 import cn.zhangchuangla.system.model.request.user.UserListRequest;
@@ -24,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +45,6 @@ public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
-    private final SysUserConverter sysUserConverter;
 
     /**
      * 获取用户信息
@@ -75,7 +74,8 @@ public class SysUserController extends BaseController {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
-            UserListVo userInfoVo = sysUserConverter.toUserInfoVo(user);
+            UserListVo userInfoVo = new UserListVo();
+            BeanUtils.copyProperties(user, userInfoVo);
             userListVos.add(userInfoVo);
         });
         return getTableData(userPage, userListVos);
@@ -119,9 +119,7 @@ public class SysUserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteUserById(@Parameter(description = "用户ID列表，支持批量删除", required = true)
                                            @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> {
-            checkParam(id == null || id <= 0, "用户ID不能为空!");
-        });
+        ids.forEach(id -> checkParam(id == null || id <= 0, "用户ID不能为空!"));
         sysUserService.deleteUserById(ids);
         return success();
     }
@@ -189,7 +187,8 @@ public class SysUserController extends BaseController {
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);
-        UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(sysUser, userInfoVo);
         userInfoVo.setRoleIds(roleId);
         return success(userInfoVo);
     }

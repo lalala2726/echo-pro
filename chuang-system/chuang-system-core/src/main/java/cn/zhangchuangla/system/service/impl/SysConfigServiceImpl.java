@@ -1,7 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.system.converter.SysConfigConverter;
 import cn.zhangchuangla.system.mapper.SysConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysConfig;
 import cn.zhangchuangla.system.model.request.config.SysConfigAddRequest;
@@ -12,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +28,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         implements SysConfigService {
 
     private final SysConfigMapper sysConfigMapper;
-    private final SysConfigConverter sysConfigConverter;
 
 
     /**
@@ -65,7 +64,8 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         if (isConfigKeyExist(request.getConfigKey())) {
             throw new ServiceException(String.format("参数键名【%s】已存在", request.getConfigKey()));
         }
-        SysConfig sysConfig = sysConfigConverter.toEntity(request);
+        SysConfig sysConfig = new SysConfig();
+        BeanUtils.copyProperties(request, sysConfig);
         return save(sysConfig);
     }
 
@@ -80,7 +80,8 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         if (isConfigKeyExist(request.getConfigKey())) {
             throw new ServiceException(String.format("参数键名【%s】已存在", request.getConfigKey()));
         }
-        SysConfig sysConfig = sysConfigConverter.toEntity(request);
+        SysConfig sysConfig = new SysConfig();
+        BeanUtils.copyProperties(request, sysConfig);
         return updateById(sysConfig);
     }
 
@@ -109,7 +110,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
     public boolean isConfigKeyExist(String configKey) {
         LambdaQueryWrapper<SysConfig> eq = new LambdaQueryWrapper<SysConfig>()
                 .eq(SysConfig::getConfigKey, configKey);
-        return count() > 0;
+        return count(eq) > 0;
     }
 }
 

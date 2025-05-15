@@ -33,6 +33,7 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
+
         <!-- HTTP客户端 -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -44,7 +45,6 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
-
 
         <!-- Redis缓存 -->
         <dependency>
@@ -68,11 +68,7 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
-        <!-- MapStruct -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-        </dependency>
+
 
         <!-- Lombok -->
         <dependency>

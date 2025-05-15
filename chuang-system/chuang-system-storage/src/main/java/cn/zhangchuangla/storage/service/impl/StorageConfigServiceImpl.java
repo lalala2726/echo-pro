@@ -10,7 +10,6 @@ import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
-import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
@@ -23,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,7 +39,6 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         implements StorageConfigService {
 
     private final SysFileConfigMapper sysFileConfigMapper;
-    private final StorageConverter storageConverter;
 
     /**
      * 查询文件配置列表
@@ -89,7 +88,8 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (isStorageKeyExist(request.getStorageKey())) {
             throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
         }
-        StorageConfig storageConfig = storageConverter.toSysFileConfig(request);
+        StorageConfig storageConfig = new StorageConfig();
+        BeanUtils.copyProperties(request, storageConfig);
         return save(storageConfig);
     }
 
@@ -101,7 +101,8 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(TencentCOSConfigRequest request) {
-        TencentCOSConfigEntity tencentCOSConfigEntity = storageConverter.toTencentCOSConfigEntity(request);
+        TencentCOSConfigEntity tencentCOSConfigEntity = new TencentCOSConfigEntity();
+        BeanUtils.copyProperties(request, tencentCOSConfigEntity);
         String value = JSON.toJSONString(tencentCOSConfigEntity);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
     }
@@ -114,8 +115,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(LocalFileConfigRequest request) {
-        LocalFileConfigEntity localFileConfig = storageConverter.toLocalFileConfigEntity(request);
-        String value = JSON.toJSONString(localFileConfig);
+        LocalFileConfigEntity localFileConfigEntity = new LocalFileConfigEntity();
+        BeanUtils.copyProperties(request, localFileConfigEntity);
+        String value = JSON.toJSONString(localFileConfigEntity);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
     }
 
@@ -127,7 +129,8 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSConfigEntity aliyunOSSConfigEntity = storageConverter.toAliyunOSSConfigEntity(request);
+        AliyunOSSConfigEntity aliyunOSSConfigEntity = new AliyunOSSConfigEntity();
+        BeanUtils.copyProperties(request, aliyunOSSConfigEntity);
         String value = JSON.toJSONString(aliyunOSSConfigEntity);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
     }
@@ -140,7 +143,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(MinioConfigRequest request) {
-        MinioConfigEntity minioConfigEntity = storageConverter.toMinioConfigEntity(request);
+        MinioConfigEntity minioConfigEntity = new MinioConfigEntity();
         String value = JSON.toJSONString(minioConfigEntity);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
     }
@@ -182,7 +185,8 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (isStorageKeyExist(request.getStorageKey())) {
             throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
         }
-        StorageConfig storageConfig = storageConverter.toEntity(request);
+        StorageConfig storageConfig = new StorageConfig();
+        BeanUtils.copyProperties(request, storageConfig);
         return updateById(storageConfig);
     }
 

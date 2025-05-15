@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
-import cn.zhangchuangla.system.converter.SysUserConverter;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
@@ -22,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,6 @@ public class SysAuthController extends BaseController {
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
     private final SysMenuService sysMenuService;
-    private final SysUserConverter sysUserConverter;
     private final SysRoleService sysRoleService;
     private final SysPermissionService sysPermissionService;
 
@@ -76,7 +75,7 @@ public class SysAuthController extends BaseController {
     @PostMapping("/auth/refreshToken")
     @Operation(summary = "刷新令牌")
     public AjaxResult<AuthenticationToken> refreshToken(@Parameter(description = "刷新令牌", required = true)
-                                                            @ParameterObject @RequestBody AuthenticationToken request) {
+                                                        @ParameterObject @RequestBody AuthenticationToken request) {
         AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request.getRefreshToken());
         return success(newAuthenticationToken);
     }
@@ -111,7 +110,8 @@ public class SysAuthController extends BaseController {
         Set<String> roles = sysRoleService.getRoleSetByUserId(userId);
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
         Set<String> permissions = sysPermissionService.getUserPermissionByRole(roles);
-        UserInfoVo userInfoVo = sysUserConverter.toUserInfoVo(sysUser);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(sysUser, userInfoVo);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
         ajax.put("permissions", permissions);

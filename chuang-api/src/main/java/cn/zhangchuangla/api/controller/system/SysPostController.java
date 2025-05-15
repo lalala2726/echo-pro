@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
@@ -19,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +37,6 @@ import java.util.List;
 public class SysPostController extends BaseController {
 
     private final SysPostService sysPostService;
-    private final SysRoleConverter sysRoleConverter;
 
     /**
      * 岗位列表
@@ -82,7 +81,7 @@ public class SysPostController extends BaseController {
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除")
-                                           @PathVariable("ids") List<Long> ids) {
+                                       @PathVariable("ids") List<Long> ids) {
         checkParam(ids == null, "id不能为空");
         boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
@@ -113,10 +112,11 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID")
-                                                 @PathVariable("id") Long id) {
+                                             @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
         SysPost post = sysPostService.getPostById(id);
-        SysPostVo sysPostVo = sysRoleConverter.toSysPostVo(post);
+        SysPostVo sysPostVo = new SysPostVo();
+        BeanUtils.copyProperties(post, sysPostVo);
         return AjaxResult.success(sysPostVo);
     }
 }

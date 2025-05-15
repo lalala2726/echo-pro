@@ -12,7 +12,10 @@ import org.springframework.context.annotation.ComponentScan;
  * created on 2025/1/11 03:18
  */
 @SpringBootApplication
-@MapperScan("cn.zhangchuangla.**.mapper")
+@MapperScan({
+        "cn.zhangchuangla.**.mapper",
+        "cn.zhangchuangla.**.converter",
+})
 @ComponentScan(basePackages = "cn.zhangchuangla.**")
 @EnableCaching
 public class APIApplication {

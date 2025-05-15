@@ -6,7 +6,6 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.annotation.RequiresSecondAuth;
-import cn.zhangchuangla.system.converter.SysLogConverter;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
@@ -24,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +44,6 @@ public class SysLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
     private final SysOperationLogService sysOperationLogService;
-    private final SysLogConverter sysLogConverter;
 
     /**
      * 获取登录日志列表
@@ -91,7 +90,8 @@ public class SysLogController extends BaseController {
     public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
                                                      @PathVariable("id") Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
-        SysLoginLogVo sysLoginLogVo = sysLogConverter.toSysLoginLogVo(sysLoginLog);
+        SysLoginLogVo sysLoginLogVo = new SysLoginLogVo();
+        BeanUtils.copyProperties(sysLoginLogVo, sysLoginLog);
         return success(sysLoginLogVo);
     }
 
@@ -107,7 +107,8 @@ public class SysLogController extends BaseController {
     public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
                                                              @PathVariable("id") Long id) {
         SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
-        SysOperationLogVo sysOperationLogVo = sysLogConverter.toSysOperationLogVo(sysOperationLog);
+        SysOperationLogVo sysOperationLogVo = new SysOperationLogVo();
+        BeanUtils.copyProperties(sysOperationLog, sysOperationLogVo);
         return success(sysOperationLogVo);
     }
 
@@ -134,7 +135,7 @@ public class SysLogController extends BaseController {
     @DeleteMapping("/operation")
     @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
-    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN, isSaveResponseData = true)
+    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     @RequiresSecondAuth()
     public AjaxResult<Void> cleanOperationLog() {
         boolean result = sysOperationLogService.cleanOperationLog();

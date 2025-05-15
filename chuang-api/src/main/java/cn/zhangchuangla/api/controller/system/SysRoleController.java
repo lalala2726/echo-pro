@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
@@ -17,7 +16,6 @@ import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +46,7 @@ import java.util.List;
 public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final SysRoleConverter sysRoleConverter;
     private final SysMenuService sysMenuService;
-    private final SysPermissionService sysPermissionService;
 
 
     /**
@@ -125,7 +122,8 @@ public class SysRoleController extends BaseController {
         if (sysRole == null) {
             return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "角色不存在");
         }
-        SysRoleVo sysRoleVo = sysRoleConverter.toSysRoleVo(sysRole);
+        SysRoleVo sysRoleVo = new SysRoleVo();
+        BeanUtils.copyProperties(sysRoleVo, sysRoleVo);
         return success(sysRoleVo);
     }
 

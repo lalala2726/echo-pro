@@ -1,5 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
@@ -13,7 +14,6 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.converter.StorageConverter;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
@@ -46,7 +46,6 @@ public class SysFileConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
     private final StorageConfigLoader sysFileConfigLoader;
-    private final StorageConverter storageConverter;
 
     /**
      * 文件配置列表
@@ -62,7 +61,8 @@ public class SysFileConfigController extends BaseController {
                                                          @Validated @ParameterObject StorageConfigListRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
-            StorageFileConfigListVo storageFileConfigListVo = storageConverter.toStorageFileConfigListVo(item);
+            StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
+            BeanUtil.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
                 case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
                         JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));

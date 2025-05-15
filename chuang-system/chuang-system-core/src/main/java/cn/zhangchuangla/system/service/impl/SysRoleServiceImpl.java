@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ParamException;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.model.entity.Option;
-import cn.zhangchuangla.system.converter.SysRoleConverter;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
@@ -21,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +40,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         implements SysRoleService {
 
     private final SysRoleMapper sysRoleMapper;
-    private final SysRoleConverter sysRoleConverter;
     private final SysRoleMenuService sysRoleMenuService;
     private final RedisCache redisCache;
 
@@ -98,13 +97,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     }
 
     /**
-     * 添加学生信息
+     * 添加角色信息
      *
      * @param roleAddRequest 请求参数
      */
     @Override
     public boolean addRoleInfo(SysRoleAddRequest roleAddRequest) {
-        SysRole sysRole = sysRoleConverter.toEntity(roleAddRequest);
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(roleAddRequest, sysRole);
         return save(sysRole);
     }
 
@@ -148,8 +148,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
-        //todo 超级管理不允许修改
-        SysRole sysRole = sysRoleConverter.toEntity(request);
+        //todo 超级管理员不允许修改
+        SysRole sysRole = new SysRole();
+        BeanUtils.copyProperties(request, sysRole);
         return updateById(sysRole);
     }
 
