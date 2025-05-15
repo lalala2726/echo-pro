@@ -1,13 +1,15 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.constant.SecurityConstants;
+import cn.zhangchuangla.common.enums.ResponseCode;
+import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.utils.ServletUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
 import cn.zhangchuangla.framework.security.token.TokenManager;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -23,6 +25,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -41,7 +44,7 @@ import java.util.Set;
  * 该类配置了Spring Security的相关设置，包括认证、授权和过滤器链。
  *
  * @author Chuang
- * created on 2024/04/23 16:48
+ *         created on 2024/04/23 16:48
  */
 @Slf4j
 @Configuration
@@ -53,11 +56,8 @@ public class SecurityConfig {
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    @Autowired
-    public SecurityConfig(
-            UserDetailsService userDetailsService,
-            AuthenticationEntryPointImpl authenticationEntryPoint,
-            @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint,
+                          RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
@@ -72,38 +72,47 @@ public class SecurityConfig {
      * @throws Exception 异常
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
         // 获取所有标记了@Anonymous注解的接口
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         Set<String> anonymousUrls = findAnonymousUrls(handlerMethods);
         log.info("Discovered anonymous URLs: {}", anonymousUrls);
 
         return http
-                // 添加 CORS 配置
+                // CORS 配置
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                // 强制 HTTPS
+                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+                // 统一异常处理：未认证和访问拒绝
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler()))
+                // 无状态会话
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 安全头增强：HSTS、CSP、XSS 保护
                 .headers(headers -> headers
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                )
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';")))
+                // 关闭 CSRF、表单登录、Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        // 静态白名单优先匹配
-                        .requestMatchers(SecurityConstants.WHITELIST).permitAll()
-                        .requestMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers(SecurityConstants.STATIC_RESOURCES_WHITELIST).permitAll()
-                        // 动态注解白名单
-                        .requestMatchers(anonymousUrls.toArray(new String[0])).permitAll()
-                        // 其他所有请求都需要认证
-                        .anyRequest().authenticated()
-                )
-                // 使用注入的 Filter Bean
+                // 授权规则
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(SecurityConstants.WHITELIST).permitAll();
+                    auth.requestMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll();
+                    auth.requestMatchers(SecurityConstants.STATIC_RESOURCES_WHITELIST).permitAll();
+                    if (!anonymousUrls.isEmpty()) {
+                        auth.requestMatchers(anonymousUrls.toArray(new String[0])).permitAll();
+                    }
+                    auth.anyRequest().authenticated();
+                })
+                // 插入自定义 Token 认证过滤器
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // 禁用 logout filter
                 .logout(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -141,6 +150,18 @@ public class SecurityConfig {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(TokenManager tokenManager) {
         return new TokenAuthenticationFilter(tokenManager);
+    }
+
+    /**
+     * 自定义 AccessDeniedHandler Bean
+     * 统一返回 403 JSON 响应
+     *
+     * @return AccessDeniedHandler 实例
+     */
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> ServletUtils.renderString(response, JSON.toJSONString(
+                AjaxResult.error(ResponseCode.FORBIDDEN)));
     }
 
     /**
