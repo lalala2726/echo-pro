@@ -107,10 +107,14 @@ public class Constants {
          */
         Long TOP_MENU_ID = 0L;
         /**
-         * 是否为外链（0是 1否）
+         * 是否外部跳转 0否 1是
          */
-        Integer NOT_EXTERNAL_LINK = 0;
         Integer IS_EXTERNAL_LINK = 1;
+        Integer NOT_EXTERNAL_LINK = 0;
+        /**
+         * 是否是外链
+         */
+        Integer IS_FRAME = 1;
         /**
          * 路由组件
          */
