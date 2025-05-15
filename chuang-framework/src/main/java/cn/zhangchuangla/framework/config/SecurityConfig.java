@@ -10,6 +10,7 @@ import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
 import cn.zhangchuangla.framework.security.token.TokenManager;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -57,7 +58,7 @@ public class SecurityConfig {
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint,
-                          RequestMappingHandlerMapping requestMappingHandlerMapping) {
+                          @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
@@ -83,7 +84,7 @@ public class SecurityConfig {
                 // CORS 配置
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // 强制 HTTPS
-                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+                //.requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // 统一异常处理：未认证和访问拒绝
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)
