@@ -407,6 +407,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return save(sysMenu);
     }
 
+
     /**
      * 配置菜单的路由名称 ({@code routeName})。
      * <p>
