@@ -13,6 +13,8 @@ import java.io.IOException;
 /**
  * 用于存储从MultipartFile中提取的信息
  * 避免多次读取MultipartFile导致的失效问题
+ *
+ * @author zhangchuang
  */
 @Data
 @NoArgsConstructor
@@ -73,7 +75,8 @@ public class FileInfo {
                 originalFilename,
                 file.getContentType(),
                 file.getSize(),
-                file.getBytes(), // 立即读取文件内容到内存
+                // 立即读取文件内容到内存
+                file.getBytes(),
                 fileExtension,
                 md5
 

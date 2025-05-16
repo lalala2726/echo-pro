@@ -73,7 +73,8 @@ public class AccessLimitHelper {
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于IP限流异常: {}", e.getMessage(), e);
-            return true; // 发生异常时默认放行
+            // 发生异常时默认放行
+            return true;
         }
     }
 
@@ -92,7 +93,8 @@ public class AccessLimitHelper {
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于用户ID限流异常: {}", e.getMessage(), e);
-            return true; // 发生异常时默认放行
+            // 发生异常时默认放行
+            return true;
         }
     }
 
@@ -111,7 +113,8 @@ public class AccessLimitHelper {
             return executeLimit(redisKey, maxCount, period);
         } catch (Exception e) {
             log.error("基于自定义标识限流异常: {}", e.getMessage(), e);
-            return true; // 发生异常时默认放行
+            // 发生异常时默认放行
+            return true;
         }
     }
 

@@ -265,7 +265,8 @@ public class MinioStorageHandler {
                     log.info("已从回收站恢复文件: {} -> {}", originalTrashPath, originalObjectName);
                 } catch (Exception e) {
                     log.error("恢复原始文件失败: {} -> {}, 错误: {}", originalTrashPath, originalObjectName, e.getMessage());
-                    throw e; // 原始文件恢复失败，直接抛出异常
+                    // 原始文件恢复失败，直接抛出异常
+                    throw e;
                 }
             }
 
@@ -307,7 +308,7 @@ public class MinioStorageHandler {
                         .build());
                 return true;
             } catch (ErrorResponseException e) {
-                if (e.errorResponse().code().equals("NoSuchKey")) {
+                if ("NoSuchKey".equals(e.errorResponse().code())) {
                     return false;
                 }
                 throw e;

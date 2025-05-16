@@ -1,5 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
+import cn.zhangchuangla.common.constant.SecurityConstants;
 import cn.zhangchuangla.framework.interceptor.AccessLimitInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,12 +102,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册接口限流拦截器并应用到所有API路径
         registry.addInterceptor(accessLimitInterceptor)
-                .addPathPatterns("/**") // 应用到所有API路径
-                .excludePathPatterns( // 排除一些不需要限流的路径
-                        "/login",
-                        "/logout",
-                        "/error/**",
-                        "/static/**",
-                        "/favicon.ico");
+                // 应用到所有API路径
+                .addPathPatterns("/**")
+                // 排除一些不需要限流的路径
+                .excludePathPatterns(SecurityConstants.STATIC_RESOURCES_WHITELIST);
     }
 }

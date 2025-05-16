@@ -34,9 +34,11 @@ public class IPUtils {
     // 注意：确保 ip2region.xdb 文件在指定的 classpath 路径下，或者调整加载方式
     private static final String DB_CLASSPATH_PATH = "/data/ip2region.xdb";
     private static final String UNKNOWN_IP_INFO = "未知";
-    private static final String PRIVATE_IP_INFO = "局域网"; // 或 "内网"
+    // 或 "内网"
+    private static final String PRIVATE_IP_INFO = "局域网";
     private static final String LOCALHOST_IO_INFO = "本机";
-    private static final String CGN_IP_INFO = "运营商NAT"; // 定义运营商NAT的标识
+    // 定义运营商NAT的标识
+    private static final String CGN_IP_INFO = "运营商NAT";
     private static Searcher searcher;
 
     // --- IP 地址获取逻辑 (基本不变) ---
@@ -76,8 +78,10 @@ public class IPUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("IPUtils getIpAddr ERROR", e); // 记录完整异常
-            return ""; // 出错时返回空字符串
+            // 记录完整异常
+            log.error("IPUtils getIpAddr ERROR", e);
+            // 出错时返回空字符串
+            return "";
         }
 
         // 处理多级代理情况，取第一个有效 IP
@@ -91,7 +95,8 @@ public class IPUtils {
             }
             // 如果分割后都无效，则保留原始处理的第一个（可能就是无效的）
             if (!isValidIp(ip)) {
-                ip = ips[0].trim(); // 或返回空？取决于业务需求
+                // 或返回空？取决于业务需求
+                ip = ips[0].trim();
             }
         }
         return ip;
@@ -155,14 +160,15 @@ public class IPUtils {
      * @param ip IPv4 地址字符串
      * @return boolean
      */
-    private static boolean isPrivateOrCGNIP(String ip) {
+    private static boolean isPrivateOrCgnIp(String ip) {
         if (StrUtil.isBlank(ip)) {
             return false;
         }
         try {
             String[] octets = ip.split("\\.");
             if (octets.length != 4) {
-                return false; // 非标准 IPv4 格式
+                // 非标准 IPv4 格式
+                return false;
             }
 
             int o1 = Integer.parseInt(octets[0]);
@@ -193,7 +199,8 @@ public class IPUtils {
             }
         } catch (NumberFormatException e) {
             log.warn("Invalid IP format for private check: {}", ip);
-            return false; // 格式错误视为非私有
+            // 格式错误视为非私有
+            return false;
         }
         return false;
     }
@@ -245,17 +252,19 @@ public class IPUtils {
      */
     public static IPEntity getRegionEntity(String ip) {
         IPEntity ipEntity = new IPEntity();
-        ipEntity.setIp(ip); // 将原始 IP 存入实体
+        // 将原始 IP 存入实体
+        ipEntity.setIp(ip);
 
         // 1. 基础校验
         if (StrUtil.isBlank(ip)) {
-            ipEntity.setRegion(UNKNOWN_IP_INFO); // 或设置所有字段为未知
+            // 或设置所有字段为未知
+            ipEntity.setRegion(UNKNOWN_IP_INFO);
             ipEntity.setISP(UNKNOWN_IP_INFO);
             return ipEntity;
         }
 
         // 2. 判断是否为私网、回环地址或 CGN 地址
-        if (isPrivateOrCGNIP(ip)) {
+        if (isPrivateOrCgnIp(ip)) {
             String info;
             if (ip.startsWith("127.")) {
                 info = LOCALHOST_IO_INFO;
@@ -276,15 +285,18 @@ public class IPUtils {
         if (regionResult != null) {
             // 解析 ip2region 返回的字符串: 国家|区域|省份|城市|ISP
             String[] parts = regionResult.split("\\|");
-            int expectedLength = 5; //
+            int expectedLength = 5;
             if (parts.length >= expectedLength) {
                 // ip2region 返回 "0" 表示未知
                 ipEntity.setCountry("0".equals(parts[0]) ? UNKNOWN_IP_INFO : parts[0]);
                 // parts[1] 通常是区域，国内为空，国外为大洲等，这里暂时不用
 
-                String province = "0".equals(parts[2]) ? "" : parts[2]; // 省份
-                String city = "0".equals(parts[3]) ? "" : parts[3];     // 城市
-                ipEntity.setArea(province.isEmpty() ? UNKNOWN_IP_INFO : province); // 单独省份
+                // 省份
+                String province = "0".equals(parts[2]) ? "" : parts[2];
+                // 城市
+                String city = "0".equals(parts[3]) ? "" : parts[3];
+                // 单独省份
+                ipEntity.setArea(province.isEmpty() ? UNKNOWN_IP_INFO : province);
 
                 // 合并省份和城市作为详细区域
                 StringBuilder regionBuilder = new StringBuilder();
@@ -292,12 +304,15 @@ public class IPUtils {
                     regionBuilder.append(province);
                 }
                 if (!city.isEmpty()) {
-                    if (!regionBuilder.isEmpty() && !province.equals(city)) { // 省市不同名时加空格
+                    // 省市不同名时加空格
+                    if (!regionBuilder.isEmpty() && !province.equals(city)) {
                         regionBuilder.append(" ");
-                    } else if (regionBuilder.isEmpty()) { // 只有城市信息
+                        // 只有城市信息
+                    } else if (regionBuilder.isEmpty()) {
                         regionBuilder.append(city);
                     }
-                    if (!province.equals(city)) { // 只有当省市不同名时，才在后面追加城市
+                    // 只有当省市不同名时，才在后面追加城市
+                    if (!province.equals(city)) {
                         regionBuilder.append(city);
                     }
                 }
@@ -307,7 +322,8 @@ public class IPUtils {
 
             } else {
                 log.warn("Unexpected ip2region result format for IP {}: {}", ip, regionResult);
-                ipEntity.setRegion(regionResult); // 将原始结果放入 region
+                // 将原始结果放入 region
+                ipEntity.setRegion(regionResult);
                 ipEntity.setISP(UNKNOWN_IP_INFO);
             }
         } else {

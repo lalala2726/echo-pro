@@ -332,7 +332,8 @@ public class LocalStorageHandler {
                     log.info("原始文件已从回收站恢复: {} -> {}", originalTrashPath, originalDestPath);
                 } catch (IOException e) {
                     log.error("恢复原始文件失败: {} -> {}, 错误: {}", originalTrashPath, originalDestPath, e.getMessage());
-                    throw e; // 原始文件恢复失败，直接抛出异常
+                    // 原始文件恢复失败，直接抛出异常
+                    throw e;
                 }
             }
 
