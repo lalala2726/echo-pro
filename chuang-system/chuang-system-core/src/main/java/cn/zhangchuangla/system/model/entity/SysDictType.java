@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典类型表
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_dict_type")
