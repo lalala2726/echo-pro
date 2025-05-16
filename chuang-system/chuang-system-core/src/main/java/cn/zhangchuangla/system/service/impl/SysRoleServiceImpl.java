@@ -148,15 +148,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
-        //todo 超级管理员不允许修改
+        boolean contains = request.getRoleKey().contains(SysRolesConstant.SUPER_ADMIN);
+        if (contains) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+        }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(request, sysRole);
         return updateById(sysRole);
-    }
-
-    @Override
-    public void refreshRolePermsCache() {
-        //todo 待开发
     }
 
     /**

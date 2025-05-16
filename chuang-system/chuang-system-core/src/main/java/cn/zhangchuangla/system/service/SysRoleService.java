@@ -75,10 +75,6 @@ public interface SysRoleService extends IService<SysRole> {
      */
     boolean updateRoleInfo(SysRoleUpdateRequest request);
 
-    /**
-     * 刷新权限缓存(所有角色)
-     */
-    void refreshRolePermsCache();
 
 
     /**

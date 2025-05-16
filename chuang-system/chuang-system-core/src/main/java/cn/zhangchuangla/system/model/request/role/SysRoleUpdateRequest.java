@@ -28,6 +28,13 @@ public class SysRoleUpdateRequest {
     private String roleName;
 
     /**
+     * 角色权限
+     */
+    @NotBlank(message = "角色权限不能为空")
+    @Schema(description = "角色权限", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String roleKey;
+
+    /**
      * 排序
      */
     @Schema(description = "排序", type = "integer", format = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
