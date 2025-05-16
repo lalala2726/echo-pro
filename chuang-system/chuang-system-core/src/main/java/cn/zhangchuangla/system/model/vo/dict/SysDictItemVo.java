@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典项表
+ *
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -44,6 +46,12 @@ public class SysDictItemVo extends BaseVo {
      */
     @Schema(description = "排序值", type = "integer")
     private Integer sort;
+
+    /**
+     * 回显方式
+     */
+    @Schema(description = "回显方式", type = "string")
+    private String tag;
 
     /**
      * 状态：0启用，1禁用
