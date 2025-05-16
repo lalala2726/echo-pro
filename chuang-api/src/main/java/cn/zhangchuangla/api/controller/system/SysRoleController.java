@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
-import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
@@ -118,12 +117,9 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "根据id获取角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:info')")
     public AjaxResult<SysRoleVo> getRoleInfoById(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
-        SysRole sysRole = sysRoleService.getById(id);
-        if (sysRole == null) {
-            return AjaxResult.error(ResponseCode.RESULT_IS_NULL, "角色不存在");
-        }
+        SysRole sysRole = sysRoleService.getRoleInfoById(id);
         SysRoleVo sysRoleVo = new SysRoleVo();
-        BeanUtils.copyProperties(sysRoleVo, sysRoleVo);
+        BeanUtils.copyProperties(sysRole, sysRoleVo);
         return success(sysRoleVo);
     }
 
