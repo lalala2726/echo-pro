@@ -76,7 +76,6 @@ public interface SysRoleService extends IService<SysRole> {
     boolean updateRoleInfo(SysRoleUpdateRequest request);
 
 
-
     /**
      * 获取部门下拉列表
      *
