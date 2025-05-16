@@ -1,12 +1,16 @@
 package cn.zhangchuangla.system.model.request.dict;
 
 import cn.zhangchuangla.common.base.BasePageRequest;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * 系统字典类型表
+ *
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -35,6 +39,7 @@ public class SysDictTypeListRequest extends BasePageRequest {
      * 状态：0启用，1禁用
      */
     @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String status;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer status;
 
 }

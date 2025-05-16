@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 系统字典项表
+ * @author zhangchuang
  */
 @Data
 @Schema(description = "系统字典项修改请求对象")
@@ -33,6 +34,12 @@ public class SysDictItemUpdateRequest {
      */
     @Schema(description = "字典项值", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String itemValue;
+
+    /**
+     * 回显方式
+     */
+    @Schema(description = "回显方式", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String tag;
 
     /**
      * 排序值

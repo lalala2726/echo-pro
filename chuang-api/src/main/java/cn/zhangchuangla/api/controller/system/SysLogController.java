@@ -91,7 +91,7 @@ public class SysLogController extends BaseController {
                                                      @PathVariable("id") Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
         SysLoginLogVo sysLoginLogVo = new SysLoginLogVo();
-        BeanUtils.copyProperties(sysLoginLogVo, sysLoginLog);
+        BeanUtils.copyProperties(sysLoginLog, sysLoginLogVo);
         return success(sysLoginLogVo);
     }
 

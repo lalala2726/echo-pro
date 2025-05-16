@@ -54,10 +54,14 @@ public class HttpUtils {
      */
     private static OkHttpClient createClient(int timeoutMs) {
         return new OkHttpClient.Builder()
-                .connectTimeout(timeoutMs, TimeUnit.MILLISECONDS) // 连接超时
-                .readTimeout(timeoutMs, TimeUnit.MILLISECONDS)    // 读取超时
-                .writeTimeout(timeoutMs, TimeUnit.MILLISECONDS)   // 写入超时
-                .retryOnConnectionFailure(true)                   // 失败自动重试
+                // 连接超时
+                .connectTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+                // 读取超时
+                .readTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+                // 写入超时
+                .writeTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+                // 失败自动重试
+                .retryOnConnectionFailure(true)
                 .build();
     }
 

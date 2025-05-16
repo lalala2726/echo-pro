@@ -112,7 +112,8 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
                 // 2. 如果用户选择永久删除(isPermanently=true)：
                 //    - 如果系统启用回收站，仍然使用回收站
                 //    - 如果系统关闭回收站，则真正删除文件
-                boolean forceTrash = !isPermanently; // 如果不是永久删除，强制使用回收站
+                // 如果不是永久删除，强制使用回收站
+                boolean forceTrash = !isPermanently;
 
                 // 执行文件删除或移至回收站操作
                 boolean operationResult = storageOperation.removeFile(fileTransferDto, forceTrash);
@@ -157,9 +158,12 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
     private void updateFileTrashStatus(Long id, String originalTrashPath, String previewTrashPath) {
         SysFile sysFile = SysFile.builder()
                 .id(id)
-                .isTrash(StorageConstants.IS_TRASH)  // 设置为"在回收站"
-                .originalTrashPath(originalTrashPath) // 记录原始文件回收站路径
-                .previewTrashPath(previewTrashPath)   // 记录预览图回收站路径（可能为null）
+                // 设置为"在回收站"
+                .isTrash(StorageConstants.IS_TRASH)
+                // 记录原始文件回收站路径
+                .originalTrashPath(originalTrashPath)
+                // 记录预览图回收站路径（可能为null）
+                .previewTrashPath(previewTrashPath)
                 .updateTime(new Date())
                 .build();
 
@@ -257,9 +261,12 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
                 // 恢复成功，更新数据库状态
                 SysFile updateEntity = SysFile.builder()
                         .id(id)
-                        .isTrash(StorageConstants.IS_NOT_TRASH) // 设置为"不在回收站"
-                        .originalTrashPath(null) // 清空回收站路径
-                        .previewTrashPath(null) // 清空预览图回收站路径
+                        // 设置为"不在回收站"
+                        .isTrash(StorageConstants.IS_NOT_TRASH)
+                        // 清空回收站路径
+                        .originalTrashPath(null)
+                        // 清空预览图回收站路径
+                        .previewTrashPath(null)
                         .updateTime(new Date())
                         .build();
 

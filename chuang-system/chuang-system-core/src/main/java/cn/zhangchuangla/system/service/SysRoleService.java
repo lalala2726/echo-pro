@@ -75,11 +75,6 @@ public interface SysRoleService extends IService<SysRole> {
      */
     boolean updateRoleInfo(SysRoleUpdateRequest request);
 
-    /**
-     * 刷新权限缓存(所有角色)
-     */
-    void refreshRolePermsCache();
-
 
     /**
      * 获取部门下拉列表
@@ -120,4 +115,11 @@ public interface SysRoleService extends IService<SysRole> {
      */
     Set<String> getRoleSetByRoleId(Long roleId);
 
+    /**
+     * 根据角色ID获取角色信息
+     *
+     * @param id 角色ID
+     * @return 角色信息
+     */
+    SysRole getRoleInfoById(Long id);
 }

@@ -86,7 +86,8 @@ public class ImageUtils {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // 判断图片格式
-        String formatName = "jpg"; // 默认jpg格式
+        // 默认jpg格式
+        String formatName = "jpg";
 
         // 尝试保存为原格式
         ImageIO.write(resizedImage, formatName, outputStream);

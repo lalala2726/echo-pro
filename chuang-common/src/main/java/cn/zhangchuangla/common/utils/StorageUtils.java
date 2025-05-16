@@ -269,8 +269,7 @@ public class StorageUtils {
 
         // 填充文件基础信息
         fileTransferDto.setFileExtension(getFileExtensionWithoutDot(fileName));
-        // fixme 后期设置
-        // fileTransferDto.setContentType(FileOperationUtils.generateFileContentType(fileName));
+        fileTransferDto.setContentType(StorageUtils.generateFileContentType(data));
         fileTransferDto.setFileMd5(calculateMD5(data));
 
         // 计算并格式化文件大小

@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
  * 操作日志记录处理
  * 通过AOP切面实现对Controller层加了 @Log 注解的方法进行拦截
  * 可记录请求参数、返回结果以及异常信息，并将日志保存到数据库
+ * @author zhangchuang
  */
 @Aspect
 @Component
@@ -232,7 +233,8 @@ public class OperationLogAspect {
                     // 将参数名和对应的值转换成 Map
                     Map<String, Object> paramMap = IntStream.range(0, parameterNames.length)
                             .filter(i -> i < args.length && args[i] != null && !(args[i] instanceof HttpServletRequest))
-                            .filter(i -> !excludeList.contains(parameterNames[i])) // 排除敏感字段
+                            // 排除敏感字段
+                            .filter(i -> !excludeList.contains(parameterNames[i]))
                             .boxed()
                             .collect(Collectors.toMap(i -> parameterNames[i], i -> args[i], (a, b) -> b));
 

@@ -8,7 +8,7 @@ import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
 import cn.zhangchuangla.framework.security.token.TokenManager;
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -163,8 +163,11 @@ public class SecurityConfig {
      */
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) ->
-                ServletUtils.renderString(response, new Gson().toJson(AjaxResult.error(ResponseCode.FORBIDDEN)));
+        return (request, response, accessDeniedException) -> {
+            String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
+            ServletUtils.renderString(response, JSON.toJSONString(
+                    AjaxResult.error(ResponseCode.FORBIDDEN, format)));
+        };
     }
 
     /**

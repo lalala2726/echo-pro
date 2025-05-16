@@ -265,7 +265,8 @@ public class TencentCOSHandler {
                     log.info("已从回收站恢复文件: {} -> {}", originalTrashPath, originalObjectName);
                 } catch (Exception e) {
                     log.error("恢复原始文件失败: {} -> {}, 错误: {}", originalTrashPath, originalObjectName, e.getMessage());
-                    throw e; // 原始文件恢复失败，直接抛出异常
+                    // 原始文件恢复失败，直接抛出异常
+                    throw e;
                 }
             }
 

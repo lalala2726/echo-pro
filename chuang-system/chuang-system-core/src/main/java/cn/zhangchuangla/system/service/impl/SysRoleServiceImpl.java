@@ -55,7 +55,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
                 .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
                         SysRole::getRoleName, request.getRoleName());
-
         return page(new Page<>(request.getPageNum(), request.getPageSize()), roleLambdaQueryWrapper);
     }
 
@@ -148,15 +147,18 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
-        //todo 超级管理员不允许修改
+        SysRole role = getById(request.getRoleId());
+        if (role == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在");
+        }
+        // 检查是否包含超级管理员角色
+        boolean contains = SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey());
+        if (contains) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+        }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(request, sysRole);
         return updateById(sysRole);
-    }
-
-    @Override
-    public void refreshRolePermsCache() {
-        //todo 待开发
     }
 
     /**
@@ -255,6 +257,21 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return roles.stream()
                 .map(SysRole::getRoleKey)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 根据用户ID查询角色信息
+     *
+     * @param id 角色ID
+     * @return 返回角色信息
+     */
+    @Override
+    public SysRole getRoleInfoById(Long id) {
+        SysRole sysRole = getById(id);
+        if (sysRole == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
+        }
+        return sysRole;
     }
 
 }

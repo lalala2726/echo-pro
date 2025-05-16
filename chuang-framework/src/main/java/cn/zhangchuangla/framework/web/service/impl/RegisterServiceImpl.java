@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * @author zhangchuang
+ */
 @Service
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
@@ -26,6 +29,7 @@ public class RegisterServiceImpl implements RegisterService {
      * @param request 请求参数
      * @return 用户ID
      */
+    @Override
     public Long register(RegisterRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new ParamException(ResponseCode.PARAM_ERROR);
@@ -38,7 +42,8 @@ public class RegisterServiceImpl implements RegisterService {
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
         user.setCreateTime(new Date());
-        user.setStatus(0); // 0-正常 1-停用
+        // 0-正常 1-停用
+        user.setStatus(0);
         sysUserService.save(user);
         return user.getUserId();
     }

@@ -6,33 +6,51 @@ import lombok.Getter;
  * 响应码枚举，定义所有返回给前端的状态码及其含义
  * <p>
  * created by Chuang on 2025/1/11 03:47
+ *
+ * @author zhangchuang
  */
 @Getter
 public enum ResponseCode {
 
     // region 通用成功与错误状态
-    SUCCESS(200, "操作成功"), // 当操作成功完成时的响应
-    WARNING(400, "操作警告"), // 当操作完成但有警告时的响应
-    ERROR(500, "操作失败"), // 当操作执行过程中发生未知错误时的响应
-    SERVER_ERROR(50001, "服务器错误"), // 明确标识为服务器内部错误
-    SYSTEM_ERROR(50002, "系统错误！"), // 明确标识为系统级异常
-    OPERATION_ERROR(50003, "操作失败"), // 通用操作失败
-    FILE_OPERATION_FAILED(50004, "文件操作失败！"), // 文件读写等失败
+    // 当操作成功完成时的响应
+    SUCCESS(200, "操作成功"),
+    // 当操作完成但有警告时的响应
+    WARNING(400, "操作警告"),
+    // 当操作执行过程中发生未知错误时的响应
+    ERROR(500, "操作失败"),
+    // 明确标识为服务器内部错误
+    SERVER_ERROR(50001, "服务器错误"),
+    // 明确标识为系统级异常
+    SYSTEM_ERROR(50002, "系统错误！"),
+    // 通用操作失败
+    OPERATION_ERROR(50003, "操作失败"),
+    // 文件读写等失败
+    FILE_OPERATION_FAILED(50004, "文件操作失败！"),
     // endregion
 
     // region 请求相关错误状态
-    PARAM_ERROR(400, "参数错误!"), // 请求参数错误
-    PARAM_NOT_NULL(40001, "参数不能为空"), // 请求参数缺失
-    PARAM_ERROR_TOO_LARGE(40002, "请求参数过大"), // 参数超出限制
-    PARAM_ERROR_ZERO(40003, "参数不能小于0"), // 参数为0无效
-    NOT_FOUND(404, "未找到该资源"), // 请求资源不存在
-    NOT_SUPPORT(405, "不支持该请求"), // 请求方法不被允许
+    // 请求参数错误
+    PARAM_ERROR(400, "参数错误!"),
+    // 请求参数缺失
+    PARAM_NOT_NULL(40001, "参数不能为空"),
+    // 参数超出限制
+    PARAM_ERROR_TOO_LARGE(40002, "请求参数过大"),
+    // 参数为0无效
+    PARAM_ERROR_ZERO(40003, "参数不能小于0"),
+    // 请求资源不存在
+    NOT_FOUND(404, "未找到该资源"),
+    // 请求方法不被允许
+    NOT_SUPPORT(405, "不支持该请求"),
     // endregion
 
     // region 认证与授权错误状态
-    UNAUTHORIZED(401, "未授权"), // 请求未提供有效身份信息
-    FORBIDDEN(403, "禁止访问"), // 有身份但无权限
-    NOT_LOGIN(40101, "未登录"), // 用户未登录
+    // 请求未提供有效身份信息
+    UNAUTHORIZED(401, "未授权"),
+    // 有身份但无权限
+    FORBIDDEN(403, "禁止访问"),
+    // 用户未登录
+    NOT_LOGIN(40101, "未登录"),
     USER_NOT_LOGIN(40102, "用户未登录"),
     TOKEN_EXPIRED(40103, "凭证已过期,请重新登录"),
     TOKEN_EXPIRE(40104, "会话已过期,请重新登录"),
@@ -45,7 +63,8 @@ public enum ResponseCode {
 
     // region 用户相关错误状态
     USER_NOT_EXIST(40401, "用户不存在"),
-    USER_EXIST(40901, "用户已存在"), // 资源冲突
+    // 资源冲突
+    USER_EXIST(40901, "用户已存在"),
     USER_PASSWORD_ERROR(40004, "用户名或密码错误"),
     USERNAME_FORMAT_ERROR(40005, "用户名不合法"),
     PASSWORD_FORMAT_ERROR(40006, "密码不合法"),
@@ -60,7 +79,8 @@ public enum ResponseCode {
 
     // region 数据相关错误状态
     DATA_NOT_FOUND(40402, "数据未找到"),
-    RESULT_IS_NULL(204, "查询为空"), // 无内容返回，语义更标准
+    // 无内容返回，语义更标准
+    RESULT_IS_NULL(204, "查询为空"),
     DELETE_ERROR(40008, "删除失败"),
     // endregion
 
@@ -80,7 +100,8 @@ public enum ResponseCode {
     NOT_EXIST(40403, "不存在"),
     NOT_ALLOW(40307, "不允许"),
     ACCESS_DENIED(40308, "您没有权限访问本资源"),
-    REQUEST_LIMIT(42901, "请求超过限制"), // 使用 429 更标准
+    // 使用 429 更标准
+    REQUEST_LIMIT(42901, "请求超过限制"),
     TOO_MANY_REQUESTS(42902, "请求过于频繁"),
     // endregion
 
@@ -104,21 +125,6 @@ public enum ResponseCode {
     ResponseCode(Integer code, String msg) {
         this.code = code;
         this.message = msg;
-    }
-
-    /**
-     * 根据状态码获取枚举值
-     *
-     * @param code 状态码
-     * @return 对应的枚举值，如果没有匹配则返回 null
-     */
-    public static ResponseCode getByCode(Integer code) {
-        for (ResponseCode rc : values()) {
-            if (rc.getCode().equals(code)) {
-                return rc;
-            }
-        }
-        return null;
     }
 
 }

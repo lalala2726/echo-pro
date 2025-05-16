@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @author Chuang
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL) // 仅序列化非空字段
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AjaxResult<T> implements Serializable {
 
     @Serial
@@ -39,9 +39,9 @@ public class AjaxResult<T> implements Serializable {
     private Long timestamp;
 
     /**
-     * 返回数据
+     * 数据
      */
-    @Schema(description = "返回数据")
+    @Schema(description = "数据")
     private T data;
 
     // --- 私有构造函数 ---

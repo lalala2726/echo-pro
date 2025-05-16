@@ -7,6 +7,9 @@
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Library/CloudStorage/OneDrive-个人/桌面/Javadoc" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
