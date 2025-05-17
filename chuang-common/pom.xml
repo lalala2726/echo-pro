@@ -159,5 +159,11 @@
             <artifactId>tika-core</artifactId>
         </dependency>
 
+        <!-- 安全的Bouncy Castle加密库 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
