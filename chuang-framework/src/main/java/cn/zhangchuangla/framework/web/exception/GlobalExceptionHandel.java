@@ -58,6 +58,7 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
+
     /**
      * 登录异常
      */
@@ -80,7 +81,7 @@ public class GlobalExceptionHandel {
      * 认证失败
      */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public AjaxResult<Void> InternalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
+    public AjaxResult<Void> internalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
         log.error("认证失败:", exception);
         return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
     }

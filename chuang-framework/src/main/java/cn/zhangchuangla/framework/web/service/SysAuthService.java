@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -27,7 +28,7 @@ public interface SysAuthService {
      * @param refreshToken 刷新令牌
      * @return 认证 Token 响应
      */
-    AuthenticationToken refreshToken(String refreshToken);
+    AuthenticationToken refreshToken(RefreshTokenRequest refreshToken);
 
 
     /**

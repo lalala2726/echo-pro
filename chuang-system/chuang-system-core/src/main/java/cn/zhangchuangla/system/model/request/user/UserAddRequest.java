@@ -27,7 +27,7 @@ public class UserAddRequest {
     /**
      * 用户名
      */
-    @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "用户名", example = "admin123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户名不能为空")
     @Size(min = 5, max = 20, message = "用户名不能超过20个字符")
     @ValidRegex(regexp = RegularConstants.User.username, message = "用户名只能是英文数字和下划线")
@@ -36,7 +36,7 @@ public class UserAddRequest {
     /**
      * 密码
      */
-    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "密码", example = "Admin@123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
     @Size(min = 8, max = 20, message = "密码长度在 8-16 之间")
     @ValidRegex(regexp = RegularConstants.User.password,
@@ -46,58 +46,58 @@ public class UserAddRequest {
     /**
      * 头像
      */
-    @Schema(description = "头像", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "头像URL地址", example = "https://example.com/avatar.png", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String avatar;
 
     /**
      * 性别
      */
-    @Schema(description = "性别", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "性别：1-男，2-女，3-未知", type = "integer", format = "int32", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer gender;
 
     /**
      * 部门ID
      */
-    @Schema(description = "部门ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "所属部门唯一标识ID", type = "integer", format = "int64", example = "1001", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Min(value = 0, message = "部门ID不能小于0")
     private Long deptId;
 
     /**
      * 角色ID
      */
-    @Schema(description = "角色ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "分配的角色列表", type = "array", format = "int64", example = "[1,2,3]", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Long> roleIds;
 
     /**
      * 手机号
      */
-    @Schema(description = "手机号", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "手机号码", example = "13800001111", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
     private String phone;
 
     /**
      * 昵称
      */
-    @Schema(description = "昵称", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "用户昵称", example = "管理员", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String nickname;
 
     /**
      * 邮箱
      */
-    @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "电子邮箱地址", example = "admin@example.com", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 状态
      */
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.AUTO)
+    @Schema(description = "账号状态：1-启用，0-停用", example = "1", requiredMode = Schema.RequiredMode.AUTO)
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
      * 备注
      */
-    @Schema(description = "备注", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "其他备注信息", example = "系统管理员账号", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String remark;
 }

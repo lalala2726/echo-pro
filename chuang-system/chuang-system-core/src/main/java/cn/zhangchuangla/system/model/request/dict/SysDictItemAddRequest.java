@@ -16,31 +16,31 @@ public class SysDictItemAddRequest {
     /**
      * 所属字典类型编码
      */
-    @Schema(description = "所属字典类型编码", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "所属字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictType;
 
     /**
      * 字典项名称
      */
-    @Schema(description = "字典项名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "字典项名称", example = "启用", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String itemLabel;
 
     /**
      * 字典项值
      */
-    @Schema(description = "字典项值", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "字典项值", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String itemValue;
 
     /**
      * 排序值
      */
-    @Schema(description = "排序值", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "排序值", example = "1", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer sort;
 
     /**
      * 状态：0启用，1禁用
      */
-    @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "状态：0启用，1禁用", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
 

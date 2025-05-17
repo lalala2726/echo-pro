@@ -1,10 +1,13 @@
 package cn.zhangchuangla.storage;
 
+import lombok.Getter;
+
 /**
  * Enum for different storage providers.
  *
  * @author Chuang
  */
+@Getter
 public enum StorageType {
     LOCAL("local", "本地存储"),
     MINIO("minio", "MinIO"),
@@ -28,11 +31,4 @@ public enum StorageType {
         throw new IllegalArgumentException("Unknown storage type code: " + code);
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

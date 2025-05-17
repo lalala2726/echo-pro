@@ -2,6 +2,7 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.utils.SecurityUtils;
@@ -20,7 +21,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -73,12 +73,12 @@ public class SysAuthController extends BaseController {
      * @return 新的token
      */
     @PostMapping("/auth/refreshToken")
-    @Operation(summary = "刷新令牌")
-    public AjaxResult<AuthenticationToken> refreshToken(@Parameter(description = "刷新令牌", required = true)
-                                                        @ParameterObject @RequestBody AuthenticationToken request) {
-        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request.getRefreshToken());
+    @Operation(summary = "刷新token")
+    public AjaxResult<AuthenticationToken> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
+        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request);
         return success(newAuthenticationToken);
     }
+
 
     /**
      * 获取用户路由

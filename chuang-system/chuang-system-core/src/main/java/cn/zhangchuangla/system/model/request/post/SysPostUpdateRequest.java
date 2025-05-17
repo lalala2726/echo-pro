@@ -19,33 +19,33 @@ public class SysPostUpdateRequest {
     /**
      * 岗位ID
      */
-    @Schema(description = "岗位ID", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "岗位ID", example = "1", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
     @Min(value = 1, message = "岗位ID必须大于等于1")
     private Integer postId;
 
     /**
      * 岗位编码
      */
-    @Schema(description = "岗位编码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "岗位编码", example = "POST001", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String postCode;
 
     /**
      * 岗位名称
      */
-    @Schema(description = "岗位名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "岗位名称", example = "管理员", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String postName;
 
     /**
      * 排序
      */
-    @Schema(description = "排序", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "排序", example = "100", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Range(min = 0, max = 999, message = "排序必须在0到999之间")
     private Integer sort;
 
     /**
      * 状态(0-正常,1-停用)
      */
-    @Schema(description = "状态(0-正常,1-停用)", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "状态(0-正常,1-停用)", example = "0", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Range(min = 0, max = 1, message = "状态只能为0或1")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;

@@ -13,9 +13,8 @@ import java.io.Serializable;
  * 认证令牌响应对象
  *
  * @author Ray.Hao
- * @since 0.0.1
  */
-@Schema(description = "认证令牌响应对象")
+@Schema(name = "认证令牌响应对象", description = "认证令牌响应对象")
 @Data
 @Builder
 @AllArgsConstructor

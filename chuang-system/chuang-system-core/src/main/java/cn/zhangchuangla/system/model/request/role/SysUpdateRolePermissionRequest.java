@@ -21,14 +21,14 @@ public class SysUpdateRolePermissionRequest {
     /**
      * 角色ID
      */
-    @Schema(description = "角色ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "角色ID", example = "1", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "角色ID不能为空")
     private Long roleId;
 
     /**
      * 分配的菜单ID
      */
-    @Schema(description = "分配的菜单ID", type = "array", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "分配的菜单ID", example = "[1,2,3]", type = "array", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分配的菜单ID不能为空")
     private List<Long> selectedMenuId;
 }

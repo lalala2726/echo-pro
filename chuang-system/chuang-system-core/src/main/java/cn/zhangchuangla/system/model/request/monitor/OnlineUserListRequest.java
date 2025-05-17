@@ -18,44 +18,44 @@ public class OnlineUserListRequest extends BasePageRequest {
     /**
      * 会话ID
      */
-    @Schema(description = "会话ID", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "会话ID", example = "abc123xyz", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String sessionId;
 
 
     /**
      * 用户名
      */
-    @Schema(description = "用户名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "用户名", example = "admin", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String username;
 
     /**
      * 用户ID
      */
-    @Schema(description = "用户ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "用户ID", example = "1001", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long userId;
 
     /**
      * 登录IP
      */
-    @Schema(description = "登录IP", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "登录IP", example = "192.168.1.1", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String ip;
 
     /**
      * 登录地点
      */
-    @Schema(description = "登录地点", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "登录地点", example = "中国-北京", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String region;
 
     /**
      * 浏览器
      */
-    @Schema(description = "浏览器", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "浏览器", example = "Chrome", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String browser;
 
     /**
      * 操作系统
      */
-    @Schema(description = "操作系统", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "操作系统", example = "Windows 11", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String os;
 
 

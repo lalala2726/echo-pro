@@ -23,34 +23,34 @@ public class SysPostListRequest extends BasePageRequest {
     /**
      * 岗位ID
      */
-    @Schema(name = "岗位ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(name = "岗位ID", example = "1", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Min(value = 1, message = "岗位ID不能小于1")
     private Integer postId;
 
     /**
      * 岗位编码
      */
-    @Schema(name = "岗位编码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(name = "岗位编码", example = "CT001", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Size(max = 64, min = 1, message = "岗位编码长度在1-64个字符")
     private String postCode;
 
     /**
      * 岗位名称
      */
-    @Schema(name = "岗位名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(name = "岗位名称", example = "程序员", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Size(max = 100, min = 1, message = "岗位名称长度在1-100个字符")
     private String postName;
 
     /**
      * 排序
      */
-    @Schema(name = "排序", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(name = "排序", example = "1", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer sort;
 
     /**
      * 状态(0-正常,1-停用)
      */
-    @Schema(name = "状态(0-正常,1-停用)", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(name = "状态(0-正常,1-停用)", example = "0", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Range(min = 0, max = 1, message = "状态只能为0或1")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
