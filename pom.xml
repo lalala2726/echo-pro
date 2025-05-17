@@ -24,6 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.4.3</spring.boot.version>
         <spring.security.version>6.4.4</spring.security.version>
+        <springdoc.version>2.8.3</springdoc.version>
         <mybatis.plus.version>3.5.10</mybatis.plus.version>
         <mysql.version>8.2.0</mysql.version>
         <redis.version>3.2.5</redis.version>
@@ -31,9 +32,6 @@
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <minio.version>8.5.17</minio.version>
         <tencent.cos.version>5.6.97</tencent.cos.version>
-
-        <!-- API 文档生成工具版本 -->
-        <openapi.knife4j.version>4.4.0</openapi.knife4j.version>
 
         <!-- 工具类相关依赖版本 -->
         <lombok.version>1.18.30</lombok.version>
@@ -77,21 +75,21 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!-- Spring Security Crypto 漏洞修复 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
                 <version>6.4.4</version>
             </dependency>
-            
+
             <!-- Spring Security Core 漏洞修复 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
                 <version>6.4.4</version>
             </dependency>
-            
+
             <!-- Spring Boot Web 启动器，用于构建 Web 应用 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -187,13 +185,6 @@
                 <version>${ip2region.version}</version>
             </dependency>
 
-            <!-- ===================== API 文档 (Knife4j) ===================== -->
-            <!-- Knife4j OpenAPI 3 Jakarta Spring Boot 启动器，用于生成 API 文档 -->
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${openapi.knife4j.version}</version>
-            </dependency>
 
             <!-- ===================== 数据库 ===================== -->
             <!-- MySQL 数据库连接驱动 -->
@@ -214,8 +205,6 @@
                 <artifactId>fastjson</artifactId>
                 <version>${alibaba.fastjson.version}</version>
             </dependency>
-
-
             <!-- ===================== 工具类 ===================== -->
             <!-- OkHttp 依赖，用于 HTTP 请求 -->
             <dependency>
@@ -274,11 +263,11 @@
                 <artifactId>spring-boot-starter-websocket</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
-            <!-- Kaptcha 依赖，用于生成验证码 -->
+
             <dependency>
-                <groupId>io.github.shuaijunlan</groupId>
-                <artifactId>nkaptcha</artifactId>
-                <version>${io.github.shuaijunlan.nkaptcha.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <!-- ===================== 项目模块依赖 ===================== -->

@@ -20,6 +20,24 @@ spring:
       port: 6379
       database: 0
       password: zhangchuang2726
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    syntax-highlight:
+      activated: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  cache:
+    disabled: true
+
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
