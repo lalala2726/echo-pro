@@ -32,14 +32,19 @@ public class SysFile {
     private String originalName;
 
     /**
+     * 新文件名 (存储系统中的唯一文件名)
+     */
+    private String newFileName;
+
+    /**
      * 文件类型，如 image/jpeg, application/pdf 等
      */
     private String contentType;
 
     /**
-     * 文件大小，格式化后的字符串，如 "1.5MB"
+     * 文件大小，单位字节
      */
-    private String fileSize;
+    private Long fileSize;
 
     /**
      * 文件MD5值，用于文件完整性校验

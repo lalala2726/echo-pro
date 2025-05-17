@@ -120,4 +120,24 @@ public class StorageConstants {
      * 回收站目录名称
      */
     public static final String TRASH_DIR_NAME = "trash";
+
+    /**
+     * 新文件名 (通常是存储系统中的唯一文件名)
+     */
+    public static final String FILE_NAME = "fileName";
+
+    /**
+     * 原始文件名 (用户上传时的文件名)
+     */
+    public static final String ORIGINAL_FILE_NAME = "originalFileName";
+
+    /**
+     * 文件在存储系统中的相对路径
+     */
+    public static final String RELATIVE_PATH = "relativePath";
+
+    /**
+     * 缩略图文件在存储系统中的相对路径
+     */
+    public static final String THUMBNAIL_RELATIVE_PATH = "thumbnailRelativePath";
 }

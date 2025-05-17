@@ -1,6 +1,5 @@
 package cn.zhangchuangla.common.utils;
 
-import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 
 import java.util.Collection;
@@ -13,7 +12,7 @@ import static java.util.Objects.isNull;
  * @author Ruoyi
  * created on 2025/1/12 11:23
  */
-public class StringUtils extends StrUtil {
+public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /**
      * 空字符串

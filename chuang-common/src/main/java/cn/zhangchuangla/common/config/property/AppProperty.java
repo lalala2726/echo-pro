@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 软件系统配置
+ *
+ * @author zhangchuang
  */
 @ConfigurationProperties(prefix = "app")
 @Configuration

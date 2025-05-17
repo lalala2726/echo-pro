@@ -143,7 +143,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public void updateDictItemDictType(String oldDictType, String newDictType) {
-        if (StringUtils.isAnyBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
+        if (StringUtils.isBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
             return;
         }
         LambdaUpdateWrapper<SysDictItem> updateWrapper = Wrappers.lambdaUpdate();
@@ -164,7 +164,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public boolean isDictItemValueExist(String dictType, String itemValue, Long itemId) {
-        if (StringUtils.isAnyBlank(dictType, itemValue)) {
+        if (StringUtils.isBlank(dictType, itemValue)) {
             // 关键参数为空，无法判断，或者认为不重复
             return false;
         }
