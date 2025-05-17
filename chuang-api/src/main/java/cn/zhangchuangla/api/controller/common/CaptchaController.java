@@ -40,12 +40,10 @@ import java.util.concurrent.TimeUnit;
 public class CaptchaController extends BaseController {
 
     private final RedisCache redisCache;
-    
+    private final SecureRandom random = new SecureRandom();
     @Resource(name = "captchaTextCreator")
     private KaptchaTextCreator captchaTextCreator;
-    
-    private final SecureRandom random = new SecureRandom();
-    
+
     /**
      * 获取验证码
      *
@@ -58,12 +56,12 @@ public class CaptchaController extends BaseController {
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
         HashMap<String, String> ajax = new HashMap<>(2);
-        
+
         // 生成数学公式验证码
         String mathText = captchaTextCreator.getText();
         String formula = mathText.substring(0, mathText.lastIndexOf("@"));
         String code = mathText.substring(mathText.lastIndexOf("@") + 1);
-        
+
         // 生成简单的验证码图片
         BufferedImage image = createCaptchaImage(formula);
 
@@ -82,10 +80,10 @@ public class CaptchaController extends BaseController {
         ajax.put("captchaBase64", Constants.BASE64_CODE + Base64.encode(os.toByteArray()));
         return success(ajax);
     }
-    
+
     /**
      * 创建简单的验证码图片
-     * 
+     *
      * @param text 验证码文本
      * @return 验证码图片
      */
@@ -94,18 +92,18 @@ public class CaptchaController extends BaseController {
         int height = 60;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
-        
+
         // 设置背景色
         g.setColor(new Color(random.nextInt(80) + 170, random.nextInt(80) + 170, random.nextInt(80) + 170));
         g.fillRect(0, 0, width, height);
-        
+
         // 设置字体
         g.setFont(new Font("Arial", Font.BOLD, 30));
         g.setColor(new Color(random.nextInt(150), random.nextInt(150), random.nextInt(150)));
-        
+
         // 绘制验证码文本
         g.drawString(text, 30, 40);
-        
+
         // 添加干扰线
         for (int i = 0; i < 10; i++) {
             g.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
@@ -115,7 +113,7 @@ public class CaptchaController extends BaseController {
             int y2 = random.nextInt(height);
             g.drawLine(x1, y1, x2, y2);
         }
-        
+
         g.dispose();
         return image;
     }

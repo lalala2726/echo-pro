@@ -12,14 +12,14 @@ public class CaptchaConfig {
 
     /**
      * 创建自定义数学验证码文本生成器
-     * 
+     *
      * @return 数学验证码文本生成器
      */
     @Bean(name = "captchaTextCreator")
     public KaptchaTextCreator getKaptchaTextCreator() {
         return new KaptchaTextCreator();
     }
-    
+
     /**
      * 数学运算验证码生成器
      *
