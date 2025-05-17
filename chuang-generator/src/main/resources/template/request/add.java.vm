@@ -1,0 +1,40 @@
+package ${packageName}.${moduleName}.model.request.${classNameLower};
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+
+/**
+ * ${tableComment}添加请求
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@Schema(description = "${tableComment}添加请求")
+public class ${className}AddRequest {
+
+    #foreach ($field in $fields)
+        #if($field.isPk || $field.columnName == "create_time" || $field.columnName ==
+            "create_by" || $field.columnName == "update_time" || $field.columnName == "update_by")
+            // 忽略主键和创建、更新字段
+        #else
+            /**
+             * ${field.columnComment}
+             */
+            @Schema(description = "${field.columnComment}")
+                #if($field.isRequired)
+                    #if($field.javaType == "String")
+                    @NotBlank(message = "${field.columnComment}不能为空")
+                    #else
+                    @NotNull(message = "${field.columnComment}不能为空")
+                    #end
+                #end
+            private ${field.javaType} ${field.javaField};
+
+        #end
+    #end
+} 
