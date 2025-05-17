@@ -16,19 +16,19 @@ public class SysDictTypeAddRequest {
     /**
      * 字典类型编码
      */
-    @Schema(description = "字典类型编码", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictType;
 
     /**
      * 字典名称
      */
-    @Schema(description = "字典名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "字典名称", example = "用户状态", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictName;
 
     /**
      * 状态：0启用，1禁用
      */
-    @Schema(description = "状态：0启用，1禁用", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "状态：0启用，1禁用", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
 }

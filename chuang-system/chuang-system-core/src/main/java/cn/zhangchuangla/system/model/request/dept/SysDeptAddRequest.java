@@ -22,33 +22,33 @@ public class SysDeptAddRequest {
      */
     @NotBlank(message = "部门名称不能为空")
     @Size(max = 50, message = "部门名称不能超过50个字符")
-    @Schema(description = "部门名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "部门名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "系统管理")
     private String deptName;
 
     /**
      * 父部门ID
      */
-    @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     private Long parentId;
 
     /**
      * 部门状态（0正常 1停用）
      */
-    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "0")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
      * 部门负责人
      */
-    @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "张三")
     @Size(max = 50, message = "部门负责人不能超过50个字符")
     private String manager;
 
     /**
      * 部门描述
      */
-    @Schema(description = "部门描述", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门描述", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统管理")
     private String description;
 
 

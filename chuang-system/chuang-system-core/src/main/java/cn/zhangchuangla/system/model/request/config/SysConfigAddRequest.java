@@ -16,7 +16,7 @@ public class SysConfigAddRequest {
     /**
      * 参数名称
      */
-    @Schema(description = "参数名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数名称", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "系统名称")
     @NotBlank(message = "参数名称不能为空")
     private String configName;
 
@@ -24,14 +24,14 @@ public class SysConfigAddRequest {
      * 参数键名
      */
     @NotBlank(message = "参数键名不能为空")
-    @Schema(description = "参数键名", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数键名", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "sys.name")
     private String configKey;
 
     /**
      * 参数键值
      */
     @NotBlank(message = "参数键值不能为空")
-    @Schema(description = "参数键值", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参数键值", requiredMode = Schema.RequiredMode.REQUIRED, example = "{\"key\":\"value\"}")
     private String configValue;
 
 }
