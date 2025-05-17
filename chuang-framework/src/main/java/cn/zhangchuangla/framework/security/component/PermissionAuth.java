@@ -29,7 +29,6 @@ import java.util.Set;
 public class PermissionAuth {
 
 
-    private final SysMenuService sysMenuService;
     private final SysRoleService sysRoleService;
     private final SysPermissionService sysPermissionService;
 

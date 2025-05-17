@@ -29,7 +29,7 @@ public class SecurityProperties {
     /**
      * token标识符
      */
-    private String header;
+    private String header = "Authorization";
 
     /**
      * 密钥

@@ -152,7 +152,7 @@ public class SecurityConfig {
      */
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(TokenManager tokenManager) {
-        return new TokenAuthenticationFilter(tokenManager);
+        return new TokenAuthenticationFilter();
     }
 
     /**

@@ -14,6 +14,7 @@
         <module>chuang-system</module>
         <module>chuang-framework</module>
         <module>chuang-api</module>
+        <module>chuang-generator</module>
     </modules>
 
     <properties>
@@ -47,6 +48,7 @@
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
+        <apache.velocity>2.4.1</apache.velocity>
         <!-- IP 地区转换 -->
         <ip2region.version>2.7.0</ip2region.version>
     </properties>
@@ -263,6 +265,12 @@
                 <artifactId>spring-boot-starter-websocket</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+            <!-- velocity低代码引擎 -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${apache.velocity}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.springdoc</groupId>
@@ -319,6 +327,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system-storage</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 低代码生成模块依赖 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>chuang-generator</artifactId>
                 <version>${app.version}</version>
             </dependency>
         </dependencies>
