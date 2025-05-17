@@ -148,12 +148,6 @@
             <artifactId>thumbnailator</artifactId>
         </dependency>
 
-        <!-- 验证码生成 -->
-        <dependency>
-            <groupId>com.github.penggle</groupId>
-            <artifactId>kaptcha</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>

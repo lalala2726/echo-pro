@@ -1,21 +1,24 @@
 package cn.zhangchuangla.framework.config.kaptcha;
 
-import com.google.code.kaptcha.text.impl.DefaultTextCreator;
-
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
- * 验证码文本生成器
+ * 安全的验证码文本生成器
+ * @author zhangchuang
  */
-public class KaptchaTextCreator extends DefaultTextCreator {
+public class KaptchaTextCreator {
     private static final String[] NUMBERS = "0,1,2,3,4,5,6,7,8,9,10".split(",");
+    private final SecureRandom secureRandom = new SecureRandom();
 
-    @Override
+    /**
+     * 生成随机数学算式文本
+     * @return 数学算式文本，格式为"算式=?@答案"
+     */
     public String getText() {
-        int x = new Random().nextInt(10);
-        int y = new Random().nextInt(10);
+        int x = secureRandom.nextInt(10);
+        int y = secureRandom.nextInt(10);
         StringBuilder mathResult = new StringBuilder();
-        int randomOperator = new Random().nextInt(3);
+        int randomOperator = secureRandom.nextInt(3);
         switch (randomOperator) {
             case 0:
                 mathResult.append(x);

@@ -46,7 +46,6 @@
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
         <javax.activation.version>1.2.0</javax.activation.version>
-        <kaptcha.version>2.3.2</kaptcha.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
@@ -277,9 +276,9 @@
             </dependency>
             <!-- Kaptcha 依赖，用于生成验证码 -->
             <dependency>
-                <groupId>com.github.penggle</groupId>
-                <artifactId>kaptcha</artifactId>
-                <version>${kaptcha.version}</version>
+                <groupId>io.github.shuaijunlan</groupId>
+                <artifactId>nkaptcha</artifactId>
+                <version>${io.github.shuaijunlan.nkaptcha.version}</version>
             </dependency>
 
             <!-- ===================== 项目模块依赖 ===================== -->

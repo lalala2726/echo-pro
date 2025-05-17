@@ -11,7 +11,7 @@
 
     <artifactId>chuang-framework</artifactId>
     <version>1.0.0</version>
-    <description>框架基础模块，提供核心功能支持</description>˚
+    <description>框架基础模块，提供核心功能支持</description>
 
     <dependencies>
         <!-- 依赖公共模块 -->
