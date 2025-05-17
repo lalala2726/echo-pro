@@ -27,7 +27,8 @@ public class GenTableQueryServiceImpl extends ServiceImpl<GenTableMapper, GenTab
   @Override
   @Transactional(readOnly = true)
   public GenTable selectGenTableById(Long id) {
-    GenTable genTable = this.getById(id); // this.getById 是 ServiceImpl (indirectly from BaseMapper) 的方法
+    // this.getById 是 ServiceImpl (indirectly from BaseMapper) 的方法
+    GenTable genTable = this.getById(id);
     if (genTable != null) {
       List<GenTableColumn> columns = genTableColumnService.selectGenTableColumnListByTableId(id);
       genTable.setColumns(columns);

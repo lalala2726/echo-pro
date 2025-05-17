@@ -225,7 +225,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public boolean deleteFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
             getClient().deleteObject(bucketName, relativePath);
@@ -239,9 +241,13 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public void deleteFiles(List<String> relativePaths) {
-        if (relativePaths == null || relativePaths.isEmpty()) return;
+        if (relativePaths == null || relativePaths.isEmpty()) {
+            return;
+        }
         List<String> validPaths = relativePaths.stream().filter(StringUtils::hasText).collect(Collectors.toList());
-        if (validPaths.isEmpty()) return;
+        if (validPaths.isEmpty()) {
+            return;
+        }
         String bucketName = config.getRootPathOrBucketName();
 
         try {
@@ -268,7 +274,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public InputStream downloadFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, relativePath);
@@ -289,7 +297,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         String bucketName = config.getRootPathOrBucketName();
         if (StringUtils.hasText(config.getFileDomain())) {
             return StoragePathUtils.concatUrl(config.getFileDomain(), relativePath);
@@ -308,7 +318,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
             return getClient().doesObjectExist(bucketName, relativePath);

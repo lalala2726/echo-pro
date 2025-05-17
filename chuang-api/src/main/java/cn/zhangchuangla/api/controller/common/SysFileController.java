@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -112,21 +113,30 @@ public class SysFileController extends BaseController {
 
             // The uploadImage method in StorageService is responsible for handling image-specific logic (e.g., thumbnails)
             FileInfo fileInfo = activeStorageService.uploadImage(file, effectiveSubPath);
-            storageFileService.saveFileInfo(fileInfo); // Save info for the main image
+            // Save info for the main image
+            storageFileService.saveFileInfo(fileInfo);
 
-            HashMap<String, String> ajax = new HashMap<>();
-            ajax.put(Constants.ORIGINAL, fileInfo.getUrl()); // URL of the main image
-            ajax.put(StorageConstants.FILE_NAME, fileInfo.getNewFileName());
-            ajax.put(StorageConstants.ORIGINAL_FILE_NAME, fileInfo.getOriginalFileName());
-            ajax.put(StorageConstants.RELATIVE_PATH, fileInfo.getRelativePath());
-            if (fileInfo.getThumbnailUrl() != null) {
-                ajax.put(Constants.PREVIEW, fileInfo.getThumbnailUrl()); // URL of the thumbnail, if generated
-                ajax.put(StorageConstants.THUMBNAIL_RELATIVE_PATH, fileInfo.getThumbnailPath());
-            }
+            HashMap<String, String> ajax = getStringStringHashMap(fileInfo);
             return success(ajax);
         } catch (Exception e) {
             log.error("图片上传异常", e);
             return error("图片上传失败: " + e.getMessage());
         }
+    }
+
+    @NotNull
+    private HashMap<String, String> getStringStringHashMap(FileInfo fileInfo) {
+        HashMap<String, String> ajax = new HashMap<>();
+        // URL of the main image
+        ajax.put(Constants.ORIGINAL, fileInfo.getUrl());
+        ajax.put(StorageConstants.FILE_NAME, fileInfo.getNewFileName());
+        ajax.put(StorageConstants.ORIGINAL_FILE_NAME, fileInfo.getOriginalFileName());
+        ajax.put(StorageConstants.RELATIVE_PATH, fileInfo.getRelativePath());
+        if (fileInfo.getThumbnailUrl() != null) {
+            // URL of the thumbnail, if generated
+            ajax.put(Constants.PREVIEW, fileInfo.getThumbnailUrl());
+            ajax.put(StorageConstants.THUMBNAIL_RELATIVE_PATH, fileInfo.getThumbnailPath());
+        }
+        return ajax;
     }
 }

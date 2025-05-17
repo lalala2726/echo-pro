@@ -67,12 +67,14 @@ public class TableInfo {
     /**
      * 子表名（原始，带下划线）
      */
-    private String subTableName; // 新增
+    // 新增
+    private String subTableName;
 
     /**
      * 子表关联的外键名（在子表中，原始，带下划线）
      */
-    private String subTableFkName; // 新增
+    // 新增
+    private String subTableFkName;
 
     /**
      * 子表名称（驼峰，首字母大写）
@@ -93,7 +95,8 @@ public class TableInfo {
     /**
      * 树编码字段名（原始，带下划线）
      */
-    private String treeCode; // 新增
+    // 新增
+    private String treeCode;
 
     /**
      * 树表主键字段的Java属性名（驼峰，首字母大写）
@@ -108,12 +111,14 @@ public class TableInfo {
     /**
      * 树父编码字段名（原始，带下划线）
      */
-    private String treeParentCode; // 新增
+    // 新增
+    private String treeParentCode;
 
     /**
      * 树名称字段名（原始，带下划线）
      */
-    private String treeName; // 新增
+    // 新增
+    private String treeName;
 
     /**
      * 树表名称字段的Java属性名（驼峰，首字母大写）

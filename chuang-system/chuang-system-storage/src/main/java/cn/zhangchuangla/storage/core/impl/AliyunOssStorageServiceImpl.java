@@ -203,7 +203,9 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public boolean deleteFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         try {
             getClient().deleteObject(config.getRootPathOrBucketName(), relativePath);
             log.info("File deleted from Aliyun OSS: {}/{}", config.getRootPathOrBucketName(), relativePath);
@@ -216,9 +218,13 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public void deleteFiles(List<String> relativePaths) {
-        if (relativePaths == null || relativePaths.isEmpty()) return;
+        if (relativePaths == null || relativePaths.isEmpty()) {
+            return;
+        }
         List<String> validPaths = relativePaths.stream().filter(StringUtils::hasText).collect(Collectors.toList());
-        if (validPaths.isEmpty()) return;
+        if (validPaths.isEmpty()) {
+            return;
+        }
 
         try {
             DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(config.getRootPathOrBucketName());
@@ -238,7 +244,9 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public InputStream downloadFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         try {
             OSSObject ossObject = getClient().getObject(config.getRootPathOrBucketName(), relativePath);
             return ossObject.getObjectContent();
@@ -257,7 +265,9 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         if (StringUtils.hasText(config.getFileDomain())) {
             return StoragePathUtils.concatUrl(config.getFileDomain(), relativePath);
         }
@@ -275,7 +285,9 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         try {
             return getClient().doesObjectExist(config.getRootPathOrBucketName(), relativePath);
         } catch (OSSException | ClientException e) {

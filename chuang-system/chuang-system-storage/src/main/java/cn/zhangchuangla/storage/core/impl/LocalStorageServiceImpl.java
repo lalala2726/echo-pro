@@ -208,7 +208,9 @@ public class LocalStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         return StringUtils.hasText(config.getFileDomain()) ?
                 StoragePathUtils.concatUrl(config.getFileDomain(), relativePath) :
                 StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
@@ -216,7 +218,9 @@ public class LocalStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         return Files.exists(getAbsolutePath(relativePath));
     }
 
