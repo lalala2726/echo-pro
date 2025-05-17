@@ -2,6 +2,7 @@ package cn.zhangchuangla.framework.model.entity;
 
 import cn.zhangchuangla.framework.model.entity.server.*;
 import cn.zhangchuangla.framework.model.entity.server.System;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
@@ -27,30 +28,37 @@ import java.util.List;
  */
 @Data
 @Slf4j
+@Schema(name = "服务器信息", description = "服务器信息")
 public class Server {
+
     /**
      * CPU信息
      */
+    @Schema(description = "CPU信息")
     private CPU cpu;
 
     /**
      * 内存信息
      */
+    @Schema(description = "内存信息")
     private Memory memory;
 
     /**
      * JVM信息
      */
+    @Schema(description = "JVM信息")
     private JVM jvm;
 
     /**
      * 系统信息
      */
+    @Schema(description = "系统信息")
     private System system;
 
     /**
      * 磁盘信息
      */
+    @Schema(description = "磁盘信息")
     private List<Disk> disks;
 
     /**
@@ -84,6 +92,7 @@ public class Server {
     /**
      * 获取CPU信息
      */
+    @Schema(description = "CPU信息")
     private CPU getCpuInfo(CentralProcessor processor) throws InterruptedException {
         CPU cpu = new CPU();
         // 获取CPU名称
@@ -136,19 +145,20 @@ public class Server {
     /**
      * 获取内存信息
      */
+    @Schema(description = "内存信息")
     private Memory getMemoryInfo(GlobalMemory memory) {
         Memory mem = new Memory();
         // 转换为GB并保留两位小数
-        double totalGB = memory.getTotal() / 1024.0 / 1024.0 / 1024.0;
-        double usedGB = (memory.getTotal() - memory.getAvailable()) / 1024.0 / 1024.0 / 1024.0;
-        double freeGB = memory.getAvailable() / 1024.0 / 1024.0 / 1024.0;
+        double totalGb = memory.getTotal() / 1024.0 / 1024.0 / 1024.0;
+        double usedGb = (memory.getTotal() - memory.getAvailable()) / 1024.0 / 1024.0 / 1024.0;
+        double freeGb = memory.getAvailable() / 1024.0 / 1024.0 / 1024.0;
 
-        mem.setTotal(Math.round(totalGB * 100) / 100.0);
-        mem.setUsed(Math.round(usedGB * 100) / 100.0);
-        mem.setFree(Math.round(freeGB * 100) / 100.0);
+        mem.setTotal(Math.round(totalGb * 100) / 100.0);
+        mem.setUsed(Math.round(usedGb * 100) / 100.0);
+        mem.setFree(Math.round(freeGb * 100) / 100.0);
 
         // 计算内存使用率
-        double usageRate = usedGB / totalGB * 100;
+        double usageRate = usedGb / totalGb * 100;
         mem.setUsage(String.format("%.2f%%", usageRate));
 
         // 添加交换内存信息
@@ -169,6 +179,7 @@ public class Server {
     /**
      * 获取JVM信息
      */
+    @Schema(description = "JVM信息")
     private JVM getJvmInfo() {
         JVM jvm = new JVM();
         // 使用完全限定名调用java.lang.System
@@ -201,6 +212,7 @@ public class Server {
     /**
      * 获取系统信息
      */
+    @Schema(description = "系统信息")
     private System getSystemInfo(OperatingSystem os) {
         System system = new System();
 
@@ -238,6 +250,7 @@ public class Server {
     /**
      * 获取磁盘信息
      */
+    @Schema(description = "磁盘信息")
     private List<Disk> getDiskInfo(OperatingSystem os) {
         List<Disk> diskList = new ArrayList<>();
         FileSystem fileSystem = os.getFileSystem();
@@ -261,6 +274,7 @@ public class Server {
     /**
      * 格式化运行时间
      */
+    @Schema(description = "格式化运行时间")
     private String formatUptime(long uptime) {
         long days = uptime / (1000 * 60 * 60 * 24);
         long hours = (uptime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);

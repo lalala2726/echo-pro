@@ -3,6 +3,7 @@ package cn.zhangchuangla.common.result;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 
 import java.io.Serial;
@@ -15,6 +16,7 @@ import java.io.Serializable;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Tag(name = "通用API响应结果封装类", description = "通用API响应结果封装类")
 public class AjaxResult<T> implements Serializable {
 
     @Serial
@@ -79,11 +81,11 @@ public class AjaxResult<T> implements Serializable {
         this(responseCode, null);
     }
 
-    // --- 静态工厂方法 (推荐使用) ---
 
     /**
      * 成功返回 (无消息，无数据)
      */
+    @Schema(description = "成功返回 (无消息，无数据)")
     public static <T> AjaxResult<T> success() {
         return new AjaxResult<>(ResponseCode.SUCCESS);
     }
@@ -93,6 +95,7 @@ public class AjaxResult<T> implements Serializable {
      *
      * @param message 自定义成功消息
      */
+    @Schema(description = "成功返回 (带自定义消息，无数据)")
     public static <T> AjaxResult<T> success(String message) {
         return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, null);
     }
@@ -102,6 +105,7 @@ public class AjaxResult<T> implements Serializable {
      *
      * @param data 返回的数据
      */
+    @Schema(description = "成功返回 (使用默认消息，带数据)")
     public static <T> AjaxResult<T> success(T data) {
         return new AjaxResult<>(ResponseCode.SUCCESS, data);
     }
@@ -112,6 +116,7 @@ public class AjaxResult<T> implements Serializable {
      * @param message 自定义成功消息
      * @param data    返回的数据
      */
+    @Schema(description = "成功返回 (带自定义消息和数据)")
     public static <T> AjaxResult<T> success(String message, T data) {
         return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, data);
     }
@@ -119,6 +124,7 @@ public class AjaxResult<T> implements Serializable {
     /**
      * 失败返回 (使用默认错误码和消息，无数据)
      */
+    @Schema(description = "失败返回 (使用默认错误码和消息，无数据)")
     public static <T> AjaxResult<T> error() {
         return new AjaxResult<>(ResponseCode.ERROR);
     }
@@ -128,6 +134,7 @@ public class AjaxResult<T> implements Serializable {
      *
      * @param message 自定义错误消息
      */
+    @Schema(description = "失败返回 (使用默认错误码，带自定义消息，无数据)")
     public static <T> AjaxResult<T> error(String message) {
         return new AjaxResult<>(ResponseCode.ERROR.getCode(), message, null);
     }
@@ -137,6 +144,7 @@ public class AjaxResult<T> implements Serializable {
      *
      * @param responseCode 响应码枚举
      */
+    @Schema(description = "失败返回 (使用指定的 ResponseCode，无数据)")
     public static <T> AjaxResult<T> error(ResponseCode responseCode) {
         return new AjaxResult<>(responseCode);
     }
@@ -147,6 +155,7 @@ public class AjaxResult<T> implements Serializable {
      * @param responseCode 响应码枚举
      * @param message      自定义错误消息 (将覆盖枚举中的默认消息)
      */
+    @Schema(description = "失败返回 (使用指定的 ResponseCode 和自定义消息，无数据)")
     public static <T> AjaxResult<T> error(ResponseCode responseCode, String message) {
         return new AjaxResult<>(responseCode.getCode(), message, null);
     }
@@ -157,6 +166,7 @@ public class AjaxResult<T> implements Serializable {
      * @param code    自定义错误码
      * @param message 自定义错误消息
      */
+    @Schema(description = "失败返回 (使用指定的自定义错误码和自定义消息，无数据)")
     public static <T> AjaxResult<T> error(Integer code, String message) {
         return new AjaxResult<>(code, message, null);
     }
@@ -166,6 +176,7 @@ public class AjaxResult<T> implements Serializable {
      *
      * @param message 自定义警告消息
      */
+    @Schema(description = "警告返回 (使用默认警告码，带自定义消息，无数据)")
     public static <T> AjaxResult<T> warning(String message) {
         return new AjaxResult<>(ResponseCode.WARNING.getCode(), message, null);
     }

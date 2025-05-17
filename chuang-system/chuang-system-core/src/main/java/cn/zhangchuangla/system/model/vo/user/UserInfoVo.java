@@ -12,7 +12,7 @@ import java.util.Set;
  * Created on 2025/3/1 18:06
  */
 @Data
-@Schema(name = "用户信息视图对象")
+@Schema(name = "用户信息视图对象", description = "用于展示用户的详细信息")
 public class UserInfoVo {
 
     /**

@@ -11,7 +11,7 @@ import lombok.Data;
  * @author Chuang
  */
 @Data
-@Schema(description = "菜单更新请求")
+@Schema(name = "菜单更新请求对象", description = "菜单更新请求对象")
 public class SysMenuUpdateRequest {
 
     /**

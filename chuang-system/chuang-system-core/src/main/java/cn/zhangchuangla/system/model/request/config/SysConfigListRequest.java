@@ -7,9 +7,12 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统配置表
+ *
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(name = "系统配置列表查询请求对象", description = "系统配置查询列表请求对象")
 public class SysConfigListRequest extends BasePageRequest {
 
     /**

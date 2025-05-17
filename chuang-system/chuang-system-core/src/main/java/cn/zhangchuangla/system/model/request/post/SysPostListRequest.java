@@ -12,10 +12,12 @@ import org.hibernate.validator.constraints.Range;
 
 /**
  * 岗位表
+ *
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "岗位信息列表请求类")
+@Schema(name = "岗位信息列表请求对象", description = "岗位信息列表请求对象")
 public class SysPostListRequest extends BasePageRequest {
 
     /**

@@ -8,10 +8,12 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 /**
- * 岗位表
+ * 修改岗位请求对象
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(name = "修改岗位请求类")
+@Schema(name = "修改岗位请求对象",description = "修改岗位请求对象")
 public class SysPostUpdateRequest {
 
     /**

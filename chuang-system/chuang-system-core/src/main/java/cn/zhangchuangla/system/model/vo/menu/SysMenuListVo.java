@@ -14,7 +14,7 @@ import java.util.List;
  * Created 2025/5/11 20:25
  */
 @Data
-@Schema(description = "菜单列表视图对象")
+@Schema(name = "菜单列表视图对象", description = "菜单列表视图对象")
 public class SysMenuListVo {
 
     /**

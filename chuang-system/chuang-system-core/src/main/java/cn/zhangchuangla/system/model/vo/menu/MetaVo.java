@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Chuang
  * @since 2024/04/12
  */
-@Schema(description = "菜单元数据对象")
+@Schema(name = "菜单元数据视图对象", description = "菜单元数据视图对象")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

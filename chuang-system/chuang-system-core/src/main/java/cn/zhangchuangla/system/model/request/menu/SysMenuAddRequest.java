@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 菜单添加请求
+ * 菜单添加请求对象
  *
  * @author Chuang
  */
 @Data
-@Schema(description = "菜单添加请求")
+@Schema(name = "菜单添加请求对象", description = "菜单添加请求对象")
 public class SysMenuAddRequest {
 
 

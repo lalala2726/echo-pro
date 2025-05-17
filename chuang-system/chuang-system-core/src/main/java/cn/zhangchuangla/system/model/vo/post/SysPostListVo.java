@@ -7,9 +7,11 @@ import lombok.Data;
 
 /**
  * 岗位表
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(name = "岗位列表视图类")
+@Schema(name = "岗位列表视图对象", description = "用于展示岗位列表的视图对象")
 public class SysPostListVo {
 
     /**

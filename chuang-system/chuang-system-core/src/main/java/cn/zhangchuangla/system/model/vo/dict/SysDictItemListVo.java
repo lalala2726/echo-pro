@@ -9,9 +9,11 @@ import java.util.Date;
 
 /**
  * 系统字典项表
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(description = "系统字典项列表视图对象")
+@Schema(name = "系统字典项列表视图对象", description = "系统字典项列表视图对象")
 public class SysDictItemListVo {
 
     /**

@@ -9,10 +9,11 @@ import java.util.Date;
 
 /**
  * 系统操作日志列表请求类
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "系统操作日志列表请求类")
+@Schema(name = "系统操作日志列表请求类", description = "系统操作日志列表请求类")
 public class SysOperationLogListRequest extends BasePageRequest {
 
     /**

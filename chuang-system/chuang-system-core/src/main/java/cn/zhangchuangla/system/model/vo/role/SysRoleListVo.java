@@ -10,6 +10,8 @@ import java.util.Date;
 
 /**
  * 角色VO
+ *
+ * @author zhangchuang
  */
 @Data
 @Schema(name = "角色列表视图对象", description = "返回前端展示的数据")

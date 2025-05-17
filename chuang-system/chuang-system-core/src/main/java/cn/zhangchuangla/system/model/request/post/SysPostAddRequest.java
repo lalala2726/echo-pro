@@ -10,11 +10,11 @@ import org.hibernate.validator.constraints.Range;
 
 /**
  * 岗位表
+ * @author zhangchuang
  */
 @Data
-@Schema(name = "添加岗位请求类")
+@Schema(name = "添加岗位请求对象",description = "添加岗位请求对象")
 public class SysPostAddRequest {
-
 
     /**
      * 岗位编码

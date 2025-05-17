@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
-import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleListRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -25,7 +25,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param request 查询参数
      * @return 分页列表
      */
-    Page<SysRole> roleList(SysRoleQueryRequest request);
+    Page<SysRole> roleList(SysRoleListRequest request);
 
     /**
      * 根据用户id获取角色列表

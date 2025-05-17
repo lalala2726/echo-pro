@@ -14,7 +14,7 @@ import lombok.Data;
  * created on 2025/3/21 09:40
  */
 @Data
-@Schema(description = "阿里云OSS配置实体类")
+@Schema(name = "阿里云OSS配置请求对象", description = "阿里云OSS配置请求对象")
 public class AliyunOSSConfigRequest {
 
 

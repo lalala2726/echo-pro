@@ -8,9 +8,11 @@ import lombok.Data;
 
 /**
  * 角色新增请求参数
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(name = "添加角色", description = "角色新增参数")
+@Schema(name = "添加角色请求对象", description = "添加角色请求对象")
 public class SysRoleAddRequest {
 
     /**

@@ -8,8 +8,11 @@ import java.util.Date;
 
 /**
  * 部门视图
+ *
+ * @author zhangchuang
  */
 @Data
+@Schema(name = "部门视图对象", description = "部门视图对象")
 public class SysDeptVo {
 
     /**

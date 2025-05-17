@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(name = "在线用户列表查询请求对象", description = "在线用户列表查询请求对象")
 public class OnlineUserListRequest extends BasePageRequest {
 
     /**
@@ -20,11 +21,6 @@ public class OnlineUserListRequest extends BasePageRequest {
     @Schema(description = "会话ID", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String sessionId;
 
-    /**
-     * 会话过期时间
-     */
-    @Schema(description = "会话过期时间", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String sessionExpireTime;
 
     /**
      * 用户名

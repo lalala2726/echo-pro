@@ -10,7 +10,7 @@ import lombok.Data;
  * @author Chuang
  */
 @Data
-@Schema(description = "腾讯云COS配置请求类")
+@Schema(name = "腾讯云COS配置请求类", description = "腾讯云COS配置请求类")
 public class TencentCOSConfigRequest {
 
     /**

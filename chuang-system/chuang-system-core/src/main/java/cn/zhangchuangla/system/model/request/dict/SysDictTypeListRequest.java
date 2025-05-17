@@ -8,13 +8,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典类型表
+ * 系统字典列表请求对象
  *
  * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "系统字典列表请求对象")
+@Schema(name = "系统字典列表请求对象", description = "系统字典列表请求对象")
 public class SysDictTypeListRequest extends BasePageRequest {
 
     /**

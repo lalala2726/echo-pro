@@ -7,9 +7,11 @@ import java.util.Date;
 
 /**
  * 系统操作日志列表视图对象
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(description = "系统操作日志列表视图对象")
+@Schema(name = "系统操作日志列表视图对象", description = "系统操作日志列表视图对象")
 public class SysOperationLogListVo {
 
     /**

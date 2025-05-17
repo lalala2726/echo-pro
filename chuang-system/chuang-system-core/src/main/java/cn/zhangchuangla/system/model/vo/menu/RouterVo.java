@@ -15,7 +15,7 @@ import java.util.List;
  * <p>
  * created on 2025年4月29日 22:14:26
  */
-@Schema(description = "路由对象")
+@Schema(name = "路由视图对象", description = "用于前端界面的动态路由")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

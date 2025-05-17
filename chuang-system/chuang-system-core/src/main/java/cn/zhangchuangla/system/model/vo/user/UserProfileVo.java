@@ -10,7 +10,7 @@ import java.util.Date;
  * Created on 2025/3/1 18:06
  */
 @Data
-@Schema(name = "用户简介视图对象")
+@Schema(name = "用户简介视图对象", description = "用于展示用户简介的视图对象")
 public class UserProfileVo {
 
     /**

@@ -7,11 +7,13 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 角色参数,用户查询角色列表
+ *
+ * @author zhangchuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "角色查询参数", description = "角色表查询参数")
-public class SysRoleQueryRequest extends BasePageRequest {
+@Schema(name = "角色列表查询请求对象", description = "角色列表查询请求对象")
+public class SysRoleListRequest extends BasePageRequest {
 
     /**
      * 角色名

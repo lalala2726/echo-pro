@@ -9,8 +9,11 @@ import java.util.Date;
 
 /**
  * 部门列表视图
+ *
+ * @author zhangchuang
  */
 @Data
+@Schema(name = "部门列表视图对象", description = "部门列表视图对象")
 public class SysDeptListVo {
 
     /**

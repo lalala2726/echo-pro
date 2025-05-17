@@ -9,9 +9,11 @@ import java.util.Date;
 
 /**
  * 系统登录日志列表视图对象
+ *
+ * @author zhangchuang
  */
 @Data
-@Schema(description = "系统登录日志列表视图对象")
+@Schema(name = "系统登录日志列表视图对象", description = "系统登录日志列表视图对象")
 public class SysLoginLogListVo {
 
     /**
