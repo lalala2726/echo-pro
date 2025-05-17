@@ -25,7 +25,7 @@
         <spring.boot.version>3.4.3</spring.boot.version>
         <spring.security.version>6.4.4</spring.security.version>
         <mybatis.plus.version>3.5.10</mybatis.plus.version>
-        <mysql.version>8.0.33</mysql.version>
+        <mysql.version>8.2.0</mysql.version>
         <redis.version>3.2.5</redis.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
@@ -293,6 +293,13 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>1.78</version>
+            </dependency>
+
+            <!-- Protobuf依赖 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>4.28.2</version>
             </dependency>
 
             <!-- 框架模块依赖 -->
