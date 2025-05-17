@@ -58,6 +58,7 @@ public class GlobalExceptionHandel {
         return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
+
     /**
      * 登录异常
      */

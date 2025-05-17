@@ -2,6 +2,7 @@ package cn.zhangchuangla.framework.web.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.common.utils.IPUtils;
@@ -76,19 +77,19 @@ public class SysAuthServiceImpl implements SysAuthService {
     /**
      * 刷新令牌
      *
-     * @param refreshToken 刷新令牌
+     * @param request 刷新令牌
      * @return 认证 Token 响应
      */
     @Override
-    public AuthenticationToken refreshToken(String refreshToken) {
+    public AuthenticationToken refreshToken(RefreshTokenRequest request) {
         // 验证刷新令牌
-        boolean isValidate = tokenManager.validateRefreshToken(refreshToken);
+        boolean isValidate = tokenManager.validateRefreshToken(request.getRefreshToken());
 
         if (!isValidate) {
             throw new ServiceException(ResponseCode.REFRESH_TOKEN_INVALID);
         }
         // 刷新令牌有效，生成新的访问令牌
-        return tokenManager.refreshToken(refreshToken);
+        return tokenManager.refreshToken(request.getRefreshToken());
     }
 
     /**
