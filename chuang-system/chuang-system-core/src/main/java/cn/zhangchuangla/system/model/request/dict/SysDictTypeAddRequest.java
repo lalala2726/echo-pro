@@ -5,7 +5,8 @@ import lombok.Data;
 
 /**
  * 系统字典添加请求对象
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 @Data
 @Schema(name = "系统字典添加请求对象", description = "系统字典添加请求对象")

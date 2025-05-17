@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 系统文件配置加载器：从数据库加载存储配置并缓存，支持 MinIO、OSS、本地文件系统。
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Component
 @Slf4j

@@ -16,7 +16,7 @@ import java.util.List;
  * <p>
  * 修改用户信息参数, 用于修改用户时使用
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "修改用户请求类", description = "用于修改用户时")

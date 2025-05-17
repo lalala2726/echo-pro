@@ -6,10 +6,11 @@ import lombok.Data;
 
 /**
  * 系统配置表
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 @Data
-@Schema(name = "系统配置添加请求类",description = "系统配置添加请求类")
+@Schema(name = "系统配置添加请求类", description = "系统配置添加请求类")
 public class SysConfigAddRequest {
 
     /**

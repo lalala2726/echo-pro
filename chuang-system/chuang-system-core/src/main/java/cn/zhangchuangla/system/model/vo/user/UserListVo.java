@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "用户列表视图对象", description = "用于在列表中展示用户的视图对象")

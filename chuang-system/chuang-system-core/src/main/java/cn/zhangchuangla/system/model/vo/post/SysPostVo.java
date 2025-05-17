@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 岗位表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

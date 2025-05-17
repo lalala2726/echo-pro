@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * 角色更新请求参数,用于更新角色时使用
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "角色更新请求对象", description = "角色更新请求对象")

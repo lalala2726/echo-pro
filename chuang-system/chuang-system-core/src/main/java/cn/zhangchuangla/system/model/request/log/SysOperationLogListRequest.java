@@ -9,7 +9,8 @@ import java.util.Date;
 
 /**
  * 系统操作日志列表请求类
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

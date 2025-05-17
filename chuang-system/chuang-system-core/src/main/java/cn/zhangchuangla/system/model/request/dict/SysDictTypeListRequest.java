@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 系统字典列表请求对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * 系统登录日志列表请求对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

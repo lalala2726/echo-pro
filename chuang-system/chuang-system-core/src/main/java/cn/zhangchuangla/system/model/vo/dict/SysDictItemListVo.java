@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * 系统字典项表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "系统字典项列表视图对象", description = "系统字典项列表视图对象")

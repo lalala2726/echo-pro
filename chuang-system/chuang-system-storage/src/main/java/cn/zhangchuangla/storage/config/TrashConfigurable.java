@@ -3,7 +3,7 @@ package cn.zhangchuangla.storage.config;
 /**
  * 定义可配置回收站功能的接口。
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public interface TrashConfigurable {
 

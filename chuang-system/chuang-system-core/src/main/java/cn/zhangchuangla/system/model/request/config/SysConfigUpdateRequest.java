@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * 系统配置表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "系统配置更新请求类", description = "系统配置更新请求类")

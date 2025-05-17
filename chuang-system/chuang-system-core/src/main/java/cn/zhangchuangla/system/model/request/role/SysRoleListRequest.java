@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 角色参数,用户查询角色列表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

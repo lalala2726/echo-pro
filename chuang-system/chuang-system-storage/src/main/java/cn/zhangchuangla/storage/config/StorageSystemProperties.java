@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 3. 若均未配置，则默认使用本地存储 (local)。
  * </p>
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @ConfigurationProperties(prefix = "storage")
 @Data

@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Range;
 /**
  * 岗位表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * 系统操作日志列表视图对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "系统操作日志列表视图对象", description = "系统操作日志列表视图对象")

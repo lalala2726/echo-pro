@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 系统配置表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

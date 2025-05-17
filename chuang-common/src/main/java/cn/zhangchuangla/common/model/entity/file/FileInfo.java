@@ -14,7 +14,7 @@ import java.io.IOException;
  * 用于存储从MultipartFile中提取的信息
  * 避免多次读取MultipartFile导致的失效问题
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @NoArgsConstructor

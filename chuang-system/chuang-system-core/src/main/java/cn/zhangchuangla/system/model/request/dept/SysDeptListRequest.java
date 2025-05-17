@@ -11,11 +11,12 @@ import java.util.Date;
 
 /**
  * 部门列表请求类
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "部门列表请求类" ,description = "部门列表请求类")
+@Schema(name = "部门列表请求类", description = "部门列表请求类")
 public class SysDeptListRequest extends BasePageRequest {
 
     /**

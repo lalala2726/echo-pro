@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 @Slf4j
 @Service("aliyunOssStorageService")

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "系统操作日志视图对象", description = "系统操作日志视图对象")

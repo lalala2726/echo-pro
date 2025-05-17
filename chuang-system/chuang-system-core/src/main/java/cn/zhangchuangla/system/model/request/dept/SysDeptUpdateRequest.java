@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * 部门修改请求类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "部门修改请求类", description = "部门修改请求类")
