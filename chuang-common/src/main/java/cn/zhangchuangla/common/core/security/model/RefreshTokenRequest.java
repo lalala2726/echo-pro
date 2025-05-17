@@ -1,7 +1,7 @@
 package cn.zhangchuangla.common.core.security.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -14,6 +14,6 @@ import lombok.Data;
 public class RefreshTokenRequest {
 
     @Schema(description = "刷新令牌")
-    @NotNull(message = "刷新令牌不能为空")
+    @NotBlank(message = "刷新令牌不能为空")
     private String refreshToken;
 }
