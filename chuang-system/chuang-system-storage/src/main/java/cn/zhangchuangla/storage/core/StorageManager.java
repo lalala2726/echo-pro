@@ -1,0 +1,156 @@
+package cn.zhangchuangla.storage.core;
+
+import cn.zhangchuangla.common.exception.ProfileException;
+import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.storage.StorageType;
+import cn.zhangchuangla.storage.config.StorageSystemProperties;
+import cn.zhangchuangla.storage.exception.StorageException;
+import cn.zhangchuangla.storage.loader.StorageConfigLoader;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Slf4j
+@Component
+public class StorageManager {
+
+    private final ApplicationContext applicationContext;
+    private final StorageSystemProperties storageSystemProperties;
+    private final StorageConfigLoader storageConfigLoader;
+
+    private StorageService activeStorageService;
+    private StorageType activeStorageType;
+    private Object activeSpecificProperties;
+
+    public StorageManager(ApplicationContext applicationContext,
+                          StorageSystemProperties storageSystemProperties,
+                          StorageConfigLoader storageConfigLoader) {
+        this.applicationContext = applicationContext;
+        this.storageSystemProperties = storageSystemProperties;
+        this.storageConfigLoader = storageConfigLoader;
+        determineActiveStorageService();
+    }
+
+    private void determineActiveStorageService() {
+        String activeTypeString = storageSystemProperties.getActiveType();
+
+        if (StringUtils.isBlank(activeTypeString)) {
+            log.info("未在 application.yml 中配置 'storage.active-type'，尝试从数据库加载...");
+            try {
+                activeTypeString = storageConfigLoader.getCurrentDefaultUploadType();
+                if (StringUtils.isBlank(activeTypeString)) {
+                    log.warn("数据库中配置的激活存储类型为空，默认使用 LOCAL。");
+                    activeTypeString = StorageType.LOCAL.name();
+                } else {
+                    log.info("从数据库加载到激活的存储类型: {}", activeTypeString);
+                }
+            } catch (ProfileException e) {
+                log.warn("从数据库加载激活存储类型失败 (可能未配置): {}。默认使用 LOCAL。", e.getMessage());
+                activeTypeString = StorageType.LOCAL.name();
+            }
+        } else {
+            log.info("从 application.yml 加载到激活的存储类型: {}", activeTypeString);
+        }
+
+        try {
+            this.activeStorageType = StorageType.valueOf(activeTypeString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.error("无效的存储类型配置: '{}'. 请检查 'storage.active-type' 或数据库中的配置.", activeTypeString);
+            throw new StorageException("无效的存储类型: " + activeTypeString + "，将默认使用 LOCAL", e);
+        }
+
+        log.info("最终确定的激活存储类型为: {}", this.activeStorageType);
+
+        this.activeSpecificProperties = getSpecificPropertiesForType(this.activeStorageType);
+        if (this.activeSpecificProperties == null) {
+            log.error("无法获取类型 {} 的具体配置信息，即使类型已确定。请检查 StorageSystemProperties 中的配置块。", this.activeStorageType);
+            throw new StorageException("无法为类型 " + this.activeStorageType + " 获取存储配置。");
+        }
+
+        this.activeStorageService = getServiceBeanForType(this.activeStorageType);
+
+        if (this.activeStorageService == null) {
+            log.error("StorageManager 初始化完成，但没有激活的存储服务配置或可用。存储操作将会失败。");
+            throw new StorageException("没有找到可用的存储服务实现，请检查配置和Bean定义以及激活类型设置。");
+        }
+        log.info("成功激活存储服务: {}", this.activeStorageType);
+    }
+
+    private Object getSpecificPropertiesForType(StorageType type) {
+        if (type == null) return null;
+        switch (type) {
+            case LOCAL:
+                return Optional.ofNullable(storageSystemProperties.getLocal())
+                        .filter(c -> StringUtils.isNotBlank(c.getRootPathOrBucketName()))
+                        .orElseThrow(() -> new StorageException("LOCAL 存储配置不完整或未找到 (local.rootPathOrBucketName 缺失)"));
+            case MINIO:
+                return Optional.ofNullable(storageSystemProperties.getMinio())
+                        .filter(c -> StringUtils.isNoneBlank(c.getEndpoint(), c.getAccessKey(), c.getSecretKey(), c.getRootPathOrBucketName()))
+                        .orElseThrow(() -> new StorageException("MinIO 存储配置不完整或未找到 (minio 部分属性缺失)"));
+            case ALIYUN_OSS:
+                return Optional.ofNullable(storageSystemProperties.getAliyunOss())
+                        .filter(c -> StringUtils.isNoneBlank(c.getEndpoint(), c.getAccessKeyId(), c.getAccessKeySecret(), c.getRootPathOrBucketName()))
+                        .orElseThrow(() -> new StorageException("Aliyun OSS 存储配置不完整或未找到 (aliyunOss 部分属性缺失)"));
+            case TENCENT_COS:
+                return Optional.ofNullable(storageSystemProperties.getTencentCos())
+                        .filter(c -> StringUtils.isNoneBlank(c.getRegion(), c.getSecretId(), c.getSecretKey(), c.getRootPathOrBucketName()))
+                        .orElseThrow(() -> new StorageException("Tencent COS 存储配置不完整或未找到 (tencentCos 部分属性缺失)"));
+            default:
+                log.warn("请求了未知或不支持的存储类型的特定配置: {}", type);
+                return null;
+        }
+    }
+
+    public StorageService getActiveStorageService() {
+        if (activeStorageService == null) {
+            log.error("试图获取激活的存储服务，但没有配置。请检查您的存储配置和激活逻辑。");
+            throw new StorageException("没有配置或激活的存储服务。");
+        }
+        return activeStorageService;
+    }
+
+    public Object getActiveStorageSpecificProperties() {
+        if (activeSpecificProperties == null) {
+            log.error("试图获取激活的存储特定配置，但没有找到。可能初始化失败或未配置激活服务。");
+            throw new StorageException("没有激活的存储服务或其特定配置信息。");
+        }
+        return activeSpecificProperties;
+    }
+
+    public StorageType getActiveStorageType() {
+        if (activeStorageType == null) {
+            log.error("试图获取激活的存储类型，但没有存储类型被激活。");
+            throw new StorageException("没有存储类型被激活。");
+        }
+        return activeStorageType;
+    }
+
+    public StorageService getServiceBeanForType(StorageType type) {
+        String beanName = "";
+        switch (type) {
+            case LOCAL:
+                beanName = "localStorageService";
+                break;
+            case MINIO:
+                beanName = "minioStorageService";
+                break;
+            case ALIYUN_OSS:
+                beanName = "aliyunOssStorageService";
+                break;
+            case TENCENT_COS:
+                beanName = "tencentCosStorageService";
+                break;
+            default:
+                throw new StorageException("Unsupported storage type: " + type);
+        }
+        try {
+            return applicationContext.getBean(beanName, StorageService.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            log.error("StorageService bean not found for type: {} (expected bean name: {})", type, beanName);
+            throw new StorageException("找不到类型 " + type + " 对应的存储服务Bean: " + beanName, e);
+        }
+    }
+}

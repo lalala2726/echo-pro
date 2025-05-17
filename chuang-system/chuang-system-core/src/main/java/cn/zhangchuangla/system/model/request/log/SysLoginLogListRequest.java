@@ -14,10 +14,12 @@ import java.util.Date;
 
 /**
  * 系统登录日志列表请求对象
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "系统登录日志列表请求对象")
+@Schema(name = "系统登录日志列表请求对象", description = "系统登录日志列表请求对象")
 public class SysLoginLogListRequest extends BasePageRequest {
 
     /**

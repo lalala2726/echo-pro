@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 角色VO
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

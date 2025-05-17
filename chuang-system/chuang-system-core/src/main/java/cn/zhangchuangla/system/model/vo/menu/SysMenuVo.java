@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(name = "菜单视图对象", description = "展示菜单详细信息")
 public class SysMenuVo extends BaseVo {
 
     /**

@@ -19,11 +19,11 @@ import org.springframework.context.annotation.Import;
 public class ApplicationConfig {
 
     /**
-     * 注册应用关闭时的钩子，优雅关闭异步任务池
+     * 注册应用关闭时的钩子
      */
     @PostConstruct
     public void init() {
-        log.info("注册应用关闭钩子");
+        log.info("初始化异步任务池");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("应用关闭钩子执行中...");
             AsyncManager.me().shutdown();

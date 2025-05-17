@@ -30,7 +30,8 @@ import java.util.stream.IntStream;
  * 操作日志记录处理
  * 通过AOP切面实现对Controller层加了 @Log 注解的方法进行拦截
  * 可记录请求参数、返回结果以及异常信息，并将日志保存到数据库
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 @Aspect
 @Component

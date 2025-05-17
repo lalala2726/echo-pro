@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
+ * 系统菜单列表查询请求对象
+ *
  * @author Chuang
  * <p>
  * created on 2025/5/14 10:47
  */
 @Data
+@Schema(name = "系统菜单列表查询请求对象", description = "系统菜单列表查询请求对象")
 public class SysMenuListRequest {
 
     /**

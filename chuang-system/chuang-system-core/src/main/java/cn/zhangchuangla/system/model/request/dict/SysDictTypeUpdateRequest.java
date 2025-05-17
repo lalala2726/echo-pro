@@ -6,12 +6,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 系统字典类型表
+ * 系统字典修改请求对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
-@Schema(description = "系统字典修改请求对象")
+@Schema(name = "系统字典修改请求对象", description = "系统字典修改请求对象")
 public class SysDictTypeUpdateRequest {
 
     /**

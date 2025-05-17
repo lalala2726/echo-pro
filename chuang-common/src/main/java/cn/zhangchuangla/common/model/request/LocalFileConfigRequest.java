@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "本地文件配置实体类")
+@Schema(name = "本地文件配置请求对象", description = "本地文件配置请求对象")
 public class LocalFileConfigRequest {
 
     /**

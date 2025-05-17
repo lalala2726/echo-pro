@@ -7,12 +7,17 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 部门表
+ * 部门修改请求类
+ *
+ * @author Chuang
  */
 @Data
-@Schema(name = "部门修改请求类")
+@Schema(name = "部门修改请求类", description = "部门修改请求类")
 public class SysDeptUpdateRequest {
 
+    /**
+     * 部门ID
+     */
     @Schema(name = "部门ID", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
     @Min(value = 1, message = "部门ID不能小于1")
     private Long deptId;

@@ -11,7 +11,7 @@ import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
-import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleListRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
@@ -51,7 +51,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      * @return 分页列表
      */
     @Override
-    public Page<SysRole> roleList(SysRoleQueryRequest request) {
+    public Page<SysRole> roleList(SysRoleListRequest request) {
         LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
                 .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
                         SysRole::getRoleName, request.getRoleName());

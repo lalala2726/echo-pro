@@ -8,8 +8,11 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author Chuang
+ */
 @Data
-@Schema(name = "用户VO", description = "返回前端展示的数据")
+@Schema(name = "用户列表视图对象", description = "用于在列表中展示用户的视图对象")
 public class UserListVo {
 
     /**

@@ -14,7 +14,7 @@ import java.util.List;
  * created on 2025/5/12 13:48
  */
 @Data
-@Schema(description = "菜单角色权限对象")
+@Schema(name = "菜单角色权限视图对象", description = "菜单角色权限对象")
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

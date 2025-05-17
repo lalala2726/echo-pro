@@ -7,8 +7,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * 键值对
+ *
+ * @author Chuang
  */
-@Schema(description = "键值对")
+@Schema(name = "键值对对象", description = "键值对")
 @Data
 @NoArgsConstructor
 public class KeyValue {

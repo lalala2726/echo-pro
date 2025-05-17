@@ -1,18 +1,21 @@
 package cn.zhangchuangla.system.model.request.role;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
 
 /**
+ * 角色权限更新请求
+ *
  * @author Chuang
  * <p>
  * created on 2025/5/12 20:07
  */
 @Data
-@Schema(description = "角色权限更新请求")
+@Tag(name = "角色权限更新请求", description = "角色权限更新请求")
 public class SysUpdateRolePermissionRequest {
 
     /**

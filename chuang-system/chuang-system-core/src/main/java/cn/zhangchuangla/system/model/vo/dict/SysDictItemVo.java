@@ -10,11 +10,11 @@ import lombok.EqualsAndHashCode;
 /**
  * 系统字典项表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "系统字典项视图对象")
+@Schema(name = "系统字典项视图对象", description = "系统字典项视图对象")
 public class SysDictItemVo extends BaseVo {
 
     /**

@@ -12,7 +12,11 @@ import org.hibernate.validator.constraints.Range;
 import java.util.List;
 
 /**
+ * 修改用户请求类
+ * <p>
  * 修改用户信息参数, 用于修改用户时使用
+ *
+ * @author Chuang
  */
 @Data
 @Schema(name = "修改用户请求类", description = "用于修改用户时")

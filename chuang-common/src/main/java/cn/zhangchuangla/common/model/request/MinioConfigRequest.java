@@ -14,7 +14,7 @@ import lombok.Data;
  * created on 2025/3/21 09:41
  */
 @Data
-@Schema(description = "minio 配置实体类")
+@Schema(name = "minio 配置请求对象", description = "minio 配置请求对象")
 public class MinioConfigRequest {
 
 

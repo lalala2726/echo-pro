@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典项表
+ * 系统字典项列表请求对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(description = "系统字典项列表请求对象")
+@Schema(name = "系统字典项列表请求对象", description = "系统字典项列表请求对象")
 public class SysDictItemListRequest extends BasePageRequest {
 
     /**

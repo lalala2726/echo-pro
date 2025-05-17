@@ -289,7 +289,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return true：是 false：否
      */
     public static boolean isHttp(String link) {
-        return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
+        return org.apache.commons.lang3.StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
 
     /**

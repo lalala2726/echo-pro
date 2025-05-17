@@ -4,7 +4,8 @@ import java.security.SecureRandom;
 
 /**
  * 安全的验证码文本生成器
- * @author zhangchuang
+ *
+ * @author Chuang
  */
 public class KaptchaTextCreator {
     private static final String[] NUMBERS = "0,1,2,3,4,5,6,7,8,9,10".split(",");
@@ -12,6 +13,7 @@ public class KaptchaTextCreator {
 
     /**
      * 生成随机数学算式文本
+     *
      * @return 数学算式文本，格式为"算式=?@答案"
      */
     public String getText() {

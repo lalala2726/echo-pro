@@ -11,7 +11,7 @@ import lombok.Data;
  * created on 2025/3/19 19:47
  */
 @Data
-@Schema(description = "内存信息")
+@Schema(name = "内存信息", description = "内存信息")
 public class Memory {
 
     /**

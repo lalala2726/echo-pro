@@ -1,6 +1,5 @@
 package cn.zhangchuangla.storage.service;
 
-import cn.zhangchuangla.common.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.model.entity.SysFile;
 import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,9 +15,9 @@ public interface StorageFileService extends IService<SysFile> {
     /**
      * 保存文件信息
      *
-     * @param fileTransferDto 文件上传结果
+     * @param fileInfo 文件上传结果
      */
-    void saveFileInfo(FileTransferDto fileTransferDto);
+    void saveFileInfo(cn.zhangchuangla.storage.FileInfo fileInfo);
 
     /**
      * 查询文件列表

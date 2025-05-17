@@ -7,7 +7,7 @@ import lombok.Getter;
  * <p>
  * created by Chuang on 2025/1/11 03:47
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Getter
 public enum ResponseCode {

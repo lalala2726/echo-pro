@@ -8,10 +8,12 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 部门表
+ * 部门添加请求类
+ *
+ * @author Chuang
  */
 @Data
-@Schema(name = "部门添加请求类")
+@Schema(name = "部门添加请求类", description = "部门添加请求类")
 public class SysDeptAddRequest {
 
 

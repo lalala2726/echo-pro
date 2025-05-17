@@ -9,10 +9,12 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 岗位表
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "岗位视图对象")
+@Schema(name = "岗位视图对象", description = "用于展示岗位的视图对象")
 public class SysPostVo extends BaseVo {
 
     /**
