@@ -148,15 +148,15 @@
             <artifactId>thumbnailator</artifactId>
         </dependency>
 
-        <!-- 验证码生成 -->
-        <dependency>
-            <groupId>com.github.penggle</groupId>
-            <artifactId>kaptcha</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
+        </dependency>
+
+        <!-- 安全的Bouncy Castle加密库 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
 
     </dependencies>

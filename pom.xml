@@ -22,10 +22,10 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>3.2.5</spring.boot.version>
-        <spring.security.version>6.2.2</spring.security.version>
+        <spring.boot.version>3.4.3</spring.boot.version>
+        <spring.security.version>6.4.4</spring.security.version>
         <mybatis.plus.version>3.5.10</mybatis.plus.version>
-        <mysql.version>8.0.33</mysql.version>
+        <mysql.version>8.2.0</mysql.version>
         <redis.version>3.2.5</redis.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
@@ -46,7 +46,6 @@
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
         <javax.activation.version>1.2.0</javax.activation.version>
-        <kaptcha.version>2.3.2</kaptcha.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
@@ -78,6 +77,21 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
+            <!-- Spring Security Crypto 漏洞修复 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>6.4.4</version>
+            </dependency>
+            
+            <!-- Spring Security Core 漏洞修复 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>6.4.4</version>
+            </dependency>
+            
             <!-- Spring Boot Web 启动器，用于构建 Web 应用 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -262,9 +276,9 @@
             </dependency>
             <!-- Kaptcha 依赖，用于生成验证码 -->
             <dependency>
-                <groupId>com.github.penggle</groupId>
-                <artifactId>kaptcha</artifactId>
-                <version>${kaptcha.version}</version>
+                <groupId>io.github.shuaijunlan</groupId>
+                <artifactId>nkaptcha</artifactId>
+                <version>${io.github.shuaijunlan.nkaptcha.version}</version>
             </dependency>
 
             <!-- ===================== 项目模块依赖 ===================== -->
@@ -278,6 +292,20 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${cn.hutool.version}</version>
+            </dependency>
+
+            <!-- Bouncy Castle依赖 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.78</version>
+            </dependency>
+
+            <!-- Protobuf依赖 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>4.28.2</version>
             </dependency>
 
             <!-- 框架模块依赖 -->
