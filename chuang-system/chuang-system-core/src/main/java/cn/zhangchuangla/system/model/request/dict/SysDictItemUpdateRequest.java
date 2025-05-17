@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 系统字典项表
+ *
  * @author zhangchuang
  */
 @Data

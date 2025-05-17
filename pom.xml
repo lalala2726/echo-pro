@@ -77,21 +77,21 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!-- Spring Security Crypto 漏洞修复 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
                 <version>6.4.4</version>
             </dependency>
-            
+
             <!-- Spring Security Core 漏洞修复 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
                 <version>6.4.4</version>
             </dependency>
-            
+
             <!-- Spring Boot Web 启动器，用于构建 Web 应用 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

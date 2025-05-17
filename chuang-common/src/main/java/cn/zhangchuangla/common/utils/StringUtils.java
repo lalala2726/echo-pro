@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.utils;
 
+import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.constant.Constants;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import static java.util.Objects.isNull;
  * @author Ruoyi
  * created on 2025/1/12 11:23
  */
-public class StringUtils extends org.apache.commons.lang3.StringUtils {
+public class StringUtils extends StrUtil {
 
     /**
      * 空字符串
@@ -289,7 +290,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return true：是 false：否
      */
     public static boolean isHttp(String link) {
-        return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
+        return org.apache.commons.lang3.StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
 
     /**

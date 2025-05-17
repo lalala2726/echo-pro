@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 
 /**
  * 安全的验证码文本生成器
+ *
  * @author zhangchuang
  */
 public class KaptchaTextCreator {
@@ -12,6 +13,7 @@ public class KaptchaTextCreator {
 
     /**
      * 生成随机数学算式文本
+     *
      * @return 数学算式文本，格式为"算式=?@答案"
      */
     public String getText() {
