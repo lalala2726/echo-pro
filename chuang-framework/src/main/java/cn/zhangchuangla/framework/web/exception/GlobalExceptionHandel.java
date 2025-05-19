@@ -38,7 +38,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(ServiceException.class)
     public AjaxResult<Void> serviceExceptionHandel(ServiceException exception) {
         log.error("业务异常", exception);
-        return AjaxResult.error(exception.getMessage());
+        return AjaxResult.error(exception.getMessage(), exception.getCode());
     }
 
     /**

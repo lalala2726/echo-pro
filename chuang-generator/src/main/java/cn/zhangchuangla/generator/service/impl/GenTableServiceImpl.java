@@ -1,5 +1,6 @@
 package cn.zhangchuangla.generator.service.impl;
 
+import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.generator.model.TableField;
 import cn.zhangchuangla.generator.model.TableInfo;
@@ -236,6 +237,9 @@ public class GenTableServiceImpl extends ServiceImpl<cn.zhangchuangla.generator.
                             .eq(GenTableColumn::getTableId, id)
                             .orderByAsc(GenTableColumn::getSort));
             genTable.setColumns(columns);
+        }
+        if (genTable == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL);
         }
         return genTable;
     }

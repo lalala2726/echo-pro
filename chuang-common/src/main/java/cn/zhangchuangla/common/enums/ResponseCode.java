@@ -80,7 +80,7 @@ public enum ResponseCode {
     // region 数据相关错误状态
     DATA_NOT_FOUND(40402, "数据未找到"),
     // 无内容返回，语义更标准
-    RESULT_IS_NULL(204, "查询为空"),
+    RESULT_IS_NULL(4204, "查询为空"),
     DELETE_ERROR(40008, "删除失败"),
     // endregion
 
