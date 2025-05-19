@@ -9,8 +9,16 @@
         <version>1.0.0</version>
     </parent>
 
+    <description>
+        站内信息模块，用于系统或者管理员推送站内消息
+    </description>
 
-    <artifactId>chuang-system-core</artifactId>
-    <version>1.0.0</version>
-    <description>系统核心模块，提供基础系统功能，包括用户管理，角色管理，菜单管理，部门管理，字典管理等</description>
+    <artifactId>chuang-system-message</artifactId>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 </project>

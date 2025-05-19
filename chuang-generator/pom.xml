@@ -11,6 +11,10 @@
 
     <artifactId>chuang-generator</artifactId>
 
+    <description>
+        代码生成模块，帮助开发者快速生成简单的增删改查代码
+    </description>
+
     <dependencies>
         <!-- Velocity模板引擎 -->
         <dependency>
