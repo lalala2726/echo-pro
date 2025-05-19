@@ -24,15 +24,13 @@ public interface GenTableColumnService extends IService<GenTableColumn> {
      * 根据表ID删除列信息
      *
      * @param tableId 表ID
-     * @return 结果
      */
-    int deleteGenTableColumnByTableId(Long tableId);
+    void deleteGenTableColumnByTableId(Long tableId);
 
     /**
      * 根据多个表ID删除列信息
      *
      * @param tableIds 表ID数组
-     * @return 结果
      */
-    int deleteGenTableColumnByTableIds(Long[] tableIds);
+    void deleteGenTableColumnByTableIds(Long[] tableIds);
 }

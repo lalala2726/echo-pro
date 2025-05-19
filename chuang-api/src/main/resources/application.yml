@@ -65,51 +65,47 @@ security:
     single-login: false
 
 # ===================================================================
-# New Storage Configuration
+# 新的存储配置
 # ===================================================================
 storage:
-  # --- Local Storage Configuration ---
+  # --- 本地存储配置 ---
   local:
-    active: true  # Set to true if Local is the active storage
-    # Root path for local storage (absolute path recommended)
-    # Example: /var/www/uploads or D:/uploads
-    # Ensure this path exists and the application has write permissions.
-    root-path-or-bucket-name: "/Users/zhangchuang/projects/app-backend/uploads" # <<< PLEASE UPDATE THIS PATH
-    # Publicly accessible base URL for files (if served directly by a web server or Spring resource handler)
-    # Example: https://yourdomain.com/uploads or just /resources/uploads if Spring serves them
-    file-domain: "/static-uploads" # Example if you set up a resource handler for /static-uploads mapped to the root-path
+    # 本地存储的根路径（推荐使用绝对路径）
+    # 示例：/var/www/uploads 或 D:/uploads
+    # 确保此路径存在，并且应用程序具有写入权限。
+    root-path-or-bucket-name: "/Users/zhangchuang/projects/app-backend/uploads" # <<< 请更新此路径
+    # 文件的公开访问基础URL（如果由Web服务器或Spring资源处理程序直接提供）
+    # 示例：https://yourdomain.com/uploads 或者如果是通过Spring提供，可以是 /resources/uploads
+    file-domain: "/static-uploads" # 如果你为root-path设置了名为/static-uploads的资源处理器，请参考此示例
     enable-trash: true
     trash-directory-name: "trash"
 
-  # --- MinIO Configuration ---
+  # --- MinIO 配置 ---
   minio:
-    active: false
     endpoint: "http://your-minio-server:9000"
     access-key: "YOUR_MINIO_ACCESS_KEY"
     secret-key: "YOUR_MINIO_SECRET_KEY"
-    root-path-or-bucket-name: "your-minio-bucket-name" # This is the bucket name
-    file-domain: "" # e.g., "https://minio.yourdomain.com/your-bucket-name"
+    root-path-or-bucket-name: "your-minio-bucket-name" # 这里填写的是存储桶名称
+    file-domain: "" # 示例："https://minio.yourdomain.com/your-bucket-name"
     enable-trash: true
     trash-directory-name: "trash"
 
-  # --- Aliyun OSS Configuration ---
+  # --- 阿里云OSS 配置 ---
   aliyun-oss:
-    active: false
     endpoint: "oss-cn-beijing.aliyuncs.com"
     access-key-id: "YOUR_ALIYUN_ACCESS_KEY_ID"
     access-key-secret: "YOUR_ALIYUN_ACCESS_KEY_SECRET"
     root-path-or-bucket-name: "your-aliyun-oss-bucket-name"
-    file-domain: "" # e.g., "https://your-oss-domain.com"
+    file-domain: "" # 示例："https://your-oss-domain.com"
     enable-trash: true
     trash-directory-name: "trash"
 
-  # --- Tencent COS Configuration ---
+  # --- 腾讯COS 配置 ---
   tencent-cos:
-    active: false
     region: "ap-beijing"
     secret-id: "YOUR_TENCENT_COS_SECRET_ID"
     secret-key: "YOUR_TENCENT_COS_SECRET_KEY"
     root-path-or-bucket-name: "your-tencent-cos-bucket-name-appid"
-    file-domain: "" # e.g., "https://your-cos-domain.com"
+    file-domain: "" # 示例："https://your-cos-domain.com"
     enable-trash: true
     trash-directory-name: "trash"

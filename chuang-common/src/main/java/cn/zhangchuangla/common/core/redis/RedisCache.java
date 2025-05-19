@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Redis缓存操作工具类
+ * @author zhangchuang
  */
 @Slf4j
 @SuppressWarnings(value = {"unchecked", "rawtypes"})

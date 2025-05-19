@@ -7,15 +7,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 统一存储系统配置属性。
  * <p>
  * 激活逻辑:
- * 1. 优先读取 {@code storage.active-type} จาก application.yml。
+ * 1. 优先读取 {@code storage.active-type}  application.yml。
  * 2. 若未配置，则尝试从数据库加载主存储配置。
  * 3. 若均未配置，则默认使用本地存储 (local)。
  * </p>
  *
  * @author Chuang
  */
-@ConfigurationProperties(prefix = "storage")
 @Data
+@ConfigurationProperties(prefix = "storage")
 public class StorageSystemProperties {
 
     /**
@@ -24,7 +24,6 @@ public class StorageSystemProperties {
      * 如果为空或未设置，将尝试从数据库加载或降级到本地。
      */
     private String activeType;
-
     private LocalConfig local;
     private MinioConfig minio;
     private AliyunOssConfig aliyunOss;
@@ -44,7 +43,7 @@ public class StorageSystemProperties {
 
         /**
          * 文件的公共可访问基础URL (如果由Web服务器或Spring资源处理器直接提供服务)。
-         * 示例: https://yourdomain.com/uploads 或 /resources/uploads (如果Spring提供服务)
+         * <p>示例: <a href="https://yourdomain.com/uploads">...</a> 或 /resources/uploads (如果Spring提供服务)</p>
          */
         private String fileDomain;
 

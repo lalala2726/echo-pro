@@ -2,10 +2,8 @@ package cn.zhangchuangla.generator.mapper;
 
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.GenTableListRequest;
 import cn.zhangchuangla.generator.model.vo.DbTableVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -48,23 +46,6 @@ public interface GenTableMapper extends BaseMapper<GenTable> {
      * @return 数据库表集合
      */
     List<DbTableVO> selectDbTableListExcludeGenTable(@Param("tableName") String tableName);
-
-    /**
-     * 查询表名称业务信息
-     *
-     * @param tableName 表名称
-     * @return 业务表信息
-     */
-    GenTable selectGenTableByName(String tableName);
-
-    /**
-     * 分页查询表列表
-     *
-     * @param page    分页对象
-     * @param request 查询参数
-     * @return 表集合
-     */
-    Page<GenTable> selectGenTableList(Page<GenTable> page, @Param("request") GenTableListRequest request);
 
     /**
      * 执行DDL语句

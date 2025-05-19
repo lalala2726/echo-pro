@@ -13,6 +13,19 @@
     <version>1.0.0</version>
     <description>系统存储相关管理</description>
     <dependencies>
+        <!-- Spring Boot 配置处理 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Boot 自动配置 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
         <!-- 腾讯云API -->
         <dependency>
             <groupId>com.qcloud</groupId>

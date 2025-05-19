@@ -63,17 +63,14 @@ public class TableInfo {
      */
     private TableType tableType;
 
-    // --- 主子表特定字段 ---
     /**
      * 子表名（原始，带下划线）
      */
-    // 新增
     private String subTableName;
 
     /**
      * 子表关联的外键名（在子表中，原始，带下划线）
      */
-    // 新增
     private String subTableFkName;
 
     /**
@@ -95,7 +92,6 @@ public class TableInfo {
     /**
      * 树编码字段名（原始，带下划线）
      */
-    // 新增
     private String treeCode;
 
     /**
@@ -111,13 +107,11 @@ public class TableInfo {
     /**
      * 树父编码字段名（原始，带下划线）
      */
-    // 新增
     private String treeParentCode;
 
     /**
      * 树名称字段名（原始，带下划线）
      */
-    // 新增
     private String treeName;
 
     /**

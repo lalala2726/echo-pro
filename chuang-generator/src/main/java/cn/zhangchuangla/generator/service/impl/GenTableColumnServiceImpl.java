@@ -27,13 +27,13 @@ public class GenTableColumnServiceImpl extends ServiceImpl<GenTableColumnMapper,
     }
 
     @Override
-    public int deleteGenTableColumnByTableId(Long tableId) {
-        return baseMapper.delete(new LambdaQueryWrapper<GenTableColumn>().eq(GenTableColumn::getTableId, tableId));
+    public void deleteGenTableColumnByTableId(Long tableId) {
+        baseMapper.delete(new LambdaQueryWrapper<GenTableColumn>().eq(GenTableColumn::getTableId, tableId));
     }
 
     @Override
-    public int deleteGenTableColumnByTableIds(Long[] tableIds) {
-        return baseMapper
+    public void deleteGenTableColumnByTableIds(Long[] tableIds) {
+        baseMapper
                 .delete(new LambdaQueryWrapper<GenTableColumn>().in(GenTableColumn::getTableId, Arrays.asList(tableIds)));
     }
 }
