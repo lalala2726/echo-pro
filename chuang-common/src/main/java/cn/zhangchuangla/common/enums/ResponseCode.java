@@ -24,7 +24,7 @@ public enum ResponseCode {
     // 明确标识为系统级异常
     SYSTEM_ERROR(50002, "系统错误！"),
     // 通用操作失败
-    OPERATION_ERROR(50003, "操作失败"),
+    OPERATION_ERROR(4000, "操作失败"),
     // 文件读写等失败
     FILE_OPERATION_FAILED(50004, "文件操作失败！"),
     // endregion
@@ -80,7 +80,7 @@ public enum ResponseCode {
     // region 数据相关错误状态
     DATA_NOT_FOUND(40402, "数据未找到"),
     // 无内容返回，语义更标准
-    RESULT_IS_NULL(204, "查询为空"),
+    RESULT_IS_NULL(4204, "查询为空"),
     DELETE_ERROR(40008, "删除失败"),
     // endregion
 

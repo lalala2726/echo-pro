@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 
 /**
  * 角色和菜单关联表
+ * @author zhangchuang
  */
 @TableName(value = "sys_role_menu")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+
 public class SysRoleMenu {
 
     /**

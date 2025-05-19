@@ -19,32 +19,34 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-framework</artifactId>
         </dependency>
-
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-core</artifactId>
+            <artifactId>chuang-system</artifactId>
         </dependency>
-
+        <!-- 依赖存储模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-system-storage</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-core</artifactId>
+        </dependency>
+        <!-- 常用工具模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common</artifactId>
         </dependency>
-
+        <!-- 代码生成模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-generator</artifactId>
         </dependency>
-
+        <!-- 缓存模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
         <!-- Swagger3 API文档 -->
         <dependency>
             <groupId>org.springdoc</groupId>

@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static cn.zhangchuangla.common.enums.ResponseCode.ACCESS_TOKEN_INVALID;
 import static cn.zhangchuangla.common.enums.ResponseCode.REFRESH_TOKEN_INVALID;
 
+
 /**
  * Redis Token 管理器
  * <p>
@@ -507,8 +508,7 @@ public class RedisTokenManager implements TokenManager {
         // 应检查是否为null
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
-        String userAgent;
-        userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         String osName = UserAgentUtils.getOsName(userAgent);
         String browserName = UserAgentUtils.getBrowserName(userAgent);
         String deviceManufacturer = UserAgentUtils.getDeviceManufacturer(userAgent);

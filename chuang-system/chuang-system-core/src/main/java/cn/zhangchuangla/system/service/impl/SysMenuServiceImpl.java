@@ -257,6 +257,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         }
     }
 
+
     /**
      * 校验菜单的组件路径是否符合规范。
      *
@@ -340,7 +341,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (menuId == null) {
             return false;
         }
-        return count(new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getParentId, menuId)) > 0;
+        return count(new LambdaQueryWrapper<SysMenu>()
+                .eq(SysMenu::getParentId, menuId)
+                .ne(SysMenu::getMenuType, Constants.MenuConstants.TYPE_BUTTON)) > 0;
     }
 
     /**
@@ -1010,6 +1013,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private void fillBaseMetaInfo(MetaVo meta, SysMenu menu) {
         meta.setTitle(menu.getMenuName());
         meta.setIcon(menu.getIcon());
+        meta.setShowParent(true);
         meta.setShowLink(Constants.MenuConstants.VISIBLE.equals(menu.getVisible()));
         if (StrUtil.isNotBlank(menu.getPermission())) {
             meta.setAuths(new String[]{menu.getPermission()});
