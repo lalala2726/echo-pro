@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.core.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
@@ -28,7 +29,7 @@ import java.util.UUID;
  * @author Chuang
  */
 @Slf4j
-@Service("localStorageService")
+@Service(StorageConstants.LOCAL_STORAGE_SERVICE)
 public class LocalStorageServiceImpl implements StorageService {
 
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp");
@@ -208,7 +209,9 @@ public class LocalStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         return StringUtils.hasText(config.getFileDomain()) ?
                 StoragePathUtils.concatUrl(config.getFileDomain(), relativePath) :
                 StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
@@ -216,8 +219,10 @@ public class LocalStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
-        return Files.exists(getAbsolutePath(relativePath));
+        if (!StringUtils.hasText(relativePath)) {
+            return true;
+        }
+        return !Files.exists(getAbsolutePath(relativePath));
     }
 
     @Override

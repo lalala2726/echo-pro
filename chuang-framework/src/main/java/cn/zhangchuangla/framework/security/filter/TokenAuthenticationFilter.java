@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.security.filter;
 
 import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.common.config.property.SecurityProperties;
 import cn.zhangchuangla.common.constant.SecurityConstants;
 import cn.zhangchuangla.common.enums.ResponseCode;
 import cn.zhangchuangla.common.utils.ResponseUtils;
@@ -11,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
@@ -28,11 +29,10 @@ import java.util.Arrays;
 @Slf4j
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenManager tokenManager;
-
-    public TokenAuthenticationFilter(TokenManager tokenManager) {
-        this.tokenManager = tokenManager;
-    }
+    @Autowired
+    private TokenManager tokenManager;
+    @Autowired
+    private SecurityProperties securityProperties;
 
 
     /**
@@ -45,8 +45,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        String header = securityProperties.getHeader();
+        String authorizationHeader = request.getHeader(header);
+        log.info("当前请求令牌：{}", authorizationHeader);
         try {
             if (StrUtil.isNotBlank(authorizationHeader)) {
 

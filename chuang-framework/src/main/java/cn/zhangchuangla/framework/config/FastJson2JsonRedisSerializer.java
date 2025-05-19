@@ -44,6 +44,6 @@ public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T> {
         String str = new String(bytes, DEFAULT_CHARSET);
 
         // 使用 parseObject 时添加 JSONReader.Feature.SupportAutoType 特性，确保能正确处理类型信息
-        return JSON.parseObject(str, clazz, AUTO_TYPE_FILTER, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(str, clazz, AUTO_TYPE_FILTER);
     }
 }

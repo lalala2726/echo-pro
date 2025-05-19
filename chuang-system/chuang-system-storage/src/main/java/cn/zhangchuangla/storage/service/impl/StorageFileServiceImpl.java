@@ -55,7 +55,8 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
             return ((StorageSystemProperties.TencentCosConfig) specificProps).getRootPathOrBucketName();
         }
         log.warn("无法确定当前激活存储的 bucketName/rootPath。");
-        return null; // 或者抛出异常
+        // 或者抛出异常
+        return null;
     }
 
     /**
@@ -186,8 +187,12 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
                 }
             } catch (Exception e) {
                 log.error("File operation exception: ID={}, Error: {}", id, e.getMessage(), e);
-                if (e instanceof FileException) throw (FileException) e;
-                if (e instanceof ParamException) throw (ParamException) e;
+                if (e instanceof FileException) {
+                    throw (FileException) e;
+                }
+                if (e instanceof ParamException) {
+                    throw (ParamException) e;
+                }
                 throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件操作异常: " + e.getMessage());
             }
         }
@@ -282,7 +287,9 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
             }
         } catch (Exception e) {
             log.error("Exception during file recovery from trash: ID={}, Error: {}", id, e.getMessage(), e);
-            if (e instanceof FileException) throw (FileException) e;
+            if (e instanceof FileException) {
+                throw (FileException) e;
+            }
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复文件操作异常: " + e.getMessage());
         }
     }

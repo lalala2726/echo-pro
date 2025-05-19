@@ -7,6 +7,7 @@ import lombok.Data;
 
 /**
  * 文件配置表
+ * @author Chuang
  */
 @Data
 @Schema(description = "文件配置修改请求类")

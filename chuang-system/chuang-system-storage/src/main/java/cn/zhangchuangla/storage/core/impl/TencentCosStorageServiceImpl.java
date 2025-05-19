@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.core.impl;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  * @author Chuang
  */
 @Slf4j
-@Service("tencentCosStorageService")
+@Service(StorageConstants.TENCENT_COS_STORAGE_SERVICE)
 public class TencentCosStorageServiceImpl implements StorageService {
 
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp");
@@ -225,7 +226,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public boolean deleteFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
             getClient().deleteObject(bucketName, relativePath);
@@ -239,9 +242,13 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public void deleteFiles(List<String> relativePaths) {
-        if (relativePaths == null || relativePaths.isEmpty()) return;
+        if (relativePaths == null || relativePaths.isEmpty()) {
+            return;
+        }
         List<String> validPaths = relativePaths.stream().filter(StringUtils::hasText).collect(Collectors.toList());
-        if (validPaths.isEmpty()) return;
+        if (validPaths.isEmpty()) {
+            return;
+        }
         String bucketName = config.getRootPathOrBucketName();
 
         try {
@@ -268,7 +275,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public InputStream downloadFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, relativePath);
@@ -289,7 +298,9 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         String bucketName = config.getRootPathOrBucketName();
         if (StringUtils.hasText(config.getFileDomain())) {
             return StoragePathUtils.concatUrl(config.getFileDomain(), relativePath);
@@ -308,10 +319,12 @@ public class TencentCosStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return true;
+        }
         String bucketName = config.getRootPathOrBucketName();
         try {
-            return getClient().doesObjectExist(bucketName, relativePath);
+            return !getClient().doesObjectExist(bucketName, relativePath);
         } catch (CosClientException e) {
             log.error("Error checking file existence in Tencent COS: {}", relativePath, e);
             throw new StorageException("检查Tencent COS文件是否存在失败: " + relativePath, e);
@@ -335,7 +348,7 @@ public class TencentCosStorageServiceImpl implements StorageService {
             log.warn("Trash is not enabled for Tencent COS. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to Tencent COS trash: {}", relativePath);
             return null;
         }
@@ -363,7 +376,7 @@ public class TencentCosStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的Tencent COS回收站路径: " + trashPath);
         }
-        if (!fileExists(trashPath)) {
+        if (fileExists(trashPath)) {
             log.warn("File not found in Tencent COS trash: {}", trashPath);
             return null;
         }

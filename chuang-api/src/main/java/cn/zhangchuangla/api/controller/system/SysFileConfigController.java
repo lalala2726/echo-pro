@@ -159,8 +159,9 @@ public class SysFileConfigController extends BaseController {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
         boolean result = storageConfigService.setMasterConfig(id);
         // 刷新缓存
-        if (result)
+        if (result) {
             refreshCache();
+        }
         return toAjax(result);
     }
 

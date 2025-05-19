@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Objects;
@@ -47,6 +48,23 @@ public class GlobalExceptionHandel {
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
         log.error("请求方法不支持", exception);
         return AjaxResult.error(ResponseCode.NOT_SUPPORT);
+    }
+
+    /**
+     * 请求参数类型不匹配
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public AjaxResult<Void> methodArgumentTypeMismatchExceptionHandel(MethodArgumentTypeMismatchException exception) {
+        log.error("请求参数类型不匹配", exception);
+        String paramName = exception.getName();
+        String errorMessage = null;
+        if (exception.getRequiredType() != null) {
+            errorMessage = String.format("参数 '%s': 类型转换失败 - 期望类型 %s, 实际值: '%s'",
+                    paramName,
+                    exception.getRequiredType().getSimpleName(),
+                    exception.getValue());
+        }
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, errorMessage);
     }
 
     /**

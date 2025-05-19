@@ -1,0 +1,117 @@
+package ${packageName}.${moduleName}.service.impl;
+
+import ${packageName}.${moduleName}.mapper.${className}Mapper;
+import ${packageName}.${moduleName}.model.entity.${className};
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}AddRequest;
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}ListRequest;
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}UpdateRequest;
+import ${packageName}.${moduleName}.service.${className}Service;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * ${tableComment} 服务实现类
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+@RequiredArgsConstructor
+public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${className}>
+        implements ${className}Service {
+
+    private final ${className}Mapper ${classNameLower}Mapper;
+
+    /**
+     * ${tableComment}列表（树形）
+     *
+     * @param request 操作结果
+     * @return 返回列表
+     */
+    @Override
+    public List<${className}> select${className}Tree(${className}ListRequest request) {
+        LambdaQueryWrapper<${className}> queryWrapper = new LambdaQueryWrapper<>();
+        // TODO: 根据实际的查询条件进行调整
+        if (StringUtils.isNotBlank(request.get${treeName}())) {
+            queryWrapper.like(${className}::get${treeName}, request.get${treeName}());
+        }
+        List<${className}> list = ${classNameLower}Mapper.selectList(queryWrapper);
+        return buildTree(list, "0"); // 假设根节点的父ID为"0"
+    }
+
+    /**
+     * 添加${tableComment}
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean add${className}(${className}AddRequest request) {
+        ${className} ${classNameLower} =new ${className}();
+        BeanUtils.copyProperties(request, ${classNameLower});
+        return save(${classNameLower});
+    }
+
+    /**
+     * 根据ID删除${tableComment}
+     *
+     * @param id ${tableComment}ID
+     * @return 操作结果
+     */
+    @Override
+    public boolean delete${className}ById(Long id) {
+        // TODO: 删除时需要考虑子节点如何处理，例如：级联删除或不允许删除带有子节点的节点
+        return removeById(id);
+    }
+
+    /**
+     * 根据ID查询${tableComment}信息
+     *
+     * @param id 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public ${className} get${className}ById(Long id) {
+        return getById(id);
+    }
+
+    /**
+     * 修改${tableComment}信息
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean update${className}(${className}UpdateRequest request) {
+        ${className} ${classNameLower} =new ${className}();
+        BeanUtils.copyProperties(request, ${classNameLower});
+        return updateById(${classNameLower});
+    }
+
+    /**
+     * 构建树形结构
+     *
+     * @param list      原始列表数据
+     * @param parentId  父节点ID
+     * @return 树形结构列表
+     */
+    private List<${className}> buildTree(List<${className}> list, String parentId) {
+        List<${className}> treeList = new ArrayList<>();
+        for (${className} node:
+                          list) {
+            if (parentId.equals(String.valueOf(node.get${treeParentCode}()))) {
+                node.setChildren(buildTree(list, String.valueOf(node.get${treeCode}())));
+                treeList.add(node);
+            }
+        }
+        return treeList;
+    }
+} 

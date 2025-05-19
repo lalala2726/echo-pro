@@ -167,7 +167,7 @@ public class RedisTokenManager implements TokenManager {
             claims = getClaimsFromToken(jwtAccessToken);
         } catch (ParamException | ServiceException e) { // 捕获自定义的token无效异常
             log.debug("验证访问令牌：JWT解析失败或无效: {}, 原因: {}", jwtAccessToken, e.getMessage());
-            return false;
+            throw e;
         }
         // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
         if (claims == null) {

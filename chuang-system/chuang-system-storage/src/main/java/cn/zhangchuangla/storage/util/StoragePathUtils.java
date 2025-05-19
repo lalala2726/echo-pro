@@ -4,7 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility class for generating and manipulating storage paths.
+ * 存储路径生成和操作工具类
  *
  * @author Chuang
  */
@@ -13,11 +13,11 @@ public class StoragePathUtils {
     private static final String URL_SEPARATOR = "/";
 
     /**
-     * Generates a unique file path including subdirectories based on date and original filename.
+     * 根据日期和原始文件名生成包含子目录的唯一文件路径
      *
-     * @param subPath        Optional base sub-path (e.g., "user-uploads", "images"). Can be null or empty.
-     * @param uniqueFileName The unique name of the file (e.g., with timestamp/UUID).
-     * @return A relative path string, e.g., "user-uploads/2023/05/17/uniqueFileName.jpg" or "2023/05/17/uniqueFileName.jpg".
+     * @param subPath        可选的基础子路径（例如："user-uploads", "images"）。可以为 null 或空字符串
+     * @param uniqueFileName 文件的唯一名称（例如：带时间戳/UUID）
+     * @return 相对路径字符串，例如："user-uploads/2023/05/17/uniqueFileName.jpg" 或 "2023/05/17/uniqueFileName.jpg"
      */
     public static String generatePath(String subPath, String uniqueFileName) {
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -38,20 +38,20 @@ public class StoragePathUtils {
     }
 
     /**
-     * Generates a path for an original image.
+     * 生成原始图片的存储路径
      *
-     * @param uniqueFileName The unique name of the file.
-     * @return Path like "images/original/2023/05/17/uniqueFileName.jpg"
+     * @param uniqueFileName 文件的唯一名称
+     * @return 路径示例："images/original/2023/05/17/uniqueFileName.jpg"
      */
     public static String generateOriginalImagePath(String uniqueFileName) {
         return generatePath("images/original", uniqueFileName);
     }
 
     /**
-     * Generates a path for a compressed/thumbnail image.
+     * 生成压缩图/缩略图的存储路径
      *
-     * @param uniqueFileName The unique name of the file.
-     * @return Path like "images/thumbnail/2023/05/17/uniqueFileName.jpg"
+     * @param uniqueFileName 文件的唯一名称
+     * @return 路径示例："images/thumbnail/2023/05/17/uniqueFileName.jpg"
      */
     public static String generateThumbnailImagePath(String uniqueFileName) {
         return generatePath("images/thumbnail", uniqueFileName);
@@ -59,19 +59,19 @@ public class StoragePathUtils {
 
 
     /**
-     * Sanitizes a path segment to prevent directory traversal issues.
-     * Removes leading/trailing slashes and normalizes path separators.
+     * 对路径片段进行安全处理以防止目录遍历问题
+     * 移除首尾的斜杠并规范化路径分隔符
      *
-     * @param pathSegment The path segment to sanitize.
-     * @return The sanitized path segment.
+     * @param pathSegment 需要处理的路径片段
+     * @return 处理后的路径片段
      */
     private static String sanitizePath(String pathSegment) {
         if (!StringUtils.hasText(pathSegment)) {
             return "";
         }
-        // Normalize path separators to forward slashes
+        // 将路径分隔符统一转换为正斜杠
         String normalized = FilenameUtils.normalizeNoEndSeparator(pathSegment.replace("\\", URL_SEPARATOR), true);
-        // Remove leading slashes to prevent absolute path interpretation in relative context
+        // 移除开头的斜杠以避免在相对路径中被解释为绝对路径
         if (normalized.startsWith(URL_SEPARATOR)) {
             normalized = normalized.substring(1);
         }
@@ -79,21 +79,21 @@ public class StoragePathUtils {
     }
 
     /**
-     * Concatenates a base URL/domain with a relative path to form a full URL.
+     * 将基础URL/域名与相对路径拼接成完整URL
      *
-     * @param baseOrDomain The base URL or domain (e.g., "https://cdn.example.com", "/resources").
-     * @param relativePath The relative path of the file (e.g., "images/pic.jpg").
-     * @return The full URL.
+     * @param baseOrDomain   基础URL或域名（例如："https://cdn.example.com", "/resources"）
+     * @param relativePath   文件的相对路径（例如："images/pic.jpg"）
+     * @return 完整的URL
      */
     public static String concatUrl(String baseOrDomain, String relativePath) {
         String sanitizedBase = baseOrDomain != null ? baseOrDomain.trim() : "";
         String sanitizedRelativePath = relativePath != null ? relativePath.trim() : "";
 
-        // Remove trailing slash from base
+        // 移除base末尾的斜杠
         if (sanitizedBase.endsWith(URL_SEPARATOR)) {
             sanitizedBase = sanitizedBase.substring(0, sanitizedBase.length() - 1);
         }
-        // Remove leading slash from relative path
+        // 移除相对路径开头的斜杠
         if (sanitizedRelativePath.startsWith(URL_SEPARATOR)) {
             sanitizedRelativePath = sanitizedRelativePath.substring(1);
         }

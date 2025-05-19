@@ -908,7 +908,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     private void populateRouterProperties(SysMenu menu, String parentPath, RouterVo router, MetaVo meta) {
         String routerPathValue;
-        String routerNameValue = menu.getRouteName(); // 默认使用数据库中的routeName (可能已被configureRouteName处理)
+        // 默认使用数据库中的routeName (可能已被configureRouteName处理)
+        String routerNameValue = menu.getRouteName();
         String componentPathValue;
         boolean isKeepAlive = false;
 
@@ -916,8 +917,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())
                 && Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame())) {
             routerPathValue = buildAndNormalizePathSegmentStructure(parentPath, menu.getPath());
-            meta.setFrameSrc(null); // 外部跳转链接不使用frameSrc
-            componentPathValue = null; // 外部跳转链接无组件
+            // 外部跳转链接不使用frameSrc
+            meta.setFrameSrc(null);
+            // 外部跳转链接无组件
+            componentPathValue = null;
             log.debug("外部链接跳转: path='{}', name (URL)='{}'", routerPathValue, routerNameValue);
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, external_link != 1, 且 menu.path 是 HTTP(S) URL)
@@ -969,8 +972,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         RouterVo router = new RouterVo();
         MetaVo meta = new MetaVo();
 
-        fillBaseMetaInfo(meta, menu); // 填充标题、图标、权限等基础meta
-        populateRouterProperties(menu, parentPath, router, meta); // 填充path, name, component及特定meta
+        // 填充标题、图标、权限等基础meta
+        fillBaseMetaInfo(meta, menu);
+        // 填充path, name, component及特定meta
+        populateRouterProperties(menu, parentPath, router, meta);
 
         router.setMeta(meta);
         router.setQuery(menu.getQuery());
@@ -1101,10 +1106,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String actualSegment; // 经过处理后的、将用于拼接的路径段
 
         // 1. 处理 segmentInput，特别是当它是HTTP(S)链接时
-        if (StringUtils.isHttp(segmentInput)) { // 假设 StringUtils.isHttp 存在且能正确判断
+        // 假设 StringUtils.isHttp 存在且能正确判断
+        if (StringUtils.isHttp(segmentInput)) {
             try {
                 URI uri = new URI(segmentInput);
-                String host = uri.getHost(); // 例如：www.baidu.com
+                // 例如：www.baidu.com
+                String host = uri.getHost();
                 if (StrUtil.isNotBlank(host)) {
                     // 将 host (e.g., "www.example.com") 转换为大驼峰 (e.g., "WwwExampleCom")
                     String[] parts = host.split("\\.");
@@ -1112,24 +1119,30 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                     for (String part : parts) {
                         if (!part.isEmpty()) {
                             hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
-                                    .append(part.substring(1).toLowerCase()); // 转为标准驼峰，如WwwBaiduCom
+                                    // 转为标准驼峰，如WwwBaiduCom
+                                    .append(part.substring(1).toLowerCase());
                         }
                     }
                     actualSegment = hostCamelCase.toString();
-                    if (StrUtil.isBlank(actualSegment)) { // 如果host解析后为空，使用默认段
+                    // 如果host解析后为空，使用默认段
+                    if (StrUtil.isBlank(actualSegment)) {
                         log.warn("无法从HTTP链接 {} 解析出有效的主机名作为路径段，将使用默认段。", segmentInput);
-                        actualSegment = "ExternalLinkPath"; // 或其他默认值
+                        // 或其他默认值
+                        actualSegment = "ExternalLinkPath";
                     }
                 } else {
                     log.warn("HTTP链接 {} 无有效主机名，将使用默认路径段。", segmentInput);
-                    actualSegment = "ExternalHostMissing"; // 或其他默认值
+                    // 或其他默认值
+                    actualSegment = "ExternalHostMissing";
                 }
             } catch (URISyntaxException e) {
                 log.warn("解析HTTP链接 {} 失败，将使用默认路径段: {}", segmentInput, e.getMessage());
-                actualSegment = "InvalidExternalLink"; // 无效URL时的默认段
+                // 无效URL时的默认段
+                actualSegment = "InvalidExternalLink";
             }
         } else {
-            actualSegment = StrUtil.trimToEmpty(segmentInput); // 普通路径段，去除首尾空格
+            // 普通路径段，去除首尾空格
+            actualSegment = StrUtil.trimToEmpty(segmentInput);
         }
 
         // 2. 路径拼接逻辑

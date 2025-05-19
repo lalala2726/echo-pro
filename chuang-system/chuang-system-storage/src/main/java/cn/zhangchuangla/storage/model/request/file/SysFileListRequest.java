@@ -9,6 +9,7 @@ import java.util.Date;
 
 /**
  * 文件上传记录表
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

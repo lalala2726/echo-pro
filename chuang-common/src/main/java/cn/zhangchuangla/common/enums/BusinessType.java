@@ -90,4 +90,14 @@ public enum BusinessType {
      * 恢复
      */
     RECOVER,
+
+    /**
+     * 生成代码
+     */
+    GENERATE,
+
+    /**
+     * 执行SQL
+     */
+    EXECUTE,
 }

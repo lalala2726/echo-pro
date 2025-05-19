@@ -8,6 +8,8 @@ import lombok.*;
 
 /**
  * 文件配置表
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "storage_config")

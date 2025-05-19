@@ -3,7 +3,7 @@ package cn.zhangchuangla.storage;
 import lombok.Getter;
 
 /**
- * Enum for different storage providers.
+ * 不同存储提供程序的枚举。
  *
  * @author Chuang
  */

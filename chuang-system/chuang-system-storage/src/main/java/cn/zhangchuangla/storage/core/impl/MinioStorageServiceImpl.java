@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.core.impl;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
@@ -27,8 +28,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Chuang
+ */
 @Slf4j
-@Service("minioStorageService")
+@Service(StorageConstants.MINIO_STORAGE_SERVICE)
 public class MinioStorageServiceImpl implements StorageService {
 
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp");
@@ -109,7 +113,7 @@ public class MinioStorageServiceImpl implements StorageService {
             throw new StorageException("输入流或原始文件名不能为空");
         }
         String objectName = getObjectName(subPath, originalFileName);
-        long size = -1L;
+        long size;
         try (InputStream closableInputStream = inputStream) {
             byte[] bytes;
             if (closableInputStream instanceof ByteArrayInputStream) {
@@ -207,7 +211,9 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public boolean deleteFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return false;
+        }
         try {
             getClient().removeObject(RemoveObjectArgs.builder()
                     .bucket(config.getRootPathOrBucketName())
@@ -223,14 +229,18 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public void deleteFiles(List<String> relativePaths) {
-        if (relativePaths == null || relativePaths.isEmpty()) return;
+        if (relativePaths == null || relativePaths.isEmpty()) {
+            return;
+        }
         List<DeleteObject> objects = new java.util.LinkedList<>();
         for (String path : relativePaths) {
             if (StringUtils.hasText(path)) {
                 objects.add(new DeleteObject(path));
             }
         }
-        if (objects.isEmpty()) return;
+        if (objects.isEmpty()) {
+            return;
+        }
 
         try {
             Iterable<Result<DeleteError>> results = getClient().removeObjects(
@@ -248,7 +258,9 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public InputStream downloadFile(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         try {
             return getClient().getObject(
                     GetObjectArgs.builder()
@@ -256,7 +268,7 @@ public class MinioStorageServiceImpl implements StorageService {
                             .object(relativePath)
                             .build());
         } catch (ErrorResponseException e) {
-            if (e.errorResponse().code().equals("NoSuchKey")) {
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
                 log.warn("File not found in MinIO for download: {}/{}", config.getRootPathOrBucketName(), relativePath);
                 return null;
             }
@@ -270,7 +282,9 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public String getFileUrl(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return null;
+        if (!StringUtils.hasText(relativePath)) {
+            return null;
+        }
         if (StringUtils.hasText(config.getFileDomain())) {
             return StoragePathUtils.concatUrl(config.getFileDomain(), relativePath);
         }
@@ -290,14 +304,16 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public boolean fileExists(String relativePath) {
-        if (!StringUtils.hasText(relativePath)) return false;
+        if (!StringUtils.hasText(relativePath)) {
+            return true;
+        }
         try {
             getClient().statObject(
                     StatObjectArgs.builder().bucket(config.getRootPathOrBucketName()).object(relativePath).build());
-            return true;
+            return false;
         } catch (ErrorResponseException e) {
-            if (e.errorResponse().code().equals("NoSuchKey")) {
-                return false;
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
+                return true;
             }
             log.error("Error checking file existence in MinIO: {}", relativePath, e);
             throw new StorageException("检查MinIO文件是否存在失败: " + relativePath, e);
@@ -330,7 +346,7 @@ public class MinioStorageServiceImpl implements StorageService {
             log.warn("Trash is not enabled for MinIO. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to trash: {}", relativePath);
             return null;
         }
@@ -358,7 +374,7 @@ public class MinioStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的MinIO回收站路径: " + trashPath);
         }
-        if (!fileExists(trashPath)) {
+        if (fileExists(trashPath)) {
             log.warn("File not found in MinIO trash: {}", trashPath);
             return null;
         }

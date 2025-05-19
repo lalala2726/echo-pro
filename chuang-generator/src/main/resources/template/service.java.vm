@@ -1,0 +1,59 @@
+package ${packageName}.${moduleName}.service;
+
+import ${packageName}.${moduleName}.model.entity.${className};
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}AddRequest;
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}ListRequest;
+import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}UpdateRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
+
+/**
+ * ${tableComment} 服务接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${className}Service extends IService<${className}> {
+
+    /**
+     * ${tableComment}列表
+     *
+     * @param request 操作结果
+     * @return 返回分页列表
+     */
+    Page<${className}> list${className}(${className}ListRequest request);
+
+    /**
+     * 添加${tableComment}
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean add${className}(${className}AddRequest request);
+
+    /**
+     * 删除${tableComment}
+     *
+     * @param ids ${tableComment}ID集合
+     * @return 操作结果
+     */
+    boolean delete${className}(List<Long> ids);
+
+    /**
+     * 根据ID查询${tableComment}信息
+     *
+     * @param id 请求参数
+     * @return 操作结果
+     */
+        ${className} get${className}ById(Long id);
+
+    /**
+     * 修改${tableComment}信息
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean update${className}(${className}UpdateRequest request);
+} 

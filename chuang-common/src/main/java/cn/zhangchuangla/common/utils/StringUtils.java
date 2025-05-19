@@ -12,22 +12,13 @@ import static java.util.Objects.isNull;
  * @author Ruoyi
  * created on 2025/1/12 11:23
  */
-public class StringUtils extends org.apache.commons.lang3.StringUtils {
+public class StringUtils {
 
     /**
      * 空字符串
      */
     private static final String NULL_STR = "";
 
-    /**
-     * 下划线
-     */
-    private static final char SEPARATOR = '_';
-
-    /**
-     * 星号
-     */
-    private static final char ASTERISK = '*';
 
     /**
      * 检查传入的字符串中是否有一个为null或空字符串
