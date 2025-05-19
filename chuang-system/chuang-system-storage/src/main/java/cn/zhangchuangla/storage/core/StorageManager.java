@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.core;
 
 import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.common.exception.ProfileException;
 import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.storage.StorageType;
@@ -120,12 +121,11 @@ public class StorageManager {
     }
 
     public StorageService getServiceBeanForType(StorageType type) {
-        //todo 服务类提取常量
         String beanName = switch (type) {
-            case LOCAL -> "localStorageService";
-            case MINIO -> "minioStorageService";
-            case ALIYUN_OSS -> "aliyunOssStorageService";
-            case TENCENT_COS -> "tencentCosStorageService";
+            case LOCAL -> StorageConstants.LOCAL_STORAGE_SERVICE;
+            case MINIO -> StorageConstants.MINIO_STORAGE_SERVICE;
+            case ALIYUN_OSS -> StorageConstants.ALIYUN_OSS_STORAGE_SERVICE;
+            case TENCENT_COS -> StorageConstants.TENCENT_COS_STORAGE_SERVICE;
         };
         try {
             return applicationContext.getBean(beanName, StorageService.class);

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.core.impl;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @author Chuang
  */
 @Slf4j
-@Service("aliyunOssStorageService")
+@Service(StorageConstants.ALIYUN_OSS_STORAGE_SERVICE)
 public class AliyunOssStorageServiceImpl implements StorageService {
 
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp");

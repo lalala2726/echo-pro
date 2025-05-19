@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.core.impl;
 
+import cn.zhangchuangla.common.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @author zhangchuang
  */
 @Slf4j
-@Service("minioStorageService")
+@Service(StorageConstants.MINIO_STORAGE_SERVICE)
 public class MinioStorageServiceImpl implements StorageService {
 
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp");

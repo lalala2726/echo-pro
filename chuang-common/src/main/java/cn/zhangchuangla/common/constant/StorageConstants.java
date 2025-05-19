@@ -140,4 +140,26 @@ public class StorageConstants {
      * 缩略图文件在存储系统中的相对路径
      */
     public static final String THUMBNAIL_RELATIVE_PATH = "thumbnailRelativePath";
+
+
+    /**
+     * 本地存储服务名称
+     */
+    public static final String LOCAL_STORAGE_SERVICE = "localStorageService";
+
+    /**
+     * 阿里云OSS存储服务名称
+     */
+    public static final String ALIYUN_OSS_STORAGE_SERVICE = "aliyunOssStorageService";
+
+    /**
+     * MinIO存储服务名称
+     */
+    public static final String MINIO_STORAGE_SERVICE = "minioStorageService";
+
+    /**
+     * 腾讯云COS存储服务名称
+     */
+    public static final String TENCENT_COS_STORAGE_SERVICE = "tencentCosStorageService";
+
 }
