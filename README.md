@@ -151,6 +151,6 @@ app-backend/
 
 ## 联系方式
 
-- 作者：zhangchuang
+- 作者：Chuang
 - 邮箱：chuang@zhangchuangla.cn
 - 项目地址：https://github.com/lalala2726/app-backend/
