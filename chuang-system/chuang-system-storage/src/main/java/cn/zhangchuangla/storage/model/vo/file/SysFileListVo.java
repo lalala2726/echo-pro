@@ -9,6 +9,8 @@ import java.util.Date;
 
 /**
  * 文件管理列表视图对象
+ *
+ * @author Chuang
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

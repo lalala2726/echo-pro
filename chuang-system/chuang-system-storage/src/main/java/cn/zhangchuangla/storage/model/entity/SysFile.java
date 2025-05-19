@@ -12,6 +12,8 @@ import java.util.Date;
 
 /**
  * 文件上传记录表
+ *
+ * @author Chuang
  */
 @TableName(value = "storage_file")
 @Data

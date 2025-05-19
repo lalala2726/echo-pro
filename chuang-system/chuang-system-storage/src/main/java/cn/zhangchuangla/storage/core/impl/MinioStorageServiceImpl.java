@@ -29,7 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author zhangchuang
+ * @author Chuang
  */
 @Slf4j
 @Service(StorageConstants.MINIO_STORAGE_SERVICE)
