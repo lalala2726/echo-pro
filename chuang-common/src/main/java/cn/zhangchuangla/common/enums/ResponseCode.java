@@ -24,7 +24,7 @@ public enum ResponseCode {
     // 明确标识为系统级异常
     SYSTEM_ERROR(50002, "系统错误！"),
     // 通用操作失败
-    OPERATION_ERROR(50003, "操作失败"),
+    OPERATION_ERROR(4000, "操作失败"),
     // 文件读写等失败
     FILE_OPERATION_FAILED(50004, "文件操作失败！"),
     // endregion
