@@ -51,6 +51,23 @@ public class GenTableServiceImpl extends ServiceImpl<cn.zhangchuangla.generator.
     private final GenTableColumnService genTableColumnService;
     private final GenTableQueryService genTableQueryService;
 
+    @NotNull
+    private static TableField getTableField(GenTableColumn column) {
+        TableField field = new TableField();
+        field.setColumnName(column.getColumnName());
+        field.setColumnType(column.getColumnType());
+        field.setColumnComment(column.getColumnComment());
+        field.setIsPk(column.isPk());
+        field.setIsIncrement(column.isIncrement());
+        field.setIsRequired(column.isRequired());
+        field.setIsList(column.isList());
+        field.setIsQuery(column.isQuery());
+        field.setQueryType(column.getQueryType());
+        field.setHtmlType(column.getHtmlType());
+        field.setDictType(column.getDictType());
+        return field;
+    }
+
     // 迁移过来的旧 generate 方法，后续会重构为 previewCode, downloadCode, genToPath 等方法的核心逻辑
     private boolean generateCodeLogic(TableInfo tableInfo, String outputDir) throws IOException {
         VelocityUtils.initVelocity(); // 初始化应在应用启动时进行一次
@@ -165,23 +182,6 @@ public class GenTableServiceImpl extends ServiceImpl<cn.zhangchuangla.generator.
         }
         // GenUtils.initTableInfo(tableInfo); // className 和 classNameLower 已经在上面设置了
         return tableInfo;
-    }
-
-    @NotNull
-    private static TableField getTableField(GenTableColumn column) {
-        TableField field = new TableField();
-        field.setColumnName(column.getColumnName());
-        field.setColumnType(column.getColumnType());
-        field.setColumnComment(column.getColumnComment());
-        field.setIsPk(column.isPk());
-        field.setIsIncrement(column.isIncrement());
-        field.setIsRequired(column.isRequired());
-        field.setIsList(column.isList());
-        field.setIsQuery(column.isQuery());
-        field.setQueryType(column.getQueryType());
-        field.setHtmlType(column.getHtmlType());
-        field.setDictType(column.getDictType());
-        return field;
     }
 
     @Override

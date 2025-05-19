@@ -219,9 +219,9 @@ public class LocalStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return false;
+            return true;
         }
-        return Files.exists(getAbsolutePath(relativePath));
+        return !Files.exists(getAbsolutePath(relativePath));
     }
 
     @Override

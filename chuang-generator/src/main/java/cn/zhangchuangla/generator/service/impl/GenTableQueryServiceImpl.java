@@ -22,28 +22,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenTableQueryServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements GenTableQueryService {
 
-  private final GenTableColumnService genTableColumnService;
+    private final GenTableColumnService genTableColumnService;
 
-  @Override
-  @Transactional(readOnly = true)
-  public GenTable selectGenTableById(Long id) {
-    // this.getById 是 ServiceImpl (indirectly from BaseMapper) 的方法
-    GenTable genTable = this.getById(id);
-    if (genTable != null) {
-      List<GenTableColumn> columns = genTableColumnService.selectGenTableColumnListByTableId(id);
-      genTable.setColumns(columns);
+    @Override
+    @Transactional(readOnly = true)
+    public GenTable selectGenTableById(Long id) {
+        // this.getById 是 ServiceImpl (indirectly from BaseMapper) 的方法
+        GenTable genTable = this.getById(id);
+        if (genTable != null) {
+            List<GenTableColumn> columns = genTableColumnService.selectGenTableColumnListByTableId(id);
+            genTable.setColumns(columns);
+        }
+        return genTable;
     }
-    return genTable;
-  }
 
-  @Override
-  @Transactional(readOnly = true)
-  public GenTable selectGenTableByName(String tableName) {
-    GenTable genTable = this.getOne(new LambdaQueryWrapper<GenTable>().eq(GenTable::getTableName, tableName));
-    if (genTable != null) {
-      List<GenTableColumn> columns = genTableColumnService.selectGenTableColumnListByTableId(genTable.getTableId());
-      genTable.setColumns(columns);
+    @Override
+    @Transactional(readOnly = true)
+    public GenTable selectGenTableByName(String tableName) {
+        GenTable genTable = this.getOne(new LambdaQueryWrapper<GenTable>().eq(GenTable::getTableName, tableName));
+        if (genTable != null) {
+            List<GenTableColumn> columns = genTableColumnService.selectGenTableColumnListByTableId(genTable.getTableId());
+            genTable.setColumns(columns);
+        }
+        return genTable;
     }
-    return genTable;
-  }
 }

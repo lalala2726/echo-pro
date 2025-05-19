@@ -319,11 +319,11 @@ public class TencentCosStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return false;
+            return true;
         }
         String bucketName = config.getRootPathOrBucketName();
         try {
-            return getClient().doesObjectExist(bucketName, relativePath);
+            return !getClient().doesObjectExist(bucketName, relativePath);
         } catch (CosClientException e) {
             log.error("Error checking file existence in Tencent COS: {}", relativePath, e);
             throw new StorageException("检查Tencent COS文件是否存在失败: " + relativePath, e);
@@ -347,7 +347,7 @@ public class TencentCosStorageServiceImpl implements StorageService {
             log.warn("Trash is not enabled for Tencent COS. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to Tencent COS trash: {}", relativePath);
             return null;
         }
@@ -375,7 +375,7 @@ public class TencentCosStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的Tencent COS回收站路径: " + trashPath);
         }
-        if (!fileExists(trashPath)) {
+        if (fileExists(trashPath)) {
             log.warn("File not found in Tencent COS trash: {}", trashPath);
             return null;
         }

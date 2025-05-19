@@ -120,6 +120,7 @@ public class StorageManager {
     }
 
     public StorageService getServiceBeanForType(StorageType type) {
+        //todo 服务类提取常量
         String beanName = switch (type) {
             case LOCAL -> "localStorageService";
             case MINIO -> "minioStorageService";

@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author zhangchuang
+ */
 @Slf4j
 @Service("minioStorageService")
 public class MinioStorageServiceImpl implements StorageService {
@@ -109,7 +112,7 @@ public class MinioStorageServiceImpl implements StorageService {
             throw new StorageException("输入流或原始文件名不能为空");
         }
         String objectName = getObjectName(subPath, originalFileName);
-        long size = -1L;
+        long size;
         try (InputStream closableInputStream = inputStream) {
             byte[] bytes;
             if (closableInputStream instanceof ByteArrayInputStream) {
@@ -301,15 +304,15 @@ public class MinioStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return false;
+            return true;
         }
         try {
             getClient().statObject(
                     StatObjectArgs.builder().bucket(config.getRootPathOrBucketName()).object(relativePath).build());
-            return true;
+            return false;
         } catch (ErrorResponseException e) {
             if ("NoSuchKey".equals(e.errorResponse().code())) {
-                return false;
+                return true;
             }
             log.error("Error checking file existence in MinIO: {}", relativePath, e);
             throw new StorageException("检查MinIO文件是否存在失败: " + relativePath, e);
@@ -342,7 +345,7 @@ public class MinioStorageServiceImpl implements StorageService {
             log.warn("Trash is not enabled for MinIO. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to trash: {}", relativePath);
             return null;
         }
@@ -370,7 +373,7 @@ public class MinioStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的MinIO回收站路径: " + trashPath);
         }
-        if (!fileExists(trashPath)) {
+        if (fileExists(trashPath)) {
             log.warn("File not found in MinIO trash: {}", trashPath);
             return null;
         }

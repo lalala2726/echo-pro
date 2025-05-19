@@ -7,94 +7,94 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Core interface for storage operations.
+ * 存储操作的核心接口。
  *
  * @author Chuang
  */
 public interface StorageService {
 
     /**
-     * Uploads a file.
+     * 上传文件。
      *
-     * @param file    The multipart file to upload.
-     * @param subPath Optional sub-path/directory within the main storage where the file should be stored.
-     * @return FileInfo object containing details of the uploaded file.
+     * @param file    要上传的 multipart 文件。
+     * @param subPath 可选的子路径/目录，用于在主存储位置内存储文件。
+     * @return 包含上传文件详细信息的 FileInfo 对象。
      */
     FileInfo uploadFile(MultipartFile file, String subPath);
 
     /**
-     * Uploads a file from an InputStream.
+     * 通过 InputStream 上传文件。
      *
-     * @param inputStream      The InputStream of the file data.
-     * @param originalFileName The original name of the file.
-     * @param contentType      The MIME type of the file.
-     * @param subPath          Optional sub-path/directory.
-     * @return FileInfo object containing details of the uploaded file.
+     * @param inputStream      文件数据的 InputStream。
+     * @param originalFileName 文件的原始名称。
+     * @param contentType      文件的 MIME 类型。
+     * @param subPath          可选的子路径/目录。
+     * @return 包含上传文件详细信息的 FileInfo 对象。
      */
     FileInfo uploadFile(InputStream inputStream, String originalFileName, String contentType, String subPath);
 
     /**
-     * Uploads an image file. Handles original and potentially compressed/thumbnail versions.
+     * 上传图片文件。处理原图以及可能压缩后的缩略图。
      *
-     * @param file    The image file to upload.
-     * @param subPath Optional sub-path/directory.
-     * @return FileInfo object, potentially including thumbnail URL/path.
+     * @param file    要上传的图片文件。
+     * @param subPath 可选的子路径/目录。
+     * @return FileInfo 对象，可能包含缩略图的 URL 或路径。
      */
     FileInfo uploadImage(MultipartFile file, String subPath);
 
     /**
-     * Deletes a file.
+     * 删除文件。
      *
-     * @param relativePath The relative path of the file in the storage.
-     * @return true if deletion was successful, false otherwise.
+     * @param relativePath 文件在存储中的相对路径。
+     * @return 如果删除操作成功返回 true，否则返回 false。
      */
     boolean deleteFile(String relativePath);
 
     /**
-     * Deletes multiple files.
+     * 删除多个文件。
      *
-     * @param relativePaths List of relative paths of the files to delete.
+     * @param relativePaths 要删除文件的相对路径列表。
      */
     void deleteFiles(List<String> relativePaths);
 
     /**
-     * Retrieves a file as an InputStream.
+     * 获取文件的 InputStream。
      *
-     * @param relativePath The relative path of the file.
-     * @return InputStream of the file, or null if not found.
+     * @param relativePath 文件的相对路径。
+     * @return 文件的 InputStream，如果未找到则返回 null。
      */
     InputStream downloadFile(String relativePath);
 
     /**
-     * Gets the public URL of a stored file.
+     * 获取已存储文件的公共 URL。
      *
-     * @param relativePath The relative path of the file.
-     * @return The public URL string.
+     * @param relativePath 文件的相对路径。
+     * @return 公共 URL 字符串。
      */
     String getFileUrl(String relativePath);
 
     /**
-     * Checks if a file exists.
+     * 检查文件是否存在。
      *
-     * @param relativePath The relative path of the file.
-     * @return true if the file exists, false otherwise.
+     * @param relativePath 文件的相对路径。
+     * @return 如果文件存在返回 true，否则返回 false。
      */
     boolean fileExists(String relativePath);
 
     /**
-     * Moves a file to the trash directory if trash is enabled.
-     * If trash is not enabled, this might behave like deleteFile or do nothing.
+     * 将文件移动到回收站目录（如果启用了回收站功能）。
+     * 如果未启用回收站，此方法的行为可能与 deleteFile 相同或无任何操作。
      *
-     * @param relativePath The relative path of the file to move to trash.
-     * @return FileInfo containing the new path in trash, or null if operation failed/not applicable.
+     * @param relativePath 要移动到回收站的文件的相对路径。
+     * @return 包含回收站中新路径的 FileInfo 对象，如果操作失败或不适用则返回 null。
      */
     FileInfo moveToTrash(String relativePath);
 
     /**
-     * Restores a file from the trash directory.
+     * 从回收站恢复文件。
      *
-     * @param trashPath The path of the file in the trash directory.
-     * @return FileInfo containing the restored path, or null if operation failed.
+     * @param trashPath 回收站中文件的路径。
+     * @return 包含恢复后路径的 FileInfo 对象，如果操作失败则返回 null。
      */
     FileInfo restoreFromTrash(String trashPath);
 
