@@ -75,7 +75,7 @@ public class OpenAPIConfig {
     @Bean
     public GroupedOpenApi toolApi() {
         return GroupedOpenApi.builder()
-                .group("通用功能")
+                .group("系统工具")
                 .packagesToScan("cn.zhangchuangla.api.controller.tool")
                 .build();
     }
