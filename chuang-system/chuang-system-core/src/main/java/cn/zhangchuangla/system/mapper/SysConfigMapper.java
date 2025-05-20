@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysConfig;
-import cn.zhangchuangla.system.model.request.config.SysConfigListRequest;
+import cn.zhangchuangla.system.model.request.config.SysConfigQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +18,7 @@ public interface SysConfigMapper extends BaseMapper<SysConfig> {
      * @param request       查询参数
      * @return 返回分页数据
      */
-    Page<SysConfig> listSysConfig(Page<SysConfig> sysConfigPage, @Param("request") SysConfigListRequest sysConfigListRequest);
+    Page<SysConfig> listSysConfig(Page<SysConfig> sysConfigPage, @Param("request") SysConfigQueryRequest sysConfigQueryRequest);
 }
 
 

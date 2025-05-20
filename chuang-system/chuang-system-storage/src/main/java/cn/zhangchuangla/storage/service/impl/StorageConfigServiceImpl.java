@@ -13,7 +13,7 @@ import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
 import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
@@ -47,7 +47,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 文件配置列表
      */
     @Override
-    public Page<StorageConfig> listSysFileConfig(StorageConfigListRequest request) {
+    public Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysFileConfigMapper.listSysFileConfig(sysFileConfigPage, request);
     }

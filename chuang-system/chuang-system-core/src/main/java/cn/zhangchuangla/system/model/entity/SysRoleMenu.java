@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 角色和菜单关联表
- * @author zhangchuang
+ * @author Chuang
  */
 @TableName(value = "sys_role_menu")
 @Data

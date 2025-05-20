@@ -9,6 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
+
     <artifactId>chuang-system-storage</artifactId>
     <version>1.0.0</version>
     <description>系统存储相关管理</description>

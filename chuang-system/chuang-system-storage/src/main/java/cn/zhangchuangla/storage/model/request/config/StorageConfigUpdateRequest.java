@@ -51,7 +51,7 @@ public class StorageConfigUpdateRequest {
     /**
      * 备注
      */
-    @Schema(description = "备注", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "备注")
     private String remark;
 
 }

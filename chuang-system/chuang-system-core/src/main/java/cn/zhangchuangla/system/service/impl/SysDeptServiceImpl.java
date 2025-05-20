@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptQueryRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.service.SysDeptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -31,7 +31,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
 
 
     @Override
-    public List<SysDept> listDept(SysDeptListRequest request) {
+    public List<SysDept> listDept(SysDeptQueryRequest request) {
         return sysDeptMapper.listDepartment(request);
     }
 

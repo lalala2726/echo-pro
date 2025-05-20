@@ -68,6 +68,44 @@
     <!-- 依赖管理，用于统一管理依赖的版本 -->
     <dependencyManagement>
         <dependencies>
+            <!-- ===================== 项目内模块管理 ===================== -->
+            <!-- 公共模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-common</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 框架模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-framework</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 系统核心模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-system-core</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 系统存储模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-system-storage</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 系统消息模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-system-message</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 代码生成模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-generator</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+
             <!-- ===================== Spring Boot & Security ===================== -->
             <!-- 引入 Spring Boot 依赖管理 POM，统一管理 Spring Boot 相关依赖版本 -->
             <dependency>
@@ -281,58 +319,26 @@
             <!-- ===================== 项目模块依赖 ===================== -->
             <!-- 通用工具模块依赖 -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-common</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${cn.hutool.version}</version>
             </dependency>
-
             <!-- Bouncy Castle依赖 -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>1.78</version>
             </dependency>
-
             <!-- Protobuf依赖 -->
             <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>4.28.2</version>
             </dependency>
-
-            <!-- 框架模块依赖 -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-framework</artifactId>
-                <version>${app.version}</version>
-            </dependency>
             <!-- 系统模块依赖 -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <!-- 系统核心模块依赖 -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-system-core</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <!-- 系统存储模块依赖 -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-system-storage</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <!-- 低代码生成模块依赖 -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-generator</artifactId>
                 <version>${app.version}</version>
             </dependency>
         </dependencies>

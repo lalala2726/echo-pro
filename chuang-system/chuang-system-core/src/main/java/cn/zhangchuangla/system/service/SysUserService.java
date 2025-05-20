@@ -2,9 +2,9 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.common.core.security.model.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.UserAddRequest;
-import cn.zhangchuangla.system.model.request.user.UserListRequest;
-import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +23,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      * @return 分页数据
      */
-    Page<SysUserDeptDto> listUser(UserListRequest request);
+    Page<SysUserDeptDto> listUser(SysUserQueryRequest request);
 
 
     /**
@@ -32,7 +32,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param request 请求参数
      * @return 用户主键
      */
-    Long addUserInfo(UserAddRequest request);
+    Long addUserInfo(SysUserAddRequest request);
 
     /**
      * 判断用户名是否存在
@@ -104,7 +104,7 @@ public interface SysUserService extends IService<SysUser> {
      *
      * @param request 请求参数
      */
-    boolean updateUserInfoById(UserUpdateRequest request);
+    boolean updateUserInfoById(SysUserUpdateRequest request);
 
 
     /**

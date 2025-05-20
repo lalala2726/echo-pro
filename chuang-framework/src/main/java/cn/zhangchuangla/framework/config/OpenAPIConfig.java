@@ -70,6 +70,18 @@ public class OpenAPIConfig {
     }
 
     /**
+     * 系统工具
+     */
+    @Bean
+    public GroupedOpenApi toolApi() {
+        return GroupedOpenApi.builder()
+                .group("系统工具")
+                .packagesToScan("cn.zhangchuangla.api.controller.tool")
+                .build();
+    }
+
+
+    /**
      * 所有接口
      */
     @Bean
@@ -84,14 +96,14 @@ public class OpenAPIConfig {
      * OpenAPI 主配置
      */
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
                         .title(appName + " API文档")
-                        .description("API接口文档")
+                        .description("提供完整的API接口定义与交互说明，便于快速集成和使用。")
                         .version(appVersion)
                         .contact(new Contact()
-                                .name("Zhang Chuang")
+                                .name("Chuang")
                                 .email("admin@zhangchuangla.cn")
                                 .url("https://zhangchuangla.cn"))
                         .license(new License()

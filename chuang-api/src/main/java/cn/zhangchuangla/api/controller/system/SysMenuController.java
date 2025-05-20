@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
@@ -49,7 +49,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取菜单列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult<List<SysMenuListVo>> listMenu(@ParameterObject SysMenuListRequest request) {
+    public AjaxResult<List<SysMenuListVo>> listMenu(@ParameterObject SysMenuQueryRequest request) {
         List<SysMenuListVo> sysMenuListVo = sysMenuService.listMenu(request);
         return success(sysMenuListVo);
     }

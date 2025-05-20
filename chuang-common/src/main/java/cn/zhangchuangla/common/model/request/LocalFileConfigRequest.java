@@ -44,7 +44,7 @@ public class LocalFileConfigRequest {
     /**
      * 文件访问路径
      */
-    @Schema(description = "文件访问路径,如果为空将直接返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "文件访问路径,如果为空将直接返回相对路径")
     private String fileDomain;
 
 

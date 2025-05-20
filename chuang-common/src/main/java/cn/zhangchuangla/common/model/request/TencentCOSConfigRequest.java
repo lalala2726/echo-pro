@@ -55,6 +55,6 @@ public class TencentCOSConfigRequest {
     /**
      * 文件域名
      */
-    @Schema(description = "文件域名,如果为空将返回相对路径", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "文件域名,如果为空将返回相对路径")
     private String fileDomain;
 }

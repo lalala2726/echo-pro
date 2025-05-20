@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
-import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostQueryRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostUpdateRequest;
 import cn.zhangchuangla.system.model.vo.post.SysPostListVo;
 import cn.zhangchuangla.system.model.vo.post.SysPostVo;
@@ -48,7 +48,7 @@ public class SysPostController extends BaseController {
     @Operation(summary = "岗位列表")
     @PreAuthorize("@ss.hasPermission('system:post:list')")
     public AjaxResult<TableDataResult> listPost(@Parameter(description = "岗位列表查询参数")
-                                                @Validated @ParameterObject SysPostListRequest request) {
+                                                    @Validated @ParameterObject SysPostQueryRequest request) {
         Page<SysPost> page = sysPostService.listPost(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(page, SysPostListVo.class);
         return getTableData(page, sysPostListVos);

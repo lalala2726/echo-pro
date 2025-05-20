@@ -11,6 +11,10 @@
 
     <artifactId>chuang-generator</artifactId>
 
+    <description>
+        代码生成模块，帮助开发者快速生成简单的增删改查代码
+    </description>
+
     <dependencies>
         <!-- Velocity模板引擎 -->
         <dependency>
@@ -22,18 +26,6 @@
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common</artifactId>
-        </dependency>
-
-        <!-- 引入框架模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-framework</artifactId>
-        </dependency>
-
-        <!-- 引入系统模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-system-core</artifactId>
         </dependency>
 
         <!-- Commons IO -->

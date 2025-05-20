@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
-import cn.zhangchuangla.system.model.request.role.SysRoleListRequest;
+import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
@@ -58,7 +58,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermission('system:role:list')")
     public AjaxResult<TableDataResult> list(@Parameter(description = "角色列表查询参数")
-                                            @Validated @ParameterObject SysRoleListRequest request) {
+                                                @Validated @ParameterObject SysRoleQueryRequest request) {
         Page<SysRole> page = sysRoleService.roleList(request);
         List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
         return getTableData(page, sysRoleListVos);

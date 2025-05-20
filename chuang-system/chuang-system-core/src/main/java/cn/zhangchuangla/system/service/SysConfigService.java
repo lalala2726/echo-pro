@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysConfig;
 import cn.zhangchuangla.system.model.request.config.SysConfigAddRequest;
-import cn.zhangchuangla.system.model.request.config.SysConfigListRequest;
+import cn.zhangchuangla.system.model.request.config.SysConfigQueryRequest;
 import cn.zhangchuangla.system.model.request.config.SysConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +23,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @param request 查询参数
      * @return 分页数据
      */
-    Page<SysConfig> listSysConfig(SysConfigListRequest request);
+    Page<SysConfig> listSysConfig(SysConfigQueryRequest request);
 
 
     /**

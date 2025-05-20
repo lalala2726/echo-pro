@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictItemQueryRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
 import cn.zhangchuangla.system.service.SysDictItemService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -43,7 +43,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * @return 分页结果
      */
     @Override
-    public Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemListRequest request) {
+    public Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemQueryRequest request) {
         return sysDictItemMapper.listDictItem(page, dictType, request);
     }
 

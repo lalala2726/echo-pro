@@ -26,20 +26,20 @@ public class SysRoleUpdateRequest {
      * 角色名
      */
     @NotBlank(message = "角色名不能为空")
-    @Schema(description = "角色名", example = "管理员", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "角色名", example = "管理员", type = "string")
     private String roleName;
 
     /**
      * 排序
      */
-    @Schema(description = "排序", example = "0", type = "integer", format = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "排序", example = "0", type = "integer", format = "integer")
     @Min(value = 0, message = "排序不能小于0")
     private Integer sort;
 
     /**
      * 备注
      */
-    @Schema(description = "备注", example = "系统默认角色", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "备注", example = "系统默认角色", type = "string")
     private String remark;
 
 

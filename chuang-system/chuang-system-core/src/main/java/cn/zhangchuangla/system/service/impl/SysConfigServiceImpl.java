@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysConfig;
 import cn.zhangchuangla.system.model.request.config.SysConfigAddRequest;
-import cn.zhangchuangla.system.model.request.config.SysConfigListRequest;
+import cn.zhangchuangla.system.model.request.config.SysConfigQueryRequest;
 import cn.zhangchuangla.system.model.request.config.SysConfigUpdateRequest;
 import cn.zhangchuangla.system.service.SysConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -37,7 +37,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      * @return 分页数据
      */
     @Override
-    public Page<SysConfig> listSysConfig(SysConfigListRequest request) {
+    public Page<SysConfig> listSysConfig(SysConfigQueryRequest request) {
         Page<SysConfig> sysConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysConfigMapper.listSysConfig(sysConfigPage, request);
     }

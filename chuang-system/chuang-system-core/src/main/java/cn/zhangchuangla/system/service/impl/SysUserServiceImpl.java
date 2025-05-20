@@ -8,9 +8,9 @@ import cn.zhangchuangla.common.utils.SecurityUtils;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.entity.SysDept;
-import cn.zhangchuangla.system.model.request.user.UserAddRequest;
-import cn.zhangchuangla.system.model.request.user.UserListRequest;
-import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysDeptService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
@@ -51,7 +51,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @return 分页数据
      */
     @Override
-    public Page<SysUserDeptDto> listUser(UserListRequest request) {
+    public Page<SysUserDeptDto> listUser(SysUserQueryRequest request) {
         Page<SysUserDeptDto> sysUserPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysUserMapper.listUser(sysUserPage, request);
     }
@@ -63,7 +63,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      * @return 添加成功返回用户ID，失败返回-1
      */
     @Override
-    public Long addUserInfo(UserAddRequest request) {
+    public Long addUserInfo(SysUserAddRequest request) {
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(request, sysUser);
         // 部门ID校验
@@ -217,7 +217,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateUserInfoById(UserUpdateRequest request) {
+    public boolean updateUserInfoById(SysUserUpdateRequest request) {
         if (request == null) {
             throw new ServiceException(ResponseCode.PARAM_ERROR, "请求参数不能为空");
         }

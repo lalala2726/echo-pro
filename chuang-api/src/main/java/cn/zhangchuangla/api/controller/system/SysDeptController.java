@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
-import cn.zhangchuangla.system.model.request.dept.SysDeptListRequest;
+import cn.zhangchuangla.system.model.request.dept.SysDeptQueryRequest;
 import cn.zhangchuangla.system.model.request.dept.SysDeptUpdateRequest;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptListVo;
 import cn.zhangchuangla.system.model.vo.dept.SysDeptVo;
@@ -48,7 +48,7 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dept:list')")
     @Operation(summary = "部门列表")
     public AjaxResult<List<SysDeptListVo>> listDept(@Parameter(description = "部门列表查询参数")
-                                                    @Validated @ParameterObject SysDeptListRequest request) {
+                                                        @Validated @ParameterObject SysDeptQueryRequest request) {
         List<SysDept> sysDept = sysDeptService.listDept(request);
         List<SysDeptListVo> sysDeptListVos = copyListProperties(sysDept, SysDeptListVo.class);
         return success(sysDeptListVos);

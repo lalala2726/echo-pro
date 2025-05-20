@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -27,7 +27,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 查询参数
      * @return 返回文件配置列表
      */
-    Page<StorageConfig> listSysFileConfig(StorageConfigListRequest request);
+    Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request);
 
 
     /**

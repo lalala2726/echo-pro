@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictTypeListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -22,7 +22,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @param request 请求
      * @return 分页结果
      */
-    Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeListRequest request);
+    Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request);
 
     /**
      * 根据id获取字典类型

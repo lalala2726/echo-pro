@@ -1,0 +1,35 @@
+package ${packageName}.model.request.${businessName};
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+
+/**
+ * ${functionName}添加请求参数
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@Schema(description = "${functionName}添加请求参数")
+public class ${ClassName}AddRequest {
+    #foreach ($column in $columns)
+        #if($column.isPk != '1' && $column.javaField != 'createTime' && $column.javaField !=
+            'createBy' && $column.javaField != 'updateTime' && $column.javaField != 'updateBy')
+
+            /**
+             * $column.columnComment
+             */
+            @Schema(description = "$column.columnComment")
+                #if($column.isRequired == '1' && $column.javaType == 'String')
+                @NotBlank(message = "$column.columnComment不能为空")
+                #elseif($column.isRequired == '1')
+                @NotNull(message = "$column.columnComment不能为空")
+                #end
+            private $column.javaType $column.javaField;
+        #end
+    #end
+}

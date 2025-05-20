@@ -16,7 +16,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigListRequest;
+import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
@@ -58,7 +58,7 @@ public class SysFileConfigController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:file-config:list')")
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
-                                                         @Validated @ParameterObject StorageConfigListRequest request) {
+                                                             @Validated @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();

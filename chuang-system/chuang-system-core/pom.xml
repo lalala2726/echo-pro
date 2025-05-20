@@ -9,7 +9,8 @@
         <version>1.0.0</version>
     </parent>
 
+
     <artifactId>chuang-system-core</artifactId>
     <version>1.0.0</version>
-    <description>系统核心模块，提供基础系统功能</description>
+    <description>系统核心模块，提供基础系统功能，包括用户管理，角色管理，菜单管理，部门管理，字典管理等</description>
 </project>

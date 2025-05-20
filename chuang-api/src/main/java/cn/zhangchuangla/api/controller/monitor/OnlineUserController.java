@@ -10,7 +10,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.common.utils.PageUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.system.model.request.monitor.OnlineUserListRequest;
+import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,7 +52,7 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public AjaxResult<TableDataResult> onlineUserList(@Parameter(description = "在线用户列表查询参数")
-                                                      @Validated @ParameterObject OnlineUserListRequest request) {
+                                                          @Validated @ParameterObject OnlineUserQueryRequest request) {
         String pattern = RedisConstants.Auth.ACCESS_TOKEN_USER + "*";
         Collection<String> keys = redisCache.keys(pattern);
         List<OnlineLoginUser> matchedUsers = new ArrayList<>();
@@ -99,7 +99,7 @@ public class OnlineUserController extends BaseController {
      * @param request 查询请求参数
      * @return 是否匹配过滤条件
      */
-    private boolean matchesFilter(OnlineLoginUser user, OnlineUserListRequest request) {
+    private boolean matchesFilter(OnlineLoginUser user, OnlineUserQueryRequest request) {
         // 会话ID匹配
         if (StrUtil.isNotBlank(request.getSessionId()) &&
                 !request.getSessionId().equals(user.getSessionId())) {
