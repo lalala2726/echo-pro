@@ -1,25 +1,23 @@
 package cn.zhangchuangla.generator.model.entity;
 
-import cn.zhangchuangla.common.base.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 代码生成业务表字段
  *
- * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ * @author zhangchuang
  */
-@EqualsAndHashCode(callSuper = true)
 @TableName(value = "gen_table_column")
 @Data
-public class GenTableColumn extends BaseEntity {
+public class GenTableColumn {
 
     /**
      * 编号
      */
+    @TableId(type = IdType.AUTO)
     private Long columnId;
 
     /**
@@ -53,47 +51,47 @@ public class GenTableColumn extends BaseEntity {
     private String javaField;
 
     /**
-     * 是否主键（0否 1是）
+     * 是否主键（1是）
      */
-    private Integer isPk;
+    private String isPk;
 
     /**
-     * 是否自增（0否 1是）
+     * 是否自增（1是）
      */
-    private Integer isIncrement;
+    private String isIncrement;
 
     /**
-     * 是否必填（0否 1是）
+     * 是否必填（1是）
      */
-    private Integer isRequired;
+    private String isRequired;
 
     /**
-     * 是否为插入字段（0否 1是）
+     * 是否为插入字段（1是）
      */
-    private Integer isInsert;
+    private String isInsert;
 
     /**
-     * 是否编辑字段（0否 1是）
+     * 是否编辑字段（1是）
      */
-    private Integer isEdit;
+    private String isEdit;
 
     /**
-     * 是否列表字段（0否 1是）
+     * 是否列表字段（1是）
      */
-    private Integer isList;
+    private String isList;
 
     /**
-     * 是否查询字段（0否 1是）
+     * 是否查询字段（1是）
      */
-    private Integer isQuery;
+    private String isQuery;
 
     /**
-     * 查询方式（EQ等于、NE不等于、GT大于、LT小于、LIKE模糊、BETWEEN范围）
+     * 查询方式（等于、不等于、大于、小于、范围）
      */
     private String queryType;
 
     /**
-     * 显示类型（input输入框、textarea文本域、select下拉框、checkbox复选框、radio单选框、date日期控件、datetime日期时间控件、upload上传控件、summernote富文本控件）
+     * 显示类型（文本框、文本域、下拉框、复选框、单选框、日期控件）
      */
     private String htmlType;
 

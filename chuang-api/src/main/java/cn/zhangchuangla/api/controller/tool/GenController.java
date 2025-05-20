@@ -1,5 +1,6 @@
 package cn.zhangchuangla.api.controller.tool;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
@@ -11,6 +12,7 @@ import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import cn.zhangchuangla.generator.model.vo.DatabaseTableVo;
 import cn.zhangchuangla.generator.model.vo.GenTableListVo;
+import cn.zhangchuangla.generator.model.vo.GenTableVo;
 import cn.zhangchuangla.generator.service.GenTableService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +54,23 @@ public class GenController extends BaseController {
         return getTableData(page, genTableListVos);
     }
 
+    /**
+     * 根据ID查询低代码详情
+     *
+     * @param id 表ID
+     * @return 表信息
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "根据ID查询低代码详情")
+    @PreAuthorize("@ss.hasPermission('tool:gen:query')")
+    public AjaxResult<GenTableVo> getGenTableInfo(@PathVariable("id") Long id) {
+        checkParam(id == null, "id不能为空");
+        GenTable genTable = genTableService.getGenTableById(id);
+        GenTableVo genTableVo = new GenTableVo();
+        BeanUtil.copyProperties(genTable, genTableVo);
+        return success(genTableVo);
+    }
+
 
     /**
      * 列出当前数据库中的表信息
@@ -76,8 +95,8 @@ public class GenController extends BaseController {
      */
     @Operation(summary = "导入数据库表结构")
     @PreAuthorize("@ss.hasPermission('tool:gen:import')")
-    @PostMapping("/import")
-    public AjaxResult<Void> importTable(@RequestBody List<String> tableNames) {
+    @PostMapping("/importTable/{tableName}")
+    public AjaxResult<Void> importTable(@PathVariable("tableName") List<String> tableNames) {
         checkParam(tableNames == null, "表名称不能为空！");
         boolean result = genTableService.importTable(tableNames);
         return toAjax(result);

@@ -1,6 +1,10 @@
 package cn.zhangchuangla.generator.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Chuang
@@ -9,51 +13,140 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class GenUtils {
 
+    /**
+     * 需要排除的字段（不作为查询条件）
+     */
+    private static final Set<String> EXCLUDE_FIELDS = new HashSet<>(Arrays.asList(
+            "id", "create_by", "create_time", "update_by", "update_time", "del_flag", "remark"
+    ));
 
     /**
-     * 将表名转换为符合Java类名规范的字符串
-     * 转换规则：
-     * 1. 下划线后紧跟的字符转为大写（首字母除外）
-     * 2. 首字母自动转为大写
-     * 3. 忽略其他特殊字符并全部转为小写处理
+     * 将下划线命名转换为驼峰命名
      *
-     * @param tableName 数据库表名，如："user_info"
-     * @return 对应的类名，如："UserInfo"
+     * @param name 下划线命名的字符串
+     * @return 驼峰命名的字符串
      */
-    public static String convertClassName(String tableName) {
-        if (tableName == null || tableName.isEmpty()) {
+    public static String toCamelCase(String name) {
+        if (StrUtil.isBlank(name)) {
             return "";
         }
 
-        StringBuilder className = new StringBuilder();
-        boolean nextUpperCase = false;
-        for (int i = 0; i < tableName.length(); i++) {
-            char c = tableName.charAt(i);
+        StringBuilder result = new StringBuilder();
+        String[] words = name.toLowerCase().split("_");
 
-            if (c == '_') {
-                nextUpperCase = true;
-            } else {
-                if (nextUpperCase || i == 0) {
-                    className.append(Character.toUpperCase(c));
-                    nextUpperCase = false;
-                } else {
-                    className.append(Character.toLowerCase(c));
-                }
+        // 第一个单词小写
+        result.append(words[0]);
+
+        // 其他单词首字母大写
+        for (int i = 1; i < words.length; i++) {
+            if (words[i].length() > 0) {
+                result.append(Character.toUpperCase(words[i].charAt(0)))
+                        .append(words[i].substring(1));
             }
         }
-        return className.toString();
+
+        return result.toString();
     }
 
     /**
-     * 获取模块名
+     * 将表名转换为类名（首字母大写的驼峰命名）
+     *
+     * @param tableName 表名
+     * @return 类名
+     */
+    public static String convertClassName(String tableName) {
+        if (StrUtil.isBlank(tableName)) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        String[] words = tableName.toLowerCase().split("_");
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1));
+            }
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 根据数据库字段类型获取Java类型
+     *
+     * @param columnType 数据库字段类型
+     * @return Java类型
+     */
+    public static String getJavaType(String columnType) {
+        if (StrUtil.isBlank(columnType)) {
+            return "String";
+        }
+
+        String type = columnType.toLowerCase();
+
+        if (type.contains("char") || type.contains("text") || type.contains("enum")) {
+            return "String";
+        } else if (type.contains("bigint")) {
+            return "Long";
+        } else if (type.contains("int")) {
+            return "Integer";
+        } else if (type.contains("float")) {
+            return "Float";
+        } else if (type.contains("double")) {
+            return "Double";
+        } else if (type.contains("decimal")) {
+            return "BigDecimal";
+        } else if (type.contains("date") || type.contains("time")) {
+            return "Date";
+        } else if (type.contains("blob")) {
+            return "byte[]";
+        } else if (type.contains("boolean") || type.contains("bit")) {
+            return "Boolean";
+        }
+
+        return "String";
+    }
+
+    /**
+     * 根据数据库字段类型获取表单显示类型
+     *
+     * @param columnType 数据库字段类型
+     * @return 表单显示类型
+     */
+    public static String getHtmlType(String columnType) {
+        if (StrUtil.isBlank(columnType)) {
+            return "input";
+        }
+
+        String type = columnType.toLowerCase();
+
+        if (type.contains("text")) {
+            return "textarea";
+        } else if (type.contains("date") || type.contains("time")) {
+            return "datetime";
+        } else if (type.contains("enum") || type.contains("set")) {
+            return "select";
+        } else if (type.contains("int") || type.contains("float") || type.contains("double") || type.contains("decimal")) {
+            return "input";
+        }
+
+        return "input";
+    }
+
+    /**
+     * 获取包名的最后一段作为模块名
      *
      * @param packageName 包名
      * @return 模块名
      */
     public static String getModuleName(String packageName) {
+        if (StrUtil.isBlank(packageName)) {
+            return "";
+        }
+
         int lastIndex = packageName.lastIndexOf(".");
-        int nameLength = packageName.length();
-        return StringUtils.substring(packageName, lastIndex + 1, nameLength);
+        return lastIndex > 0 ? packageName.substring(lastIndex + 1) : packageName;
     }
 
     /**
@@ -63,8 +156,29 @@ public class GenUtils {
      * @return 业务名
      */
     public static String getBusinessName(String tableName) {
-        int lastIndex = tableName.lastIndexOf("_");
-        int nameLength = tableName.length();
-        return StringUtils.substring(tableName, lastIndex + 1, nameLength);
+        if (StrUtil.isBlank(tableName)) {
+            return "";
+        }
+
+        // 去除表前缀
+        String businessName = tableName;
+
+        // 如果表名包含下划线，取最后一段作为业务名
+        int lastIndex = businessName.lastIndexOf("_");
+        if (lastIndex > 0) {
+            businessName = businessName.substring(lastIndex + 1);
+        }
+
+        return businessName;
+    }
+
+    /**
+     * 判断字段是否为需要排除的字段
+     *
+     * @param fieldName 字段名
+     * @return 是否排除
+     */
+    public static boolean isExcludeField(String fieldName) {
+        return EXCLUDE_FIELDS.contains(fieldName.toLowerCase());
     }
 }

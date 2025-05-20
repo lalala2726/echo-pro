@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.generator.mapper.GenTableColumnMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.generator.model.entity.GenTableColumn">
-        <result property="columnId" column="column_id"/>
+        <id property="columnId" column="column_id"/>
         <result property="tableId" column="table_id"/>
         <result property="columnName" column="column_name"/>
         <result property="columnComment" column="column_comment"/>
@@ -23,11 +23,6 @@
         <result property="htmlType" column="html_type"/>
         <result property="dictType" column="dict_type"/>
         <result property="sort" column="sort"/>
-        <result property="createBy" column="create_by"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateBy" column="update_by"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="remark" column="remark"/>
     </resultMap>
 
 </mapper>

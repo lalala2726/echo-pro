@@ -22,4 +22,9 @@ public class GenConfig {
      * 包名
      */
     private String packageName = "cn.zhangchuangla.system";
+
+    /**
+     * 生成路径
+     */
+    private String genPath = "/";
 }

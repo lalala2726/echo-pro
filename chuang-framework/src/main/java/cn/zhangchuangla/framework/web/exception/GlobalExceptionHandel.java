@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
@@ -48,6 +49,15 @@ public class GlobalExceptionHandel {
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
         log.error("请求方法不支持", exception);
         return AjaxResult.error(ResponseCode.NOT_SUPPORT);
+    }
+
+    /**
+     * 请求参数非法
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
+        log.error("请求参数非法: ", exception);
+        return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
     }
 
     /**

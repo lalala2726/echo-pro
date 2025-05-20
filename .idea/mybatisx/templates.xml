@@ -71,6 +71,10 @@
                   <option name="className" value="GenTableColumn" />
                   <option name="tableName" value="gen_table_column" />
                 </TableUIInfo>
+                <TableUIInfo>
+                  <option name="className" value="GenTable" />
+                  <option name="tableName" value="gen_table" />
+                </TableUIInfo>
               </list>
             </option>
             <option name="templatesName" value="mybatis-plus3" />

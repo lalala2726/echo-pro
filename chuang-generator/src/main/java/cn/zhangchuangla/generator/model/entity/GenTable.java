@@ -1,29 +1,26 @@
 package cn.zhangchuangla.generator.model.entity;
 
-import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * 代码生成业务表
  *
- * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ * @author zhangchuang
  */
-@EqualsAndHashCode(callSuper = true)
 @TableName(value = "gen_table")
 @Data
-public class GenTable extends BaseEntity {
+public class GenTable {
 
     /**
-     * 主键
+     * 编号
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long tableId;
 
     /**
      * 表名称
@@ -36,15 +33,9 @@ public class GenTable extends BaseEntity {
     private String tableComment;
 
     /**
-     * 表类型（0单表，1主子表,2树表）
-     */
-    private Integer tableType;
-
-    /**
      * 实体类名称
      */
     private String className;
-
 
     /**
      * 生成包路径
@@ -72,17 +63,32 @@ public class GenTable extends BaseEntity {
     private String functionAuthor;
 
     /**
-     * 生成代码方式（0 zip压缩包 1 自定义路径）
+     * 生成模板类型
      */
-    private Integer genType;
-
-    /**
-     * 生成路径（不填默认项目路径）
-     */
-    private String genPath;
+    private String tplCategory;
 
     /**
      * 创建者
      */
     private String createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private String updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 备注
+     */
+    private String remark;
 }

@@ -16,6 +16,7 @@ public class BaseVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1128600362851925919L;
+
     /**
      * 备注
      */

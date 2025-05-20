@@ -17,63 +17,52 @@ import java.util.Date;
 public class GenTableListVo {
 
     /**
-     * 主键
+     * 编号
      */
-    @Schema(description = "主键", type = "int", format = "int64", example = "1")
-    private Long id;
+    @Schema(description = "编号", type = "int", format = "int64")
+    private Long tableId;
 
     /**
      * 表名称
      */
-    @Schema(description = "表名称", example = "user_table")
+    @Schema(description = "表名称")
     private String tableName;
 
     /**
      * 表描述
      */
-    @Schema(description = "表描述", example = "用户信息表")
+    @Schema(description = "表描述")
     private String tableComment;
 
     /**
-     * 表类型（0单表，1主子表,2树表）
+     * 实体类名称
      */
-    @Schema(description = "表类型（0单表，1主子表,2树表）", example = "0")
-    private Integer tableType;
+    @Schema(description = "实体类名称")
+    private String className;
 
 
     /**
-     * 生成模块名
+     * 生成模板类型
      */
-    @Schema(description = "生成模块名", example = "user")
-    private String moduleName;
-
-    /**
-     * 生成业务名
-     */
-    @Schema(description = "生成业务名", example = "user")
-    private String businessName;
-
-    /**
-     * 生成功能名
-     */
-    @Schema(description = "生成功能名", example = "用户管理")
-    private String functionName;
-
-    /**
-     * 生成功能作者
-     */
-    @Schema(description = "生成功能作者", example = "Chuang")
-    private String functionAuthor;
+    @Schema(description = "生成模板类型")
+    private String tplCategory;
 
     /**
      * 创建者
      */
-    @Schema(description = "创建者", example = "admin")
+    @Schema(description = "创建者")
     private String createBy;
 
     /**
      * 创建时间
      */
-    @Schema(description = "创建时间", example = "2025-05-20 11:01:00")
+    @Schema(description = "创建时间")
     private Date createTime;
+
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
 }

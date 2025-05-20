@@ -56,4 +56,12 @@ public interface GenTableService extends IService<GenTable> {
      * @return 修改结果
      */
     boolean updateConfigInfo(GenConfigUpdateRequest request);
+
+    /**
+     * 根据ID查询低代码表信息
+     *
+     * @param id id
+     * @return 返回详情
+     */
+    GenTable getGenTableById(Long id);
 }
