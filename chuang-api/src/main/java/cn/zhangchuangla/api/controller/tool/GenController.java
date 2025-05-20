@@ -3,9 +3,11 @@ package cn.zhangchuangla.api.controller.tool;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import cn.zhangchuangla.generator.model.vo.DatabaseTableVo;
 import cn.zhangchuangla.generator.model.vo.GenTableListVo;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -75,7 +78,33 @@ public class GenController extends BaseController {
     @PreAuthorize("@ss.hasPermission('tool:gen:import')")
     @PostMapping("/import")
     public AjaxResult<Void> importTable(@RequestBody List<String> tableNames) {
-        return success();
+        checkParam(tableNames == null, "表名称不能为空！");
+        boolean result = genTableService.importTable(tableNames);
+        return toAjax(result);
+    }
+
+    /**
+     * 查询配置信息
+     *
+     * @return 配置信息
+     */
+    @Operation(summary = "查询配置信息")
+    @GetMapping("/config")
+    public AjaxResult<GenConfig> getConfigInfo() {
+        GenConfig genConfig = genTableService.getConfigInfo();
+        return success(genConfig);
+    }
+
+    /**
+     * 修改配置信息
+     *
+     * @return 操作结果
+     */
+    @Operation(summary = "修改配置信息")
+    @PutMapping
+    public AjaxResult<Void> updateConfigInfo(@RequestBody @Validated GenConfigUpdateRequest request) {
+        boolean result = genTableService.updateConfigInfo(request);
+        return toAjax(result);
     }
 
     /**

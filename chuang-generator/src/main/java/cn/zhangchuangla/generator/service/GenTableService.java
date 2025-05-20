@@ -1,11 +1,15 @@
 package cn.zhangchuangla.generator.service;
 
+import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * @author Chuang
@@ -30,4 +34,26 @@ public interface GenTableService extends IService<GenTable> {
      */
     Page<DatabaseTable> listDatabaseTables(DatabaseTableQueryRequest databaseTableQueryRequest);
 
+    /**
+     * 导入当前数据库中的表到低代码表中 （支持批量导入）
+     *
+     * @param tableNames 表名称集合
+     * @return 导入结果
+     */
+    boolean importTable(List<String> tableNames);
+
+    /**
+     * 查询配置信息
+     *
+     * @return 配置信息
+     */
+    GenConfig getConfigInfo();
+
+    /**
+     * 修改配置信息
+     *
+     * @param request 配置信息
+     * @return 修改结果
+     */
+    boolean updateConfigInfo(GenConfigUpdateRequest request);
 }

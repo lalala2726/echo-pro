@@ -64,6 +64,13 @@ public interface RedisConstants {
     }
 
     /**
+     * 代码生成
+     */
+    interface Generator {
+        String CONFIG_INFO = "generator:config:info";
+    }
+
+    /**
      * 认证模块
      */
     interface Auth {

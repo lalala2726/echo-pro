@@ -41,6 +41,12 @@ public class GenTable extends BaseEntity {
     private Integer tableType;
 
     /**
+     * 实体类名称
+     */
+    private String className;
+
+
+    /**
      * 生成包路径
      */
     private String packageName;
