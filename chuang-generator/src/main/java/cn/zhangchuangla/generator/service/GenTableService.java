@@ -4,7 +4,10 @@ import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.*;
+import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
+import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -96,14 +99,6 @@ public interface GenTableService extends IService<GenTable> {
      * @return 更新结果
      */
     boolean updateGenTable(GenTableUpdateRequest request);
-
-    /**
-     * 更新低代码表状态
-     *
-     * @param request 状态更新请求
-     * @return 更新结果
-     */
-    boolean updateGenTableStatus(GenTableStatusUpdateRequest request);
 
 
     /**

@@ -13,7 +13,10 @@ import cn.zhangchuangla.generator.mapper.GenTableMapper;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.*;
+import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
+import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import cn.zhangchuangla.generator.utils.VelocityUtils;
@@ -410,31 +413,6 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         return updateById(updateTable);
     }
 
-    /**
-     * 更新低代码表状态
-     *
-     * @param request 状态更新请求
-     * @return 更新结果
-     */
-    @Override
-    public boolean updateGenTableStatus(GenTableStatusUpdateRequest request) {
-        // 检查表是否存在
-        GenTable existingTable = getById(request.getTableId());
-        if (existingTable == null) {
-            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
-        }
-
-        // 创建更新对象
-        GenTable updateTable = new GenTable();
-        updateTable.setTableId(request.getTableId());
-        updateTable.setStatus(request.getStatus());
-
-        // 设置更新者
-        updateTable.setUpdateBy(SecurityUtils.getUsername());
-
-        // 更新表状态
-        return updateById(updateTable);
-    }
 
     /**
      * 删除低代码表，支持批量删除

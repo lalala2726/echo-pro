@@ -9,7 +9,10 @@ import cn.zhangchuangla.generator.enums.FileType;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.*;
+import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
+import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
 import cn.zhangchuangla.generator.model.vo.*;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
@@ -268,19 +271,5 @@ public class GenController extends BaseController {
         boolean importResult = genTableService.importTable(tableNames);
 
         return toAjax(importResult);
-    }
-
-    /**
-     * 修改状态
-     *
-     * @param request 状态更新请求
-     * @return 操作结果
-     */
-    @Operation(summary = "修改状态")
-    @PreAuthorize("@ss.hasPermission('tool:gen:edit')")
-    @PutMapping("/changeStatus")
-    public AjaxResult<Void> changeStatus(@RequestBody @Validated GenTableStatusUpdateRequest request) {
-        boolean result = genTableService.updateGenTableStatus(request);
-        return toAjax(result);
     }
 }
