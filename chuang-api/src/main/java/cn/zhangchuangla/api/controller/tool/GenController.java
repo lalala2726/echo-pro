@@ -124,7 +124,7 @@ public class GenController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "修改配置信息")
-    @PutMapping
+    @PutMapping("/config")
     public AjaxResult<Void> updateConfigInfo(@RequestBody @Validated GenConfigUpdateRequest request) {
         boolean result = genTableService.updateConfigInfo(request);
         return toAjax(result);
