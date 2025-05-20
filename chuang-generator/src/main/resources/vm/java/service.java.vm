@@ -26,6 +26,14 @@ public interface ${ClassName}Service extends IService<${ClassName}> {
     Page<${ClassName}> list${ClassName}(${ClassName}QueryRequest request);
 
     /**
+     * 导出${functionName}列表
+     *
+     * @param request 查询参数
+     * @return ${functionName}列表
+     */
+    List<${ClassName}> export${ClassName}(${ClassName}QueryRequest request);
+
+    /**
      * 根据ID查询${functionName}
      *
      * @param ${pkColumn.javaField} ID
@@ -56,4 +64,20 @@ public interface ${ClassName}Service extends IService<${ClassName}> {
      * @return 结果
      */
     boolean delete${ClassName}ByIds(List<${pkColumn.javaType}> ${pkColumn.javaField}s);
+
+    /**
+     * 修改${functionName}状态
+     *
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @param status 状态
+     * @return 结果
+     */
+    boolean updateStatus(${pkColumn.javaType} ${pkColumn.javaField}, String status);
+
+    /**
+     * 获取${functionName}选项列表
+     *
+     * @return ${functionName}列表
+     */
+    List<${ClassName}> list${ClassName}ForOption();
 }

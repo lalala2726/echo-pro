@@ -10,7 +10,6 @@ import lombok.Data;
  * created on 2025/5/20 13:54
  */
 @Data
-//todo 后续将这个到缓存中，后续前端可以修改基本基本的配置
 public class GenConfig {
 
     /**

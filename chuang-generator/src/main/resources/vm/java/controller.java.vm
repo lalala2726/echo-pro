@@ -1,9 +1,11 @@
 package ${packageName}.controller;
 
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.enums.BusinessType;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.common.utils.ExcelUtil;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import ${packageName}.model.entity.${ClassName};
 import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
@@ -23,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -50,6 +53,21 @@ public class ${ClassName}Controller extends BaseController {
         Page<${ClassName}> page = ${className}Service.list${ClassName}(request);
         List<${ClassName}ListVo> voList = copyListProperties(page, ${ClassName}ListVo.class);
         return getTableData(page, voList);
+    }
+
+    /**
+     * 导出${functionName}列表
+     */
+    @Operation(summary = "导出${functionName}列表")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
+    @PostMapping("/export")
+    @OperationLog(title = "${functionName}管理", businessType = BusinessType.EXPORT)
+    public void export(@Parameter(description = "${functionName}列表查询参数")
+                       @Validated @RequestBody ${ClassName}QueryRequest request, HttpServletResponse response) {
+        List<${ClassName}> list = ${className}Service.export${ClassName}(request);
+        List<${ClassName}ListVo> voList = copyListProperties(list, ${ClassName}ListVo.class);
+        ExcelUtil<${ClassName}ListVo> util = new ExcelUtil<>(${ClassName}ListVo.class);
+        util.exportExcel(response, voList, "${functionName}数据");
     }
 
     /**
@@ -105,5 +123,32 @@ public class ${ClassName}Controller extends BaseController {
         checkParam(${pkColumn.javaField}s == null, "id不能为空");
         boolean result = ${className}Service.delete${ClassName}ByIds(${pkColumn.javaField}s);
         return toAjax(result);
+    }
+
+    /**
+     * 修改${functionName}状态
+     */
+    @Operation(summary = "修改${functionName}状态")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:edit')")
+    @PutMapping("/changeStatus")
+    @OperationLog(title = "${functionName}管理", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> changeStatus(@Parameter(description = "${functionName}ID和状态")
+                                         @RequestBody ${ClassName} ${className}) {
+        checkParam(${className}.get${pkColumn.javaField.substring(0, 1).toUpperCase()}${pkColumn.javaField.substring(1)}() == null, "${pkColumn.javaField}不能为空")
+        ;
+        checkParam(${className}.getStatus() == null, "状态不能为空");
+        return toAjax(${className}Service.updateStatus(${className}.get${pkColumn.javaField.substring(0, 1).toUpperCase()}${pkColumn.javaField.substring(1)}(), ${className}.getStatus()))
+        ;
+    }
+
+    /**
+     * 获取${functionName}选项列表
+     */
+    @Operation(summary = "获取${functionName}选项列表")
+    @GetMapping("/optionList")
+    public AjaxResult<List<${ClassName}ListVo>> optionList() {
+        List<${ClassName}> list = ${className}Service.list${ClassName}ForOption();
+        List<${ClassName}ListVo> voList = copyListProperties(list, ${ClassName}ListVo.class);
+        return success(voList);
     }
 }

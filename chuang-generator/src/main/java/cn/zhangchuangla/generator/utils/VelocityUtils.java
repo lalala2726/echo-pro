@@ -9,6 +9,7 @@ import org.apache.velocity.app.Velocity;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 模板工具类
@@ -62,12 +63,12 @@ public class VelocityUtils {
         velocityContext.put("packageName", packageName);
         velocityContext.put("author", genTable.getFunctionAuthor());
         velocityContext.put("datetime", DateUtil.format(new Date(), "yyyy-MM-dd"));
-        velocityContext.put("pkColumn", getPkColumn(genTable.getTableId()));
-        velocityContext.put("importList", getImportList(genTable.getTableId()));
+        velocityContext.put("pkColumn", getPkColumn(genTable.getColumns()));
+        velocityContext.put("importList", getImportList(genTable.getColumns()));
         velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
         velocityContext.put("columns", genTable.getColumns());
         velocityContext.put("table", genTable);
-        velocityContext.put("dicts", getDicts(genTable.getTableId()));
+        velocityContext.put("dicts", getDicts(genTable.getColumns()));
         velocityContext.put("parentMenuId", DEFAULT_PARENT_MENU_ID);
 
         return velocityContext;
@@ -153,17 +154,30 @@ public class VelocityUtils {
     /**
      * 根据列类型获取导入包
      *
-     * @param tableId 表ID
+     * @param columns 列信息
      * @return 返回需要导入的包列表
      */
-    public static HashSet<String> getImportList(Long tableId) {
-        // 模拟实现，实际应该从数据库中获取列信息
+    public static HashSet<String> getImportList(List<GenTableColumn> columns) {
         HashSet<String> importList = new HashSet<>();
-        importList.add("java.util.Date");
         importList.add("com.baomidou.mybatisplus.annotation.TableName");
         importList.add("com.baomidou.mybatisplus.annotation.TableId");
         importList.add("com.baomidou.mybatisplus.annotation.IdType");
         importList.add("lombok.Data");
+
+        // 检查列表是否为空
+        if (columns == null || columns.isEmpty()) {
+            return importList;
+        }
+
+        // 根据列类型添加对应的导入包
+        for (GenTableColumn column : columns) {
+            if ("Date".equals(column.getJavaType())) {
+                importList.add("java.util.Date");
+            } else if ("BigDecimal".equals(column.getJavaType())) {
+                importList.add("java.math.BigDecimal");
+            }
+        }
+
         return importList;
     }
 
@@ -181,27 +195,52 @@ public class VelocityUtils {
     /**
      * 获取主键列
      *
-     * @param tableId 表ID
+     * @param columns 表字段列表
      * @return 主键列
      */
-    public static GenTableColumn getPkColumn(Long tableId) {
-        // 模拟实现，实际应该从数据库中获取主键列信息
-        GenTableColumn column = new GenTableColumn();
-        column.setColumnName("id");
-        column.setJavaField("id");
-        column.setJavaType("Long");
-        return column;
+    public static GenTableColumn getPkColumn(List<GenTableColumn> columns) {
+        // 检查列表是否为空
+        if (columns == null || columns.isEmpty()) {
+            // 如果列表为空，则创建一个默认的主键列
+            GenTableColumn column = new GenTableColumn();
+            column.setColumnName("id");
+            column.setJavaField("id");
+            column.setJavaType("Long");
+            return column;
+        }
+
+        // 从表字段列表中查找主键列
+        return columns.stream()
+                .filter(column -> "1".equals(column.getIsPk()))
+                .findFirst()
+                .orElseGet(() -> {
+                    // 如果没有找到主键列，则创建一个默认的主键列
+                    GenTableColumn column = new GenTableColumn();
+                    column.setColumnName("id");
+                    column.setJavaField("id");
+                    column.setJavaType("Long");
+                    return column;
+                });
     }
 
     /**
      * 获取字典列表
      *
-     * @param tableId 表ID
+     * @param columns 表字段列表
      * @return 字典列表
      */
-    public static List<String> getDicts(Long tableId) {
-        // 模拟实现，实际应该从数据库中获取字典列表
-        return new ArrayList<>();
+    public static List<String> getDicts(List<GenTableColumn> columns) {
+        // 检查列表是否为空
+        if (columns == null || columns.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 获取所有配置了字典类型的列的字典类型
+        return columns.stream()
+                .map(GenTableColumn::getDictType)
+                .filter(StrUtil::isNotEmpty)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**

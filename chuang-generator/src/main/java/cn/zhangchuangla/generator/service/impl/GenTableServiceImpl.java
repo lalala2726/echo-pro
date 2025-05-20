@@ -12,12 +12,11 @@ import cn.zhangchuangla.generator.mapper.GenTableMapper;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
-import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.*;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import cn.zhangchuangla.generator.utils.VelocityUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -260,7 +256,18 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
      */
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableName(String tableName) {
-        return genTableColumnMapper.selectDbTableColumnsByTableName(tableName);
+        // 先查询表信息，获取表ID
+        GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
+        if (table == null) {
+            return new ArrayList<>();
+        }
+
+        // 根据表ID查询表字段信息
+        return genTableColumnMapper.selectList(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<GenTableColumn>()
+                        .eq(GenTableColumn::getTableId, table.getTableId())
+                        .orderByAsc(GenTableColumn::getSort)
+        );
     }
 
     /**
@@ -341,7 +348,96 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         } catch (IOException e) {
             log.error("生成代码失败，表名：{}", tableName, e);
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成代码失败，请稍后重试");
+        } finally {
+            try {
+                if (zip != null) {
+                    zip.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                log.error("关闭流失败", e);
+            }
         }
+    }
+
+    /**
+     * 更新低代码表信息
+     *
+     * @param request 更新请求
+     * @return 更新结果
+     */
+    @Override
+    public boolean updateGenTable(GenTableUpdateRequest request) {
+        // 检查表是否存在
+        GenTable existingTable = getById(request.getTableId());
+        if (existingTable == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
+        }
+
+        // 创建更新对象
+        GenTable updateTable = new GenTable();
+        BeanUtils.copyProperties(request, updateTable);
+
+        // 设置更新者
+        updateTable.setUpdateBy(SecurityUtils.getUsername());
+
+        // 更新表信息
+        return updateById(updateTable);
+    }
+
+    /**
+     * 更新低代码表状态
+     *
+     * @param request 状态更新请求
+     * @return 更新结果
+     */
+    @Override
+    public boolean updateGenTableStatus(GenTableStatusUpdateRequest request) {
+        // 检查表是否存在
+        GenTable existingTable = getById(request.getTableId());
+        if (existingTable == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
+        }
+
+        // 创建更新对象
+        GenTable updateTable = new GenTable();
+        updateTable.setTableId(request.getTableId());
+        updateTable.setStatus(request.getStatus());
+
+        // 设置更新者
+        updateTable.setUpdateBy(SecurityUtils.getUsername());
+
+        // 更新表状态
+        return updateById(updateTable);
+    }
+
+    /**
+     * 删除低代码表，支持批量删除
+     *
+     * <p>此方法会级联删除与这些低代码表关联的列信息。</p>
+     *
+     * @param tableIds 低代码表ID集合，不能为null且不能为空
+     * @return 操作结果，成功返回true，否则false
+     * @throws ServiceException 如果参数无效或删除过程中发生异常
+     */
+    @Override
+    @Transactional(rollbackFor = ServiceException.class)
+    public boolean deleteGenTable(List<Long> tableIds) {
+        if (tableIds == null || tableIds.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表ID列表不能为空");
+        }
+
+        // 删除主表数据
+        removeByIds(tableIds);
+
+        // 删除关联的列数据
+        LambdaQueryWrapper<GenTableColumn> columnWrapper = new LambdaQueryWrapper<>();
+        columnWrapper.in(GenTableColumn::getTableId, tableIds);
+        genTableColumnMapper.delete(columnWrapper);
+
+        return true;
     }
 }
 

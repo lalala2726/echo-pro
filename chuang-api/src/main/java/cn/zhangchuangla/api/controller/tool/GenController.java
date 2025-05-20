@@ -5,14 +5,14 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.generator.config.GenConfig;
+import cn.zhangchuangla.generator.enums.FileType;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
-import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.*;
 import cn.zhangchuangla.generator.model.vo.*;
 import cn.zhangchuangla.generator.service.GenTableService;
+import cn.zhangchuangla.generator.utils.GenUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -154,26 +154,30 @@ public class GenController extends BaseController {
     /**
      * 修改低代码表配置
      *
+     * @param request 更新请求
      * @return 操作结果
      */
     @Operation(summary = "修改低代码表配置")
     @PreAuthorize("@ss.hasPermission('tool:gen:update')")
-    @PostMapping("/update")
-    public AjaxResult<Void> update() {
-        return success();
+    @PutMapping
+    public AjaxResult<Void> update(@RequestBody @Validated GenTableUpdateRequest request) {
+        boolean result = genTableService.updateGenTable(request);
+        return toAjax(result);
     }
 
     /**
      * 删除低代码表
      *
-     * @param tableNames 表名称
+     * @param tableIds 表ID数组
      * @return 操作结果
      */
     @Operation(summary = "删除低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:remove')")
-    @PostMapping("/delete")
-    public AjaxResult<Void> delete(@RequestBody String[] tableNames) {
-        return success();
+    @DeleteMapping("/{tableIds}")
+    public AjaxResult<Void> deleteGenTable(@PathVariable("tableIds") List<Long> tableIds) {
+        checkParam(tableIds == null, "ID不能为空");
+        boolean result = genTableService.deleteGenTable(tableIds);
+        return toAjax(result);
     }
 
     /**
@@ -196,64 +200,22 @@ public class GenController extends BaseController {
 
         codeMap.forEach((fileName, content) -> {
             // 获取文件类型
-            String fileType = getFileType(fileName);
+            FileType fileType = GenUtils.getFileType(fileName);
 
             // 获取简化文件名
-            String simpleFileName = getSimpleFileName(fileName);
+            String simpleFileName = GenUtils.getSimpleFileName(fileName);
 
             // 添加到预览列表
             CodePreviewVo previewVo = CodePreviewVo.builder()
                     .fileName(simpleFileName)
                     .content(content)
-                    .fileType(fileType)
+                    .fileType(fileType.getCode())
                     .build();
 
             previewList.add(previewVo);
         });
 
         return success(previewList);
-    }
-
-    /**
-     * 获取文件类型
-     *
-     * @param fileName 文件名
-     * @return 文件类型
-     */
-    private String getFileType(String fileName) {
-        if (fileName.contains("entity.java")) {
-            return "entity";
-        } else if (fileName.contains("mapper.java")) {
-            return "mapper";
-        } else if (fileName.contains("service.java") && !fileName.contains("serviceImpl")) {
-            return "service";
-        } else if (fileName.contains("serviceImpl.java")) {
-            return "serviceImpl";
-        } else if (fileName.contains("controller.java")) {
-            return "controller";
-        } else if (fileName.contains("mapper.xml")) {
-            return "mapperXml";
-        } else if (fileName.contains("vo.java")) {
-            return "vo";
-        } else if (fileName.contains("request.java")) {
-            return "request";
-        } else {
-            return "other";
-        }
-    }
-
-    /**
-     * 获取简化文件名
-     *
-     * @param fileName 文件名
-     * @return 简化文件名
-     */
-    private String getSimpleFileName(String fileName) {
-        int lastIndex = fileName.lastIndexOf("/");
-        if (lastIndex > -1) {
-            return fileName.substring(lastIndex + 1);
-        }
-        return fileName;
     }
 
     /**
@@ -287,8 +249,38 @@ public class GenController extends BaseController {
      */
     @Operation(summary = "同步数据库结构")
     @PreAuthorize("@ss.hasPermission('tool:gen:sync')")
-    @PostMapping("/syncDb")
-    public AjaxResult<Void> syncDb(@RequestParam String tableName) {
-        return success();
+    @PostMapping("/syncDb/{tableName}")
+    public AjaxResult<Void> syncDb(@PathVariable("tableName") String tableName) {
+        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
+
+        // 删除旧的表结构
+        GenTable table = genTableService.lambdaQuery().eq(GenTable::getTableName, tableName).one();
+        if (table == null) {
+            return error("表不存在");
+        }
+
+        // 删除旧的表记录
+        genTableService.removeById(table.getTableId());
+
+        // 重新导入表结构
+        List<String> tableNames = new ArrayList<>();
+        tableNames.add(tableName);
+        boolean importResult = genTableService.importTable(tableNames);
+
+        return toAjax(importResult);
+    }
+
+    /**
+     * 修改状态
+     *
+     * @param request 状态更新请求
+     * @return 操作结果
+     */
+    @Operation(summary = "修改状态")
+    @PreAuthorize("@ss.hasPermission('tool:gen:edit')")
+    @PutMapping("/changeStatus")
+    public AjaxResult<Void> changeStatus(@RequestBody @Validated GenTableStatusUpdateRequest request) {
+        boolean result = genTableService.updateGenTableStatus(request);
+        return toAjax(result);
     }
 }

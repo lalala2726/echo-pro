@@ -1,6 +1,7 @@
 package cn.zhangchuangla.generator.utils;
 
 import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.generator.enums.FileType;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,6 +20,63 @@ public class GenUtils {
     private static final Set<String> EXCLUDE_FIELDS = new HashSet<>(Arrays.asList(
             "id", "create_by", "create_time", "update_by", "update_time", "del_flag", "remark"
     ));
+
+
+    /**
+     * 根据文件名获取文件类型
+     *
+     * @param fileName 文件名
+     * @return 文件类型
+     */
+    public static FileType getFileType(String fileName) {
+        if (fileName == null) {
+            return FileType.OTHER;
+        }
+
+        if (fileName.contains("entity.java")) {
+            return FileType.ENTITY;
+        } else if (fileName.contains("mapper.java")) {
+            return FileType.MAPPER;
+        } else if (fileName.contains("service.java") && !fileName.contains("serviceImpl")) {
+            return FileType.SERVICE;
+        } else if (fileName.contains("serviceImpl.java")) {
+            return FileType.SERVICE_IMPL;
+        } else if (fileName.contains("controller.java")) {
+            return FileType.CONTROLLER;
+        } else if (fileName.contains("mapper.xml")) {
+            return FileType.MAPPER_XML;
+        } else if (fileName.contains("list-vo.java")) {
+            return FileType.LIST_VO;
+        } else if (fileName.contains("vo.java")) {
+            return FileType.VO;
+        } else if (fileName.contains("add-request.java")) {
+            return FileType.ADD_REQUEST;
+        } else if (fileName.contains("update-request.java")) {
+            return FileType.UPDATE_REQUEST;
+        } else if (fileName.contains("request.java")) {
+            return FileType.REQUEST;
+        } else {
+            return FileType.OTHER;
+        }
+    }
+
+    /**
+     * 获取简化文件名
+     *
+     * @param fileName 文件名
+     * @return 简化文件名
+     */
+    public static String getSimpleFileName(String fileName) {
+        if (fileName == null) {
+            return "";
+        }
+
+        int lastIndex = fileName.lastIndexOf("/");
+        if (lastIndex > -1) {
+            return fileName.substring(lastIndex + 1);
+        }
+        return fileName;
+    }
 
     /**
      * 将下划线命名转换为驼峰命名
@@ -39,7 +97,7 @@ public class GenUtils {
 
         // 其他单词首字母大写
         for (int i = 1; i < words.length; i++) {
-            if (words[i].length() > 0) {
+            if (!words[i].isEmpty()) {
                 result.append(Character.toUpperCase(words[i].charAt(0)))
                         .append(words[i].substring(1));
             }
@@ -63,7 +121,7 @@ public class GenUtils {
         String[] words = tableName.toLowerCase().split("_");
 
         for (String word : words) {
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 result.append(Character.toUpperCase(word.charAt(0)))
                         .append(word.substring(1));
             }

@@ -48,6 +48,12 @@ public class GenTableListVo {
     private String tplCategory;
 
     /**
+     * 状态（0正常 1停用）
+     */
+    @Schema(description = "状态（0正常 1停用）")
+    private String status;
+
+    /**
      * 创建者
      */
     @Schema(description = "创建者")

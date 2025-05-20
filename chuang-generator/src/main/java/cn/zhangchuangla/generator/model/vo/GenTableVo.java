@@ -74,4 +74,10 @@ public class GenTableVo extends BaseVo {
      */
     @Schema(description = "生成模板类型")
     private String tplCategory;
+
+    /**
+     * 状态（0正常 1停用）
+     */
+    @Schema(description = "状态（0正常 1停用）")
+    private String status;
 }

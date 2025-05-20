@@ -3,6 +3,8 @@ package cn.zhangchuangla.generator.service;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author Chuang
  * <p>
@@ -10,4 +12,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface GenTableColumnService extends IService<GenTableColumn> {
 
+    /**
+     * 根据表名查询表字段配置
+     *
+     * @param tableName 表名
+     * @return 表字段配置列表
+     */
+    List<GenTableColumn> selectGenTableColumnListByTableName(String tableName);
 }
