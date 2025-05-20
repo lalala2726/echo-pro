@@ -70,6 +70,18 @@ public class OpenAPIConfig {
     }
 
     /**
+     * 系统工具
+     */
+    @Bean
+    public GroupedOpenApi toolApi() {
+        return GroupedOpenApi.builder()
+                .group("通用功能")
+                .packagesToScan("cn.zhangchuangla.api.controller.tool")
+                .build();
+    }
+
+
+    /**
      * 所有接口
      */
     @Bean
@@ -84,7 +96,7 @@ public class OpenAPIConfig {
      * OpenAPI 主配置
      */
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
                         .title(appName + " API文档")
