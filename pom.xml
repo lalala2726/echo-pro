@@ -44,11 +44,13 @@
         <alibaba.druid.starter.version>1.2.24</alibaba.druid.starter.version>
         <apache.commons-io.version>2.18.0</apache.commons-io.version>
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
-        <javax.activation.version>1.2.0</javax.activation.version>
+        <javax.activation.version>2.1.2</javax.activation.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
         <apache.velocity>2.4.1</apache.velocity>
+        <google.protobuf.version>4.28.2</google.protobuf.version>
+        <fast.excel.version>1.2.0</fast.excel.version>
         <!-- IP 地区转换 -->
         <ip2region.version>2.7.0</ip2region.version>
     </properties>
@@ -116,18 +118,16 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Spring Security Crypto 漏洞修复 -->
+            <!-- Spring Security 相关依赖统一使用指定版本 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
-                <version>6.4.4</version>
+                <version>${spring.security.version}</version>
             </dependency>
-
-            <!-- Spring Security Core 漏洞修复 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
-                <version>6.4.4</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <!-- Spring Boot Web 启动器，用于构建 Web 应用 -->
@@ -295,7 +295,7 @@
             <dependency>
                 <groupId>jakarta.activation</groupId>
                 <artifactId>jakarta.activation-api</artifactId>
-                <version>2.1.2</version>
+                <version>${javax.activation.version}</version>
             </dependency>
             <!-- Spring Boot WebSocket 启动器，用于实现 WebSocket 通信 -->
             <dependency>
@@ -333,7 +333,12 @@
             <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
-                <version>4.28.2</version>
+                <version>${google.protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.idev.excel</groupId>
+                <artifactId>fastexcel</artifactId>
+                <version>${fast.excel.version}</version>
             </dependency>
             <!-- 系统模块依赖 -->
             <dependency>
