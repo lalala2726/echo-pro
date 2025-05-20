@@ -49,6 +49,7 @@
         <version.apache.tika>2.9.0</version.apache.tika>
         <cn.hutool.version>5.8.37</cn.hutool.version>
         <apache.velocity>2.4.1</apache.velocity>
+        <fast.excel.version>1.2.0</fast.excel.version>
         <!-- IP 地区转换 -->
         <ip2region.version>2.7.0</ip2region.version>
     </properties>
@@ -329,11 +330,10 @@
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>1.78</version>
             </dependency>
-            <!-- Protobuf依赖 -->
             <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>4.28.2</version>
+                <groupId>cn.idev.excel</groupId>
+                <artifactId>fastexcel</artifactId>
+                <version>${fast.excel.version}</version>
             </dependency>
             <!-- 系统模块依赖 -->
             <dependency>
