@@ -29,35 +29,7 @@ public class GenUtils {
      * @return 文件类型
      */
     public static FileType getFileType(String fileName) {
-        if (fileName == null) {
-            return FileType.OTHER;
-        }
-
-        if (fileName.contains("entity.java")) {
-            return FileType.ENTITY;
-        } else if (fileName.contains("mapper.java")) {
-            return FileType.MAPPER;
-        } else if (fileName.contains("service.java") && !fileName.contains("serviceImpl")) {
-            return FileType.SERVICE;
-        } else if (fileName.contains("serviceImpl.java")) {
-            return FileType.SERVICE_IMPL;
-        } else if (fileName.contains("controller.java")) {
-            return FileType.CONTROLLER;
-        } else if (fileName.contains("mapper.xml")) {
-            return FileType.MAPPER_XML;
-        } else if (fileName.contains("list-vo.java")) {
-            return FileType.LIST_VO;
-        } else if (fileName.contains("vo.java")) {
-            return FileType.VO;
-        } else if (fileName.contains("add-request.java")) {
-            return FileType.ADD_REQUEST;
-        } else if (fileName.contains("update-request.java")) {
-            return FileType.UPDATE_REQUEST;
-        } else if (fileName.contains("request.java")) {
-            return FileType.REQUEST;
-        } else {
-            return FileType.OTHER;
-        }
+        return FileType.getFileType(fileName);
     }
 
     /**

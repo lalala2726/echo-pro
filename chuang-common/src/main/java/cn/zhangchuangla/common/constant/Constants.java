@@ -38,31 +38,12 @@ public class Constants {
      */
     public static final String SYSTEM_CREATE = "系统自动创建";
     public static final String RESOURCE_PREFIX = "/profile";
-    public static final Integer CACHE_USER_PERMISSIONS_EXPIRE = 15;
 
     /**
      * 权限相关常量
      */
     public static final String ALL_PERMISSION = "*:*:*";
-    /**
-     * 系统默认标识常量
-     */
-    public static final String IS_SYSTEM_DEFAULT = "YES";
 
-    /**
-     * 菜单相关常量
-     */
-    public static final String IS_MENU_EXTERNAL_LINK = "0";
-    public static final String IS_NOT_MENU_EXTERNAL_LINK = "1";
-    public static final String MENU_TYPE_DIRECTORY = "M";
-    public static final String MENU_TYPE_MENU = "C";
-    public static final String MENU_TYPE_BUTTON = "F";
-
-    /**
-     * 组件标识常量
-     */
-    public static final String LAYOUT = "Layout";
-    public static final String INNER_LINK = "InnerLink";
 
     /**
      * HTTP 相关常量
@@ -72,31 +53,29 @@ public class Constants {
     public static final String WWW = "www.";
 
 
-    /**
-     * 其他常量
-     */
-    public static final long IS_PARENT_NODE = 0L;
-    public static final Integer IS_CACHE = 1;
-    public static final String CURRENT_DEFAULT_UPLOAD_TYPE = "currentDefaultUploadType";
-    public static final int IS_FILE_UPLOAD_MASTER = 1;
     public static final String ORIGINAL = "original";
     public static final String PREVIEW = "preview";
 
     /**
-     * 登录异常类型标识
+     * 代码生成相关常量
      */
-    public static final String LOGIN_EXCEPTION_ATTR = "LOGIN_EXCEPTION";
-    public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
-    public static final String INVALID_TOKEN = "INVALID_TOKEN";
-    public static final String NOT_LOGIN = "NOT_LOGIN";
-    public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
-    public static final Long ROOT_NODE_ID = 0L;
+    public interface Generator {
+        String YES = "1";
+        String NO = "0";
+        String EQ = "eq";
+        String NOT_EQUAL = "ne";
+        String GREATER_THAN = "gt";
+        String GREATER_THAN_OR_EQUAL_TO = "ge";
+        String LESS_THAN = "lt";
+        String LESS_THAN_OR_EQUAL_TO = "le";
+        String BETWEEN = "between";
+        String IN = "in";
+        String NOT_IN = "not in";
+        String LIKE = "like";
+        String crud = "crud";
 
-
-    public interface CommonConstants {
-        Integer ENABLE = 0;
-        Integer DISABLE = 1;
     }
+
 
     /**
      * 菜单常量

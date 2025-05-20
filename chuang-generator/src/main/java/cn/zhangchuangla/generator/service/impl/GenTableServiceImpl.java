@@ -1,6 +1,7 @@
 package cn.zhangchuangla.generator.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.zhangchuangla.common.constant.Constants;
 import cn.zhangchuangla.common.constant.RedisConstants;
 import cn.zhangchuangla.common.core.redis.RedisCache;
 import cn.zhangchuangla.common.enums.ResponseCode;
@@ -136,9 +137,21 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     }
 
     /**
-     * 处理表列信息
+     * 处理表列信息并设置字段的生成规则。
+     *
+     * <p>此方法用于根据数据库列的名称和类型，自动填充代码生成所需的字段属性，
+     * 包括 Java 字段名（驼峰命名）、Java 类型、HTML 表单显示类型以及字段在业务逻辑中的默认行为。</p>
+     *
+     * <p>主键字段将被标记为只读（不可编辑），且不会出现在列表展示与查询条件中；
+     * 非主键字段则会根据其是否为排除字段（如创建人、创建时间等系统字段）决定是否作为查询条件。</p>
+     *
+     * @param column 数据库列实体对象，不能为 null
+     * @throws IllegalArgumentException 如果传入的 column 为 null
      */
     private void processColumnInfo(GenTableColumn column) {
+        if (column == null) {
+            throw new IllegalArgumentException("列信息不能为空");
+        }
         // 设置Java字段名（驼峰命名）
         String javaField = GenUtils.toCamelCase(column.getColumnName());
         column.setJavaField(javaField);
@@ -152,55 +165,67 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         column.setHtmlType(htmlType);
 
         // 设置默认值
-        if ("1".equals(column.getIsPk())) {
-            column.setIsInsert("1");
-            column.setIsEdit("0");
-            column.setIsList("0");
-            column.setIsQuery("0");
+        if (Constants.Generator.YES.equals(column.getIsPk())) {
+            column.setIsInsert(Constants.Generator.YES);
+            column.setIsEdit(Constants.Generator.NO);
+            column.setIsList(Constants.Generator.NO);
+            column.setIsQuery(Constants.Generator.NO);
         } else {
-            column.setIsInsert("1");
-            column.setIsEdit("1");
-            column.setIsList("1");
+            column.setIsInsert(Constants.Generator.YES);
+            column.setIsEdit(Constants.Generator.YES);
+            column.setIsList(Constants.Generator.YES);
 
             // 设置查询条件
             if (!GenUtils.isExcludeField(column.getColumnName())) {
-                column.setIsQuery("1");
+                column.setIsQuery(Constants.Generator.YES);
                 // 默认等于查询
-                column.setQueryType("EQ");
+                column.setQueryType(Constants.Generator.EQ);
             } else {
-                column.setIsQuery("0");
+                column.setIsQuery(Constants.Generator.YES);
             }
         }
     }
 
     /**
-     * 将数据库表转换为代码生成表
+     * 将数据库表信息转换为代码生成所需的低代码表实体。
+     *
+     * <p>此方法会基于传入的数据库表结构和全局配置，构建一个完整的 GenTable 实体对象，
+     * 用于后续的代码生成操作。</p>
+     *
+     * @param dbTable 数据库表信息，不能为 null
+     * @param config  全局代码生成配置，不能为 null
+     * @return 返回转换后的 GenTable 实体对象
+     * @throws IllegalArgumentException 如果 dbTable 或 config 为 null
      */
     private GenTable convertToGenTable(DatabaseTable dbTable, GenConfig config) {
+        if (dbTable == null || config == null) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
         GenTable genTable = new GenTable();
 
+        // 基本信息设置
         genTable.setTableName(dbTable.getTableName());
         genTable.setTableComment(dbTable.getTableComment());
-        // 默认模板类型
-        genTable.setTplCategory("crud");
+        // 默认模板类型为 CRUD 操作
+        genTable.setTplCategory(Constants.Generator.crud);
 
-        // 设置类名（首字母大写的驼峰命名）
+        // 类名处理：将表名转换为首字母大写的驼峰命名
         String className = GenUtils.convertClassName(dbTable.getTableName());
         genTable.setClassName(className);
 
-        // 设置包名和模块名
+        // 包路径和模块名设置
         genTable.setPackageName(config.getPackageName());
         genTable.setModuleName(GenUtils.getModuleName(config.getPackageName()));
 
-        // 设置业务名和功能名
+        // 业务信息设置
         genTable.setBusinessName(GenUtils.getBusinessName(dbTable.getTableName()));
         genTable.setFunctionName(StrUtil.isBlank(dbTable.getTableComment()) ?
                 dbTable.getTableName() : dbTable.getTableComment());
 
-        // 设置作者
+        // 设置作者信息
         genTable.setFunctionAuthor(config.getAuthor());
 
-        // 设置创建者
+        // 设置创建者（从安全上下文中获取当前用户名）
         genTable.setCreateBy(SecurityUtils.getUsername());
 
         return genTable;
@@ -273,8 +298,14 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     /**
      * 预览代码
      *
-     * @param tableName 表名
-     * @return 代码预览列表
+     * <p>此方法用于预览指定表名的代码生成结果。它会查询该低代码表的信息以及相关的列信息，
+     * 然后使用Velocity模板引擎渲染出所有相关文件的代码内容。</p>
+     *
+     * <p>如果找不到对应的表或表没有列信息，将抛出异常。</p>
+     *
+     * @param tableName 表名，不能为空且必须对应一个已存在的低代码表
+     * @return 返回一个包含文件路径和对应代码内容的映射表，其中键是文件路径，值是生成的代码字符串
+     * @throws ServiceException 如果表不存在或表没有列信息
      */
     @Override
     public Map<String, String> previewCode(String tableName) {
@@ -321,44 +352,36 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     }
 
     /**
-     * 生成代码（下载方式）
+     * 下载生成的代码压缩包
      *
-     * @param tableName 表名
-     * @return 代码压缩包
+     * <p>此方法会预览指定表名的代码内容，并将其打包为 ZIP 格式供下载。</p>
+     *
+     * @param tableName 表名，不能为空且必须对应一个已存在的低代码表
+     * @return 生成的代码压缩包字节数组，可用于下载
+     * @throws ServiceException 如果表不存在、生成代码失败或发生 IO 异常
      */
     @Override
     public byte[] downloadCode(String tableName) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
-
-        // 生成代码
+        // 获取代码预览内容
         Map<String, String> codeMap = previewCode(tableName);
 
-        try {
-            // 加入到zip
+        // 创建内存输出流用于生成ZIP
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+
+            // 将每个文件写入到ZIP中
             for (Map.Entry<String, String> entry : codeMap.entrySet()) {
-                // 添加到zip
                 zip.putNextEntry(new ZipEntry(entry.getKey()));
                 IOUtils.write(entry.getValue(), zip, StandardCharsets.UTF_8);
                 zip.flush();
                 zip.closeEntry();
             }
-            zip.close();
+
+            // 返回生成的ZIP字节流
             return outputStream.toByteArray();
         } catch (IOException e) {
             log.error("生成代码失败，表名：{}", tableName, e);
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成代码失败，请稍后重试");
-        } finally {
-            try {
-                if (zip != null) {
-                    zip.close();
-                }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                log.error("关闭流失败", e);
-            }
         }
     }
 
