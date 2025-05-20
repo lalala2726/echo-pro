@@ -33,8 +33,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -192,98 +190,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * 对菜单实体进行基础规则校验。
-     *
-     * <p>此方法用于验证菜单实体对象的基本业务规则，包括：
-     * <ul>
-     *     <li>组件路径不能为外部链接（HTTP/HTTPS）；</li>
-     *     <li>如果该菜单存在子菜单，则菜单类型必须是目录（M）；</li>
-     *     <li>菜单名称在同级目录下必须唯一；</li>
-     *     <li>根据菜单配置的外链模式，分别对路由名称和路径进行格式校验；
-     *         支持两种外链模式：外部链接跳转和内嵌iframe。</li>
-     *     <li>上级菜单不能选择自身作为父级节点，防止循环引用。</li>
-     * </ul>
-     *
-     * <p><b>参数说明：</b></p>
-     * <ul>
-     *     <li>{@code menu} - 待校验的 {@link SysMenu} 实体对象，不能为 null。</li>
-     * </ul>
-     *
-     * <p><b>异常说明：</b></p>
-     * <ul>
-     *     <li>当任意一项校验不通过时，抛出 {@link ServiceException} 异常，并附带相应的错误提示信息。</li>
-     * </ul>
-     */
-    private void menuBaseCheck(SysMenu menu) {
-        if (StrUtil.isNotBlank(menu.getComponent()) && (menu.getComponent().contains(Constants.HTTP) || menu.getComponent().contains(Constants.HTTPS))) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径不应是外部链接。如需添加外链，请参考外链配置方式。");
-        }
-        if (menu.getMenuId() != null && hasChildByMenuId(menu.getMenuId())) {
-            if (!Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单下有子菜单，菜单类型只能是目录。");
-            }
-        }
-        if (checkMenuNameUnique(menu)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称 '" + menu.getMenuName() + "' 已存在于同级目录下。");
-        }
-
-        boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
-        boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && !isExternalRedirect;
-
-
-        // 明确为外部链接跳转模式
-        if (isExternalRedirect) {
-            // routeName 必须是 URL
-            if (!StringUtils.isHttp(menu.getRouteName())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
-            }
-            // path 必须是内部路径段且非空
-            if (StringUtils.isHttp(menu.getPath()) || StrUtil.isBlank(menu.getPath())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由路径必须是一个非空、非HTTP(S)的内部路径段。");
-            }
-            // 明确为内嵌iframe模式
-        } else if (isEmbeddedIframe) {
-            // path 必须是 URL
-            if (!StringUtils.isHttp(menu.getPath())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由路径必须是有效的HTTP(S)链接地址。");
-            }
-            // routeName 不应是 URL
-            if (StringUtils.isHttp(menu.getRouteName())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由名称不应是HTTP(S)链接，应为内部路由名。");
-            }
-        }
-        if (menu.getMenuId() != null && menu.getMenuId().equals(menu.getParentId())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己。");
-        }
-    }
-
-
-    /**
-     * 校验菜单的组件路径是否符合规范。
-     *
-     * @param menu 待校验的 {@link SysMenu} 实体。
-     * @throws ServiceException 如果组件路径不符合规范。
-     */
-    private void checkComponentIsLegal(SysMenu menu) {
-        // 检查是否为需要组件的内部菜单 (非按钮、非外部跳转、非内嵌iframe)
-        boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
-        boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                !isExternalRedirect &&
-                StringUtils.isHttp(menu.getPath());
-
-        boolean requiresComponent = Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
-                !isExternalRedirect &&
-                !isEmbeddedIframe;
-
-        if (requiresComponent && StrUtil.isBlank(menu.getComponent())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "普通菜单类型的组件路径不能为空。");
-        }
-        if (StrUtil.isNotBlank(menu.getComponent()) && menu.getComponent().startsWith("/")) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径预期为相对于views目录的相对路径，不应以 / 开头。例如：system/user/index");
-        }
-    }
-
-    /**
      * 删除菜单信息
      *
      * <p>根据提供的菜单ID删除对应的菜单项。在删除前会进行以下检查：
@@ -432,238 +338,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
 
     /**
-     * 配置菜单的路由名称 ({@code routeName})。
-     * <p>
-     * 此方法会根据菜单是否为“外部链接跳转”模式 (由 {@code external_link} 字段决定，
-     * 假设值为 {@link Constants.MenuConstants#IS_EXTERNAL_LINK})
-     * 来决定 {@code routeName} 的来源：
-     * <ul>
-     * <li>如果是“外部链接跳转”模式，则直接使用用户在 {@code routeName} 字段中提供的外部URL，
-     * 并确保该URL本身是有效的HTTP(S)链接。不会再调用内部生成逻辑。</li>
-     * <li>对于其他类型的菜单（如内嵌iframe、普通菜单、目录），则调用
-     * {@link #generateAndSetUniqueInternalRouteName(SysMenu)} 来自动生成一个唯一的内部路由名。</li>
-     * <li>对于按钮类型，或无路径且非外部跳转的目录，路由名称会设置为空字符串。</li>
-     * </ul>
-     * </p>
-     *
-     * @param sysMenu 菜单实体，其 {@code routeName} 字段将被此方法修改。
-     */
-    private void configureRouteName(SysMenu sysMenu) {
-        // 情况1: "外部链接跳转"模式 (external_link = 1)
-        // 此时，用户应在routeName字段直接提供外部URL。
-        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink())) {
-            // 确保routeName是URL
-            if (!StringUtils.isHttp(sysMenu.getRouteName())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
-            }
-            log.info("检测到“外部链接跳转”模式： path='{}', routeName (URL)='{}'. 将直接使用此routeName。",
-                    sysMenu.getPath(), sysMenu.getRouteName());
-            // routeName已经是外部URL，ensureRouteNameUnique 方法会直接返回它，不尝试唯一化。
-            sysMenu.setRouteName(ensureRouteNameUnique(sysMenu.getRouteName(), sysMenu.getMenuId()));
-            return;
-        }
-
-        // 情况2: 按钮类型，或者目录类型但没有路径且routeName不是外部URL (表示它不是外链跳转目录)
-        // 这些类型的菜单通常没有或不需要路由名称。
-        if (Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType()) ||
-                (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType()) &&
-                        StrUtil.isBlank(sysMenu.getPath()) &&
-                        (sysMenu.getRouteName() == null || !StringUtils.isHttp(sysMenu.getRouteName())))
-        ) {
-            // 设置为空字符串
-            sysMenu.setRouteName("");
-        }
-        // 情况3: 其他情况 (如内嵌iframe, 普通菜单, 有路径的目录)
-        // 这些需要根据其path或component生成一个内部路由名。
-        else {
-            // 调用通用的生成和唯一化逻辑
-            generateAndSetUniqueInternalRouteName(sysMenu);
-        }
-    }
-
-    /**
-     * 为菜单生成并设置一个唯一的内部路由名称。
-     * 此方法用于“内嵌iframe”和普通的“菜单”、“目录”类型。
-     * 不适用于“外部链接跳转”模式（其routeName是外部URL，已由 {@link #configureRouteName(SysMenu)} 处理）。
-     *
-     * @param menu 菜单实体，其routeName将被设置为生成的内部名称。
-     */
-    private void generateAndSetUniqueInternalRouteName(SysMenu menu) {
-        if (menu == null) {
-            return;
-        }
-        String baseRouteName;
-
-        // 情况1: 内嵌Iframe (isFrame=1, path是HTTP URL, external_link!=IS_EXTERNAL_LINK)
-        // routeName 应基于一个稳定的内部标识。优先使用用户在routeName字段填写的内部名（如果合法），否则基于菜单名生成。
-        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                StringUtils.isHttp(menu.getPath()) &&
-                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
-
-            if (StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) {
-                // 用户已提供合法的内部路由名
-                baseRouteName = capitalize(menu.getRouteName().replaceAll("[^a-zA-Z0-9]", ""));
-            } else {
-                // 用户未提供，或提供了URL（不应如此），则基于菜单名生成
-                baseRouteName = capitalize(menu.getMenuName().replaceAll("[^a-zA-Z0-9]", ""));
-            }
-            // 如果菜单名全是特殊字符
-            if (StrUtil.isBlank(baseRouteName)) {
-                baseRouteName = "Iframe" + (menu.getMenuId() == null ? System.currentTimeMillis() % 10000 : menu.getMenuId());
-            }
-        }
-        // 情况2: 普通菜单 (有组件路径，且非特殊外链类型)
-        else if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
-                StrUtil.isNotBlank(menu.getComponent()) &&
-                !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
-            baseRouteName = buildRouteNameFromComponentPath(menu.getComponent());
-        }
-        // 情况3: 有路径的目录 (且非特殊外链类型)
-        else if (Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType()) &&
-                StrUtil.isNotBlank(menu.getPath()) &&
-                !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
-            baseRouteName = buildRouteNameFromComponentPath(menu.getPath());
-        }
-        // 情况4: 其他（如按钮、无路径目录、或已由configureRouteName处理的外部跳转链接），不应在此生成
-        else {
-            menu.setRouteName((StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) ?
-                    ensureRouteNameUnique(menu.getRouteName(), menu.getMenuId()) : "");
-            return;
-        }
-
-        if (StrUtil.isBlank(baseRouteName)) {
-            menu.setRouteName("");
-            return;
-        }
-        menu.setRouteName(ensureRouteNameUnique(baseRouteName, menu.getMenuId()));
-    }
-
-    /**
-     * 从组件路径（或类似结构的路径段，如目录的path）构建基础路由名称。
-     * 会移除常见扩展名，忽略路径末尾的 "index" 段，并将各部分首字母大写后拼接。
-     *
-     * @param pathOrComponent 组件路径或路径段。
-     * @return 构建的基础路由名称。如果无法生成则返回空字符串。
-     */
-    private String buildRouteNameFromComponentPath(String pathOrComponent) {
-        if (StrUtil.isBlank(pathOrComponent)) {
-            return "";
-        }
-
-        String pathWithoutExtension = pathOrComponent.replaceFirst("\\.(vue|js|ts|tsx|jsx)$", "");
-        String[] parts = pathWithoutExtension.split("/");
-        StringBuilder routeNameBuilder = new StringBuilder();
-        for (String part : parts) {
-            if (!part.isEmpty() && !"index".equalsIgnoreCase(part)) {
-                routeNameBuilder.append(capitalize(part));
-            }
-        }
-
-        if (routeNameBuilder.isEmpty() && parts.length > 0) {
-            for (int i = parts.length - 1; i >= 0; i--) {
-                if (!parts[i].isEmpty() && !"index".equalsIgnoreCase(parts[i])) {
-                    routeNameBuilder.append(capitalize(parts[i]));
-                    break;
-                }
-            }
-            if (routeNameBuilder.isEmpty()) {
-                return "";
-            }
-        }
-        return routeNameBuilder.toString();
-    }
-
-    /**
-     * 确保内部路由名称在数据库中的唯一性。
-     * 如果基础名称是HTTP(S)链接，则直接返回。
-     * 否则，如果名称已存在，则在基础名称后附加数字后缀 (1, 2, ...) 直到找到唯一的名称或达到最大尝试次数。
-     *
-     * @param baseName      希望使用的基础路由名称。
-     * @param currentMenuId 当前正在操作的菜单ID。
-     * @return 保证唯一的路由名称，或原始HTTP链接。
-     * @throws ServiceException 如果在最大尝试次数后仍无法生成唯一的内部名称。
-     */
-    private String ensureRouteNameUnique(String baseName, Long currentMenuId) {
-        if (StringUtils.isHttp(baseName)) {
-            return baseName;
-        }
-        if (StrUtil.isBlank(baseName)) {
-            return "";
-        }
-        final int MAX_RETRIES = 100;
-        Long menuIdForExclusion = Optional.ofNullable(currentMenuId).orElse(-1L);
-        String tempRouteName = baseName;
-        for (int i = 0; i < MAX_RETRIES; i++) {
-            SysMenu existingMenu = getOne(new LambdaQueryWrapper<SysMenu>()
-                    .eq(SysMenu::getRouteName, tempRouteName)
-                    .ne(SysMenu::getMenuId, menuIdForExclusion));
-            if (existingMenu == null) {
-                return tempRouteName;
-            }
-            log.warn("内部路由名称 '{}' 已存在，尝试生成新名称 (尝试次数: {})...", tempRouteName, i + 1);
-            tempRouteName = baseName + (i + 1);
-        }
-        log.error("多次尝试后仍无法为基础名称 '{}' 生成唯一的内部路由名称。", baseName);
-        throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成唯一内部路由名称失败，可能存在大量冲突，请检查配置或稍后重试。");
-    }
-
-    /**
-     * 将字符串的首字母转为大写。
-     *
-     * @param str 原始字符串。
-     * @return 首字母大写后的字符串；如果输入为null或isBlank，则原样返回。
-     */
-    private String capitalize(String str) {
-        if (StrUtil.isBlank(str)) {
-            return str;
-        }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-    }
-
-    /**
-     * 校验菜单的路由路径 (path) 是否符合基本要求。
-     *
-     * @param sysMenu 待校验的 {@link SysMenu} 实体。
-     * @throws ServiceException 如果路径不符合要求。
-     */
-    private void checkPathIsLegal(SysMenu sysMenu) {
-        if (sysMenu == null) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单信息不能为空。");
-        }
-
-        if (!Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType())) {
-            boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(sysMenu.getIsFrame()) &&
-                    !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink()) &&
-                    StringUtils.isHttp(sysMenu.getPath());
-            boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink());
-
-            if (!isEmbeddedIframe && !isExternalRedirect && StringUtils.isBlank(sysMenu.getPath())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "路由路径不能为空（按钮、内嵌iframe或外部跳转链接除外）。");
-            }
-        }
-    }
-
-    /**
-     * 校验并设置菜单的父ID (parentId)。
-     *
-     * @param menu 待校验的 {@link SysMenu} 实体，其parentId可能会被修改。
-     * @throws ServiceException 如果指定的父菜单ID无效或不存在。
-     */
-    private void checkParentIdIsLegal(SysMenu menu) {
-        if (menu.getParentId() == null) {
-            menu.setParentId(0L);
-        }
-        if (menu.getParentId() != 0L) {
-            if (getById(menu.getParentId()) == null) {
-                log.error("指定的父菜单ID {} 不存在。", menu.getParentId());
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "指定的父菜单不存在。");
-            }
-        }
-    }
-
-    /**
      * {@inheritDoc}
      *
      * <p>此方法用于根据角色ID获取该角色的权限菜单树信息。主要流程包括：
@@ -765,49 +439,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return buildTreeFormattedMenuList(allMenus);
     }
 
-    /**
-     * 将扁平的菜单列表构建成用于后台管理界面树形表格的 {@link SysMenuListVo} 结构。
-     *
-     * @param allMenus 已按 {@code parentId} 和 {@code sort} 排序的完整菜单列表。
-     * @return {@link SysMenuListVo} 结构的树形菜单列表。
-     */
-    private List<SysMenuListVo> buildTreeFormattedMenuList(List<SysMenu> allMenus) {
-        if (allMenus == null || allMenus.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Map<Long, List<SysMenu>> parentChildrenMap = allMenus.stream()
-                .filter(menu -> menu.getParentId() != null)
-                .collect(Collectors.groupingBy(SysMenu::getParentId));
-
-        parentChildrenMap.forEach((parentId, childrenList) ->
-                childrenList.sort(Comparator.comparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
-        );
-
-        return allMenus.stream()
-                .filter(menu -> menu.getParentId() == 0L)
-                .map(menu -> convertToSysMenuListVoRecursive(menu, parentChildrenMap))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 递归地将 {@link SysMenu} 实体转换为 {@link SysMenuListVo} 视图对象，并构建其子节点。
-     *
-     * @param menu              当前要转换的菜单实体。
-     * @param parentChildrenMap 预处理好的父ID到其（已排序）子菜单列表的映射。
-     * @return 包含子节点层级结构的 {@link SysMenuListVo} 对象。
-     */
-    private SysMenuListVo convertToSysMenuListVoRecursive(SysMenu menu, Map<Long, List<SysMenu>> parentChildrenMap) {
-        SysMenuListVo vo = new SysMenuListVo();
-        BeanUtils.copyProperties(menu, vo);
-        List<SysMenu> childrenEntities = parentChildrenMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
-
-        if (!childrenEntities.isEmpty()) {
-            vo.setChildren(childrenEntities.stream()
-                    .map(child -> convertToSysMenuListVoRecursive(child, parentChildrenMap))
-                    .collect(Collectors.toList()));
-        }
-        return vo;
-    }
 
     /**
      * {@inheritDoc}
@@ -1023,165 +654,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * 为“菜单”类型的路由路径按需添加 "/index" 后缀。
-     * 不为LAYOUT和PARENT_VIEW组件添加此后缀。
-     *
-     * @param currentRouterPath  当前已构建的基础路由路径。
-     * @param componentPathValue 菜单的组件路径。
-     * @param menuPathOriginal   菜单原始的path字段值（用于检查是否已是index）。
-     * @return 添加后缀（如果适用）后的路由路径。
-     */
-    private String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
-        // 仅当组件路径不是布局组件时才考虑添加 /index
-        if (!Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
-                !Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
-
-            String pathSegmentForIndexCheck = StrUtil.trimToEmpty(menuPathOriginal);
-            // 避免给已经是 /index 结尾的路径重复添加，或给空路径段（如根目录下的菜单）错误添加
-            // 只有当路径段本身非空，或者当前完整路径是根"/"或以"/"结尾的父目录时，才适合添加/index
-            if (!pathSegmentForIndexCheck.endsWith("index") &&
-                    (StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))
-            ) {
-                return currentRouterPath.endsWith("/") ? (currentRouterPath + "index") : (currentRouterPath + "/index");
-            }
-        }
-        return currentRouterPath;
-    }
-
-    /**
-     * 构建内部路由的路径结构。
-     *
-     * <p>此方法用于根据父级路由路径和当前菜单的路径段生成完整的内部路由路径。
-     * 它会处理多种情况，包括绝对路径、相对路径以及空路径的情况，并确保最终路径格式正确且唯一。</p>
-     *
-     * @param parentPath  父级完整内部路径。可以为空或以 '/' 开头。
-     * @param pathSegment 当前菜单的路径段 (来自 menu.getPath())。
-     *                    如果路径段以 '/' 开头，则视为绝对路径，直接使用；
-     *                    否则将基于父路径进行拼接。
-     * @return 拼接并规范化后的完整内部路径。
-     *
-     * <pre>{@code
-     * 示例：
-     * buildInternalPathStructure("/", "user") => "/user"
-     * buildInternalPathStructure("/user", "detail") => "/user/detail"
-     * buildInternalPathStructure("", "home") => "/home"
-     * buildInternalPathStructure("/settings/", "profile") => "/settings/profile"
-     * }</pre>
-     */
-    private String buildInternalPathStructure(String parentPath, String pathSegment) {
-        String segment = StrUtil.trimToEmpty(pathSegment);
-        String fullPath;
-
-        if (segment.startsWith("/")) {
-            fullPath = segment;
-        } else {
-            if (StrUtil.isBlank(parentPath) || "/".equals(parentPath)) {
-                fullPath = "/" + segment;
-            } else {
-                String formattedParent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
-                fullPath = formattedParent + segment;
-            }
-        }
-
-        fullPath = fullPath.replaceAll("//+", "/");
-        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
-            fullPath = fullPath.substring(0, fullPath.length() - 1);
-        }
-        if (StrUtil.isBlank(segment) && (StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
-            return "/";
-        }
-        return StrUtil.isBlank(fullPath) ? "/" : fullPath;
-    }
-
-    /**
-     * 构建并规范化路由路径结构。
-     * <p>
-     * 此方法接收父级路径和当前的路径段输入。
-     * 如果当前路径段输入是一个HTTP(S)链接，它会尝试提取主机名并将其转换为大驼峰形式作为实际的路径段。
-     * 如果不是HTTP(S)链接，则直接使用该输入（去除首尾空格）。
-     * 然后，将处理后的路径段与父路径智能拼接（处理绝对/相对路径情况）。
-     * 最后，对生成的完整路径进行规范化，包括去除多余的斜杠和末尾斜杠（根路径除外）。
-     * </p>
-     *
-     * @param parentPath   父级路由路径。如果为 {@code null} 或空字符串，则视为根路径 "/"。
-     * @param segmentInput 当前菜单的路径段输入。这可能是普通的内部路径段（如 "user", "/system/user"），
-     */
-    private String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
-        String actualSegment; // 经过处理后的、将用于拼接的路径段
-
-        // 1. 处理 segmentInput，特别是当它是HTTP(S)链接时
-        // 假设 StringUtils.isHttp 存在且能正确判断
-        if (StringUtils.isHttp(segmentInput)) {
-            try {
-                URI uri = new URI(segmentInput);
-                // 例如：www.baidu.com
-                String host = uri.getHost();
-                if (StrUtil.isNotBlank(host)) {
-                    // 将 host (e.g., "www.example.com") 转换为大驼峰 (e.g., "WwwExampleCom")
-                    String[] parts = host.split("\\.");
-                    StringBuilder hostCamelCase = new StringBuilder();
-                    for (String part : parts) {
-                        if (!part.isEmpty()) {
-                            hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
-                                    // 转为标准驼峰，如WwwBaiduCom
-                                    .append(part.substring(1).toLowerCase());
-                        }
-                    }
-                    actualSegment = hostCamelCase.toString();
-                    // 如果host解析后为空，使用默认段
-                    if (StrUtil.isBlank(actualSegment)) {
-                        log.warn("无法从HTTP链接 {} 解析出有效的主机名作为路径段，将使用默认段。", segmentInput);
-                        // 或其他默认值
-                        actualSegment = "ExternalLinkPath";
-                    }
-                } else {
-                    log.warn("HTTP链接 {} 无有效主机名，将使用默认路径段。", segmentInput);
-                    // 或其他默认值
-                    actualSegment = "ExternalHostMissing";
-                }
-            } catch (URISyntaxException e) {
-                log.warn("解析HTTP链接 {} 失败，将使用默认路径段: {}", segmentInput, e.getMessage());
-                // 无效URL时的默认段
-                actualSegment = "InvalidExternalLink";
-            }
-        } else {
-            // 普通路径段，去除首尾空格
-            actualSegment = StrUtil.trimToEmpty(segmentInput);
-        }
-
-        // 2. 路径拼接逻辑
-        String fullPath;
-        // 如果处理后的 actualSegment 是绝对路径 (以 / 开头)，则直接使用它
-        if (actualSegment.startsWith("/")) {
-            fullPath = actualSegment;
-        }
-        // 否则，它是相对路径，需要与 parentPath 拼接
-        else {
-            String normalizedParentPath = StrUtil.isBlank(parentPath) ? "/" : parentPath;
-            if ("/".equals(normalizedParentPath)) {
-                // 如果父路径是根，或者处理后的段是空（意味着只显示父路径），则直接拼接
-                fullPath = StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
-            } else {
-                // 确保父路径以 "/" 结尾
-                String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
-                fullPath = formattedParent + actualSegment;
-            }
-        }
-
-        // 3. 规范化路径
-        // 替换一个或多个斜杠为一个斜杠
-        fullPath = fullPath.replaceAll("/{2,}", "/");
-
-        // 移除路径末尾的斜杠 (除非路径本身就是根路径 "/")
-        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
-            fullPath = fullPath.substring(0, fullPath.length() - 1);
-        }
-
-        // 如果最终路径为空（例如父路径和段都为空或无效），则默认为根路径 "/"
-        return StrUtil.isBlank(fullPath) ? "/" : fullPath;
-    }
-
-    /**
      * 根据菜单配置获取其对应的前端组件路径（供RouterVo使用）。
      *
      * @param menu SysMenu 实体
@@ -1296,4 +768,541 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 })
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 根据组件路径构建路由名称。
+     *
+     * <p>该方法接收一个组件路径或文件名字符串，将其转换为驼峰格式的路由名称。
+     * 处理逻辑如下：
+     * <ul>
+     *   <li>如果输入为空、null 或仅包含空白字符，则返回空字符串。</li>
+     *   <li>移除文件扩展名（支持 vue/js/ts/tsx/jsx）。</li>
+     *   <li>按斜杠 '/' 分割路径为多个部分。</li>
+     *   <li>遍历每个部分，过滤掉空字符串和 "index" 片段，并将每个有效部分首字母大写后追加到结果中。</li>
+     *   <li>如果所有片段都无效（如全是 index 或空），则尝试从后往前取第一个有效片段作为名称。</li>
+     *   <li>如果仍未找到有效名称，则返回空字符串。</li>
+     * </ul>
+     * </p>
+     *
+     * @param pathOrComponent 组件路径或文件名字符串。例如："/views/user/index.vue", "components/Profile.js"
+     * @return 构建后的路由名称，如："UserProfile", "ComponentsProfile"；若无效则返回空字符串
+     *
+     * <pre>{@code
+     * 示例：
+     * buildRouteNameFromComponentPath("/views/user/index.vue") => "User"
+     * buildRouteNameFromComponentPath("components/Profile.js") => "ComponentsProfile"
+     * buildRouteNameFromComponentPath("index/index.jsx") => "Index"
+     * buildRouteNameFromComponentPath("") => ""
+     * }</pre>
+     */
+    public static String buildRouteNameFromComponentPath(String pathOrComponent) {
+        if (cn.hutool.core.util.StrUtil.isBlank(pathOrComponent)) {
+            return "";
+        }
+        String pathWithoutExtension = pathOrComponent.replaceFirst("\\.(vue|js|ts|tsx|jsx)$", "");
+        String[] parts = pathWithoutExtension.split("/");
+        StringBuilder routeNameBuilder = new StringBuilder();
+        for (String part : parts) {
+            if (!part.isEmpty() && !"index".equalsIgnoreCase(part)) {
+                routeNameBuilder.append(capitalize(part));
+            }
+        }
+        if (routeNameBuilder.isEmpty() && parts.length > 0) {
+            for (int i = parts.length - 1; i >= 0; i--) {
+                if (!parts[i].isEmpty() && !"index".equalsIgnoreCase(parts[i])) {
+                    routeNameBuilder.append(capitalize(parts[i]));
+                    break;
+                }
+            }
+            if (routeNameBuilder.isEmpty()) {
+                return "";
+            }
+        }
+        return routeNameBuilder.toString();
+    }
+
+    /**
+     * 将字符串的首字母转换为大写，其余部分保持不变。
+     *
+     * <p>如果输入字符串为空、null 或仅包含空白字符，则直接返回原字符串；
+     * 否则将字符串的第一个字符转为大写，其余字符保持不变并返回新字符串。</p>
+     *
+     * @param str 需要处理的原始字符串
+     * @return 首字母大写的字符串，或原样返回空/空白字符串
+     *
+     * <pre>{@code
+     * 示例：
+     * capitalize("hello") => "Hello"
+     * capitalize("  world  ") => "  world  "
+     * capitalize(null) => null
+     * }</pre>
+     */
+    public static String capitalize(String str) {
+        if (cn.hutool.core.util.StrUtil.isBlank(str)) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    /**
+     * 构建内部路由的路径结构。
+     *
+     * <p>此方法用于根据父级路由路径和当前菜单的路径段生成完整的内部路由路径。
+     * 它会处理多种情况，包括绝对路径、相对路径以及空路径的情况，并确保最终路径格式正确且唯一。</p>
+     *
+     * @param parentPath  父级完整内部路径。可以为空或以 '/' 开头。
+     * @param pathSegment 当前菜单的路径段 (来自 menu.getPath())。
+     *                    如果路径段以 '/' 开头，则视为绝对路径，直接使用；
+     *                    否则将基于父路径进行拼接。
+     * @return 拼接并规范化后的完整内部路径。
+     *
+     * <pre>{@code
+     * 示例：
+     * buildInternalPathStructure("/", "user") => "/user"
+     * buildInternalPathStructure("/user", "detail") => "/user/detail"
+     * buildInternalPathStructure("", "home") => "/home"
+     * buildInternalPathStructure("/settings/", "profile") => "/settings/profile"
+     * }</pre>
+     */
+    public static String buildInternalPathStructure(String parentPath, String pathSegment) {
+        String segment = cn.hutool.core.util.StrUtil.trimToEmpty(pathSegment);
+        String fullPath;
+        if (segment.startsWith("/")) {
+            fullPath = segment;
+        } else {
+            if (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath)) {
+                fullPath = "/" + segment;
+            } else {
+                String formattedParent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
+                fullPath = formattedParent + segment;
+            }
+        }
+        fullPath = fullPath.replaceAll("//+", "/");
+        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 1);
+        }
+        if (cn.hutool.core.util.StrUtil.isBlank(segment) && (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
+            return "/";
+        }
+        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+    }
+
+    /**
+     * 构建并规范化路由路径结构。
+     * <p>
+     * 此方法接收父级路径和当前的路径段输入。
+     * 如果当前路径段输入是一个HTTP(S)链接，它会尝试提取主机名并将其转换为大驼峰形式作为实际的路径段。
+     * 如果不是HTTP(S)链接，则直接使用该输入（去除首尾空格）。
+     * 然后，将处理后的路径段与父路径智能拼接（处理绝对/相对路径情况）。
+     * 最后，对生成的完整路径进行规范化，包括去除多余的斜杠和末尾斜杠（根路径除外）。
+     * </p>
+     *
+     * @param parentPath   父级路由路径。如果为 {@code null} 或空字符串，则视为根路径 "/"。
+     * @param segmentInput 当前菜单的路径段输入。这可能是普通的内部路径段（如 "user", "/system/user"），
+     */
+    public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
+        String actualSegment;
+        if (cn.zhangchuangla.common.utils.StringUtils.isHttp(segmentInput)) {
+            try {
+                java.net.URI uri = new java.net.URI(segmentInput);
+                String host = uri.getHost();
+                if (cn.hutool.core.util.StrUtil.isNotBlank(host)) {
+                    String[] parts = host.split("\\.");
+                    StringBuilder hostCamelCase = new StringBuilder();
+                    for (String part : parts) {
+                        if (!part.isEmpty()) {
+                            hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
+                                    .append(part.substring(1).toLowerCase());
+                        }
+                    }
+                    actualSegment = hostCamelCase.toString();
+                    if (cn.hutool.core.util.StrUtil.isBlank(actualSegment)) {
+                        actualSegment = "ExternalLinkPath";
+                    }
+                } else {
+                    actualSegment = "ExternalHostMissing";
+                }
+            } catch (java.net.URISyntaxException e) {
+                actualSegment = "InvalidExternalLink";
+            }
+        } else {
+            actualSegment = cn.hutool.core.util.StrUtil.trimToEmpty(segmentInput);
+        }
+        String fullPath;
+        if (actualSegment.startsWith("/")) {
+            fullPath = actualSegment;
+        } else {
+            String normalizedParentPath = cn.hutool.core.util.StrUtil.isBlank(parentPath) ? "/" : parentPath;
+            if ("/".equals(normalizedParentPath)) {
+                fullPath = cn.hutool.core.util.StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
+            } else {
+                String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
+                fullPath = formattedParent + actualSegment;
+            }
+        }
+        fullPath = fullPath.replaceAll("/{2,}", "/");
+        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 1);
+        }
+        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+    }
+
+    /**
+     * 根据菜单路径和组件类型决定是否追加 "index" 路由段。
+     *
+     * <p>如果当前组件不是布局组件（如 Layout 或 ParentView），并且菜单的原始路径不以 "index" 结尾，
+     * 同时满足以下条件之一：
+     * <ul>
+     *   <li>菜单原始路径非空</li>
+     *   <li>当前路由路径为根路径 "/" </li>
+     *   <li>当前路由路径以斜杠结尾</li>
+     * </ul>
+     * 则在当前路由路径后追加 "/index"。</p>
+     *
+     * @param currentRouterPath  当前已构建的完整路由路径，不能为空。
+     * @param componentPathValue 当前菜单项关联的组件路径标识符，例如 "Layout", "ParentView" 等。
+     *                           如果是这些特殊组件，则不会自动添加 index。
+     * @param menuPathOriginal   当前菜单项的原始配置路径，用于判断是否需要添加 index。
+     *                           如果该路径为空或仅包含空白字符，也可能影响 index 的添加逻辑。
+     * @return 可能已追加了 "/index" 的新路由路径；否则返回原路由路径。
+     *
+     * <pre>{@code
+     * 示例：
+     * appendIndexToMenuPath("/user", "Layout", "user") => "/user"
+     * appendIndexToMenuPath("/user", "UserComponent", "user") => "/user/index"
+     * appendIndexToMenuPath("/user/", "UserComponent", "") => "/user//index"
+     * }</pre>
+     */
+    public static String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
+        if (!cn.zhangchuangla.common.constant.Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
+                !cn.zhangchuangla.common.constant.Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
+            String pathSegmentForIndexCheck = cn.hutool.core.util.StrUtil.trimToEmpty(menuPathOriginal);
+            if (!pathSegmentForIndexCheck.endsWith("index") &&
+                    (cn.hutool.core.util.StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))
+            ) {
+                return currentRouterPath.endsWith("/") ? (currentRouterPath + "index") : (currentRouterPath + "/index");
+            }
+        }
+        return currentRouterPath;
+    }
+
+    /**
+     * 配置菜单的路由名称 ({@code routeName})。
+     * <p>
+     * 此方法会根据菜单是否为"外部链接跳转"模式 (由 {@code external_link} 字段决定，
+     * 假设值为 {@link Constants.MenuConstants#IS_EXTERNAL_LINK})
+     * 来决定 {@code routeName} 的来源：
+     * <ul>
+     * <li>如果是"外部链接跳转"模式，则直接使用用户在 {@code routeName} 字段中提供的外部URL，
+     * 并确保该URL本身是有效的HTTP(S)链接。不会再调用内部生成逻辑。</li>
+     * <li>对于其他类型的菜单（如内嵌iframe、普通菜单、目录），则调用
+     * {@link #generateAndSetUniqueInternalRouteName(SysMenu)} 来自动生成一个唯一的内部路由名。</li>
+     * <li>对于按钮类型，或无路径且非外部跳转的目录，路由名称会设置为空字符串。</li>
+     * </ul>
+     * </p>
+     *
+     * @param sysMenu 菜单实体，其 {@code routeName} 字段将被此方法修改。
+     */
+    private void configureRouteName(SysMenu sysMenu) {
+        // 情况1: "外部链接跳转"模式 (external_link = 1)
+        // 此时，用户应在routeName字段直接提供外部URL。
+        if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink())) {
+            // 确保routeName是URL
+            if (!StringUtils.isHttp(sysMenu.getRouteName())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
+            }
+            log.info("检测到“外部链接跳转”模式： path='{}', routeName (URL)='{}'. 将直接使用此routeName。",
+                    sysMenu.getPath(), sysMenu.getRouteName());
+            // routeName已经是外部URL，ensureRouteNameUnique 方法会直接返回它，不尝试唯一化。
+            sysMenu.setRouteName(ensureRouteNameUnique(sysMenu.getRouteName(), sysMenu.getMenuId()));
+            return;
+        }
+
+        // 情况2: 按钮类型，或者目录类型但没有路径且routeName不是外部URL (表示它不是外链跳转目录)
+        // 这些类型的菜单通常没有或不需要路由名称。
+        if (Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType()) ||
+                (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType()) &&
+                        StrUtil.isBlank(sysMenu.getPath()) &&
+                        (sysMenu.getRouteName() == null || !StringUtils.isHttp(sysMenu.getRouteName())))
+        ) {
+            // 设置为空字符串
+            sysMenu.setRouteName("");
+        }
+        // 情况3: 其他情况 (如内嵌iframe, 普通菜单, 有路径的目录)
+        // 这些需要根据其path或component生成一个内部路由名。
+        else {
+            // 调用通用的生成和唯一化逻辑
+            generateAndSetUniqueInternalRouteName(sysMenu);
+        }
+    }
+
+    /**
+     * 为菜单生成并设置一个唯一的内部路由名称。
+     * 此方法用于"内嵌iframe"和普通的"菜单"、"目录"类型。
+     * 不适用于"外部链接跳转"模式（其routeName是外部URL，已由 {@link #configureRouteName(SysMenu)} 处理）。
+     *
+     * @param menu 菜单实体，其routeName将被设置为生成的内部名称。
+     */
+    private void generateAndSetUniqueInternalRouteName(SysMenu menu) {
+        if (menu == null) {
+            return;
+        }
+        String baseRouteName;
+
+        // 情况1: 内嵌Iframe (isFrame=1, path是HTTP URL, external_link!=IS_EXTERNAL_LINK)
+        // routeName 应基于一个稳定的内部标识。优先使用用户在routeName字段填写的内部名（如果合法），否则基于菜单名生成。
+        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
+                StringUtils.isHttp(menu.getPath()) &&
+                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
+
+            if (StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) {
+                // 用户已提供合法的内部路由名
+                baseRouteName = capitalize(menu.getRouteName().replaceAll("[^a-zA-Z0-9]", ""));
+            } else {
+                // 用户未提供，或提供了URL（不应如此），则基于菜单名生成
+                baseRouteName = capitalize(menu.getMenuName().replaceAll("[^a-zA-Z0-9]", ""));
+            }
+            // 如果菜单名全是特殊字符
+            if (StrUtil.isBlank(baseRouteName)) {
+                baseRouteName = "Iframe" + (menu.getMenuId() == null ? System.currentTimeMillis() % 10000 : menu.getMenuId());
+            }
+        }
+        // 情况2: 普通菜单 (有组件路径，且非特殊外链类型)
+        else if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
+                StrUtil.isNotBlank(menu.getComponent()) &&
+                !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
+                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
+            baseRouteName = buildRouteNameFromComponentPath(menu.getComponent());
+        }
+        // 情况3: 有路径的目录 (且非特殊外链类型)
+        else if (Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType()) &&
+                StrUtil.isNotBlank(menu.getPath()) &&
+                !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
+                !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
+            baseRouteName = buildRouteNameFromComponentPath(menu.getPath());
+        }
+        // 情况4: 其他（如按钮、无路径目录、或已由configureRouteName处理的外部跳转链接），不应在此生成
+        else {
+            menu.setRouteName((StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) ?
+                    ensureRouteNameUnique(menu.getRouteName(), menu.getMenuId()) : "");
+            return;
+        }
+
+        if (StrUtil.isBlank(baseRouteName)) {
+            menu.setRouteName("");
+            return;
+        }
+        menu.setRouteName(ensureRouteNameUnique(baseRouteName, menu.getMenuId()));
+    }
+
+    /**
+     * 确保内部路由名称在数据库中的唯一性。
+     * 如果基础名称是HTTP(S)链接，则直接返回。
+     * 否则，如果名称已存在，则在基础名称后附加数字后缀 (1, 2, ...) 直到找到唯一的名称或达到最大尝试次数。
+     *
+     * @param baseName      希望使用的基础路由名称。
+     * @param currentMenuId 当前正在操作的菜单ID。
+     * @return 保证唯一的路由名称，或原始HTTP链接。
+     * @throws ServiceException 如果在最大尝试次数后仍无法生成唯一的内部名称。
+     */
+    private String ensureRouteNameUnique(String baseName, Long currentMenuId) {
+        if (StringUtils.isHttp(baseName)) {
+            return baseName;
+        }
+        if (StrUtil.isBlank(baseName)) {
+            return "";
+        }
+        final int MAX_RETRIES = 100;
+        Long menuIdForExclusion = Optional.ofNullable(currentMenuId).orElse(-1L);
+        String tempRouteName = baseName;
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            SysMenu existingMenu = getOne(new LambdaQueryWrapper<SysMenu>()
+                    .eq(SysMenu::getRouteName, tempRouteName)
+                    .ne(SysMenu::getMenuId, menuIdForExclusion));
+            if (existingMenu == null) {
+                return tempRouteName;
+            }
+            log.warn("内部路由名称 '{}' 已存在，尝试生成新名称 (尝试次数: {})...", tempRouteName, i + 1);
+            tempRouteName = baseName + (i + 1);
+        }
+        log.error("多次尝试后仍无法为基础名称 '{}' 生成唯一的内部路由名称。", baseName);
+        throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成唯一内部路由名称失败，可能存在大量冲突，请检查配置或稍后重试。");
+    }
+
+    /**
+     * 校验菜单的路由路径 (path) 是否符合基本要求。
+     *
+     * @param sysMenu 待校验的 {@link SysMenu} 实体。
+     * @throws ServiceException 如果路径不符合要求。
+     */
+    private void checkPathIsLegal(SysMenu sysMenu) {
+        if (sysMenu == null) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单信息不能为空。");
+        }
+
+        if (!Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType())) {
+            boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(sysMenu.getIsFrame()) &&
+                    !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink()) &&
+                    StringUtils.isHttp(sysMenu.getPath());
+            boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink());
+
+            if (!isEmbeddedIframe && !isExternalRedirect && StringUtils.isBlank(sysMenu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "路由路径不能为空（按钮、内嵌iframe或外部跳转链接除外）。");
+            }
+        }
+    }
+
+    /**
+     * 校验并设置菜单的父ID (parentId)。
+     *
+     * @param menu 待校验的 {@link SysMenu} 实体，其parentId可能会被修改。
+     * @throws ServiceException 如果指定的父菜单ID无效或不存在。
+     */
+    private void checkParentIdIsLegal(SysMenu menu) {
+        if (menu.getParentId() == null) {
+            menu.setParentId(0L);
+        }
+        if (menu.getParentId() != 0L) {
+            if (getById(menu.getParentId()) == null) {
+                log.error("指定的父菜单ID {} 不存在。", menu.getParentId());
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "指定的父菜单不存在。");
+            }
+        }
+    }
+
+    /**
+     * 对菜单实体进行基础规则校验。
+     *
+     * <p>此方法用于验证菜单实体对象的基本业务规则，包括：
+     * <ul>
+     *     <li>组件路径不能为外部链接（HTTP/HTTPS）；</li>
+     *     <li>如果该菜单存在子菜单，则菜单类型必须是目录（M）；</li>
+     *     <li>菜单名称在同级目录下必须唯一；</li>
+     *     <li>根据菜单配置的外链模式，分别对路由名称和路径进行格式校验；
+     *         支持两种外链模式：外部链接跳转和内嵌iframe。</li>
+     *     <li>上级菜单不能选择自身作为父级节点，防止循环引用。</li>
+     * </ul>
+     *
+     * <p><b>参数说明：</b></p>
+     * <ul>
+     *     <li>{@code menu} - 待校验的 {@link SysMenu} 实体对象，不能为 null。</li>
+     * </ul>
+     *
+     * <p><b>异常说明：</b></p>
+     * <ul>
+     *     <li>当任意一项校验不通过时，抛出 {@link ServiceException} 异常，并附带相应的错误提示信息。</li>
+     * </ul>
+     */
+    private void menuBaseCheck(SysMenu menu) {
+        if (StrUtil.isNotBlank(menu.getComponent()) && (menu.getComponent().contains(Constants.HTTP) || menu.getComponent().contains(Constants.HTTPS))) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径不应是外部链接。如需添加外链，请参考外链配置方式。");
+        }
+        if (menu.getMenuId() != null && hasChildByMenuId(menu.getMenuId())) {
+            if (!Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单下有子菜单，菜单类型只能是目录。");
+            }
+        }
+        if (checkMenuNameUnique(menu)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称 '" + menu.getMenuName() + "' 已存在于同级目录下。");
+        }
+
+        boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
+        boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && !isExternalRedirect;
+
+
+        // 明确为外部链接跳转模式
+        if (isExternalRedirect) {
+            // routeName 必须是 URL
+            if (!StringUtils.isHttp(menu.getRouteName())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
+            }
+            // path 必须是内部路径段且非空
+            if (StringUtils.isHttp(menu.getPath()) || StrUtil.isBlank(menu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由路径必须是一个非空、非HTTP(S)的内部路径段。");
+            }
+            // 明确为内嵌iframe模式
+        } else if (isEmbeddedIframe) {
+            // path 必须是 URL
+            if (!StringUtils.isHttp(menu.getPath())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由路径必须是有效的HTTP(S)链接地址。");
+            }
+            // routeName 不应是 URL
+            if (StringUtils.isHttp(menu.getRouteName())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由名称不应是HTTP(S)链接，应为内部路由名。");
+            }
+        }
+        if (menu.getMenuId() != null && menu.getMenuId().equals(menu.getParentId())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "上级菜单不能选择自己。");
+        }
+    }
+
+    /**
+     * 校验菜单的组件路径是否符合规范。
+     *
+     * @param menu 待校验的 {@link SysMenu} 实体。
+     * @throws ServiceException 如果组件路径不符合规范。
+     */
+    private void checkComponentIsLegal(SysMenu menu) {
+        // 检查是否为需要组件的内部菜单 (非按钮、非外部跳转、非内嵌iframe)
+        boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
+        boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
+                !isExternalRedirect &&
+                StringUtils.isHttp(menu.getPath());
+
+        boolean requiresComponent = Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
+                !isExternalRedirect &&
+                !isEmbeddedIframe;
+
+        if (requiresComponent && StrUtil.isBlank(menu.getComponent())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "普通菜单类型的组件路径不能为空。");
+        }
+        if (StrUtil.isNotBlank(menu.getComponent()) && menu.getComponent().startsWith("/")) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径预期为相对于views目录的相对路径，不应以 / 开头。例如：system/user/index");
+        }
+    }
+
+    /**
+     * 将扁平的菜单列表构建成用于后台管理界面树形表格的 {@link SysMenuListVo} 结构。
+     *
+     * @param allMenus 已按 {@code parentId} 和 {@code sort} 排序的完整菜单列表。
+     * @return {@link SysMenuListVo} 结构的树形菜单列表。
+     */
+    private List<SysMenuListVo> buildTreeFormattedMenuList(List<SysMenu> allMenus) {
+        if (allMenus == null || allMenus.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<Long, List<SysMenu>> parentChildrenMap = allMenus.stream()
+                .filter(menu -> menu.getParentId() != null)
+                .collect(Collectors.groupingBy(SysMenu::getParentId));
+
+        parentChildrenMap.forEach((parentId, childrenList) ->
+                childrenList.sort(Comparator.comparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
+        );
+
+        return allMenus.stream()
+                .filter(menu -> menu.getParentId() == 0L)
+                .map(menu -> convertToSysMenuListVoRecursive(menu, parentChildrenMap))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 递归地将 {@link SysMenu} 实体转换为 {@link SysMenuListVo} 视图对象，并构建其子节点。
+     *
+     * @param menu              当前要转换的菜单实体。
+     * @param parentChildrenMap 预处理好的父ID到其（已排序）子菜单列表的映射。
+     * @return 包含子节点层级结构的 {@link SysMenuListVo} 对象。
+     */
+    private SysMenuListVo convertToSysMenuListVoRecursive(SysMenu menu, Map<Long, List<SysMenu>> parentChildrenMap) {
+        SysMenuListVo vo = new SysMenuListVo();
+        BeanUtils.copyProperties(menu, vo);
+        List<SysMenu> childrenEntities = parentChildrenMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
+
+        if (!childrenEntities.isEmpty()) {
+            vo.setChildren(childrenEntities.stream()
+                    .map(child -> convertToSysMenuListVoRecursive(child, parentChildrenMap))
+                    .collect(Collectors.toList()));
+        }
+        return vo;
+    }
+
 }
