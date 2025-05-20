@@ -1,0 +1,109 @@
+package ${packageName}.controller;
+
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.framework.annotation.OperationLog;
+import ${packageName}.model.entity.${ClassName};
+import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
+import ${packageName}.model.vo.${businessName}.${ClassName}ListVo;
+import ${packageName}.model.vo.${businessName}.${ClassName}Vo;
+import ${packageName}.service.${ClassName}Service;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * ${functionName}控制器
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+@Tag(name = "${functionName}管理")
+@RequiredArgsConstructor
+public class ${ClassName}Controller extends BaseController {
+
+    private final ${ClassName}Service ${className}Service;
+
+    /**
+     * 查询${functionName}列表
+     */
+    @Operation(summary = "查询${functionName}列表")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:list')")
+    @GetMapping("/list")
+    public AjaxResult<TableDataResult> list(@Parameter(description = "${functionName}列表查询参数")
+                                            @Validated @ParameterObject ${ClassName}QueryRequest request) {
+        Page<${ClassName}> page = ${className}Service.list${ClassName}(request);
+        List<${ClassName}ListVo> voList = copyListProperties(page, ${ClassName}ListVo.class);
+        return getTableData(page, voList);
+    }
+
+    /**
+     * 获取${functionName}详细信息
+     */
+    @Operation(summary = "获取${functionName}详细信息")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+    @GetMapping("/{${pkColumn.javaField}}")
+    public AjaxResult<${ClassName}Vo> getInfo(@Parameter(description = "${functionName}ID")
+                                              @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
+        checkParam(${pkColumn.javaField} == null, "id不能为空");
+        ${ClassName} ${className} =${className}Service.get${ClassName}ById(${pkColumn.javaField});
+            ${ClassName}Vo vo = new ${ClassName}Vo();
+        BeanUtils.copyProperties(${className}, vo);
+        return success(vo);
+    }
+
+    /**
+     * 新增${functionName}
+     */
+    @Operation(summary = "新增${functionName}")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:add')")
+    @PostMapping
+    @OperationLog(title = "${functionName}管理", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> add(@Parameter(description = "新增${functionName}请求参数")
+                                @Validated @RequestBody ${ClassName}AddRequest request) {
+        boolean result = ${className}Service.add${ClassName}(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @Operation(summary = "修改${functionName}")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:edit')")
+    @PutMapping
+    @OperationLog(title = "${functionName}管理", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> edit(@Parameter(description = "修改${functionName}请求参数")
+                                 @Validated @RequestBody ${ClassName}UpdateRequest request) {
+        boolean result = ${className}Service.update${ClassName}(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 删除${functionName}
+     */
+    @Operation(summary = "删除${functionName}")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:remove')")
+    @DeleteMapping("/{${pkColumn.javaField}s}")
+    @OperationLog(title = "${functionName}管理", businessType = BusinessType.DELETE)
+    public AjaxResult<Void> remove(@Parameter(description = "${functionName}ID集合，支持批量删除")
+                                   @PathVariable List<${pkColumn.javaType}> ${pkColumn.javaField}s) {
+        checkParam(${pkColumn.javaField}s == null, "id不能为空");
+        boolean result = ${className}Service.delete${ClassName}ByIds(${pkColumn.javaField}s);
+        return toAjax(result);
+    }
+}

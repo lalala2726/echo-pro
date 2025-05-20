@@ -1,0 +1,27 @@
+package ${packageName}.model.vo.${businessName};
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.util.Date;
+
+/**
+ * ${functionName}列表视图对象
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@Schema(description = "${functionName}列表视图对象")
+public class ${ClassName}ListVo {
+    #foreach ($column in $columns)
+        #if($column.isList == '1')
+
+            /**
+             * $column.columnComment
+             */
+            @Schema(description = "$column.columnComment")
+            private $column.javaType $column.javaField;
+        #end
+    #end
+}

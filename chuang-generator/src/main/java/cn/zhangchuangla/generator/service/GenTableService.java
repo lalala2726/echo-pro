@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Chuang
@@ -73,4 +74,20 @@ public interface GenTableService extends IService<GenTable> {
      * @return 表字段配置列表
      */
     List<GenTableColumn> selectGenTableColumnListByTableName(String tableName);
+
+    /**
+     * 预览代码
+     *
+     * @param tableName 表名
+     * @return 代码预览列表
+     */
+    Map<String, String> previewCode(String tableName);
+
+    /**
+     * 生成代码（下载方式）
+     *
+     * @param tableName 表名
+     * @return 代码压缩包
+     */
+    byte[] downloadCode(String tableName);
 }

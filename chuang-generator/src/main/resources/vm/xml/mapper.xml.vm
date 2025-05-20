@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.mapper.${ClassName}Mapper">
+
+    <resultMap id="BaseResultMap" type="${packageName}.model.entity.${ClassName}">
+        #foreach ($column in $columns)
+            #if($column.isPk == '1')
+                <id property="${column.javaField}" column="${column.columnName}"/>
+            #else
+                <result property="${column.javaField}" column="${column.columnName}"/>
+            #end
+        #end
+    </resultMap>
+
+    <sql id="Base_Column_List">
+            #foreach ($column in $columns)
+                ${column.columnName}#if($foreach.hasNext),#end
+            #end
+    </sql>
+
+    <select id="list${ClassName}" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ${tableName}
+        <where>
+            #foreach ($column in $columns)
+                #if($column.isQuery == '1')
+                    #if($column.javaType == 'String')
+                        <if test="request.${column.javaField} != null and request.${column.javaField} != ''">
+                            and ${column.columnName} like concat('%', #{request.${column.javaField}}, '%')
+                        </if>
+                    #else
+                        <if test="request.${column.javaField} != null">
+                            and ${column.columnName} = #{request.${column.javaField}}
+                        </if>
+                    #end
+                #end
+            #end
+        </where>
+        order by ${pkColumn.columnName} desc
+    </select>
+
+</mapper>

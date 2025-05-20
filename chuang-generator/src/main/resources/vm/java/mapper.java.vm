@@ -1,0 +1,25 @@
+package ${packageName}.mapper;
+
+import ${packageName}.model.entity.${ClassName};
+import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * ${functionName}Mapper接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Mapper extends BaseMapper<${ClassName}> {
+
+    /**
+     * 分页查询${functionName}信息
+     *
+     * @param page    分页对象
+     * @param request 查询参数
+     * @return 返回分页对象
+     */
+    Page<${ClassName}> list${ClassName}(Page<${ClassName}> page, @Param("request") ${ClassName}QueryRequest request);
+}

@@ -17,17 +17,30 @@ import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
+import cn.zhangchuangla.generator.utils.VelocityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Chuang
@@ -248,6 +261,87 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableName(String tableName) {
         return genTableColumnMapper.selectDbTableColumnsByTableName(tableName);
+    }
+
+    /**
+     * 预览代码
+     *
+     * @param tableName 表名
+     * @return 代码预览列表
+     */
+    @Override
+    public Map<String, String> previewCode(String tableName) {
+        // 查询表信息
+        GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
+        if (table == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
+        }
+
+        // 查询列信息
+        List<GenTableColumn> columns = selectGenTableColumnListByTableName(tableName);
+        if (columns.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表没有列信息");
+        }
+
+        // 设置列信息
+        table.setColumns(columns);
+
+        // 初始化Velocity引擎
+        VelocityUtils.initVelocity();
+
+        // 设置模板变量信息
+        VelocityContext context = VelocityUtils.prepareContext(table);
+
+        // 获取模板列表
+        List<String> templates = VelocityUtils.getTemplateList();
+
+        // 生成代码
+        Map<String, String> codeMap = new HashMap<>();
+        for (String template : templates) {
+            // 渲染模板
+            StringWriter sw = new StringWriter();
+            Template tpl = Velocity.getTemplate(template, StandardCharsets.UTF_8.name());
+            tpl.merge(context, sw);
+
+            // 获取文件名
+            String fileName = VelocityUtils.getFileName(template, table);
+
+            // 添加到返回结果
+            codeMap.put(fileName, sw.toString());
+        }
+
+        return codeMap;
+    }
+
+    /**
+     * 生成代码（下载方式）
+     *
+     * @param tableName 表名
+     * @return 代码压缩包
+     */
+    @Override
+    public byte[] downloadCode(String tableName) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+
+        // 生成代码
+        Map<String, String> codeMap = previewCode(tableName);
+
+        try {
+            // 加入到zip
+            for (Map.Entry<String, String> entry : codeMap.entrySet()) {
+                // 添加到zip
+                zip.putNextEntry(new ZipEntry(entry.getKey()));
+                IOUtils.write(entry.getValue(), zip, StandardCharsets.UTF_8);
+                zip.flush();
+                zip.closeEntry();
+            }
+            zip.close();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("生成代码失败，表名：{}", tableName, e);
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成代码失败，请稍后重试");
+        }
     }
 }
 

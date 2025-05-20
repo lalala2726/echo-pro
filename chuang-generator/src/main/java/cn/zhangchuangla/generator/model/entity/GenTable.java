@@ -1,11 +1,13 @@
 package cn.zhangchuangla.generator.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 代码生成业务表
@@ -91,4 +93,10 @@ public class GenTable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 表字段信息
+     */
+    @TableField(exist = false)
+    private List<GenTableColumn> columns;
 }
