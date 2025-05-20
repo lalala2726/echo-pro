@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysPostMapper;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
-import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostQueryRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostUpdateRequest;
 import cn.zhangchuangla.system.service.SysPostService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -36,7 +36,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
      * @return 返回分页列表
      */
     @Override
-    public Page<SysPost> listPost(SysPostListRequest request) {
+    public Page<SysPost> listPost(SysPostQueryRequest request) {
         Page<SysPost> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysPostMapper.listPost(page, request);
     }

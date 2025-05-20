@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
@@ -148,6 +148,6 @@ public interface SysMenuService extends IService<SysMenu> {
      * @param request 请求参数
      * @return 结果
      */
-    List<SysMenuListVo> listMenu(SysMenuListRequest request);
+    List<SysMenuListVo> listMenu(SysMenuQueryRequest request);
 
 }

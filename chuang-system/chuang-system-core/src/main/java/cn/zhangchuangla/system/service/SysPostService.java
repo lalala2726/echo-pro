@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
-import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostQueryRequest;
 import cn.zhangchuangla.system.model.request.post.SysPostUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +23,7 @@ public interface SysPostService extends IService<SysPost> {
      * @param request 请求参数
      * @return 返回岗位列表
      */
-    Page<SysPost> listPost(SysPostListRequest request);
+    Page<SysPost> listPost(SysPostQueryRequest request);
 
     /**
      * 新增岗位

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysPost;
-import cn.zhangchuangla.system.model.request.post.SysPostListRequest;
+import cn.zhangchuangla.system.model.request.post.SysPostQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +18,7 @@ public interface SysPostMapper extends BaseMapper<SysPost> {
      * @param request 查询参数
      * @return 返回分页对象
      */
-    Page<SysPost> listPost(Page<SysPost> page, @Param("request") SysPostListRequest request);
+    Page<SysPost> listPost(Page<SysPost> page, @Param("request") SysPostQueryRequest request);
 }
 
 

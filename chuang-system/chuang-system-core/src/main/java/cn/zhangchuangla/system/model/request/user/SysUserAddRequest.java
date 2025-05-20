@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Data
 @Schema(name = "添加用户请求类", description = "用于添加用户中使用")
-public class UserAddRequest {
+public class SysUserAddRequest {
 
     /**
      * 用户名

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
-import cn.zhangchuangla.system.model.request.log.SysOperationLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -19,7 +19,7 @@ public interface SysOperationLogMapper extends BaseMapper<SysOperationLog> {
      * @return 返回分页数据
      */
     Page<SysOperationLog> listOperationLog(Page<SysOperationLog> page,
-                                           @Param("request") SysOperationLogListRequest request);
+                                           @Param("request") SysOperationLogQueryRequest request);
 
     /**
      * 清空操作日志

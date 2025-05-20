@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service;
 import cn.zhangchuangla.common.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictItemListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictItemQueryRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemUpdateRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -24,7 +24,7 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * @param request 请求
      * @return 分页结果
      */
-    Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemListRequest request);
+    Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemQueryRequest request);
 
     /**
      * 根据id获取字典项

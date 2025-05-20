@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
-import cn.zhangchuangla.system.model.request.dict.SysDictTypeListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeUpdateRequest;
 import cn.zhangchuangla.system.service.SysDictItemService;
 import cn.zhangchuangla.system.service.SysDictTypeService;
@@ -40,7 +40,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @return 分页结果
      */
     @Override
-    public Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeListRequest request) {
+    public Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request) {
         return dictTypeMapper.listDictType(page, request);
     }
 

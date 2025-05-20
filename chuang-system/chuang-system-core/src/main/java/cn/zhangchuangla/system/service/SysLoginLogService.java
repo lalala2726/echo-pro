@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
-import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ public interface SysLoginLogService extends IService<SysLoginLog> {
      * @param request 查询参数
      * @return 登录日志列表
      */
-    Page<SysLoginLog> listLoginLog(SysLoginLogListRequest request);
+    Page<SysLoginLog> listLoginLog(SysLoginLogQueryRequest request);
 
     /**
      * 清空登录日志

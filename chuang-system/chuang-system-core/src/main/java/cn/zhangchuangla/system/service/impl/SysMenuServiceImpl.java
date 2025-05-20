@@ -14,7 +14,7 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
-import cn.zhangchuangla.system.model.request.menu.SysMenuListRequest;
+import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.MetaVo;
@@ -755,7 +755,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * 6. 返回最终的 SysMenuListVo 列表，供前端展示使用。
      */
     @Override
-    public List<SysMenuListVo> listMenu(SysMenuListRequest request) {
+    public List<SysMenuListVo> listMenu(SysMenuQueryRequest request) {
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
         if (request != null && StrUtil.isNotBlank(request.getMenuName())) {
             queryWrapper.like(SysMenu::getMenuName, request.getMenuName());

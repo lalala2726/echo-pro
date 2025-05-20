@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.system.mapper.SysOperationLogMapper;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
-import cn.zhangchuangla.system.model.request.log.SysOperationLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
 import cn.zhangchuangla.system.service.SysOperationLogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,7 +32,7 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
      * @return 操作日志列表
      */
     @Override
-    public Page<SysOperationLog> listOperationLog(SysOperationLogListRequest request) {
+    public Page<SysOperationLog> listOperationLog(SysOperationLogQueryRequest request) {
         Page<SysOperationLog> sysOperationLogPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysOperationLogMapper.listOperationLog(sysOperationLogPage, request);
     }

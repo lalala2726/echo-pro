@@ -14,7 +14,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "文件管理列表请求参数")
-public class SysFileListRequest extends BasePageRequest {
+public class SysFileQueryRequest extends BasePageRequest {
 
     /**
      * 文件名

@@ -8,9 +8,9 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
-import cn.zhangchuangla.system.model.request.user.UserAddRequest;
-import cn.zhangchuangla.system.model.request.user.UserListRequest;
-import cn.zhangchuangla.system.model.request.user.UserUpdateRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
+import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
 import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
@@ -70,7 +70,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public AjaxResult<TableDataResult> listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                                                @Validated @ParameterObject UserListRequest request) {
+                                                    @Validated @ParameterObject SysUserQueryRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
@@ -93,7 +93,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult<Long> addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
-                                    @Validated @RequestBody UserAddRequest request) {
+                                        @Validated @RequestBody SysUserAddRequest request) {
         if (!request.getUsername().isEmpty()) {
             checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         }
@@ -136,7 +136,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
-                                               @Validated @RequestBody UserUpdateRequest request) {
+                                                   @Validated @RequestBody SysUserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         // 参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {

@@ -18,7 +18,7 @@ import org.hibernate.validator.constraints.Range;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "岗位信息列表请求对象", description = "岗位信息列表请求对象")
-public class SysPostListRequest extends BasePageRequest {
+public class SysPostQueryRequest extends BasePageRequest {
 
     /**
      * 岗位ID

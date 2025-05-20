@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.entity.SysFile;
-import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
+import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
 import cn.zhangchuangla.storage.model.vo.file.SysFileListVo;
 import cn.zhangchuangla.storage.service.StorageFileService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,7 +47,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                                      @Validated @ParameterObject SysFileListRequest request) {
+                                                          @Validated @ParameterObject SysFileQueryRequest request) {
         Page<SysFile> sysFileManagementPage = storageFileService.listFileManage(request);
 
         // 使用流式处理优化代码
@@ -74,7 +74,7 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                                     @Validated @ParameterObject SysFileListRequest request) {
+                                                         @Validated @ParameterObject SysFileQueryRequest request) {
         Page<SysFile> sysFileManagementPage = storageFileService.listFileTrash(request);
         List<SysFileListVo> sysFileListVos = copyListProperties(sysFileManagementPage,
                 SysFileListVo.class);

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
-import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -17,7 +17,7 @@ public interface SysLoginLogMapper extends BaseMapper<SysLoginLog> {
      * @param sysLoginLogPage 分页对象
      * @return 返回分页数据
      */
-    Page<SysLoginLog> listLoginLog(Page<SysLoginLog> sysLoginLogPage, @Param("request") SysLoginLogListRequest request);
+    Page<SysLoginLog> listLoginLog(Page<SysLoginLog> sysLoginLogPage, @Param("request") SysLoginLogQueryRequest request);
 
     /**
      * 清空登录日志

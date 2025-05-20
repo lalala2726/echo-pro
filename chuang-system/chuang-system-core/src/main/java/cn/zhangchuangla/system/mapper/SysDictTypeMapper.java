@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysDictType;
-import cn.zhangchuangla.system.model.request.dict.SysDictTypeListRequest;
+import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +18,7 @@ public interface SysDictTypeMapper extends BaseMapper<SysDictType> {
      * @param request         查询参数
      * @return 字典类型列表
      */
-    Page<SysDictType> listDictType(Page<SysDictType> sysDictTypePage, @Param("request") SysDictTypeListRequest request);
+    Page<SysDictType> listDictType(Page<SysDictType> sysDictTypePage, @Param("request") SysDictTypeQueryRequest request);
 }
 
 

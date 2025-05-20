@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service;
 
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
-import cn.zhangchuangla.system.model.request.log.SysOperationLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -18,7 +18,7 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
      * @param request 请求对象
      * @return 操作日志列表
      */
-    Page<SysOperationLog> listOperationLog(SysOperationLogListRequest request);
+    Page<SysOperationLog> listOperationLog(SysOperationLogQueryRequest request);
 
 
     /**

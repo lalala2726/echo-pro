@@ -15,7 +15,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统操作日志列表请求类", description = "系统操作日志列表请求类")
-public class SysOperationLogListRequest extends BasePageRequest {
+public class SysOperationLogQueryRequest extends BasePageRequest {
 
     /**
      * 主键

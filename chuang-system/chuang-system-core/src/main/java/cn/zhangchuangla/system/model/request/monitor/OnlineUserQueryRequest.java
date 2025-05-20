@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "在线用户列表查询请求对象", description = "在线用户列表查询请求对象")
-public class OnlineUserListRequest extends BasePageRequest {
+public class OnlineUserQueryRequest extends BasePageRequest {
 
     /**
      * 会话ID

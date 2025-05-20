@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.utils.IPUtils;
 import cn.zhangchuangla.common.utils.UserAgentUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
-import cn.zhangchuangla.system.model.request.log.SysLoginLogListRequest;
+import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
 import cn.zhangchuangla.system.service.SysLoginLogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -87,7 +87,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
      * @return 登录日志列表
      */
     @Override
-    public Page<SysLoginLog> listLoginLog(SysLoginLogListRequest request) {
+    public Page<SysLoginLog> listLoginLog(SysLoginLogQueryRequest request) {
         Page<SysLoginLog> sysLoginLogPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysLoginLogMapper.listLoginLog(sysLoginLogPage, request);
     }

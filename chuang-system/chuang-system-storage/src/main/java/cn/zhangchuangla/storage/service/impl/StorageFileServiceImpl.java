@@ -12,7 +12,7 @@ import cn.zhangchuangla.storage.core.StorageManager;
 import cn.zhangchuangla.storage.core.StorageService;
 import cn.zhangchuangla.storage.mapper.SysFileMapper;
 import cn.zhangchuangla.storage.model.entity.SysFile;
-import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
+import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
 import cn.zhangchuangla.storage.service.StorageFileService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -102,7 +102,7 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
      * @return 分页结果
      */
     @Override
-    public Page<SysFile> listFileManage(SysFileListRequest request) {
+    public Page<SysFile> listFileManage(SysFileQueryRequest request) {
         Page<SysFile> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysFileMapper.listFileManage(sysFileManagementPage, request);
     }
@@ -240,7 +240,7 @@ public class StorageFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile>
      * @return 分页结果
      */
     @Override
-    public Page<SysFile> listFileTrash(SysFileListRequest request) {
+    public Page<SysFile> listFileTrash(SysFileQueryRequest request) {
         Page<SysFile> sysFileManagementPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysFileMapper.listFileTrash(sysFileManagementPage, request);
     }

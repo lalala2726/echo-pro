@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "文件列表请求类")
-public class StorageConfigListRequest extends BasePageRequest {
+public class StorageConfigQueryRequest extends BasePageRequest {
 
     /**
      * 参数名称

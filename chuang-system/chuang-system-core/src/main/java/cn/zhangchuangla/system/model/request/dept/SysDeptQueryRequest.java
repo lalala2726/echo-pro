@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "部门列表请求类", description = "部门列表请求类")
-public class SysDeptListRequest extends BasePageRequest {
+public class SysDeptQueryRequest extends BasePageRequest {
 
     /**
      * 部门ID

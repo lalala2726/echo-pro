@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "系统菜单列表查询请求对象", description = "系统菜单列表查询请求对象")
-public class SysMenuListRequest {
+public class SysMenuQueryRequest {
 
     /**
      * 菜单名称

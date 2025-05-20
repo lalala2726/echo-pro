@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.entity.SysFile;
-import cn.zhangchuangla.storage.model.request.file.SysFileListRequest;
+import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -25,7 +25,7 @@ public interface StorageFileService extends IService<SysFile> {
      * @param request 查询参数
      * @return 分页结果
      */
-    Page<SysFile> listFileManage(SysFileListRequest request);
+    Page<SysFile> listFileManage(SysFileQueryRequest request);
 
     /**
      * 删除文件
@@ -51,7 +51,7 @@ public interface StorageFileService extends IService<SysFile> {
      * @param request 查询参数
      * @return 分页结果
      */
-    Page<SysFile> listFileTrash(SysFileListRequest request);
+    Page<SysFile> listFileTrash(SysFileQueryRequest request);
 
     /**
      * 恢复文件

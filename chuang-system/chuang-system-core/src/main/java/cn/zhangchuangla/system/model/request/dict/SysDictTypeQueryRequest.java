@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统字典列表请求对象", description = "系统字典列表请求对象")
-public class SysDictTypeListRequest extends BasePageRequest {
+public class SysDictTypeQueryRequest extends BasePageRequest {
 
     /**
      * 主键ID

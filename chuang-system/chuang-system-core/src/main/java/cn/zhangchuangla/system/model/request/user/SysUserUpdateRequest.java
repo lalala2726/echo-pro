@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Data
 @Schema(name = "修改用户请求类", description = "用于修改用户时")
-public class UserUpdateRequest {
+public class SysUserUpdateRequest {
 
     /**
      * ID

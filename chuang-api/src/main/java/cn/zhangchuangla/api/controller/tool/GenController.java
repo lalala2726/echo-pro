@@ -47,6 +47,13 @@ public class GenController extends BaseController {
     }
 
 
+    @GetMapping("/db/list")
+    @Operation(summary = "查询数据库表结构")
+    public AjaxResult<Void> listDatabaseTables() {
+        return success();
+    }
+
+
     /**
      * 导入数据库表结构
      *

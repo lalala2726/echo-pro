@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "用户查询参数", description = "用户查询参数")
-public class UserListRequest extends BasePageRequest {
+public class SysUserQueryRequest extends BasePageRequest {
 
     /**
      * 用户名

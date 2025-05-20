@@ -20,7 +20,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统登录日志列表请求对象", description = "系统登录日志列表请求对象")
-public class SysLoginLogListRequest extends BasePageRequest {
+public class SysLoginLogQueryRequest extends BasePageRequest {
 
     /**
      * 主键

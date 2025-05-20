@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统字典项列表请求对象", description = "系统字典项列表请求对象")
-public class SysDictItemListRequest extends BasePageRequest {
+public class SysDictItemQueryRequest extends BasePageRequest {
 
     /**
      * 主键ID
