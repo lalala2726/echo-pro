@@ -18,6 +18,7 @@ import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -55,7 +56,8 @@ public class GenController extends BaseController {
     @Operation(summary = "分页查询低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:list')")
     @GetMapping("/list")
-    public AjaxResult<TableDataResult> listGenTable(GenTableQueryRequest request) {
+    public AjaxResult<TableDataResult> listGenTable(@Parameter(description = "列表查询参数")
+                                                    GenTableQueryRequest request) {
         Page<GenTable> page = genTableService.listGenTable(request);
         List<GenTableListVo> genTableListVos = copyListProperties(page, GenTableListVo.class);
         return getTableData(page, genTableListVos);
@@ -70,7 +72,8 @@ public class GenController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "根据ID查询低代码详情")
     @PreAuthorize("@ss.hasPermission('tool:gen:query')")
-    public AjaxResult<GenTableVo> getGenTableInfo(@PathVariable("id") Long id) {
+    public AjaxResult<GenTableVo> getGenTableInfo(@Parameter(description = "低代码表ID")
+                                                  @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
         GenTable genTable = genTableService.getGenTableById(id);
         GenTableVo genTableVo = new GenTableVo();
@@ -87,7 +90,8 @@ public class GenController extends BaseController {
      */
     @GetMapping("/db/list")
     @Operation(summary = "查询数据库表结构")
-    public AjaxResult<TableDataResult> listDatabaseTables(DatabaseTableQueryRequest databaseTableQueryRequest) {
+    public AjaxResult<TableDataResult> listDatabaseTables(@Parameter(description = "查询参数")
+                                                          DatabaseTableQueryRequest databaseTableQueryRequest) {
         Page<DatabaseTable> page = genTableService.listDatabaseTables(databaseTableQueryRequest);
         List<DatabaseTableVo> databaseTableVos = copyListProperties(page, DatabaseTableVo.class);
         return getTableData(page, databaseTableVos);
@@ -103,7 +107,8 @@ public class GenController extends BaseController {
     @Operation(summary = "导入数据库表结构")
     @PreAuthorize("@ss.hasPermission('tool:gen:import')")
     @PostMapping("/importTable/{tableName}")
-    public AjaxResult<Void> importTable(@PathVariable("tableName") List<String> tableNames) {
+    public AjaxResult<Void> importTable(@Parameter(description = "数据库中表的名称")
+                                        @PathVariable("tableName") List<String> tableNames) {
         checkParam(tableNames == null, "表名称不能为空！");
         boolean result = genTableService.importTable(tableNames);
         return toAjax(result);
@@ -128,7 +133,8 @@ public class GenController extends BaseController {
      */
     @Operation(summary = "修改配置信息")
     @PutMapping("/config")
-    public AjaxResult<Void> updateConfigInfo(@RequestBody @Validated GenConfigUpdateRequest request) {
+    public AjaxResult<Void> updateConfigInfo(@Parameter(description = "新的配置")
+                                             @RequestBody @Validated GenConfigUpdateRequest request) {
         boolean result = genTableService.updateConfigInfo(request);
         return toAjax(result);
     }
@@ -142,7 +148,8 @@ public class GenController extends BaseController {
     @Operation(summary = "查询表字段配置")
     @PreAuthorize("@ss.hasPermission('tool:gen:query')")
     @GetMapping("/column/{tableName}")
-    public AjaxResult<List<GenTableColumnVo>> columnList(@PathVariable("tableName") String tableName) {
+    public AjaxResult<List<GenTableColumnVo>> columnList(@Parameter(description = "低代码中表的名称")
+                                                         @PathVariable("tableName") String tableName) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 查询表字段配置
@@ -163,7 +170,8 @@ public class GenController extends BaseController {
     @Operation(summary = "修改低代码表配置")
     @PreAuthorize("@ss.hasPermission('tool:gen:update')")
     @PutMapping
-    public AjaxResult<Void> update(@RequestBody @Validated GenTableUpdateRequest request) {
+    public AjaxResult<Void> update(@Parameter(description = "修改后的参数")
+                                   @RequestBody @Validated GenTableUpdateRequest request) {
         boolean result = genTableService.updateGenTable(request);
         return toAjax(result);
     }
@@ -177,7 +185,8 @@ public class GenController extends BaseController {
     @Operation(summary = "删除低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:remove')")
     @DeleteMapping("/{tableIds}")
-    public AjaxResult<Void> deleteGenTable(@PathVariable("tableIds") List<Long> tableIds) {
+    public AjaxResult<Void> deleteGenTable(@Parameter(description = "低代码表ID")
+                                           @PathVariable("tableIds") List<Long> tableIds) {
         checkParam(tableIds == null, "ID不能为空");
         boolean result = genTableService.deleteGenTable(tableIds);
         return toAjax(result);
@@ -192,7 +201,8 @@ public class GenController extends BaseController {
     @Operation(summary = "预览代码")
     @PreAuthorize("@ss.hasPermission('tool:gen:preview')")
     @GetMapping("/preview/{tableName}")
-    public AjaxResult<List<CodePreviewVo>> preview(@PathVariable("tableName") String tableName) {
+    public AjaxResult<List<CodePreviewVo>> preview(@Parameter(description = "需要预览的表名称")
+                                                   @PathVariable("tableName") String tableName) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 获取预览代码
@@ -230,7 +240,8 @@ public class GenController extends BaseController {
     @Operation(summary = "下载代码")
     @PreAuthorize("@ss.hasPermission('tool:gen:download')")
     @GetMapping("/download/{tableName}")
-    public ResponseEntity<byte[]> download(@PathVariable("tableName") String tableName) throws IOException {
+    public ResponseEntity<byte[]> download(@Parameter(description = "需要预览的表名称")
+                                           @PathVariable("tableName") String tableName) throws IOException {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 生成代码
@@ -253,7 +264,8 @@ public class GenController extends BaseController {
     @Operation(summary = "同步数据库结构")
     @PreAuthorize("@ss.hasPermission('tool:gen:sync')")
     @PostMapping("/syncDb/{tableName}")
-    public AjaxResult<Void> syncDb(@PathVariable("tableName") String tableName) {
+    public AjaxResult<Void> syncDb(@Parameter(description = "需要同步表的名称")
+                                   @PathVariable("tableName") String tableName) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 删除旧的表结构
