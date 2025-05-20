@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.generator;
+package cn.zhangchuangla.api.controller.tool;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
@@ -36,7 +36,7 @@ public class GenController extends BaseController {
     @Operation(summary = "分页查询低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:list')")
     @GetMapping("/list")
-    public TableDataResult list() {
+    public TableDataResult listGenTable() {
         return null;
     }
 

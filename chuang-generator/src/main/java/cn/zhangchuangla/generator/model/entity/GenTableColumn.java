@@ -1,9 +1,9 @@
 package cn.zhangchuangla.generator.model.entity;
 
+import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 /**
  * 代码生成业务表字段
@@ -12,9 +12,10 @@ import java.util.Date;
  * <p>
  * created on 2025-05-20 11:01
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "gen_table_column")
 @Data
-public class GenTableColumn {
+public class GenTableColumn extends BaseEntity {
 
     /**
      * 编号
@@ -105,29 +106,4 @@ public class GenTableColumn {
      * 排序
      */
     private Integer sort;
-
-    /**
-     * 创建者
-     */
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }
