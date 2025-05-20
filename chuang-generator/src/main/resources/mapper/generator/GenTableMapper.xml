@@ -4,6 +4,30 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.generator.mapper.GenTableMapper">
 
+    <resultMap id="DatabaseTableResultMap" type="cn.zhangchuangla.generator.model.entity.DatabaseTable">
+        <result column="TABLE_CATALOG" property="tableCatalog"/>
+        <result column="TABLE_SCHEMA" property="tableSchema"/>
+        <result column="TABLE_NAME" property="tableName"/>
+        <result column="TABLE_TYPE" property="tableType"/>
+        <result column="ENGINE" property="engine"/>
+        <result column="VERSION" property="version"/>
+        <result column="ROW_FORMAT" property="rowFormat"/>
+        <result column="TABLE_ROWS" property="tableRows"/>
+        <result column="AVG_ROW_LENGTH" property="avgRowLength"/>
+        <result column="DATA_LENGTH" property="dataLength"/>
+        <result column="MAX_DATA_LENGTH" property="maxDataLength"/>
+        <result column="INDEX_LENGTH" property="indexLength"/>
+        <result column="DATA_FREE" property="dataFree"/>
+        <result column="AUTO_INCREMENT" property="autoIncrement"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+        <result column="CHECK_TIME" property="checkTime"/>
+        <result column="TABLE_COLLATION" property="tableCollation"/>
+        <result column="CHECKSUM" property="checksum"/>
+        <result column="CREATE_OPTIONS" property="createOptions"/>
+        <result column="TABLE_COMMENT" property="tableComment"/>
+    </resultMap>
+
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.generator.model.entity.GenTable">
         <id property="id" column="id"/>
         <result property="tableName" column="table_name"/>
@@ -64,6 +88,31 @@
             </if>
             <if test="request.createTime != null">
                 and create_time >= #{request.createTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="listDatabaseTables" resultMap="DatabaseTableResultMap">
+        SELECT
+        TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, ENGINE, VERSION, ROW_FORMAT, TABLE_ROWS, AVG_ROW_LENGTH,
+        DATA_LENGTH, MAX_DATA_LENGTH, INDEX_LENGTH, DATA_FREE, AUTO_INCREMENT, CREATE_TIME, UPDATE_TIME, CHECK_TIME,
+        TABLE_COLLATION, CHECKSUM, CREATE_OPTIONS, TABLE_COMMENT
+        FROM
+        information_schema.tables
+        WHERE
+        table_schema = DATABASE()
+        <where>
+            <if test="request.tableName != null and request.tableName != ''">
+                AND TABLE_NAME LIKE concat('%', #{request.tableName}, '%')
+            </if>
+            <if test="request.tableComment != null and request.tableComment != ''">
+                AND TABLE_COMMENT LIKE concat('%', #{request.tableComment}, '%')
+            </if>
+            <if test="request.createTime != null">
+                AND CREATE_TIME >= #{request.createTime}
+            </if>
+            <if test="request.updateTime != null">
+                AND UPDATE_TIME >= #{request.updateTime}
             </if>
         </where>
     </select>

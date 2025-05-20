@@ -1,8 +1,10 @@
 package cn.zhangchuangla.generator.service.impl;
 
 import cn.zhangchuangla.generator.mapper.GenTableMapper;
+import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
-import cn.zhangchuangla.generator.model.request.GenTableListRequest;
+import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import cn.zhangchuangla.generator.service.GenTableService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,9 +31,21 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
      * @return 列表
      */
     @Override
-    public Page<GenTable> listGenTable(GenTableListRequest request) {
+    public Page<GenTable> listGenTable(GenTableQueryRequest request) {
         Page<GenTable> page = new Page<>(request.getPageNum(), request.getPageSize());
         return genTableMapper.listGenTable(page, request);
+    }
+
+    /**
+     * 查询当前数据库表信息
+     *
+     * @param request 查询参数
+     * @return 分页结果
+     */
+    @Override
+    public Page<DatabaseTable> listDatabaseTables(DatabaseTableQueryRequest request) {
+        Page<DatabaseTable> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return genTableMapper.listDatabaseTables(page, request);
     }
 }
 

@@ -3,8 +3,11 @@ package cn.zhangchuangla.api.controller.tool;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
-import cn.zhangchuangla.generator.model.request.GenTableListRequest;
+import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
+import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
+import cn.zhangchuangla.generator.model.vo.DatabaseTableVo;
 import cn.zhangchuangla.generator.model.vo.GenTableListVo;
 import cn.zhangchuangla.generator.service.GenTableService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,17 +43,25 @@ public class GenController extends BaseController {
     @Operation(summary = "分页查询低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:list')")
     @GetMapping("/list")
-    public AjaxResult<TableDataResult> listGenTable(GenTableListRequest request) {
+    public AjaxResult<TableDataResult> listGenTable(GenTableQueryRequest request) {
         Page<GenTable> page = genTableService.listGenTable(request);
         List<GenTableListVo> genTableListVos = copyListProperties(page, GenTableListVo.class);
         return getTableData(page, genTableListVos);
     }
 
 
+    /**
+     * 列出当前数据库中的表信息
+     *
+     * @param databaseTableQueryRequest 查询参数
+     * @return 分页结果
+     */
     @GetMapping("/db/list")
     @Operation(summary = "查询数据库表结构")
-    public AjaxResult<Void> listDatabaseTables() {
-        return success();
+    public AjaxResult<TableDataResult> listDatabaseTables(DatabaseTableQueryRequest databaseTableQueryRequest) {
+        Page<DatabaseTable> page = genTableService.listDatabaseTables(databaseTableQueryRequest);
+        List<DatabaseTableVo> databaseTableVos = copyListProperties(page, DatabaseTableVo.class);
+        return getTableData(page, databaseTableVos);
     }
 
 

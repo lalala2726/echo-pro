@@ -17,7 +17,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "代码生成列表查询对象", description = "用户列表的查询请求")
-public class GenTableListRequest extends BasePageRequest {
+public class GenTableQueryRequest extends BasePageRequest {
 
     /**
      * 主键
