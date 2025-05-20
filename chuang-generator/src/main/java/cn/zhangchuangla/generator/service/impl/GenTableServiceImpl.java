@@ -44,8 +44,8 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ *         <p>
+ *         created on 2025-05-20 11:01
  */
 @Service
 @RequiredArgsConstructor
@@ -142,11 +142,15 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     /**
      * 处理表列信息并设置字段的生成规则。
      *
-     * <p>此方法用于根据数据库列的名称和类型，自动填充代码生成所需的字段属性，
-     * 包括 Java 字段名（驼峰命名）、Java 类型、HTML 表单显示类型以及字段在业务逻辑中的默认行为。</p>
+     * <p>
+     * 此方法用于根据数据库列的名称和类型，自动填充代码生成所需的字段属性，
+     * 包括 Java 字段名（驼峰命名）、Java 类型、HTML 表单显示类型以及字段在业务逻辑中的默认行为。
+     * </p>
      *
-     * <p>主键字段将被标记为只读（不可编辑），且不会出现在列表展示与查询条件中；
-     * 非主键字段则会根据其是否为排除字段（如创建人、创建时间等系统字段）决定是否作为查询条件。</p>
+     * <p>
+     * 主键字段将被标记为只读（不可编辑），且不会出现在列表展示与查询条件中；
+     * 非主键字段则会根据其是否为排除字段（如创建人、创建时间等系统字段）决定是否作为查询条件。
+     * </p>
      *
      * @param column 数据库列实体对象，不能为 null
      * @throws IllegalArgumentException 如果传入的 column 为 null
@@ -192,8 +196,10 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     /**
      * 将数据库表信息转换为代码生成所需的低代码表实体。
      *
-     * <p>此方法会基于传入的数据库表结构和全局配置，构建一个完整的 GenTable 实体对象，
-     * 用于后续的代码生成操作。</p>
+     * <p>
+     * 此方法会基于传入的数据库表结构和全局配置，构建一个完整的 GenTable 实体对象，
+     * 用于后续的代码生成操作。
+     * </p>
      *
      * @param dbTable 数据库表信息，不能为 null
      * @param config  全局代码生成配置，不能为 null
@@ -222,8 +228,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
 
         // 业务信息设置
         genTable.setBusinessName(GenUtils.getBusinessName(dbTable.getTableName()));
-        genTable.setFunctionName(StrUtil.isBlank(dbTable.getTableComment()) ?
-                dbTable.getTableName() : dbTable.getTableComment());
+        genTable.setFunctionName(
+                StrUtil.isBlank(dbTable.getTableComment()) ? dbTable.getTableName() : dbTable.getTableComment());
 
         // 设置作者信息
         genTable.setFunctionAuthor(config.getAuthor());
@@ -294,17 +300,20 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         return genTableColumnMapper.selectList(
                 new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<GenTableColumn>()
                         .eq(GenTableColumn::getTableId, table.getTableId())
-                        .orderByAsc(GenTableColumn::getSort)
-        );
+                        .orderByAsc(GenTableColumn::getSort));
     }
 
     /**
      * 预览代码
      *
-     * <p>此方法用于预览指定表名的代码生成结果。它会查询该低代码表的信息以及相关的列信息，
-     * 然后使用Velocity模板引擎渲染出所有相关文件的代码内容。</p>
+     * <p>
+     * 此方法用于预览指定表名的代码生成结果。它会查询该低代码表的信息以及相关的列信息，
+     * 然后使用Velocity模板引擎渲染出所有相关文件的代码内容。
+     * </p>
      *
-     * <p>如果找不到对应的表或表没有列信息，将抛出异常。</p>
+     * <p>
+     * 如果找不到对应的表或表没有列信息，将抛出异常。
+     * </p>
      *
      * @param tableName 表名，不能为空且必须对应一个已存在的低代码表
      * @return 返回一个包含文件路径和对应代码内容的映射表，其中键是文件路径，值是生成的代码字符串
@@ -357,7 +366,9 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     /**
      * 下载生成的代码压缩包
      *
-     * <p>此方法会预览指定表名的代码内容，并将其打包为 ZIP 格式供下载。</p>
+     * <p>
+     * 此方法会预览指定表名的代码内容，并将其打包为 ZIP 格式供下载。
+     * </p>
      *
      * @param tableName 表名，不能为空且必须对应一个已存在的低代码表
      * @return 生成的代码压缩包字节数组，可用于下载
@@ -372,13 +383,32 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
+            // 设置ZIP文件编码为UTF-8，确保文件名正确
+            zip.setLevel(9); // 最高压缩级别
+
             // 将每个文件写入到ZIP中
             for (Map.Entry<String, String> entry : codeMap.entrySet()) {
-                zip.putNextEntry(new ZipEntry(entry.getKey()));
-                IOUtils.write(entry.getValue(), zip, StandardCharsets.UTF_8);
+                // 规范化文件路径，确保使用标准的"/"分隔符
+                String filePath = entry.getKey().replace("\\", "/");
+
+                // 确保文件内容不为空
+                String content = entry.getValue();
+                if (content == null) {
+                    content = "";
+                }
+
+                // 创建ZIP条目
+                ZipEntry zipEntry = new ZipEntry(filePath);
+                zip.putNextEntry(zipEntry);
+
+                // 写入文件内容
+                IOUtils.write(content, zip, StandardCharsets.UTF_8);
                 zip.flush();
                 zip.closeEntry();
             }
+
+            // 确保所有数据都写入
+            zip.finish();
 
             // 返回生成的ZIP字节流
             return outputStream.toByteArray();
@@ -413,11 +443,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         return updateById(updateTable);
     }
 
-
     /**
      * 删除低代码表，支持批量删除
      *
-     * <p>此方法会级联删除与这些低代码表关联的列信息。</p>
+     * <p>
+     * 此方法会级联删除与这些低代码表关联的列信息。
+     * </p>
      *
      * @param tableIds 低代码表ID集合，不能为null且不能为空
      * @return 操作结果，成功返回true，否则false
@@ -441,7 +472,3 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         return true;
     }
 }
-
-
-
-

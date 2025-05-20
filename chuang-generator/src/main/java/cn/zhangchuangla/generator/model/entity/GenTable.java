@@ -70,11 +70,6 @@ public class GenTable {
     private String tplCategory;
 
     /**
-     * 状态（0正常 1停用）
-     */
-    private String status;
-
-    /**
      * 创建者
      */
     private String createBy;

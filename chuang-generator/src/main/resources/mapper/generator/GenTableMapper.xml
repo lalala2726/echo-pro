@@ -45,6 +45,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
     </resultMap>
+
     <select id="listGenTable" resultMap="BaseResultMap">
         select table_id, table_name, table_comment, class_name, package_name, module_name, business_name, function_name,
         function_author, tpl_category, create_by, create_time, update_by, update_time, remark
