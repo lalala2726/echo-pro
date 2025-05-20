@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.generator.mapper.GenTableMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.generator.model.GenTable">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.generator.model.entity.GenTable">
         <id property="id" column="id"/>
         <result property="tableName" column="table_name"/>
         <result property="tableComment" column="table_comment"/>

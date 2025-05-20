@@ -1,6 +1,6 @@
 package cn.zhangchuangla.generator.service;
 
-import cn.zhangchuangla.generator.model.GenTable;
+import cn.zhangchuangla.generator.model.entity.GenTable;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

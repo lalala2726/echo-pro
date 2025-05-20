@@ -1,7 +1,7 @@
 package cn.zhangchuangla.generator.service.impl;
 
 import cn.zhangchuangla.generator.mapper.GenTableColumnMapper;
-import cn.zhangchuangla.generator.model.GenTableColumn;
+import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import cn.zhangchuangla.generator.service.GenTableColumnService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

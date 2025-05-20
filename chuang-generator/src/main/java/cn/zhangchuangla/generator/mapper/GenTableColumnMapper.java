@@ -1,6 +1,6 @@
 package cn.zhangchuangla.generator.mapper;
 
-import cn.zhangchuangla.generator.model.GenTableColumn;
+import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.generator.model;
+package cn.zhangchuangla.generator.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
