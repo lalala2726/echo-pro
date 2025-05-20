@@ -9,7 +9,7 @@ import lombok.Data;
  * @author zhangchuang
  */
 @Data
-@Schema(description = "代码生成业务表字段视图对象")
+@Schema(name = "代码生成业务表字段视图对象", description = "代码生成业务表字段视图对象")
 public class GenTableColumnVo {
 
     /**
@@ -119,4 +119,4 @@ public class GenTableColumnVo {
      */
     @Schema(description = "排序")
     private Integer sort;
-} 
+}

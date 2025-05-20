@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "代码预览视图对象")
+@Schema(name = "代码预览视图对象", description = "代码预览视图对象")
 public class CodePreviewVo {
 
     /**
@@ -35,4 +35,4 @@ public class CodePreviewVo {
      */
     @Schema(description = "文件类型（entity, mapper, service, serviceImpl, controller, mapperXml, vo, request）")
     private String fileType;
-} 
+}
