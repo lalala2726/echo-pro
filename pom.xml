@@ -51,6 +51,7 @@
         <apache.velocity>2.4.1</apache.velocity>
         <google.protobuf.version>4.28.2</google.protobuf.version>
         <fast.excel.version>1.2.0</fast.excel.version>
+        <apache.poi.version>5.4.0</apache.poi.version>
         <!-- IP 地区转换 -->
         <ip2region.version>2.7.0</ip2region.version>
     </properties>
@@ -335,6 +336,12 @@
                 <artifactId>protobuf-java</artifactId>
                 <version>${google.protobuf.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>cn.idev.excel</groupId>
                 <artifactId>fastexcel</artifactId>
