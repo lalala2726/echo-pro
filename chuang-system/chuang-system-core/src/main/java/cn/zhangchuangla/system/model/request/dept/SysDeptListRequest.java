@@ -20,32 +20,32 @@ public class SysDeptListRequest extends BasePageRequest {
     /**
      * 部门ID
      */
-    @Schema(description = "部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    @Schema(description = "部门ID", type = "integer", example = "1")
     private Integer deptId;
 
     /**
      * 部门名称
      */
-    @Schema(description = "部门名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "研发部")
+    @Schema(description = "部门名称", type = "string", example = "研发部")
     private String deptName;
 
     /**
      * 父部门ID
      */
-    @Schema(description = "父部门ID", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "100")
+    @Schema(description = "父部门ID", type = "integer", format = "int64", example = "100")
     private Long parentId;
 
     /**
      * 部门创建时间
      */
-    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    @Schema(description = "部门状态", type = "integer", format = "int32", example = "1")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
      * 部门负责人
      */
-    @Schema(description = "部门负责人", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "200")
+    @Schema(description = "部门负责人", type = "integer", format = "int64", example = "200")
     private String manager;
 
 }

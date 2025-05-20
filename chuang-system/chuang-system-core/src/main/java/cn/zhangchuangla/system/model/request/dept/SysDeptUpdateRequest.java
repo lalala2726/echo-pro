@@ -33,25 +33,25 @@ public class SysDeptUpdateRequest {
     /**
      * 父部门ID
      */
-    @Schema(description = "父部门ID", example = "0", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "父部门ID", example = "0", type = "integer")
     private Long parentId;
 
     /**
      * 部门状态（0正常 1停用）
      */
-    @Schema(description = "部门状态", example = "0", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门状态", example = "0", type = "integer", format = "int32")
     private Long status;
 
     /**
      * 部门负责人
      */
-    @Schema(description = "部门负责人", example = "张三", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门负责人", example = "张三", type = "string")
     private String manager;
 
     /**
      * 部门描述
      */
-    @Schema(description = "部门描述", example = "负责产品研发的部门", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "部门描述", example = "负责产品研发的部门", type = "string")
     private String description;
 
 

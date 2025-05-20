@@ -20,25 +20,25 @@ public class SysDictTypeListRequest extends BasePageRequest {
     /**
      * 主键ID
      */
-    @Schema(description = "主键ID", example = "1", type = "integer", format = "int64", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "主键ID", example = "1", type = "integer", format = "int64")
     private Long id;
 
     /**
      * 字典类型编码
      */
-    @Schema(description = "字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "字典类型编码", example = "user_status", type = "string")
     private String dictType;
 
     /**
      * 字典名称
      */
-    @Schema(description = "字典名称", example = "用户状态", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "字典名称", example = "用户状态", type = "string")
     private String dictName;
 
     /**
      * 状态：0启用，1禁用
      */
-    @Schema(description = "状态：0启用，1禁用", example = "0", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "状态：0启用，1禁用", example = "0", type = "string")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 

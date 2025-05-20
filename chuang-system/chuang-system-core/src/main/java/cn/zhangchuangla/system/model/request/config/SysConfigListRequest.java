@@ -18,26 +18,26 @@ public class SysConfigListRequest extends BasePageRequest {
     /**
      * 主键
      */
-    @Schema(description = "主键", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    @Schema(description = "主键", type = "integer", example = "1")
     private Integer id;
 
     /**
      * 参数名称
      */
-    @Schema(description = "参数名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统名称")
+    @Schema(description = "参数名称", type = "string", example = "系统名称")
     private String configName;
 
     /**
      * 参数键名
      */
-    @Schema(description = "参数键名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "sys.name")
+    @Schema(description = "参数键名", type = "string", example = "sys.name")
     private String configKey;
 
 
     /**
      * 备注
      */
-    @Schema(description = "备注", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统名称")
+    @Schema(description = "备注", type = "string", example = "系统名称")
     private String remark;
 
 }

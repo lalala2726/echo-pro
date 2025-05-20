@@ -35,13 +35,13 @@ public class SysRoleAddRequest {
     /**
      * 角色排序
      */
-    @Schema(description = "角色排序", example = "1", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "角色排序", example = "1", type = "integer")
     private Integer sort;
 
     /**
      * 备注
      */
-    @Schema(description = "备注", example = "系统默认管理员角色", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "备注", example = "系统默认管理员角色", type = "string")
     private String remark;
 
 

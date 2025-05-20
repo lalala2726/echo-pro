@@ -18,7 +18,7 @@ public class SysRoleListRequest extends BasePageRequest {
     /**
      * 角色名
      */
-    @Schema(description = "角色名", example = "管理员", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "角色名", example = "管理员", type = "string")
     private String roleName;
 
 }

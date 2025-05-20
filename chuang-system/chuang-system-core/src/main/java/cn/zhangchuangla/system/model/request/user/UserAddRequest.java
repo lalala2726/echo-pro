@@ -46,19 +46,19 @@ public class UserAddRequest {
     /**
      * 头像
      */
-    @Schema(description = "头像URL地址", example = "https://example.com/avatar.png", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "头像URL地址", example = "https://example.com/avatar.png")
     private String avatar;
 
     /**
      * 性别
      */
-    @Schema(description = "性别：1-男，2-女，3-未知", type = "integer", format = "int32", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "性别：1-男，2-女，3-未知", type = "integer", format = "int32", example = "1")
     private Integer gender;
 
     /**
      * 部门ID
      */
-    @Schema(description = "所属部门唯一标识ID", type = "integer", format = "int64", example = "1001", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "所属部门唯一标识ID", type = "integer", format = "int64", example = "1001")
     @Min(value = 0, message = "部门ID不能小于0")
     private Long deptId;
 
@@ -71,20 +71,20 @@ public class UserAddRequest {
     /**
      * 手机号
      */
-    @Schema(description = "手机号码", example = "13800001111", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "手机号码", example = "13800001111")
     @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
     private String phone;
 
     /**
      * 昵称
      */
-    @Schema(description = "用户昵称", example = "管理员", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "用户昵称", example = "管理员")
     private String nickname;
 
     /**
      * 邮箱
      */
-    @Schema(description = "电子邮箱地址", example = "admin@example.com", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "电子邮箱地址", example = "admin@example.com")
     @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
     private String email;
 
@@ -98,6 +98,6 @@ public class UserAddRequest {
     /**
      * 备注
      */
-    @Schema(description = "其他备注信息", example = "系统管理员账号", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "其他备注信息", example = "系统管理员账号")
     private String remark;
 }

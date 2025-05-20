@@ -28,27 +28,27 @@ public class SysDeptAddRequest {
     /**
      * 父部门ID
      */
-    @Schema(description = "父部门ID", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    @Schema(description = "父部门ID", type = "integer", example = "1")
     private Long parentId;
 
     /**
      * 部门状态（0正常 1停用）
      */
-    @Schema(description = "部门状态", type = "integer", format = "int32", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "0")
+    @Schema(description = "部门状态", type = "integer", format = "int32", example = "0")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
      * 部门负责人
      */
-    @Schema(description = "部门负责人", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "张三")
+    @Schema(description = "部门负责人", type = "integer", example = "张三")
     @Size(max = 50, message = "部门负责人不能超过50个字符")
     private String manager;
 
     /**
      * 部门描述
      */
-    @Schema(description = "部门描述", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统管理")
+    @Schema(description = "部门描述", type = "string", example = "系统管理")
     private String description;
 
 
