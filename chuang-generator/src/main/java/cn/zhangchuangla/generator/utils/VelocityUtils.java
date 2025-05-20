@@ -23,15 +23,6 @@ public class VelocityUtils {
      */
     private static final String PROJECT_PATH = "main/java";
 
-    /**
-     * 模板后缀
-     */
-    private static final String TEMPLATE_SUFFIX = ".vm";
-
-    /**
-     * 模板文件路径
-     */
-    private static final String TEMPLATE_PATH = "vm";
 
     /**
      * 默认上级菜单，系统工具
@@ -112,7 +103,6 @@ public class VelocityUtils {
 
         String javaPath = PROJECT_PATH + "/" + StrUtil.replace(packageName, ".", "/");
         String mapperXmlPath = "main/resources/mapper/" + moduleName;
-        String vuePath = "vue";
 
         if (template.contains("entity.java.vm")) {
             fileName = StrUtil.format("{}/model/entity/{}.java", javaPath, className);

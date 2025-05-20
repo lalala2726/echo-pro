@@ -34,7 +34,11 @@ public class GlobalExceptionHandel {
 
 
     /**
-     * 业务异常
+     * 处理业务逻辑中抛出的自定义业务异常。
+     * ServiceException 通常表示在业务流程中检测到的错误，例如非法操作或不符合预期的状态。
+     *
+     * @param exception 包含错误信息和状态码的异常对象
+     * @return 返回包含错误信息和状态码的 AjaxResult 对象
      */
     @ExceptionHandler(ServiceException.class)
     public AjaxResult<Void> serviceExceptionHandel(ServiceException exception) {
@@ -43,7 +47,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 请求方法不支持
+     * 处理请求方法不被支持的情况。
+     * HttpRequestMethodNotSupportedException 表示客户端使用了服务器端不支持的 HTTP 方法（如 GET、POST 等）。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“请求方法不支持”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
@@ -52,7 +60,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 请求参数非法
+     * 处理请求参数无法解析的情况。
+     * HttpMessageNotReadableException 表示 Spring MVC 在反序列化请求体时遇到问题，比如 JSON 格式错误。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
@@ -61,7 +73,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 请求参数类型不匹配
+     * 处理请求参数类型不匹配的情况。
+     * MethodArgumentTypeMismatchException 表示控制器方法期望的参数类型与实际传入的值不兼容，例如期望整数但收到字符串。
+     *
+     * @param exception 包含参数名、期望类型及实际值的异常对象
+     * @return 返回详细描述类型转换失败原因的 AjaxResult 对象
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public AjaxResult<Void> methodArgumentTypeMismatchExceptionHandel(MethodArgumentTypeMismatchException exception) {
@@ -78,7 +94,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 参数异常
+     * 处理非法参数导致的 IllegalArgumentException。
+     * IllegalArgumentException 表示传递给方法的参数非法或格式不正确。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
@@ -88,7 +108,11 @@ public class GlobalExceptionHandel {
 
 
     /**
-     * 登录异常
+     * 处理登录相关的自定义异常。
+     * LoginException 表示在身份验证过程中发生错误，如无效凭证或登录失败。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“登录失败”的 AjaxResult 对象
      */
     @ExceptionHandler(LoginException.class)
     public AjaxResult<Void> loginExceptionHandel(LoginException exception) {
@@ -97,7 +121,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 认证异常
+     * 处理账户认证相关的自定义异常。
+     * AccountException 表示与账户状态或权限相关的问题，如账户锁定或未授权访问。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“账户异常”的 AjaxResult 对象
      */
     @ExceptionHandler(AccountException.class)
     public AjaxResult<Void> accountExceptionExceptionHandel(Exception exception) {
@@ -106,7 +134,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 认证失败
+     * 处理内部身份验证服务失败的情况。
+     * InternalAuthenticationServiceException 表示在进行身份验证时发生了系统级错误。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“认证失败”的 AjaxResult 对象
      */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public AjaxResult<Void> internalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
@@ -115,7 +147,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 账号被锁定
+     * 处理账号被锁定的情况。
+     * LockedException 表示用户尝试登录次数过多，导致账户暂时被锁定。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“账号被锁定”的 AjaxResult 对象
      */
     @ExceptionHandler(LockedException.class)
     public AjaxResult<Void> lockedExceptionHandel(LockedException exception) {
@@ -124,7 +160,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 参数异常
+     * 处理参数校验失败的情况。
+     * ParamException 是一个通用的参数校验异常类，用于表示参数不满足业务需求。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“参数异常”的 AjaxResult 对象
      */
     @ExceptionHandler(ParamException.class)
     public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
@@ -133,7 +173,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 权限不足
+     * 处理没有足够权限访问特定资源的情况。
+     * AccessDeniedException 表示当前用户没有足够的权限执行某个操作。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“权限不足”的 AjaxResult 对象
      */
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
@@ -142,7 +186,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 参数校验失败
+     * 处理控制器方法参数校验失败的情况。
+     * MethodArgumentNotValidException 表示通过 JSR-380 注解（如 @Valid）校验失败。
+     *
+     * @param exception 包含字段错误信息的异常对象
+     * @return 返回具体的字段校验错误信息的 AjaxResult 对象
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public AjaxResult<Void> methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
@@ -152,7 +200,12 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 资源不存在
+     * 处理找不到请求的资源的情况。
+     * NoResourceFoundException 表示客户端请求了一个不存在的 URL 资源。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @param request   当前的 HttpServletRequest 对象，用于获取请求 URI
+     * @return 返回表示“资源不存在”的 AjaxResult 对象，并附带请求的 URI
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
@@ -162,7 +215,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 配置文件异常
+     * 处理配置文件加载失败的情况。
+     * ProfileException 表示在读取或解析配置文件时出现问题。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“配置异常”的 AjaxResult 对象
      */
     @ExceptionHandler(ProfileException.class)
     public AjaxResult<Void> profileExceptionHandel(ProfileException exception) {
@@ -171,7 +228,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 访问过于频繁
+     * 处理请求过于频繁的情况。
+     * TooManyRequestException 表示客户端在短时间内发送了太多请求，触发了速率限制机制。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“请求过于频繁”的 AjaxResult 对象
      */
     @ExceptionHandler(TooManyRequestException.class)
     public AjaxResult<Void> tooManyRequestExceptionHandel(TooManyRequestException exception) {
@@ -180,7 +241,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 却少请求参数
+     * 处理缺少必需的请求参数的情况。
+     * MissingServletRequestParameterException 表示控制器方法需要某个请求参数，但该参数未提供。
+     *
+     * @param exception 包含缺失参数名称的异常对象
+     * @return 返回表示“缺少请求参数”的 AjaxResult 对象，并指出具体缺失的参数名
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public AjaxResult<Void> missingServletRequestParameterExceptionHandel(MissingServletRequestParameterException exception) {
@@ -198,7 +263,11 @@ public class GlobalExceptionHandel {
     }
 
     /**
-     * 系统异常
+     * 处理所有未明确捕获的系统异常。
+     * Exception 是通用的捕获所有异常的兜底处理器，用于防止未预料的错误导致服务崩溃。
+     *
+     * @param exception 包含错误信息的异常对象
+     * @return 返回表示“系统异常”的 AjaxResult 对象
      */
     @ExceptionHandler(Exception.class)
     public AjaxResult<Void> exceptionHandel(Exception exception) {
