@@ -3,7 +3,11 @@ package cn.zhangchuangla.api.controller.tool;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.generator.model.entity.GenTable;
+import cn.zhangchuangla.generator.model.request.GenTableListRequest;
+import cn.zhangchuangla.generator.model.vo.GenTableListVo;
 import cn.zhangchuangla.generator.service.GenTableService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +40,10 @@ public class GenController extends BaseController {
     @Operation(summary = "分页查询低代码表")
     @PreAuthorize("@ss.hasPermission('tool:gen:list')")
     @GetMapping("/list")
-    public TableDataResult listGenTable() {
-        return null;
+    public AjaxResult<TableDataResult> listGenTable(GenTableListRequest request) {
+        Page<GenTable> page = genTableService.listGenTable(request);
+        List<GenTableListVo> genTableListVos = copyListProperties(page, GenTableListVo.class);
+        return getTableData(page, genTableListVos);
     }
 
 

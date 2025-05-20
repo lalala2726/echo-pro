@@ -22,4 +22,49 @@
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
     </resultMap>
+    <select id="listGenTable" resultMap="BaseResultMap">
+        select id,
+        table_name,
+        table_comment,
+        table_type,
+        package_name,
+        module_name,
+        business_name,
+        function_name,
+        function_author,
+        gen_type,
+        gen_path,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark
+        from gen_table
+        <where>
+            <if test="request.id != null">
+                and id = #{request.id}
+            </if>
+            <if test="request.tableName != null and request.tableName != ''">
+                and table_name like concat('%', #{request.tableName}, '%')
+            </if>
+            <if test="request.tableComment != null and request.tableComment != ''">
+                and table_comment like concat('%', #{request.tableComment}, '%')
+            </if>
+            <if test="request.tableType != null">
+                and table_type = #{request.tableType}
+            </if>
+            <if test="request.businessName != null and request.businessName != ''">
+                and business_name like concat('%', #{request.businessName}, '%')
+            </if>
+            <if test="request.functionName != null and request.functionName != ''">
+                and function_name like concat('%', #{request.functionName}, '%')
+            </if>
+            <if test="request.functionAuthor != null and request.functionAuthor != ''">
+                and function_author like concat('%', #{request.functionAuthor}, '%')
+            </if>
+            <if test="request.createTime != null">
+                and create_time >= #{request.createTime}
+            </if>
+        </where>
+    </select>
 </mapper>
