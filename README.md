@@ -46,7 +46,7 @@ app-backend/
    - 控制层 (Controller)：处理HTTP请求，参数验证，调用服务层
    - 服务层 (Service)：实现业务逻辑，事务管理
    - 数据访问层 (Mapper)：数据库交互
-   - 实体层 (Entity)：数据模型与映射
+   - 实体层 (Entity)：数据模型与映射。
 
 2. **安全架构**
    - 基于JWT的无状态认证
