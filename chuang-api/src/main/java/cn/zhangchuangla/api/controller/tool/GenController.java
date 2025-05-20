@@ -7,10 +7,12 @@ import cn.zhangchuangla.common.result.TableDataResult;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
+import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
 import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
 import cn.zhangchuangla.generator.model.vo.DatabaseTableVo;
+import cn.zhangchuangla.generator.model.vo.GenTableColumnVo;
 import cn.zhangchuangla.generator.model.vo.GenTableListVo;
 import cn.zhangchuangla.generator.model.vo.GenTableVo;
 import cn.zhangchuangla.generator.service.GenTableService;
@@ -134,9 +136,17 @@ public class GenController extends BaseController {
      */
     @Operation(summary = "查询表字段配置")
     @PreAuthorize("@ss.hasPermission('tool:gen:query')")
-    @GetMapping("/column/list")
-    public AjaxResult<Void> columnList(@RequestParam String tableName) {
-        return success();
+    @GetMapping("/column/{tableName}")
+    public AjaxResult<List<GenTableColumnVo>> columnList(@PathVariable("tableName") String tableName) {
+        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
+
+        // 查询表字段配置
+        List<GenTableColumn> columnList = genTableService.selectGenTableColumnListByTableName(tableName);
+
+        // 转换为VO对象
+        List<GenTableColumnVo> columnVoList = copyListProperties(columnList, GenTableColumnVo.class);
+
+        return success(columnVoList);
     }
 
     /**

@@ -238,6 +238,17 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     public GenTable getGenTableById(Long id) {
         return getById(id);
     }
+
+    /**
+     * 根据表名查询表字段配置
+     *
+     * @param tableName 表名
+     * @return 表字段配置列表
+     */
+    @Override
+    public List<GenTableColumn> selectGenTableColumnListByTableName(String tableName) {
+        return genTableColumnMapper.selectDbTableColumnsByTableName(tableName);
+    }
 }
 
 

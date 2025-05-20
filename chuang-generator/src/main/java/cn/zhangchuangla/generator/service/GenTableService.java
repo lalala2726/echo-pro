@@ -3,6 +3,7 @@ package cn.zhangchuangla.generator.service;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
+import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
 import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
@@ -64,4 +65,12 @@ public interface GenTableService extends IService<GenTable> {
      * @return 返回详情
      */
     GenTable getGenTableById(Long id);
+
+    /**
+     * 根据表名查询表字段配置
+     *
+     * @param tableName 表名
+     * @return 表字段配置列表
+     */
+    List<GenTableColumn> selectGenTableColumnListByTableName(String tableName);
 }
