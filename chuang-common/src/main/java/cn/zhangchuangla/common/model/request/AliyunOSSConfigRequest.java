@@ -66,7 +66,7 @@ public class AliyunOSSConfigRequest {
     /**
      * 域名
      */
-    @Pattern(regexp = RegularConstants.Storage.domain,
+    @Pattern(regexp = RegularConstants.Storage.DOMAIN,
             message = "访问端点域名格式不正确")
     @Schema(description = "文件访问路径,如果为空将直接返回相对路径")
     private String fileDomain;

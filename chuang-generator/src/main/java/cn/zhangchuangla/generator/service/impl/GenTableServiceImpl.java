@@ -384,7 +384,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
              ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
             // 设置ZIP文件编码为UTF-8，确保文件名正确
-            zip.setLevel(9); // 最高压缩级别
+            // 最高压缩级别
+            zip.setLevel(9);
 
             // 将每个文件写入到ZIP中
             for (Map.Entry<String, String> entry : codeMap.entrySet()) {

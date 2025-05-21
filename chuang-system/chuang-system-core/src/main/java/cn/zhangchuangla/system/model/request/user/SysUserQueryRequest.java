@@ -46,13 +46,13 @@ public class SysUserQueryRequest extends BasePageRequest {
      * 邮箱
      */
     @Schema(description = "邮箱", example = "zhangsan@example.com")
-    @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.EMAIL, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机号
      */
-    @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.PHONE, message = "手机号格式不正确")
     @Schema(description = "手机号", example = "13800001111")
     private String phone;
 

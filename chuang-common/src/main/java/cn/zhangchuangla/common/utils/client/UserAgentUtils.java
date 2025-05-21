@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils;
+package cn.zhangchuangla.common.utils.client;
 
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.DeviceType;

@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统配置表
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_config")
