@@ -9,6 +9,7 @@ import java.util.Date;
 
 /**
  * 操作日志表
+ * @author Chuang
  */
 @TableName(value = "sys_operation_log")
 @Data

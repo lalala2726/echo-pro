@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 代码生成业务表
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @TableName(value = "gen_table")
 @Data

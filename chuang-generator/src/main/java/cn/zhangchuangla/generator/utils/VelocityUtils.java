@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * 模板工具类
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public class VelocityUtils {
 

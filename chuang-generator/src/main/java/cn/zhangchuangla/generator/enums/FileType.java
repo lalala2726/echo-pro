@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * 文件类型枚举
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Getter
 public enum FileType {

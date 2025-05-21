@@ -11,6 +11,7 @@ import java.util.Date;
 
 /**
  * 用户角色关系对应实体类
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_user_role")
