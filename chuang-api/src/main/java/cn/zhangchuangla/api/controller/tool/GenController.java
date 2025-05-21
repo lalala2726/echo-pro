@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.result.AjaxResult;
 import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.enums.FileType;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
@@ -20,16 +21,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -231,40 +232,42 @@ public class GenController extends BaseController {
      * 下载代码
      *
      * @param tableName 表名称
-     * @return 压缩包
      */
     @Operation(summary = "下载代码")
-    @PreAuthorize("@ss.hasPermission('tool:gen:download')")
     @GetMapping("/download/{tableName}")
-    public ResponseEntity<byte[]> download(
-            @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName) {
+    @Anonymous
+    public void download(HttpServletResponse response, @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName) {
         // 参数验证
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 生成代码
         byte[] data = genTableService.downloadCode(tableName);
 
-        // 设置更完善的响应头
-        HttpHeaders headers = new HttpHeaders();
+        // 设置响应头
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        try {
+            // 设置文件名，确保使用UTF-8编码避免中文问题
+            String fileName = tableName + "_code.zip";
+            String encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
 
-        // 明确指定为ZIP文件类型
-        headers.setContentType(MediaType.parseMediaType("application/zip"));
+            // 设置内容长度
+            response.setContentLength(data.length);
 
-        // 设置文件名，确保使用UTF-8编码避免中文问题
-        String fileName = tableName + "_code.zip";
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+            // 禁止缓存
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+            response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+            response.setDateHeader(HttpHeaders.EXPIRES, 0);
 
-        // 设置内容长度
-        headers.setContentLength(data.length);
+            // 写入响应体
+            response.getOutputStream().write(data);
+            response.getOutputStream().flush();
 
-        // 禁止缓存
-        headers.setCacheControl("no-cache, no-store, must-revalidate");
-        headers.setPragma("no-cache");
-        headers.setExpires(0);
-
-        log.info("正在下载代码，表名：{}，文件大小：{} 字节", tableName, data.length);
-
-        return new ResponseEntity<>(data, headers, HttpStatus.OK);
+            log.info("正在下载代码，表名：{}，文件大小：{} 字节", tableName, data.length);
+        } catch (Exception e) {
+            log.error("下载代码失败，表名：{}", tableName, e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
