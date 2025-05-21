@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * 代码生成业务表字段
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @TableName(value = "gen_table_column")
 @Data

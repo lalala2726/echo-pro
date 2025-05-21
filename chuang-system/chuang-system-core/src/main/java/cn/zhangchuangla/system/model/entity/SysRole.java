@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 角色表
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_role")

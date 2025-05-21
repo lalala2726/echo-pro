@@ -10,6 +10,7 @@ import java.util.Date;
 
 /**
  * 角色权限对应关系实体类
+ * @author Chuang
  */
 @TableName(value = "sys_role_permissions")
 @Data

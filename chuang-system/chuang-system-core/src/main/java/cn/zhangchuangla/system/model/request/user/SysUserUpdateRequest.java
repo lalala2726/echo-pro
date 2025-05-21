@@ -59,14 +59,14 @@ public class SysUserUpdateRequest {
      * 手机号
      */
     @Schema(description = "手机号码", example = "13800001111")
-    @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号码格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.PHONE, message = "手机号码格式不正确")
     private String phone;
 
     /**
      * 密码
      */
     @Schema(description = "登录密码", example = "Abc123456!")
-    @ValidRegex(regexp = RegularConstants.User.password, message = "密码格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.PASSWORD, message = "密码格式不正确")
     private String password;
 
     /**
@@ -79,7 +79,7 @@ public class SysUserUpdateRequest {
      * 邮箱
      */
     @Schema(description = "电子邮箱地址", example = "tom@example.com")
-    @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.EMAIL, message = "邮箱格式不正确")
     private String email;
 
     /**

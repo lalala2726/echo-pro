@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.model.entity;
 
+import cn.zhangchuangla.common.annoation.Excel;
 import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,6 +10,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 岗位表
+ *
+ * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_post")
@@ -19,16 +22,19 @@ public class SysPost extends BaseEntity {
      * 岗位ID
      */
     @TableId(type = IdType.AUTO)
+    @Excel(name = "岗位ID")
     private Integer postId;
 
     /**
      * 岗位编码
      */
+    @Excel(name = "岗位编码")
     private String postCode;
 
     /**
      * 岗位名称
      */
+    @Excel(name = "岗位名称")
     private String postName;
 
     /**
@@ -40,7 +46,6 @@ public class SysPost extends BaseEntity {
      * 状态(0-正常,1-停用)
      */
     private Integer status;
-
 
     /**
      * 是否删除(0-未删除,1-已删除)

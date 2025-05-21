@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * 系统登录日志, 用于记录用户登录日志
+ * @author Chuang
  */
 @TableName(value = "sys_login_log")
 @Data

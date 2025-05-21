@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 代码生成业务表字段视图对象
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "代码生成业务表字段视图对象", description = "代码生成业务表字段视图对象")

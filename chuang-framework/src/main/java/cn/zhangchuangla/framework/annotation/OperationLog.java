@@ -6,9 +6,9 @@ import cn.zhangchuangla.common.enums.BusinessType;
 import java.lang.annotation.*;
 
 /**
- * 自定义操作日志记录注解
+ * 操作日志记录注解，用于标记需要记录系统操作日志的方法
  *
- * @author ruoyi
+ * @author Chuang
  */
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

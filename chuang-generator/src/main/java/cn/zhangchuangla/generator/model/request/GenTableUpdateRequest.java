@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * 代码生成业务表更新请求
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Data
 @Schema(name = "代码生成业务表更新请求", description = "用于更新低代码业务表信息")

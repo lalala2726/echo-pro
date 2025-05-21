@@ -5,12 +5,11 @@ import cn.zhangchuangla.common.enums.AccessType;
 import java.lang.annotation.*;
 
 /**
- * 接口限流注解
- * 用于限制接口在指定时间内的访问次数
- * 支持多种限流策略：IP限流、用户限流或自定义key限流
+ * 接口限流注解，用于控制单位时间内的接口访问频率。
+ * 支持多种限流策略（如：IP、用户ID、自定义KEY），适用于防止接口滥用或保护系统资源。
+ * 注解信息可与 Google Guice 或 Spring AOP 等框架结合使用，实现运行时动态拦截和限流逻辑处理。
  *
  * @author Chuang
- * <p>
  * created on 2025/4/7 20:44
  */
 @Target({ElementType.METHOD})

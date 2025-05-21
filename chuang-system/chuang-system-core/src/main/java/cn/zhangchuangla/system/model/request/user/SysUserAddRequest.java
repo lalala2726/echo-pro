@@ -30,7 +30,7 @@ public class SysUserAddRequest {
     @Schema(description = "用户名", example = "admin123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户名不能为空")
     @Size(min = 5, max = 20, message = "用户名不能超过20个字符")
-    @ValidRegex(regexp = RegularConstants.User.username, message = "用户名只能是英文数字和下划线")
+    @ValidRegex(regexp = RegularConstants.User.USERNAME, message = "用户名只能是英文数字和下划线", allowEmpty = false)
     private String username;
 
     /**
@@ -39,7 +39,7 @@ public class SysUserAddRequest {
     @Schema(description = "密码", example = "Admin@123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
     @Size(min = 8, max = 20, message = "密码长度在 8-16 之间")
-    @ValidRegex(regexp = RegularConstants.User.password,
+    @ValidRegex(regexp = RegularConstants.User.PASSWORD,
             message = "至少一个大写字母、一个小写字母、一个数字和一个特殊字符（只允许 !@#¥%&*()—+/ 这些特殊字符")
     private String password;
 
@@ -72,7 +72,7 @@ public class SysUserAddRequest {
      * 手机号
      */
     @Schema(description = "手机号码", example = "13800001111")
-    @ValidRegex(regexp = RegularConstants.User.phone, message = "手机号格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.PHONE, message = "手机号格式不正确")
     private String phone;
 
     /**
@@ -85,7 +85,7 @@ public class SysUserAddRequest {
      * 邮箱
      */
     @Schema(description = "电子邮箱地址", example = "admin@example.com")
-    @ValidRegex(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
+    @ValidRegex(regexp = RegularConstants.User.EMAIL, message = "邮箱格式不正确")
     private String email;
 
     /**

@@ -27,7 +27,6 @@
             <artifactId>ip2region</artifactId>
         </dependency>
 
-
         <!-- HTTP客户端 -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -67,7 +66,6 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
-
 
         <!-- Lombok -->
         <dependency>
@@ -128,6 +126,11 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
+        <!-- Excel工具 -->
+        <dependency>
+            <groupId>cn.idev.excel</groupId>
+            <artifactId>fastexcel</artifactId>
+        </dependency>
 
         <!-- XML绑定 -->
         <dependency>
