@@ -8,6 +8,8 @@ import java.util.Date;
 
 /**
  * 基础实体类,
+ *
+ * @author Chuang
  */
 @Data
 @Schema(description = "基础实体类")

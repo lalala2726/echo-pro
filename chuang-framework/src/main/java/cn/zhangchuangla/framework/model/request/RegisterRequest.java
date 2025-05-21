@@ -30,20 +30,20 @@ public class RegisterRequest {
      */
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
-    @Pattern(regexp = RegularConstants.User.password, message = "密码格式不正确")
+    @Pattern(regexp = RegularConstants.User.PASSWORD, message = "密码格式不正确")
     private String password;
 
     /**
      * 邮箱
      */
     @Schema(description = "邮箱")
-    @Pattern(regexp = RegularConstants.User.email, message = "邮箱格式不正确")
+    @Pattern(regexp = RegularConstants.User.EMAIL, message = "邮箱格式不正确")
     private String email;
 
     /**
      * 手机
      */
-    @Pattern(regexp = RegularConstants.User.phone, message = "手机格式不正确")
+    @Pattern(regexp = RegularConstants.User.PHONE, message = "手机格式不正确")
     @Schema(description = "手机")
     private String phone;
 }

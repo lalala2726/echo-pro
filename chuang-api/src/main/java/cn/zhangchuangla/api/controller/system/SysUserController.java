@@ -35,6 +35,8 @@ import java.util.Set;
 /**
  * 用户管理控制器
  * 提供用户的增删改查等功能
+ *
+ * @author Chuang
  */
 @Slf4j
 @Tag(name = "用户管理")
@@ -163,7 +165,7 @@ public class SysUserController extends BaseController {
     public AjaxResult<Boolean> resetPassword(@PathVariable("id") Long id,
                                              @RequestParam("password") String password) {
         checkParam(id == null || id <= 0, "用户ID不能小于等于0");
-        if (!password.matches(RegularConstants.User.password)) {
+        if (!password.matches(RegularConstants.User.PASSWORD)) {
             return error("密码格式不正确");
         }
         password = encryptPassword(password);

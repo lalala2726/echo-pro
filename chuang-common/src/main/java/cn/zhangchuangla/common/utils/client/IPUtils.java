@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.utils;
+package cn.zhangchuangla.common.utils.client;
 
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.model.entity.IPEntity;

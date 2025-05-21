@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.entity;
 
-import cn.idev.excel.annotation.ExcelProperty;
+import cn.zhangchuangla.common.annoation.Excel;
 import cn.zhangchuangla.common.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -22,19 +22,19 @@ public class SysPost extends BaseEntity {
      * 岗位ID
      */
     @TableId(type = IdType.AUTO)
-    @ExcelProperty(value = "岗位ID", order = 1)
+    @Excel(name = "岗位ID")
     private Integer postId;
 
     /**
      * 岗位编码
      */
-    @ExcelProperty(value = "岗位编码", order = 2)
+    @Excel(name = "岗位编码")
     private String postCode;
 
     /**
      * 岗位名称
      */
-    @ExcelProperty(value = "岗位名称", order = 3)
+    @Excel(name = "岗位名称")
     private String postName;
 
     /**
@@ -45,7 +45,6 @@ public class SysPost extends BaseEntity {
     /**
      * 状态(0-正常,1-停用)
      */
-    @ExcelProperty(value = "状态", order = 4)
     private Integer status;
 
     /**

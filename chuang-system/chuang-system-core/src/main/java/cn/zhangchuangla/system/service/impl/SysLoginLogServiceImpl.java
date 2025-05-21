@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.utils.IPUtils;
-import cn.zhangchuangla.common.utils.UserAgentUtils;
+import cn.zhangchuangla.common.utils.client.IPUtils;
+import cn.zhangchuangla.common.utils.client.UserAgentUtils;
 import cn.zhangchuangla.system.mapper.SysLoginLogMapper;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;

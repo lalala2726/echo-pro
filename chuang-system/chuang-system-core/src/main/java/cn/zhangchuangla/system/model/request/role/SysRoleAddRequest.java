@@ -19,8 +19,6 @@ public class SysRoleAddRequest {
      * 角色名
      */
     @Schema(description = "角色名", example = "管理员", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "角色名不能为空")
-    @Size(min = 2, max = 50, message = "角色名不能超过50个字符")
     private String roleName;
 
 

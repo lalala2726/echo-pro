@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -118,5 +119,12 @@ public class SysPostController extends BaseController {
         SysPostVo sysPostVo = new SysPostVo();
         BeanUtils.copyProperties(post, sysPostVo);
         return AjaxResult.success(sysPostVo);
+    }
+
+    @PostMapping("/export")
+    @PreAuthorize("@ss.hasPermission('system:post:export')")
+    @Operation(summary = "导出岗位")
+    public AjaxResult<Void> exportPost(HttpServletResponse response) {
+        return success();
     }
 }

@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+/**
+ * @author Chuang
+ */
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_user")
 @Data
@@ -80,7 +83,6 @@ public class SysUser extends BaseEntity {
     @Schema(description = "状态")
     @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
-
 
     /**
      * 逻辑删除
