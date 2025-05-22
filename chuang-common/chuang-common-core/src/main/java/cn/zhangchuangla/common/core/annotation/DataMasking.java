@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.annoation;
+package cn.zhangchuangla.common.core.annotation;
 
 /**
  * 数据脱敏注解，用于标记需要进行数据脱敏的字段。

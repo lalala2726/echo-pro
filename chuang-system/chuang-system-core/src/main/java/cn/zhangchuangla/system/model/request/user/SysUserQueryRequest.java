@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.request.user;
 
-import cn.zhangchuangla.common.core.annoation.ValidRegex;
+import cn.zhangchuangla.common.core.annotation.ValidRegex;
 import cn.zhangchuangla.common.core.base.BasePageRequest;
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

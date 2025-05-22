@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.annoation;
+package cn.zhangchuangla.common.core.annotation;
 
 import cn.zhangchuangla.common.core.validator.RegexValidator;
 import jakarta.validation.Constraint;

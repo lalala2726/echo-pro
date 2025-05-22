@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.validator;
 
-import cn.zhangchuangla.common.core.annoation.ValidRegex;
+import cn.zhangchuangla.common.core.annotation.ValidRegex;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

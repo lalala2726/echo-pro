@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.annoation;
+package cn.zhangchuangla.common.excel.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
