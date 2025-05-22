@@ -1,9 +1,9 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import cn.zhangchuangla.common.core.security.model.SysUser;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.web.service.RegisterService;
 import cn.zhangchuangla.system.service.SysUserService;

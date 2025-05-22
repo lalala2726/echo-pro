@@ -17,7 +17,7 @@
         <!-- 依赖公共模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-common</artifactId>
+            <artifactId>chuang-common-core</artifactId>
         </dependency>
 
         <!-- 添加系统核心模块依赖 -->

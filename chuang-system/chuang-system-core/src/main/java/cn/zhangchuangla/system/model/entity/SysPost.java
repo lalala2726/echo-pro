@@ -1,7 +1,6 @@
 package cn.zhangchuangla.system.model.entity;
 
-import cn.zhangchuangla.common.annoation.Excel;
-import cn.zhangchuangla.common.base.BaseEntity;
+import cn.zhangchuangla.common.core.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,19 +21,16 @@ public class SysPost extends BaseEntity {
      * 岗位ID
      */
     @TableId(type = IdType.AUTO)
-    @Excel(name = "岗位ID")
     private Integer postId;
 
     /**
      * 岗位编码
      */
-    @Excel(name = "岗位编码")
     private String postCode;
 
     /**
      * 岗位名称
      */
-    @Excel(name = "岗位名称")
     private String postName;
 
     /**

@@ -11,7 +11,13 @@
 
     <artifactId>chuang-common</artifactId>
     <version>1.0.0</version>
+    <packaging>pom</packaging>
     <description>公共模块，包含公共工具类、实体类和常量定义</description>
+    <modules>
+        <module>chuang-common-core</module>
+        <module>chuang-common-redis</module>
+        <module>chuang-common-excel</module>
+    </modules>
 
     <dependencies>
 

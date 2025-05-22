@@ -5,6 +5,21 @@
     <file url="file://$PROJECT_DIR$/accounting/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-excel/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-excel/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-file/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-file/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-log/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-mybatis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-redis/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-redis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-security/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-security/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-web/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-framework/src/main/java" charset="UTF-8" />

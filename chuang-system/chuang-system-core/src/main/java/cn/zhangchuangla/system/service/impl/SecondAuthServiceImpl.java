@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.security.model.SysUser;
-import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.service.SecondAuthService;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.generator.model.vo;
 
-import cn.zhangchuangla.common.base.BaseVo;
+import cn.zhangchuangla.common.core.base.BaseVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.security.token;
 
 
-import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.Authentication;
 

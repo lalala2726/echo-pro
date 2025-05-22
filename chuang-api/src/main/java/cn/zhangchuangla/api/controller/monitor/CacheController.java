@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.monitor;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.result.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

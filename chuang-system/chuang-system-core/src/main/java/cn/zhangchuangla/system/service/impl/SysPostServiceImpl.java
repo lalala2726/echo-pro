@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysPostMapper;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
