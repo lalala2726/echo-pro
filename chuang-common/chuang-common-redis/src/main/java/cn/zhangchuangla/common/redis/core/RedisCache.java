@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.core.redis;
+package cn.zhangchuangla.common.redis.core;
 
 
 import lombok.extern.slf4j.Slf4j;

@@ -25,5 +25,9 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-redis</artifactId>
+        </dependency>
     </dependencies>
 </project>

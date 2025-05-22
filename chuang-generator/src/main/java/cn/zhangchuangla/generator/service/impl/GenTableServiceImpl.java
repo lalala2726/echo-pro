@@ -2,11 +2,11 @@ package cn.zhangchuangla.generator.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.constant.RedisConstants;
-import cn.zhangchuangla.common.core.core.redis.RedisCache;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.mapper.GenTableColumnMapper;
 import cn.zhangchuangla.generator.mapper.GenTableMapper;
@@ -44,8 +44,8 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * @author Chuang
- *         <p>
- *         created on 2025-05-20 11:01
+ * <p>
+ * created on 2025-05-20 11:01
  */
 @Service
 @RequiredArgsConstructor

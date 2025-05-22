@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.constant;
+package cn.zhangchuangla.common.redis.constant;
 
 /**
  * Redis 常量

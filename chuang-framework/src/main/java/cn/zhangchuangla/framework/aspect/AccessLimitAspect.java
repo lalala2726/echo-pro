@@ -1,12 +1,12 @@
 package cn.zhangchuangla.framework.aspect;
 
-import cn.zhangchuangla.common.core.constant.RedisConstants;
 import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.AccessType;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.TooManyRequestException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.framework.annotation.AccessLimit;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

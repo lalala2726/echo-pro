@@ -16,6 +16,7 @@
     <modules>
         <module>chuang-common-core</module>
         <module>chuang-common-redis</module>
+        <module>chuang-common-excel</module>
     </modules>
 
     <dependencies>

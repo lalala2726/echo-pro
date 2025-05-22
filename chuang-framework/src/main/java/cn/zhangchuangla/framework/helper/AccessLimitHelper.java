@@ -1,11 +1,11 @@
 package cn.zhangchuangla.framework.helper;
 
-import cn.zhangchuangla.common.core.constant.RedisConstants;
 import cn.zhangchuangla.common.core.enums.AccessType;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.TooManyRequestException;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
