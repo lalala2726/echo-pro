@@ -25,7 +25,11 @@
         <!-- 引入公共模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-common</artifactId>
+            <artifactId>chuang-common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-redis</artifactId>
         </dependency>
 
         <!-- Commons IO -->

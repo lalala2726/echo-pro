@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.security.model.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 

@@ -1,20 +1,17 @@
 package ${packageName}.service.impl;
 
-import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.model.entity.${ClassName};
 import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
 import ${packageName}.service.${ClassName}Service;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

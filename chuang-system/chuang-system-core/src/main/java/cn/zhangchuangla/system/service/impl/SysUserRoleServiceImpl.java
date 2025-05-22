@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ParamException;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.system.mapper.SysUserRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysUserRoleService;

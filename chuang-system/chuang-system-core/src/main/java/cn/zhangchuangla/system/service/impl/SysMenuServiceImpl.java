@@ -1,13 +1,13 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.SysRolesConstant;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.model.entity.Option;
-import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.model.entity.Option;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
@@ -902,7 +902,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
         String actualSegment;
-        if (cn.zhangchuangla.common.utils.StringUtils.isHttp(segmentInput)) {
+        if (StringUtils.isHttp(segmentInput)) {
             try {
                 java.net.URI uri = new java.net.URI(segmentInput);
                 String host = uri.getHost();
@@ -974,8 +974,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * }</pre>
      */
     public static String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
-        if (!cn.zhangchuangla.common.constant.Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
-                !cn.zhangchuangla.common.constant.Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
+        if (!Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
+                !Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
             String pathSegmentForIndexCheck = cn.hutool.core.util.StrUtil.trimToEmpty(menuPathOriginal);
             if (!pathSegmentForIndexCheck.endsWith("index") &&
                     (cn.hutool.core.util.StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))

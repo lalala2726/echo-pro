@@ -1,9 +1,9 @@
 package cn.zhangchuangla.framework.manager.factory;
 
-import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.utils.SpringUtils;
-import cn.zhangchuangla.common.utils.client.IPUtils;
-import cn.zhangchuangla.common.utils.client.UserAgentUtils;
+import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.utils.SpringUtils;
+import cn.zhangchuangla.common.core.utils.client.IPUtils;
+import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.service.SysLoginLogService;

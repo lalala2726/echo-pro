@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.model.request;
 
-import cn.zhangchuangla.common.constant.RegularConstants;
+import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

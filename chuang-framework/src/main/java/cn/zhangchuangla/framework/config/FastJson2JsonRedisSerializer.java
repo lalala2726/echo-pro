@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.constant.Constants;
+import cn.zhangchuangla.common.core.constant.Constants;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.request.post;
 
-import cn.zhangchuangla.common.base.BasePageRequest;
+import cn.zhangchuangla.common.core.base.BasePageRequest;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;

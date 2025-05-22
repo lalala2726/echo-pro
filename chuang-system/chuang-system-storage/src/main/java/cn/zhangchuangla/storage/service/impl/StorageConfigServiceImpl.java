@@ -1,15 +1,15 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.constant.StorageConstants;
-import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
-import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.model.request.MinioConfigRequest;
-import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
+import cn.zhangchuangla.common.core.constant.StorageConstants;
+import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.LocalFileConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;

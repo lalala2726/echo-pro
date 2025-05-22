@@ -1,9 +1,9 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.StringUtils;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;

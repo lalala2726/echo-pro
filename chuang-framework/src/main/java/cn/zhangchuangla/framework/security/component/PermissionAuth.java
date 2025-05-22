@@ -1,10 +1,10 @@
 package cn.zhangchuangla.framework.security.component;
 
-import cn.zhangchuangla.common.constant.Constants;
-import cn.zhangchuangla.common.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
-import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.common.utils.StringUtils;
+import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.StringUtils;
 import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;

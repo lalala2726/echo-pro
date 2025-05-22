@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.utils.SpringUtils;
+import cn.zhangchuangla.common.core.utils.SpringUtils;
 import cn.zhangchuangla.framework.manager.AsyncManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
