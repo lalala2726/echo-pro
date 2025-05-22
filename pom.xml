@@ -78,6 +78,11 @@
                 <artifactId>chuang-common</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-common-core</artifactId>
+                <version>${app.version}</version>
+            </dependency>
             <!-- 框架模块 -->
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>
