@@ -1,8 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.config.property.AppProperty;
-import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.result.AjaxResult;
+import cn.zhangchuangla.common.core.config.property.AppProperty;
+import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;

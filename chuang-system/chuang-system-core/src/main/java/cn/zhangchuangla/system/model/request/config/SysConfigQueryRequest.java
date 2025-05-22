@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.request.config;
 
-import cn.zhangchuangla.common.base.BasePageRequest;
+import cn.zhangchuangla.common.core.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

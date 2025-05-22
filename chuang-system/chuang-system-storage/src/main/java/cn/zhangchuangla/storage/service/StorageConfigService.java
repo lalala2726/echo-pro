@@ -1,9 +1,9 @@
 package cn.zhangchuangla.storage.service;
 
-import cn.zhangchuangla.common.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.model.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.model.request.MinioConfigRequest;
-import cn.zhangchuangla.common.model.request.TencentCOSConfigRequest;
+import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
+import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
+import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;

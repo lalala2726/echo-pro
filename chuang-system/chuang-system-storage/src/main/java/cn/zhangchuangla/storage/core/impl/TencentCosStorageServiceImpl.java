@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core.impl;
 
-import cn.zhangchuangla.common.constant.StorageConstants;
+import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.storage.FileInfo;
 import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;

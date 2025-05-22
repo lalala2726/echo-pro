@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.constant.SecurityConstants;
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.framework.interceptor.AccessLimitInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

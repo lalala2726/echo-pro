@@ -2,18 +2,18 @@ package cn.zhangchuangla.framework.security.token;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.zhangchuangla.common.config.property.SecurityProperties;
-import cn.zhangchuangla.common.constant.RedisConstants;
-import cn.zhangchuangla.common.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.redis.RedisCache;
-import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.security.model.OnlineLoginUser;
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
-import cn.zhangchuangla.common.exception.ParamException;
-import cn.zhangchuangla.common.exception.ServiceException;
-import cn.zhangchuangla.common.utils.SecurityUtils;
-import cn.zhangchuangla.common.utils.client.IPUtils;
-import cn.zhangchuangla.common.utils.client.UserAgentUtils;
+import cn.zhangchuangla.common.core.config.property.SecurityProperties;
+import cn.zhangchuangla.common.core.constant.RedisConstants;
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
+import cn.zhangchuangla.common.core.core.redis.RedisCache;
+import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.security.model.OnlineLoginUser;
+import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.client.IPUtils;
+import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.system.service.SysRoleService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.zhangchuangla.common.enums.ResponseCode.ACCESS_TOKEN_INVALID;
-import static cn.zhangchuangla.common.enums.ResponseCode.REFRESH_TOKEN_INVALID;
+import static cn.zhangchuangla.common.core.enums.ResponseCode.ACCESS_TOKEN_INVALID;
+import static cn.zhangchuangla.common.core.enums.ResponseCode.REFRESH_TOKEN_INVALID;
 
 
 /**

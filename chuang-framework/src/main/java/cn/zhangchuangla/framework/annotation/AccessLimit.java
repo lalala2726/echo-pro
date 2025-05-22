@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.annotation;
 
-import cn.zhangchuangla.common.enums.AccessType;
+import cn.zhangchuangla.common.core.enums.AccessType;
 
 import java.lang.annotation.*;
 

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.annotation;
 
 
-import cn.zhangchuangla.common.enums.BusinessType;
+import cn.zhangchuangla.common.core.enums.BusinessType;
 
 import java.lang.annotation.*;
 

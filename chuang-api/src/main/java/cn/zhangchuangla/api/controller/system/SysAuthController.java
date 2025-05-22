@@ -1,11 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.security.model.RefreshTokenRequest;
-import cn.zhangchuangla.common.core.security.model.SysUser;
-import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
 import cn.zhangchuangla.system.model.entity.SysMenu;

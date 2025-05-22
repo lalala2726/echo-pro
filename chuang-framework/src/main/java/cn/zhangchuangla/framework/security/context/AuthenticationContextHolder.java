@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.security.context;
 
-import cn.zhangchuangla.common.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
 
 /**
  * 身份验证信息

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.model.entity;
 
-import cn.zhangchuangla.common.annoation.Excel;
-import cn.zhangchuangla.common.base.BaseEntity;
+import cn.zhangchuangla.common.core.annoation.Excel;
+import cn.zhangchuangla.common.core.base.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

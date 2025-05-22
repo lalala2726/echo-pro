@@ -1,9 +1,9 @@
 package cn.zhangchuangla.api.controller.tool;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.result.TableDataResult;
+import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.enums.FileType;

@@ -1,9 +1,9 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.constant.SecurityConstants;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.result.AjaxResult;
-import cn.zhangchuangla.common.utils.ServletUtils;
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;

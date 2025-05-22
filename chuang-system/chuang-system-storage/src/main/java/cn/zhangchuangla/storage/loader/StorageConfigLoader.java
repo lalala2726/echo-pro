@@ -1,13 +1,13 @@
 package cn.zhangchuangla.storage.loader;
 
-import cn.zhangchuangla.common.config.property.AppProperty;
-import cn.zhangchuangla.common.constant.StorageConstants;
-import cn.zhangchuangla.common.core.service.DataLoader;
-import cn.zhangchuangla.common.enums.ResponseCode;
-import cn.zhangchuangla.common.exception.ProfileException;
-import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.common.core.config.property.AppProperty;
+import cn.zhangchuangla.common.core.constant.StorageConstants;
+import cn.zhangchuangla.common.core.core.service.DataLoader;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ProfileException;
+import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;

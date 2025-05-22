@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.exception.ServiceException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysConfigMapper;
 import cn.zhangchuangla.system.model.entity.SysConfig;
 import cn.zhangchuangla.system.model.request.config.SysConfigAddRequest;

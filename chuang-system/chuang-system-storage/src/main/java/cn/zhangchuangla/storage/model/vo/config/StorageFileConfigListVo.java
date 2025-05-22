@@ -1,8 +1,8 @@
 package cn.zhangchuangla.storage.model.vo.config;
 
-import cn.zhangchuangla.common.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
+import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
