@@ -1,5 +1,6 @@
-package cn.zhangchuangla.storage;
+package cn.zhangchuangla.storage.model.entity;
 
+import cn.zhangchuangla.storage.enums.StorageType;
 import lombok.Builder;
 import lombok.Data;
 

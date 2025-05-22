@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 文件配置表
+ *
  * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)

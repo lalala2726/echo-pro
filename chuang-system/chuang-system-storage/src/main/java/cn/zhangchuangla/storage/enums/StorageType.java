@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage;
+package cn.zhangchuangla.storage.enums;
 
 import lombok.Getter;
 

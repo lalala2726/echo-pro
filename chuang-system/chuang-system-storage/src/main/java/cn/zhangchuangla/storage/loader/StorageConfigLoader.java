@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.loader;
 
 import cn.zhangchuangla.common.core.config.property.AppProperty;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
-import cn.zhangchuangla.common.core.core.service.DataLoader;
+import cn.zhangchuangla.common.core.core.loader.DataLoader;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ProfileException;
 import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;

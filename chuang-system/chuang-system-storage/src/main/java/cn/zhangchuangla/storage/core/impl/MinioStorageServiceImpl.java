@@ -1,12 +1,12 @@
 package cn.zhangchuangla.storage.core.impl;
 
 import cn.zhangchuangla.common.core.constant.StorageConstants;
-import cn.zhangchuangla.storage.FileInfo;
-import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.core.StorageService;
+import cn.zhangchuangla.storage.enums.StorageType;
 import cn.zhangchuangla.storage.exception.StorageException;
-import cn.zhangchuangla.storage.util.StoragePathUtils;
+import cn.zhangchuangla.storage.model.entity.FileInfo;
+import cn.zhangchuangla.storage.utils.StorageUtils;
 import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
@@ -94,7 +94,7 @@ public class MinioStorageServiceImpl implements StorageService {
         String extension = FilenameUtils.getExtension(originalFileName);
         String safeOriginalFileName = FilenameUtils.getName(originalFileName);
         String newFileName = safeOriginalFileName + "_" + timestamp + "_" + randomSuffix + "." + extension;
-        return StoragePathUtils.generatePath(subPath, newFileName);
+        return StorageUtils.generatePath(subPath, newFileName);
     }
 
     @Override
@@ -286,7 +286,7 @@ public class MinioStorageServiceImpl implements StorageService {
             return null;
         }
         if (StringUtils.hasText(config.getFileDomain())) {
-            return StoragePathUtils.concatUrl(config.getFileDomain(), relativePath);
+            return StorageUtils.concatUrl(config.getFileDomain(), relativePath);
         }
         try {
             return getClient().getPresignedObjectUrl(
@@ -351,7 +351,7 @@ public class MinioStorageServiceImpl implements StorageService {
             return null;
         }
 
-        String trashObjectPath = StoragePathUtils.generatePath(config.getTrashDirectoryName(), FilenameUtils.getName(relativePath));
+        String trashObjectPath = StorageUtils.generatePath(config.getTrashDirectoryName(), FilenameUtils.getName(relativePath));
         try {
             copyObject(relativePath, trashObjectPath);
             deleteFile(relativePath);

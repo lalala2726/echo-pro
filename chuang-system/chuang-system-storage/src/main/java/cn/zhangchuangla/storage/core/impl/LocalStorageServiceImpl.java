@@ -2,12 +2,12 @@ package cn.zhangchuangla.storage.core.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
-import cn.zhangchuangla.storage.FileInfo;
-import cn.zhangchuangla.storage.StorageType;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.core.StorageService;
+import cn.zhangchuangla.storage.enums.StorageType;
 import cn.zhangchuangla.storage.exception.StorageException;
-import cn.zhangchuangla.storage.util.StoragePathUtils;
+import cn.zhangchuangla.storage.model.entity.FileInfo;
+import cn.zhangchuangla.storage.utils.StorageUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -60,7 +60,7 @@ public class LocalStorageServiceImpl implements StorageService {
         String extension = FilenameUtils.getExtension(originalFileName);
         String safeOriginalFileName = FilenameUtils.getName(originalFileName);
         String newFileName = safeOriginalFileName + "_" + timestamp + "_" + randomSuffix + "." + extension;
-        return StoragePathUtils.generatePath(subPath, newFileName);
+        return StorageUtils.generatePath(subPath, newFileName);
     }
 
     @Override
@@ -96,8 +96,8 @@ public class LocalStorageServiceImpl implements StorageService {
             log.info("File uploaded locally: {} ({} bytes)", absolutePath, size);
 
             String url = StringUtils.hasText(config.getFileDomain()) ?
-                    StoragePathUtils.concatUrl(config.getFileDomain(), relativePath) :
-                    StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
+                    StorageUtils.concatUrl(config.getFileDomain(), relativePath) :
+                    StorageUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
 
             return FileInfo.builder()
                     .originalFileName(originalFileName)
@@ -141,8 +141,8 @@ public class LocalStorageServiceImpl implements StorageService {
 
                 String thumbnailRelativePath = FilenameUtils.concat(thumbnailRelativeDir, thumbnailName);
                 String thumbnailUrl = StringUtils.hasText(config.getFileDomain()) ?
-                        StoragePathUtils.concatUrl(config.getFileDomain(), thumbnailRelativePath) :
-                        StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, thumbnailRelativePath);
+                        StorageUtils.concatUrl(config.getFileDomain(), thumbnailRelativePath) :
+                        StorageUtils.concatUrl(Constants.RESOURCE_PREFIX, thumbnailRelativePath);
 
                 originalFileInfo.setThumbnailUrl(thumbnailUrl);
                 originalFileInfo.setThumbnailPath(thumbnailRelativePath);
@@ -213,8 +213,8 @@ public class LocalStorageServiceImpl implements StorageService {
             return null;
         }
         return StringUtils.hasText(config.getFileDomain()) ?
-                StoragePathUtils.concatUrl(config.getFileDomain(), relativePath) :
-                StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
+                StorageUtils.concatUrl(config.getFileDomain(), relativePath) :
+                StorageUtils.concatUrl(Constants.RESOURCE_PREFIX, relativePath);
     }
 
     @Override
@@ -241,7 +241,7 @@ public class LocalStorageServiceImpl implements StorageService {
             return null;
         }
 
-        String trashSubPath = StoragePathUtils.generatePath(config.getTrashDirectoryName(), FilenameUtils.getName(relativePath));
+        String trashSubPath = StorageUtils.generatePath(config.getTrashDirectoryName(), FilenameUtils.getName(relativePath));
         Path trashAbsolutePath = getAbsolutePath(trashSubPath);
         Path trashDirectory = trashAbsolutePath.getParent();
 
@@ -253,15 +253,13 @@ public class LocalStorageServiceImpl implements StorageService {
             Files.move(sourceAbsolutePath, trashAbsolutePath, StandardCopyOption.REPLACE_EXISTING);
             log.info("File moved to trash: {} -> {}", sourceAbsolutePath, trashAbsolutePath);
 
-            FileInfo fileInfo = FileInfo.builder()
+            return FileInfo.builder()
                     .originalFileName(FilenameUtils.getName(relativePath))
                     .newFileName(trashAbsolutePath.getFileName().toString())
                     .relativePath(relativePath)
                     .originalTrashPath(trashSubPath)
                     .storageType(StorageType.LOCAL)
                     .build();
-
-            return fileInfo;
         } catch (IOException e) {
             log.error("Failed to move file to trash (local): {}", sourceAbsolutePath, e);
             throw new StorageException("移动文件到回收站失败: " + relativePath, e);
@@ -293,8 +291,8 @@ public class LocalStorageServiceImpl implements StorageService {
             log.info("File restored from trash: {} -> {}", trashAbsolutePath, restoredAbsolutePath);
 
             String url = StringUtils.hasText(config.getFileDomain()) ?
-                    StoragePathUtils.concatUrl(config.getFileDomain(), originalRelativePath) :
-                    StoragePathUtils.concatUrl(Constants.RESOURCE_PREFIX, originalRelativePath);
+                    StorageUtils.concatUrl(config.getFileDomain(), originalRelativePath) :
+                    StorageUtils.concatUrl(Constants.RESOURCE_PREFIX, originalRelativePath);
 
             return FileInfo.builder()
                     .originalFileName(FilenameUtils.getName(originalRelativePath))

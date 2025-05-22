@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core;
 
-import cn.zhangchuangla.storage.FileInfo;
+import cn.zhangchuangla.storage.model.entity.FileInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
