@@ -44,7 +44,6 @@ mybatis-plus:
   type-aliases-package: cn.zhangchuangla.**.entity
   mapper-locations:
     - classpath*:mapper/**/**.xml
-    - classpath*:cn/zhangchuangla/**/mapper/xml/**.xml
   global-config:
     db-config:
       logic-delete-field: isDeleted  # 全局逻辑删除字段名
