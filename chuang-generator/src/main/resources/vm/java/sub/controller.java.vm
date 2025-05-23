@@ -1,0 +1,88 @@
+package ${packageName}.controller;
+
+import ${packageName}.model.entity.${ClassName};
+import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
+import ${packageName}.service.${ClassName}Service;
+import cn.zhangchuangla.common.core.model.response.ApiResponse;
+import cn.zhangchuangla.common.core.model.response.PageResponse;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+/**
+ * ${functionName} 控制器
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Tag(name = "${functionName}管理")
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+@RequiredArgsConstructor
+public class ${ClassName}Controller {
+
+    private final ${ClassName}Service ${classNameLower}Service;
+
+    /**
+     * ${functionName}分页列表
+     */
+    @Operation(summary = "${functionName}分页列表")
+    @GetMapping("/page")
+    @PreAuthorize("hasAuthority('${permissionPrefix}:list')")
+    public ApiResponse<PageResponse<${ClassName}>> page(${ClassName}QueryRequest request) {
+        Page<${ClassName}> page = ${classNameLower}Service.list${ClassName}(request);
+        return ApiResponse.success(PageResponse.of(page));
+    }
+
+    /**
+     * 根据ID查询${functionName}详情（包含子表数据）
+     */
+    @Operation(summary = "根据ID查询${functionName}详情")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('${permissionPrefix}:query')")
+    public ApiResponse<${ClassName}> getById(@PathVariable Long id) {
+        ${ClassName} ${classNameLower} = ${classNameLower}Service.get${ClassName}ById(id);
+        return ApiResponse.success(${classNameLower});
+    }
+
+    /**
+     * 添加${functionName}（包含子表数据）
+     */
+    @Operation(summary = "添加${functionName}")
+    @PostMapping
+    @PreAuthorize("hasAuthority('${permissionPrefix}:add')")
+    public ApiResponse<Boolean> add(@Valid @RequestBody ${ClassName}AddRequest request) {
+        boolean result = ${classNameLower}Service.add${ClassName}(request);
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 修改${functionName}（包含子表数据）
+     */
+    @Operation(summary = "修改${functionName}")
+    @PutMapping
+    @PreAuthorize("hasAuthority('${permissionPrefix}:edit')")
+    public ApiResponse<Boolean> update(@Valid @RequestBody ${ClassName}UpdateRequest request) {
+        boolean result = ${classNameLower}Service.update${ClassName}(request);
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 删除${functionName}（级联删除子表数据）
+     */
+    @Operation(summary = "删除${functionName}")
+    @DeleteMapping
+    @PreAuthorize("hasAuthority('${permissionPrefix}:remove')")
+    public ApiResponse<Boolean> delete(@RequestBody List<Long> ids) {
+        boolean result = ${classNameLower}Service.delete${ClassName}(ids);
+        return ApiResponse.success(result);
+    }
+} 

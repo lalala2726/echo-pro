@@ -7,9 +7,13 @@ import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.generator.config.GenConfig;
 import cn.zhangchuangla.generator.enums.FileType;
+import cn.zhangchuangla.generator.enums.TemplateTypeEnum;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
+import cn.zhangchuangla.generator.model.request.BatchDownloadRequest;
+import cn.zhangchuangla.generator.model.request.BatchPreviewRequest;
+import cn.zhangchuangla.generator.model.request.BatchTemplateRequest;
 import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
 import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
 import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,12 +108,32 @@ public class GenController extends BaseController {
      */
     @Operation(summary = "导入数据库表结构")
     @PreAuthorize("@ss.hasPermission('tool:gen:import')")
-    @PostMapping("/importTable/{tableName}")
+    @PostMapping("/importTable")
     public AjaxResult<Void> importTable(
-            @Parameter(description = "数据库中表的名称") @PathVariable("tableName") List<String> tableNames) {
-        checkParam(tableNames == null, "表名称不能为空！");
+            @Parameter(description = "数据库中表的名称列表") @RequestBody List<String> tableNames) {
+        checkParam(tableNames == null || tableNames.isEmpty(), "表名称不能为空！");
         boolean result = genTableService.importTable(tableNames);
         return toAjax(result);
+    }
+
+    /**
+     * 获取模板类型列表
+     *
+     * @return 模板类型列表
+     */
+    @Operation(summary = "获取模板类型列表")
+    @GetMapping("/template/types")
+    public AjaxResult<List<Map<String, Object>>> getTemplateTypes() {
+        List<Map<String, Object>> templateTypes = new ArrayList<>();
+
+        for (TemplateTypeEnum type : TemplateTypeEnum.values()) {
+            Map<String, Object> typeInfo = new HashMap<>();
+            typeInfo.put("code", type.getCode());
+            typeInfo.put("description", type.getDescription());
+            templateTypes.add(typeInfo);
+        }
+
+        return success(templateTypes);
     }
 
     /**
@@ -174,6 +199,27 @@ public class GenController extends BaseController {
     }
 
     /**
+     * 批量设置模板类型
+     *
+     * @param request 批量设置请求
+     * @return 操作结果
+     */
+    @Operation(summary = "批量设置模板类型")
+    @PreAuthorize("@ss.hasPermission('tool:gen:update')")
+    @PostMapping("/template/batch")
+    public AjaxResult<Void> batchSetTemplateType(@RequestBody BatchTemplateRequest request) {
+        checkParam(request.getTableIds() == null || request.getTableIds().isEmpty(), "表ID不能为空");
+        checkParam(request.getTemplateType() == null || request.getTemplateType().isEmpty(), "模板类型不能为空");
+
+        // 验证模板类型
+        TemplateTypeEnum.getByCode(request.getTemplateType());
+
+        // 批量更新
+        boolean result = genTableService.batchSetTemplateType(request.getTableIds(), request.getTemplateType());
+        return toAjax(result);
+    }
+
+    /**
      * 删除低代码表
      *
      * @param tableIds 表ID数组
@@ -193,17 +239,19 @@ public class GenController extends BaseController {
      * 预览代码
      *
      * @param tableName 表名称
+     * @param codeType  代码类型（typescript/javascript，默认typescript）
      * @return 预览数据
      */
     @Operation(summary = "预览代码")
     @PreAuthorize("@ss.hasPermission('tool:gen:preview')")
     @GetMapping("/preview/{tableName}")
     public AjaxResult<List<CodePreviewVo>> preview(
-            @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName) {
+            @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName,
+            @Parameter(description = "代码类型") @RequestParam(defaultValue = "typescript") String codeType) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 获取预览代码
-        Map<String, String> codeMap = genTableService.previewCode(tableName);
+        Map<String, String> codeMap = genTableService.previewCode(tableName, codeType);
 
         // 转换为前端需要的格式
         List<CodePreviewVo> previewList = new ArrayList<>();
@@ -229,25 +277,73 @@ public class GenController extends BaseController {
     }
 
     /**
+     * 批量预览代码
+     *
+     * @param request 批量预览请求
+     * @return 预览数据
+     */
+    @Operation(summary = "批量预览代码")
+    @PreAuthorize("@ss.hasPermission('tool:gen:preview')")
+    @PostMapping("/preview/batch")
+    public AjaxResult<Map<String, List<CodePreviewVo>>> batchPreview(@RequestBody BatchPreviewRequest request) {
+        checkParam(request.getTableNames() == null || request.getTableNames().isEmpty(), "表名称不能为空");
+
+        String codeType = request.getCodeType() != null ? request.getCodeType() : "typescript";
+        Map<String, List<CodePreviewVo>> result = new HashMap<>();
+
+        for (String tableName : request.getTableNames()) {
+            // 获取预览代码
+            Map<String, String> codeMap = genTableService.previewCode(tableName, codeType);
+
+            // 转换为前端需要的格式
+            List<CodePreviewVo> previewList = new ArrayList<>();
+
+            codeMap.forEach((fileName, content) -> {
+                // 获取文件类型
+                FileType fileType = GenUtils.getFileType(fileName);
+
+                // 获取简化文件名
+                String simpleFileName = GenUtils.getSimpleFileName(fileName);
+
+                // 添加到预览列表
+                CodePreviewVo previewVo = CodePreviewVo.builder()
+                        .fileName(simpleFileName)
+                        .content(content)
+                        .fileType(fileType.getCode())
+                        .build();
+
+                previewList.add(previewVo);
+            });
+
+            result.put(tableName, previewList);
+        }
+
+        return success(result);
+    }
+
+    /**
      * 下载代码
      *
      * @param tableName 表名称
+     * @param codeType  代码类型（typescript/javascript，默认typescript）
      */
     @Operation(summary = "下载代码")
     @GetMapping("/download/{tableName}")
     @Anonymous
-    public void download(HttpServletResponse response, @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName) {
+    public void download(HttpServletResponse response,
+            @Parameter(description = "需要下载的表名称") @PathVariable("tableName") String tableName,
+            @Parameter(description = "代码类型") @RequestParam(defaultValue = "typescript") String codeType) {
         // 参数验证
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 生成代码
-        byte[] data = genTableService.downloadCode(tableName);
+        byte[] data = genTableService.downloadCode(tableName, codeType);
 
         // 设置响应头
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         try {
             // 设置文件名，确保使用UTF-8编码避免中文问题
-            String fileName = tableName + "_code.zip";
+            String fileName = tableName + "_" + codeType + "_code.zip";
             String encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
 
@@ -263,9 +359,49 @@ public class GenController extends BaseController {
             response.getOutputStream().write(data);
             response.getOutputStream().flush();
 
-            log.info("正在下载代码，表名：{}，文件大小：{} 字节", tableName, data.length);
+            log.info("正在下载代码，表名：{}，代码类型：{}，文件大小：{} 字节", tableName, codeType, data.length);
         } catch (Exception e) {
-            log.error("下载代码失败，表名：{}", tableName, e);
+            log.error("下载代码失败，表名：{}，代码类型：{}", tableName, codeType, e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 批量下载代码
+     *
+     * @param request 批量下载请求
+     */
+    @Operation(summary = "批量下载代码")
+    @PostMapping("/download/batch")
+    @Anonymous
+    public void batchDownload(HttpServletResponse response, @RequestBody BatchDownloadRequest request) {
+        // 参数验证
+        checkParam(request.getTableNames() == null || request.getTableNames().isEmpty(), "表名称不能为空");
+
+        String codeType = request.getCodeType() != null ? request.getCodeType() : "typescript";
+
+        try {
+            // 批量生成代码并打包
+            byte[] data = genTableService.batchDownloadCode(request.getTableNames(), codeType);
+
+            // 设置响应头
+            response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            String fileName = "batch_" + codeType + "_code_" + System.currentTimeMillis() + ".zip";
+            String encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
+
+            response.setContentLength(data.length);
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+            response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+            response.setDateHeader(HttpHeaders.EXPIRES, 0);
+
+            response.getOutputStream().write(data);
+            response.getOutputStream().flush();
+
+            log.info("正在批量下载代码，表数量：{}，代码类型：{}，文件大小：{} 字节",
+                    request.getTableNames().size(), codeType, data.length);
+        } catch (Exception e) {
+            log.error("批量下载代码失败，表名：{}，代码类型：{}", request.getTableNames(), codeType, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -282,20 +418,23 @@ public class GenController extends BaseController {
     public AjaxResult<Void> syncDb(@Parameter(description = "需要同步表的名称") @PathVariable("tableName") String tableName) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
-        // 删除旧的表结构
-        GenTable table = genTableService.lambdaQuery().eq(GenTable::getTableName, tableName).one();
-        if (table == null) {
-            return error("表不存在");
-        }
+        boolean result = genTableService.syncDb(tableName);
+        return toAjax(result);
+    }
 
-        // 删除旧的表记录
-        genTableService.removeById(table.getTableId());
+    /**
+     * 批量同步数据库结构
+     *
+     * @param tableNames 表名称列表
+     * @return 操作结果
+     */
+    @Operation(summary = "批量同步数据库结构")
+    @PreAuthorize("@ss.hasPermission('tool:gen:sync')")
+    @PostMapping("/syncDb/batch")
+    public AjaxResult<Void> batchSyncDb(@Parameter(description = "需要同步的表名称列表") @RequestBody List<String> tableNames) {
+        checkParam(tableNames == null || tableNames.isEmpty(), "表名称不能为空");
 
-        // 重新导入表结构
-        List<String> tableNames = new ArrayList<>();
-        tableNames.add(tableName);
-        boolean importResult = genTableService.importTable(tableNames);
-
-        return toAjax(importResult);
+        boolean result = genTableService.batchSyncDb(tableNames);
+        return toAjax(result);
     }
 }

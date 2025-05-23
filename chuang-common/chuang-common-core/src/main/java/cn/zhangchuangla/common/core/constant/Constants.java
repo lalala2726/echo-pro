@@ -10,7 +10,6 @@ package cn.zhangchuangla.common.core.constant;
  */
 public class Constants {
 
-
     /**
      * 验证码相关
      */
@@ -18,8 +17,7 @@ public class Constants {
     /**
      * JSON 序列化白名单
      */
-    public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
-
+    public static final String[] JSON_WHITELIST_STR = { "org.springframework", "cn.zhangchuangla" };
 
     /**
      * 账号状态常量
@@ -44,14 +42,12 @@ public class Constants {
      */
     public static final String ALL_PERMISSION = "*:*:*";
 
-
     /**
      * HTTP 相关常量
      */
     public static final String HTTP = "http://";
     public static final String HTTPS = "https://";
     public static final String WWW = "www.";
-
 
     public static final String ORIGINAL = "original";
     public static final String PREVIEW = "preview";
@@ -60,9 +56,9 @@ public class Constants {
      * 字典相关常量
      */
     public interface DictConstants {
-        //字典启用
+        // 字典启用
         Integer ENABLE_STATUS = 0;
-        //字典禁用
+        // 字典禁用
         Integer DISABLE_STATUS = 1;
     }
 
@@ -83,9 +79,9 @@ public class Constants {
         String NOT_IN = "not in";
         String LIKE = "like";
         String crud = "crud";
-
+        String tree = "tree";
+        String sub = "sub";
     }
-
 
     /**
      * 菜单常量

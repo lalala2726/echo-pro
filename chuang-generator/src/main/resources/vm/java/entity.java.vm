@@ -6,7 +6,16 @@ package ${packageName}.model.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import cn.zhangchuangla.common.excel.annotation.Excel;
 import lombok.Data;
+
+#if($tplCategory == 'tree')
+import java.util.List;
+#end
+#if($tplCategory == 'sub')
+import java.util.List;
+#end
 
 /**
  * ${functionName}实体
@@ -25,6 +34,27 @@ public class ${ClassName} {
     #if($column.isPk == '1')
     @TableId(type = IdType.AUTO)
     #end
+#if($column.dictType && $column.dictType != '')
+    @Excel(name = "$column.columnComment", sort = ${foreach.index}, dictType = "$column.dictType")
+#else
+    @Excel(name = "$column.columnComment", sort = ${foreach.index})
+#end
 private $column.javaType $column.javaField;
+#end
+
+#if($tplCategory == 'tree')
+    /**
+     * 子节点列表
+     */
+    @TableField(exist = false)
+    private List<${ClassName}> children;
+#end
+
+#if($tplCategory == 'sub')
+    /**
+     * 子表数据列表
+     */
+    @TableField(exist = false)
+    private List<${subClassName}> ${subClassNameLower}List;
 #end
 }

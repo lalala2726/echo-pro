@@ -16,8 +16,8 @@ import java.util.Map;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ *         <p>
+ *         created on 2025-05-20 11:01
  */
 public interface GenTableService extends IService<GenTable> {
 
@@ -85,12 +85,39 @@ public interface GenTableService extends IService<GenTable> {
     Map<String, String> previewCode(String tableName);
 
     /**
+     * 预览代码（支持代码类型）
+     *
+     * @param tableName 表名
+     * @param codeType  代码类型（typescript/javascript）
+     * @return 代码预览列表
+     */
+    Map<String, String> previewCode(String tableName, String codeType);
+
+    /**
      * 生成代码（下载方式）
      *
      * @param tableName 表名
      * @return 代码压缩包
      */
     byte[] downloadCode(String tableName);
+
+    /**
+     * 生成代码（下载方式，支持代码类型）
+     *
+     * @param tableName 表名
+     * @param codeType  代码类型（typescript/javascript）
+     * @return 代码压缩包
+     */
+    byte[] downloadCode(String tableName, String codeType);
+
+    /**
+     * 批量下载代码
+     *
+     * @param tableNames 表名列表
+     * @param codeType   代码类型（typescript/javascript）
+     * @return 代码压缩包
+     */
+    byte[] batchDownloadCode(List<String> tableNames, String codeType);
 
     /**
      * 更新低代码表信息
@@ -100,6 +127,14 @@ public interface GenTableService extends IService<GenTable> {
      */
     boolean updateGenTable(GenTableUpdateRequest request);
 
+    /**
+     * 批量设置模板类型
+     *
+     * @param tableIds     表ID列表
+     * @param templateType 模板类型
+     * @return 操作结果
+     */
+    boolean batchSetTemplateType(List<Long> tableIds, String templateType);
 
     /**
      * 删除低代码表，支持批量删除
@@ -109,4 +144,19 @@ public interface GenTableService extends IService<GenTable> {
      */
     boolean deleteGenTable(List<Long> tableIds);
 
+    /**
+     * 同步数据库结构
+     *
+     * @param tableName 表名
+     * @return 操作结果
+     */
+    boolean syncDb(String tableName);
+
+    /**
+     * 批量同步数据库结构
+     *
+     * @param tableNames 表名列表
+     * @return 操作结果
+     */
+    boolean batchSyncDb(List<String> tableNames);
 }

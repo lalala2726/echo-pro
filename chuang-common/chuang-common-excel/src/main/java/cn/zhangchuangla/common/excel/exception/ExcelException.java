@@ -1,32 +1,22 @@
 package cn.zhangchuangla.common.excel.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
-
 /**
- * @author chuang
+ * Excel操作异常
+ *
+ * @author Chuang
+ * @since 2025-01-23
  */
-
 public class ExcelException extends RuntimeException {
-
-    /**
-     * 状态码
-     */
-    private final Integer code;
-
-
-    public ExcelException(ResponseCode responseCode, String message) {
-        super(message);
-        this.code = responseCode.getCode();
-    }
-
-    public ExcelException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
-    }
 
     public ExcelException(String message) {
         super(message);
-        this.code = ResponseCode.EXCEL_ERROR.getCode();
     }
 
+    public ExcelException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ExcelException(Throwable cause) {
+        super(cause);
+    }
 }

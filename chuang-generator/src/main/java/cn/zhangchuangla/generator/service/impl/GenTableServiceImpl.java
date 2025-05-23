@@ -44,8 +44,8 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ *         <p>
+ *         created on 2025-05-20 11:01
  */
 @Service
 @RequiredArgsConstructor
@@ -321,6 +321,18 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
      */
     @Override
     public Map<String, String> previewCode(String tableName) {
+        return previewCode(tableName, "typescript");
+    }
+
+    /**
+     * 预览代码（支持代码类型）
+     *
+     * @param tableName 表名
+     * @param codeType  代码类型（typescript/javascript）
+     * @return 代码预览列表
+     */
+    @Override
+    public Map<String, String> previewCode(String tableName, String codeType) {
         // 查询表信息
         GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
         if (table == null) {
@@ -342,8 +354,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         // 设置模板变量信息
         VelocityContext context = VelocityUtils.prepareContext(table);
 
+        // 设置代码类型到上下文
+        context.put("codeType", codeType);
+        context.put("isTypeScript", "typescript".equals(codeType));
+
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList();
+        List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
 
         // 生成代码
         Map<String, String> codeMap = new HashMap<>();
@@ -376,12 +392,24 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
      */
     @Override
     public byte[] downloadCode(String tableName) {
+        return downloadCode(tableName, "typescript");
+    }
+
+    /**
+     * 生成代码（下载方式，支持代码类型）
+     *
+     * @param tableName 表名
+     * @param codeType  代码类型（typescript/javascript）
+     * @return 代码压缩包
+     */
+    @Override
+    public byte[] downloadCode(String tableName, String codeType) {
         // 获取代码预览内容
-        Map<String, String> codeMap = previewCode(tableName);
+        Map<String, String> codeMap = previewCode(tableName, codeType);
 
         // 创建内存输出流用于生成ZIP
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+                ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
             // 设置ZIP文件编码为UTF-8，确保文件名正确
             // 最高压缩级别
@@ -414,9 +442,143 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
             // 返回生成的ZIP字节流
             return outputStream.toByteArray();
         } catch (IOException e) {
-            log.error("生成代码失败，表名：{}", tableName, e);
+            log.error("生成代码失败，表名：{}，代码类型：{}", tableName, codeType, e);
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "生成代码失败，请稍后重试");
         }
+    }
+
+    /**
+     * 批量下载代码
+     *
+     * @param tableNames 表名列表
+     * @param codeType   代码类型（typescript/javascript）
+     * @return 代码压缩包
+     */
+    @Override
+    public byte[] batchDownloadCode(List<String> tableNames, String codeType) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+
+            zip.setLevel(9);
+
+            // 为每个表生成代码
+            for (String tableName : tableNames) {
+                try {
+                    Map<String, String> codeMap = previewCode(tableName, codeType);
+
+                    // 为每个表创建单独的文件夹
+                    String tableFolder = tableName + "/";
+
+                    for (Map.Entry<String, String> entry : codeMap.entrySet()) {
+                        String filePath = tableFolder + entry.getKey().replace("\\", "/");
+                        String content = entry.getValue();
+                        if (content == null) {
+                            content = "";
+                        }
+
+                        ZipEntry zipEntry = new ZipEntry(filePath);
+                        zip.putNextEntry(zipEntry);
+                        IOUtils.write(content, zip, StandardCharsets.UTF_8);
+                        zip.flush();
+                        zip.closeEntry();
+                    }
+                } catch (Exception e) {
+                    log.error("生成表 {} 的代码失败", tableName, e);
+                    // 继续处理其他表，不中断整个流程
+                }
+            }
+
+            zip.finish();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("批量生成代码失败，表名：{}，代码类型：{}", tableNames, codeType, e);
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "批量生成代码失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 批量设置模板类型
+     *
+     * @param tableIds     表ID列表
+     * @param templateType 模板类型
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchSetTemplateType(List<Long> tableIds, String templateType) {
+        if (tableIds == null || tableIds.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表ID列表不能为空");
+        }
+
+        // 检查所有表是否存在
+        List<GenTable> existingTables = listByIds(tableIds);
+        if (existingTables.size() != tableIds.size()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "存在不存在的表");
+        }
+
+        // 批量更新
+        for (Long tableId : tableIds) {
+            GenTable updateTable = new GenTable();
+            updateTable.setTableId(tableId);
+            updateTable.setTplCategory(templateType);
+            updateTable.setUpdateBy(SecurityUtils.getUsername());
+            updateById(updateTable);
+        }
+
+        return true;
+    }
+
+    /**
+     * 同步数据库结构
+     *
+     * @param tableName 表名
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean syncDb(String tableName) {
+        // 删除旧的表结构
+        GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
+        if (table == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
+        }
+
+        // 删除旧的表记录和列记录
+        deleteGenTable(Arrays.asList(table.getTableId()));
+
+        // 重新导入表结构
+        List<String> tableNames = Arrays.asList(tableName);
+        return importTable(tableNames);
+    }
+
+    /**
+     * 批量同步数据库结构
+     *
+     * @param tableNames 表名列表
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchSyncDb(List<String> tableNames) {
+        if (tableNames == null || tableNames.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表名列表不能为空");
+        }
+
+        // 查询所有要同步的表
+        List<GenTable> existingTables = lambdaQuery()
+                .in(GenTable::getTableName, tableNames)
+                .list();
+
+        // 删除旧的表记录
+        if (!existingTables.isEmpty()) {
+            List<Long> tableIds = existingTables.stream()
+                    .map(GenTable::getTableId)
+                    .collect(Collectors.toList());
+            deleteGenTable(tableIds);
+        }
+
+        // 重新导入表结构
+        return importTable(tableNames);
     }
 
     /**

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
@@ -213,6 +214,21 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             log.error("刷新字典缓存失败", e);
             return false;
         }
+    }
+
+    /**
+     * 获取所有字典类型
+     *
+     * @return 字典类型列表
+     */
+    @Override
+    public List<Option<String>> getAllDictType() {
+        LambdaQueryWrapper<SysDictType> eq = new LambdaQueryWrapper<SysDictType>()
+                .eq(SysDictType::getStatus, Constants.DictConstants.ENABLE_STATUS);
+        List<SysDictType> list = list(eq);
+        return list.stream()
+                .map(item -> new Option<>(item.getDictType(), item.getDictName()))
+                .toList();
     }
 
 }

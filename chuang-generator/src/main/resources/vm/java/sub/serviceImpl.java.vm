@@ -1,13 +1,13 @@
-package ${packageName}.${moduleName}.service.impl;
+package ${packageName}.service.impl;
 
-import ${packageName}.${moduleName}.mapper.${className}Mapper;
-import ${packageName}.${moduleName}.mapper.${subClassName}Mapper;
-import ${packageName}.${moduleName}.model.entity.${className};
-import ${packageName}.${moduleName}.model.entity.${subClassName};
-import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}AddRequest;
-import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}ListRequest;
-import ${packageName}.${moduleName}.model.request.${classNameLower}.${className}UpdateRequest;
-import ${packageName}.${moduleName}.service.${className}Service;
+import ${packageName}.mapper.${ClassName}Mapper;
+import ${packageName}.mapper.${subClassName}Mapper;
+import ${packageName}.model.entity.${ClassName};
+import ${packageName}.model.entity.${subClassName};
+import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
+import ${packageName}.service.${ClassName}Service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,41 +19,41 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * ${tableComment} 服务实现类
+ * ${functionName} 服务实现类
  *
  * @author ${author}
  * @date ${datetime}
  */
 @Service
 @RequiredArgsConstructor
-public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${className}>
-        implements ${className}Service {
+public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}>
+        implements ${ClassName}Service {
 
-    private final ${className}Mapper ${classNameLower}Mapper;
+    private final ${ClassName}Mapper ${classNameLower}Mapper;
     private final ${subClassName}Mapper ${subClassNameLower}Mapper;
 
     /**
-     * ${tableComment}列表
+     * ${functionName}分页列表
      *
-     * @param request 操作结果
-     * @return 返回分页列表
+     * @param request 查询参数
+     * @return 分页列表
      */
     @Override
-    public Page<${className}> list${className}(${className}ListRequest request) {
-        Page<${className}> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return ${classNameLower}Mapper.list${className}(page, request);
+    public Page<${ClassName}> list${ClassName}(${ClassName}QueryRequest request) {
+        Page<${ClassName}> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return ${classNameLower}Mapper.list${ClassName}(page, request);
     }
 
     /**
-     * 添加${tableComment}
+     * 添加${functionName}（包含子表数据）
      *
      * @param request 请求参数
      * @return 操作结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean add${className}(${className}AddRequest request) {
-        ${className} ${classNameLower} =new ${className}();
+    public boolean add${ClassName}(${ClassName}AddRequest request) {
+        ${ClassName} ${classNameLower} = new ${ClassName}();
         BeanUtils.copyProperties(request, ${classNameLower});
 
         // 保存主表
@@ -62,7 +62,7 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
         // 保存子表数据
         if (result && request.get${subClassName}List() != null && !request.get${subClassName}List().isEmpty()) {
             List<${subClassName}> ${subClassNameLower}List = request.get${subClassName}List();
-            for (${subClassName} ${subClassNameLower} :${subClassNameLower}List){
+            for (${subClassName} ${subClassNameLower} : ${subClassNameLower}List) {
                 ${subClassNameLower}.set${subTableFkName}(${classNameLower}.get${primaryKey.javaFieldCapitalize}());
             }
             result = ${subClassNameLower}Mapper.insertBatch(${subClassNameLower}List) > 0;
@@ -72,14 +72,14 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
     }
 
     /**
-     * 删除${tableComment}
+     * 删除${functionName}（级联删除子表数据）
      *
-     * @param ids ${tableComment}ID集合
+     * @param ids ${functionName}ID集合
      * @return 操作结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean delete${className}(List<Long> ids) {
+    public boolean delete${ClassName}(List<Long> ids) {
         // 删除主表
         boolean result = removeByIds(ids);
 
@@ -88,7 +88,7 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
             for (Long id : ids) {
                 LambdaQueryWrapper<${subClassName}> queryWrapper = new LambdaQueryWrapper<>();
                 queryWrapper.eq(${subClassName}::get${subTableFkName}, id);
-                    ${subClassNameLower}Mapper.delete(queryWrapper);
+                ${subClassNameLower}Mapper.delete(queryWrapper);
             }
         }
 
@@ -96,15 +96,15 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
     }
 
     /**
-     * 根据ID查询${tableComment}信息
+     * 根据ID查询${functionName}信息（包含子表数据）
      *
-     * @param id 请求参数
-     * @return 操作结果
+     * @param id ID
+     * @return ${functionName}信息
      */
     @Override
-    public ${className} get${className}ById(Long id) {
-        ${className} ${classNameLower} =getById(id);
-        if (${classNameLower} !=null){
+    public ${ClassName} get${ClassName}ById(Long id) {
+        ${ClassName} ${classNameLower} = getById(id);
+        if (${classNameLower} != null) {
             // 查询子表数据
             LambdaQueryWrapper<${subClassName}> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(${subClassName}::get${subTableFkName}, id);
@@ -115,15 +115,15 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
     }
 
     /**
-     * 修改${tableComment}信息
+     * 修改${functionName}信息（包含子表数据）
      *
      * @param request 请求参数
      * @return 操作结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean update${className}(${className}UpdateRequest request) {
-        ${className} ${classNameLower} =new ${className}();
+    public boolean update${ClassName}(${ClassName}UpdateRequest request) {
+        ${ClassName} ${classNameLower} = new ${ClassName}();
         BeanUtils.copyProperties(request, ${classNameLower});
 
         // 更新主表
@@ -133,13 +133,13 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
         if (result) {
             LambdaQueryWrapper<${subClassName}> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(${subClassName}::get${subTableFkName}, request.get${primaryKey.javaFieldCapitalize}());
-                ${subClassNameLower}Mapper.delete(queryWrapper);
+            ${subClassNameLower}Mapper.delete(queryWrapper);
 
-            // 添加新的子表数据
+            // 重新插入子表数据
             if (request.get${subClassName}List() != null && !request.get${subClassName}List().isEmpty()) {
                 List<${subClassName}> ${subClassNameLower}List = request.get${subClassName}List();
-                for (${subClassName} ${subClassNameLower} :${subClassNameLower}List){
-                    ${subClassNameLower}.set${subTableFkName}(${classNameLower}.get${primaryKey.javaFieldCapitalize}());
+                for (${subClassName} ${subClassNameLower} : ${subClassNameLower}List) {
+                    ${subClassNameLower}.set${subTableFkName}(request.get${primaryKey.javaFieldCapitalize}());
                 }
                 result = ${subClassNameLower}Mapper.insertBatch(${subClassNameLower}List) > 0;
             }
