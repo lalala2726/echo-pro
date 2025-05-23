@@ -56,7 +56,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "字典类型列表")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
     public AjaxResult<TableDataResult> listDictType(@Parameter(description = "字典类型列表查询参数")
-                                                        @Validated @ParameterObject SysDictTypeQueryRequest request) {
+                                                    @Validated @ParameterObject SysDictTypeQueryRequest request) {
         Page<SysDictType> page = new Page<>(request.getPageNum(), request.getPageSize());
         Page<SysDictType> sysDictTypePage = sysDictTypeService.listDictType(page, request);
         List<SysDictTypeVo> sysDictTypeVos = copyListProperties(sysDictTypePage, SysDictTypeVo.class);

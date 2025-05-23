@@ -96,6 +96,8 @@ public enum ResponseCode {
     PROFILE_ERROR(50006, "配置文件错误"),
     // endregion
 
+    EXCEL_ERROR(50007, "Excel文件错误"),
+
     // region 其他错误状态
     NOT_EXIST(40403, "不存在"),
     NOT_ALLOW(40307, "不允许"),
