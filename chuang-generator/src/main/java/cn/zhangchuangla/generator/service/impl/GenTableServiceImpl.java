@@ -13,10 +13,8 @@ import cn.zhangchuangla.generator.mapper.GenTableMapper;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
-import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
+import cn.zhangchuangla.generator.model.request.*;
+import cn.zhangchuangla.generator.service.GenTableColumnService;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import cn.zhangchuangla.generator.utils.VelocityUtils;
@@ -44,8 +42,8 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * @author Chuang
- *         <p>
- *         created on 2025-05-20 11:01
+ * <p>
+ * created on 2025-05-20 11:01
  */
 @Service
 @RequiredArgsConstructor
@@ -56,6 +54,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     private final GenTableMapper genTableMapper;
     private final GenTableColumnMapper genTableColumnMapper;
     private final RedisCache redisCache;
+    private final GenTableColumnService genTableColumnService;
 
     /**
      * 获取低代码表列表
@@ -409,7 +408,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
 
         // 创建内存输出流用于生成ZIP
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+             ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
             // 设置ZIP文件编码为UTF-8，确保文件名正确
             // 最高压缩级别
@@ -457,7 +456,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     @Override
     public byte[] batchDownloadCode(List<String> tableNames, String codeType) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+             ZipOutputStream zip = new ZipOutputStream(outputStream)) {
 
             zip.setLevel(9);
 
@@ -588,6 +587,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
      * @return 更新结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateGenTable(GenTableUpdateRequest request) {
         // 检查表是否存在
         GenTable existingTable = getById(request.getTableId());
@@ -603,7 +603,36 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         updateTable.setUpdateBy(SecurityUtils.getUsername());
 
         // 更新表信息
-        return updateById(updateTable);
+        boolean tableUpdated = updateById(updateTable);
+        if (!tableUpdated) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "表基本信息更新失败");
+        }
+
+        // 处理字段信息更新
+        if (request.getColumns() != null && !request.getColumns().isEmpty()) {
+            // 遍历处理每个字段
+            for (ColumnUpdateRequest column : request.getColumns()) {
+                GenTableColumn updateColumn = new GenTableColumn();
+                BeanUtils.copyProperties(column, updateColumn);
+
+                // 更新字段信息
+                if (updateColumn.getColumnId() != null) {
+                    // 检查字段是否存在
+                    GenTableColumn existingColumn = genTableColumnMapper.selectById(updateColumn.getColumnId());
+                    if (existingColumn == null) {
+                        log.warn("字段不存在，ID: {}", updateColumn.getColumnId());
+                        continue;
+                    }
+
+                    // 更新字段
+                    if (genTableColumnMapper.updateById(updateColumn) <= 0) {
+                        log.warn("更新字段失败，ID: {}", updateColumn.getColumnId());
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -11,13 +11,7 @@ import cn.zhangchuangla.generator.enums.TemplateTypeEnum;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.BatchDownloadRequest;
-import cn.zhangchuangla.generator.model.request.BatchPreviewRequest;
-import cn.zhangchuangla.generator.model.request.BatchTemplateRequest;
-import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
-import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
+import cn.zhangchuangla.generator.model.request.*;
 import cn.zhangchuangla.generator.model.vo.*;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
@@ -194,7 +188,27 @@ public class GenController extends BaseController {
     @PutMapping
     public AjaxResult<Void> update(
             @Parameter(description = "修改后的参数") @RequestBody @Validated GenTableUpdateRequest request) {
+        log.info("开始更新低代码表配置，表ID: {}, 表名: {}", request.getTableId(), request.getTableName());
+
+        // 参数验证
+        checkParam(request.getTableId() == null, "表ID不能为空");
+        checkParam(request.getTableName() == null || request.getTableName().isEmpty(), "表名称不能为空");
+
+        // 如果包含字段信息，验证字段信息
+        if (request.getColumns() != null && !request.getColumns().isEmpty()) {
+            for (ColumnUpdateRequest column : request.getColumns()) {
+                if (column.getColumnId() == null) {
+                    log.warn("字段ID为空，跳过更新: {}", column.getColumnName());
+                }
+            }
+        }
+
+        // 执行更新
         boolean result = genTableService.updateGenTable(request);
+
+        log.info("低代码表配置更新{}, 表ID: {}, 表名: {}",
+                result ? "成功" : "失败", request.getTableId(), request.getTableName());
+
         return toAjax(result);
     }
 

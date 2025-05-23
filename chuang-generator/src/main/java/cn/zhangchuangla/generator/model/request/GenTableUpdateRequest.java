@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * 代码生成业务表更新请求
@@ -87,4 +89,11 @@ public class GenTableUpdateRequest {
      */
     @Schema(description = "备注", example = "这是一个示例备注")
     private String remark;
+
+    /**
+     * 代码生成业务表字段信息
+     */
+    @Schema(description = "代码生成业务表字段信息")
+    private List<ColumnUpdateRequest> columns;
+
 }
