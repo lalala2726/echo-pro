@@ -5,6 +5,8 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.request.dict.SysDictItemAddRequest;
@@ -17,6 +19,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +32,12 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDictItem>
         implements SysDictItemService {
 
     private final SysDictItemMapper sysDictItemMapper;
-
+    private final RedisCache redisCache;
 
     /**
      * 获取字典项列表
@@ -59,6 +63,50 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     }
 
     /**
+     * 根据字典类型编码获取字典项列表
+     *
+     * @param dictType 字典类型编码
+     * @return 字典项列表
+     */
+    @Override
+    public List<Option<String>> getDictItemOption(String dictType) {
+        if (StringUtils.isBlank(dictType)) {
+            return List.of();
+        }
+
+        // 1. 优先从缓存中获取
+        String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType);
+        List<Option<String>> cachedOptions = redisCache.getCacheObject(cacheKey);
+
+        if (cachedOptions != null) {
+            log.debug("从缓存中获取字典数据: {}", dictType);
+            return cachedOptions;
+        }
+
+        // 2. 缓存中没有数据，从数据库查询
+        log.debug("缓存中没有字典数据，从数据库查询: {}", dictType);
+        LambdaQueryWrapper<SysDictItem> queryWrapper = new LambdaQueryWrapper<SysDictItem>()
+                .eq(SysDictItem::getDictType, dictType)
+                .eq(SysDictItem::getStatus, 0) // 只查询启用的字典项
+                .orderByAsc(SysDictItem::getSort); // 按排序字段升序
+
+        List<SysDictItem> dictItems = list(queryWrapper);
+        List<Option<String>> options = dictItems.stream()
+                .map(item -> new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag()))
+                .toList();
+
+        // 3. 将查询结果缓存起来
+        try {
+            redisCache.setCacheObject(cacheKey, options, RedisConstants.DICT_CACHE_EXPIRE_TIME);
+            log.debug("字典数据已缓存: {}", dictType);
+        } catch (Exception e) {
+            log.warn("缓存字典数据失败: {}, 错误: {}", dictType, e.getMessage());
+        }
+
+        return options;
+    }
+
+    /**
      * 添加字典项
      *
      * @param request 请求
@@ -76,9 +124,14 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         SysDictItem sysDictItem = new SysDictItem();
         BeanUtils.copyProperties(request, sysDictItem);
         sysDictItem.setCreateBy(SecurityUtils.getUsername());
-        return save(sysDictItem);
-    }
 
+        boolean result = save(sysDictItem);
+        if (result) {
+            // 清除相关缓存
+            clearDictCache(request.getDictType());
+        }
+        return result;
+    }
 
     /**
      * 更新字典项
@@ -102,7 +155,17 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         SysDictItem sysDictItem = new SysDictItem();
         BeanUtils.copyProperties(request, sysDictItem);
         sysDictItem.setUpdateBy(SecurityUtils.getUsername());
-        return sysDictItemMapper.updateById(sysDictItem) > 0;
+
+        boolean result = sysDictItemMapper.updateById(sysDictItem) > 0;
+        if (result) {
+            // 清除相关缓存
+            clearDictCache(request.getDictType());
+            // 如果字典类型发生了变化，也要清除旧的缓存
+            if (!request.getDictType().equals(existDictItem.getDictType())) {
+                clearDictCache(existDictItem.getDictType());
+            }
+        }
+        return result;
     }
 
     /**
@@ -116,7 +179,19 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         if (ids == null || ids.isEmpty()) {
             return false;
         }
-        return sysDictItemMapper.deleteByIds(ids) > 0;
+
+        // 先查询要删除的字典项，以便清除相关缓存
+        List<SysDictItem> itemsToDelete = sysDictItemMapper.selectByIds(ids);
+
+        boolean result = sysDictItemMapper.deleteByIds(ids) > 0;
+        if (result) {
+            // 清除相关缓存
+            itemsToDelete.stream()
+                    .map(SysDictItem::getDictType)
+                    .distinct()
+                    .forEach(this::clearDictCache);
+        }
+        return result;
     }
 
     /**
@@ -179,21 +254,18 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
     }
 
     /**
-     * 根据字典类型编码获取字典项列表
-     *
-     * @param dictType 字典类型编码
-     * @return 字典项列表
+     * 清除指定字典类型的缓存
      */
-    @Override
-    public List<Option<String>> getDictItemOption(String dictType) {
-        if (StringUtils.isBlank(dictType)) {
-            return List.of();
+    private void clearDictCache(String dictType) {
+        if (!StringUtils.isBlank(dictType)) {
+            String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType);
+            try {
+                redisCache.deleteObject(cacheKey);
+                log.debug("清除字典缓存: {}", dictType);
+            } catch (Exception e) {
+                log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());
+            }
         }
-        LambdaQueryWrapper<SysDictItem> eq = new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictType, dictType);
-        List<SysDictItem> list = list(eq);
-        return list.stream().map(item ->
-                new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag())
-        ).toList();
     }
 }
 

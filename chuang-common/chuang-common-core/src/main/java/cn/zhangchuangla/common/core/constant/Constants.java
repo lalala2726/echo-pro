@@ -57,6 +57,16 @@ public class Constants {
     public static final String PREVIEW = "preview";
 
     /**
+     * 字典相关常量
+     */
+    public interface DictConstants {
+        //字典启用
+        Integer ENABLE_STATUS = 0;
+        //字典禁用
+        Integer DISABLE_STATUS = 1;
+    }
+
+    /**
      * 代码生成相关常量
      */
     public interface Generator {

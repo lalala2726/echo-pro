@@ -131,6 +131,20 @@ public class SysDictController extends BaseController {
     }
 
     /**
+     * 刷新字典缓存
+     *
+     * @return 操作结果
+     */
+    @OperationLog(title = "字典类型", businessType = BusinessType.REFRESH)
+    @Operation(summary = "刷新字典缓存")
+    @PreAuthorize("@ss.hasPermission('system:dict:refreshCache')")
+    @PostMapping("/refreshCache")
+    public AjaxResult<Void> refreshCache() {
+        boolean result = sysDictTypeService.refreshCache();
+        return toAjax(result);
+    }
+
+    /**
      * 获取字典项列表
      *
      * @param request 字典项列表查询参数
