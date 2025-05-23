@@ -9,6 +9,13 @@
         <version>1.0.0</version>
     </parent>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-excel</artifactId>
+        </dependency>
+    </dependencies>
+
 
     <artifactId>chuang-system-core</artifactId>
     <version>1.0.0</version>

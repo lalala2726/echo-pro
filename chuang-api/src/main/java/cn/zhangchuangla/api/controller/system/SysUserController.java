@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
@@ -20,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -47,6 +49,7 @@ public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
+    private final ExcelUtils excelUtils;
 
     /**
      * 获取用户信息
@@ -72,7 +75,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public AjaxResult<TableDataResult> listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
-                                                    @Validated @ParameterObject SysUserQueryRequest request) {
+                                                @Validated @ParameterObject SysUserQueryRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
@@ -81,6 +84,29 @@ public class SysUserController extends BaseController {
             userListVos.add(userInfoVo);
         });
         return getTableData(userPage, userListVos);
+    }
+
+    /**
+     * 导出用户列表
+     * 根据查询条件导出系统用户列表
+     *
+     * @param request 包含分页、排序和筛选条件的用户查询参数
+     */
+    @PostMapping("/export")
+    @Operation(summary = "导出用户列表")
+    @PreAuthorize("@ss.hasPermission('system:user:export')")
+    @OperationLog(title = "用户管理", businessType = BusinessType.EXPORT)
+    public void exportExcel(HttpServletResponse response,
+                            @Parameter(description = "用户查询参数，包含分页和筛选条件")
+                            @Validated @ParameterObject SysUserQueryRequest request) {
+        Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
+        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        userPage.getRecords().forEach(user -> {
+            UserListVo userInfoVo = new UserListVo();
+            BeanUtils.copyProperties(user, userInfoVo);
+            userListVos.add(userInfoVo);
+        });
+        excelUtils.exportExcel(response, userListVos, UserListVo.class, "用户列表");
     }
 
     /**
@@ -95,7 +121,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult<Long> addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
-                                        @Validated @RequestBody SysUserAddRequest request) {
+                                    @Validated @RequestBody SysUserAddRequest request) {
         if (!request.getUsername().isEmpty()) {
             checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
         }
@@ -138,7 +164,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
-                                                   @Validated @RequestBody SysUserUpdateRequest request) {
+                                               @Validated @RequestBody SysUserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
         // 参数校验
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {

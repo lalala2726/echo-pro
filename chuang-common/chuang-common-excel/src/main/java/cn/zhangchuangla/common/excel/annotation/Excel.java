@@ -111,6 +111,13 @@ public @interface Excel {
     String numFormat() default "";
 
     /**
+     * 字典类型编码，用于字典值映射
+     * 当设置此属性时，会从Redis中获取对应的字典项进行值转换
+     * 例如：dictType = "sys_user_sex" 会将 0,1,2 转换为 男,女,未知
+     */
+    String dictType() default "";
+
+    /**
      * 单元格格式枚举
      */
     enum ColumnType {

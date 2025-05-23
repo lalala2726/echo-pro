@@ -1,9 +1,8 @@
 package cn.zhangchuangla.common.core.core.loader;
 
-import cn.zhangchuangla.common.core.core.service.DataLoader;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -13,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * 数据加载协调器，负责在应用启动时协调各模块数据加载
@@ -22,16 +20,28 @@ import java.util.stream.Collectors;
  */
 @Component
 @Order(1) // 确保较早执行
+@RequiredArgsConstructor
 public class LoaderCoordinator implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(LoaderCoordinator.class);
     private final Map<String, LoaderStatus> loaderStatusMap = new ConcurrentHashMap<>();
-    @Autowired
-    private List<DataLoader> loaders;
+    private final List<DataLoader> loaders;
+
+    /**
+     * 加载超时时间
+     */
     @Value("${app.loader.timeout:60}")
     private int loaderTimeoutSeconds;
+
+    /**
+     * 异步加载器线程池大小
+     */
     @Value("${app.loader.async-pool-size:10}")
     private int asyncPoolSize;
+
+    /**
+     * 是否快速失败，如果为true，则遇到异常就立即停止加载器执行
+     */
     @Value("${app.loader.fail-fast:false}")
     private boolean failFast;
 
@@ -155,7 +165,7 @@ public class LoaderCoordinator implements CommandLineRunner {
                             logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg, e);
                         }
                     }, executorService))
-                    .collect(Collectors.toList());
+                    .toList();
 
             // 设置超时等待所有异步加载完成
             try {

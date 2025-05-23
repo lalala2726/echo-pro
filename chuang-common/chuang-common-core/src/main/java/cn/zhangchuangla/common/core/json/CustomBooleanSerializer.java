@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.config.jackson;
+package cn.zhangchuangla.common.core.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

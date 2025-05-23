@@ -33,6 +33,10 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-excel</artifactId>
+        </dependency>
         <!-- 代码生成模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>

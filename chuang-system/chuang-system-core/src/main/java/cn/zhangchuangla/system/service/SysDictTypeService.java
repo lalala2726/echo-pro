@@ -66,4 +66,11 @@ public interface SysDictTypeService extends IService<SysDictType> {
     boolean isDictTypeExist(String dictType);
 
 
+    /**
+     * 刷新字典缓存
+     *
+     * @return 操作结果
+     */
+    boolean refreshCache();
+
 }

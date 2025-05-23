@@ -88,6 +88,11 @@
                 <artifactId>chuang-common-redis</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-common-excel</artifactId>
+                <version>${app.version}</version>
+            </dependency>
             <!-- 框架模块 -->
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>
@@ -116,6 +121,12 @@
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>
                 <artifactId>chuang-generator</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- 系统模块依赖 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>chuang-system</artifactId>
                 <version>${app.version}</version>
             </dependency>
 
@@ -356,12 +367,6 @@
                 <groupId>cn.idev.excel</groupId>
                 <artifactId>fastexcel</artifactId>
                 <version>${fast.excel.version}</version>
-            </dependency>
-            <!-- 系统模块依赖 -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>chuang-system</artifactId>
-                <version>${app.version}</version>
             </dependency>
         </dependencies>
 
