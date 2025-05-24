@@ -33,6 +33,9 @@
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <minio.version>8.5.17</minio.version>
         <tencent.cos.version>5.6.97</tencent.cos.version>
+        <!-- MQ 消息队列相关版本 -->
+        <rabbitmq.version>3.4.3</rabbitmq.version>
+        <spring.boot.amqp.version>3.4.3</spring.boot.amqp.version>
 
         <!-- 工具类相关依赖版本 -->
         <lombok.version>1.18.30</lombok.version>
@@ -81,6 +84,16 @@
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>
                 <artifactId>chuang-common-core</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-common-mq</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-common-websocket</artifactId>
                 <version>${app.version}</version>
             </dependency>
             <dependency>
@@ -373,6 +386,14 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.26.0</version>
+            </dependency>
+
+            <!-- ===================== MQ 消息队列 ===================== -->
+            <!-- Spring Boot AMQP 启动器，用于RabbitMQ消息队列 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>${spring.boot.amqp.version}</version>
             </dependency>
         </dependencies>
 

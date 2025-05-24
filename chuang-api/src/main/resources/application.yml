@@ -9,7 +9,7 @@ server:
   port: 8080
 spring:
   profiles:
-    active: druid
+    active: druid,rabbitmq  # 激活druid和rabbitmq配置
   servlet:
     multipart:
       max-file-size: 50MB
@@ -36,8 +36,6 @@ springdoc:
   default-consumes-media-type: application/json
   cache:
     disabled: true
-
-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

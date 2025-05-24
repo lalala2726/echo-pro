@@ -1,0 +1,39 @@
+# RabbitMQ 消息队列配置 Profile
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: zhangchuang
+    password: zhangchuang2726
+    virtual-host: /
+    # 连接池配置
+    connection-timeout: 15000
+    # 消费者配置
+    listener:
+      simple:
+        # 消费者数量
+        concurrency: 5
+        max-concurrency: 10
+        # 自动确认模式
+        acknowledge-mode: auto
+        # 重试配置
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000
+          multiplier: 2
+          max-interval: 10000
+    # 生产者配置
+    template:
+      # 消息确认
+      mandatory: true
+      # 重试配置
+      retry:
+        enabled: true
+        max-attempts: 3
+        initial-interval: 1000
+        multiplier: 2
+        max-interval: 10000
+    # 发布者确认
+    publisher-confirm-type: correlated
+    publisher-returns: true
