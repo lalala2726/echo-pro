@@ -23,12 +23,6 @@
 
     <dependencies>
 
-        <!-- Spring Boot 基础依赖 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!-- IP 转省市区 -->
         <dependency>
             <groupId>org.lionsoul</groupId>
@@ -70,17 +64,6 @@
             <artifactId>UserAgentUtils</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <!-- 安全框架 -->
         <dependency>
@@ -100,11 +83,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- JSON工具 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
 
         <!-- IO工具 -->
         <dependency>
