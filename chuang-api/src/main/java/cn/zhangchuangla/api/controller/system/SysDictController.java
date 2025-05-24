@@ -131,6 +131,19 @@ public class SysDictController extends BaseController {
     }
 
     /**
+     * 获取所有字典类型
+     *
+     * @return 所有字典类型
+     */
+    @PreAuthorize("@ss.hasPermission('system:dict:list')")
+    @Operation(summary = "获取所有字典类型")
+    @GetMapping("/type/all")
+    public AjaxResult<List<Option<String>>> getAllDictType() {
+        List<Option<String>> options = sysDictTypeService.getAllDictType();
+        return success(options);
+    }
+
+    /**
      * 刷新字典缓存
      *
      * @return 操作结果

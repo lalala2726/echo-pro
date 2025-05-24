@@ -16,8 +16,8 @@ import java.util.Map;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025-05-20 11:01
+ *         <p>
+ *         created on 2025-05-20 11:01
  */
 public interface GenTableService extends IService<GenTable> {
 
@@ -93,6 +93,14 @@ public interface GenTableService extends IService<GenTable> {
     byte[] downloadCode(String tableName);
 
     /**
+     * 批量下载代码
+     *
+     * @param tableNames 表名列表
+     * @return 代码压缩包
+     */
+    byte[] batchDownloadCode(List<String> tableNames);
+
+    /**
      * 更新低代码表信息
      *
      * @param request 更新请求
@@ -100,6 +108,14 @@ public interface GenTableService extends IService<GenTable> {
      */
     boolean updateGenTable(GenTableUpdateRequest request);
 
+    /**
+     * 批量设置模板类型
+     *
+     * @param tableIds     表ID列表
+     * @param templateType 模板类型
+     * @return 操作结果
+     */
+    boolean batchSetTemplateType(List<Long> tableIds, String templateType);
 
     /**
      * 删除低代码表，支持批量删除
@@ -108,5 +124,36 @@ public interface GenTableService extends IService<GenTable> {
      * @return 操作结果
      */
     boolean deleteGenTable(List<Long> tableIds);
+
+    /**
+     * 同步数据库结构
+     *
+     * @param tableName 表名
+     * @return 操作结果
+     */
+    boolean syncDb(String tableName);
+
+    /**
+     * 批量同步数据库结构
+     *
+     * @param tableNames 表名列表
+     * @return 操作结果
+     */
+    boolean batchSyncDb(List<String> tableNames);
+
+    /**
+     * 查询所有表结构
+     *
+     * @return 表结构列表
+     */
+    List<DatabaseTable> listAllTable();
+
+    /**
+     * 查询数据库表的字段信息
+     *
+     * @param tableName 表名
+     * @return 字段信息列表
+     */
+    List<GenTableColumn> selectDbTableColumns(String tableName);
 
 }

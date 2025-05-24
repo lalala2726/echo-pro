@@ -1,0 +1,86 @@
+package ${packageName}.controller;
+
+import ${packageName}.model.entity.${ClassName};
+import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
+import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
+import ${packageName}.service.${ClassName}Service;
+import cn.zhangchuangla.common.core.model.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+/**
+ * ${functionName} 控制器
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Tag(name = "${functionName}管理")
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+@RequiredArgsConstructor
+public class ${ClassName}Controller {
+
+    private final ${ClassName}Service ${classNameLower}Service;
+
+    /**
+     * ${functionName}树形列表
+     */
+    @Operation(summary = "${functionName}树形列表")
+    @GetMapping("/tree")
+    @PreAuthorize("hasAuthority('${permissionPrefix}:list')")
+    public ApiResponse<List<${ClassName}>> tree(${ClassName}QueryRequest request) {
+        List<${ClassName}> list = ${classNameLower}Service.select${ClassName}Tree(request);
+        return ApiResponse.success(list);
+    }
+
+    /**
+     * 根据ID查询${functionName}详情
+     */
+    @Operation(summary = "根据ID查询${functionName}详情")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('${permissionPrefix}:query')")
+    public ApiResponse<${ClassName}> getById(@PathVariable Long id) {
+        ${ClassName} ${classNameLower} = ${classNameLower}Service.get${ClassName}ById(id);
+        return ApiResponse.success(${classNameLower});
+    }
+
+    /**
+     * 添加${functionName}
+     */
+    @Operation(summary = "添加${functionName}")
+    @PostMapping
+    @PreAuthorize("hasAuthority('${permissionPrefix}:add')")
+    public ApiResponse<Boolean> add(@Valid @RequestBody ${ClassName}AddRequest request) {
+        boolean result = ${classNameLower}Service.add${ClassName}(request);
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @Operation(summary = "修改${functionName}")
+    @PutMapping
+    @PreAuthorize("hasAuthority('${permissionPrefix}:edit')")
+    public ApiResponse<Boolean> update(@Valid @RequestBody ${ClassName}UpdateRequest request) {
+        boolean result = ${classNameLower}Service.update${ClassName}(request);
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 删除${functionName}
+     */
+    @Operation(summary = "删除${functionName}")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('${permissionPrefix}:remove')")
+    public ApiResponse<Boolean> delete(@PathVariable Long id) {
+        boolean result = ${classNameLower}Service.delete${ClassName}ById(id);
+        return ApiResponse.success(result);
+    }
+} 

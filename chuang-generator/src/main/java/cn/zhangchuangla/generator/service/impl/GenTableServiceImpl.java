@@ -13,10 +13,8 @@ import cn.zhangchuangla.generator.mapper.GenTableMapper;
 import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
-import cn.zhangchuangla.generator.model.request.DatabaseTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenConfigUpdateRequest;
-import cn.zhangchuangla.generator.model.request.GenTableQueryRequest;
-import cn.zhangchuangla.generator.model.request.GenTableUpdateRequest;
+import cn.zhangchuangla.generator.model.request.*;
+import cn.zhangchuangla.generator.service.GenTableColumnService;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import cn.zhangchuangla.generator.utils.VelocityUtils;
@@ -56,6 +54,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     private final GenTableMapper genTableMapper;
     private final GenTableColumnMapper genTableColumnMapper;
     private final RedisCache redisCache;
+    private final GenTableColumnService genTableColumnService;
 
     /**
      * 获取低代码表列表
@@ -216,7 +215,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         genTable.setTableName(dbTable.getTableName());
         genTable.setTableComment(dbTable.getTableComment());
         // 默认模板类型为 CRUD 操作
-        genTable.setTplCategory(Constants.Generator.crud);
+        genTable.setTplCategory(Constants.Generator.CRUD);
 
         // 类名处理：将表名转换为首字母大写的驼峰命名
         String className = GenUtils.convertClassName(dbTable.getTableName());
@@ -293,7 +292,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         // 先查询表信息，获取表ID
         GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
         if (table == null) {
-            return new ArrayList<>();
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "表不存在");
         }
 
         // 根据表ID查询表字段信息
@@ -343,7 +342,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         VelocityContext context = VelocityUtils.prepareContext(table);
 
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList();
+        List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
 
         // 生成代码
         Map<String, String> codeMap = new HashMap<>();
@@ -420,12 +419,167 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     }
 
     /**
+     * 批量下载代码
+     *
+     * @param tableNames 表名列表
+     * @return 代码压缩包
+     */
+    @Override
+    public byte[] batchDownloadCode(List<String> tableNames) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+
+            zip.setLevel(9);
+
+            // 为每个表生成代码
+            for (String tableName : tableNames) {
+                try {
+                    Map<String, String> codeMap = previewCode(tableName);
+
+                    // 为每个表创建单独的文件夹
+                    String tableFolder = tableName + "/";
+
+                    for (Map.Entry<String, String> entry : codeMap.entrySet()) {
+                        String filePath = tableFolder + entry.getKey().replace("\\", "/");
+                        String content = entry.getValue();
+                        if (content == null) {
+                            content = "";
+                        }
+
+                        ZipEntry zipEntry = new ZipEntry(filePath);
+                        zip.putNextEntry(zipEntry);
+                        IOUtils.write(content, zip, StandardCharsets.UTF_8);
+                        zip.flush();
+                        zip.closeEntry();
+                    }
+                } catch (Exception e) {
+                    log.error("生成表 {} 的代码失败", tableName, e);
+                    // 继续处理其他表，不中断整个流程
+                }
+            }
+
+            zip.finish();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("批量生成代码失败，表名：{}", tableNames, e);
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "批量生成代码失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 批量设置模板类型
+     *
+     * @param tableIds     表ID列表
+     * @param templateType 模板类型
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchSetTemplateType(List<Long> tableIds, String templateType) {
+        if (tableIds == null || tableIds.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表ID列表不能为空");
+        }
+
+        // 检查所有表是否存在
+        List<GenTable> existingTables = listByIds(tableIds);
+        if (existingTables.size() != tableIds.size()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "存在不存在的表");
+        }
+
+        // 批量更新
+        for (Long tableId : tableIds) {
+            GenTable updateTable = new GenTable();
+            updateTable.setTableId(tableId);
+            updateTable.setTplCategory(templateType);
+            updateTable.setUpdateBy(SecurityUtils.getUsername());
+            updateById(updateTable);
+        }
+
+        return true;
+    }
+
+    /**
+     * 同步数据库结构
+     *
+     * @param tableName 表名
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean syncDb(String tableName) {
+        // 删除旧的表结构
+        GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
+        if (table == null) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表不存在");
+        }
+
+        // 删除旧的表记录和列记录
+        deleteGenTable(Arrays.asList(table.getTableId()));
+
+        // 重新导入表结构
+        List<String> tableNames = Arrays.asList(tableName);
+        return importTable(tableNames);
+    }
+
+    /**
+     * 批量同步数据库结构
+     *
+     * @param tableNames 表名列表
+     * @return 操作结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchSyncDb(List<String> tableNames) {
+        if (tableNames == null || tableNames.isEmpty()) {
+            throw new ServiceException(ResponseCode.PARAM_ERROR, "表名列表不能为空");
+        }
+
+        // 查询所有要同步的表
+        List<GenTable> existingTables = lambdaQuery()
+                .in(GenTable::getTableName, tableNames)
+                .list();
+
+        // 删除旧的表记录
+        if (!existingTables.isEmpty()) {
+            List<Long> tableIds = existingTables.stream()
+                    .map(GenTable::getTableId)
+                    .collect(Collectors.toList());
+            deleteGenTable(tableIds);
+        }
+
+        // 重新导入表结构
+        return importTable(tableNames);
+    }
+
+    /**
+     * 获取所有表信息
+     *
+     * @return 所有表信息
+     */
+    @Override
+    public List<DatabaseTable> listAllTable() {
+        return genTableMapper.listAllTable();
+    }
+
+    /**
+     * 查询数据库表的字段信息
+     *
+     * @param tableName 表名
+     * @return 字段信息列表
+     */
+    @Override
+    public List<GenTableColumn> selectDbTableColumns(String tableName) {
+        return genTableMapper.selectDbTableColumnsByName(tableName);
+    }
+
+    /**
      * 更新低代码表信息
      *
      * @param request 更新请求
      * @return 更新结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateGenTable(GenTableUpdateRequest request) {
         // 检查表是否存在
         GenTable existingTable = getById(request.getTableId());
@@ -437,11 +591,53 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         GenTable updateTable = new GenTable();
         BeanUtils.copyProperties(request, updateTable);
 
+        // 根据模板类型处理特殊配置
+        String tplCategory = request.getTplCategory();
+        if (Constants.Generator.TREE.equals(tplCategory) && request.getTreeTableType() != null) {
+            // 处理树表配置
+            updateTable.setTreeCode(request.getTreeTableType().getTreeCode());
+            updateTable.setTreeParentCode(request.getTreeTableType().getTreeParentCode());
+            updateTable.setTreeName(request.getTreeTableType().getTreeName());
+        } else if (Constants.Generator.TREE.equals(tplCategory) && request.getSubTableType() != null) {
+            // 处理主子表配置
+            updateTable.setSubTableName(request.getSubTableType().getSubTableName());
+            updateTable.setSubTableFkName(request.getSubTableType().getSubTableFkName());
+        }
+
         // 设置更新者
         updateTable.setUpdateBy(SecurityUtils.getUsername());
 
         // 更新表信息
-        return updateById(updateTable);
+        boolean tableUpdated = updateById(updateTable);
+        if (!tableUpdated) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "表基本信息更新失败");
+        }
+
+        // 处理字段信息更新
+        if (request.getColumns() != null && !request.getColumns().isEmpty()) {
+            // 遍历处理每个字段
+            for (ColumnUpdateRequest column : request.getColumns()) {
+                GenTableColumn updateColumn = new GenTableColumn();
+                BeanUtils.copyProperties(column, updateColumn);
+
+                // 更新字段信息
+                if (updateColumn.getColumnId() != null) {
+                    // 检查字段是否存在
+                    GenTableColumn existingColumn = genTableColumnMapper.selectById(updateColumn.getColumnId());
+                    if (existingColumn == null) {
+                        log.warn("字段不存在，ID: {}", updateColumn.getColumnId());
+                        continue;
+                    }
+
+                    // 更新字段
+                    if (genTableColumnMapper.updateById(updateColumn) <= 0) {
+                        log.warn("更新字段失败，ID: {}", updateColumn.getColumnId());
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

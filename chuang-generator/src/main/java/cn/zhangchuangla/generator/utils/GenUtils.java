@@ -9,8 +9,8 @@ import java.util.Set;
 
 /**
  * @author Chuang
- * <p>
- * created on 2025/5/20 13:51
+ *         <p>
+ *         created on 2025/5/20 13:51
  */
 public class GenUtils {
 
@@ -18,9 +18,7 @@ public class GenUtils {
      * 需要排除的字段（不作为查询条件）
      */
     private static final Set<String> EXCLUDE_FIELDS = new HashSet<>(Arrays.asList(
-            "id", "create_by", "create_time", "update_by", "update_time", "del_flag", "remark"
-    ));
-
+            "id", "create_by", "create_time", "update_by", "update_time", "del_flag", "remark"));
 
     /**
      * 根据文件名获取文件类型
@@ -125,14 +123,20 @@ public class GenUtils {
             return "Float";
         } else if (type.contains("double")) {
             return "Double";
-        } else if (type.contains("decimal")) {
+        } else if (type.contains("decimal") || type.contains("numeric")) {
             return "BigDecimal";
-        } else if (type.contains("date") || type.contains("time")) {
-            return "Date";
+        } else if (type.contains("datetime") || type.contains("timestamp")) {
+            return "LocalDateTime";
+        } else if (type.contains("date")) {
+            return "LocalDate";
+        } else if (type.contains("time")) {
+            return "LocalTime";
         } else if (type.contains("blob")) {
             return "byte[]";
         } else if (type.contains("boolean") || type.contains("bit")) {
             return "Boolean";
+        } else if (type.contains("json")) {
+            return "String";
         }
 
         return "String";
@@ -157,7 +161,8 @@ public class GenUtils {
             return "datetime";
         } else if (type.contains("enum") || type.contains("set")) {
             return "select";
-        } else if (type.contains("int") || type.contains("float") || type.contains("double") || type.contains("decimal")) {
+        } else if (type.contains("int") || type.contains("float") || type.contains("double")
+                || type.contains("decimal")) {
             return "input";
         }
 

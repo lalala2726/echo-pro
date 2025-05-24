@@ -87,8 +87,10 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
         log.debug("缓存中没有字典数据，从数据库查询: {}", dictType);
         LambdaQueryWrapper<SysDictItem> queryWrapper = new LambdaQueryWrapper<SysDictItem>()
                 .eq(SysDictItem::getDictType, dictType)
-                .eq(SysDictItem::getStatus, 0) // 只查询启用的字典项
-                .orderByAsc(SysDictItem::getSort); // 按排序字段升序
+                // 只查询启用的字典项
+                .eq(SysDictItem::getStatus, 0)
+                // 按排序字段升序
+                .orderByAsc(SysDictItem::getSort);
 
         List<SysDictItem> dictItems = list(queryWrapper);
         List<Option<String>> options = dictItems.stream()

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;
@@ -73,4 +74,10 @@ public interface SysDictTypeService extends IService<SysDictType> {
      */
     boolean refreshCache();
 
+    /**
+     * 获取所有字典类型
+     *
+     * @return 字典类型列表
+     */
+    List<Option<String>> getAllDictType();
 }

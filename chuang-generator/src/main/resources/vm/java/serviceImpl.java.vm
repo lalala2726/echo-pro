@@ -8,6 +8,7 @@ import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
 import ${packageName}.service.${ClassName}Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -60,8 +61,6 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     public boolean add${ClassName}(${ClassName}AddRequest request) {
         ${ClassName} ${className} =new ${ClassName}();
         BeanUtils.copyProperties(request, ${className});
-        // 设置创建者
-        ${className}.setCreateBy(SecurityUtils.getUsername());
         return save(${className});
     }
 
@@ -75,20 +74,17 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     public boolean update${ClassName}(${ClassName}UpdateRequest request) {
         ${ClassName} ${className} =new ${ClassName}();
         BeanUtils.copyProperties(request, ${className});
-        // 设置更新者
-        ${className}.setUpdateBy(SecurityUtils.getUsername());
-        ${className}.setUpdateTime(new Date());
         return updateById(${className});
     }
 
     /**
      * 批量删除${functionName}
      *
-     * @param ${pkColumn.javaField}s 需要删除的ID集合
+     * @param ids 需要删除的ID集合
      * @return 结果
      */
     @Override
-    public boolean delete${ClassName}ByIds(List<${pkColumn.javaType}> ${pkColumn.javaField}s) {
-        return removeByIds(${pkColumn.javaField}s);
+    public boolean delete${ClassName}ByIds(List<${pkColumn.javaType}> ids) {
+        return removeByIds(ids);
     }
 }

@@ -1,10 +1,12 @@
 package ${packageName}.model.request.${businessName};
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -17,8 +19,7 @@ import java.util.Date;
 @Schema(description = "${functionName}添加请求参数")
 public class ${ClassName}AddRequest {
     #foreach ($column in $columns)
-        #if($column.isPk != '1' && $column.javaField != 'createTime' && $column.javaField !=
-            'createBy' && $column.javaField != 'updateTime' && $column.javaField != 'updateBy')
+        #if($column.isPk != '1' && $column.isInsert == '1')
 
             /**
              * $column.columnComment
@@ -28,6 +29,10 @@ public class ${ClassName}AddRequest {
                 @NotBlank(message = "$column.columnComment不能为空")
                 #elseif($column.isRequired == '1')
                 @NotNull(message = "$column.columnComment不能为空")
+                #end
+                #if($column.dictType && $column.dictType != '' && ($column.javaType == 'Long' || $column.javaType ==
+                    'Integer'))
+                @JsonSerialize(using = ToStringSerializer.class)
                 #end
             private $column.javaType $column.javaField;
         #end

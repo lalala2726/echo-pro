@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
- * ${functionName}Service接口
+ * ${functionName} 服务接口
  *
  * @author ${author}
  * @date ${datetime}
@@ -18,43 +18,42 @@ import java.util.List;
 public interface ${ClassName}Service extends IService<${ClassName}> {
 
     /**
-     * 分页查询${functionName}
+     * ${functionName}分页列表
      *
      * @param request 查询参数
-     * @return 分页结果
+     * @return 分页列表
      */
     Page<${ClassName}> list${ClassName}(${ClassName}QueryRequest request);
 
     /**
-     * 根据ID查询${functionName}
+     * 添加${functionName}（包含子表数据）
      *
-     * @param ${pkColumn.javaField} ID
-     * @return ${functionName}
-     */
-        ${ClassName} get${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
-
-    /**
-     * 新增${functionName}
-     *
-     * @param request 新增请求参数
-     * @return 结果
+     * @param request 请求参数
+     * @return 操作结果
      */
     boolean add${ClassName}(${ClassName}AddRequest request);
 
     /**
-     * 修改${functionName}
+     * 删除${functionName}（级联删除子表数据）
      *
-     * @param request 修改请求参数
-     * @return 结果
+     * @param ids ${functionName}ID集合
+     * @return 操作结果
      */
-    boolean update${ClassName}(${ClassName}UpdateRequest request);
+    boolean delete${ClassName}(List<Long> ids);
 
     /**
-     * 批量删除${functionName}
+     * 根据ID查询${functionName}信息（包含子表数据）
      *
-     * @param ids 需要删除的ID集合
-     * @return 结果
+     * @param id ID
+     * @return ${functionName}信息
      */
-    boolean delete${ClassName}ByIds(List<${pkColumn.javaType}> ids);
+    ${ClassName} get${ClassName}ById(Long id);
 
-}
+    /**
+     * 修改${functionName}信息（包含子表数据）
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean update${ClassName}(${ClassName}UpdateRequest request);
+} 

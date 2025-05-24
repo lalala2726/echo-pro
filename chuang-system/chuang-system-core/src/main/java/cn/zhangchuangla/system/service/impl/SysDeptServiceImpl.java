@@ -32,7 +32,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
 
     @Override
     public List<SysDept> listDept(SysDeptQueryRequest request) {
-        return sysDeptMapper.listDepartment(request);
+        SysDept sysDept = new SysDept();
+        BeanUtils.copyProperties(request, sysDept);
+        return sysDeptMapper.listDepartment(sysDept);
     }
 
     /**

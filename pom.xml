@@ -176,25 +176,6 @@
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
-
-            <!-- ===================== 安全补丁 ===================== -->
-            <!-- Bouncy Castle依赖 -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.78</version>
-            </dependency>
-            <!-- Protobuf依赖 -->
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${google.protobuf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${apache.poi.version}</version>
-            </dependency>
             <!-- ===================== JWT & 安全性 ===================== -->
             <!-- JWT API 依赖，用于处理 JWT 相关操作 -->
             <dependency>
@@ -367,6 +348,31 @@
                 <groupId>cn.idev.excel</groupId>
                 <artifactId>fastexcel</artifactId>
                 <version>${fast.excel.version}</version>
+            </dependency>
+
+
+            <!-- ===================== 安全补丁 ===================== -->
+            <!-- Bouncy Castle依赖 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.78</version>
+            </dependency>
+            <!-- Protobuf依赖 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${google.protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.26.0</version>
             </dependency>
         </dependencies>
 

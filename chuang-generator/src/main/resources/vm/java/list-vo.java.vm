@@ -1,5 +1,8 @@
 package ${packageName}.model.vo.${businessName};
 
+import cn.zhangchuangla.common.excel.annotation.Excel;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -14,14 +17,22 @@ import java.util.Date;
 @Data
 @Schema(description = "${functionName}列表视图对象")
 public class ${ClassName}ListVo {
-    #foreach ($column in $columns)
-        #if($column.isList == '1')
+        #foreach ($column in $columns)
+                #if($column.isList == '1')
 
-            /**
-             * $column.columnComment
-             */
-            @Schema(description = "$column.columnComment")
-            private $column.javaType $column.javaField;
+                        /**
+                         * $column.columnComment
+                         */
+                        @Schema(description = "$column.columnComment")
+                                #if($column.dictType && $column.dictType != '')
+                                @Excel(name = "$column.columnComment", sort = ${foreach.index}, dictType = "$column.dictType")
+                                        #if($column.javaType == 'Long' || $column.javaType == 'Integer')
+                                        @JsonSerialize(using = ToStringSerializer.class)
+                                        #end
+                                #else
+                                @Excel(name = "$column.columnComment", sort = ${foreach.index})
+                                #end
+                        private $column.javaType $column.javaField;
+                #end
         #end
-    #end
 }
