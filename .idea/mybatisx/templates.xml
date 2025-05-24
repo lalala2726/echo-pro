@@ -71,10 +71,6 @@
                   <option name="className" value="SysUserMessage" />
                   <option name="tableName" value="sys_user_message" />
                 </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="SysMessage" />
-                  <option name="tableName" value="sys_message" />
-                </TableUIInfo>
               </list>
             </option>
             <option name="templatesName" value="mybatis-plus3" />

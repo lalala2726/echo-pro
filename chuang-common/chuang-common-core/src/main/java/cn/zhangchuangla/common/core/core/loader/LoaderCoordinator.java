@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 /**
  * 数据加载协调器，负责在应用启动时协调各模块数据加载
  *
- * @author zhangchuang
+ * @author Chuang
  */
 @Component
 @Order(1) // 确保较早执行
