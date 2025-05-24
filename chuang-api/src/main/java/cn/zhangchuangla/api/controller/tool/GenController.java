@@ -2,6 +2,7 @@ package cn.zhangchuangla.api.controller.tool;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.model.entity.KeyValue;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
@@ -87,12 +88,45 @@ public class GenController extends BaseController {
      */
     @GetMapping("/db/list")
     @Operation(summary = "查询数据库表结构")
+    @PreAuthorize("@ss.hasPermission('tool:gen:list')")
     public AjaxResult<TableDataResult> listDatabaseTables(
             @Parameter(description = "查询参数") DatabaseTableQueryRequest databaseTableQueryRequest) {
         Page<DatabaseTable> page = genTableService.listDatabaseTables(databaseTableQueryRequest);
         List<DatabaseTableVo> databaseTableVos = copyListProperties(page, DatabaseTableVo.class);
         return getTableData(page, databaseTableVos);
     }
+
+    /**
+     * 查询所有表
+     *
+     * @return 表信息
+     */
+    @Operation(summary = "查询所有表")
+    @GetMapping("/db/list/all")
+    @PreAuthorize("@ss.hasPermission('tool:gen:list')")
+    public AjaxResult<List<DatabaseTableVo>> listAllTable() {
+        List<DatabaseTable> databaseTables = genTableService.listAllTable();
+        List<DatabaseTableVo> databaseTableVos = copyListProperties(databaseTables, DatabaseTableVo.class);
+        return success(databaseTableVos);
+    }
+
+    /**
+     * 根据表名称查询表基本字段信息
+     *
+     * @param tableName 表名称
+     * @return 表信息
+     */
+    @Operation(summary = "根据表名称查询表基本字段信息")
+    @GetMapping("/db/{tableName}")
+    public AjaxResult<List<KeyValue>> getTableInfo(@PathVariable("tableName") String tableName) {
+        List<GenTableColumn> genTableColumns = genTableService.selectGenTableColumnListByTableName(tableName);
+        List<KeyValue> keyValues = new ArrayList<>();
+        genTableColumns.forEach(genTableColumn -> {
+            keyValues.add(new KeyValue(genTableColumn.getColumnName(), genTableColumn.getColumnComment()));
+        });
+        return success(keyValues);
+    }
+
 
     /**
      * 导入数据库表结构
@@ -110,25 +144,6 @@ public class GenController extends BaseController {
         return toAjax(result);
     }
 
-    /**
-     * 获取模板类型列表
-     *
-     * @return 模板类型列表
-     */
-    @Operation(summary = "获取模板类型列表")
-    @GetMapping("/template/types")
-    public AjaxResult<List<Map<String, Object>>> getTemplateTypes() {
-        List<Map<String, Object>> templateTypes = new ArrayList<>();
-
-        for (TemplateTypeEnum type : TemplateTypeEnum.values()) {
-            Map<String, Object> typeInfo = new HashMap<>();
-            typeInfo.put("code", type.getCode());
-            typeInfo.put("description", type.getDescription());
-            templateTypes.add(typeInfo);
-        }
-
-        return success(templateTypes);
-    }
 
     /**
      * 查询配置信息
@@ -175,6 +190,134 @@ public class GenController extends BaseController {
         List<GenTableColumnVo> columnVoList = copyListProperties(columnList, GenTableColumnVo.class);
 
         return success(columnVoList);
+    }
+
+    /**
+     * 获取表字段选项（用于树表和主子表配置）
+     *
+     * @param tableName 表名称
+     * @return 字段选项
+     */
+    @Operation(summary = "获取表字段选项")
+    @GetMapping("/column/options/{tableName}")
+    public AjaxResult<List<Map<String, Object>>> getColumnOptions(
+            @Parameter(description = "表名称") @PathVariable("tableName") String tableName) {
+        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
+
+        // 查询表字段信息
+        List<GenTableColumn> columns = genTableService.selectGenTableColumnListByTableName(tableName);
+
+        // 转换为选项格式
+        List<Map<String, Object>> options = new ArrayList<>();
+        for (GenTableColumn column : columns) {
+            Map<String, Object> option = new HashMap<>();
+            option.put("value", column.getColumnName());
+            option.put("label", column.getColumnComment() + " (" + column.getColumnName() + ")");
+            option.put("columnType", column.getColumnType());
+            option.put("javaType", column.getJavaType());
+            option.put("isPk", column.getIsPk());
+            options.add(option);
+        }
+
+        return success(options);
+    }
+
+    /**
+     * 获取指定表的外键字段选项
+     *
+     * @param tableName 表名称
+     * @return 外键字段选项
+     */
+    @Operation(summary = "获取外键字段选项")
+    @GetMapping("/foreign-key/options/{tableName}")
+    public AjaxResult<List<Map<String, Object>>> getForeignKeyOptions(
+            @Parameter(description = "表名称") @PathVariable("tableName") String tableName) {
+        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
+
+        try {
+            // 查询指定表的字段信息（包括未导入的表）
+            List<GenTableColumn> columns = genTableService.selectDbTableColumns(tableName);
+
+            // 转换为选项格式，通常外键字段以_id结尾或者包含id字样
+            List<Map<String, Object>> options = new ArrayList<>();
+            for (GenTableColumn column : columns) {
+                String columnName = column.getColumnName().toLowerCase();
+                // 过滤出可能的外键字段
+                if (columnName.contains("id")) {
+                    Map<String, Object> option = new HashMap<>();
+                    option.put("value", column.getColumnName());
+                    option.put("label", (column.getColumnComment() != null ? column.getColumnComment() : column.getColumnName())
+                            + " (" + column.getColumnName() + ")");
+                    option.put("columnType", column.getColumnType());
+                    options.add(option);
+                }
+            }
+
+            return success(options);
+        } catch (Exception e) {
+            log.error("获取外键字段选项失败，表名：{}", tableName, e);
+            return success(new ArrayList<>());
+        }
+    }
+
+    /**
+     * 获取模板配置信息
+     *
+     * @param templateType 模板类型
+     * @param tableName    表名（可选）
+     * @return 模板配置信息
+     */
+    @Operation(summary = "获取模板配置信息")
+    @GetMapping("/template/config")
+    public AjaxResult<Map<String, Object>> getTemplateConfig(
+            @Parameter(description = "模板类型") @RequestParam String templateType,
+            @Parameter(description = "表名") @RequestParam(required = false) String tableName) {
+
+        Map<String, Object> config = new HashMap<>();
+        config.put("templateType", templateType);
+
+        if ("tree".equals(templateType) && tableName != null) {
+            // 获取表字段选项用于树表配置
+            List<GenTableColumn> columns = genTableService.selectGenTableColumnListByTableName(tableName);
+            List<Map<String, Object>> fieldOptions = new ArrayList<>();
+            for (GenTableColumn column : columns) {
+                Map<String, Object> option = new HashMap<>();
+                option.put("value", column.getColumnName());
+                option.put("label", column.getColumnComment() + " (" + column.getColumnName() + ")");
+                option.put("isPk", column.getIsPk());
+                fieldOptions.add(option);
+            }
+            config.put("fieldOptions", fieldOptions);
+
+            // 自动推断字段
+            Map<String, String> autoFields = new HashMap<>();
+            for (GenTableColumn column : columns) {
+                String columnName = column.getColumnName().toLowerCase();
+                if ("1".equals(column.getIsPk())) {
+                    autoFields.put("treeCode", column.getColumnName());
+                } else if (columnName.contains("parent") && columnName.contains("id")) {
+                    autoFields.put("treeParentCode", column.getColumnName());
+                } else if (columnName.contains("name") || columnName.contains("title")) {
+                    autoFields.put("treeName", column.getColumnName());
+                }
+            }
+            config.put("autoFields", autoFields);
+
+        } else if ("sub".equals(templateType)) {
+            // 获取所有表选项用于主子表配置
+            List<DatabaseTable> allTables = genTableService.listAllTable();
+            List<Map<String, Object>> tableOptions = new ArrayList<>();
+            for (DatabaseTable table : allTables) {
+                Map<String, Object> option = new HashMap<>();
+                option.put("value", table.getTableName());
+                option.put("label", (table.getTableComment() != null ? table.getTableComment() : table.getTableName())
+                        + " (" + table.getTableName() + ")");
+                tableOptions.add(option);
+            }
+            config.put("tableOptions", tableOptions);
+        }
+
+        return success(config);
     }
 
     /**
@@ -253,19 +396,17 @@ public class GenController extends BaseController {
      * 预览代码
      *
      * @param tableName 表名称
-     * @param codeType  代码类型（typescript/javascript，默认typescript）
      * @return 预览数据
      */
     @Operation(summary = "预览代码")
     @PreAuthorize("@ss.hasPermission('tool:gen:preview')")
     @GetMapping("/preview/{tableName}")
     public AjaxResult<List<CodePreviewVo>> preview(
-            @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName,
-            @Parameter(description = "代码类型") @RequestParam(defaultValue = "typescript") String codeType) {
+            @Parameter(description = "需要预览的表名称") @PathVariable("tableName") String tableName) {
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 获取预览代码
-        Map<String, String> codeMap = genTableService.previewCode(tableName, codeType);
+        Map<String, String> codeMap = genTableService.previewCode(tableName);
 
         // 转换为前端需要的格式
         List<CodePreviewVo> previewList = new ArrayList<>();
@@ -302,12 +443,11 @@ public class GenController extends BaseController {
     public AjaxResult<Map<String, List<CodePreviewVo>>> batchPreview(@RequestBody BatchPreviewRequest request) {
         checkParam(request.getTableNames() == null || request.getTableNames().isEmpty(), "表名称不能为空");
 
-        String codeType = request.getCodeType() != null ? request.getCodeType() : "typescript";
         Map<String, List<CodePreviewVo>> result = new HashMap<>();
 
         for (String tableName : request.getTableNames()) {
             // 获取预览代码
-            Map<String, String> codeMap = genTableService.previewCode(tableName, codeType);
+            Map<String, String> codeMap = genTableService.previewCode(tableName);
 
             // 转换为前端需要的格式
             List<CodePreviewVo> previewList = new ArrayList<>();
@@ -339,25 +479,23 @@ public class GenController extends BaseController {
      * 下载代码
      *
      * @param tableName 表名称
-     * @param codeType  代码类型（typescript/javascript，默认typescript）
      */
     @Operation(summary = "下载代码")
     @GetMapping("/download/{tableName}")
     @Anonymous
     public void download(HttpServletResponse response,
-            @Parameter(description = "需要下载的表名称") @PathVariable("tableName") String tableName,
-            @Parameter(description = "代码类型") @RequestParam(defaultValue = "typescript") String codeType) {
+                         @Parameter(description = "需要下载的表名称") @PathVariable("tableName") String tableName) {
         // 参数验证
         checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
 
         // 生成代码
-        byte[] data = genTableService.downloadCode(tableName, codeType);
+        byte[] data = genTableService.downloadCode(tableName);
 
         // 设置响应头
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         try {
             // 设置文件名，确保使用UTF-8编码避免中文问题
-            String fileName = tableName + "_" + codeType + "_code.zip";
+            String fileName = tableName + "_code.zip";
             String encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
 
@@ -373,9 +511,9 @@ public class GenController extends BaseController {
             response.getOutputStream().write(data);
             response.getOutputStream().flush();
 
-            log.info("正在下载代码，表名：{}，代码类型：{}，文件大小：{} 字节", tableName, codeType, data.length);
+            log.info("正在下载代码，表名：{}，文件大小：{} 字节", tableName, data.length);
         } catch (Exception e) {
-            log.error("下载代码失败，表名：{}，代码类型：{}", tableName, codeType, e);
+            log.error("下载代码失败，表名：{}", tableName, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -392,15 +530,13 @@ public class GenController extends BaseController {
         // 参数验证
         checkParam(request.getTableNames() == null || request.getTableNames().isEmpty(), "表名称不能为空");
 
-        String codeType = request.getCodeType() != null ? request.getCodeType() : "typescript";
-
         try {
             // 批量生成代码并打包
-            byte[] data = genTableService.batchDownloadCode(request.getTableNames(), codeType);
+            byte[] data = genTableService.batchDownloadCode(request.getTableNames());
 
             // 设置响应头
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            String fileName = "batch_" + codeType + "_code_" + System.currentTimeMillis() + ".zip";
+            String fileName = "batch_code_" + System.currentTimeMillis() + ".zip";
             String encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
 
@@ -412,10 +548,10 @@ public class GenController extends BaseController {
             response.getOutputStream().write(data);
             response.getOutputStream().flush();
 
-            log.info("正在批量下载代码，表数量：{}，代码类型：{}，文件大小：{} 字节",
-                    request.getTableNames().size(), codeType, data.length);
+            log.info("正在批量下载代码，表数量：{}，文件大小：{} 字节",
+                    request.getTableNames().size(), data.length);
         } catch (Exception e) {
-            log.error("批量下载代码失败，表名：{}，代码类型：{}", request.getTableNames(), codeType, e);
+            log.error("批量下载代码失败，表名：{}", request.getTableNames(), e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

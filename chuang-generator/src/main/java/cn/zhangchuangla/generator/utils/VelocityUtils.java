@@ -69,12 +69,12 @@ public class VelocityUtils {
         velocityContext.put("primaryKey", pkColumn);
 
         // 树表相关变量
-        if (Constants.Generator.tree.equals(tplCategory)) {
-            setTreeTemplateContext(velocityContext, genTable.getColumns());
+        if (Constants.Generator.TREE.equals(tplCategory)) {
+            setTreeTemplateContext(velocityContext, genTable);
         }
 
         // 主子表相关变量
-        if (Constants.Generator.sub.equals(tplCategory)) {
+        if (Constants.Generator.SUB.equals(tplCategory)) {
             setSubTemplateContext(velocityContext, genTable);
         }
 
@@ -84,48 +84,191 @@ public class VelocityUtils {
     /**
      * 设置树表模板上下文
      */
-    private static void setTreeTemplateContext(VelocityContext context, List<GenTableColumn> columns) {
-        // 查找树表相关字段
-        GenTableColumn treeCodeColumn = null;
-        GenTableColumn treeParentCodeColumn = null;
-        GenTableColumn treeNameColumn = null;
+    private static void setTreeTemplateContext(VelocityContext context, GenTable genTable) {
+        List<GenTableColumn> columns = genTable.getColumns();
 
-        for (GenTableColumn column : columns) {
-            String columnName = column.getColumnName().toLowerCase();
-            if (columnName.contains("parent") && columnName.contains("id")) {
-                treeParentCodeColumn = column;
-            } else if (columnName.contains("name") || columnName.contains("title")) {
-                treeNameColumn = column;
+        // 优先使用用户配置的字段
+        String treeCode = genTable.getTreeCode();
+        String treeParentCode = genTable.getTreeParentCode();
+        String treeName = genTable.getTreeName();
+
+        // 如果没有配置，则自动推断
+        if (StrUtil.isBlank(treeCode) || StrUtil.isBlank(treeParentCode) || StrUtil.isBlank(treeName)) {
+            GenTableColumn treeCodeColumn = null;
+            GenTableColumn treeParentCodeColumn = null;
+            GenTableColumn treeNameColumn = null;
+
+            for (GenTableColumn column : columns) {
+                String columnName = column.getColumnName().toLowerCase();
+
+                // 如果没有配置树编码字段，使用主键
+                if (StrUtil.isBlank(treeCode) && Constants.Generator.YES.equals(column.getIsPk())) {
+                    treeCodeColumn = column;
+                    treeCode = column.getColumnName();
+                }
+
+                // 如果没有配置父编码字段，查找包含parent和id的字段
+                if (StrUtil.isBlank(treeParentCode) && columnName.contains("parent") && columnName.contains("id")) {
+                    treeParentCodeColumn = column;
+                    treeParentCode = column.getColumnName();
+                }
+
+                // 如果没有配置名称字段，查找包含name或title的字段
+                if (StrUtil.isBlank(treeName) && (columnName.contains("name") || columnName.contains("title"))) {
+                    treeNameColumn = column;
+                    treeName = column.getColumnName();
+                }
+            }
+
+            // 设置默认值
+            if (StrUtil.isBlank(treeCode) && !columns.isEmpty()) {
+                treeCodeColumn = getPkColumn(columns);
+                treeCode = treeCodeColumn != null ? treeCodeColumn.getColumnName() : "id";
+            }
+            if (StrUtil.isBlank(treeName) && columns.size() > 1) {
+                treeNameColumn = columns.get(1); // 取第二个字段作为名称字段
+                treeName = treeNameColumn.getColumnName();
             }
         }
 
-        // 设置默认值
-        if (treeCodeColumn == null) {
-            treeCodeColumn = getPkColumn(columns);
-        }
-        if (treeNameColumn == null && !columns.isEmpty()) {
-            treeNameColumn = columns.get(1); // 取第二个字段作为名称字段
-        }
+        // 根据字段名查找对应的GenTableColumn对象，用于获取Java字段名
+        GenTableColumn treeCodeColumn = findColumnByName(columns, treeCode);
+        GenTableColumn treeParentCodeColumn = findColumnByName(columns, treeParentCode);
+        GenTableColumn treeNameColumn = findColumnByName(columns, treeName);
 
-        context.put("treeCode", treeCodeColumn != null ? treeCodeColumn.getJavaField() : "id");
-        context.put("treeParentCode", treeParentCodeColumn != null ? treeParentCodeColumn.getJavaField() : "parentId");
-        context.put("treeName", treeNameColumn != null ? treeNameColumn.getJavaField() : "name");
-        context.put("TreeCode", treeCodeColumn != null ? StrUtil.upperFirst(treeCodeColumn.getJavaField()) : "Id");
-        context.put("TreeParentCode",
-                treeParentCodeColumn != null ? StrUtil.upperFirst(treeParentCodeColumn.getJavaField()) : "ParentId");
-        context.put("TreeName", treeNameColumn != null ? StrUtil.upperFirst(treeNameColumn.getJavaField()) : "Name");
+        // 设置模板变量
+        context.put("treeCode", treeCodeColumn != null ? treeCodeColumn.getJavaField() : toCamelCase(treeCode));
+        context.put("treeParentCode", treeParentCodeColumn != null ? treeParentCodeColumn.getJavaField() : toCamelCase(treeParentCode));
+        context.put("treeName", treeNameColumn != null ? treeNameColumn.getJavaField() : toCamelCase(treeName));
+        context.put("TreeCode", treeCodeColumn != null ? StrUtil.upperFirst(treeCodeColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeCode)));
+        context.put("TreeParentCode", treeParentCodeColumn != null ? StrUtil.upperFirst(treeParentCodeColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeParentCode)));
+        context.put("TreeName", treeNameColumn != null ? StrUtil.upperFirst(treeNameColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeName)));
     }
 
     /**
      * 设置主子表模板上下文
      */
     private static void setSubTemplateContext(VelocityContext context, GenTable genTable) {
-        // 这里需要根据实际的子表配置来设置
-        // 暂时设置一些默认值，实际使用时需要从配置中获取
-        context.put("subTableName", "sub_" + genTable.getTableName());
-        context.put("subClassName", genTable.getClassName() + "Detail");
-        context.put("subClassNameLower", StrUtil.lowerFirst(genTable.getClassName()) + "Detail");
-        context.put("subTableFkName", StrUtil.upperFirst(getPkColumn(genTable.getColumns()).getJavaField()));
+        // 使用用户配置的子表信息
+        String subTableName = genTable.getSubTableName();
+        String subTableFkName = genTable.getSubTableFkName();
+
+        // 如果没有配置，设置默认值
+        if (StrUtil.isBlank(subTableName)) {
+            subTableName = "sub_" + genTable.getTableName();
+        }
+        if (StrUtil.isBlank(subTableFkName)) {
+            GenTableColumn pkColumn = getPkColumn(genTable.getColumns());
+            subTableFkName = pkColumn != null ? pkColumn.getColumnName() : "id";
+        }
+
+        // 生成子表类名和业务名称
+        String subClassName = genTable.getClassName() + "Detail";
+        String subClassNameLower = StrUtil.lowerFirst(subClassName);
+        String subBusinessName = genTable.getBusinessName() + "Detail";
+        String subFunctionName = genTable.getFunctionName() + "详情";
+
+        // 创建子表对象用于模板
+        Map<String, Object> subTable = new HashMap<>();
+        subTable.put("tableName", subTableName);
+        subTable.put("className", subClassName);
+        subTable.put("classNameLower", subClassNameLower);
+        subTable.put("businessName", subBusinessName);
+        subTable.put("functionName", subFunctionName);
+        subTable.put("fkName", subTableFkName);
+        subTable.put("fkJavaField", toCamelCase(subTableFkName));
+
+        // 创建子表字段列表（示例字段）
+        List<Map<String, Object>> subColumns = new ArrayList<>();
+
+        // 添加主键字段
+        Map<String, Object> idColumn = new HashMap<>();
+        idColumn.put("columnName", "id");
+        idColumn.put("javaField", "id");
+        idColumn.put("javaType", "Long");
+        idColumn.put("columnComment", "主键ID");
+        idColumn.put("isPk", "1");
+        idColumn.put("isRequired", "1");
+        idColumn.put("isInsert", "1");
+        idColumn.put("isEdit", "0");
+        idColumn.put("isList", "1");
+        idColumn.put("htmlType", "input");
+        subColumns.add(idColumn);
+
+        // 添加外键字段
+        Map<String, Object> fkColumn = new HashMap<>();
+        fkColumn.put("columnName", subTableFkName);
+        fkColumn.put("javaField", toCamelCase(subTableFkName));
+        fkColumn.put("javaType", "Long");
+        fkColumn.put("columnComment", "关联主表ID");
+        fkColumn.put("isPk", "0");
+        fkColumn.put("isRequired", "1");
+        fkColumn.put("isInsert", "1");
+        fkColumn.put("isEdit", "1");
+        fkColumn.put("isList", "0");
+        fkColumn.put("htmlType", "input");
+        subColumns.add(fkColumn);
+
+        // 添加示例字段
+        Map<String, Object> nameColumn = new HashMap<>();
+        nameColumn.put("columnName", "name");
+        nameColumn.put("javaField", "name");
+        nameColumn.put("javaType", "String");
+        nameColumn.put("columnComment", "名称");
+        nameColumn.put("isPk", "0");
+        nameColumn.put("isRequired", "1");
+        nameColumn.put("isInsert", "1");
+        nameColumn.put("isEdit", "1");
+        nameColumn.put("isList", "1");
+        nameColumn.put("htmlType", "input");
+        subColumns.add(nameColumn);
+
+        Map<String, Object> remarkColumn = new HashMap<>();
+        remarkColumn.put("columnName", "remark");
+        remarkColumn.put("javaField", "remark");
+        remarkColumn.put("javaType", "String");
+        remarkColumn.put("columnComment", "备注");
+        remarkColumn.put("isPk", "0");
+        remarkColumn.put("isRequired", "0");
+        remarkColumn.put("isInsert", "1");
+        remarkColumn.put("isEdit", "1");
+        remarkColumn.put("isList", "1");
+        remarkColumn.put("htmlType", "textarea");
+        subColumns.add(remarkColumn);
+
+        subTable.put("columns", subColumns);
+
+        // 设置模板变量
+        context.put("subTable", subTable);
+        context.put("subTableName", subTableName);
+        context.put("subClassName", subClassName);
+        context.put("subClassNameLower", subClassNameLower);
+        context.put("subTableFkName", subTableFkName);
+        context.put("subTableFkJavaField", toCamelCase(subTableFkName));
+        context.put("SubTableFkJavaField", StrUtil.upperFirst(toCamelCase(subTableFkName)));
+    }
+
+    /**
+     * 根据字段名查找对应的GenTableColumn对象
+     */
+    private static GenTableColumn findColumnByName(List<GenTableColumn> columns, String columnName) {
+        if (StrUtil.isBlank(columnName) || columns == null) {
+            return null;
+        }
+        return columns.stream()
+                .filter(column -> columnName.equals(column.getColumnName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 将下划线命名转换为驼峰命名
+     */
+    private static String toCamelCase(String str) {
+        if (StrUtil.isBlank(str)) {
+            return str;
+        }
+        return StrUtil.toCamelCase(str);
     }
 
     /**
@@ -137,7 +280,22 @@ public class VelocityUtils {
     public static List<String> getTemplateList(String tplCategory) {
         List<String> templates = new ArrayList<>();
 
-        // 基础模板
+        // Java后端模板优先 - Controller在最前面
+        if (Constants.Generator.CRUD.equals(tplCategory)) {
+            templates.add("vm/java/controller.java.vm");
+            templates.add("vm/java/service.java.vm");
+            templates.add("vm/java/serviceImpl.java.vm");
+        } else if (Constants.Generator.TREE.equals(tplCategory)) {
+            templates.add("vm/java/tree/controller.java.vm");
+            templates.add("vm/java/tree/service.java.vm");
+            templates.add("vm/java/tree/serviceImpl.java.vm");
+        } else if (Constants.Generator.SUB.equals(tplCategory)) {
+            templates.add("vm/java/sub/controller.java.vm");
+            templates.add("vm/java/sub/service.java.vm");
+            templates.add("vm/java/sub/serviceImpl.java.vm");
+        }
+
+        // Java基础模板
         templates.add("vm/java/entity.java.vm");
         templates.add("vm/java/mapper.java.vm");
         templates.add("vm/xml/mapper.xml.vm");
@@ -147,31 +305,22 @@ public class VelocityUtils {
         templates.add("vm/java/update-request.java.vm");
         templates.add("vm/java/request.java.vm");
 
-        // 根据模板类型添加特定模板
-        if (Constants.Generator.crud.equals(tplCategory)) {
-            templates.add("vm/java/service.java.vm");
-            templates.add("vm/java/serviceImpl.java.vm");
-            templates.add("vm/java/controller.java.vm");
-        } else if (Constants.Generator.tree.equals(tplCategory)) {
-            templates.add("vm/java/tree/service.java.vm");
-            templates.add("vm/java/tree/serviceImpl.java.vm");
-            templates.add("vm/java/tree/controller.java.vm");
-        } else if (Constants.Generator.sub.equals(tplCategory)) {
-            templates.add("vm/java/sub/service.java.vm");
-            templates.add("vm/java/sub/serviceImpl.java.vm");
-            templates.add("vm/java/sub/controller.java.vm");
+        // 前端模板放在最后
+        if (Constants.Generator.CRUD.equals(tplCategory)) {
+            templates.add("vm/vue/api.ts.vm");
+            templates.add("vm/vue/types.ts.vm");
+            templates.add("vm/vue/crud/index.vue.vm");
+        } else if (Constants.Generator.TREE.equals(tplCategory)) {
+            templates.add("vm/vue/api.ts.vm");
+            templates.add("vm/vue/types.ts.vm");
+            templates.add("vm/vue/tree/index.vue.vm");
+        } else if (Constants.Generator.SUB.equals(tplCategory)) {
+            templates.add("vm/vue/api.ts.vm");
+            templates.add("vm/vue/types.ts.vm");
+            templates.add("vm/vue/sub/index.vue.vm");
         }
 
         return templates;
-    }
-
-    /**
-     * 获取模板信息（兼容旧版本）
-     *
-     * @return 模板列表
-     */
-    public static List<String> getTemplateList() {
-        return getTemplateList(Constants.Generator.crud);
     }
 
     /**
@@ -191,6 +340,9 @@ public class VelocityUtils {
 
         String javaPath = PROJECT_PATH + "/" + StrUtil.replace(packageName, ".", "/");
         String mapperXmlPath = "main/resources/mapper/" + moduleName;
+        String vuePath = "src/views/" + moduleName + "/" + businessName;
+        String apiPath = "src/api/" + moduleName;
+        String typesPath = "src/types/" + moduleName;
 
         if (template.contains("entity.java.vm")) {
             fileName = StrUtil.format("{}/model/entity/{}.java", javaPath, className);
@@ -215,6 +367,15 @@ public class VelocityUtils {
         } else if (template.contains("request.java.vm")) {
             fileName = StrUtil.format("{}/model/request/{}/{}QueryRequest.java", javaPath, businessName, className);
         }
+        // 前端文件名处理
+        else if (template.contains("api.ts.vm")) {
+            fileName = StrUtil.format("{}/{}.ts", apiPath, businessName);
+        } else if (template.contains("types.ts.vm")) {
+            fileName = StrUtil.format("{}/type{}.ts", typesPath, StrUtil.upperFirst(businessName));
+        } else if (template.contains("index.vue.vm")) {
+            fileName = StrUtil.format("{}/index.vue", vuePath);
+        }
+
         return fileName;
     }
 

@@ -78,9 +78,9 @@ public class Constants {
         String IN = "in";
         String NOT_IN = "not in";
         String LIKE = "like";
-        String crud = "crud";
-        String tree = "tree";
-        String sub = "sub";
+        String CRUD = "crud";
+        String TREE = "tree";
+        String SUB = "sub";
     }
 
     /**

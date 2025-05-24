@@ -39,6 +39,11 @@
         <result property="functionName" column="function_name"/>
         <result property="functionAuthor" column="function_author"/>
         <result property="tplCategory" column="tpl_category"/>
+        <result property="treeCode" column="tree_code"/>
+        <result property="treeParentCode" column="tree_parent_code"/>
+        <result property="treeName" column="tree_name"/>
+        <result property="subTableName" column="sub_table_name"/>
+        <result property="subTableFkName" column="sub_table_fk_name"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
@@ -48,7 +53,8 @@
 
     <select id="listGenTable" resultMap="BaseResultMap">
         select table_id, table_name, table_comment, class_name, package_name, module_name, business_name, function_name,
-        function_author, tpl_category, create_by, create_time, update_by, update_time, remark
+        function_author, tpl_category, tree_code, tree_parent_code, tree_name, sub_table_name, sub_table_fk_name,
+        create_by, create_time, update_by, update_time, remark
         from gen_table
         <where>
             <if test="request.id != null">
@@ -85,8 +91,6 @@
         TABLE_COLLATION, CHECKSUM, CREATE_OPTIONS, TABLE_COMMENT
         FROM
         information_schema.tables
-        WHERE
-        table_schema = DATABASE()
         <where>
             <if test="request.tableName != null and request.tableName != ''">
                 AND TABLE_NAME LIKE concat('%', #{request.tableName}, '%')
@@ -100,6 +104,7 @@
             <if test="request.updateTime != null">
                 AND UPDATE_TIME >= #{request.updateTime}
             </if>
+            and table_schema = DATABASE()
         </where>
     </select>
 
@@ -127,5 +132,30 @@
         where table_schema = (select database())
           and table_name = #{tableName}
         order by ordinal_position
+    </select>
+    <select id="listAllTable" resultMap="DatabaseTableResultMap">
+        SELECT TABLE_CATALOG,
+               TABLE_SCHEMA,
+               TABLE_NAME,
+               TABLE_TYPE,
+               ENGINE,
+               VERSION,
+               ROW_FORMAT,
+               TABLE_ROWS,
+               AVG_ROW_LENGTH,
+               DATA_LENGTH,
+               MAX_DATA_LENGTH,
+               INDEX_LENGTH,
+               DATA_FREE,
+               AUTO_INCREMENT,
+               CREATE_TIME,
+               UPDATE_TIME,
+               CHECK_TIME,
+               TABLE_COLLATION,
+               CHECKSUM,
+               CREATE_OPTIONS,
+               TABLE_COMMENT
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE()
     </select>
 </mapper>

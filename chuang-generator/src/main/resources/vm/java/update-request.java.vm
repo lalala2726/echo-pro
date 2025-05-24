@@ -1,10 +1,13 @@
 package ${packageName}.model.request.${businessName};
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Date;
 
 /**
@@ -25,8 +28,7 @@ public class ${ClassName}UpdateRequest {
             @Schema(description = "$column.columnComment")
             @NotNull(message = "$column.columnComment不能为空")
             private $column.javaType $column.javaField;
-        #elseif($column.javaField != 'createTime' && $column.javaField != 'createBy' && $column.javaField !=
-            'updateTime' && $column.javaField != 'updateBy')
+        #elseif($column.isEdit == '1')
 
             /**
              * $column.columnComment
@@ -36,6 +38,10 @@ public class ${ClassName}UpdateRequest {
                 @NotBlank(message = "$column.columnComment不能为空")
                 #elseif($column.isRequired == '1')
                 @NotNull(message = "$column.columnComment不能为空")
+                #end
+                #if($column.dictType && $column.dictType != '' && ($column.javaType == 'Long' || $column.javaType ==
+                    'Integer'))
+                @JsonSerialize(using = ToStringSerializer.class)
                 #end
             private $column.javaType $column.javaField;
         #end

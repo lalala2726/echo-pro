@@ -1,0 +1,671 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索区域 -->
+    <div class="search-bar mb-12">
+      <el-form ref="queryFormRef" :inline="true" :model="queryParams">
+          #foreach($column in $columns)
+              #if($column.isQuery == '1')
+                <el-form-item label="$column.columnComment" prop="$column.javaField">
+                    #if($column.htmlType == 'input')
+                      <el-input
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          placeholder="请输入$column.columnComment"
+                          style="width: 200px"
+                          @keyup.enter="handleQuery"
+                      />
+                    #elseif($column.htmlType == 'select')
+                      <el-select
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          placeholder="请选择$column.columnComment"
+                          style="width: 200px"
+                      >
+                        <el-option label="选项1" value="1"/>
+                        <el-option label="选项2" value="2"/>
+                      </el-select>
+                    #elseif($column.htmlType == 'datetime')
+                      <el-date-picker
+                          v-model="queryParams.$column.javaField"
+                          type="date"
+                          placeholder="选择$column.columnComment"
+                          style="width: 200px"
+                      />
+                    #else
+                      <el-input
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          placeholder="请输入$column.columnComment"
+                          style="width: 200px"
+                          @keyup.enter="handleQuery"
+                      />
+                    #end
+                </el-form-item>
+              #end
+          #end
+        <el-form-item>
+          <el-button :icon="Search" type="primary" @click="handleQuery">
+            搜索
+          </el-button>
+          <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- 操作按钮区域 -->
+    <el-card shadow="never">
+      <template #header>
+        <div class="card-header">
+          <span class="title">${functionName}管理</span>
+          <div class="buttons">
+            <el-button
+                v-hasPermi="['${permissionPrefix}:add']"
+                :icon="Plus"
+                type="primary"
+                @click="handleAdd"
+            >
+              新增
+            </el-button>
+            <el-button
+                v-hasPermi="['${permissionPrefix}:remove']"
+                :disabled="multiple"
+                :icon="Delete"
+                type="danger"
+                @click="handleDelete()"
+            >
+              删除
+            </el-button>
+            <el-button
+                v-hasPermi="['${permissionPrefix}:export']"
+                :icon="Download"
+                type="warning"
+                @click="handleExport"
+            >
+              导出
+            </el-button>
+          </div>
+        </div>
+      </template>
+
+      <!-- 表格区域 -->
+      <el-table
+          v-loading="loading"
+          :data="${businessName}List"
+          border
+          stripe
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+      >
+        <el-table-column align="center" type="selection" width="55"/>
+          #foreach($column in $columns)
+              #if($column.isList == '1')
+                <el-table-column
+                    align="center"
+                    label="$column.columnComment"
+                    prop="$column.javaField"
+                    #if($column.javaField == $pkColumn.javaField)
+                    width="80"
+                    #else
+                    min-width="120"
+                    #end
+                    show-overflow-tooltip
+                />
+              #end
+          #end
+        <el-table-column
+            align="center"
+            label="创建时间"
+            prop="createTime"
+            width="160"
+            show-overflow-tooltip
+        />
+        <el-table-column align="center" fixed="right" label="操作" width="200">
+          <template #default="{ row }">
+            <el-button
+                v-hasPermi="['${permissionPrefix}:query']"
+                :icon="View"
+                link
+                type="primary"
+                @click="handleView(row)"
+            >
+              查看
+            </el-button>
+            <el-button
+                v-hasPermi="['${permissionPrefix}:edit']"
+                :icon="Edit"
+                link
+                type="primary"
+                @click="handleUpdate(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+                v-hasPermi="['${permissionPrefix}:remove']"
+                :icon="Delete"
+                link
+                type="danger"
+                @click="handleDelete([row.${pkColumn.javaField}])"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页组件 -->
+      <pagination
+          v-if="total > 0"
+          :limit="queryParams.pageSize"
+          :page="queryParams.pageNum"
+          :total="total"
+          @pagination="handlePagination"
+      />
+    </el-card>
+
+    <!-- 表单对话框 -->
+    <el-dialog
+        v-model="formDialog.visible"
+        :title="formDialog.title"
+        :width="600"
+        :close-on-click-modal="false"
+        @close="handleFormClose"
+    >
+      <el-form
+          ref="formRef"
+          :model="formDialog.data"
+          :rules="formRules"
+          label-width="120px"
+          :disabled="formDialog.type === 'view'"
+      >
+          #foreach($column in $columns)
+              #if($column.isInsert == '1' || $column.isEdit == '1')
+                <el-form-item label="$column.columnComment" prop="$column.javaField">
+                    #if($column.htmlType == 'input')
+                      <el-input
+                          v-model="formDialog.data.$column.javaField"
+                          placeholder="请输入$column.columnComment"
+                          clearable
+                      />
+                    #elseif($column.htmlType == 'textarea')
+                      <el-input
+                          v-model="formDialog.data.$column.javaField"
+                          type="textarea"
+                          placeholder="请输入$column.columnComment"
+                          :rows="4"
+                      />
+                    #elseif($column.htmlType == 'select')
+                      <el-select
+                          v-model="formDialog.data.$column.javaField"
+                          placeholder="请选择$column.columnComment"
+                          clearable
+                          style="width: 100%"
+                      >
+                          #if($column.dictType && $column.dictType != '')
+                            <el-option
+                                v-for="dict in ${column.dictType}Options"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="dict.value"
+                            />
+                          #else
+                            <el-option label="选项1" value="1"/>
+                            <el-option label="选项2" value="2"/>
+                          #end
+                      </el-select>
+                    #elseif($column.htmlType == 'radio')
+                      <el-radio-group v-model="formDialog.data.$column.javaField">
+                          #if($column.dictType && $column.dictType != '')
+                            <el-radio
+                                v-for="dict in ${column.dictType}Options"
+                                :key="dict.value"
+                                :label="dict.value"
+                            >
+                              {{ dict.label }}
+                            </el-radio>
+                          #else
+                            <el-radio label="1">选项1</el-radio>
+                            <el-radio label="2">选项2</el-radio>
+                          #end
+                      </el-radio-group>
+                    #elseif($column.htmlType == 'checkbox')
+                      <el-checkbox-group v-model="formDialog.data.$column.javaField">
+                          #if($column.dictType && $column.dictType != '')
+                            <el-checkbox
+                                v-for="dict in ${column.dictType}Options"
+                                :key="dict.value"
+                                :label="dict.value"
+                            >
+                              {{ dict.label }}
+                            </el-checkbox>
+                          #else
+                            <el-checkbox label="1">选项1</el-checkbox>
+                            <el-checkbox label="2">选项2</el-checkbox>
+                          #end
+                      </el-checkbox-group>
+                    #elseif($column.htmlType == 'datetime')
+                      <el-date-picker
+                          v-model="formDialog.data.$column.javaField"
+                          type="datetime"
+                          placeholder="选择$column.columnComment"
+                          style="width: 100%"
+                      />
+                    #elseif($column.htmlType == 'imageUpload')
+                      <image-upload
+                          v-model="formDialog.data.$column.javaField"
+                          :limit="1"
+                      />
+                    #elseif($column.htmlType == 'fileUpload')
+                      <file-upload
+                          v-model="formDialog.data.$column.javaField"
+                          :limit="1"
+                      />
+                    #elseif($column.htmlType == 'editor')
+                      <editor
+                          v-model="formDialog.data.$column.javaField"
+                          :min-height="192"
+                      />
+                    #else
+                      <el-input
+                          v-model="formDialog.data.$column.javaField"
+                          placeholder="请输入$column.columnComment"
+                          clearable
+                      />
+                    #end
+                </el-form-item>
+              #end
+          #end
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="handleFormClose">取消</el-button>
+          <el-button
+              v-if="formDialog.type !== 'view'"
+              type="primary"
+              @click="handleFormSubmit"
+          >
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import {onMounted, reactive, ref} from "vue";
+  import type {FormInstance, FormRules} from "element-plus";
+  import {ElMessage, ElMessageBox} from "element-plus";
+
+  import {
+          ${businessName}Api
+  }
+    from
+        "@/api/";
+
+  // 查询参数
+  const queryParams = reactive<any>({
+    pageNum: 1,
+    pageSize: 10
+  });
+
+  // 表格数据
+  const ${businessName}List = ref<any[]>([]);
+  const total = ref(0);
+  const loading = ref(false);
+  const queryFormRef = ref<FormInstance>();
+
+  // 多选框选中数据
+  const ids = ref<any[]>([]);
+  const multiple = ref(true);
+
+  // 表单相关
+  const formRef = ref<FormInstance>();
+  const submitLoading = ref(false);
+  const fileList = ref([]);
+
+  // 表单对话框
+  const formDialog = reactive({
+    visible: false,
+    type: "add" as "add" | "edit" | "view",
+    title: "",
+    data: {} as any
+  });
+
+  // 表单验证规则
+  const formRules: FormRules = {
+      #foreach($column in $columns)
+          #if($column.isRequired == '1' && $column.isPk != '1')
+                  $column.javaField: [
+              {required: true, message: "请输入$column.columnComment", trigger: "blur"}
+            ],
+          #end
+      #end
+  };
+
+  // 获取${functionName}列表
+  const handleQuery = async () => {
+    loading.value = true;
+    try {
+      const res = await ${businessName}Api.list(queryParams);
+      if (res && res.data) {
+              ${businessName}List.value = res.data.records || [];
+        total.value = res.data.total || 0;
+      } else {
+              ${businessName}List.value = [];
+        total.value = 0;
+      }
+    } catch (error) {
+      console.error("获取${functionName}列表失败", error);
+      ElMessage.error("获取${functionName}列表失败");
+            ${businessName}List.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 重置查询条件
+  const resetQuery = () => {
+    queryFormRef.value?.resetFields();
+    queryParams.pageNum = 1;
+    handleQuery();
+  };
+
+  // 多选框选中数据
+  const handleSelectionChange = (selection: any[]) => {
+    ids.value = selection.map(item => item.${pkColumn.javaField});
+    multiple.value = !selection.length;
+  };
+
+  // 分页事件处理
+  const handlePagination = (val: { page: number; limit: number }) => {
+    queryParams.pageNum = val.page;
+    queryParams.pageSize = val.limit;
+    handleQuery();
+  };
+
+  // 新增${functionName}
+  const handleAdd = () => {
+    formDialog.visible = true;
+    formDialog.type = "add";
+    formDialog.title = "新增${functionName}";
+    formDialog.data = {
+        #foreach($column in $columns)
+            #if($column.isInsert == '1' || $column.isEdit == '1')
+                $column.javaField: #if($column.javaType == 'String')""
+                #elseif($column.javaType == 'number')0#else undefined#end,
+            #end
+        #end
+    };
+  };
+
+  // 查看${functionName}
+  const handleView = (row: any) => {
+    formDialog.visible = true;
+    formDialog.type = "view";
+    formDialog.title = "查看${functionName}";
+    formDialog.data = {...row};
+  };
+
+  // 编辑${functionName}
+  const handleUpdate = (row: any) => {
+    formDialog.visible = true;
+    formDialog.type = "edit";
+    formDialog.title = "编辑${functionName}";
+    formDialog.data = {...row};
+  };
+
+  // 删除${functionName}
+  const handleDelete = (selectedIds?: any[]) => {
+    const ${pkColumn.javaField}s = selectedIds || ids.value;
+    if (!${pkColumn.javaField}s || ${pkColumn.javaField}s.length === 0) {
+      ElMessage.warning("请选择要删除的数据");
+      return;
+    }
+    ElMessageBox.confirm("是否确认删除选中的${functionName}?", "警告", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+        .then(async () => {
+          try {
+            await ${businessName}Api.delete(${pkColumn.javaField}s);
+            ElMessage.success("删除成功");
+            handleQuery();
+          } catch (error) {
+            console.error("删除失败", error);
+            ElMessage.error("删除失败");
+          }
+        })
+        .catch(() => {
+        });
+  };
+
+  // 导出${functionName}
+  const handleExport = () => {
+    ElMessageBox.confirm("是否确认导出所有${functionName}数据?", "警告", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+        .then(async () => {
+          try {
+            const res = await ${businessName}Api.export(queryParams);
+            // 处理文件下载
+            const blob = new Blob([res], {type: "application/vnd.ms-excel"});
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "${functionName}数据.xlsx";
+            link.click();
+            window.URL.revokeObjectURL(url);
+            ElMessage.success("导出成功");
+          } catch (error) {
+            console.error("导出失败", error);
+            ElMessage.error("导出失败");
+          }
+        })
+        .catch(() => {
+        });
+  };
+
+  // 图片上传成功回调
+  const handleImageSuccess = (response: any) => {
+    if (response.code === 200) {
+      formDialog.data.imageUrl = response.data.url;
+      ElMessage.success("图片上传成功");
+    } else {
+      ElMessage.error("图片上传失败");
+    }
+  };
+
+  // 图片上传前校验
+  const beforeImageUpload = (file: File) => {
+    const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+    const isLt2M = file.size / 1024 / 1024 < 2;
+
+    if (!isJPG) {
+      ElMessage.error("上传图片只能是 JPG/PNG 格式!");
+    }
+    if (!isLt2M) {
+      ElMessage.error("上传图片大小不能超过 2MB!");
+    }
+    return isJPG && isLt2M;
+  };
+
+  // 文件上传成功回调
+  const handleFileSuccess = (response: any) => {
+    if (response.code === 200) {
+      ElMessage.success("文件上传成功");
+    } else {
+      ElMessage.error("文件上传失败");
+    }
+  };
+
+  // 文件移除回调
+  const handleFileRemove = () => {
+    ElMessage.success("文件移除成功");
+  };
+
+  // 提交表单
+  const handleSubmit = async () => {
+    if (!formRef.value) return;
+
+    try {
+      await formRef.value.validate();
+      submitLoading.value = true;
+
+      if (formDialog.type === "add") {
+        await ${businessName}Api.add(formDialog.data);
+        ElMessage.success("新增成功");
+      } else if (formDialog.type === "edit") {
+        await ${businessName}Api.update(formDialog.data);
+        ElMessage.success("修改成功");
+      }
+
+      formDialog.visible = false;
+      handleQuery();
+    } catch (error) {
+      console.error("提交失败", error);
+      ElMessage.error("提交失败");
+    } finally {
+      submitLoading.value = false;
+    }
+  };
+
+  // 关闭表单对话框
+  const handleFormClose = () => {
+    formRef.value?.resetFields();
+    formDialog.visible = false;
+  };
+
+  // 页面初始化时加载数据
+  onMounted(() => {
+    handleQuery();
+  });
+</script>
+
+<style lang="scss" scoped>
+  .app-container {
+    padding: 20px;
+
+    .search-bar {
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: var(--el-bg-color);
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+      border: 1px solid var(--el-border-color-light);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .title {
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+      }
+    }
+
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+  }
+
+  .dialog-footer {
+    text-align: right;
+  }
+
+  .avatar-uploader {
+    :deep(.el-upload) {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--el-transition-duration-fast);
+
+      &:hover {
+        border-color: var(--el-color-primary);
+      }
+    }
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+    line-height: 178px;
+  }
+
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+
+  .editor-container {
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    overflow: hidden;
+
+    :deep(.el-textarea__inner) {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  :deep(.el-card) {
+    background-color: var(--el-bg-color);
+    border-color: var(--el-border-color-light);
+    color: var(--el-text-color-primary);
+  }
+
+  :deep(.el-card__header) {
+    border-bottom-color: var(--el-border-color-light);
+  }
+
+  :deep(.el-table) {
+    background-color: var(--el-bg-color);
+    color: var(--el-text-color-primary);
+    --el-table-border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table th) {
+    background-color: var(--el-fill-color-light) !important;
+  }
+
+  :deep(.el-table--border th) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table td) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table--border) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  :deep(.el-button--link) {
+    justify-content: center;
+    padding: 0 5px;
+  }
+</style>

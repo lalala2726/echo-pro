@@ -1,0 +1,102 @@
+import {http} from "@/utils/http";
+
+const BASE_URL = "/${moduleName}/${businessName}";
+
+/**
+ * ${functionName}API
+ */
+export const ${businessName}Api = {
+    /**
+     * 分页查询${functionName}列表
+     */
+    list: (params: any) =>
+        http.request<any>({
+            url: `${BASE_URL}/list`,
+            method: "GET",
+            params
+        }),
+
+    /**
+     * 根据ID查询${functionName}详情
+     */
+    getById: (id: any) =>
+        http.request<any>({
+            url: `${BASE_URL}/${id}`,
+            method: "GET"
+        }),
+
+    /**
+     * 新增${functionName}
+     */
+    add: (data: any) =>
+        http.request<any>({
+            url: BASE_URL,
+            method: "POST",
+            data
+        }),
+
+    /**
+     * 修改${functionName}
+     */
+    update: (data: any) =>
+        http.request<any>({
+            url: BASE_URL,
+            method: "PUT",
+            data
+        }),
+
+    /**
+     * 删除${functionName}
+     */
+    delete: (ids: any[]) =>
+        http.request<any>({
+            url: BASE_URL,
+            method: "DELETE",
+            data: ids
+        }),
+
+    #if($tplCategory == 'tree')
+        /**
+         * 查询${functionName}树形列表
+         */
+        getTree: (params?: any) =>
+            http.request<any>({
+                url: `${BASE_URL}/tree`,
+                method: "GET",
+                params
+            }),
+
+    #end
+    #if($tplCategory == 'sub')
+        /**
+         * 查询${functionName}详情（包含子表数据）
+         */
+        getDetailById: (id: any) =>
+            http.request<any>({
+                url: `${BASE_URL}/detail/${id}`,
+                method: "GET"
+            }),
+
+    #end
+    /**
+     * 导出${functionName}数据
+     */
+    export: (params: any) =>
+        http.request<Blob>({
+            url: `${BASE_URL}/export`,
+            method: "POST",
+            data: params,
+            responseType: "blob"
+        }),
+
+    /**
+     * 获取${functionName}选项列表
+     */
+    getOptions: () =>
+        http.request<any>({
+            url: `${BASE_URL}/optionList`,
+            method: "GET"
+        })
+};
+
+export default ${businessName}Api;

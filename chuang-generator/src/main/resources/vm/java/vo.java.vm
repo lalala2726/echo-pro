@@ -1,5 +1,7 @@
 package ${packageName}.model.vo.${businessName};
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,6 +22,10 @@ public class ${ClassName}Vo {
          * $column.columnComment
          */
         @Schema(description = "$column.columnComment")
+            #if($column.dictType && $column.dictType != '' && ($column.javaType == 'Long' || $column.javaType ==
+                'Integer'))
+            @JsonSerialize(using = ToStringSerializer.class)
+            #end
         private $column.javaType $column.javaField;
     #end
 }

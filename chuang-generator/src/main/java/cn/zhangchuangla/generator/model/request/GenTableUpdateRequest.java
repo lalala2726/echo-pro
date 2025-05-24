@@ -85,6 +85,17 @@ public class GenTableUpdateRequest {
     private String tplCategory;
 
     /**
+     * 树形结构类型
+     */
+    @Schema(description = "树形结构类型")
+    private TreeTableTypeRequest treeTableType;
+
+    /**
+     * 子表类型
+     */
+    @Schema(description = "子表类型")
+    private SubTableTypeRequest subTableType;
+    /**
      * 备注
      */
     @Schema(description = "备注", example = "这是一个示例备注")

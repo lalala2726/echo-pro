@@ -1,13 +1,12 @@
 package ${packageName}.model.entity;
 
-    #foreach ($import in $importList)
-    import ${import};
-    #end
+#foreach ($import in $importList)
+import ${import};
+#end
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import cn.zhangchuangla.common.excel.annotation.Excel;
 import lombok.Data;
 
 #if($tplCategory == 'tree')
@@ -28,16 +27,11 @@ import java.util.List;
 public class ${ClassName} {
 #foreach ($column in $columns)
 
-/**
- * $column.columnComment
- */
+        /**
+         * $column.columnComment
+         */
     #if($column.isPk == '1')
     @TableId(type = IdType.AUTO)
-    #end
-#if($column.dictType && $column.dictType != '')
-    @Excel(name = "$column.columnComment", sort = ${foreach.index}, dictType = "$column.dictType")
-#else
-    @Excel(name = "$column.columnComment", sort = ${foreach.index})
 #end
 private $column.javaType $column.javaField;
 #end

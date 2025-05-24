@@ -85,15 +85,6 @@ public interface GenTableService extends IService<GenTable> {
     Map<String, String> previewCode(String tableName);
 
     /**
-     * 预览代码（支持代码类型）
-     *
-     * @param tableName 表名
-     * @param codeType  代码类型（typescript/javascript）
-     * @return 代码预览列表
-     */
-    Map<String, String> previewCode(String tableName, String codeType);
-
-    /**
      * 生成代码（下载方式）
      *
      * @param tableName 表名
@@ -102,22 +93,12 @@ public interface GenTableService extends IService<GenTable> {
     byte[] downloadCode(String tableName);
 
     /**
-     * 生成代码（下载方式，支持代码类型）
-     *
-     * @param tableName 表名
-     * @param codeType  代码类型（typescript/javascript）
-     * @return 代码压缩包
-     */
-    byte[] downloadCode(String tableName, String codeType);
-
-    /**
      * 批量下载代码
      *
      * @param tableNames 表名列表
-     * @param codeType   代码类型（typescript/javascript）
      * @return 代码压缩包
      */
-    byte[] batchDownloadCode(List<String> tableNames, String codeType);
+    byte[] batchDownloadCode(List<String> tableNames);
 
     /**
      * 更新低代码表信息
@@ -159,4 +140,20 @@ public interface GenTableService extends IService<GenTable> {
      * @return 操作结果
      */
     boolean batchSyncDb(List<String> tableNames);
+
+    /**
+     * 查询所有表结构
+     *
+     * @return 表结构列表
+     */
+    List<DatabaseTable> listAllTable();
+
+    /**
+     * 查询数据库表的字段信息
+     *
+     * @param tableName 表名
+     * @return 字段信息列表
+     */
+    List<GenTableColumn> selectDbTableColumns(String tableName);
+
 }

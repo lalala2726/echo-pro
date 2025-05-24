@@ -1,6 +1,6 @@
 package ${packageName}.model.request.${businessName};
 
-import cn.zhangchuangla.common.base.BaseRequest;
+import cn.zhangchuangla.common.core.model.request.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "${functionName}查询请求参数")
-public class ${ClassName}QueryRequest extends BaseRequest {
+public class ${ClassName}QueryRequest extends BasePageRequest {
     #foreach ($column in $columns)
         #if($column.isQuery == '1')
 

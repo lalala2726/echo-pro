@@ -70,6 +70,31 @@ public class GenTable {
     private String tplCategory;
 
     /**
+     * 树编码字段（树表专用）
+     */
+    private String treeCode;
+
+    /**
+     * 树父编码字段（树表专用）
+     */
+    private String treeParentCode;
+
+    /**
+     * 树名称字段（树表专用）
+     */
+    private String treeName;
+
+    /**
+     * 关联子表的表名（主子表专用）
+     */
+    private String subTableName;
+
+    /**
+     * 子表关联的外键名（主子表专用）
+     */
+    private String subTableFkName;
+
+    /**
      * 创建者
      */
     private String createBy;
