@@ -10,6 +10,8 @@ import cn.zhangchuangla.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.SysUserMessageService;
+import cn.zhangchuangla.mq.dto.MessageSendDTO;
+import cn.zhangchuangla.mq.service.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysDeptService;
@@ -19,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ import java.util.List;
  * @author Chuang
  * @date 2025-05-24
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage> implements SysMessageService {
@@ -41,6 +45,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final SysUserService sysUserService;
+    private final MessageProducer messageProducer;
 
     /**
      * 分页查询系统消息表
@@ -128,20 +133,34 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (userId.stream().anyMatch(id -> id == null || id <= 0)) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID必须大于零");
         }
+
+        // 先保存消息
         message.setCreateTime(new Date());
         boolean save = save(message);
         if (!save) {
             return false;
         }
-        userId.forEach(id -> {
-            SysUserMessage sysUserMessage = SysUserMessage.builder()
+
+        // 使用消息队列异步处理用户消息记录
+        try {
+            MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(message.getId())
-                    .createTime(new Date())
-                    .userId(id)
+                    .title(message.getTitle())
+                    .content(message.getContent())
+                    .userIds(userId)
+                    // 每批500条记录
+                    .batchSize(500)
                     .build();
-            sysUserMessageService.save(sysUserMessage);
-        });
-        return true;
+
+            messageProducer.sendMessage(messageSendDTO);
+            log.info("消息发送到队列成功，消息ID: {}, 用户数量: {}", message.getId(), userId.size());
+            return true;
+        } catch (Exception e) {
+            log.error("消息发送到队列失败，消息ID: {}", message.getId(), e);
+            // 如果队列发送失败，回滚消息记录
+            removeById(message.getId());
+            throw new RuntimeException("消息发送失败", e);
+        }
     }
 
     /**
@@ -165,7 +184,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     private boolean sendMessageToUserId(SendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
-        if (receiveId != null && !receiveId.isEmpty()) {
+        if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
         MessageRequest message = request.getMessage();
@@ -182,10 +201,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     private boolean sendMessageToRoleId(SendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
-        if (receiveId != null && !receiveId.isEmpty()) {
+        if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }
-        LambdaQueryWrapper<SysUserRole> eq = new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, receiveId);
+        LambdaQueryWrapper<SysUserRole> eq = new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, receiveId);
         List<SysUserRole> list = sysUserRoleService.list(eq);
         List<Long> userList = list.stream().map(SysUserRole::getUserId).toList();
         SysMessage sysMessage = new SysMessage();
@@ -200,10 +219,14 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 结果
      */
     private boolean sendMessageToDeptId(SendMessageRequest request) {
-        LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().eq(SysDept::getDeptId, request.getReceiveId());
+        List<Long> receiveId = request.getReceiveId();
+        if (receiveId == null || receiveId.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
+        }
+        LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().in(SysDept::getDeptId, receiveId);
         List<SysDept> list = sysDeptService.list(eq);
         List<Long> deptId = list.stream().map(SysDept::getDeptId).toList();
-        LambdaQueryWrapper<SysUser> eq1 = new LambdaQueryWrapper<SysUser>().eq(SysUser::getDeptId, deptId);
+        LambdaQueryWrapper<SysUser> eq1 = new LambdaQueryWrapper<SysUser>().in(SysUser::getDeptId, deptId);
         List<Long> userList = sysUserService.list(eq1)
                 .stream()
                 .map(SysUser::getUserId)
