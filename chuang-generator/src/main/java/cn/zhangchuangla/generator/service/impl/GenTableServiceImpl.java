@@ -290,16 +290,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableName(String tableName) {
         // 先查询表信息，获取表ID
-        GenTable table = lambdaQuery().eq(GenTable::getTableName, tableName).one();
-        if (table == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "表不存在");
+        List<GenTableColumn> genTableColumns = genTableMapper.selectDbTableColumnsByName(tableName);
+        if (genTableColumns == null || genTableColumns.isEmpty()) {
+            throw new ServiceException("表不存在");
         }
-
         // 根据表ID查询表字段信息
-        return genTableColumnMapper.selectList(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<GenTableColumn>()
-                        .eq(GenTableColumn::getTableId, table.getTableId())
-                        .orderByAsc(GenTableColumn::getSort));
+        return genTableColumns;
     }
 
     /**
