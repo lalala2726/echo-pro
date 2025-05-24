@@ -14,15 +14,19 @@
                           style="width: 200px"
                           @keyup.enter="handleQuery"
                       />
-                    #elseif($column.htmlType == 'select')
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
                       <el-select
                           v-model="queryParams.$column.javaField"
                           clearable
-                          placeholder="请选择$column.columnComment"
                           style="width: 200px"
+                          placeholder="请选择$column.columnComment"
                       >
-                        <el-option label="选项1" value="1"/>
-                        <el-option label="选项2" value="2"/>
+                        <el-option
+                            v-for="dict in ${column.dictType}"
+                            :key="dict.value"
+                            :label="dict.label"
+                            :value="dict.value"
+                        />
                       </el-select>
                     #else
                       <el-input
@@ -51,18 +55,10 @@
         <div class="card-header">
           <span class="title">${functionName}管理</span>
           <div class="buttons">
-            <el-button
-                v-hasPermi="['${permissionPrefix}:add']"
-                :icon="Plus"
-                type="primary"
-                @click="handleAdd"
-            >
+            <el-button :icon="Plus" type="primary" @click="handleAdd">
               新增
             </el-button>
-            <el-button
-                :icon="Sort"
-                @click="toggleExpandAll"
-            >
+            <el-button :icon="Sort" @click="toggleExpandAll">
               展开/折叠
             </el-button>
           </div>
@@ -107,7 +103,6 @@
         <el-table-column align="center" fixed="right" label="操作" width="200">
           <template #default="{ row }">
             <el-button
-                v-hasPermi="['${permissionPrefix}:add']"
                 :icon="Plus"
                 link
                 type="primary"
@@ -116,7 +111,6 @@
               新增
             </el-button>
             <el-button
-                v-hasPermi="['${permissionPrefix}:edit']"
                 :icon="Edit"
                 link
                 type="primary"
@@ -125,7 +119,6 @@
               编辑
             </el-button>
             <el-button
-                v-hasPermi="['${permissionPrefix}:remove']"
                 :icon="Delete"
                 link
                 type="danger"
@@ -166,12 +159,6 @@
                           :render-after-expand="false"
                           style="width: 100%"
                       />
-                    #elseif($column.htmlType == 'input')
-                      <el-input
-                          v-model="formDialog.data.$column.javaField"
-                          placeholder="请输入$column.columnComment"
-                          clearable
-                      />
                     #elseif($column.htmlType == 'textarea')
                       <el-input
                           v-model="formDialog.data.$column.javaField"
@@ -179,77 +166,20 @@
                           placeholder="请输入$column.columnComment"
                           :rows="4"
                       />
-                    #elseif($column.htmlType == 'select')
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
                       <el-select
                           v-model="formDialog.data.$column.javaField"
                           placeholder="请选择$column.columnComment"
                           clearable
                           style="width: 100%"
                       >
-                          #if($column.dictType && $column.dictType != '')
-                            <el-option
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.label"
-                                :value="dict.value"
-                            />
-                          #else
-                            <el-option label="选项1" value="1"/>
-                            <el-option label="选项2" value="2"/>
-                          #end
+                          <el-option
+                              v-for="dict in ${column.dictType}"
+                              :key="dict.value"
+                              :label="dict.label"
+                              :value="dict.value"
+                          />
                       </el-select>
-                    #elseif($column.htmlType == 'radio')
-                      <el-radio-group v-model="formDialog.data.$column.javaField">
-                          #if($column.dictType && $column.dictType != '')
-                            <el-radio
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.value"
-                            >
-                              {{ dict.label }}
-                            </el-radio>
-                          #else
-                            <el-radio label="1">选项1</el-radio>
-                            <el-radio label="2">选项2</el-radio>
-                          #end
-                      </el-radio-group>
-                    #elseif($column.htmlType == 'checkbox')
-                      <el-checkbox-group v-model="formDialog.data.$column.javaField">
-                          #if($column.dictType && $column.dictType != '')
-                            <el-checkbox
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.value"
-                            >
-                              {{ dict.label }}
-                            </el-checkbox>
-                          #else
-                            <el-checkbox label="1">选项1</el-checkbox>
-                            <el-checkbox label="2">选项2</el-checkbox>
-                          #end
-                      </el-checkbox-group>
-                    #elseif($column.htmlType == 'datetime')
-                      <el-date-picker
-                          v-model="formDialog.data.$column.javaField"
-                          type="datetime"
-                          placeholder="选择$column.columnComment"
-                          style="width: 100%"
-                      />
-                    #elseif($column.htmlType == 'imageUpload')
-                      <image-upload
-                          v-model="formDialog.data.$column.javaField"
-                          :limit="1"
-                      />
-                    #elseif($column.htmlType == 'fileUpload')
-                      <file-upload
-                          v-model="formDialog.data.$column.javaField"
-                          :limit="1"
-                      />
-                    #elseif($column.htmlType == 'editor')
-                      <editor
-                          v-model="formDialog.data.$column.javaField"
-                          :min-height="192"
-                      />
                     #else
                       <el-input
                           v-model="formDialog.data.$column.javaField"
@@ -267,7 +197,8 @@
           <el-button
               v-if="formDialog.type !== 'view'"
               type="primary"
-              @click="handleFormSubmit"
+              :loading="submitLoading"
+              @click="handleSubmit"
           >
             确定
           </el-button>
@@ -281,12 +212,20 @@
   import {onMounted, reactive, ref} from "vue";
   import type {FormInstance, FormRules} from "element-plus";
   import {ElMessage, ElMessageBox} from "element-plus";
-
   import {
-      ${businessName}Api
-  }
-    from
-            "@/api/";
+      Delete,
+      Edit,
+      Plus,
+      Refresh,
+      Search,
+      Sort
+  } from "@element-plus/icons-vue";
+  import {
+      add${ClassName},
+      delete${ClassName},
+      get${ClassName}Tree,
+      update${ClassName}
+  } from "@/api/${moduleName}/${businessName}";
 
   // 查询参数
   const queryParams = reactive<any>({});
@@ -303,7 +242,6 @@
   // 表单相关
   const formRef = ref<FormInstance>();
   const submitLoading = ref(false);
-  const fileList = ref([]);
 
   // 表单对话框
   const formDialog = reactive({
@@ -328,7 +266,7 @@
   const handleQuery = async () => {
     loading.value = true;
     try {
-      const res = await ${businessName}Api.getTree(queryParams);
+      const res = await get${ClassName}Tree(queryParams);
       if (res && res.data) {
               ${businessName}List.value = res.data || [];
         // 构建父级选项（用于新增/编辑时选择父级）
@@ -441,7 +379,7 @@
     })
         .then(async () => {
           try {
-            await ${businessName}Api.delete([row.${pkColumn.javaField}]);
+            await delete${ClassName}([row.${pkColumn.javaField}]);
             ElMessage.success("删除成功");
             handleQuery();
           } catch (error) {
@@ -453,44 +391,6 @@
         });
   };
 
-  // 图片上传成功回调
-  const handleImageSuccess = (response: any) => {
-    if (response.code === 200) {
-      formDialog.data.imageUrl = response.data.url;
-      ElMessage.success("图片上传成功");
-    } else {
-      ElMessage.error("图片上传失败");
-    }
-  };
-
-  // 图片上传前校验
-  const beforeImageUpload = (file: File) => {
-    const isJPG = file.type === "image/jpeg" || file.type === "image/png";
-    const isLt2M = file.size / 1024 / 1024 < 2;
-
-    if (!isJPG) {
-      ElMessage.error("上传图片只能是 JPG/PNG 格式!");
-    }
-    if (!isLt2M) {
-      ElMessage.error("上传图片大小不能超过 2MB!");
-    }
-    return isJPG && isLt2M;
-  };
-
-  // 文件上传成功回调
-  const handleFileSuccess = (response: any) => {
-    if (response.code === 200) {
-      ElMessage.success("文件上传成功");
-    } else {
-      ElMessage.error("文件上传失败");
-    }
-  };
-
-  // 文件移除回调
-  const handleFileRemove = () => {
-    ElMessage.success("文件移除成功");
-  };
-
   // 提交表单
   const handleSubmit = async () => {
     if (!formRef.value) return;
@@ -500,10 +400,10 @@
       submitLoading.value = true;
 
       if (formDialog.type === "add") {
-        await ${businessName}Api.add(formDialog.data);
+        await add${ClassName}(formDialog.data);
         ElMessage.success("新增成功");
       } else if (formDialog.type === "edit") {
-        await ${businessName}Api.update(formDialog.data);
+        await update${ClassName}(formDialog.data);
         ElMessage.success("修改成功");
       }
 

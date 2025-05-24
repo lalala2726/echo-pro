@@ -8,6 +8,10 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.message.model.entity.SysMessage;
+import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
+import cn.zhangchuangla.message.model.vo.UserMessageList;
+import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
@@ -50,6 +54,7 @@ public class SysUserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final ExcelUtils excelUtils;
+    private final SysMessageService sysMessageService;
 
     /**
      * 获取用户信息
@@ -62,6 +67,18 @@ public class SysUserController extends BaseController {
     public AjaxResult<UserProfileVo> userProfile() {
         UserProfileVo profileVo = sysUserService.getUserProfile();
         return success(profileVo);
+    }
+
+    /**
+     * 获取用户消息列表
+     */
+    @GetMapping("/message/list")
+    @Operation(summary = "获取用户消息列表")
+    public AjaxResult<List<UserMessageList>> getMessageList(SysMessageQueryRequest request) {
+        Long userId = getUserId();
+        List<SysMessage> userMessageListList = sysMessageService.listUserMessageByUserId(userId, request);
+        List<UserMessageList> userMessageLists = copyListProperties(userMessageListList, UserMessageList.class);
+        return success(userMessageLists);
     }
 
     /**
