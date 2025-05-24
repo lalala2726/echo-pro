@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * 消息发送DTO
  *
  * @author Chuang
- * @date 2025-01-20
+ * created on 2025/5/25
  */
 @Data
 @Builder
@@ -20,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MessageSendDTO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -51,4 +53,4 @@ public class MessageSendDTO implements Serializable {
      * 批次大小（用于分批处理）
      */
     private Integer batchSize = 500;
-} 
+}

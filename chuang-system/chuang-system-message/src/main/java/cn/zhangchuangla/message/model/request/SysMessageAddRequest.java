@@ -1,8 +1,6 @@
 package cn.zhangchuangla.message.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,7 +9,7 @@ import java.time.LocalDateTime;
  * 系统消息表添加请求参数
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on 2025/5/25
  */
 @Data
 @Schema(description = "系统消息表添加请求参数")

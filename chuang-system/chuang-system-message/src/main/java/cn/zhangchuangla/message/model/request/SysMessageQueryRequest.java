@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 系统消息表查询请求参数
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on 2025/5/25
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

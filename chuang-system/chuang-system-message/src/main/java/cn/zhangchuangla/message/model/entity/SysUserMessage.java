@@ -21,6 +21,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class SysUserMessage {
+
     /**
      * 关联ID
      */

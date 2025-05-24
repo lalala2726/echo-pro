@@ -14,7 +14,7 @@ import java.util.List;
  * 消息生产者服务
  *
  * @author Chuang
- * @date 2025-01-20
+ * created on 2025/5/25
  */
 @Slf4j
 @Service
@@ -33,11 +33,11 @@ public class MessageProducer {
             // 分批处理用户列表
             List<Long> userIds = messageSendDTO.getUserIds();
             int batchSize = messageSendDTO.getBatchSize();
-            
+
             for (int i = 0; i < userIds.size(); i += batchSize) {
                 int endIndex = Math.min(i + batchSize, userIds.size());
                 List<Long> batchUserIds = userIds.subList(i, endIndex);
-                
+
                 // 创建批次消息
                 MessageSendDTO batchMessage = MessageSendDTO.builder()
                         .messageId(messageSendDTO.getMessageId())
@@ -47,15 +47,15 @@ public class MessageProducer {
                         .userIds(batchUserIds)
                         .batchSize(batchSize)
                         .build();
-                
+
                 // 发送到队列
                 rabbitTemplate.convertAndSend(
                         RabbitMQConfig.MESSAGE_EXCHANGE,
                         RabbitMQConfig.MESSAGE_ROUTING_KEY,
                         JSON.toJSONString(batchMessage)
                 );
-                
-                log.info("发送消息批次到队列，消息ID: {}, 用户数量: {}", 
+
+                log.info("发送消息批次到队列，消息ID: {}, 用户数量: {}",
                         messageSendDTO.getMessageId(), batchUserIds.size());
             }
         } catch (Exception e) {
@@ -63,4 +63,4 @@ public class MessageProducer {
             throw new RuntimeException("发送消息到队列失败", e);
         }
     }
-} 
+}

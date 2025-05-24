@@ -4,9 +4,9 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.SysUserMessageService;
@@ -33,7 +33,7 @@ import java.util.List;
  * 系统消息表Service实现
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on 2025/5/25
  */
 @Slf4j
 @Service
@@ -148,7 +148,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                     .title(message.getTitle())
                     .content(message.getContent())
                     .userIds(userId)
-                    // 每批500条记录
                     .batchSize(500)
                     .build();
 
@@ -159,7 +158,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             log.error("消息发送到队列失败，消息ID: {}", message.getId(), e);
             // 如果队列发送失败，回滚消息记录
             removeById(message.getId());
-            throw new RuntimeException("消息发送失败", e);
+            throw new ServiceException("消息发送失败");
         }
     }
 

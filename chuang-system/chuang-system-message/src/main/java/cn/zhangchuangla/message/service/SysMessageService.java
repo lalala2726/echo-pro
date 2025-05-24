@@ -14,7 +14,7 @@ import java.util.List;
  * 系统消息表Service接口
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on 2025/5/25
  */
 public interface SysMessageService extends IService<SysMessage> {
 
@@ -78,7 +78,7 @@ public interface SysMessageService extends IService<SysMessage> {
     /**
      * 根据用户ID获取用户消息列表
      *
-     * @param userId 用户ID
+     * @param userId  用户ID
      * @param request 查询参数
      * @return 结果
      */

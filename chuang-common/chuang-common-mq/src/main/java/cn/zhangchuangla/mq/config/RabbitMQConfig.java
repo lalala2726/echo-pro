@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * RabbitMQ配置类
  *
  * @author Chuang
- * @date 2025-01-20
+ * created on 2025-01-20
  */
 @Configuration
 public class RabbitMQConfig {
@@ -53,4 +53,4 @@ public class RabbitMQConfig {
                 .to(messageExchange())
                 .with(MESSAGE_ROUTING_KEY);
     }
-} 
+}

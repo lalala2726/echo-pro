@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 系统消息表视图对象
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on 2025/5/25
  */
 @Data
 @Schema(description = "系统消息表视图对象")
