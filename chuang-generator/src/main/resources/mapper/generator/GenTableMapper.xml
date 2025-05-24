@@ -121,17 +121,28 @@
 
     <!-- 添加根据表名查询表字段信息的SQL映射 -->
     <select id="selectDbTableColumnsByName" resultType="cn.zhangchuangla.generator.model.entity.GenTableColumn">
-        select column_name,
+        SELECT column_id,
+               table_id,
+               column_name,
                column_comment,
                column_type,
-               (case when column_key = 'PRI' then '1' else '0' end)       as is_pk,
-               (case when extra = 'auto_increment' then '1' else '0' end) as is_increment,
-               (case when is_nullable = 'NO' then '1' else '0' end)       as is_required,
-               ordinal_position                                           as sort
-        from information_schema.columns
-        where table_schema = (select database())
-          and table_name = #{tableName}
-        order by ordinal_position
+               java_type,
+               java_field,
+               is_pk,
+               is_increment,
+               is_required,
+               is_insert,
+               is_edit,
+               is_list,
+               is_query,
+               query_type,
+               html_type,
+               dict_type,
+               sort
+        FROM gen_table_column
+        WHERE table_id in (select gen_table.table_id
+                           from gen_table
+                           where table_name = #{tableName})
     </select>
     <select id="listAllTable" resultMap="DatabaseTableResultMap">
         SELECT TABLE_CATALOG,

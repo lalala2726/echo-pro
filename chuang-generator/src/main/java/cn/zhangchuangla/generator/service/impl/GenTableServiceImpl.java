@@ -14,7 +14,6 @@ import cn.zhangchuangla.generator.model.entity.DatabaseTable;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
 import cn.zhangchuangla.generator.model.request.*;
-import cn.zhangchuangla.generator.service.GenTableColumnService;
 import cn.zhangchuangla.generator.service.GenTableService;
 import cn.zhangchuangla.generator.utils.GenUtils;
 import cn.zhangchuangla.generator.utils.VelocityUtils;
@@ -291,9 +290,9 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         // 先查询表信息，获取表ID
         List<GenTableColumn> genTableColumns = genTableMapper.selectDbTableColumnsByName(tableName);
         if (genTableColumns == null || genTableColumns.isEmpty()) {
-            throw new ServiceException("表不存在");
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "表不存在");
         }
-        // 根据表ID查询表字段信息
+        // 返回字段信息
         return genTableColumns;
     }
 

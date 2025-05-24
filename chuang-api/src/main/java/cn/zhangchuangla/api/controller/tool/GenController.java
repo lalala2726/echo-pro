@@ -183,7 +183,6 @@ public class GenController extends BaseController {
 
         // 查询表字段配置
         List<GenTableColumn> columnList = genTableService.selectGenTableColumnListByTableName(tableName);
-
         // 转换为VO对象
         List<GenTableColumnVo> columnVoList = copyListProperties(columnList, GenTableColumnVo.class);
 
