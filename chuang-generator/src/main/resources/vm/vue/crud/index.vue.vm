@@ -14,23 +14,20 @@
                           style="width: 200px"
                           @keyup.enter="handleQuery"
                       />
-                    #elseif($column.htmlType == 'select')
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
                       <el-select
                           v-model="queryParams.$column.javaField"
                           clearable
+                          style="width: 200px"
                           placeholder="请选择$column.columnComment"
-                          style="width: 200px"
                       >
-                        <el-option label="选项1" value="1"/>
-                        <el-option label="选项2" value="2"/>
+                          <el-option
+                              v-for="dict in ${column.dictType}"
+                              :key="dict.value"
+                              :label="dict.label"
+                              :value="dict.value"
+                          />
                       </el-select>
-                    #elseif($column.htmlType == 'datetime')
-                      <el-date-picker
-                          v-model="queryParams.$column.javaField"
-                          type="date"
-                          placeholder="选择$column.columnComment"
-                          style="width: 200px"
-                      />
                     #else
                       <el-input
                           v-model="queryParams.$column.javaField"
@@ -58,16 +55,10 @@
         <div class="card-header">
           <span class="title">${functionName}管理</span>
           <div class="buttons">
-            <el-button
-                v-hasPermi="['${permissionPrefix}:add']"
-                :icon="Plus"
-                type="primary"
-                @click="handleAdd"
-            >
+            <el-button :icon="Plus" type="primary" @click="handleAdd">
               新增
             </el-button>
             <el-button
-                v-hasPermi="['${permissionPrefix}:remove']"
                 :disabled="multiple"
                 :icon="Delete"
                 type="danger"
@@ -75,12 +66,7 @@
             >
               删除
             </el-button>
-            <el-button
-                v-hasPermi="['${permissionPrefix}:export']"
-                :icon="Download"
-                type="warning"
-                @click="handleExport"
-            >
+            <el-button :icon="Download" type="warning" @click="handleExport">
               导出
             </el-button>
           </div>
@@ -104,7 +90,7 @@
                     label="$column.columnComment"
                     prop="$column.javaField"
                     #if($column.javaField == $pkColumn.javaField)
-                    width="80"
+                    width="120"
                     #else
                     min-width="120"
                     #end
@@ -122,16 +108,6 @@
         <el-table-column align="center" fixed="right" label="操作" width="200">
           <template #default="{ row }">
             <el-button
-                v-hasPermi="['${permissionPrefix}:query']"
-                :icon="View"
-                link
-                type="primary"
-                @click="handleView(row)"
-            >
-              查看
-            </el-button>
-            <el-button
-                v-hasPermi="['${permissionPrefix}:edit']"
                 :icon="Edit"
                 link
                 type="primary"
@@ -140,7 +116,6 @@
               编辑
             </el-button>
             <el-button
-                v-hasPermi="['${permissionPrefix}:remove']"
                 :icon="Delete"
                 link
                 type="danger"
@@ -180,90 +155,27 @@
           #foreach($column in $columns)
               #if($column.isInsert == '1' || $column.isEdit == '1')
                 <el-form-item label="$column.columnComment" prop="$column.javaField">
-                    #if($column.htmlType == 'input')
-                      <el-input
-                          v-model="formDialog.data.$column.javaField"
-                          placeholder="请输入$column.columnComment"
-                          clearable
-                      />
-                    #elseif($column.htmlType == 'textarea')
+                    #if($column.htmlType == 'textarea')
                       <el-input
                           v-model="formDialog.data.$column.javaField"
                           type="textarea"
                           placeholder="请输入$column.columnComment"
                           :rows="4"
                       />
-                    #elseif($column.htmlType == 'select')
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
                       <el-select
                           v-model="formDialog.data.$column.javaField"
                           placeholder="请选择$column.columnComment"
                           clearable
                           style="width: 100%"
                       >
-                          #if($column.dictType && $column.dictType != '')
-                            <el-option
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.label"
-                                :value="dict.value"
-                            />
-                          #else
-                            <el-option label="选项1" value="1"/>
-                            <el-option label="选项2" value="2"/>
-                          #end
+                          <el-option
+                              v-for="dict in ${column.dictType}"
+                              :key="dict.value"
+                              :label="dict.label"
+                              :value="dict.value"
+                          />
                       </el-select>
-                    #elseif($column.htmlType == 'radio')
-                      <el-radio-group v-model="formDialog.data.$column.javaField">
-                          #if($column.dictType && $column.dictType != '')
-                            <el-radio
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.value"
-                            >
-                              {{ dict.label }}
-                            </el-radio>
-                          #else
-                            <el-radio label="1">选项1</el-radio>
-                            <el-radio label="2">选项2</el-radio>
-                          #end
-                      </el-radio-group>
-                    #elseif($column.htmlType == 'checkbox')
-                      <el-checkbox-group v-model="formDialog.data.$column.javaField">
-                          #if($column.dictType && $column.dictType != '')
-                            <el-checkbox
-                                v-for="dict in ${column.dictType}Options"
-                                :key="dict.value"
-                                :label="dict.value"
-                            >
-                              {{ dict.label }}
-                            </el-checkbox>
-                          #else
-                            <el-checkbox label="1">选项1</el-checkbox>
-                            <el-checkbox label="2">选项2</el-checkbox>
-                          #end
-                      </el-checkbox-group>
-                    #elseif($column.htmlType == 'datetime')
-                      <el-date-picker
-                          v-model="formDialog.data.$column.javaField"
-                          type="datetime"
-                          placeholder="选择$column.columnComment"
-                          style="width: 100%"
-                      />
-                    #elseif($column.htmlType == 'imageUpload')
-                      <image-upload
-                          v-model="formDialog.data.$column.javaField"
-                          :limit="1"
-                      />
-                    #elseif($column.htmlType == 'fileUpload')
-                      <file-upload
-                          v-model="formDialog.data.$column.javaField"
-                          :limit="1"
-                      />
-                    #elseif($column.htmlType == 'editor')
-                      <editor
-                          v-model="formDialog.data.$column.javaField"
-                          :min-height="192"
-                      />
                     #else
                       <el-input
                           v-model="formDialog.data.$column.javaField"
@@ -281,7 +193,8 @@
           <el-button
               v-if="formDialog.type !== 'view'"
               type="primary"
-              @click="handleFormSubmit"
+              :loading="submitLoading"
+              @click="handleSubmit"
           >
             确定
           </el-button>
@@ -295,12 +208,29 @@
   import {onMounted, reactive, ref} from "vue";
   import type {FormInstance, FormRules} from "element-plus";
   import {ElMessage, ElMessageBox} from "element-plus";
-
+  import Pagination from "@/components/Pagination/index.vue";
   import {
-          ${businessName}Api
-  }
-    from
-        "@/api/";
+          Delete,
+          Download,
+          Edit,
+          Plus,
+          Refresh,
+          Search
+  } from "@element-plus/icons-vue";
+  import {
+          add${ClassName},
+          delete${ClassName},
+          list${ClassName},
+          update${ClassName}
+  } from "@/api/${moduleName}/${businessName}";
+  import downloadTool from "@/utils/download";
+  #if($dicts && $dicts.size() > 0)
+  import { useDict } from "@/utils/dict";
+
+  #foreach($dict in $dicts)
+  const { ${dict} } = useDict("${dict}");
+  #end
+  #end
 
   // 查询参数
   const queryParams = reactive<any>({
@@ -321,7 +251,6 @@
   // 表单相关
   const formRef = ref<FormInstance>();
   const submitLoading = ref(false);
-  const fileList = ref([]);
 
   // 表单对话框
   const formDialog = reactive({
@@ -332,23 +261,15 @@
   });
 
   // 表单验证规则
-  const formRules: FormRules = {
-      #foreach($column in $columns)
-          #if($column.isRequired == '1' && $column.isPk != '1')
-                  $column.javaField: [
-              {required: true, message: "请输入$column.columnComment", trigger: "blur"}
-            ],
-          #end
-      #end
-  };
+  const formRules: FormRules = {};
 
   // 获取${functionName}列表
   const handleQuery = async () => {
     loading.value = true;
     try {
-      const res = await ${businessName}Api.list(queryParams);
+      const res = await list${ClassName}(queryParams);
       if (res && res.data) {
-              ${businessName}List.value = res.data.records || [];
+              ${businessName}List.value = res.data.rows || [];
         total.value = res.data.total || 0;
       } else {
               ${businessName}List.value = [];
@@ -392,19 +313,10 @@
     formDialog.data = {
         #foreach($column in $columns)
             #if($column.isInsert == '1' || $column.isEdit == '1')
-                $column.javaField: #if($column.javaType == 'String')""
-                #elseif($column.javaType == 'number')0#else undefined#end,
+                $column.javaField: #if($column.javaType == 'String')""#else undefined#end,
             #end
         #end
     };
-  };
-
-  // 查看${functionName}
-  const handleView = (row: any) => {
-    formDialog.visible = true;
-    formDialog.type = "view";
-    formDialog.title = "查看${functionName}";
-    formDialog.data = {...row};
   };
 
   // 编辑${functionName}
@@ -416,9 +328,9 @@
   };
 
   // 删除${functionName}
-  const handleDelete = (selectedIds?: any[]) => {
-    const ${pkColumn.javaField}s = selectedIds || ids.value;
-    if (!${pkColumn.javaField}s || ${pkColumn.javaField}s.length === 0) {
+  const handleDelete = (selectedIds?: number[]) => {
+    const ids = selectedIds || [];
+    if (ids.length === 0) {
       ElMessage.warning("请选择要删除的数据");
       return;
     }
@@ -429,7 +341,7 @@
     })
         .then(async () => {
           try {
-            await ${businessName}Api.delete(${pkColumn.javaField}s);
+            await delete${ClassName}(ids);
             ElMessage.success("删除成功");
             handleQuery();
           } catch (error) {
@@ -437,8 +349,7 @@
             ElMessage.error("删除失败");
           }
         })
-        .catch(() => {
-        });
+        .catch(() => {});
   };
 
   // 导出${functionName}
@@ -450,61 +361,19 @@
     })
         .then(async () => {
           try {
-            const res = await ${businessName}Api.export(queryParams);
-            // 处理文件下载
-            const blob = new Blob([res], {type: "application/vnd.ms-excel"});
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "${functionName}数据.xlsx";
-            link.click();
-            window.URL.revokeObjectURL(url);
+            // 方式1：指定文件名
+            downloadTool.download("/${moduleName}/${businessName}/export", "${functionName}数据.xlsx");
+
+            // 方式2：不指定文件名，从后端响应头获取
+            // downloadTool.download("/${moduleName}/${businessName}/export");
+
             ElMessage.success("导出成功");
           } catch (error) {
             console.error("导出失败", error);
             ElMessage.error("导出失败");
           }
         })
-        .catch(() => {
-        });
-  };
-
-  // 图片上传成功回调
-  const handleImageSuccess = (response: any) => {
-    if (response.code === 200) {
-      formDialog.data.imageUrl = response.data.url;
-      ElMessage.success("图片上传成功");
-    } else {
-      ElMessage.error("图片上传失败");
-    }
-  };
-
-  // 图片上传前校验
-  const beforeImageUpload = (file: File) => {
-    const isJPG = file.type === "image/jpeg" || file.type === "image/png";
-    const isLt2M = file.size / 1024 / 1024 < 2;
-
-    if (!isJPG) {
-      ElMessage.error("上传图片只能是 JPG/PNG 格式!");
-    }
-    if (!isLt2M) {
-      ElMessage.error("上传图片大小不能超过 2MB!");
-    }
-    return isJPG && isLt2M;
-  };
-
-  // 文件上传成功回调
-  const handleFileSuccess = (response: any) => {
-    if (response.code === 200) {
-      ElMessage.success("文件上传成功");
-    } else {
-      ElMessage.error("文件上传失败");
-    }
-  };
-
-  // 文件移除回调
-  const handleFileRemove = () => {
-    ElMessage.success("文件移除成功");
+        .catch(() => {});
   };
 
   // 提交表单
@@ -516,10 +385,10 @@
       submitLoading.value = true;
 
       if (formDialog.type === "add") {
-        await ${businessName}Api.add(formDialog.data);
+        await add${ClassName}(formDialog.data);
         ElMessage.success("新增成功");
       } else if (formDialog.type === "edit") {
-        await ${businessName}Api.update(formDialog.data);
+        await update${ClassName}(formDialog.data);
         ElMessage.success("修改成功");
       }
 
