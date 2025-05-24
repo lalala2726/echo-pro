@@ -54,7 +54,6 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
     private final GenTableMapper genTableMapper;
     private final GenTableColumnMapper genTableColumnMapper;
     private final RedisCache redisCache;
-    private final GenTableColumnService genTableColumnService;
 
     /**
      * 获取低代码表列表
@@ -510,10 +509,10 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         }
 
         // 删除旧的表记录和列记录
-        deleteGenTable(Arrays.asList(table.getTableId()));
+        deleteGenTable(Collections.singletonList(table.getTableId()));
 
         // 重新导入表结构
-        List<String> tableNames = Arrays.asList(tableName);
+        List<String> tableNames = Collections.singletonList(tableName);
         return importTable(tableNames);
     }
 
@@ -594,7 +593,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
             updateTable.setTreeCode(request.getTreeTableType().getTreeCode());
             updateTable.setTreeParentCode(request.getTreeTableType().getTreeParentCode());
             updateTable.setTreeName(request.getTreeTableType().getTreeName());
-        } else if (Constants.Generator.TREE.equals(tplCategory) && request.getSubTableType() != null) {
+        } else if (Constants.Generator.SUB.equals(tplCategory) && request.getSubTableType() != null) {
             // 处理主子表配置
             updateTable.setSubTableName(request.getSubTableType().getSubTableName());
             updateTable.setSubTableFkName(request.getSubTableType().getSubTableFkName());

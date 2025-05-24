@@ -66,6 +66,9 @@ public class Constants {
      * 代码生成相关常量
      */
     public interface Generator {
+
+        //主键
+        String IS_PK = "1";
         String YES = "1";
         String NO = "0";
         String EQ = "eq";

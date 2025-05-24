@@ -121,9 +121,7 @@ public class GenController extends BaseController {
     public AjaxResult<List<KeyValue>> getTableInfo(@PathVariable("tableName") String tableName) {
         List<GenTableColumn> genTableColumns = genTableService.selectGenTableColumnListByTableName(tableName);
         List<KeyValue> keyValues = new ArrayList<>();
-        genTableColumns.forEach(genTableColumn -> {
-            keyValues.add(new KeyValue(genTableColumn.getColumnName(), genTableColumn.getColumnComment()));
-        });
+        genTableColumns.forEach(genTableColumn -> keyValues.add(new KeyValue(genTableColumn.getColumnName(), genTableColumn.getColumnComment())));
         return success(keyValues);
     }
 
@@ -190,134 +188,6 @@ public class GenController extends BaseController {
         List<GenTableColumnVo> columnVoList = copyListProperties(columnList, GenTableColumnVo.class);
 
         return success(columnVoList);
-    }
-
-    /**
-     * 获取表字段选项（用于树表和主子表配置）
-     *
-     * @param tableName 表名称
-     * @return 字段选项
-     */
-    @Operation(summary = "获取表字段选项")
-    @GetMapping("/column/options/{tableName}")
-    public AjaxResult<List<Map<String, Object>>> getColumnOptions(
-            @Parameter(description = "表名称") @PathVariable("tableName") String tableName) {
-        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
-
-        // 查询表字段信息
-        List<GenTableColumn> columns = genTableService.selectGenTableColumnListByTableName(tableName);
-
-        // 转换为选项格式
-        List<Map<String, Object>> options = new ArrayList<>();
-        for (GenTableColumn column : columns) {
-            Map<String, Object> option = new HashMap<>();
-            option.put("value", column.getColumnName());
-            option.put("label", column.getColumnComment() + " (" + column.getColumnName() + ")");
-            option.put("columnType", column.getColumnType());
-            option.put("javaType", column.getJavaType());
-            option.put("isPk", column.getIsPk());
-            options.add(option);
-        }
-
-        return success(options);
-    }
-
-    /**
-     * 获取指定表的外键字段选项
-     *
-     * @param tableName 表名称
-     * @return 外键字段选项
-     */
-    @Operation(summary = "获取外键字段选项")
-    @GetMapping("/foreign-key/options/{tableName}")
-    public AjaxResult<List<Map<String, Object>>> getForeignKeyOptions(
-            @Parameter(description = "表名称") @PathVariable("tableName") String tableName) {
-        checkParam(tableName == null || tableName.isEmpty(), "表名称不能为空");
-
-        try {
-            // 查询指定表的字段信息（包括未导入的表）
-            List<GenTableColumn> columns = genTableService.selectDbTableColumns(tableName);
-
-            // 转换为选项格式，通常外键字段以_id结尾或者包含id字样
-            List<Map<String, Object>> options = new ArrayList<>();
-            for (GenTableColumn column : columns) {
-                String columnName = column.getColumnName().toLowerCase();
-                // 过滤出可能的外键字段
-                if (columnName.contains("id")) {
-                    Map<String, Object> option = new HashMap<>();
-                    option.put("value", column.getColumnName());
-                    option.put("label", (column.getColumnComment() != null ? column.getColumnComment() : column.getColumnName())
-                            + " (" + column.getColumnName() + ")");
-                    option.put("columnType", column.getColumnType());
-                    options.add(option);
-                }
-            }
-
-            return success(options);
-        } catch (Exception e) {
-            log.error("获取外键字段选项失败，表名：{}", tableName, e);
-            return success(new ArrayList<>());
-        }
-    }
-
-    /**
-     * 获取模板配置信息
-     *
-     * @param templateType 模板类型
-     * @param tableName    表名（可选）
-     * @return 模板配置信息
-     */
-    @Operation(summary = "获取模板配置信息")
-    @GetMapping("/template/config")
-    public AjaxResult<Map<String, Object>> getTemplateConfig(
-            @Parameter(description = "模板类型") @RequestParam String templateType,
-            @Parameter(description = "表名") @RequestParam(required = false) String tableName) {
-
-        Map<String, Object> config = new HashMap<>();
-        config.put("templateType", templateType);
-
-        if ("tree".equals(templateType) && tableName != null) {
-            // 获取表字段选项用于树表配置
-            List<GenTableColumn> columns = genTableService.selectGenTableColumnListByTableName(tableName);
-            List<Map<String, Object>> fieldOptions = new ArrayList<>();
-            for (GenTableColumn column : columns) {
-                Map<String, Object> option = new HashMap<>();
-                option.put("value", column.getColumnName());
-                option.put("label", column.getColumnComment() + " (" + column.getColumnName() + ")");
-                option.put("isPk", column.getIsPk());
-                fieldOptions.add(option);
-            }
-            config.put("fieldOptions", fieldOptions);
-
-            // 自动推断字段
-            Map<String, String> autoFields = new HashMap<>();
-            for (GenTableColumn column : columns) {
-                String columnName = column.getColumnName().toLowerCase();
-                if ("1".equals(column.getIsPk())) {
-                    autoFields.put("treeCode", column.getColumnName());
-                } else if (columnName.contains("parent") && columnName.contains("id")) {
-                    autoFields.put("treeParentCode", column.getColumnName());
-                } else if (columnName.contains("name") || columnName.contains("title")) {
-                    autoFields.put("treeName", column.getColumnName());
-                }
-            }
-            config.put("autoFields", autoFields);
-
-        } else if ("sub".equals(templateType)) {
-            // 获取所有表选项用于主子表配置
-            List<DatabaseTable> allTables = genTableService.listAllTable();
-            List<Map<String, Object>> tableOptions = new ArrayList<>();
-            for (DatabaseTable table : allTables) {
-                Map<String, Object> option = new HashMap<>();
-                option.put("value", table.getTableName());
-                option.put("label", (table.getTableComment() != null ? table.getTableComment() : table.getTableName())
-                        + " (" + table.getTableName() + ")");
-                tableOptions.add(option);
-            }
-            config.put("tableOptions", tableOptions);
-        }
-
-        return success(config);
     }
 
     /**
