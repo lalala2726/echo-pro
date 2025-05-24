@@ -3,7 +3,7 @@ app:
     upload-path: D:\\DevelopUploads\\personApp # This seems to be an old config, will be superseded by new storage config if local is active
     enable-trash: true # This too might be superseded
   name: Chuang
-  version: 1.0.0
+  version: 0.1
 #开发环境数据库文件
 server:
   port: 8080
