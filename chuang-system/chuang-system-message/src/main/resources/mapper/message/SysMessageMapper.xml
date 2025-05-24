@@ -115,5 +115,30 @@
         </where>
         order by id desc
     </select>
+    <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
+        select sys_message.id as id,
+               sys_message.title as title,
+               sys_message.content as content,
+               sys_message.type as type,
+               sys_message.level as level,
+               sys_message.sender_id as sender_id,
+               sys_message.sender_name as sender_name,
+               sys_message.target_type as target_type,
+               sys_message.target_ids as target_ids,
+               sys_message.role_ids as role_ids,
+               sys_message.push_type as push_type,
+               sys_message.is_published as is_published,
+               sys_message.publish_time as publish_time,
+               sys_message.scheduled_time as scheduled_time,
+               sys_message.expire_time as expire_time,
+               sys_message.is_deleted as is_deleted,
+               sys_message.create_time as create_time,
+               sys_message.update_time as update_time,
+               sys_message.create_by as create_by,
+               sys_message.update_by as update_by
+        from sys_message
+                 join sys_user_message sum on sys_message.id = sum.message_id
+        where sum.user_id = #{userId}
+    </select>
 
 </mapper>

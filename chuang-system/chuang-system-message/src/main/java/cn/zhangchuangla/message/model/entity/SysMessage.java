@@ -3,18 +3,24 @@ package cn.zhangchuangla.message.model.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 
 /**
  * 系统消息表实体
  *
  * @author Chuang
- * @date 2025-05-24
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @TableName("sys_message")
 public class SysMessage {
 
@@ -27,11 +33,13 @@ public class SysMessage {
     /**
      * 消息标题
      */
+    @NotNull(message = "消息标题不能为空")
     private String title;
 
     /**
      * 消息内容
      */
+    @NotNull(message = "消息内容不能为空")
     private String content;
 
     /**
@@ -82,17 +90,17 @@ public class SysMessage {
     /**
      * 发布时间
      */
-    private LocalDateTime publishTime;
+    private Date publishTime;
 
     /**
      * 定时发送时间，NULL表示立即发送
      */
-    private LocalDateTime scheduledTime;
+    private Date scheduledTime;
 
     /**
      * 过期时间，NULL表示不过期
      */
-    private LocalDateTime expireTime;
+    private Date expireTime;
 
     /**
      * 是否删除：0-未删除 1-已删除
@@ -102,12 +110,12 @@ public class SysMessage {
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     /**
      * 创建人

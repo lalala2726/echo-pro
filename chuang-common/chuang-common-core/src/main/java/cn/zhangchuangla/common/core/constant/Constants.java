@@ -17,7 +17,7 @@ public class Constants {
     /**
      * JSON 序列化白名单
      */
-    public static final String[] JSON_WHITELIST_STR = { "org.springframework", "cn.zhangchuangla" };
+    public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
 
     /**
      * 账号状态常量
@@ -60,6 +60,17 @@ public class Constants {
         Integer ENABLE_STATUS = 0;
         // 字典禁用
         Integer DISABLE_STATUS = 1;
+    }
+
+    public interface MessageConstants {
+        //根据用户ID发送
+        String SEND_METHOD_USER = "0";
+        //根据角色ID发送
+        String SEND_METHOD_ROLE = "1";
+        //根据部门ID发送
+        String SEND_METHOD_DEPT = "2";
+        //全部发送
+        String SEND_METHOD_ALL = "3";
     }
 
     /**

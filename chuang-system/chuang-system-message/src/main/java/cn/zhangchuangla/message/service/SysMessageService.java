@@ -64,5 +64,23 @@ public interface SysMessageService extends IService<SysMessage> {
      * @param request 发送消息请求参数
      * @return 结果
      */
-    int sendMessage(SendMessageRequest request);
+    boolean sendMessage(SendMessageRequest request);
+
+    /**
+     * 根据用户ID发送消息
+     *
+     * @param userId  用户ID
+     * @param message 消息
+     * @return 结果
+     */
+    boolean sendMessageByUserId(List<Long> userId, SysMessage message);
+
+    /**
+     * 根据用户ID获取用户消息列表
+     *
+     * @param userId 用户ID
+     * @param request 查询参数
+     * @return 结果
+     */
+    List<SysMessage> listUserMessageByUserId(Long userId, SysMessageQueryRequest request);
 }

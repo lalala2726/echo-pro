@@ -64,9 +64,10 @@ public class SysMessageController extends BaseController {
     @PostMapping("/send")
     @PreAuthorize("@ss.hasPermission('system:message:send')")
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SendMessageRequest request) {
-        int result = sysMessageService.sendMessage(request);
+        boolean result = sysMessageService.sendMessage(request);
         return toAjax(result);
     }
+
 
     /**
      * 导出系统消息表列表

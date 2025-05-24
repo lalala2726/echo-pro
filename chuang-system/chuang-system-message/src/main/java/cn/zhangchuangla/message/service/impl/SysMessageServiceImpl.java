@@ -1,18 +1,29 @@
 package cn.zhangchuangla.message.service.impl;
 
+import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.SendMessageRequest;
-import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
-import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
-import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
+import cn.zhangchuangla.message.model.entity.SysUserMessage;
+import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
+import cn.zhangchuangla.message.service.SysUserMessageService;
+import cn.zhangchuangla.system.model.entity.SysDept;
+import cn.zhangchuangla.system.model.entity.SysUserRole;
+import cn.zhangchuangla.system.service.SysDeptService;
+import cn.zhangchuangla.system.service.SysUserRoleService;
+import cn.zhangchuangla.system.service.SysUserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +37,10 @@ import java.util.List;
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage> implements SysMessageService {
 
     private final SysMessageMapper sysMessageMapper;
+    private final SysUserMessageService sysUserMessageService;
+    private final SysUserRoleService sysUserRoleService;
+    private final SysDeptService sysDeptService;
+    private final SysUserService sysUserService;
 
     /**
      * 分页查询系统消息表
@@ -94,18 +109,121 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 结果
      */
     @Override
-    public int sendMessage(SendMessageRequest request) {
-        switch (request.getSendMethod()) {
-            case 0:
-                //TODO 根据ID发送消息
-                break;
-            case 1:
-                //TODO 根据角色发送消息
-                break;
-            case 2:
-                //TODO 根据部门发送消息
-                break;
+    @Transactional(rollbackFor = Exception.class)
+    public boolean sendMessage(SendMessageRequest request) {
+        return switch (request.getSendMethod()) {
+            case Constants.MessageConstants.SEND_METHOD_USER -> sendMessageToUserId(request);
+            case Constants.MessageConstants.SEND_METHOD_ROLE -> sendMessageToRoleId(request);
+            case Constants.MessageConstants.SEND_METHOD_DEPT -> sendMessageToDeptId(request);
+            case Constants.MessageConstants.SEND_METHOD_ALL -> sendMessageToAll(request);
+            default -> false;
+        };
+    }
+
+    @Override
+    public boolean sendMessageByUserId(List<Long> userId, SysMessage message) {
+        if (userId == null || userId.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
         }
-        return 0;
+        if (userId.stream().anyMatch(id -> id == null || id <= 0)) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID必须大于零");
+        }
+        message.setCreateTime(new Date());
+        boolean save = save(message);
+        if (!save) {
+            return false;
+        }
+        userId.forEach(id -> {
+            SysUserMessage sysUserMessage = SysUserMessage.builder()
+                    .messageId(message.getId())
+                    .createTime(new Date())
+                    .userId(id)
+                    .build();
+            sysUserMessageService.save(sysUserMessage);
+        });
+        return true;
+    }
+
+    /**
+     * 获取用户消息列表
+     *
+     * @param userId  用户ID
+     * @param request 查询参数
+     * @return 用户消息列表
+     */
+    @Override
+    public List<SysMessage> listUserMessageByUserId(Long userId, SysMessageQueryRequest request) {
+        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysMessageMapper.listUserMessageByUserId(page, userId, request);
+    }
+
+    /**
+     * 根据用户ID发送消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    private boolean sendMessageToUserId(SendMessageRequest request) {
+        List<Long> receiveId = request.getReceiveId();
+        if (receiveId != null && !receiveId.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
+        }
+        MessageRequest message = request.getMessage();
+        SysMessage sysMessage = new SysMessage();
+        BeanUtils.copyProperties(message, sysMessage);
+        return sendMessageByUserId(receiveId, sysMessage);
+    }
+
+    /**
+     * 根据角色ID发送消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    private boolean sendMessageToRoleId(SendMessageRequest request) {
+        List<Long> receiveId = request.getReceiveId();
+        if (receiveId != null && !receiveId.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
+        }
+        LambdaQueryWrapper<SysUserRole> eq = new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, receiveId);
+        List<SysUserRole> list = sysUserRoleService.list(eq);
+        List<Long> userList = list.stream().map(SysUserRole::getUserId).toList();
+        SysMessage sysMessage = new SysMessage();
+        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        return sendMessageByUserId(userList, sysMessage);
+    }
+
+    /**
+     * 根据部门ID发送消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    private boolean sendMessageToDeptId(SendMessageRequest request) {
+        LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().eq(SysDept::getDeptId, request.getReceiveId());
+        List<SysDept> list = sysDeptService.list(eq);
+        List<Long> deptId = list.stream().map(SysDept::getDeptId).toList();
+        LambdaQueryWrapper<SysUser> eq1 = new LambdaQueryWrapper<SysUser>().eq(SysUser::getDeptId, deptId);
+        List<Long> userList = sysUserService.list(eq1)
+                .stream()
+                .map(SysUser::getUserId)
+                .toList();
+        SysMessage sysMessage = new SysMessage();
+        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        return sendMessageByUserId(userList, sysMessage);
+    }
+
+    /**
+     * 发送全部消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    private boolean sendMessageToAll(SendMessageRequest request) {
+        List<SysUser> list = sysUserService.list();
+        List<Long> userList = list.stream().map(SysUser::getUserId).toList();
+        SysMessage sysMessage = new SysMessage();
+        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        return sendMessageByUserId(userList, sysMessage);
     }
 }
