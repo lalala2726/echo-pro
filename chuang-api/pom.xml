@@ -19,6 +19,10 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-framework</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-message</artifactId>
+        </dependency>
         <!-- 依赖存储模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
