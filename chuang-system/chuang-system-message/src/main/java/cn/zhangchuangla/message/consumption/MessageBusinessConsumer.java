@@ -1,4 +1,4 @@
-package cn.zhangchuangla.message.mq;
+package cn.zhangchuangla.message.consumption;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.message.model.entity.SysUserMessage;
@@ -39,7 +39,7 @@ public class MessageBusinessConsumer {
         try {
             log.info("开始处理用户消息批次: {}", message);
             MessageSendDTO messageSendDTO = JSON.parseObject(message, MessageSendDTO.class);
-            
+
             // 根据发送方式处理不同类型的消息
             switch (messageSendDTO.getSendMethod()) {
                 case Constants.MessageConstants.SEND_METHOD_USER -> handleUserMessage(messageSendDTO, startTime);

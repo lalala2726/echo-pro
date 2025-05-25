@@ -11,7 +11,7 @@ import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
-import cn.zhangchuangla.mq.service.MessageProducer;
+import cn.zhangchuangla.mq.production.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysDeptService;
