@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * @author Chuang
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "用户部门传输类")

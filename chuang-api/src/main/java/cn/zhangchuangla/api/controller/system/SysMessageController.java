@@ -5,12 +5,10 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.framework.annotation.AccessLimit;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.SendMessageRequest;
-import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
-import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
-import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
+import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.model.vo.SysMessageListVo;
 import cn.zhangchuangla.message.model.vo.SysMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
@@ -62,6 +60,8 @@ public class SysMessageController extends BaseController {
      * @return 操作结果
      */
     @PostMapping("/send")
+    @Operation(summary = "发送消息")
+    @OperationLog(title = "消息管理", businessType = BusinessType.SEND_MESSAGES)
     @PreAuthorize("@ss.hasPermission('system:message:send')")
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SendMessageRequest request) {
         boolean result = sysMessageService.sendMessage(request);

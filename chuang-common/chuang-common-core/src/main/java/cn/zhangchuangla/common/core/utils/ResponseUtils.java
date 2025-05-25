@@ -1,8 +1,8 @@
 package cn.zhangchuangla.common.core.utils;
 
-import cn.hutool.json.JSONUtil;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class ResponseUtils {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter writer = response.getWriter()) {
-            String jsonResponse = JSONUtil.toJsonStr(AjaxResult.error(resultCode));
+            String jsonResponse = JSON.toJSONString(AjaxResult.error(resultCode));
             writer.print(jsonResponse);
             writer.flush(); // 确保将响应内容写入到输出流
         } catch (IOException e) {
@@ -56,7 +56,7 @@ public class ResponseUtils {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter writer = response.getWriter()) {
-            String jsonResponse = JSONUtil.toJsonStr(AjaxResult.error(resultCode, message));
+            String jsonResponse = JSON.toJSONString(AjaxResult.error(resultCode, message));
             writer.print(jsonResponse);
             writer.flush(); // 确保将响应内容写入到输出流
         } catch (IOException e) {

@@ -17,6 +17,7 @@
         <module>chuang-generator</module>
     </modules>
 
+
     <properties>
         <app.version>1.0.0</app.version>
         <java.version>17</java.version>
@@ -357,6 +358,7 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${cn.hutool.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>cn.idev.excel</groupId>
                 <artifactId>fastexcel</artifactId>

@@ -1,7 +1,7 @@
 # 数据源配置
 spring:
   datasource:
-    url: jdbc:mysql://192.168.10.110:3306/echo_pro?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/echo_pro?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
     password: zhangchuang2726
     type: com.alibaba.druid.pool.DruidDataSource

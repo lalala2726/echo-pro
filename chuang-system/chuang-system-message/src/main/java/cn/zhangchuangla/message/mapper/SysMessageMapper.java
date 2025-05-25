@@ -2,6 +2,7 @@ package cn.zhangchuangla.message.mapper;
 
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
+import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +13,7 @@ import java.util.List;
  * 系统消息表Mapper接口
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on  2025-05-24
  */
 public interface SysMessageMapper extends BaseMapper<SysMessage> {
 
@@ -28,10 +29,9 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
     /**
      * 根据用户ID分页查询系统消息表信息
      *
-     * @param page    分页对象
-     * @param userId  用户ID
-     * @param request 查询参数
+     * @param page   分页对象
+     * @param userId 用户ID
      * @return 列表
      */
-    List<SysMessage> listUserMessageByUserId(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") SysMessageQueryRequest request);
+    Page<SysMessage> listUserMessageByUserId(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
 }

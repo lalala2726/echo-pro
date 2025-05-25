@@ -8,6 +8,8 @@
         <id property="id" column="id"/>
         <result property="messageId" column="message_id"/>
         <result property="userId" column="user_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="deptId" column="dept_id"/>
         <result property="isRead" column="is_read"/>
         <result property="readTime" column="read_time"/>
         <result property="isStarred" column="is_starred"/>
