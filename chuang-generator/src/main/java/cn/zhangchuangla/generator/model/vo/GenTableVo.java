@@ -76,6 +76,36 @@ public class GenTableVo extends BaseVo {
     private String tplCategory;
 
     /**
+     * 树编码字段（树表专用）
+     */
+    @Schema(description = "树编码字段")
+    private String treeCode;
+
+    /**
+     * 树父编码字段（树表专用）
+     */
+    @Schema(description = "树父编码字段")
+    private String treeParentCode;
+
+    /**
+     * 树名称字段（树表专用）
+     */
+    @Schema(description = "树名称字段")
+    private String treeName;
+
+    /**
+     * 关联子表的表名（主子表专用）
+     */
+    @Schema(description = "关联子表的表名")
+    private String subTableName;
+
+    /**
+     * 子表关联的外键名（主子表专用）
+     */
+    @Schema(description = "子表关联的外键名")
+    private String subTableFkName;
+
+    /**
      * 状态（0正常 1停用）
      */
     @Schema(description = "状态（0正常 1停用）")

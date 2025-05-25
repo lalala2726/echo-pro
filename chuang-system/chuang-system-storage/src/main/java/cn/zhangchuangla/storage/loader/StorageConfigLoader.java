@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.loader;
 
 import cn.zhangchuangla.common.core.config.property.AppProperty;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
-import cn.zhangchuangla.common.core.core.service.DataLoader;
+import cn.zhangchuangla.common.core.core.loader.DataLoader;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ProfileException;
 import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
@@ -40,12 +40,12 @@ public class StorageConfigLoader implements DataLoader {
 
     @Override
     public int getOrder() {
-        return 10; // 优先级较高，需要早于其他依赖存储配置的加载器执行
+        return 10;
     }
 
     @Override
     public boolean isAsync() {
-        return false; // 存储配置必须同步加载，因为其他服务可能依赖它
+        return true;
     }
 
     /**

@@ -52,7 +52,7 @@ public class OnlineUserController extends BaseController {
     @Operation(summary = "在线用户列表")
     @PreAuthorize("@ss.hasPermission('monitor:online-user:list')")
     public AjaxResult<TableDataResult> onlineUserList(@Parameter(description = "在线用户列表查询参数")
-                                                          @Validated @ParameterObject OnlineUserQueryRequest request) {
+                                                      @Validated @ParameterObject OnlineUserQueryRequest request) {
         String pattern = RedisConstants.Auth.ACCESS_TOKEN_USER + "*";
         Collection<String> keys = redisCache.keys(pattern);
         List<OnlineLoginUser> matchedUsers = new ArrayList<>();

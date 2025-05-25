@@ -56,7 +56,7 @@ public class SysDictController extends BaseController {
     @Operation(summary = "字典类型列表")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
     public AjaxResult<TableDataResult> listDictType(@Parameter(description = "字典类型列表查询参数")
-                                                        @Validated @ParameterObject SysDictTypeQueryRequest request) {
+                                                    @Validated @ParameterObject SysDictTypeQueryRequest request) {
         Page<SysDictType> page = new Page<>(request.getPageNum(), request.getPageSize());
         Page<SysDictType> sysDictTypePage = sysDictTypeService.listDictType(page, request);
         List<SysDictTypeVo> sysDictTypeVos = copyListProperties(sysDictTypePage, SysDictTypeVo.class);
@@ -127,6 +127,33 @@ public class SysDictController extends BaseController {
     public AjaxResult<Void> deleteDictType(@Parameter(description = "字典类型ID列表") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "字典类型ID不能为空!"));
         boolean result = sysDictTypeService.deleteDictType(ids);
+        return toAjax(result);
+    }
+
+    /**
+     * 获取所有字典类型
+     *
+     * @return 所有字典类型
+     */
+    @PreAuthorize("@ss.hasPermission('system:dict:list')")
+    @Operation(summary = "获取所有字典类型")
+    @GetMapping("/type/all")
+    public AjaxResult<List<Option<String>>> getAllDictType() {
+        List<Option<String>> options = sysDictTypeService.getAllDictType();
+        return success(options);
+    }
+
+    /**
+     * 刷新字典缓存
+     *
+     * @return 操作结果
+     */
+    @OperationLog(title = "字典类型", businessType = BusinessType.REFRESH)
+    @Operation(summary = "刷新字典缓存")
+    @PreAuthorize("@ss.hasPermission('system:dict:refreshCache')")
+    @PostMapping("/refreshCache")
+    public AjaxResult<Void> refreshCache() {
+        boolean result = sysDictTypeService.refreshCache();
         return toAjax(result);
     }
 

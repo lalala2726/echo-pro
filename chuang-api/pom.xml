@@ -13,11 +13,21 @@
     <version>1.0.0</version>
     <description>API入口模块，包含启动类和对外接口</description>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <!-- 依赖框架模块（包含所有核心功能支持） -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-message</artifactId>
         </dependency>
         <!-- 依赖存储模块 -->
         <dependency>
@@ -32,6 +42,10 @@
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-excel</artifactId>
         </dependency>
         <!-- 代码生成模块 -->
         <dependency>

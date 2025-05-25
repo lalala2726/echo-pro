@@ -3,13 +3,13 @@ app:
     upload-path: D:\\DevelopUploads\\personApp # This seems to be an old config, will be superseded by new storage config if local is active
     enable-trash: true # This too might be superseded
   name: Chuang
-  version: 1.0.0
+  version: 0.1
 #开发环境数据库文件
 server:
   port: 8080
 spring:
   profiles:
-    active: druid
+    active: druid,rabbitmq  # 激活druid和rabbitmq配置
   servlet:
     multipart:
       max-file-size: 50MB
@@ -36,15 +36,12 @@ springdoc:
   default-consumes-media-type: application/json
   cache:
     disabled: true
-
-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: cn.zhangchuangla.**.entity
   mapper-locations:
     - classpath*:mapper/**/**.xml
-    - classpath*:cn/zhangchuangla/**/mapper/xml/**.xml
   global-config:
     db-config:
       logic-delete-field: isDeleted  # 全局逻辑删除字段名

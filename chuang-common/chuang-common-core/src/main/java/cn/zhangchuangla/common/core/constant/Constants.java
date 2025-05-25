@@ -10,7 +10,6 @@ package cn.zhangchuangla.common.core.constant;
  */
 public class Constants {
 
-
     /**
      * 验证码相关
      */
@@ -19,7 +18,6 @@ public class Constants {
      * JSON 序列化白名单
      */
     public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
-
 
     /**
      * 账号状态常量
@@ -44,7 +42,6 @@ public class Constants {
      */
     public static final String ALL_PERMISSION = "*:*:*";
 
-
     /**
      * HTTP 相关常量
      */
@@ -52,14 +49,38 @@ public class Constants {
     public static final String HTTPS = "https://";
     public static final String WWW = "www.";
 
-
     public static final String ORIGINAL = "original";
     public static final String PREVIEW = "preview";
+
+    /**
+     * 字典相关常量
+     */
+    public interface DictConstants {
+        // 字典启用
+        Integer ENABLE_STATUS = 0;
+        // 字典禁用
+        Integer DISABLE_STATUS = 1;
+    }
+
+    public interface MessageConstants {
+        //根据用户ID发送
+        int SEND_METHOD_USER = 0;
+        //根据角色ID发送
+        int SEND_METHOD_ROLE = 1;
+        //根据部门ID发送
+        int SEND_METHOD_DEPT = 2;
+        //全部发送
+        int SEND_METHOD_ALL = 3;
+
+    }
 
     /**
      * 代码生成相关常量
      */
     public interface Generator {
+
+        //主键
+        String IS_PK = "1";
         String YES = "1";
         String NO = "0";
         String EQ = "eq";
@@ -72,10 +93,10 @@ public class Constants {
         String IN = "in";
         String NOT_IN = "not in";
         String LIKE = "like";
-        String crud = "crud";
-
+        String CRUD = "crud";
+        String TREE = "tree";
+        String SUB = "sub";
     }
-
 
     /**
      * 菜单常量

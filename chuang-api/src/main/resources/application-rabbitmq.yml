@@ -1,0 +1,27 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: zhangchuang
+    password: zhangchuang2726
+    virtual-host: /
+    # 连接池配置
+    connection-timeout: 15000
+    # 消费者配置
+    listener:
+      simple:
+        # 消费者数量
+        concurrency: 5
+        # 最大消费者数量
+        max-concurrency: 10
+        # 每次从队列获取的消息数量
+        prefetch: 10
+        # 手动确认消息
+        acknowledge-mode: auto
+        # 重试配置
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 10000
+          multiplier: 1.0

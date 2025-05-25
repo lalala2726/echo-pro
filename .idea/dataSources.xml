@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="开发服务器" uuid="7aa13fa2-d2f3-4fef-b3c4-0f9230f1b3b0">
+    <data-source source="LOCAL" name="192.168.10.110" uuid="2724d4c4-fb2b-435b-bf34-de35d6c94470">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
@@ -13,7 +13,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="本地MySQL" uuid="8ed82b6f-8f1f-442e-a520-d853f61afbe7">
+    <data-source source="LOCAL" name="@localhost" uuid="e80e8bf6-1a9b-4b33-88f1-cdcee6bef57f">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>

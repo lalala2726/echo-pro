@@ -51,6 +51,14 @@ public interface GenTableMapper extends BaseMapper<GenTable> {
      * @return 表字段信息
      */
     List<GenTableColumn> selectDbTableColumnsByName(@Param("tableName") String tableName);
+
+    /**
+     * 查询所有数据库表信息
+     *
+     * @return 所有数据库表信息
+     */
+    List<DatabaseTable> listAllTable();
+
 }
 
 

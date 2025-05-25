@@ -48,7 +48,7 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dept:list')")
     @Operation(summary = "部门列表")
     public AjaxResult<List<SysDeptListVo>> listDept(@Parameter(description = "部门列表查询参数")
-                                                        @Validated @ParameterObject SysDeptQueryRequest request) {
+                                                    @Validated @ParameterObject SysDeptQueryRequest request) {
         List<SysDept> sysDept = sysDeptService.listDept(request);
         List<SysDeptListVo> sysDeptListVos = copyListProperties(sysDept, SysDeptListVo.class);
         return success(sysDeptListVos);

@@ -55,7 +55,7 @@ public class SysLogController extends BaseController {
     @Operation(summary = "获取登录日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
     public AjaxResult<TableDataResult> listLoginLog(@Parameter(description = "登录日志列表查询参数")
-                                                        @Validated @ParameterObject SysLoginLogQueryRequest request) {
+                                                    @Validated @ParameterObject SysLoginLogQueryRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
         return getTableData(sysLoginLogPage, sysLoginLogListVos);
@@ -71,7 +71,7 @@ public class SysLogController extends BaseController {
     @Operation(summary = "获取操作日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
     public AjaxResult<TableDataResult> listOperationLog(@Parameter(description = "操作日志列表查询参数")
-                                                            @Validated @ParameterObject SysOperationLogQueryRequest request) {
+                                                        @Validated @ParameterObject SysOperationLogQueryRequest request) {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
         List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
                 SysOperationLogListVo.class);

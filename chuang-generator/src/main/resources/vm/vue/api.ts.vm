@@ -1,0 +1,46 @@
+import { http } from "@/utils/http";
+
+const BASE_URL = "/${moduleName}/${businessName}";
+
+/**
+ * ${functionName}列表
+ * @param params
+ */
+export const list${ClassName} = (params: any) => {
+  return http.request<BaseResponse>("get", `${BASE_URL}/list`, { params });
+};
+
+/**
+ * 根据ID查询${functionName}
+ * @param ${businessName}Id
+ */
+export const get${ClassName}ById = (${businessName}Id: number) => {
+  return http.request<BaseResponse>("get", `${BASE_URL}/${${businessName}Id}`);
+};
+
+/**
+ * 添加${functionName}
+ * @param data
+ */
+export const add${ClassName} = (data: any) => {
+  return http.request<BaseResponse>("post", `${BASE_URL}`, { data });
+};
+
+/**
+ * 修改${functionName}
+ * @param data
+ */
+export const update${ClassName} = (data: any) => {
+  return http.request<BaseResponse>("put", `${BASE_URL}`, { data });
+};
+
+/**
+ * 删除${functionName}
+ * @param ${businessName}Ids
+ */
+export const delete${ClassName} = (${businessName}Ids: number[]) => {
+  return http.request<BaseResponse>(
+    "delete",
+    `${BASE_URL}/${${businessName}Ids.join(",")}`
+  );
+}; 

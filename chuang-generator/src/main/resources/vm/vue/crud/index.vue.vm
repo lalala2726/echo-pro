@@ -1,0 +1,540 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索区域 -->
+    <div class="search-bar mb-12">
+      <el-form ref="queryFormRef" :inline="true" :model="queryParams">
+          #foreach($column in $columns)
+              #if($column.isQuery == '1')
+                <el-form-item label="$column.columnComment" prop="$column.javaField">
+                    #if($column.htmlType == 'input')
+                      <el-input
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          placeholder="请输入$column.columnComment"
+                          style="width: 200px"
+                          @keyup.enter="handleQuery"
+                      />
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
+                      <el-select
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          style="width: 200px"
+                          placeholder="请选择$column.columnComment"
+                      >
+                          <el-option
+                              v-for="dict in ${column.dictType}"
+                              :key="dict.value"
+                              :label="dict.label"
+                              :value="dict.value"
+                          />
+                      </el-select>
+                    #else
+                      <el-input
+                          v-model="queryParams.$column.javaField"
+                          clearable
+                          placeholder="请输入$column.columnComment"
+                          style="width: 200px"
+                          @keyup.enter="handleQuery"
+                      />
+                    #end
+                </el-form-item>
+              #end
+          #end
+        <el-form-item>
+          <el-button :icon="Search" type="primary" @click="handleQuery">
+            搜索
+          </el-button>
+          <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- 操作按钮区域 -->
+    <el-card shadow="never">
+      <template #header>
+        <div class="card-header">
+          <span class="title">${functionName}管理</span>
+          <div class="buttons">
+            <el-button :icon="Plus" type="primary" @click="handleAdd">
+              新增
+            </el-button>
+            <el-button
+                :disabled="multiple"
+                :icon="Delete"
+                type="danger"
+                @click="handleDelete()"
+            >
+              删除
+            </el-button>
+            <el-button :icon="Download" type="warning" @click="handleExport">
+              导出
+            </el-button>
+          </div>
+        </div>
+      </template>
+
+      <!-- 表格区域 -->
+      <el-table
+          v-loading="loading"
+          :data="${businessName}List"
+          border
+          stripe
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+      >
+        <el-table-column align="center" type="selection" width="55"/>
+          #foreach($column in $columns)
+              #if($column.isList == '1')
+                <el-table-column
+                    align="center"
+                    label="$column.columnComment"
+                    prop="$column.javaField"
+                    #if($column.javaField == $pkColumn.javaField)
+                    width="120"
+                    #else
+                    min-width="120"
+                    #end
+                    show-overflow-tooltip
+                />
+              #end
+          #end
+        <el-table-column
+            align="center"
+            label="创建时间"
+            prop="createTime"
+            width="160"
+            show-overflow-tooltip
+        />
+        <el-table-column align="center" fixed="right" label="操作" width="200">
+          <template #default="{ row }">
+            <el-button
+                :icon="Edit"
+                link
+                type="primary"
+                @click="handleUpdate(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+                :icon="Delete"
+                link
+                type="danger"
+                @click="handleDelete([row.${pkColumn.javaField}])"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页组件 -->
+      <pagination
+          v-if="total > 0"
+          :limit="queryParams.pageSize"
+          :page="queryParams.pageNum"
+          :total="total"
+          @pagination="handlePagination"
+      />
+    </el-card>
+
+    <!-- 表单对话框 -->
+    <el-dialog
+        v-model="formDialog.visible"
+        :title="formDialog.title"
+        :width="600"
+        :close-on-click-modal="false"
+        @close="handleFormClose"
+    >
+      <el-form
+          ref="formRef"
+          :model="formDialog.data"
+          :rules="formRules"
+          label-width="120px"
+          :disabled="formDialog.type === 'view'"
+      >
+          #foreach($column in $columns)
+              #if($column.isInsert == '1' || $column.isEdit == '1')
+                <el-form-item label="$column.columnComment" prop="$column.javaField">
+                    #if($column.htmlType == 'textarea')
+                      <el-input
+                          v-model="formDialog.data.$column.javaField"
+                          type="textarea"
+                          placeholder="请输入$column.columnComment"
+                          :rows="4"
+                      />
+                    #elseif($column.htmlType == 'select' && $column.dictType && $column.dictType != '')
+                      <el-select
+                          v-model="formDialog.data.$column.javaField"
+                          placeholder="请选择$column.columnComment"
+                          clearable
+                          style="width: 100%"
+                      >
+                          <el-option
+                              v-for="dict in ${column.dictType}"
+                              :key="dict.value"
+                              :label="dict.label"
+                              :value="dict.value"
+                          />
+                      </el-select>
+                    #else
+                      <el-input
+                          v-model="formDialog.data.$column.javaField"
+                          placeholder="请输入$column.columnComment"
+                          clearable
+                      />
+                    #end
+                </el-form-item>
+              #end
+          #end
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="handleFormClose">取消</el-button>
+          <el-button
+              v-if="formDialog.type !== 'view'"
+              type="primary"
+              :loading="submitLoading"
+              @click="handleSubmit"
+          >
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import {onMounted, reactive, ref} from "vue";
+  import type {FormInstance, FormRules} from "element-plus";
+  import {ElMessage, ElMessageBox} from "element-plus";
+  import Pagination from "@/components/Pagination/index.vue";
+  import {
+          Delete,
+          Download,
+          Edit,
+          Plus,
+          Refresh,
+          Search
+  } from "@element-plus/icons-vue";
+  import {
+          add${ClassName},
+          delete${ClassName},
+          list${ClassName},
+          update${ClassName}
+  } from "@/api/${moduleName}/${businessName}";
+  import downloadTool from "@/utils/download";
+  #if($dicts && $dicts.size() > 0)
+  import { useDict } from "@/utils/dict";
+
+  #foreach($dict in $dicts)
+  const { ${dict} } = useDict("${dict}");
+  #end
+  #end
+
+  // 查询参数
+  const queryParams = reactive<any>({
+    pageNum: 1,
+    pageSize: 10
+  });
+
+  // 表格数据
+  const ${businessName}List = ref<any[]>([]);
+  const total = ref(0);
+  const loading = ref(false);
+  const queryFormRef = ref<FormInstance>();
+
+  // 多选框选中数据
+  const ids = ref<any[]>([]);
+  const multiple = ref(true);
+
+  // 表单相关
+  const formRef = ref<FormInstance>();
+  const submitLoading = ref(false);
+
+  // 表单对话框
+  const formDialog = reactive({
+    visible: false,
+    type: "add" as "add" | "edit" | "view",
+    title: "",
+    data: {} as any
+  });
+
+  // 表单验证规则
+  const formRules: FormRules = {};
+
+  // 获取${functionName}列表
+  const handleQuery = async () => {
+    loading.value = true;
+    try {
+      const res = await list${ClassName}(queryParams);
+      if (res && res.data) {
+              ${businessName}List.value = res.data.rows || [];
+        total.value = res.data.total || 0;
+      } else {
+              ${businessName}List.value = [];
+        total.value = 0;
+      }
+    } catch (error) {
+      console.error("获取${functionName}列表失败", error);
+      ElMessage.error("获取${functionName}列表失败");
+            ${businessName}List.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 重置查询条件
+  const resetQuery = () => {
+    queryFormRef.value?.resetFields();
+    queryParams.pageNum = 1;
+    handleQuery();
+  };
+
+  // 多选框选中数据
+  const handleSelectionChange = (selection: any[]) => {
+    ids.value = selection.map(item => item.${pkColumn.javaField});
+    multiple.value = !selection.length;
+  };
+
+  // 分页事件处理
+  const handlePagination = (val: { page: number; limit: number }) => {
+    queryParams.pageNum = val.page;
+    queryParams.pageSize = val.limit;
+    handleQuery();
+  };
+
+  // 新增${functionName}
+  const handleAdd = () => {
+    formDialog.visible = true;
+    formDialog.type = "add";
+    formDialog.title = "新增${functionName}";
+    formDialog.data = {
+        #foreach($column in $columns)
+            #if($column.isInsert == '1' || $column.isEdit == '1')
+                $column.javaField: #if($column.javaType == 'String')""#else undefined#end,
+            #end
+        #end
+    };
+  };
+
+  // 编辑${functionName}
+  const handleUpdate = (row: any) => {
+    formDialog.visible = true;
+    formDialog.type = "edit";
+    formDialog.title = "编辑${functionName}";
+    formDialog.data = {...row};
+  };
+
+  // 删除${functionName}
+  const handleDelete = (selectedIds?: number[]) => {
+    const ids = selectedIds || [];
+    if (ids.length === 0) {
+      ElMessage.warning("请选择要删除的数据");
+      return;
+    }
+    ElMessageBox.confirm("是否确认删除选中的${functionName}?", "警告", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+        .then(async () => {
+          try {
+            await delete${ClassName}(ids);
+            ElMessage.success("删除成功");
+            handleQuery();
+          } catch (error) {
+            console.error("删除失败", error);
+            ElMessage.error("删除失败");
+          }
+        })
+        .catch(() => {});
+  };
+
+  // 导出${functionName}
+  const handleExport = () => {
+    ElMessageBox.confirm("是否确认导出所有${functionName}数据?", "警告", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+        .then(async () => {
+          try {
+            // 方式1：指定文件名
+            downloadTool.download("/${moduleName}/${businessName}/export", "${functionName}数据.xlsx");
+
+            // 方式2：不指定文件名，从后端响应头获取
+            // downloadTool.download("/${moduleName}/${businessName}/export");
+
+            ElMessage.success("导出成功");
+          } catch (error) {
+            console.error("导出失败", error);
+            ElMessage.error("导出失败");
+          }
+        })
+        .catch(() => {});
+  };
+
+  // 提交表单
+  const handleSubmit = async () => {
+    if (!formRef.value) return;
+
+    try {
+      await formRef.value.validate();
+      submitLoading.value = true;
+
+      if (formDialog.type === "add") {
+        await add${ClassName}(formDialog.data);
+        ElMessage.success("新增成功");
+      } else if (formDialog.type === "edit") {
+        await update${ClassName}(formDialog.data);
+        ElMessage.success("修改成功");
+      }
+
+      formDialog.visible = false;
+      handleQuery();
+    } catch (error) {
+      console.error("提交失败", error);
+      ElMessage.error("提交失败");
+    } finally {
+      submitLoading.value = false;
+    }
+  };
+
+  // 关闭表单对话框
+  const handleFormClose = () => {
+    formRef.value?.resetFields();
+    formDialog.visible = false;
+  };
+
+  // 页面初始化时加载数据
+  onMounted(() => {
+    handleQuery();
+  });
+</script>
+
+<style lang="scss" scoped>
+  .app-container {
+    padding: 20px;
+
+    .search-bar {
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: var(--el-bg-color);
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+      border: 1px solid var(--el-border-color-light);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .title {
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+      }
+    }
+
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+  }
+
+  .dialog-footer {
+    text-align: right;
+  }
+
+  .avatar-uploader {
+    :deep(.el-upload) {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--el-transition-duration-fast);
+
+      &:hover {
+        border-color: var(--el-color-primary);
+      }
+    }
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+    line-height: 178px;
+  }
+
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+
+  .editor-container {
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    overflow: hidden;
+
+    :deep(.el-textarea__inner) {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  :deep(.el-card) {
+    background-color: var(--el-bg-color);
+    border-color: var(--el-border-color-light);
+    color: var(--el-text-color-primary);
+  }
+
+  :deep(.el-card__header) {
+    border-bottom-color: var(--el-border-color-light);
+  }
+
+  :deep(.el-table) {
+    background-color: var(--el-bg-color);
+    color: var(--el-text-color-primary);
+    --el-table-border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table th) {
+    background-color: var(--el-fill-color-light) !important;
+  }
+
+  :deep(.el-table--border th) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table td) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-table--border) {
+    border-color: var(--el-border-color-lighter);
+  }
+
+  :deep(.el-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  :deep(.el-button--link) {
+    justify-content: center;
+    padding: 0 5px;
+  }
+</style>

@@ -54,6 +54,223 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private final SysRoleMenuService sysRoleMenuService;
 
     /**
+     * 根据组件路径构建路由名称。
+     *
+     * <p>该方法接收一个组件路径或文件名字符串，将其转换为驼峰格式的路由名称。
+     * 处理逻辑如下：
+     * <ul>
+     *   <li>如果输入为空、null 或仅包含空白字符，则返回空字符串。</li>
+     *   <li>移除文件扩展名（支持 vue/js/ts/tsx/jsx）。</li>
+     *   <li>按斜杠 '/' 分割路径为多个部分。</li>
+     *   <li>遍历每个部分，过滤掉空字符串和 "index" 片段，并将每个有效部分首字母大写后追加到结果中。</li>
+     *   <li>如果所有片段都无效（如全是 index 或空），则尝试从后往前取第一个有效片段作为名称。</li>
+     *   <li>如果仍未找到有效名称，则返回空字符串。</li>
+     * </ul>
+     * </p>
+     *
+     * @param pathOrComponent 组件路径或文件名字符串。例如："/views/user/index.vue", "components/Profile.js"
+     * @return 构建后的路由名称，如："UserProfile", "ComponentsProfile"；若无效则返回空字符串
+     *
+     * <pre>{@code
+     * 示例：
+     * buildRouteNameFromComponentPath("/views/user/index.vue") => "User"
+     * buildRouteNameFromComponentPath("components/Profile.js") => "ComponentsProfile"
+     * buildRouteNameFromComponentPath("index/index.jsx") => "Index"
+     * buildRouteNameFromComponentPath("") => ""
+     * }</pre>
+     */
+    public static String buildRouteNameFromComponentPath(String pathOrComponent) {
+        if (cn.hutool.core.util.StrUtil.isBlank(pathOrComponent)) {
+            return "";
+        }
+        String pathWithoutExtension = pathOrComponent.replaceFirst("\\.(vue|js|ts|tsx|jsx)$", "");
+        String[] parts = pathWithoutExtension.split("/");
+        StringBuilder routeNameBuilder = new StringBuilder();
+        for (String part : parts) {
+            if (!part.isEmpty() && !"index".equalsIgnoreCase(part)) {
+                routeNameBuilder.append(capitalize(part));
+            }
+        }
+        if (routeNameBuilder.isEmpty() && parts.length > 0) {
+            for (int i = parts.length - 1; i >= 0; i--) {
+                if (!parts[i].isEmpty() && !"index".equalsIgnoreCase(parts[i])) {
+                    routeNameBuilder.append(capitalize(parts[i]));
+                    break;
+                }
+            }
+            if (routeNameBuilder.isEmpty()) {
+                return "";
+            }
+        }
+        return routeNameBuilder.toString();
+    }
+
+    /**
+     * 将字符串的首字母转换为大写，其余部分保持不变。
+     *
+     * <p>如果输入字符串为空、null 或仅包含空白字符，则直接返回原字符串；
+     * 否则将字符串的第一个字符转为大写，其余字符保持不变并返回新字符串。</p>
+     *
+     * @param str 需要处理的原始字符串
+     * @return 首字母大写的字符串，或原样返回空/空白字符串
+     *
+     * <pre>{@code
+     * 示例：
+     * capitalize("hello") => "Hello"
+     * capitalize("  world  ") => "  world  "
+     * capitalize(null) => null
+     * }</pre>
+     */
+    public static String capitalize(String str) {
+        if (cn.hutool.core.util.StrUtil.isBlank(str)) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    /**
+     * 构建内部路由的路径结构。
+     *
+     * <p>此方法用于根据父级路由路径和当前菜单的路径段生成完整的内部路由路径。
+     * 它会处理多种情况，包括绝对路径、相对路径以及空路径的情况，并确保最终路径格式正确且唯一。</p>
+     *
+     * @param parentPath  父级完整内部路径。可以为空或以 '/' 开头。
+     * @param pathSegment 当前菜单的路径段 (来自 menu.getPath())。
+     *                    如果路径段以 '/' 开头，则视为绝对路径，直接使用；
+     *                    否则将基于父路径进行拼接。
+     * @return 拼接并规范化后的完整内部路径。
+     *
+     * <pre>{@code
+     * 示例：
+     * buildInternalPathStructure("/", "user") => "/user"
+     * buildInternalPathStructure("/user", "detail") => "/user/detail"
+     * buildInternalPathStructure("", "home") => "/home"
+     * buildInternalPathStructure("/settings/", "profile") => "/settings/profile"
+     * }</pre>
+     */
+    public static String buildInternalPathStructure(String parentPath, String pathSegment) {
+        String segment = cn.hutool.core.util.StrUtil.trimToEmpty(pathSegment);
+        String fullPath;
+        if (segment.startsWith("/")) {
+            fullPath = segment;
+        } else {
+            if (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath)) {
+                fullPath = "/" + segment;
+            } else {
+                String formattedParent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
+                fullPath = formattedParent + segment;
+            }
+        }
+        fullPath = fullPath.replaceAll("//+", "/");
+        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 1);
+        }
+        if (cn.hutool.core.util.StrUtil.isBlank(segment) && (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
+            return "/";
+        }
+        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+    }
+
+    /**
+     * 构建并规范化路由路径结构。
+     * <p>
+     * 此方法接收父级路径和当前的路径段输入。
+     * 如果当前路径段输入是一个HTTP(S)链接，它会尝试提取主机名并将其转换为大驼峰形式作为实际的路径段。
+     * 如果不是HTTP(S)链接，则直接使用该输入（去除首尾空格）。
+     * 然后，将处理后的路径段与父路径智能拼接（处理绝对/相对路径情况）。
+     * 最后，对生成的完整路径进行规范化，包括去除多余的斜杠和末尾斜杠（根路径除外）。
+     * </p>
+     *
+     * @param parentPath   父级路由路径。如果为 {@code null} 或空字符串，则视为根路径 "/"。
+     * @param segmentInput 当前菜单的路径段输入。这可能是普通的内部路径段（如 "user", "/system/user"），
+     */
+    public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
+        String actualSegment;
+        if (StringUtils.isHttp(segmentInput)) {
+            try {
+                java.net.URI uri = new java.net.URI(segmentInput);
+                String host = uri.getHost();
+                if (cn.hutool.core.util.StrUtil.isNotBlank(host)) {
+                    String[] parts = host.split("\\.");
+                    StringBuilder hostCamelCase = new StringBuilder();
+                    for (String part : parts) {
+                        if (!part.isEmpty()) {
+                            hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
+                                    .append(part.substring(1).toLowerCase());
+                        }
+                    }
+                    actualSegment = hostCamelCase.toString();
+                    if (cn.hutool.core.util.StrUtil.isBlank(actualSegment)) {
+                        actualSegment = "ExternalLinkPath";
+                    }
+                } else {
+                    actualSegment = "ExternalHostMissing";
+                }
+            } catch (java.net.URISyntaxException e) {
+                actualSegment = "InvalidExternalLink";
+            }
+        } else {
+            actualSegment = cn.hutool.core.util.StrUtil.trimToEmpty(segmentInput);
+        }
+        String fullPath;
+        if (actualSegment.startsWith("/")) {
+            fullPath = actualSegment;
+        } else {
+            String normalizedParentPath = cn.hutool.core.util.StrUtil.isBlank(parentPath) ? "/" : parentPath;
+            if ("/".equals(normalizedParentPath)) {
+                fullPath = cn.hutool.core.util.StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
+            } else {
+                String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
+                fullPath = formattedParent + actualSegment;
+            }
+        }
+        fullPath = fullPath.replaceAll("/{2,}", "/");
+        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 1);
+        }
+        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+    }
+
+    /**
+     * 根据菜单路径和组件类型决定是否追加 "index" 路由段。
+     *
+     * <p>如果当前组件不是布局组件（如 Layout 或 ParentView），并且菜单的原始路径不以 "index" 结尾，
+     * 同时满足以下条件之一：
+     * <ul>
+     *   <li>菜单原始路径非空</li>
+     *   <li>当前路由路径为根路径 "/" </li>
+     *   <li>当前路由路径以斜杠结尾</li>
+     * </ul>
+     * 则在当前路由路径后追加 "/index"。</p>
+     *
+     * @param currentRouterPath  当前已构建的完整路由路径，不能为空。
+     * @param componentPathValue 当前菜单项关联的组件路径标识符，例如 "Layout", "ParentView" 等。
+     *                           如果是这些特殊组件，则不会自动添加 index。
+     * @param menuPathOriginal   当前菜单项的原始配置路径，用于判断是否需要添加 index。
+     *                           如果该路径为空或仅包含空白字符，也可能影响 index 的添加逻辑。
+     * @return 可能已追加了 "/index" 的新路由路径；否则返回原路由路径。
+     *
+     * <pre>{@code
+     * 示例：
+     * appendIndexToMenuPath("/user", "Layout", "user") => "/user"
+     * appendIndexToMenuPath("/user", "UserComponent", "user") => "/user/index"
+     * appendIndexToMenuPath("/user/", "UserComponent", "") => "/user//index"
+     * }</pre>
+     */
+    public static String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
+        if (!Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
+                !Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
+            String pathSegmentForIndexCheck = cn.hutool.core.util.StrUtil.trimToEmpty(menuPathOriginal);
+            if (!pathSegmentForIndexCheck.endsWith("index") &&
+                    (cn.hutool.core.util.StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))
+            ) {
+                return currentRouterPath.endsWith("/") ? (currentRouterPath + "index") : (currentRouterPath + "/index");
+            }
+        }
+        return currentRouterPath;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -336,7 +553,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return save(sysMenu);
     }
 
-
     /**
      * {@inheritDoc}
      *
@@ -407,7 +623,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return true;
     }
 
-
     /**
      * 根据请求参数查询菜单信息并构建成树形结构的菜单列表视图对象。
      * <p>
@@ -438,7 +653,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         List<SysMenu> allMenus = list(queryWrapper);
         return buildTreeFormattedMenuList(allMenus);
     }
-
 
     /**
      * {@inheritDoc}
@@ -767,223 +981,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                     return treeNode;
                 })
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 根据组件路径构建路由名称。
-     *
-     * <p>该方法接收一个组件路径或文件名字符串，将其转换为驼峰格式的路由名称。
-     * 处理逻辑如下：
-     * <ul>
-     *   <li>如果输入为空、null 或仅包含空白字符，则返回空字符串。</li>
-     *   <li>移除文件扩展名（支持 vue/js/ts/tsx/jsx）。</li>
-     *   <li>按斜杠 '/' 分割路径为多个部分。</li>
-     *   <li>遍历每个部分，过滤掉空字符串和 "index" 片段，并将每个有效部分首字母大写后追加到结果中。</li>
-     *   <li>如果所有片段都无效（如全是 index 或空），则尝试从后往前取第一个有效片段作为名称。</li>
-     *   <li>如果仍未找到有效名称，则返回空字符串。</li>
-     * </ul>
-     * </p>
-     *
-     * @param pathOrComponent 组件路径或文件名字符串。例如："/views/user/index.vue", "components/Profile.js"
-     * @return 构建后的路由名称，如："UserProfile", "ComponentsProfile"；若无效则返回空字符串
-     *
-     * <pre>{@code
-     * 示例：
-     * buildRouteNameFromComponentPath("/views/user/index.vue") => "User"
-     * buildRouteNameFromComponentPath("components/Profile.js") => "ComponentsProfile"
-     * buildRouteNameFromComponentPath("index/index.jsx") => "Index"
-     * buildRouteNameFromComponentPath("") => ""
-     * }</pre>
-     */
-    public static String buildRouteNameFromComponentPath(String pathOrComponent) {
-        if (cn.hutool.core.util.StrUtil.isBlank(pathOrComponent)) {
-            return "";
-        }
-        String pathWithoutExtension = pathOrComponent.replaceFirst("\\.(vue|js|ts|tsx|jsx)$", "");
-        String[] parts = pathWithoutExtension.split("/");
-        StringBuilder routeNameBuilder = new StringBuilder();
-        for (String part : parts) {
-            if (!part.isEmpty() && !"index".equalsIgnoreCase(part)) {
-                routeNameBuilder.append(capitalize(part));
-            }
-        }
-        if (routeNameBuilder.isEmpty() && parts.length > 0) {
-            for (int i = parts.length - 1; i >= 0; i--) {
-                if (!parts[i].isEmpty() && !"index".equalsIgnoreCase(parts[i])) {
-                    routeNameBuilder.append(capitalize(parts[i]));
-                    break;
-                }
-            }
-            if (routeNameBuilder.isEmpty()) {
-                return "";
-            }
-        }
-        return routeNameBuilder.toString();
-    }
-
-    /**
-     * 将字符串的首字母转换为大写，其余部分保持不变。
-     *
-     * <p>如果输入字符串为空、null 或仅包含空白字符，则直接返回原字符串；
-     * 否则将字符串的第一个字符转为大写，其余字符保持不变并返回新字符串。</p>
-     *
-     * @param str 需要处理的原始字符串
-     * @return 首字母大写的字符串，或原样返回空/空白字符串
-     *
-     * <pre>{@code
-     * 示例：
-     * capitalize("hello") => "Hello"
-     * capitalize("  world  ") => "  world  "
-     * capitalize(null) => null
-     * }</pre>
-     */
-    public static String capitalize(String str) {
-        if (cn.hutool.core.util.StrUtil.isBlank(str)) {
-            return str;
-        }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-    }
-
-    /**
-     * 构建内部路由的路径结构。
-     *
-     * <p>此方法用于根据父级路由路径和当前菜单的路径段生成完整的内部路由路径。
-     * 它会处理多种情况，包括绝对路径、相对路径以及空路径的情况，并确保最终路径格式正确且唯一。</p>
-     *
-     * @param parentPath  父级完整内部路径。可以为空或以 '/' 开头。
-     * @param pathSegment 当前菜单的路径段 (来自 menu.getPath())。
-     *                    如果路径段以 '/' 开头，则视为绝对路径，直接使用；
-     *                    否则将基于父路径进行拼接。
-     * @return 拼接并规范化后的完整内部路径。
-     *
-     * <pre>{@code
-     * 示例：
-     * buildInternalPathStructure("/", "user") => "/user"
-     * buildInternalPathStructure("/user", "detail") => "/user/detail"
-     * buildInternalPathStructure("", "home") => "/home"
-     * buildInternalPathStructure("/settings/", "profile") => "/settings/profile"
-     * }</pre>
-     */
-    public static String buildInternalPathStructure(String parentPath, String pathSegment) {
-        String segment = cn.hutool.core.util.StrUtil.trimToEmpty(pathSegment);
-        String fullPath;
-        if (segment.startsWith("/")) {
-            fullPath = segment;
-        } else {
-            if (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath)) {
-                fullPath = "/" + segment;
-            } else {
-                String formattedParent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
-                fullPath = formattedParent + segment;
-            }
-        }
-        fullPath = fullPath.replaceAll("//+", "/");
-        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
-            fullPath = fullPath.substring(0, fullPath.length() - 1);
-        }
-        if (cn.hutool.core.util.StrUtil.isBlank(segment) && (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
-            return "/";
-        }
-        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
-    }
-
-    /**
-     * 构建并规范化路由路径结构。
-     * <p>
-     * 此方法接收父级路径和当前的路径段输入。
-     * 如果当前路径段输入是一个HTTP(S)链接，它会尝试提取主机名并将其转换为大驼峰形式作为实际的路径段。
-     * 如果不是HTTP(S)链接，则直接使用该输入（去除首尾空格）。
-     * 然后，将处理后的路径段与父路径智能拼接（处理绝对/相对路径情况）。
-     * 最后，对生成的完整路径进行规范化，包括去除多余的斜杠和末尾斜杠（根路径除外）。
-     * </p>
-     *
-     * @param parentPath   父级路由路径。如果为 {@code null} 或空字符串，则视为根路径 "/"。
-     * @param segmentInput 当前菜单的路径段输入。这可能是普通的内部路径段（如 "user", "/system/user"），
-     */
-    public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
-        String actualSegment;
-        if (StringUtils.isHttp(segmentInput)) {
-            try {
-                java.net.URI uri = new java.net.URI(segmentInput);
-                String host = uri.getHost();
-                if (cn.hutool.core.util.StrUtil.isNotBlank(host)) {
-                    String[] parts = host.split("\\.");
-                    StringBuilder hostCamelCase = new StringBuilder();
-                    for (String part : parts) {
-                        if (!part.isEmpty()) {
-                            hostCamelCase.append(Character.toUpperCase(part.charAt(0)))
-                                    .append(part.substring(1).toLowerCase());
-                        }
-                    }
-                    actualSegment = hostCamelCase.toString();
-                    if (cn.hutool.core.util.StrUtil.isBlank(actualSegment)) {
-                        actualSegment = "ExternalLinkPath";
-                    }
-                } else {
-                    actualSegment = "ExternalHostMissing";
-                }
-            } catch (java.net.URISyntaxException e) {
-                actualSegment = "InvalidExternalLink";
-            }
-        } else {
-            actualSegment = cn.hutool.core.util.StrUtil.trimToEmpty(segmentInput);
-        }
-        String fullPath;
-        if (actualSegment.startsWith("/")) {
-            fullPath = actualSegment;
-        } else {
-            String normalizedParentPath = cn.hutool.core.util.StrUtil.isBlank(parentPath) ? "/" : parentPath;
-            if ("/".equals(normalizedParentPath)) {
-                fullPath = cn.hutool.core.util.StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
-            } else {
-                String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
-                fullPath = formattedParent + actualSegment;
-            }
-        }
-        fullPath = fullPath.replaceAll("/{2,}", "/");
-        if (fullPath.length() > 1 && fullPath.endsWith("/")) {
-            fullPath = fullPath.substring(0, fullPath.length() - 1);
-        }
-        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
-    }
-
-    /**
-     * 根据菜单路径和组件类型决定是否追加 "index" 路由段。
-     *
-     * <p>如果当前组件不是布局组件（如 Layout 或 ParentView），并且菜单的原始路径不以 "index" 结尾，
-     * 同时满足以下条件之一：
-     * <ul>
-     *   <li>菜单原始路径非空</li>
-     *   <li>当前路由路径为根路径 "/" </li>
-     *   <li>当前路由路径以斜杠结尾</li>
-     * </ul>
-     * 则在当前路由路径后追加 "/index"。</p>
-     *
-     * @param currentRouterPath  当前已构建的完整路由路径，不能为空。
-     * @param componentPathValue 当前菜单项关联的组件路径标识符，例如 "Layout", "ParentView" 等。
-     *                           如果是这些特殊组件，则不会自动添加 index。
-     * @param menuPathOriginal   当前菜单项的原始配置路径，用于判断是否需要添加 index。
-     *                           如果该路径为空或仅包含空白字符，也可能影响 index 的添加逻辑。
-     * @return 可能已追加了 "/index" 的新路由路径；否则返回原路由路径。
-     *
-     * <pre>{@code
-     * 示例：
-     * appendIndexToMenuPath("/user", "Layout", "user") => "/user"
-     * appendIndexToMenuPath("/user", "UserComponent", "user") => "/user/index"
-     * appendIndexToMenuPath("/user/", "UserComponent", "") => "/user//index"
-     * }</pre>
-     */
-    public static String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
-        if (!Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
-                !Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
-            String pathSegmentForIndexCheck = cn.hutool.core.util.StrUtil.trimToEmpty(menuPathOriginal);
-            if (!pathSegmentForIndexCheck.endsWith("index") &&
-                    (cn.hutool.core.util.StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))
-            ) {
-                return currentRouterPath.endsWith("/") ? (currentRouterPath + "index") : (currentRouterPath + "/index");
-            }
-        }
-        return currentRouterPath;
     }
 
     /**

@@ -13,19 +13,23 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <description>公共模块，包含公共工具类、实体类和常量定义</description>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <modules>
         <module>chuang-common-core</module>
         <module>chuang-common-redis</module>
         <module>chuang-common-excel</module>
+        <module>chuang-common-mq</module>
+        <module>chuang-common-websocket</module>
     </modules>
 
-    <dependencies>
 
-        <!-- Spring Boot 基础依赖 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+    <dependencies>
 
         <!-- IP 转省市区 -->
         <dependency>
@@ -68,18 +72,6 @@
             <artifactId>UserAgentUtils</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- 安全框架 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -92,17 +84,25 @@
             <artifactId>oshi-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${cn.hutool.version}</version>
+        </dependency>
+
+        <!-- 阿里巴巴 FastJSON 依赖，用于 JSON 数据处理 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${alibaba.fastjson.version}</version>
+        </dependency>
+
         <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- JSON工具 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
 
         <!-- IO工具 -->
         <dependency>

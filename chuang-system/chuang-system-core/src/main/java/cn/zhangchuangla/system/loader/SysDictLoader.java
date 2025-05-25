@@ -1,9 +1,19 @@
 package cn.zhangchuangla.system.loader;
 
-import cn.zhangchuangla.common.core.core.service.DataLoader;
+import cn.zhangchuangla.common.core.core.loader.DataLoader;
+import cn.zhangchuangla.common.core.model.entity.Option;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.system.model.entity.SysDictItem;
+import cn.zhangchuangla.system.model.entity.SysDictType;
+import cn.zhangchuangla.system.service.SysDictItemService;
+import cn.zhangchuangla.system.service.SysDictTypeService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 字典加载器，在启动项目的时候统一将字典数据加载到缓存中
@@ -17,6 +27,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class SysDictLoader implements DataLoader {
+
+    private final SysDictTypeService sysDictTypeService;
+    private final SysDictItemService sysDictItemService;
+    private final RedisCache redisCache;
 
     @Override
     public String getName() {
@@ -32,13 +46,51 @@ public class SysDictLoader implements DataLoader {
     public void load() {
         try {
             log.info("开始加载系统字典数据到缓存...");
-            // TODO: 从数据库加载字典数据
-            // 1. 查询所有字典类型
-            // 2. 查询所有字典数据
-            // 3. 将数据放入缓存
 
-            Thread.sleep(500); // 模拟加载耗时
-            log.info("系统字典数据加载完成");
+            // 1. 查询所有启用的字典类型
+            LambdaQueryWrapper<SysDictType> dictTypeWrapper = new LambdaQueryWrapper<SysDictType>()
+                    .eq(SysDictType::getStatus, 0); // 0表示启用状态
+            List<SysDictType> dictTypes = sysDictTypeService.list(dictTypeWrapper);
+
+            if (dictTypes.isEmpty()) {
+                log.info("没有找到启用的字典类型，跳过字典缓存加载");
+                return;
+            }
+
+            int successCount = 0;
+            int failCount = 0;
+
+            // 2. 为每个字典类型加载字典项到缓存
+            for (SysDictType dictType : dictTypes) {
+                try {
+                    // 查询该字典类型下所有启用的字典项
+                    LambdaQueryWrapper<SysDictItem> dictItemWrapper = new LambdaQueryWrapper<SysDictItem>()
+                            .eq(SysDictItem::getDictType, dictType.getDictType())
+                            .eq(SysDictItem::getStatus, 0) // 0表示启用状态
+                            .orderByAsc(SysDictItem::getSort); // 按排序字段升序
+
+                    List<SysDictItem> dictItems = sysDictItemService.list(dictItemWrapper);
+
+                    // 转换为Option格式
+                    List<Option<String>> options = dictItems.stream()
+                            .map(item -> new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag()))
+                            .toList();
+
+                    // 3. 将数据放入缓存
+                    String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType.getDictType());
+                    redisCache.setCacheObject(cacheKey, options, RedisConstants.DICT_CACHE_EXPIRE_TIME);
+
+                    successCount++;
+                    log.debug("字典类型 [{}] 缓存成功，共 {} 个字典项", dictType.getDictType(), dictItems.size());
+
+                } catch (Exception e) {
+                    failCount++;
+                    log.error("字典类型 [{}] 缓存失败: {}", dictType.getDictType(), e.getMessage(), e);
+                }
+            }
+
+            log.info("系统字典数据加载完成，成功: {} 个，失败: {} 个", successCount, failCount);
+
         } catch (Exception e) {
             log.error("加载系统字典数据失败", e);
             throw new RuntimeException("系统字典加载失败: " + e.getMessage(), e);

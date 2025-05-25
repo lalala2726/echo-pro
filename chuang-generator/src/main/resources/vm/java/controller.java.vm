@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.common.utils.ExcelUtil;
+import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import ${packageName}.model.entity.${ClassName};
 import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
@@ -24,7 +25,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -40,6 +40,7 @@ import java.util.List;
 public class ${ClassName}Controller extends BaseController {
 
     private final ${ClassName}Service ${className}Service;
+    private final ExcelUtils excelUtils;
 
     /**
      * 查询${functionName}列表
@@ -59,14 +60,12 @@ public class ${ClassName}Controller extends BaseController {
      */
     @Operation(summary = "导出${functionName}列表")
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
-    @PostMapping("/export")
+    @GetMapping("/export")
     @OperationLog(title = "${functionName}管理", businessType = BusinessType.EXPORT)
-    public void export(@Parameter(description = "${functionName}列表查询参数")
-                       @Validated @RequestBody ${ClassName}QueryRequest request, HttpServletResponse response) {
-        List<${ClassName}> list = ${className}Service.export${ClassName}(request);
+    public void export(HttpServletResponse response) {
+        List<${ClassName}> list = ${className}Service.list();
         List<${ClassName}ListVo> voList = copyListProperties(list, ${ClassName}ListVo.class);
-        ExcelUtil<${ClassName}ListVo> util = new ExcelUtil<>(${ClassName}ListVo.class);
-        util.exportExcel(response, voList, "${functionName}数据");
+        excelUtils.exportExcel(response, voList, ${ClassName}ListVo.class, "${functionName}列表");
     }
 
     /**
@@ -115,39 +114,11 @@ public class ${ClassName}Controller extends BaseController {
      */
     @Operation(summary = "删除${functionName}")
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:remove')")
-    @DeleteMapping("/{${pkColumn.javaField}s}")
+    @DeleteMapping("/{ids}")
     @OperationLog(title = "${functionName}管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> remove(@Parameter(description = "${functionName}ID集合，支持批量删除")
-                                   @PathVariable List<${pkColumn.javaType}> ${pkColumn.javaField}s) {
-        checkParam(${pkColumn.javaField}s == null, "id不能为空");
-        boolean result = ${className}Service.delete${ClassName}ByIds(${pkColumn.javaField}s);
+                                   @PathVariable("ids") List<${pkColumn.javaType}> ids) {
+        boolean result = ${className}Service.delete${ClassName}ByIds(ids);
         return toAjax(result);
-    }
-
-    /**
-     * 修改${functionName}状态
-     */
-    @Operation(summary = "修改${functionName}状态")
-    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:edit')")
-    @PutMapping("/changeStatus")
-    @OperationLog(title = "${functionName}管理", businessType = BusinessType.UPDATE)
-    public AjaxResult<Void> changeStatus(@Parameter(description = "${functionName}ID和状态")
-                                         @RequestBody ${ClassName} ${className}) {
-        checkParam(${className}.get${pkColumn.javaField.substring(0, 1).toUpperCase()}${pkColumn.javaField.substring(1)}() == null, "${pkColumn.javaField}不能为空")
-        ;
-        checkParam(${className}.getStatus() == null, "状态不能为空");
-        return toAjax(${className}Service.updateStatus(${className}.get${pkColumn.javaField.substring(0, 1).toUpperCase()}${pkColumn.javaField.substring(1)}(), ${className}.getStatus()))
-        ;
-    }
-
-    /**
-     * 获取${functionName}选项列表
-     */
-    @Operation(summary = "获取${functionName}选项列表")
-    @GetMapping("/optionList")
-    public AjaxResult<List<${ClassName}ListVo>> optionList() {
-        List<${ClassName}> list = ${className}Service.list${ClassName}ForOption();
-        List<${ClassName}ListVo> voList = copyListProperties(list, ${ClassName}ListVo.class);
-        return success(voList);
     }
 }

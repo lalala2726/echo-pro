@@ -13,6 +13,12 @@
     <version>1.0.0</version>
     <description>框架基础模块，提供核心功能支持</description>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <!-- 依赖公共模块 -->
         <dependency>
