@@ -52,28 +52,57 @@
         <include refid="Base_Column_List"/>
         order by id desc
     </select>
-    <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
-        select sys_message.id             as id,
-               sys_message.title          as title,
-               sys_message.content        as content,
-               sys_message.type           as type,
-               sys_message.level          as level,
-               sys_message.sender_id      as sender_id,
-               sys_message.sender_name    as sender_name,
-               sys_message.target_type    as target_type,
-               sys_message.push_type      as push_type,
-               sys_message.is_published   as is_published,
-               sys_message.publish_time   as publish_time,
-               sys_message.scheduled_time as scheduled_time,
-               sys_message.expire_time    as expire_time,
-               sys_message.is_deleted     as is_deleted,
-               sys_message.create_time    as create_time,
-               sys_message.update_time    as update_time,
-               sys_message.create_by      as create_by,
-               sys_message.update_by      as update_by
-        from sys_message
-                 join sys_user_message sum on sys_message.id = sum.message_id
-        where sum.user_id = #{userId}
-    </select>
 
+    <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
+        SELECT DISTINCT sm.id AS id,
+        sm.title AS title,
+        IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
+        sm.type AS type,
+        sm.level AS level,
+        sm.sender_id AS sender_id,
+        sm.sender_name AS sender_name,
+        sm.target_type AS target_type,
+        sm.push_type AS push_type,
+        sm.is_published AS is_published,
+        sm.publish_time AS publish_time,
+        sm.scheduled_time AS scheduled_time,
+        sm.expire_time AS expire_time,
+        sm.is_deleted AS is_deleted,
+        sm.create_time AS create_time,
+        sm.update_time AS update_time,
+        sm.create_by AS create_by,
+        sm.update_by AS update_by
+        FROM
+        sys_message sm LEFT JOIN
+        sys_user_message sum_link ON sm.id = sum_link.message_id
+        <where>
+            (
+            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            OR
+            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            OR
+            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            )
+
+            AND sm.is_deleted = 0
+
+            <if test="request != null">
+                <if test="request.title != null and request.title != ''">
+                    AND sm.title LIKE CONCAT('%', #{request.title}, '%')
+                </if>
+                <if test="request.type != null">
+                    AND sm.type = #{request.type}
+                </if>
+                <if test="request.level != null">
+                    AND sm.level = #{request.level}
+                </if>
+                <if test="request.senderName != null and request.senderName != ''">
+                    AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
+                </if>
+                <if test="request.publishTime != null">
+                    AND sm.publish_time >= #{request.publishTime}
+                </if>
+            </if>
+        </where>
+    </select>
 </mapper>

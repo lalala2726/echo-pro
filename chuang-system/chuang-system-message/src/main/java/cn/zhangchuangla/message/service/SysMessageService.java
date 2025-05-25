@@ -1,10 +1,7 @@
 package cn.zhangchuangla.message.service;
 
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.SendMessageRequest;
-import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
-import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
-import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
+import cn.zhangchuangla.message.model.request.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -75,12 +72,13 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     boolean sendMessageByUserId(List<Long> userId, SysMessage message);
 
+
+
     /**
-     * 根据用户ID获取用户消息列表
+     * 查询当前用户的消息列表
      *
-     * @param userId  用户ID
      * @param request 查询参数
-     * @return 结果
+     * @return 消息分页结果
      */
-    List<SysMessage> listUserMessageByUserId(Long userId, SysMessageQueryRequest request);
+    Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request);
 }

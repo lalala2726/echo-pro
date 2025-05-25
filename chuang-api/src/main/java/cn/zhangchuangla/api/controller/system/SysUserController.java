@@ -9,7 +9,7 @@ import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
+import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageList;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
@@ -74,11 +74,10 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/message/list")
     @Operation(summary = "获取用户消息列表")
-    public AjaxResult<List<UserMessageList>> getMessageList(SysMessageQueryRequest request) {
-        Long userId = getUserId();
-        List<SysMessage> userMessageListList = sysMessageService.listUserMessageByUserId(userId, request);
-        List<UserMessageList> userMessageLists = copyListProperties(userMessageListList, UserMessageList.class);
-        return success(userMessageLists);
+    public AjaxResult<TableDataResult> getMessageList(UserMessageListQueryRequest request) {
+        Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
+        List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
+        return getTableData(sysMessagePage, userMessageLists);
     }
 
     /**
@@ -98,6 +97,9 @@ public class SysUserController extends BaseController {
         userPage.getRecords().forEach(user -> {
             UserListVo userInfoVo = new UserListVo();
             BeanUtils.copyProperties(user, userInfoVo);
+            if (user.getSysDept() != null) {
+                userInfoVo.setDeptName(user.getSysDept().getDeptName());
+            }
             userListVos.add(userInfoVo);
         });
         return getTableData(userPage, userListVos);

@@ -20,9 +20,9 @@ public class SendMessageRequest {
      * 1 - 按角色发送
      * 2 - 按部门发送
      */
-    @Schema(description = "消息发送方式（0-按用户ID发送，1-按角色发送，2-按部门发送，3-全部用户发送）", type = "integer", example = "0")
+    @Schema(description = "消息发送方式（0-按用户ID接收，1-按角色ID接收，2-按部门ID接收，3-全部用户接收）", type = "integer", example = "0")
     @NotNull(message = "消息发送方式不能为空")
-    private String sendMethod;
+    private Integer sendMethod;
 
     /**
      * 接收者ID列表，根据发送方式指定不同类型的ID：

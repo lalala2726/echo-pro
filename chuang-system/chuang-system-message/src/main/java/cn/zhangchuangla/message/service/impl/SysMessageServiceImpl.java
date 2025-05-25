@@ -1,14 +1,16 @@
 package cn.zhangchuangla.message.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.core.security.model.SysUser;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
+import cn.zhangchuangla.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
+import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.mq.service.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -45,6 +47,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysDeptService sysDeptService;
     private final SysUserService sysUserService;
     private final MessageProducer messageProducer;
+    private final SysUserMessageService sysUserMessageService;
 
     /**
      * 分页查询系统消息表
@@ -162,15 +165,15 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
-     * 获取用户消息列表
+     * 查询当前用户的消息列表
      *
-     * @param userId  用户ID
      * @param request 查询参数
-     * @return 用户消息列表
+     * @return 分页消息结果
      */
     @Override
-    public List<SysMessage> listUserMessageByUserId(Long userId, SysMessageQueryRequest request) {
+    public Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request) {
         Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
+        Long userId = SecurityUtils.getUserId();
         return sysMessageMapper.listUserMessageByUserId(page, userId, request);
     }
 
@@ -202,12 +205,36 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }
-        LambdaQueryWrapper<SysUserRole> eq = new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, receiveId);
-        List<SysUserRole> list = sysUserRoleService.list(eq);
-        List<Long> userList = list.stream().map(SysUserRole::getUserId).toList();
-        SysMessage sysMessage = new SysMessage();
+        // 查询所有有效的角色ID
+        LambdaQueryWrapper<SysUserRole> roleQueryWrapper = new LambdaQueryWrapper<SysUserRole>()
+                .in(SysUserRole::getRoleId, receiveId);
+        List<Long> validRoleIds = sysUserRoleService.list(roleQueryWrapper)
+                .stream()
+                .map(SysUserRole::getRoleId)
+                .distinct()
+                .toList();
+
+        // 判断是否有无效的角色ID
+        if (validRoleIds.size() != receiveId.size()) {
+            List<Long> invalidRoleIds = receiveId.stream()
+                    .filter(id -> !validRoleIds.contains(id))
+                    .toList();
+            throw new ServiceException(String.format("无效的角色ID：%s，请刷新网页重新请求！", invalidRoleIds));
+        }
+
+        SysMessage sysMessage = SysMessage.builder()
+                .targetType(request.getSendMethod())
+                .build();
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        return sendMessageByUserId(userList, sysMessage);
+        save(sysMessage);
+        request.getReceiveId().forEach(roleId -> {
+            SysUserMessage sysUserMessage = SysUserMessage.builder()
+                    .messageId(sysMessage.getId())
+                    .roleId(roleId)
+                    .build();
+            sysUserMessageService.save(sysUserMessage);
+        });
+        return true;
     }
 
     /**
@@ -221,30 +248,51 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
         }
-        LambdaQueryWrapper<SysDept> eq = new LambdaQueryWrapper<SysDept>().in(SysDept::getDeptId, receiveId);
-        List<SysDept> list = sysDeptService.list(eq);
-        List<Long> deptId = list.stream().map(SysDept::getDeptId).toList();
-        LambdaQueryWrapper<SysUser> eq1 = new LambdaQueryWrapper<SysUser>().in(SysUser::getDeptId, deptId);
-        List<Long> userList = sysUserService.list(eq1)
+        //查询所有有效的部门ID
+        LambdaQueryWrapper<SysDept> deptQueryWrapper = new LambdaQueryWrapper<SysDept>()
+                .in(SysDept::getDeptId, receiveId);
+
+        List<Long> validDeptIds = sysDeptService.list(deptQueryWrapper)
                 .stream()
-                .map(SysUser::getUserId)
+                .map(SysDept::getDeptId)
+                .distinct()
                 .toList();
-        SysMessage sysMessage = new SysMessage();
+
+        if (validDeptIds.size() != receiveId.size()) {
+            List<Long> invalidDeptIds = receiveId.stream()
+                    .filter(id -> !validDeptIds.contains(id))
+                    .toList();
+            throw new ServiceException(String.format("无效的部门ID：%s，请刷新网页重新请求！", invalidDeptIds));
+        }
+
+        SysMessage sysMessage = SysMessage.builder()
+                .targetType(request.getSendMethod())
+                .build();
+
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        return sendMessageByUserId(userList, sysMessage);
+        save(sysMessage);
+        request.getReceiveId().forEach(deptId -> {
+            SysUserMessage sysUserMessage = SysUserMessage.builder()
+                    .messageId(sysMessage.getId())
+                    .deptId(deptId)
+                    .build();
+            sysUserMessageService.save(sysUserMessage);
+        });
+        return true;
     }
 
     /**
-     * 发送全部消息
+     * 给全部用户发送消息
      *
      * @param request 发送消息请求参数
      * @return 结果
      */
     private boolean sendMessageToAll(SendMessageRequest request) {
-        List<SysUser> list = sysUserService.list();
-        List<Long> userList = list.stream().map(SysUser::getUserId).toList();
-        SysMessage sysMessage = new SysMessage();
+        SysMessage sysMessage = SysMessage.builder()
+                .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
+                .build();
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        return sendMessageByUserId(userList, sysMessage);
+        //发送给全部用户无需设置用户消息对应表
+        return save(sysMessage);
     }
 }

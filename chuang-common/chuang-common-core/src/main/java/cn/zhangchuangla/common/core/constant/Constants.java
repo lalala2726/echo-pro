@@ -64,13 +64,14 @@ public class Constants {
 
     public interface MessageConstants {
         //根据用户ID发送
-        String SEND_METHOD_USER = "0";
+        int SEND_METHOD_USER = 0;
         //根据角色ID发送
-        String SEND_METHOD_ROLE = "1";
+        int SEND_METHOD_ROLE = 1;
         //根据部门ID发送
-        String SEND_METHOD_DEPT = "2";
+        int SEND_METHOD_DEPT = 2;
         //全部发送
-        String SEND_METHOD_ALL = "3";
+        int SEND_METHOD_ALL = 3;
+
     }
 
     /**
