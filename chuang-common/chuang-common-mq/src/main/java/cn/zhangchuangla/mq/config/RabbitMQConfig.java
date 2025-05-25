@@ -19,14 +19,14 @@ public class RabbitMQConfig {
     public static final String MESSAGE_EXCHANGE = "message.exchange";
 
     /**
-     * 消息发送队列
+     * 用户消息批量插入队列
      */
-    public static final String MESSAGE_QUEUE = "message.send.queue";
+    public static final String USER_MESSAGE_QUEUE = "user.message.queue";
 
     /**
-     * 消息发送路由键
+     * 用户消息批量插入路由键
      */
-    public static final String MESSAGE_ROUTING_KEY = "message.send";
+    public static final String USER_MESSAGE_ROUTING_KEY = "user.message";
 
     /**
      * 声明交换机
@@ -37,20 +37,20 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 声明队列
+     * 声明用户消息队列
      */
     @Bean
-    public Queue messageQueue() {
-        return QueueBuilder.durable(MESSAGE_QUEUE).build();
+    public Queue userMessageQueue() {
+        return QueueBuilder.durable(USER_MESSAGE_QUEUE).build();
     }
 
     /**
-     * 绑定队列到交换机
+     * 绑定用户消息队列到交换机
      */
     @Bean
-    public Binding messageBinding() {
-        return BindingBuilder.bind(messageQueue())
+    public Binding userMessageBinding() {
+        return BindingBuilder.bind(userMessageQueue())
                 .to(messageExchange())
-                .with(MESSAGE_ROUTING_KEY);
+                .with(USER_MESSAGE_ROUTING_KEY);
     }
 }

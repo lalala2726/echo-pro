@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.SysUserMessageService;
@@ -31,8 +30,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 系统消息表Service实现 //todo 这边消息发送重新设计，在消息中添加部门ID，角色ID，当用户查询消息的时候，根据部门ID，角色ID，用户ID查询消息
- * //todo 只有单独给没有标签的用户发送消息的时候才会使用用户消息对应表，这边避免对数据插入大量的数据，节省资源
+ * 系统消息表Service实现
+ * 新设计：在消息中添加部门ID，角色ID，当用户查询消息的时候，根据部门ID，角色ID，用户ID查询消息
+ * 只有单独给没有标签的用户发送消息的时候才会使用用户消息对应表，这边避免对数据插入大量的数据，节省资源
  *
  * @author Chuang
  * created on 2025/5/25
@@ -137,6 +137,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
+        message.setTargetType(Constants.MessageConstants.SEND_METHOD_USER);
         message.setCreateTime(new Date());
         boolean save = save(message);
         if (!save) {
@@ -149,15 +150,17 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                     .messageId(message.getId())
                     .title(message.getTitle())
                     .content(message.getContent())
+                    .messageType(message.getType())
+                    .sendMethod(Constants.MessageConstants.SEND_METHOD_USER)
                     .userIds(userId)
                     .batchSize(500)
                     .build();
 
-            messageProducer.sendMessage(messageSendDTO);
-            log.info("消息发送到队列成功，消息ID: {}, 用户数量: {}", message.getId(), userId.size());
+            messageProducer.sendUserMessage(messageSendDTO);
+            log.info("用户消息发送到队列成功，消息ID: {}, 用户数量: {}", message.getId(), userId.size());
             return true;
         } catch (Exception e) {
-            log.error("消息发送到队列失败，消息ID: {}", message.getId(), e);
+            log.error("用户消息发送到队列失败，消息ID: {}", message.getId(), e);
             // 如果队列发送失败，回滚消息记录
             removeById(message.getId());
             throw new ServiceException("消息发送失败");
@@ -205,6 +208,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
         }
+
         // 查询所有有效的角色ID
         LambdaQueryWrapper<SysUserRole> roleQueryWrapper = new LambdaQueryWrapper<SysUserRole>()
                 .in(SysUserRole::getRoleId, receiveId);
@@ -222,19 +226,37 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             throw new ServiceException(String.format("无效的角色ID：%s，请刷新网页重新请求！", invalidRoleIds));
         }
 
+        // 先保存消息
         SysMessage sysMessage = SysMessage.builder()
-                .targetType(request.getSendMethod())
+                .targetType(Constants.MessageConstants.SEND_METHOD_ROLE)
+                .createTime(new Date())
                 .build();
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        save(sysMessage);
-        request.getReceiveId().forEach(roleId -> {
-            SysUserMessage sysUserMessage = SysUserMessage.builder()
+        boolean save = save(sysMessage);
+        if (!save) {
+            return false;
+        }
+
+        // 使用消息队列异步处理角色消息记录
+        try {
+            MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(sysMessage.getId())
-                    .roleId(roleId)
+                    .title(sysMessage.getTitle())
+                    .content(sysMessage.getContent())
+                    .messageType(sysMessage.getType())
+                    .sendMethod(Constants.MessageConstants.SEND_METHOD_ROLE)
+                    .roleIds(receiveId)
                     .build();
-            sysUserMessageService.save(sysUserMessage);
-        });
-        return true;
+
+            messageProducer.sendRoleMessage(messageSendDTO);
+            log.info("角色消息发送到队列成功，消息ID: {}, 角色数量: {}", sysMessage.getId(), receiveId.size());
+            return true;
+        } catch (Exception e) {
+            log.error("角色消息发送到队列失败，消息ID: {}", sysMessage.getId(), e);
+            // 如果队列发送失败，回滚消息记录
+            removeById(sysMessage.getId());
+            throw new ServiceException("角色消息发送失败");
+        }
     }
 
     /**
@@ -248,7 +270,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
         }
-        //查询所有有效的部门ID
+
+        // 查询所有有效的部门ID
         LambdaQueryWrapper<SysDept> deptQueryWrapper = new LambdaQueryWrapper<SysDept>()
                 .in(SysDept::getDeptId, receiveId);
 
@@ -265,20 +288,37 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             throw new ServiceException(String.format("无效的部门ID：%s，请刷新网页重新请求！", invalidDeptIds));
         }
 
+        // 先保存消息
         SysMessage sysMessage = SysMessage.builder()
-                .targetType(request.getSendMethod())
+                .targetType(Constants.MessageConstants.SEND_METHOD_DEPT)
+                .createTime(new Date())
                 .build();
-
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        save(sysMessage);
-        request.getReceiveId().forEach(deptId -> {
-            SysUserMessage sysUserMessage = SysUserMessage.builder()
+        boolean save = save(sysMessage);
+        if (!save) {
+            return false;
+        }
+
+        // 使用消息队列异步处理部门消息记录
+        try {
+            MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(sysMessage.getId())
-                    .deptId(deptId)
+                    .title(sysMessage.getTitle())
+                    .content(sysMessage.getContent())
+                    .messageType(sysMessage.getType())
+                    .sendMethod(Constants.MessageConstants.SEND_METHOD_DEPT)
+                    .deptIds(receiveId)
                     .build();
-            sysUserMessageService.save(sysUserMessage);
-        });
-        return true;
+
+            messageProducer.sendDeptMessage(messageSendDTO);
+            log.info("部门消息发送到队列成功，消息ID: {}, 部门数量: {}", sysMessage.getId(), receiveId.size());
+            return true;
+        } catch (Exception e) {
+            log.error("部门消息发送到队列失败，消息ID: {}", sysMessage.getId(), e);
+            // 如果队列发送失败，回滚消息记录
+            removeById(sysMessage.getId());
+            throw new ServiceException("部门消息发送失败");
+        }
     }
 
     /**
@@ -290,9 +330,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private boolean sendMessageToAll(SendMessageRequest request) {
         SysMessage sysMessage = SysMessage.builder()
                 .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
+                .createTime(new Date())
                 .build();
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
-        //发送给全部用户无需设置用户消息对应表
+        // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
     }
 }

@@ -61,7 +61,6 @@ public class SysMessageController extends BaseController {
      */
     @PostMapping("/send")
     @Operation(summary = "发送消息")
-    @AccessLimit()
     @OperationLog(title = "消息管理", businessType = BusinessType.SEND_MESSAGES)
     @PreAuthorize("@ss.hasPermission('system:message:send')")
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SendMessageRequest request) {
