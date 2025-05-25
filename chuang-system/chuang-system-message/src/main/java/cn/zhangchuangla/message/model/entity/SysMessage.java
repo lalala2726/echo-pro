@@ -63,19 +63,10 @@ public class SysMessage {
     private String senderName;
 
     /**
-     * 目标类型：1-指定用户 2-全部用户 3-角色用户
+     * 目标类型：0-指定用户 1-角色用户 2-部门用户 3-全部用户
      */
     private Integer targetType;
 
-    /**
-     * 目标用户ID列表，JSON格式，target_type=1时使用
-     */
-    private String targetIds;
-
-    /**
-     * 目标角色ID列表，JSON格式，target_type=3时使用
-     */
-    private String roleIds;
 
     /**
      * 推送方式：1-仅站内信 2-仅WebSocket 3-站内信+WebSocket

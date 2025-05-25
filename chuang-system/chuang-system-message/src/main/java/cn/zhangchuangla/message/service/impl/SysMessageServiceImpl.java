@@ -9,7 +9,6 @@ import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
-import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.mq.service.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -30,7 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 系统消息表Service实现
+ * 系统消息表Service实现 //todo 这边消息发送重新设计，在消息中添加部门ID，角色ID，当用户查询消息的时候，根据部门ID，角色ID，用户ID查询消息
+ * //todo 只有单独给没有标签的用户发送消息的时候才会使用用户消息对应表，这边避免对数据插入大量的数据，节省资源
  *
  * @author Chuang
  * created on 2025/5/25
@@ -41,7 +41,6 @@ import java.util.List;
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage> implements SysMessageService {
 
     private final SysMessageMapper sysMessageMapper;
-    private final SysUserMessageService sysUserMessageService;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final SysUserService sysUserService;

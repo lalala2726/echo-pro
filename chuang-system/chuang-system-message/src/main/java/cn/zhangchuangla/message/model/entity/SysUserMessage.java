@@ -39,6 +39,16 @@ public class SysUserMessage {
     private Long userId;
 
     /**
+     * 角色ID
+     */
+    private Long roleId;
+
+    /**
+     * 部门ID
+     */
+    private Long deptId;
+
+    /**
      * 是否已读：0-未读 1-已读
      */
     private Integer isRead;

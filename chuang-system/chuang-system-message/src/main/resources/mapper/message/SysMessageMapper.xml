@@ -13,8 +13,6 @@
         <result property="senderId" column="sender_id"/>
         <result property="senderName" column="sender_name"/>
         <result property="targetType" column="target_type"/>
-        <result property="targetIds" column="target_ids"/>
-        <result property="roleIds" column="role_ids"/>
         <result property="pushType" column="push_type"/>
         <result property="isPublished" column="is_published"/>
         <result property="publishTime" column="publish_time"/>
@@ -36,8 +34,6 @@
                sender_id,
                sender_name,
                target_type,
-               target_ids,
-               role_ids,
                push_type,
                is_published,
                publish_time,
@@ -54,65 +50,6 @@
 
     <select id="listSysMessage" resultMap="BaseResultMap">
         <include refid="Base_Column_List"/>
-        <where>
-            <if test="request.title != null and request.title != ''">
-                and title like concat('%', #{request.title}, '%')
-            </if>
-            <if test="request.content != null and request.content != ''">
-                and content like concat('%', #{request.content}, '%')
-            </if>
-            <if test="request.type != null">
-                and type = #{request.type}
-            </if>
-            <if test="request.level != null">
-                and level = #{request.level}
-            </if>
-            <if test="request.senderId != null">
-                and sender_id = #{request.senderId}
-            </if>
-            <if test="request.senderName != null and request.senderName != ''">
-                and sender_name like concat('%', #{request.senderName}, '%')
-            </if>
-            <if test="request.targetType != null">
-                and target_type = #{request.targetType}
-            </if>
-            <if test="request.targetIds != null and request.targetIds != ''">
-                and target_ids like concat('%', #{request.targetIds}, '%')
-            </if>
-            <if test="request.roleIds != null and request.roleIds != ''">
-                and role_ids like concat('%', #{request.roleIds}, '%')
-            </if>
-            <if test="request.pushType != null">
-                and push_type = #{request.pushType}
-            </if>
-            <if test="request.isPublished != null">
-                and is_published = #{request.isPublished}
-            </if>
-            <if test="request.publishTime != null">
-                and publish_time = #{request.publishTime}
-            </if>
-            <if test="request.scheduledTime != null">
-                and scheduled_time = #{request.scheduledTime}
-            </if>
-            <if test="request.expireTime != null">
-                and expire_time = #{request.expireTime}
-            </if>
-            <if test="request.isDeleted != null">
-                and is_deleted = #{request.isDeleted}
-            </if>
-            <if test="request.createTime != null">
-                and create_time = #{request.createTime}
-            </if>
-            <if test="request.updateTime != null">
-                and update_time = #{request.updateTime}
-            </if>
-            <if test="request.createBy != null and request.createBy != ''">
-                and create_by like concat('%', #{request.createBy}, '%')
-            </if>
-            <if test="request.updateBy != null and request.updateBy != ''">
-                and update_by like concat('%', #{request.updateBy}, '%')
-            </if>
-        </where>
         order by id desc
     </select>
     <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
@@ -124,8 +61,6 @@
                sys_message.sender_id      as sender_id,
                sys_message.sender_name    as sender_name,
                sys_message.target_type    as target_type,
-               sys_message.target_ids     as target_ids,
-               sys_message.role_ids       as role_ids,
                sys_message.push_type      as push_type,
                sys_message.is_published   as is_published,
                sys_message.publish_time   as publish_time,
