@@ -6,8 +6,8 @@ import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.SentMessageListQueryRequest;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
+import cn.zhangchuangla.message.model.request.UserSendMessageRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageListVo;
 import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.model.vo.UserSentMessageListVo;
@@ -54,6 +54,18 @@ public class MessageController extends BaseController {
     }
 
     /**
+     * 发送消息
+     *
+     * @return 操作结果
+     */
+    @PostMapping
+    @Operation(summary = "发送消息")
+    public AjaxResult<Void> sendMessage(@RequestBody UserSendMessageRequest request) {
+        boolean result = sysMessageService.userSendMessage(request);
+        return toAjax(result);
+    }
+
+    /**
      * 根据消息ID获取消息详情
      *
      * @param id 消息ID
@@ -80,7 +92,7 @@ public class MessageController extends BaseController {
     @GetMapping("/sent/list")
     @Operation(summary = "获取已发送消息列表")
     public AjaxResult<TableDataResult> getSentMessageList(@Parameter(description = "已发送消息列表查询，包含分页和筛选条件")
-                                                          SentMessageListQueryRequest request) {
+                                                              UserMessageListQueryRequest request) {
         Page<SysMessage> sysMessagePage = sysMessageService.listUserSentMessageList(request);
         List<UserSentMessageListVo> userSentMessageListVoList = copyListProperties(sysMessagePage, UserSentMessageListVo.class);
         return getTableData(sysMessagePage, userSentMessageListVoList);

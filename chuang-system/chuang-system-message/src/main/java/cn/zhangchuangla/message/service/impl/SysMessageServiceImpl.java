@@ -118,7 +118,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean sendMessage(SendMessageRequest request) {
+    public boolean sysSendMessage(SysSendMessageRequest request) {
         return switch (request.getSendMethod()) {
             case Constants.MessageConstants.SEND_METHOD_USER -> sendMessageToUserId(request);
             case Constants.MessageConstants.SEND_METHOD_ROLE -> sendMessageToRoleId(request);
@@ -270,10 +270,22 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 分页消息结果
      */
     @Override
-    public Page<SysMessage> listUserSentMessageList(SentMessageListQueryRequest request) {
+    public Page<SysMessage> listUserSentMessageList(UserMessageListQueryRequest request) {
         Long userId = SecurityUtils.getUserId();
         Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysMessageMapper.pageUserSentMessage(page, userId, request);
+    }
+
+    /**
+     * 用户发送消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    @Override
+    public boolean userSendMessage(UserSendMessageRequest request) {
+        //todo 待开发
+        return false;
     }
 
     /**
@@ -282,7 +294,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToUserId(SendMessageRequest request) {
+    private boolean sendMessageToUserId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
@@ -299,7 +311,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToRoleId(SendMessageRequest request) {
+    private boolean sendMessageToRoleId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
@@ -361,7 +373,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToDeptId(SendMessageRequest request) {
+    private boolean sendMessageToDeptId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
@@ -423,7 +435,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToAll(SendMessageRequest request) {
+    private boolean sendMessageToAll(SysSendMessageRequest request) {
         SysMessage sysMessage = SysMessage.builder()
                 .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
                 .createTime(new Date())
