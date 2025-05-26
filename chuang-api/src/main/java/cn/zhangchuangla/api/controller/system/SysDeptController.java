@@ -30,7 +30,7 @@ import java.util.List;
  * @author Chuang
  * created on 2025/3/25 10:57
  */
-@Tag(name = "部门管理")
+@Tag(name = "部门管理", description = "提供部门的新增、删除、修改、查询等管理功能接口")
 @RestController
 @RequestMapping("/system/dept")
 @RequiredArgsConstructor

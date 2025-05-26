@@ -40,8 +40,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/system/file/config")
-@Tag(name = "文件配置")
 @RequiredArgsConstructor
+@Tag(name = "文件存储配置", description = "提供本地存储、MinIO、阿里云OSS、腾讯云COS等文件存储配置的增删改查及主配置设置、缓存刷新等相关接口")
 public class SysFileConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;

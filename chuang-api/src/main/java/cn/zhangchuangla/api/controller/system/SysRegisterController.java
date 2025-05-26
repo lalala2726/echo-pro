@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@Tag(name = "注册接口")
+@Tag(name = "注册接口", description = "提供用户注册相关的接口功能")
 @RequiredArgsConstructor
 public class SysRegisterController extends BaseController {
 

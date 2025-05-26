@@ -36,7 +36,7 @@ import java.util.Set;
  */
 @RestController
 @Slf4j
-@Tag(name = "登录接口")
+@Tag(name = "用户认证", description = "提供用户登录、刷新令牌、退出登录等认证相关操作接口")
 @RequiredArgsConstructor
 public class SysAuthController extends BaseController {
 

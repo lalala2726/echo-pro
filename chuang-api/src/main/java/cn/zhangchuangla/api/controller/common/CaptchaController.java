@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/captcha")
-@Tag(name = "验证码相关")
+@Tag(name = "验证码接口", description = "提供获取验证码的功能")
 @RequiredArgsConstructor
 public class CaptchaController extends BaseController {
 

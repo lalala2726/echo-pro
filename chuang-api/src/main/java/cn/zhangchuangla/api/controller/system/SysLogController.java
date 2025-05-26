@@ -38,7 +38,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/log")
 @RequiredArgsConstructor
-@Tag(name = "系统日志")
+@Tag(name = "系统日志", description = "提供系统登录日志和操作日志的查询、详情、清空等管理接口。")
 @Slf4j
 public class SysLogController extends BaseController {
 
