@@ -1,8 +1,7 @@
-package cn.zhangchuangla.message.model.entity;
+package cn.zhangchuangla.message.model.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,36 +10,36 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-
 /**
- * 系统消息表实体
- *
  * @author Chuang
+ * <p>
+ * created on 2025/5/26 19:42
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName("sys_message")
-public class SysMessage {
+public class UserMessageDto {
 
     /**
      * 消息ID
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 消息标题
      */
-    @NotNull(message = "消息标题不能为空")
     private String title;
 
     /**
      * 消息内容
      */
-    @NotNull(message = "消息内容不能为空")
     private String content;
+
+    /**
+     * 是否已读
+     */
+    private Boolean isRead;
 
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息

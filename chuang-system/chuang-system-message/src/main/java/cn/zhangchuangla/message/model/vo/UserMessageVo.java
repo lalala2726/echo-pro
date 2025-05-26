@@ -52,9 +52,9 @@ public class UserMessageVo {
     private String senderName;
 
     /**
-     * 发布时间
+     * 发送时间
      */
-    @Schema(description = "发布时间")
-    private Date publishTime;
+    @Schema(description = "发送时间")
+    private Date sentTime;
 
 }

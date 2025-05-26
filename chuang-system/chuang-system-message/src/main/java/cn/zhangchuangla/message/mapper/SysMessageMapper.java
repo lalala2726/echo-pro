@@ -3,6 +3,7 @@ package cn.zhangchuangla.message.mapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
+import cn.zhangchuangla.message.model.request.SentMessageListQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -61,4 +62,13 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      */
     long getUserMessageCount(@Param("userId") Long userId);
 
+    /**
+     * 根据用户ID分页查询已发送的系统消息表信息
+     *
+     * @param page    分页对象
+     * @param userId  用户ID
+     * @param request 查询参数
+     * @return 返回分页对象
+     */
+    Page<SysMessage> pageUserSentMessage(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") SentMessageListQueryRequest request);
 }

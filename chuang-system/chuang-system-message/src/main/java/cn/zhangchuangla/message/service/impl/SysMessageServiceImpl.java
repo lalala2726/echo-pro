@@ -6,8 +6,10 @@ import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
+import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
+import cn.zhangchuangla.message.model.entity.UserMessageRead;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.UserMessageReadService;
@@ -174,16 +176,39 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
-     * 查询当前用户的消息列表
+     * 获取用户消息列表
      *
      * @param request 查询参数
-     * @return 分页消息结果
+     * @return 分页结果
      */
     @Override
-    public Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request) {
-        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
+    public Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request) {
+        Page<SysMessage> sysMessagePage = new Page<>(request.getPageNum(), request.getPageSize());
         Long userId = SecurityUtils.getUserId();
-        return sysMessageMapper.pageUserMessage(page, userId, request);
+        sysMessagePage = sysMessageMapper.pageUserMessage(sysMessagePage, userId, request);
+
+
+        //  获取用户已读消息ID
+        new LambdaQueryWrapper<UserMessageRead>().eq(UserMessageRead::getUserId, userId);
+        List<Long> readMessageIds = userMessageReadService.list().stream()
+                .map(UserMessageRead::getMessageId)
+                .toList();
+
+        List<UserMessageDto> userMessageDtos = sysMessagePage.getRecords().stream()
+                .map(message -> {
+                    UserMessageDto dto = new UserMessageDto();
+                    BeanUtils.copyProperties(message, dto);
+                    dto.setIsRead(readMessageIds.contains(message.getId()));
+                    return dto;
+                })
+                .toList();
+
+        Page<UserMessageDto> resultPage = new Page<>();
+        resultPage.setCurrent(sysMessagePage.getCurrent());
+        resultPage.setSize(sysMessagePage.getSize());
+        resultPage.setTotal(sysMessagePage.getTotal());
+        resultPage.setRecords(userMessageDtos);
+        return resultPage;
     }
 
     /**
@@ -236,6 +261,19 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     public boolean markMessageAsUnRead(List<Long> ids) {
         Long userId = SecurityUtils.getUserId();
         return userMessageReadService.unread(userId, ids);
+    }
+
+    /**
+     * 查询当前用户的发送消息列表
+     *
+     * @param request 查询参数
+     * @return 分页消息结果
+     */
+    @Override
+    public Page<SysMessage> listUserSentMessageList(SentMessageListQueryRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysMessageMapper.pageUserSentMessage(page, userId, request);
     }
 
     /**

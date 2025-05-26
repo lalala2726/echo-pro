@@ -8,11 +8,6 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
-import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
-import cn.zhangchuangla.message.model.vo.UserMessageList;
-import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
@@ -36,7 +31,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 用户管理控制器
@@ -69,85 +66,6 @@ public class SysUserController extends BaseController {
         return success(profileVo);
     }
 
-
-    /**
-     * 获取用户消息列表
-     */
-    @GetMapping("/messages/list")
-    @Operation(summary = "获取用户消息列表")
-    public AjaxResult<TableDataResult> getMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
-                                                      UserMessageListQueryRequest request) {
-        Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
-        UserMessageReadCountDto userMessageReadCountDto = sysMessageService.getUserMessageReadCount();
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("read", userMessageReadCountDto.getRead());
-        extra.put("unread", userMessageReadCountDto.getUnRead());
-        List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
-        return getTableData(sysMessagePage, userMessageLists, extra);
-    }
-
-    /**
-     * 获取用户消息数量
-     *
-     * @return 用户消息数量
-     */
-    @GetMapping("/messages/count")
-    @Operation(summary = "获取用户消息数量")
-    public AjaxResult<UserMessageReadCountDto> getUserMessageReadCount() {
-        UserMessageReadCountDto userMessageReadCountDto = sysMessageService.getUserMessageReadCount();
-        return success(userMessageReadCountDto);
-    }
-
-    /**
-     * 标记消息为已读
-     *
-     * @param ids 消息ID列表
-     * @return 操作结果
-     */
-    @PutMapping("/messages/read/{ids}")
-    @Operation(summary = "标记消息为已读")
-    public AjaxResult<Void> markMessageAsRead(@Parameter(description = "消息ID，用于标记消息为已读")
-                                              @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = sysMessageService.markMessageAsRead(ids);
-        return toAjax(result);
-    }
-
-    /**
-     * 标记消息为未读
-     *
-     * @param ids 消息ID列表
-     * @return 操作结果
-     */
-    @PutMapping("/messages/unread/{ids}")
-    @Operation(summary = "标记消息为未读")
-    public AjaxResult<Void> markMessageAsUnRead(@Parameter(description = "消息ID，用于标记消息为未读")
-                                                @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = sysMessageService.markMessageAsUnRead(ids);
-        return toAjax(result);
-    }
-
-
-    /**
-     * 根据消息ID获取消息详情
-     *
-     * @param id 消息ID
-     * @return 消息详情
-     */
-    @GetMapping("/messages/{id}")
-    @Operation(summary = "根据消息ID获取消息详情")
-
-    public AjaxResult<UserMessageVo> getMessageById(@Parameter(description = "消息ID，用于查询消息详情")
-                                                    @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "消息ID不能小于等于0");
-        SysMessage sysMessage = sysMessageService.getCurrentUserMessageById(id);
-        UserMessageVo userMessageVo = new UserMessageVo();
-        BeanUtils.copyProperties(sysMessage, userMessageVo);
-        return success(userMessageVo);
-    }
-
-
     /**
      * 获取用户列表
      * 根据查询条件分页获取系统用户列表
@@ -172,6 +90,7 @@ public class SysUserController extends BaseController {
         });
         return getTableData(userPage, userListVos);
     }
+
 
     /**
      * 导出用户列表
