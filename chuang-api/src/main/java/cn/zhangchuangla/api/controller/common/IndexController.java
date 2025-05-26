@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.system;
+package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.core.config.property.AppProperty;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 @RequiredArgsConstructor
 @Anonymous
-@Tag(name = "首页")
+@Tag(name = "首页接口", description = "提供系统基本信息和系统健康状态")
 public class IndexController extends BaseController {
 
     private final AppProperty appProperty;

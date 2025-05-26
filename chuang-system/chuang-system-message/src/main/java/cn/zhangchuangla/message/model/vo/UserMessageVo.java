@@ -1,27 +1,37 @@
-package cn.zhangchuangla.message.model.request;
+package cn.zhangchuangla.message.model.vo;
 
-import cn.zhangchuangla.common.core.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
+import java.util.Date;
+
 
 /**
+ * 用户消息视图对象
+ *
  * @author Chuang
- * <p>
- * created on 2025/5/25 22:44
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "用户消息列表查询参数", description = "用于用户查询自己的消息时候的查询条件")
-public class UserMessageListQueryRequest extends BasePageRequest {
+@Schema(name = "用户消息视图对象", description = "用于用户查询自己消息详情")
+public class UserMessageVo {
+
+    /**
+     * 消息ID
+     */
+    @Schema(description = "消息ID")
+    private Long id;
 
     /**
      * 消息标题
      */
     @Schema(description = "消息标题")
     private String title;
+
+    /**
+     * 消息内容
+     */
+    @Schema(description = "消息内容")
+    private String content;
 
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息
@@ -36,12 +46,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     private Integer level;
 
     /**
-     * 是否已读
-     */
-    @Schema(description = "是否已读")
-    private Boolean isRead;
-
-    /**
      * 发送者姓名
      */
     @Schema(description = "发送者姓名")
@@ -51,7 +55,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      * 发布时间
      */
     @Schema(description = "发布时间")
-    private LocalDateTime publishTime;
-
+    private Date publishTime;
 
 }

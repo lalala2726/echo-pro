@@ -48,12 +48,12 @@
         from sys_message
     </sql>
 
-    <select id="listSysMessage" resultMap="BaseResultMap">
+    <select id="pageSysMessage" resultMap="BaseResultMap">
         <include refid="Base_Column_List"/>
         order by id desc
     </select>
 
-    <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
+    <select id="pageUserMessage" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
         SELECT DISTINCT sm.id AS id,
         sm.title AS title,
         IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
@@ -83,7 +83,6 @@
             OR
             (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
-
             AND sm.is_deleted = 0
 
             <if test="request != null">
@@ -104,5 +103,89 @@
                 </if>
             </if>
         </where>
+    </select>
+    <select id="getCurrentUserMessage" resultMap="BaseResultMap">
+        SELECT DISTINCT sm.id             AS id,
+                        sm.title          AS title,
+                        sm.content        AS content,
+                        sm.type           AS type,
+                        sm.level          AS level,
+                        sm.sender_id      AS sender_id,
+                        sm.sender_name    AS sender_name,
+                        sm.target_type    AS target_type,
+                        sm.push_type      AS push_type,
+                        sm.is_published   AS is_published,
+                        sm.publish_time   AS publish_time,
+                        sm.scheduled_time AS scheduled_time,
+                        sm.expire_time    AS expire_time,
+                        sm.is_deleted     AS is_deleted,
+                        sm.create_time    AS create_time,
+                        sm.update_time    AS update_time,
+                        sm.create_by      AS create_by,
+                        sm.update_by      AS update_by
+        FROM sys_message sm
+                 LEFT JOIN
+             sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+                OR
+            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+                OR
+            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            )
+          AND sm.id = #{messageId}
+          AND sm.is_deleted = 0
+    </select>
+
+    <select id="getUserMessageCount" resultType="java.lang.Long">
+        SELECT DISTINCT count(sm.id)
+        FROM sys_message sm
+                 LEFT JOIN
+             sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+                OR
+            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+                OR
+            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            )
+          AND sm.is_deleted = 0
+    </select>
+
+    <select id="listMessageWithUserIdAndMessageId"
+            resultMap="BaseResultMap">
+        SELECT DISTINCT sm.id AS id,
+        sm.title AS title,
+        sm.content AS content,
+        sm.type AS type,
+        sm.level AS level,
+        sm.sender_id AS sender_id,
+        sm.sender_name AS sender_name,
+        sm.target_type AS target_type,
+        sm.push_type AS push_type,
+        sm.is_published AS is_published,
+        sm.publish_time AS publish_time,
+        sm.scheduled_time AS scheduled_time,
+        sm.expire_time AS expire_time,
+        sm.is_deleted AS is_deleted,
+        sm.create_time AS create_time,
+        sm.update_time AS update_time,
+        sm.create_by AS create_by,
+        sm.update_by AS update_by
+        FROM sys_message sm
+        LEFT JOIN
+        sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+        (sum_link.user_id = #{userId} OR sm.target_type = 3)
+        OR
+        (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+        OR
+        (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+        )
+        AND sm.id in
+        <foreach collection="messageIds" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+        AND sm.is_deleted = 0
     </select>
 </mapper>

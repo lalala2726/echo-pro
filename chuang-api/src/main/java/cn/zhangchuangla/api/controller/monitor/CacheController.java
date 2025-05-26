@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/monitor/cache")
-@Tag(name = "缓存监控")
+@Tag(name = "缓存监控", description = "提供Redis缓存相关监控信息")
 @RequiredArgsConstructor
 public class CacheController extends BaseController {
 

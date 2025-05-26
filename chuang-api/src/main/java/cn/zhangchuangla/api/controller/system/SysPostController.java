@@ -35,7 +35,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/system/post")
-@Tag(name = "岗位管理")
+@Tag(name = "岗位管理", description = "提供岗位的新增、删除、修改、查询、批量操作、导出等管理相关接口")
 @RequiredArgsConstructor
 public class SysPostController extends BaseController {
 

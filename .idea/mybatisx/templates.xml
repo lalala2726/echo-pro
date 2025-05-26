@@ -68,8 +68,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="SysUserMessage" />
-                  <option name="tableName" value="sys_user_message" />
+                  <option name="className" value="UserMessageRead" />
+                  <option name="tableName" value="user_message_read" />
                 </TableUIInfo>
               </list>
             </option>

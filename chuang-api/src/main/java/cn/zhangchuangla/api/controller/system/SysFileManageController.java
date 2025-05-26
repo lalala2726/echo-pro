@@ -29,8 +29,8 @@ import java.util.List;
  * <p>
  * created on 2025/4/8 16:25
  */
-@Tag(name = "文件资源")
 @RestController
+@Tag(name = "文件资源管理", description = "提供文件资源的列表查询、回收站管理、恢复、删除等相关操作接口")
 @RequestMapping("/system/file/manage")
 @RequiredArgsConstructor
 public class SysFileManageController extends BaseController {

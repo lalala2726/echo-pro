@@ -33,10 +33,10 @@ import java.util.HashMap;
  */
 @RequestMapping("/common/file")
 @RestController
-@Tag(name = "文件相关")
+@Tag(name = "文件相关接口", description = "提供多种文件和资源上传相关接口")
 @Slf4j
 @RequiredArgsConstructor
-public class SysFileController extends BaseController {
+public class FileController extends BaseController {
 
     private final StorageManager storageManager;
     private final StorageFileService storageFileService;

@@ -40,7 +40,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/system/role")
-@Tag(name = "角色接口")
+@Tag(name = "角色管理", description = "提供角色的新增、删除、修改、查询、权限分配、角色选项等管理接口")
 @RequiredArgsConstructor
 public class SysRoleController extends BaseController {
 
