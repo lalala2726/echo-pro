@@ -1,5 +1,6 @@
 package cn.zhangchuangla.message.service;
 
+import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
@@ -62,7 +63,7 @@ public interface SysMessageService extends IService<SysMessage> {
      * @param request 发送消息请求参数
      * @return 结果
      */
-    boolean sendMessage(SendMessageRequest request);
+    boolean sysSendMessage(SysSendMessageRequest request);
 
     /**
      * 根据用户ID发送消息
@@ -80,7 +81,7 @@ public interface SysMessageService extends IService<SysMessage> {
      * @param request 查询参数
      * @return 消息分页结果
      */
-    Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request);
+    Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request);
 
     /**
      * 根据消息ID查询消息详情
@@ -112,4 +113,20 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 结果
      */
     boolean markMessageAsUnRead(List<Long> ids);
+
+    /**
+     * 查询当前用户的已发送消息列表
+     *
+     * @param request 查询参数
+     * @return 消息分页结果
+     */
+    Page<SysMessage> listUserSentMessageList(UserMessageListQueryRequest request);
+
+    /**
+     * 用户发送消息
+     *
+     * @param request 发送消息请求参数
+     * @return 结果
+     */
+    boolean userSendMessage(UserSendMessageRequest request);
 }
