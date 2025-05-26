@@ -81,4 +81,11 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 消息分页结果
      */
     Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request);
+
+    /**
+     * 根据消息ID查询消息详情
+     * @param id 消息ID
+     * @return 消息详情
+     */
+    SysMessage getCurrentUserMessageById(Long id);
 }

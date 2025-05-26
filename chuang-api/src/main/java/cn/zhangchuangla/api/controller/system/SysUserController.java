@@ -11,6 +11,7 @@ import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageList;
+import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
@@ -54,7 +55,6 @@ public class SysUserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final ExcelUtils excelUtils;
-    private final SysMessageService sysMessageService;
 
     /**
      * 获取用户信息
@@ -69,16 +69,6 @@ public class SysUserController extends BaseController {
         return success(profileVo);
     }
 
-    /**
-     * 获取用户消息列表
-     */
-    @GetMapping("/message/list")
-    @Operation(summary = "获取用户消息列表")
-    public AjaxResult<TableDataResult> getMessageList(UserMessageListQueryRequest request) {
-        Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
-        List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
-        return getTableData(sysMessagePage, userMessageLists);
-    }
 
     /**
      * 获取用户列表

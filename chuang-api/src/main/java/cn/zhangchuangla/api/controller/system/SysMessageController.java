@@ -5,12 +5,13 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
-import cn.zhangchuangla.framework.annotation.AccessLimit;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.model.vo.SysMessageListVo;
 import cn.zhangchuangla.message.model.vo.SysMessageVo;
+import cn.zhangchuangla.message.model.vo.UserMessageList;
+import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,6 +67,35 @@ public class SysMessageController extends BaseController {
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SendMessageRequest request) {
         boolean result = sysMessageService.sendMessage(request);
         return toAjax(result);
+    }
+
+    /**
+     * 获取用户消息列表
+     */
+    @GetMapping("/message/list")
+    @Operation(summary = "获取用户消息列表")
+    public AjaxResult<TableDataResult> getMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
+                                                      UserMessageListQueryRequest request) {
+        Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
+        List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
+        return getTableData(sysMessagePage, userMessageLists);
+    }
+
+    /**
+     * 根据消息ID获取消息详情
+     *
+     * @param id 消息ID
+     * @return 消息详情
+     */
+    @GetMapping("/message/{id}")
+    @Operation(summary = "根据消息ID获取消息详情")
+    public AjaxResult<UserMessageVo> getMessageById(@Parameter(description = "消息ID，用于查询消息详情")
+                                                    @PathVariable("id") Long id) {
+        checkParam(id == null || id <= 0, "消息ID不能小于等于0");
+        SysMessage sysMessage = sysMessageService.getCurrentUserMessageById(id);
+        UserMessageVo userMessageVo = new UserMessageVo();
+        BeanUtils.copyProperties(sysMessage, userMessageVo);
+        return success(userMessageVo);
     }
 
 

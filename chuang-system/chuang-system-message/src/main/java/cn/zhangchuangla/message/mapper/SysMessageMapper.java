@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 /**
  * 系统消息表Mapper接口
  *
@@ -34,4 +32,13 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @return 列表
      */
     Page<SysMessage> listUserMessageByUserId(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
+
+    /**
+     * 根据用户ID查询系统消息表信息
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 列表
+     */
+    SysMessage getCurrentUserMessageById(@Param("userId") Long userId, @Param("messageId") Long messageId);
 }

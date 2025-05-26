@@ -181,6 +181,23 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
+     * 根据ID查询当前用户的消息
+     *
+     * @param id ID
+     * @return 系统消息表
+     */
+    @Override
+    public SysMessage getCurrentUserMessageById(Long id) {
+        //todo 查询详细详情将此消息标记为已读状态
+        //todo 用户可以指定是否发送给所有用户 系统可以设置最大数量等等
+        Long userId = SecurityUtils.getUserId();
+        SysMessage sysMessage = sysMessageMapper.getCurrentUserMessageById(userId, id);
+        if (sysMessage == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
+        }
+        return sysMessage;
+    }
+    /**
      * 根据用户ID发送消息
      *
      * @param request 发送消息请求参数

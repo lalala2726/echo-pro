@@ -20,7 +20,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SysUserMessage {
+public class SysUserMessageMapping {
 
     /**
      * 关联ID
