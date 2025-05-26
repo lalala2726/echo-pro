@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 表格分页数据结果
@@ -54,9 +55,24 @@ public class TableDataResult implements Serializable {
     @Schema(description = "列表数据")
     private List<?> rows;
 
+
+    /**
+     * 其他参数
+     */
+    @Schema(description = "其他参数")
+    private Map<String, Object> extra;
+
     /**
      * 默认构造函数，初始化基本属性
      */
+    public TableDataResult(List<?> rows, Long total, Long pageSize, Long pageNum, Map<String, Object> extra) {
+        this.rows = rows;
+        this.total = total;
+        this.pageSize = pageSize;
+        this.pageNum = pageNum;
+        this.extra = extra;
+    }
+
     public TableDataResult(List<?> rows, Long total, Long pageSize, Long pageNum) {
         this.rows = rows;
         this.total = total;
@@ -79,6 +95,7 @@ public class TableDataResult implements Serializable {
         ));
     }
 
+
     /**
      * 从 Page 对象和自定义行数据构建 TableDataResult
      *
@@ -93,6 +110,26 @@ public class TableDataResult implements Serializable {
                         page.getTotal(),
                         page.getSize(),
                         page.getCurrent()
+                )
+        );
+    }
+
+    /**
+     * 从 Page 、自定义行数据、其他参数构建 TableDataResult
+     *
+     * @param page  分页对象
+     * @param rows  自定义行数据
+     * @param extra 其他参数
+     * @return TableDataResult 实例
+     */
+    public static AjaxResult<TableDataResult> build(Page<?> page, List<?> rows, Map<String, Object> extra) {
+        return AjaxResult.success(
+                new TableDataResult(
+                        rows,
+                        page.getTotal(),
+                        page.getSize(),
+                        page.getCurrent(),
+                        extra
                 )
         );
     }

@@ -36,9 +36,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用户管理控制器
@@ -80,8 +78,12 @@ public class SysUserController extends BaseController {
     public AjaxResult<TableDataResult> getMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
                                                       UserMessageListQueryRequest request) {
         Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
+        UserMessageReadCountDto userMessageReadCountDto = sysMessageService.getUserMessageReadCount();
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("read", userMessageReadCountDto.getRead());
+        extra.put("unread", userMessageReadCountDto.getUnRead());
         List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
-        return getTableData(sysMessagePage, userMessageLists);
+        return getTableData(sysMessagePage, userMessageLists, extra);
     }
 
     /**
