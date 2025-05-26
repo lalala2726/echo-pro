@@ -36,6 +36,12 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     private Integer level;
 
     /**
+     * 是否已读
+     */
+    @Schema(description = "是否已读")
+    private Boolean isRead;
+
+    /**
      * 发送者姓名
      */
     @Schema(description = "发送者姓名")

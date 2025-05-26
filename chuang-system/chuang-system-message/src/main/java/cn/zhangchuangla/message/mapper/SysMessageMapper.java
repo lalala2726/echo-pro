@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 系统消息表Mapper接口
  *
@@ -22,7 +24,7 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @param request 查询参数
      * @return 返回分页对象
      */
-    Page<SysMessage> listSysMessage(Page<SysMessage> page, @Param("request") SysMessageQueryRequest request);
+    Page<SysMessage> pageSysMessage(Page<SysMessage> page, @Param("request") SysMessageQueryRequest request);
 
     /**
      * 根据用户ID分页查询系统消息表信息
@@ -31,7 +33,16 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @param userId 用户ID
      * @return 列表
      */
-    Page<SysMessage> listUserMessageByUserId(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
+    Page<SysMessage> pageUserMessage(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
+
+    /**
+     * 根据用户ID和消息ID查询系统消息表信息
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 列表
+     */
+    List<SysMessage> listMessageWithUserIdAndMessageId(@Param("userId") Long userId, @Param("messageIds") List<Long> messageId);
 
     /**
      * 根据用户ID查询系统消息表信息
@@ -40,5 +51,14 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @param messageId 消息ID
      * @return 列表
      */
-    SysMessage getCurrentUserMessageById(@Param("userId") Long userId, @Param("messageId") Long messageId);
+    SysMessage getCurrentUserMessage(@Param("userId") Long userId, @Param("messageId") Long messageId);
+
+    /**
+     * 根据用户ID查询消息数量
+     *
+     * @param userId 用户ID
+     * @return 消息数量
+     */
+    long getUserMessageCount(@Param("userId") Long userId);
+
 }

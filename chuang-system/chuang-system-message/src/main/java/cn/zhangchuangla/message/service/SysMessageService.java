@@ -1,5 +1,6 @@
 package cn.zhangchuangla.message.service;
 
+import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -73,7 +74,6 @@ public interface SysMessageService extends IService<SysMessage> {
     boolean sendMessageByUserId(List<Long> userId, SysMessage message);
 
 
-
     /**
      * 查询当前用户的消息列表
      *
@@ -84,8 +84,32 @@ public interface SysMessageService extends IService<SysMessage> {
 
     /**
      * 根据消息ID查询消息详情
+     *
      * @param id 消息ID
      * @return 消息详情
      */
     SysMessage getCurrentUserMessageById(Long id);
+
+    /**
+     * 获取当前用户的消息已读未读数量
+     *
+     * @return 已读未读数量
+     */
+    UserMessageReadCountDto getUserMessageReadCount();
+
+    /**
+     * 标记消息已读
+     *
+     * @param ids 消息ID集合
+     * @return 结果
+     */
+    boolean markMessageAsRead(List<Long> ids);
+
+    /**
+     * 标记消息未读
+     *
+     * @param ids 消息ID集合
+     * @return 结果
+     */
+    boolean markMessageAsUnRead(List<Long> ids);
 }

@@ -6,17 +6,17 @@ import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
+import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
-import cn.zhangchuangla.message.service.SysUserMessageService;
+import cn.zhangchuangla.message.service.UserMessageReadService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.mq.production.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysDeptService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
-import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -45,9 +45,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysMessageMapper sysMessageMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
-    private final SysUserService sysUserService;
     private final MessageProducer messageProducer;
-    private final SysUserMessageService sysUserMessageService;
+    private final UserMessageReadService userMessageReadService;
 
     /**
      * 分页查询系统消息表
@@ -58,7 +57,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     public Page<SysMessage> listSysMessage(SysMessageQueryRequest request) {
         Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysMessageMapper.listSysMessage(page, request);
+        return sysMessageMapper.pageSysMessage(page, request);
     }
 
     /**
@@ -127,6 +126,13 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         };
     }
 
+    /**
+     * 发送消息到指定用户，此处将会使用消息队列处理
+     *
+     * @param userId  用户ID
+     * @param message 消息
+     * @return 操作结果
+     */
     @Override
     public boolean sendMessageByUserId(List<Long> userId, SysMessage message) {
         if (userId == null || userId.isEmpty()) {
@@ -177,7 +183,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     public Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request) {
         Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
         Long userId = SecurityUtils.getUserId();
-        return sysMessageMapper.listUserMessageByUserId(page, userId, request);
+        return sysMessageMapper.pageUserMessage(page, userId, request);
     }
 
     /**
@@ -188,15 +194,50 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     public SysMessage getCurrentUserMessageById(Long id) {
-        //todo 查询详细详情将此消息标记为已读状态
-        //todo 用户可以指定是否发送给所有用户 系统可以设置最大数量等等
         Long userId = SecurityUtils.getUserId();
-        SysMessage sysMessage = sysMessageMapper.getCurrentUserMessageById(userId, id);
+        userMessageReadService.read(userId, id);
+        SysMessage sysMessage = sysMessageMapper.getCurrentUserMessage(userId, id);
         if (sysMessage == null) {
             throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
         }
         return sysMessage;
     }
+
+    /**
+     * 获取用户消息已读未读数量
+     *
+     * @return 用户消息已读未读数量
+     */
+    @Override
+    public UserMessageReadCountDto getUserMessageReadCount() {
+        Long userId = SecurityUtils.getUserId();
+        return userMessageReadService.getUserReadMessageCount(userId);
+    }
+
+    /**
+     * 标记消息已读
+     *
+     * @param ids 消息ID
+     * @return 结果
+     */
+    @Override
+    public boolean markMessageAsRead(List<Long> ids) {
+        Long userId = SecurityUtils.getUserId();
+        return userMessageReadService.read(userId, ids);
+    }
+
+    /**
+     * 批量标记消息未读
+     *
+     * @param ids 批量标记未读的ID
+     * @return 批量标记未读结果
+     */
+    @Override
+    public boolean markMessageAsUnRead(List<Long> ids) {
+        Long userId = SecurityUtils.getUserId();
+        return userMessageReadService.unread(userId, ids);
+    }
+
     /**
      * 根据用户ID发送消息
      *

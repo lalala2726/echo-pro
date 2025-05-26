@@ -1,5 +1,6 @@
 package cn.zhangchuangla.message.service;
 
+import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.UserMessageRead;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -45,6 +46,14 @@ public interface UserMessageReadService extends IService<UserMessageRead> {
      * @return 操作结果
      */
     boolean unread(Long userId, List<Long> messageId);
+
+    /**
+     * 获取用户读取消息数量
+     *
+     * @param userId 用户ID
+     * @return 已读消息列表
+     */
+    UserMessageReadCountDto getUserReadMessageCount(Long userId);
 
 
 }

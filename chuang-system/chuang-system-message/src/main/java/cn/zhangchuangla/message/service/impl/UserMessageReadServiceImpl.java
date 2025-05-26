@@ -1,9 +1,10 @@
 package cn.zhangchuangla.message.service.impl;
 
+import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.mapper.UserMessageReadMapper;
+import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.entity.UserMessageRead;
-import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.UserMessageReadService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,7 +22,7 @@ import java.util.List;
 public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMapper, UserMessageRead>
         implements UserMessageReadService {
 
-    private final SysMessageService sysMessageService;
+    private final SysMessageMapper sysMessageMapper;
 
     /**
      * 标记已读
@@ -43,10 +44,8 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
             return false;
         }
 
-        // 只查询存在的消息
-        List<SysMessage> sysMessages = sysMessageService.list(
-                new LambdaQueryWrapper<SysMessage>().in(SysMessage::getId, messageIds)
-        );
+        // 只查询存在的消息并且用户可读
+        List<SysMessage> sysMessages = sysMessageMapper.listMessageWithUserIdAndMessageId(userId, messageIds);
         List<Long> existMessageIds = sysMessages.stream()
                 .map(SysMessage::getId)
                 .toList();
@@ -107,10 +106,8 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
         if (userId == null || messageIds == null || messageIds.isEmpty()) {
             return false;
         }
-        // 只查询存在的消息
-        List<SysMessage> sysMessages = sysMessageService.list(
-                new LambdaQueryWrapper<SysMessage>().in(SysMessage::getId, messageIds)
-        );
+        // 只查询存在的消息并且用户可读
+        List<SysMessage> sysMessages = sysMessageMapper.listMessageWithUserIdAndMessageId(userId, messageIds);
         List<Long> existMessageIds = sysMessages.stream()
                 .map(SysMessage::getId)
                 .toList();
@@ -123,6 +120,23 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
                         .eq(UserMessageRead::getUserId, userId)
                         .in(UserMessageRead::getMessageId, existMessageIds)
         );
+    }
+
+    /**
+     * 获取用户读取消息量
+     *
+     * @param userId 用户ID
+     * @return 用户消息读取量
+     */
+    @Override
+    public UserMessageReadCountDto getUserReadMessageCount(Long userId) {
+        LambdaQueryWrapper<UserMessageRead> eq = new LambdaQueryWrapper<UserMessageRead>().eq(UserMessageRead::getUserId, userId);
+        //  已读
+        long read = count(eq);
+        long allMessageCount = sysMessageMapper.getUserMessageCount(userId);
+        long unread = allMessageCount - read;
+
+        return new UserMessageReadCountDto(userId, read, unread);
     }
 }
 
