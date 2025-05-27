@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -78,6 +79,19 @@ public class BaseController {
     protected AjaxResult<TableDataResult> getTableData(Page<?> page, List<?> rows) {
         return TableDataResult.build(page, rows);
     }
+
+    /**
+     * 封装分页数据,如果想要返回VO必须传入VO对象,否则返回的数据总数和页码不正确
+     *
+     * @param page  分页对象
+     * @param rows  列表数据
+     * @param extra 额外的数据
+     * @return 封装后的分页数据
+     */
+    protected AjaxResult<TableDataResult> getTableData(Page<?> page, List<?> rows, Map<String, Object> extra) {
+        return TableDataResult.build(page, rows, extra);
+    }
+
 
     /**
      * 获取当前用户信息

@@ -48,12 +48,12 @@
         from sys_message
     </sql>
 
-    <select id="listSysMessage" resultMap="BaseResultMap">
+    <select id="pageSysMessage" resultMap="BaseResultMap">
         <include refid="Base_Column_List"/>
         order by id desc
     </select>
 
-    <select id="listUserMessageByUserId" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
+    <select id="pageUserMessage" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
         SELECT DISTINCT sm.id AS id,
         sm.title AS title,
         IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
@@ -77,15 +77,16 @@
         sys_user_message sum_link ON sm.id = sum_link.message_id
         <where>
             (
+            -- 查询条件1:消息是专门给当前用户 --
             (sum_link.user_id = #{userId} OR sm.target_type = 3)
             OR
+            -- 查询条件2:消息是部门内消息--
             (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
+            -- 查询条件3:消息是角色内消息--
             (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
-
             AND sm.is_deleted = 0
-
             <if test="request != null">
                 <if test="request.title != null and request.title != ''">
                     AND sm.title LIKE CONCAT('%', #{request.title}, '%')
@@ -99,10 +100,127 @@
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
                 </if>
-                <if test="request.publishTime != null">
-                    AND sm.publish_time >= #{request.publishTime}
+                <if test="request.sentByMyself != null and request.sentByMyself == true">
+                    AND sm.sender_id = #{userId}
                 </if>
             </if>
+        </where>
+
+        order by sm.create_by
+    </select>
+
+    <select id="getCurrentUserMessage" resultMap="BaseResultMap">
+        SELECT DISTINCT sm.id             AS id,
+                        sm.title          AS title,
+                        sm.content        AS content,
+                        sm.type           AS type,
+                        sm.level          AS level,
+                        sm.sender_id      AS sender_id,
+                        sm.sender_name    AS sender_name,
+                        sm.target_type    AS target_type,
+                        sm.push_type      AS push_type,
+                        sm.is_published   AS is_published,
+                        sm.publish_time   AS publish_time,
+                        sm.scheduled_time AS scheduled_time,
+                        sm.expire_time    AS expire_time,
+                        sm.is_deleted     AS is_deleted,
+                        sm.create_time    AS create_time,
+                        sm.update_time    AS update_time,
+                        sm.create_by      AS create_by,
+                        sm.update_by      AS update_by
+        FROM sys_message sm
+                 LEFT JOIN
+             sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+                OR
+            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+                OR
+            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            )
+          AND sm.id = #{messageId}
+          AND sm.is_deleted = 0
+    </select>
+
+    <select id="getUserMessageCount" resultType="java.lang.Long">
+        SELECT DISTINCT count(sm.id)
+        FROM sys_message sm
+                 LEFT JOIN
+             sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+                OR
+            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+                OR
+            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            )
+          AND sm.is_deleted = 0
+    </select>
+
+    <select id="listMessageWithUserIdAndMessageId"
+            resultMap="BaseResultMap">
+        SELECT DISTINCT sm.id AS id,
+        sm.title AS title,
+        sm.content AS content,
+        sm.type AS type,
+        sm.level AS level,
+        sm.sender_id AS sender_id,
+        sm.sender_name AS sender_name,
+        sm.target_type AS target_type,
+        sm.push_type AS push_type,
+        sm.is_published AS is_published,
+        sm.publish_time AS publish_time,
+        sm.scheduled_time AS scheduled_time,
+        sm.expire_time AS expire_time,
+        sm.is_deleted AS is_deleted,
+        sm.create_time AS create_time,
+        sm.update_time AS update_time,
+        sm.create_by AS create_by,
+        sm.update_by AS update_by
+        FROM sys_message sm
+        LEFT JOIN
+        sys_user_message sum_link ON sm.id = sum_link.message_id
+        where (
+        (sum_link.user_id = #{userId} OR sm.target_type = 3)
+        OR
+        (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+        OR
+        (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+        )
+        AND sm.id in
+        <foreach collection="messageIds" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+        AND sm.is_deleted = 0
+    </select>
+    <select id="pageUserSentMessage" resultType="cn.zhangchuangla.message.model.entity.SysMessage">
+        select id,
+        title,
+        content,
+        type,
+        level,
+        sender_id,
+        sender_name,
+        target_type,
+        push_type,
+        is_published,
+        publish_time,
+        scheduled_time,
+        expire_time,
+        is_deleted,
+        create_time,
+        update_time,
+        create_by,
+        update_by
+        from sys_message
+        <where>
+            <if test="request != null">
+                <if test="request.title != null and request.title != '' or request.content != null and request.content !=''">
+                    AND (title LIKE CONCAT('%', #{request.title}, '%') or (content like CONCAT('%', #{request.content},
+                    '%')))
+                </if>
+            </if>
+            and sender_id = #{userId}
         </where>
     </select>
 </mapper>

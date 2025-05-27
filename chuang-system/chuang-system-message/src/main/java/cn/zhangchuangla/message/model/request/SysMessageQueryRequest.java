@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 系统消息表查询请求参数
@@ -88,7 +89,7 @@ public class SysMessageQueryRequest extends BasePageRequest {
      * 发布时间
      */
     @Schema(description = "发布时间")
-    private LocalDateTime publishTime;
+    private Date publishTime;
 
     /**
      * 定时发送时间，NULL表示立即发送

@@ -52,6 +52,11 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-generator</artifactId>
         </dependency>
+        <!-- Quartz定时任务模块 -->
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-quartz</artifactId>
+        </dependency>
         <!-- 缓存模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

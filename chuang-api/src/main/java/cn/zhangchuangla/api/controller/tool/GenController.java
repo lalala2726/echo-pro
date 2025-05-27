@@ -43,7 +43,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/tool/gen")
-@Tag(name = "代码生成")
+@Tag(name = "代码生成", description = "提供前后端代码快速生成相关接口")
 @RequiredArgsConstructor
 public class GenController extends BaseController {
 

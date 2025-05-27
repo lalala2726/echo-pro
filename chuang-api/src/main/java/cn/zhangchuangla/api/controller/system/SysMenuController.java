@@ -31,8 +31,8 @@ import java.util.List;
  * @author 有来来源
  * @since 2025/3/29 21:19
  */
-@Tag(name = "菜单管理")
 @RestController
+@Tag(name = "菜单管理", description = "提供菜单的增删改查、菜单下拉选项、路由列表等相关操作接口")
 @RequestMapping("/system/menu")
 @RequiredArgsConstructor
 public class SysMenuController extends BaseController {

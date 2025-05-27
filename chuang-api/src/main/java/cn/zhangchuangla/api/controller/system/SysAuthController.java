@@ -36,8 +36,9 @@ import java.util.Set;
  */
 @RestController
 @Slf4j
-@Tag(name = "登录接口")
+@Tag(name = "用户认证", description = "提供用户登录、刷新令牌、退出登录等认证相关操作接口")
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class SysAuthController extends BaseController {
 
     private final SysAuthService sysAuthService;
@@ -52,7 +53,7 @@ public class SysAuthController extends BaseController {
      * @param request 请求参数
      * @return token
      */
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     @Operation(summary = "登录")
     public AjaxResult<AuthenticationToken> login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
@@ -72,7 +73,7 @@ public class SysAuthController extends BaseController {
      * @param request 刷新令牌
      * @return 新的token
      */
-    @PostMapping("/auth/refreshToken")
+    @PostMapping("/refreshToken")
     @Operation(summary = "刷新token")
     public AjaxResult<AuthenticationToken> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
         AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request);
@@ -86,7 +87,7 @@ public class SysAuthController extends BaseController {
      * @return 用户路由
      */
     @Operation(summary = "菜单路由列表")
-    @GetMapping("/auth/routes")
+    @GetMapping("/routes")
     public AjaxResult<List<RouterVo>> getCurrentUserRoutes() {
 
         Long userId = SecurityUtils.getUserId();
@@ -102,7 +103,7 @@ public class SysAuthController extends BaseController {
      *
      * @return 用户信息，包括user、roles、permissions等
      */
-    @GetMapping("/auth/getUserInfo")
+    @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息")
     public AjaxResult<HashMap<String, Object>> getInfo() {
         HashMap<String, Object> ajax = new HashMap<>(4);
@@ -123,7 +124,7 @@ public class SysAuthController extends BaseController {
      *
      * @return 操作结果
      */
-    @DeleteMapping("/auth/logout")
+    @DeleteMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult<Void> logout() {
         sysAuthService.logout();

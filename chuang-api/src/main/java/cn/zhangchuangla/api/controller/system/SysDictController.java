@@ -40,7 +40,7 @@ import java.util.List;
 @RequestMapping("/system/dict")
 @RequiredArgsConstructor
 @RestController
-@Tag(name = "字典接口")
+@Tag(name = "字典管理", description = "提供字典类型与字典项的增删改查、缓存刷新等相关接口。")
 public class SysDictController extends BaseController {
 
     private final SysDictTypeService sysDictTypeService;

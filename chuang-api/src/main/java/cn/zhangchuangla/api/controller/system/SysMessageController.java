@@ -5,10 +5,12 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
-import cn.zhangchuangla.framework.annotation.AccessLimit;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.*;
+import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
+import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
+import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
+import cn.zhangchuangla.message.model.request.SysSendMessageRequest;
 import cn.zhangchuangla.message.model.vo.SysMessageListVo;
 import cn.zhangchuangla.message.model.vo.SysMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
@@ -30,12 +32,12 @@ import java.util.List;
  * 系统消息表控制器
  *
  * @author Chuang
- * @date 2025-05-24
+ * created on  2025-05-24
  */
 @RestController
 @RequestMapping("/system/message")
-@Tag(name = "系统消息表管理")
 @RequiredArgsConstructor
+@Tag(name = "站内信管理", description = "提供系统消息的列表、发送、用户消息操作、标记已读未读、详情、导出等相关接口")
 public class SysMessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
@@ -63,11 +65,10 @@ public class SysMessageController extends BaseController {
     @Operation(summary = "发送消息")
     @OperationLog(title = "消息管理", businessType = BusinessType.SEND_MESSAGES)
     @PreAuthorize("@ss.hasPermission('system:message:send')")
-    public AjaxResult<Void> sendMessage(@RequestBody @Validated SendMessageRequest request) {
-        boolean result = sysMessageService.sendMessage(request);
+    public AjaxResult<Void> sendMessage(@RequestBody @Validated SysSendMessageRequest request) {
+        boolean result = sysMessageService.sysSendMessage(request);
         return toAjax(result);
     }
-
 
     /**
      * 导出系统消息表列表

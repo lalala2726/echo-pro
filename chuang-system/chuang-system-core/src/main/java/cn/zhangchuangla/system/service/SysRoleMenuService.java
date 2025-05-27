@@ -18,4 +18,19 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      */
     List<Long> getSelectedMenuIdByRoleId(Long roleId);
 
+    /**
+     * 检查菜单是否被角色使用
+     *
+     * @param menuId 菜单ID
+     * @return 角色使用数量
+     */
+    int checkMenuExistRole(Long menuId);
+
+    /**
+     * 根据角色ID获取菜单列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单列表
+     */
+    List<Long> selectMenuListByRoleId(Long roleId);
 }

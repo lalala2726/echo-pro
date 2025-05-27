@@ -36,7 +36,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/monitor/online")
-@Tag(name = "在线用户管理")
+@Tag(name = "在线用户管理", description = "提供在线用户列表和强制下线功能")
 @RequiredArgsConstructor
 public class OnlineUserController extends BaseController {
 

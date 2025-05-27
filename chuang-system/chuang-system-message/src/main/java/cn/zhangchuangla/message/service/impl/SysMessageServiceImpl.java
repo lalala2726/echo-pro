@@ -5,18 +5,17 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.message.constant.MessageConstants;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
-import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
-import cn.zhangchuangla.mq.service.MessageProducer;
+import cn.zhangchuangla.mq.production.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
 import cn.zhangchuangla.system.service.SysDeptService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
-import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,7 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 系统消息表Service实现
+ * 系统消息服务实现类
+ * 专门负责消息的CRUD操作和发送
  * 新设计：在消息中添加部门ID，角色ID，当用户查询消息的时候，根据部门ID，角色ID，用户ID查询消息
  * 只有单独给没有标签的用户发送消息的时候才会使用用户消息对应表，这边避免对数据插入大量的数据，节省资源
  *
@@ -45,9 +45,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysMessageMapper sysMessageMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
-    private final SysUserService sysUserService;
     private final MessageProducer messageProducer;
-    private final SysUserMessageService sysUserMessageService;
 
     /**
      * 分页查询系统消息表
@@ -58,7 +56,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     public Page<SysMessage> listSysMessage(SysMessageQueryRequest request) {
         Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysMessageMapper.listSysMessage(page, request);
+        return sysMessageMapper.pageSysMessage(page, request);
     }
 
     /**
@@ -117,7 +115,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean sendMessage(SendMessageRequest request) {
+    public boolean sysSendMessage(SysSendMessageRequest request) {
         return switch (request.getSendMethod()) {
             case Constants.MessageConstants.SEND_METHOD_USER -> sendMessageToUserId(request);
             case Constants.MessageConstants.SEND_METHOD_ROLE -> sendMessageToRoleId(request);
@@ -127,6 +125,13 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         };
     }
 
+    /**
+     * 发送消息到指定用户，此处将会使用消息队列处理
+     *
+     * @param userId  用户ID
+     * @param message 消息
+     * @return 操作结果
+     */
     @Override
     public boolean sendMessageByUserId(List<Long> userId, SysMessage message) {
         if (userId == null || userId.isEmpty()) {
@@ -168,16 +173,21 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
-     * 查询当前用户的消息列表
+     * 用户发送消息
      *
-     * @param request 查询参数
-     * @return 分页消息结果
+     * @param request 发送消息请求参数
+     * @return 结果
      */
     @Override
-    public Page<SysMessage> listUserMessageList(UserMessageListQueryRequest request) {
-        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
+    public boolean userSendMessage(UserSendMessageRequest request) {
         Long userId = SecurityUtils.getUserId();
-        return sysMessageMapper.listUserMessageByUserId(page, userId, request);
+        SysMessage sysMessage = SysMessage.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .targetType(MessageConstants.MessageTypeConstants.USER_MESSAGE)
+                .senderId(userId)
+                .build();
+        return sendMessageByUserId(request.getReceiveId(), sysMessage);
     }
 
     /**
@@ -186,7 +196,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToUserId(SendMessageRequest request) {
+    private boolean sendMessageToUserId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
@@ -203,7 +213,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToRoleId(SendMessageRequest request) {
+    private boolean sendMessageToRoleId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
@@ -265,7 +275,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToDeptId(SendMessageRequest request) {
+    private boolean sendMessageToDeptId(SysSendMessageRequest request) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
@@ -327,7 +337,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToAll(SendMessageRequest request) {
+    private boolean sendMessageToAll(SysSendMessageRequest request) {
         SysMessage sysMessage = SysMessage.builder()
                 .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
                 .createTime(new Date())
@@ -335,5 +345,53 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
+    }
+
+    /**
+     * 获取用户消息数量
+     *
+     * @param userId 用户ID
+     * @return 用户消息数量
+     */
+    @Override
+    public long getUserMessageCount(Long userId) {
+        return sysMessageMapper.getUserMessageCount(userId);
+    }
+
+    /**
+     * 获取用户消息列表
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @return 用户消息列表
+     */
+    @Override
+    public Page<SysMessage> pageUserMessage(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request) {
+        return sysMessageMapper.pageUserMessage(sysMessagePage, userId, request);
+    }
+
+    /**
+     * 根据消息角色ID和消息ID获取用户消息详情
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 用户消息详情
+     */
+    @Override
+    public SysMessage getCurrentUserMessage(Long userId, Long messageId) {
+        return sysMessageMapper.getCurrentUserMessage(userId, messageId);
+    }
+
+    /**
+     * 根据用户ID和消息ID批量获取消息详情
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 消息详情
+     */
+    @Override
+    public List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId) {
+        return List.of();
     }
 }

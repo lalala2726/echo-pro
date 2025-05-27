@@ -8,9 +8,6 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
-import cn.zhangchuangla.message.model.vo.UserMessageList;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
@@ -45,7 +42,7 @@ import java.util.Set;
  * @author Chuang
  */
 @Slf4j
-@Tag(name = "用户管理")
+@Tag(name = "用户管理", description = "提供用户的新增、删除、修改、查询、重置密码、导出等相关管理接口")
 @RestController
 @RequestMapping("/system/user")
 @RequiredArgsConstructor
@@ -67,17 +64,6 @@ public class SysUserController extends BaseController {
     public AjaxResult<UserProfileVo> userProfile() {
         UserProfileVo profileVo = sysUserService.getUserProfile();
         return success(profileVo);
-    }
-
-    /**
-     * 获取用户消息列表
-     */
-    @GetMapping("/message/list")
-    @Operation(summary = "获取用户消息列表")
-    public AjaxResult<TableDataResult> getMessageList(UserMessageListQueryRequest request) {
-        Page<SysMessage> sysMessagePage = sysMessageService.listUserMessageList(request);
-        List<UserMessageList> userMessageLists = copyListProperties(sysMessagePage, UserMessageList.class);
-        return getTableData(sysMessagePage, userMessageLists);
     }
 
     /**
@@ -104,6 +90,7 @@ public class SysUserController extends BaseController {
         });
         return getTableData(userPage, userListVos);
     }
+
 
     /**
      * 导出用户列表

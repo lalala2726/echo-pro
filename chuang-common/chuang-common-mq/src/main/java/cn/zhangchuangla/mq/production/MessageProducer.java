@@ -1,4 +1,4 @@
-package cn.zhangchuangla.mq.service;
+package cn.zhangchuangla.mq.production;
 
 import cn.zhangchuangla.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
@@ -36,7 +36,7 @@ public class MessageProducer {
                 log.warn("用户ID列表为空，跳过发送");
                 return;
             }
-            
+
             int batchSize = messageSendDTO.getBatchSize();
             for (int i = 0; i < userIds.size(); i += batchSize) {
                 int endIndex = Math.min(i + batchSize, userIds.size());

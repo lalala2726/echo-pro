@@ -15,6 +15,7 @@
         <module>chuang-framework</module>
         <module>chuang-api</module>
         <module>chuang-generator</module>
+        <module>chuang-quartz</module>
     </modules>
 
 
@@ -58,6 +59,8 @@
         <apache.poi.version>5.4.0</apache.poi.version>
         <!-- IP 地区转换 -->
         <ip2region.version>2.7.0</ip2region.version>
+        <!-- Quartz 定时任务 -->
+        <quartz.version>2.5.0</quartz.version>
     </properties>
 
     <!-- 项目的依赖列表 -->
@@ -141,6 +144,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <!-- Quartz定时任务模块 -->
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-quartz</artifactId>
                 <version>${app.version}</version>
             </dependency>
 
@@ -396,6 +405,20 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-amqp</artifactId>
                 <version>${spring.boot.amqp.version}</version>
+            </dependency>
+
+            <!-- ===================== Quartz 定时任务 ===================== -->
+            <!-- Spring Boot Quartz 启动器，用于定时任务调度 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-quartz</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <!-- Quartz 核心依赖 -->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${quartz.version}</version>
             </dependency>
         </dependencies>
 

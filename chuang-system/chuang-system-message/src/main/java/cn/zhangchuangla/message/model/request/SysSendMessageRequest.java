@@ -12,7 +12,7 @@ import java.util.List;
  * created on 2025/5/24 22:42
  */
 @Data
-public class SendMessageRequest {
+public class SysSendMessageRequest {
 
     /**
      * 消息发送方式，取值说明：

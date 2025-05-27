@@ -117,6 +117,4 @@ public class SysMessage {
      * 更新人
      */
     private String updateBy;
-
-
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/monitor/server")
-@Tag(name = "服务器监控")
+@Tag(name = "服务器监控", description = "提供服务器运行状态信息")
 public class ServerController extends BaseController {
 
     public ServerController() {
