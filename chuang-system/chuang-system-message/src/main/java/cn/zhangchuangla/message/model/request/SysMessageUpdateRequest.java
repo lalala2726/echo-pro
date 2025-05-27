@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 系统消息表修改请求参数
@@ -101,7 +102,7 @@ public class SysMessageUpdateRequest {
      * 发布时间
      */
     @Schema(description = "发布时间")
-    private LocalDateTime publishTime;
+    private Date publishTime;
 
     /**
      * 定时发送时间，NULL表示立即发送

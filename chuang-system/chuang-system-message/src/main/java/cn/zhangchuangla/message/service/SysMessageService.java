@@ -108,15 +108,6 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     SysMessage getCurrentUserMessage(Long userId, Long messageId);
 
-    /**
-     * 分页查询用户发送的消息
-     *
-     * @param page    分页参数
-     * @param userId  用户ID
-     * @param request 查询参数
-     * @return 分页结果
-     */
-    Page<SysMessage> pageUserSentMessage(Page<SysMessage> page, Long userId, UserMessageListQueryRequest request);
 
     /**
      * 根据用户ID和消息ID列表获取消息列表

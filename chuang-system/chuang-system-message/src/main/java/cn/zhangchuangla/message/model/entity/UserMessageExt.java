@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 /**
- * 用户消息已读表
+ * 用户消息扩展表
  *
  * @author Chuang
  */
-@TableName(value = "user_message_read")
+@TableName(value = "user_message_ext")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserMessageRead {
+public class UserMessageExt {
     /**
      * 主键ID
      */
@@ -30,6 +30,21 @@ public class UserMessageRead {
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 是否阅读(0未读 1已读)
+     */
+    private Integer isRead;
+
+    /**
+     * 首次阅读时间(真实阅读,而不是批量标记已读)
+     */
+    private Date firstReadTime;
+
+    /**
+     * 最后阅读时间(真实阅读,而不是批量标记已读)
+     */
+    private Date lastReadTime;
 
     /**
      * 消息ID

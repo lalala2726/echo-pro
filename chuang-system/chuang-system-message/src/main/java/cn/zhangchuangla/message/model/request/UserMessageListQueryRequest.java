@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 
 /**
  * @author Chuang
@@ -27,8 +26,16 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息,4-已发送消息")
-    private List<Long> type;
+    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
+    private Integer type;
+
+    /**
+     * 是否查询我发送的消息
+     * true：仅查询我自己发送的消息
+     * false 或 null：查询我接收到的消息
+     */
+    @Schema(description = "是否查询我发送的消息（true：我发送的；false：接收的）")
+    private Boolean sentByMyself;
 
     /**
      * 消息级别：1-普通 2-重要 3-紧急
@@ -53,7 +60,7 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      * 发布时间
      */
     @Schema(description = "发布时间")
-    private LocalDateTime publishTime;
+    private Date publishTime;
 
 
 }

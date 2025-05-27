@@ -4,6 +4,8 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.message.constant.MessageConstants;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
@@ -178,8 +180,14 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     public boolean userSendMessage(UserSendMessageRequest request) {
-        // todo 待开发
-        return false;
+        Long userId = SecurityUtils.getUserId();
+        SysMessage sysMessage = SysMessage.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .targetType(MessageConstants.MessageTypeConstants.USER_MESSAGE)
+                .senderId(userId)
+                .build();
+        return sendMessageByUserId(request.getReceiveId(), sysMessage);
     }
 
     /**
@@ -373,19 +381,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     public SysMessage getCurrentUserMessage(Long userId, Long messageId) {
         return sysMessageMapper.getCurrentUserMessage(userId, messageId);
-    }
-
-    /**
-     * 获取用户发送的消息列表
-     *
-     * @param page    分页参数
-     * @param userId  用户ID
-     * @param request 查询参数
-     * @return 用户发送的消息列表
-     */
-    @Override
-    public Page<SysMessage> pageUserSentMessage(Page<SysMessage> page, Long userId, UserMessageListQueryRequest request) {
-        return sysMessageMapper.pageUserSentMessage(page, userId, request);
     }
 
     /**

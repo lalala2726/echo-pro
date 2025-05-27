@@ -77,10 +77,13 @@
         sys_user_message sum_link ON sm.id = sum_link.message_id
         <where>
             (
+            -- 查询条件1:消息是专门给当前用户 --
             (sum_link.user_id = #{userId} OR sm.target_type = 3)
             OR
+            -- 查询条件2:消息是部门内消息--
             (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
+            -- 查询条件3:消息是角色内消息--
             (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
             AND sm.is_deleted = 0
@@ -101,9 +104,13 @@
                 <if test="request.publishTime != null">
                     AND sm.publish_time >= #{request.publishTime}
                 </if>
+                <if test="request.sentByMyself != null and request.sentByMyself == true">
+                    AND sm.sender_id = #{userId}
+                </if>
             </if>
         </where>
     </select>
+
     <select id="getCurrentUserMessage" resultMap="BaseResultMap">
         SELECT DISTINCT sm.id             AS id,
                         sm.title          AS title,

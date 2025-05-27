@@ -1,8 +1,10 @@
 package cn.zhangchuangla.api.controller.workbench;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -43,8 +46,8 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户消息列表")
-    public AjaxResult<TableDataResult> listUserMessageList(
-            @Parameter(description = "消息列表查询，包含分页和筛选条件") UserMessageListQueryRequest request) {
+    public AjaxResult<TableDataResult> listUserMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
+                                                           @ParameterObject UserMessageListQueryRequest request) {
         Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         Map<String, Object> extra = new HashMap<>();
@@ -61,6 +64,7 @@ public class MessageController extends BaseController {
      */
     @PostMapping
     @Operation(summary = "发送消息")
+    @OperationLog(title = "发送消息", businessType = BusinessType.SEND_MESSAGES)
     public AjaxResult<Void> sendMessage(@RequestBody UserSendMessageRequest request) {
         boolean result = sysMessageService.userSendMessage(request);
         return toAjax(result);
@@ -78,6 +82,11 @@ public class MessageController extends BaseController {
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "消息ID不能小于等于0");
         UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
+
+        // 真实阅读，记录首次和最后阅读时间
+        Long userId = getUserId();
+        userMessageReadService.realRead(userId, id);
+
         return success(userMessageVo);
     }
 
@@ -104,7 +113,12 @@ public class MessageController extends BaseController {
     public AjaxResult<Void> markMessageAsRead(
             @Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = userMessageReadService.read(cn.zhangchuangla.common.core.utils.SecurityUtils.getUserId(), ids);
+
+        // 批量标记已读，不记录阅读时间
+        Long userId = getUserId();
+        boolean result = userMessageReadService
+                .batchMarkAsRead(userId, ids);
+
         return toAjax(result);
     }
 
@@ -119,8 +133,11 @@ public class MessageController extends BaseController {
     public AjaxResult<Void> markMessageAsUnRead(
             @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = userMessageReadService.unread(cn.zhangchuangla.common.core.utils.SecurityUtils.getUserId(),
-                ids);
+
+        // 标记未读，保留阅读时间记录
+        Long userId = getUserId();
+        boolean result = userMessageReadService.unread(userId, ids);
+
         return toAjax(result);
     }
 

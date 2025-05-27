@@ -6,12 +6,12 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.entity.UserMessageRead;
+import cn.zhangchuangla.message.model.entity.UserMessageExt;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.service.MessageQueryService;
 import cn.zhangchuangla.message.service.SysMessageService;
-import cn.zhangchuangla.message.service.UserMessageReadService;
+import cn.zhangchuangla.message.service.UserMessageExtService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ import java.util.List;
 public class MessageQueryServiceImpl implements MessageQueryService {
 
     private final SysMessageService sysMessageService;
-    private final UserMessageReadService userMessageReadService;
+    private final UserMessageExtService userMessageExtService;
 
     /**
      * 用户消息列表查询
@@ -96,7 +96,7 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         }
 
         // 异步标记为已读（优化：避免在查询方法中执行写操作）
-        userMessageReadService.read(userId, messageId);
+        userMessageExtService.read(userId, messageId);
 
         UserMessageVo userMessageVo = new UserMessageVo();
         BeanUtils.copyProperties(sysMessage, userMessageVo);
@@ -115,24 +115,12 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         if (userMessageCount == 0L) {
             return new UserMessageReadCountDto(userId, 0L, 0L);
         }
-        LambdaQueryWrapper<UserMessageRead> eq = new LambdaQueryWrapper<UserMessageRead>().eq(UserMessageRead::getUserId, userId);
-        long read = userMessageReadService.count(eq);
+        LambdaQueryWrapper<UserMessageExt> eq = new LambdaQueryWrapper<UserMessageExt>().eq(UserMessageExt::getUserId, userId);
+        long read = userMessageExtService.count(eq);
         long unRead = userMessageCount - read;
         return new UserMessageReadCountDto(userId, read, unRead);
     }
 
-    /**
-     * 用户发送消息列表查询
-     *
-     * @param request 查询参数
-     * @return 分页消息结果
-     */
-    @Override
-    public Page<SysMessage> listUserSentMessageList(UserMessageListQueryRequest request) {
-        Long userId = SecurityUtils.getUserId();
-        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysMessageService.pageUserSentMessage(page, userId, request);
-    }
 
     /**
      * 获取已读消息ID
@@ -147,12 +135,12 @@ public class MessageQueryServiceImpl implements MessageQueryService {
             return List.of();
         }
 
-        return userMessageReadService.list(
-                        new LambdaQueryWrapper<UserMessageRead>()
-                                .eq(UserMessageRead::getUserId, userId)
-                                .in(UserMessageRead::getMessageId, messageIds))
+        return userMessageExtService.list(
+                        new LambdaQueryWrapper<UserMessageExt>()
+                                .eq(UserMessageExt::getUserId, userId)
+                                .in(UserMessageExt::getMessageId, messageIds))
                 .stream()
-                .map(UserMessageRead::getMessageId)
+                .map(UserMessageExt::getMessageId)
                 .toList();
     }
 
