@@ -1,7 +1,5 @@
 package cn.zhangchuangla.message.service;
 
-import cn.zhangchuangla.message.model.dto.UserMessageDto;
-import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,7 +8,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
- * 系统消息表Service接口
+ * 系统消息服务接口
+ * 专门负责消息的CRUD操作和发送
  *
  * @author Chuang
  * created on 2025/5/25
@@ -18,7 +17,7 @@ import java.util.List;
 public interface SysMessageService extends IService<SysMessage> {
 
     /**
-     * 分页查询系统消息表
+     * 分页查询系统消息表（管理员功能）
      *
      * @param request 查询参数
      * @return 分页结果
@@ -58,7 +57,7 @@ public interface SysMessageService extends IService<SysMessage> {
     boolean deleteSysMessageByIds(List<Long> ids);
 
     /**
-     * 发送消息
+     * 系统管理员发送消息
      *
      * @param request 发送消息请求参数
      * @return 结果
@@ -66,61 +65,13 @@ public interface SysMessageService extends IService<SysMessage> {
     boolean sysSendMessage(SysSendMessageRequest request);
 
     /**
-     * 根据用户ID发送消息
+     * 根据用户ID批量发送消息
      *
-     * @param userId  用户ID
-     * @param message 消息
+     * @param userIds 用户ID列表
+     * @param message 消息内容
      * @return 结果
      */
-    boolean sendMessageByUserId(List<Long> userId, SysMessage message);
-
-
-    /**
-     * 查询当前用户的消息列表
-     *
-     * @param request 查询参数
-     * @return 消息分页结果
-     */
-    Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request);
-
-    /**
-     * 根据消息ID查询消息详情
-     *
-     * @param id 消息ID
-     * @return 消息详情
-     */
-    SysMessage getCurrentUserMessageById(Long id);
-
-    /**
-     * 获取当前用户的消息已读未读数量
-     *
-     * @return 已读未读数量
-     */
-    UserMessageReadCountDto getUserMessageReadCount();
-
-    /**
-     * 标记消息已读
-     *
-     * @param ids 消息ID集合
-     * @return 结果
-     */
-    boolean markMessageAsRead(List<Long> ids);
-
-    /**
-     * 标记消息未读
-     *
-     * @param ids 消息ID集合
-     * @return 结果
-     */
-    boolean markMessageAsUnRead(List<Long> ids);
-
-    /**
-     * 查询当前用户的已发送消息列表
-     *
-     * @param request 查询参数
-     * @return 消息分页结果
-     */
-    Page<SysMessage> listUserSentMessageList(UserMessageListQueryRequest request);
+    boolean sendMessageByUserId(List<Long> userIds, SysMessage message);
 
     /**
      * 用户发送消息
@@ -129,4 +80,41 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 结果
      */
     boolean userSendMessage(UserSendMessageRequest request);
+
+    /**
+     * 获取用户消息数量
+     *
+     * @param userId 用户ID
+     * @return 用户消息数量
+     */
+    long getUserMessageCount(Long userId);
+
+    /**
+     * 分页查询用户消息表
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @return 分页结果
+     */
+    Page<SysMessage> pageUserMessage(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request);
+
+    /**
+     * 根据用户ID和消息ID获取当前用户消息
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 当前用户消息
+     */
+    SysMessage getCurrentUserMessage(Long userId, Long messageId);
+
+
+    /**
+     * 根据用户ID和消息ID列表获取消息列表
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID列表
+     * @return 消息列表
+     */
+    List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId);
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 系统消息表添加请求参数
@@ -85,7 +86,7 @@ public class SysMessageAddRequest {
      * 发布时间
      */
     @Schema(description = "发布时间")
-    private LocalDateTime publishTime;
+    private Date publishTime;
 
     /**
      * 定时发送时间，NULL表示立即发送

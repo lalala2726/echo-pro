@@ -1,5 +1,9 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
+import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
+
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,19 +31,28 @@ public interface SysPermissionService {
      */
     Set<String> getUserPermissionByRole(String role);
 
-    /**
-     * 根据用户id获取权限列表
-     *
-     * @param userId 用户id
-     * @return 权限列表
-     */
-    Set<String> getUserPermissionByUserId(Long userId);
 
     /**
-     * 根据用户id获取权限列表,如果不传递用户id，则默认获取当前登录用户的权限列表
+     * 根据角色id获取权限列表
      *
+     * @param roleId 角色ID
      * @return 权限列表
      */
-    Set<String> getUserPermissionByUserId();
+    SysRolePermVo getRolePermByRoleId(Long roleId);
 
+    /**
+     * 更新角色权限信息
+     *
+     * @param request 更新角色权限请求参数
+     * @return 是否更新成功
+     */
+    boolean updateRolePermission(SysUpdateRolePermissionRequest request);
+
+    /**
+     * 根据角色id获取已选择的权限ID
+     *
+     * @param roleId 角色ID
+     * @return 权限ID列表
+     */
+    List<Long> getRolePermissionSelectedByRoleId(Long roleId);
 }

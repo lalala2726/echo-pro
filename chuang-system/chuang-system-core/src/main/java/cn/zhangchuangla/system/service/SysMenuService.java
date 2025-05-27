@@ -30,14 +30,6 @@ public interface SysMenuService extends IService<SysMenu> {
 
 
     /**
-     * 根据角色ID查询菜单ID列表
-     *
-     * @param roleId 角色ID
-     * @return 菜单ID列表
-     */
-    List<Long> getRolePermSelectedByRoleId(Long roleId);
-
-    /**
      * 构造前端需要的路由界面
      *
      * @param menus 菜单列表
@@ -125,23 +117,6 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     boolean addMenu(SysMenuAddRequest request);
-
-    /**
-     * 根据角色ID获取菜单权限信息
-     *
-     * @param roleId 角色ID
-     * @return 菜单权限信息
-     */
-    SysRolePermVo getRolePermByRoleId(Long roleId);
-
-    /**
-     * 更新角色权限
-     *
-     * @param request 请求参数
-     * @return 结果
-     */
-    boolean updateRolePermission(SysUpdateRolePermissionRequest request);
-
     /**
      * 更新角色权限
      *

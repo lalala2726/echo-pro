@@ -1,4 +1,4 @@
-package cn.zhangchuangla.message.consumption;
+package cn.zhangchuangla.message.consumer;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.message.model.entity.SysUserMessageMapping;

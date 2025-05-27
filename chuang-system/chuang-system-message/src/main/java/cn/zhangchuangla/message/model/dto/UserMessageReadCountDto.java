@@ -25,11 +25,11 @@ public class UserMessageReadCountDto {
      * 已读数量
      */
     @Schema(description = "已读数量")
-    private Long read;
+    private long read;
 
     /**
      * 未读数量
      */
     @Schema(description = "未读数量")
-    private Long unRead;
+    private long unRead;
 }

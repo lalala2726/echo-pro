@@ -1,23 +1,25 @@
 package cn.zhangchuangla.api.controller.workbench;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
-import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.request.UserSendMessageRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageListVo;
 import cn.zhangchuangla.message.model.vo.UserMessageVo;
-import cn.zhangchuangla.message.model.vo.UserSentMessageListVo;
+import cn.zhangchuangla.message.service.MessageQueryService;
 import cn.zhangchuangla.message.service.SysMessageService;
+import cn.zhangchuangla.message.service.UserMessageReadService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -36,6 +38,8 @@ import java.util.Map;
 public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
+    private final MessageQueryService messageQueryService;
+    private final UserMessageReadService userMessageReadService;
 
     /**
      * 获取用户消息列表
@@ -43,9 +47,9 @@ public class MessageController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取用户消息列表")
     public AjaxResult<TableDataResult> listUserMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
-                                                           UserMessageListQueryRequest request) {
-        Page<UserMessageDto> sysMessagePage = sysMessageService.listUserMessageList(request);
-        UserMessageReadCountDto userMessageReadCountDto = sysMessageService.getUserMessageReadCount();
+                                                           @ParameterObject UserMessageListQueryRequest request) {
+        Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
+        UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         Map<String, Object> extra = new HashMap<>();
         extra.put("read", userMessageReadCountDto.getRead());
         extra.put("unread", userMessageReadCountDto.getUnRead());
@@ -60,6 +64,7 @@ public class MessageController extends BaseController {
      */
     @PostMapping
     @Operation(summary = "发送消息")
+    @OperationLog(title = "发送消息", businessType = BusinessType.SEND_MESSAGES)
     public AjaxResult<Void> sendMessage(@RequestBody UserSendMessageRequest request) {
         boolean result = sysMessageService.userSendMessage(request);
         return toAjax(result);
@@ -73,29 +78,16 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据消息ID获取消息详情，当成功请求此接口后系统将自动将消息标记已读，无须单独调用已读消息的接口")
-    public AjaxResult<UserMessageVo> getMessageById(@Parameter(description = "消息ID，用于查询消息详情")
-                                                    @PathVariable("id") Long id) {
+    public AjaxResult<UserMessageVo> getMessageById(
+            @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "消息ID不能小于等于0");
-        SysMessage sysMessage = sysMessageService.getCurrentUserMessageById(id);
-        UserMessageVo userMessageVo = new UserMessageVo();
-        BeanUtils.copyProperties(sysMessage, userMessageVo);
+        UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
+
+        // 真实阅读，记录首次和最后阅读时间
+        Long userId = getUserId();
+        userMessageReadService.realRead(userId, id);
+
         return success(userMessageVo);
-    }
-
-
-    /**
-     * 获取已发送消息列表
-     *
-     * @param request 查询参数
-     * @return 消息列表
-     */
-    @GetMapping("/sent/list")
-    @Operation(summary = "获取已发送消息列表")
-    public AjaxResult<TableDataResult> getSentMessageList(@Parameter(description = "已发送消息列表查询，包含分页和筛选条件")
-                                                              UserMessageListQueryRequest request) {
-        Page<SysMessage> sysMessagePage = sysMessageService.listUserSentMessageList(request);
-        List<UserSentMessageListVo> userSentMessageListVoList = copyListProperties(sysMessagePage, UserSentMessageListVo.class);
-        return getTableData(sysMessagePage, userSentMessageListVoList);
     }
 
     /**
@@ -106,7 +98,7 @@ public class MessageController extends BaseController {
     @GetMapping("/count")
     @Operation(summary = "获取用户消息数量")
     public AjaxResult<UserMessageReadCountDto> getUserMessageReadCount() {
-        UserMessageReadCountDto userMessageReadCountDto = sysMessageService.getUserMessageReadCount();
+        UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         return success(userMessageReadCountDto);
     }
 
@@ -118,10 +110,15 @@ public class MessageController extends BaseController {
      */
     @PutMapping("/read/{ids}")
     @Operation(summary = "标记消息为已读")
-    public AjaxResult<Void> markMessageAsRead(@Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读")
-                                              @PathVariable("ids") List<Long> ids) {
+    public AjaxResult<Void> markMessageAsRead(
+            @Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = sysMessageService.markMessageAsRead(ids);
+
+        // 批量标记已读，不记录阅读时间
+        Long userId = getUserId();
+        boolean result = userMessageReadService
+                .batchMarkAsRead(userId, ids);
+
         return toAjax(result);
     }
 
@@ -133,10 +130,14 @@ public class MessageController extends BaseController {
      */
     @PutMapping("/unread/{ids}")
     @Operation(summary = "标记消息为未读")
-    public AjaxResult<Void> markMessageAsUnRead(@Parameter(description = "消息ID，用于标记消息为未读")
-                                                @PathVariable("ids") List<Long> ids) {
+    public AjaxResult<Void> markMessageAsUnRead(
+            @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-        boolean result = sysMessageService.markMessageAsUnRead(ids);
+
+        // 标记未读，保留阅读时间记录
+        Long userId = getUserId();
+        boolean result = userMessageReadService.unread(userId, ids);
+
         return toAjax(result);
     }
 
