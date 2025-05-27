@@ -84,11 +84,6 @@ public class MessageQueryServiceImpl implements MessageQueryService {
     public UserMessageVo getUserMessageDetail(Long messageId) {
         Long userId = SecurityUtils.getUserId();
 
-        // 检查用户是否可以访问该消息
-        if (!canUserAccessMessage(userId, messageId)) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在或无权访问");
-        }
-
         // 获取消息详情
         SysMessage sysMessage = sysMessageService.getCurrentUserMessage(userId, messageId);
         if (sysMessage == null) {
@@ -113,12 +108,12 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         Long userId = SecurityUtils.getUserId();
         long userMessageCount = sysMessageService.getUserMessageCount(userId);
         if (userMessageCount == 0L) {
-            return new UserMessageReadCountDto(userId, 0L, 0L);
+            return new UserMessageReadCountDto(userId, 0L, 0L, 0L);
         }
         LambdaQueryWrapper<UserMessageExt> eq = new LambdaQueryWrapper<UserMessageExt>().eq(UserMessageExt::getUserId, userId);
         long read = userMessageExtService.count(eq);
         long unRead = userMessageCount - read;
-        return new UserMessageReadCountDto(userId, read, unRead);
+        return new UserMessageReadCountDto(userId, userMessageCount, read, unRead);
     }
 
 
@@ -142,18 +137,5 @@ public class MessageQueryServiceImpl implements MessageQueryService {
                 .stream()
                 .map(UserMessageExt::getMessageId)
                 .toList();
-    }
-
-    /**
-     * 检查用户是否可以访问该消息
-     *
-     * @param userId    用户ID
-     * @param messageId 消息ID
-     * @return 用户是否可以访问该消息
-     */
-    @Override
-    public boolean canUserAccessMessage(Long userId, Long messageId) {
-        List<SysMessage> messages = sysMessageService.listMessageWithUserIdAndMessageId(userId, List.of(messageId));
-        return !messages.isEmpty();
     }
 }

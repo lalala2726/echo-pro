@@ -87,7 +87,6 @@
             (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
             AND sm.is_deleted = 0
-
             <if test="request != null">
                 <if test="request.title != null and request.title != ''">
                     AND sm.title LIKE CONCAT('%', #{request.title}, '%')
@@ -101,14 +100,13 @@
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
                 </if>
-                <if test="request.publishTime != null">
-                    AND sm.publish_time >= #{request.publishTime}
-                </if>
                 <if test="request.sentByMyself != null and request.sentByMyself == true">
                     AND sm.sender_id = #{userId}
                 </if>
             </if>
         </where>
+
+        order by sm.create_by
     </select>
 
     <select id="getCurrentUserMessage" resultMap="BaseResultMap">

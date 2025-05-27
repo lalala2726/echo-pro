@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * @author Chuang
  * <p>
@@ -55,12 +53,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      */
     @Schema(description = "发送者姓名")
     private String senderName;
-
-    /**
-     * 发布时间
-     */
-    @Schema(description = "发布时间")
-    private Date publishTime;
 
 
 }

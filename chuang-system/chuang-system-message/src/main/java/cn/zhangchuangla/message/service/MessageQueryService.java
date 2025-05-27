@@ -49,12 +49,4 @@ public interface MessageQueryService {
      */
     List<Long> getReadMessageIds(Long userId, List<Long> messageIds);
 
-    /**
-     * 检查用户是否可以访问指定消息
-     *
-     * @param userId    用户ID
-     * @param messageId 消息ID
-     * @return 是否可以访问
-     */
-    boolean canUserAccessMessage(Long userId, Long messageId);
 }

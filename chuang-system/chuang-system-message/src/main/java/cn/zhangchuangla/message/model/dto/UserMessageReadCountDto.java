@@ -22,6 +22,12 @@ public class UserMessageReadCountDto {
     private Long userId;
 
     /**
+     * 总数量
+     */
+    @Schema(description = "总数量")
+    private long total;
+
+    /**
      * 已读数量
      */
     @Schema(description = "已读数量")

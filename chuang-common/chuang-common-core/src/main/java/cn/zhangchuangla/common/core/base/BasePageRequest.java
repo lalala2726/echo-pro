@@ -16,11 +16,11 @@ public class BasePageRequest {
      */
 
     @Schema(description = "当前页码", type = "integer", format = "int32", defaultValue = "1", requiredMode = Schema.RequiredMode.AUTO)
-    private Integer pageNum = 1;
+    private int pageNum = 1;
 
     /**
      * 每页数量
      */
     @Schema(description = "当前页码", type = "integer", format = "int32", defaultValue = "10", requiredMode = Schema.RequiredMode.AUTO)
-    private Integer pageSize = 10;
+    private int pageSize = 10;
 }
