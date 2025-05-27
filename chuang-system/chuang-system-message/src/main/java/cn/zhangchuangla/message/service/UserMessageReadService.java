@@ -7,21 +7,24 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 /**
+ * 用户消息已读状态服务接口
+ * 专门负责消息的已读/未读状态管理
+ *
  * @author Chuang
  */
 public interface UserMessageReadService extends IService<UserMessageRead> {
 
     /**
-     * 读取消息
+     * 标记单个消息为已读
      *
      * @param userId    用户ID
      * @param messageId 消息ID
-     * @return 读取结果
+     * @return 操作结果
      */
     boolean read(Long userId, Long messageId);
 
     /**
-     * 批量读取消息
+     * 批量标记消息为已读
      *
      * @param userId     用户ID
      * @param messageIds 消息ID集合
@@ -30,7 +33,7 @@ public interface UserMessageReadService extends IService<UserMessageRead> {
     boolean read(Long userId, List<Long> messageIds);
 
     /**
-     * 标记消息为未读
+     * 标记单个消息为未读
      *
      * @param userId    用户ID
      * @param messageId 消息ID
@@ -41,19 +44,27 @@ public interface UserMessageReadService extends IService<UserMessageRead> {
     /**
      * 批量标记消息为未读
      *
-     * @param userId    用户ID
-     * @param messageId 消息ID集合
+     * @param userId     用户ID
+     * @param messageIds 消息ID集合
      * @return 操作结果
      */
-    boolean unread(Long userId, List<Long> messageId);
+    boolean unread(Long userId, List<Long> messageIds);
 
     /**
-     * 获取用户读取消息数量
+     * 检查用户是否已读指定消息
      *
-     * @param userId 用户ID
-     * @return 已读消息列表
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 是否已读
      */
-    UserMessageReadCountDto getUserReadMessageCount(Long userId);
+    boolean isMessageRead(Long userId, Long messageId);
 
-
+    /**
+     * 批量检查消息已读状态
+     *
+     * @param userId     用户ID
+     * @param messageIds 消息ID集合
+     * @return 已读的消息ID列表
+     */
+    List<Long> getReadMessageIds(Long userId, List<Long> messageIds);
 }

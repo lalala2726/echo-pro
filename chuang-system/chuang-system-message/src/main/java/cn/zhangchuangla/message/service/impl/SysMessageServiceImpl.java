@@ -4,15 +4,10 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
-import cn.zhangchuangla.message.model.dto.UserMessageDto;
-import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.entity.UserMessageRead;
 import cn.zhangchuangla.message.model.request.*;
 import cn.zhangchuangla.message.service.SysMessageService;
-import cn.zhangchuangla.message.service.UserMessageReadService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.mq.production.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -32,7 +27,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 系统消息表Service实现
+ * 系统消息服务实现类
+ * 专门负责消息的CRUD操作和发送
  * 新设计：在消息中添加部门ID，角色ID，当用户查询消息的时候，根据部门ID，角色ID，用户ID查询消息
  * 只有单独给没有标签的用户发送消息的时候才会使用用户消息对应表，这边避免对数据插入大量的数据，节省资源
  *
@@ -48,7 +44,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final MessageProducer messageProducer;
-    private final UserMessageReadService userMessageReadService;
 
     /**
      * 分页查询系统消息表
@@ -176,107 +171,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
-     * 获取用户消息列表
-     *
-     * @param request 查询参数
-     * @return 分页结果
-     */
-    @Override
-    public Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request) {
-        Page<SysMessage> sysMessagePage = new Page<>(request.getPageNum(), request.getPageSize());
-        Long userId = SecurityUtils.getUserId();
-        sysMessagePage = sysMessageMapper.pageUserMessage(sysMessagePage, userId, request);
-
-
-        //  获取用户已读消息ID
-        new LambdaQueryWrapper<UserMessageRead>().eq(UserMessageRead::getUserId, userId);
-        List<Long> readMessageIds = userMessageReadService.list().stream()
-                .map(UserMessageRead::getMessageId)
-                .toList();
-
-        List<UserMessageDto> userMessageDtos = sysMessagePage.getRecords().stream()
-                .map(message -> {
-                    UserMessageDto dto = new UserMessageDto();
-                    BeanUtils.copyProperties(message, dto);
-                    dto.setIsRead(readMessageIds.contains(message.getId()));
-                    return dto;
-                })
-                .toList();
-
-        Page<UserMessageDto> resultPage = new Page<>();
-        resultPage.setCurrent(sysMessagePage.getCurrent());
-        resultPage.setSize(sysMessagePage.getSize());
-        resultPage.setTotal(sysMessagePage.getTotal());
-        resultPage.setRecords(userMessageDtos);
-        return resultPage;
-    }
-
-    /**
-     * 根据ID查询当前用户的消息
-     *
-     * @param id ID
-     * @return 系统消息表
-     */
-    @Override
-    public SysMessage getCurrentUserMessageById(Long id) {
-        Long userId = SecurityUtils.getUserId();
-        userMessageReadService.read(userId, id);
-        SysMessage sysMessage = sysMessageMapper.getCurrentUserMessage(userId, id);
-        if (sysMessage == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
-        }
-        return sysMessage;
-    }
-
-    /**
-     * 获取用户消息已读未读数量
-     *
-     * @return 用户消息已读未读数量
-     */
-    @Override
-    public UserMessageReadCountDto getUserMessageReadCount() {
-        Long userId = SecurityUtils.getUserId();
-        return userMessageReadService.getUserReadMessageCount(userId);
-    }
-
-    /**
-     * 标记消息已读
-     *
-     * @param ids 消息ID
-     * @return 结果
-     */
-    @Override
-    public boolean markMessageAsRead(List<Long> ids) {
-        Long userId = SecurityUtils.getUserId();
-        return userMessageReadService.read(userId, ids);
-    }
-
-    /**
-     * 批量标记消息未读
-     *
-     * @param ids 批量标记未读的ID
-     * @return 批量标记未读结果
-     */
-    @Override
-    public boolean markMessageAsUnRead(List<Long> ids) {
-        Long userId = SecurityUtils.getUserId();
-        return userMessageReadService.unread(userId, ids);
-    }
-
-    /**
-     * 查询当前用户的发送消息列表
-     *
-     * @param request 查询参数
-     * @return 分页消息结果
-     */
-    @Override
-    public Page<SysMessage> listUserSentMessageList(UserMessageListQueryRequest request) {
-        Long userId = SecurityUtils.getUserId();
-        Page<SysMessage> page = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysMessageMapper.pageUserSentMessage(page, userId, request);
-    }
-
-    /**
      * 用户发送消息
      *
      * @param request 发送消息请求参数
@@ -284,7 +178,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     public boolean userSendMessage(UserSendMessageRequest request) {
-        //todo 待开发
+        // todo 待开发
         return false;
     }
 
@@ -443,5 +337,66 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         BeanUtils.copyProperties(request.getMessage(), sysMessage);
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
+    }
+
+    /**
+     * 获取用户消息数量
+     *
+     * @param userId 用户ID
+     * @return 用户消息数量
+     */
+    @Override
+    public long getUserMessageCount(Long userId) {
+        return sysMessageMapper.getUserMessageCount(userId);
+    }
+
+    /**
+     * 获取用户消息列表
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @return 用户消息列表
+     */
+    @Override
+    public Page<SysMessage> pageUserMessage(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request) {
+        return sysMessageMapper.pageUserMessage(sysMessagePage, userId, request);
+    }
+
+    /**
+     * 根据消息角色ID和消息ID获取用户消息详情
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 用户消息详情
+     */
+    @Override
+    public SysMessage getCurrentUserMessage(Long userId, Long messageId) {
+        return sysMessageMapper.getCurrentUserMessage(userId, messageId);
+    }
+
+    /**
+     * 获取用户发送的消息列表
+     *
+     * @param page    分页参数
+     * @param userId  用户ID
+     * @param request 查询参数
+     * @return 用户发送的消息列表
+     */
+    @Override
+    public Page<SysMessage> pageUserSentMessage(Page<SysMessage> page, Long userId, UserMessageListQueryRequest request) {
+        return sysMessageMapper.pageUserSentMessage(page, userId, request);
+    }
+
+    /**
+     * 根据用户ID和消息ID批量获取消息详情
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 消息详情
+     */
+    @Override
+    public List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId) {
+        return List.of();
     }
 }

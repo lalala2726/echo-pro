@@ -1,28 +1,29 @@
 package cn.zhangchuangla.message.service.impl;
 
-import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.mapper.UserMessageReadMapper;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
-import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.entity.UserMessageRead;
 import cn.zhangchuangla.message.service.UserMessageReadService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
+ * 用户消息已读状态服务实现类
+ * 专门负责消息的已读/未读状态管理
+ *
  * @author Chuang
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMapper, UserMessageRead>
         implements UserMessageReadService {
-
-    private final SysMessageMapper sysMessageMapper;
 
     /**
      * 标记已读
@@ -37,6 +38,13 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
         return read(userId, List.of(messageId));
     }
 
+    /**
+     * 批量标记已读
+     *
+     * @param userId     用户ID
+     * @param messageIds 批量消息ID
+     * @return 操作结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean read(Long userId, List<Long> messageIds) {
@@ -44,27 +52,17 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
             return false;
         }
 
-        // 只查询存在的消息并且用户可读
-        List<SysMessage> sysMessages = sysMessageMapper.listMessageWithUserIdAndMessageId(userId, messageIds);
-        List<Long> existMessageIds = sysMessages.stream()
-                .map(SysMessage::getId)
-                .toList();
-
-        if (existMessageIds.isEmpty()) {
-            return false;
-        }
-
         // 查询用户已读的消息，避免重复插入
         List<Long> alreadyReadIds = this.lambdaQuery()
                 .eq(UserMessageRead::getUserId, userId)
-                .in(UserMessageRead::getMessageId, existMessageIds)
+                .in(UserMessageRead::getMessageId, messageIds)
                 .list()
                 .stream()
                 .map(UserMessageRead::getMessageId)
                 .toList();
 
         // 过滤掉已读的消息
-        List<UserMessageRead> userMessageReads = existMessageIds.stream()
+        List<UserMessageRead> userMessageReads = messageIds.stream()
                 .filter(id -> !alreadyReadIds.contains(id))
                 .map(id -> UserMessageRead.builder()
                         .userId(userId)
@@ -106,40 +104,51 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageReadMappe
         if (userId == null || messageIds == null || messageIds.isEmpty()) {
             return false;
         }
-        // 只查询存在的消息并且用户可读
-        List<SysMessage> sysMessages = sysMessageMapper.listMessageWithUserIdAndMessageId(userId, messageIds);
-        List<Long> existMessageIds = sysMessages.stream()
-                .map(SysMessage::getId)
-                .toList();
 
-        if (existMessageIds.isEmpty()) {
-            return false;
-        }
         return this.remove(
                 new LambdaQueryWrapper<UserMessageRead>()
                         .eq(UserMessageRead::getUserId, userId)
-                        .in(UserMessageRead::getMessageId, existMessageIds)
-        );
+                        .in(UserMessageRead::getMessageId, messageIds));
+    }
+
+
+    /**
+     * 判断消息是否已读
+     *
+     * @param userId    用户ID
+     * @param messageId 消息ID
+     * @return 是否已读
+     */
+    @Override
+    public boolean isMessageRead(Long userId, Long messageId) {
+        if (userId == null || messageId == null) {
+            return false;
+        }
+
+        return this.lambdaQuery()
+                .eq(UserMessageRead::getUserId, userId)
+                .eq(UserMessageRead::getMessageId, messageId)
+                .exists();
     }
 
     /**
-     * 获取用户读取消息量
+     * 获取已读消息ID列表
      *
-     * @param userId 用户ID
-     * @return 用户消息读取量
+     * @param userId     用户ID
+     * @param messageIds 消息ID列表
+     * @return 已读消息ID列表
      */
     @Override
-    public UserMessageReadCountDto getUserReadMessageCount(Long userId) {
-        LambdaQueryWrapper<UserMessageRead> eq = new LambdaQueryWrapper<UserMessageRead>().eq(UserMessageRead::getUserId, userId);
-        //  已读
-        long read = count(eq);
-        long allMessageCount = sysMessageMapper.getUserMessageCount(userId);
-        long unread = allMessageCount - read;
-
-        return new UserMessageReadCountDto(userId, read, unread);
+    public List<Long> getReadMessageIds(Long userId, List<Long> messageIds) {
+        if (userId == null || messageIds == null || messageIds.isEmpty()) {
+            return List.of();
+        }
+        return this.lambdaQuery()
+                .eq(UserMessageRead::getUserId, userId)
+                .in(UserMessageRead::getMessageId, messageIds)
+                .list()
+                .stream()
+                .map(UserMessageRead::getMessageId)
+                .toList();
     }
 }
-
-
-
-

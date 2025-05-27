@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Chuang
@@ -26,8 +27,8 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
-    private Integer type;
+    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息,4-已发送消息")
+    private List<Long> type;
 
     /**
      * 消息级别：1-普通 2-重要 3-紧急
@@ -40,6 +41,7 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      */
     @Schema(description = "是否已读")
     private Boolean isRead;
+
 
     /**
      * 发送者姓名
