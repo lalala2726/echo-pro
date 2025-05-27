@@ -42,10 +42,10 @@ import java.util.stream.Collectors;
 public class SysPermissionServiceImpl implements SysPermissionService {
 
     private final SysMenuService sysMenuService;
-    private final SysMenuMapper sysMenuMapper;
     private final RedisCache redisCache;
     private final SysRoleService sysRoleService;
     private final SysRoleMenuService sysRoleMenuService;
+    private final SysMenuMapper sysMenuMapper;
 
     /**
      * 获取用户权限列表

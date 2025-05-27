@@ -1,18 +1,21 @@
 package cn.zhangchuangla.message.service.impl;
 
+import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.message.constant.MessageConstants;
 import cn.zhangchuangla.message.mapper.UserMessageExtMapper;
 import cn.zhangchuangla.message.model.entity.UserMessageExt;
 import cn.zhangchuangla.message.service.UserMessageReadService;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -54,65 +57,68 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Transactional(rollbackFor = Exception.class)
     public boolean realRead(Long userId, List<Long> messageIds) {
         if (userId == null || messageIds == null || messageIds.isEmpty()) {
-            return false;
+            throw new ParamException("参数错误");
+        }
+
+        // 查询已存在的记录
+        List<UserMessageExt> existingRecords = lambdaQuery()
+                .eq(UserMessageExt::getUserId, userId)
+                .in(UserMessageExt::getMessageId, messageIds)
+                .list();
+
+        // 处理不存在的 messageId
+        List<Long> newMessageIds = new ArrayList<>(messageIds);
+        if (!existingRecords.isEmpty()) {
+            newMessageIds.removeAll(existingRecords.stream()
+                    .map(UserMessageExt::getMessageId)
+                    .toList());
         }
 
         Date now = new Date();
 
-        // 查询用户已有的阅读记录
-        Map<Long, UserMessageExt> existingReads = this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .in(UserMessageExt::getMessageId, messageIds)
-                .list()
-                .stream()
-                .collect(Collectors.toMap(UserMessageExt::getMessageId, ext -> ext));
-
-        // 处理新增和更新
-        for (Long messageId : messageIds) {
-            UserMessageExt existing = existingReads.get(messageId);
-
-            if (existing == null) {
-                // 新增记录：首次真实阅读
-                UserMessageExt newRecord = UserMessageExt.builder()
+        // 创建新记录
+        List<UserMessageExt> toCreate = newMessageIds.stream()
+                .map(messageId -> UserMessageExt.builder()
                         .userId(userId)
                         .messageId(messageId)
                         .isRead(MessageConstants.StatusConstants.MESSAGE_IS_READ)
-                        // 记录首次阅读时间
                         .firstReadTime(now)
-                        // 记录最后阅读时间
                         .lastReadTime(now)
                         .createTime(now)
                         .updateTime(now)
-                        .build();
+                        .build())
+                .collect(Collectors.toList());
 
-                if (!this.save(newRecord)) {
-                    log.error("保存用户真实阅读记录失败: userId={}, messageId={}", userId, messageId);
-                    return false;
+        // 保存新记录
+        if (!toCreate.isEmpty() && !saveBatch(toCreate)) {
+            log.error("批量保存真实阅读记录失败: userId={}, messageIds={}", userId, newMessageIds);
+            return false;
+        }
+
+        // 更新已存在记录（如果需要）
+        if (!existingRecords.isEmpty()) {
+            boolean updated = existingRecords.stream().allMatch(record -> {
+                record.setIsRead(MessageConstants.StatusConstants.MESSAGE_IS_READ);
+                record.setUpdateTime(now);
+
+                // 只更新首次阅读时间，如果它尚未设置
+                if (record.getFirstReadTime() == null) {
+                    record.setFirstReadTime(now);
                 }
 
-                log.info("用户首次真实阅读消息: userId={}, messageId={}, time={}", userId, messageId, now);
+                record.setLastReadTime(now);
+                return updateById(record);
+            });
 
-            } else {
-                // 更新记录：更新最后阅读时间和已读状态
-                boolean updateResult = this.lambdaUpdate()
-                        .eq(UserMessageExt::getUserId, userId)
-                        .eq(UserMessageExt::getMessageId, messageId)
-                        .set(UserMessageExt::getIsRead, 1)
-                        // 更新最后阅读时间
-                        .set(UserMessageExt::getLastReadTime, now)
-                        .set(UserMessageExt::getUpdateTime, now)
-                        // 注意：不更新 firstReadTime，保持首次阅读时间不变
-                        .update();
-
-                if (!updateResult) {
-                    log.error("更新用户真实阅读记录失败: userId={}, messageId={}", userId, messageId);
-                    return false;
-                }
-
-                log.info("用户再次真实阅读消息: userId={}, messageId={}, lastReadTime={}", userId, messageId, now);
+            if (!updated) {
+                log.warn("部分已有消息记录更新阅读状态失败: userId={}, messageIds={}", userId,
+                        existingRecords.stream().map(UserMessageExt::getMessageId).collect(Collectors.toList()));
+                // 根据业务需求决定是否返回false
             }
         }
 
+        log.info("真实阅读操作完成: userId={}, total={}, created={}, updated={}",
+                userId, messageIds.size(), toCreate.size(), existingRecords.size());
         return true;
     }
 
@@ -128,7 +134,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Transactional(rollbackFor = Exception.class)
     public boolean batchMarkAsRead(Long userId, List<Long> messageIds) {
         if (userId == null || messageIds == null || messageIds.isEmpty()) {
-            return false;
+            throw new ParamException("参数错误");
         }
 
         Date now = new Date();
@@ -211,7 +217,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Transactional(rollbackFor = Exception.class)
     public boolean unread(Long userId, List<Long> messageIds) {
         if (userId == null || messageIds == null || messageIds.isEmpty()) {
-            return false;
+            throw new ParamException("参数错误");
         }
 
         // 将已读状态设置为未读，但保留阅读时间记录（用于数据分析）
@@ -236,7 +242,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Override
     public boolean isMessageRead(Long userId, Long messageId) {
         if (userId == null || messageId == null) {
-            return false;
+            throw new ParamException("参数错误");
         }
 
         return this.lambdaQuery()
@@ -256,7 +262,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Override
     public boolean isMessageRealRead(Long userId, Long messageId) {
         if (userId == null || messageId == null) {
-            return false;
+            throw new ParamException("参数错误");
         }
 
         return this.lambdaQuery()
@@ -301,7 +307,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Override
     public Date getFirstReadTime(Long userId, Long messageId) {
         if (userId == null || messageId == null) {
-            return null;
+            throw new ParamException("参数错误");
         }
 
         UserMessageExt record = this.lambdaQuery()
@@ -322,7 +328,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
     @Override
     public Date getLastReadTime(Long userId, Long messageId) {
         if (userId == null || messageId == null) {
-            return null;
+            throw new ParamException("参数错误");
         }
 
         UserMessageExt record = this.lambdaQuery()

@@ -82,11 +82,12 @@ public class MessageController extends BaseController {
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "消息ID不能小于等于0");
         UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
-
+        if (userMessageVo == null) {
+            return error("消息不存在");
+        }
         // 真实阅读，记录首次和最后阅读时间
         Long userId = getUserId();
         userMessageReadService.realRead(userId, id);
-
         return success(userMessageVo);
     }
 
