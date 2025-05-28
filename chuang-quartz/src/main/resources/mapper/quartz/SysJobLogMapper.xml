@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.quartz.mapper.SysJobLogMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.quartz.entity.SysJobLog">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.quartz.model.entity.SysJobLog">
         <id property="jobLogId" column="job_log_id"/>
         <result property="jobName" column="job_name"/>
         <result property="jobGroup" column="job_group"/>

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.quartz.mapper;
 
-import cn.zhangchuangla.quartz.entity.SysJobLog;
+import cn.zhangchuangla.quartz.model.entity.SysJobLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
