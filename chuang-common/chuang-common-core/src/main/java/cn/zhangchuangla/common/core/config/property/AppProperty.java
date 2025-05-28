@@ -32,6 +32,7 @@ public class AppProperty {
 
     @Data
     public static class Config {
+
         /**
          * 本地上传路径
          */

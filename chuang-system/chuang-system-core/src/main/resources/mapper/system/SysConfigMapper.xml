@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysConfigMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysConfig">
-        <id property="id" column="id"/>
+        <id property="configId" column="config_id"/>
         <result property="configName" column="config_name"/>
         <result property="configKey" column="config_key"/>
         <result property="configValue" column="config_value"/>
@@ -17,7 +17,7 @@
     </resultMap>
     <select id="listSysConfig" resultMap="BaseResultMap">
         select
-        id,
+        config_id,
         config_name,
         config_key,
         config_value,
