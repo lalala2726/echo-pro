@@ -3,6 +3,7 @@ package cn.zhangchuangla.generator.utils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper; // 新增：导入LambdaQueryWrapper
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
@@ -190,10 +191,13 @@ public class VelocityUtils {
         // 如果GenTableMapper为null，则无法继续，实际应用中应确保其可用。
         if (genTableMapper == null || genTableColumnMapper == null) {
             log.error("GenTableMapper 或 GenTableColumnMapper 未提供，无法处理子表信息。");
-            // 在此可以决定是抛出异常还是静默失败
+            // 在此可以决定是抛出异常还是静默失败 (Here you can decide whether to throw an exception or fail silently)
             return;
         }
-        GenTable subGenTable = genTableMapper.selectGenTableByName(subTableNameConfig);
+        // Corrected: 使用LambdaQueryWrapper通过表名查询子表GenTable信息 (Using LambdaQueryWrapper to query sub-table GenTable info by table name)
+        LambdaQueryWrapper<GenTable> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(GenTable::getTableName, subTableNameConfig);
+        GenTable subGenTable = genTableMapper.selectOne(queryWrapper);
 
         if (subGenTable == null) {
             log.warn("根据子表名 '{}' 未找到对应的GenTable记录，跳过子表模板变量设置。", subTableNameConfig);
@@ -280,18 +284,10 @@ public class VelocityUtils {
         String subTableJsonString = JSON.toJSONString(subTableDataForJson);
         context.put("subTableJson", subTableJsonString); // 将JSON字符串放入Velocity上下文
 
-        // 为了getFileName能够获取到subClassNameDto，将其存入genTable的params中
-        // params是一个Map<String, Object>，通常用于在生成器各阶段传递临时数据
-        if (genTable.getParams() == null) {
-            genTable.setParams(new HashMap<>());
-        }
-        genTable.getParams().put("subClassNameDto", subClassNameDto); // 存储子类DTO名
-        // 也存储子表的packageName和moduleName，如果它们可能与主表不同
-        genTable.getParams().put("subPackageName", subGenTable.getPackageName());
-        genTable.getParams().put("subModuleName", subGenTable.getModuleName());
+        // Removed: 不再需要将subClassNameDto, subPackageName, subModuleName存入genTable.getParams()
+        // (No longer necessary to store subClassNameDto, subPackageName, subModuleName in genTable.getParams())
 
-
-        // 原有的subTable Map结构可以保留，如果旧模板或其他地方仍在使用
+        // 原有的subTable Map结构可以保留，如果旧模板或其他地方仍在使用 (The original subTable Map structure can be kept if old templates or other places still use it)
         // 但新的变量更直接，建议模板优先使用新变量
         Map<String, Object> subTableMap = new HashMap<>();
         subTableMap.put("tableName", subGenTable.getTableName());
@@ -428,24 +424,42 @@ public class VelocityUtils {
         } else if (template.contains("request.java.vm")) {
             fileName = StrUtil.format("{}/model/request/{}/{}QueryRequest.java", mainJavaPath, businessName, className);
         }
-        // 新增：处理子项DTO文件名
+        // 新增：处理子项DTO文件名 (New: Handle sub-item DTO filename)
         else if (template.equals(getJavaDtoSubItemTemplate())) {
-            // 从genTable的params中获取子类DTO名 (在prepareContext中设置)
-            String subClassNameDto = (genTable.getParams() != null) ? (String) genTable.getParams().get("subClassNameDto") : null;
-            // 子表可能在不同的包或模块，这里假设它和主表在同一个包下，但可以从subGenTable获取实际的包路径
-            String subPackageName = (genTable.getParams() != null && genTable.getParams().get("subPackageName") != null) ? (String) genTable.getParams().get("subPackageName") : mainPackageName;
-            String subJavaPath = PROJECT_PATH + "/" + StrUtil.replace(subPackageName, ".", "/");
-
-            if (StrUtil.isNotBlank(subClassNameDto)) {
-                fileName = StrUtil.format("{}/model/dto/{}.java", subJavaPath, subClassNameDto); // 子项DTO放在model/dto/目录下
+            // 直接从主表配置中获取子表名，并结合主表的包和模块信息生成路径
+            // (Directly get sub-table name from main table config, and generate path using main table's package and module info)
+            String subTableName = genTable.getSubTableName();
+            if (StrUtil.isNotBlank(subTableName)) {
+                String subClassName = GenUtils.convertClassName(subTableName);
+                String subClassNameDto = subClassName + "Dto";
+                
+                // 使用主表的包名和模块名 (Using main table's package name and module name)
+                // String mainPackageName = genTable.getPackageName(); // 已在方法开始处获取 (Already obtained at the start of the method)
+                // String moduleName = genTable.getModuleName(); // 已在方法开始处获取 (Already obtained at the start of the method)
+                
+                // 路径格式: src/main/java/com/example/project/module/model/dto/SubItemDto.java
+                // GenUtils.getSrcPath() 期望返回 "src" (GenUtils.getSrcPath() is expected to return "src")
+                // PROJECT_PATH 是 "main/java" (PROJECT_PATH is "main/java")
+                // mainPackageName.replace('.', '/') 转换包名为路径 (converts package name to path)
+                String packagePath = mainPackageName.replace('.', '/');
+                
+                // 确保路径各部分不为空 (Ensure path components are not blank)
+                // if (StrUtil.isNotBlank(GenUtils.getSrcPath()) && StrUtil.isNotBlank(packagePath) && StrUtil.isNotBlank(moduleName)) {
+                // GenUtils.getSrcPath() 似乎不是一个标准方法，直接使用 PROJECT_PATH
+                // (GenUtils.getSrcPath() doesn't seem to be a standard method, using PROJECT_PATH directly)
+                // 修正：路径应基于主表的包，子项DTO通常在主表模块下
+                // (Correction: Path should be based on the main table's package; sub-item DTOs are usually under the main table's module)
+                String dtoPath = PROJECT_PATH + "/" + packagePath + "/model/dto"; // 修正路径：移除moduleName，DTO在主包的model/dto下
+                fileName = StrUtil.format("{}/{}.java", dtoPath, subClassNameDto);
+                // } else {
+                // log.error("无法为子项DTO生成完整路径，部分路径组件缺失。SrcPath: {}, PackagePath: {}, ModuleName: {}",
+                // GenUtils.getSrcPath(), packagePath, moduleName);
+                // }
             } else {
-                // 如果subClassNameDto未设置，记录错误或抛出异常
-                log.error("无法生成子项DTO文件名，因为 'subClassNameDto' 未在GenTable的params中设置。模板: {}", template);
-                // 可以选择返回一个空文件名或特定错误标记，或者抛出异常
-                // fileName = ""; // 或者 throw new IllegalStateException("subClassNameDto not set");
+                log.error("子表名未在主表配置中设置，无法生成子项DTO文件名。主表: {}", genTable.getTableName());
             }
         }
-        // 前端文件名处理
+        // 前端文件名处理 (Frontend filename handling)
         else if (template.contains("api.ts.vm")) {
             fileName = StrUtil.format("{}/{}.ts", apiPath, businessName);
         } else if (template.contains("types.ts.vm")) {
