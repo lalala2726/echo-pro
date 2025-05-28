@@ -1,15 +1,18 @@
-package ${packageName}.model.dto; // Assuming sub-DTOs go into a 'dto' subpackage
+// 假设子DTO存放在 'dto' 子包下 (Assuming sub-DTOs go into a 'dto' subpackage)
+package ${packageName}.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-#foreach ($import in $subDtoImports) // To handle imports like Date, BigDecimal if needed for sub-item fields
+// 处理子项字段可能需要的导入，例如 Date, BigDecimal (To handle imports like Date, BigDecimal if needed for sub-item fields)
+#foreach ($import in $subDtoImports)
 import ${import};
 #end
-import jakarta.validation.constraints.NotBlank; // Ensure these are jakarta
+// 确保这些是Jakarta约束 (Ensure these are jakarta constraints)
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * ${subClassName} DTO // e.g., OrderItem DTO
+ * ${subClassName} DTO (例如: OrderItem DTO)
  * (为 ${subTableComment} 设计的数据传输对象)
  *
  * @author ${author} (代码生成器)
@@ -17,9 +20,11 @@ import jakarta.validation.constraints.NotNull;
  */
 @Data
 @Schema(description = "${subTableComment} DTO")
-public class ${subClassName}Dto { // Name like OrderItemDto
+// 类名示例: OrderItemDto (Name like OrderItemDto)
+public class ${subClassName}Dto {
     #foreach ($column in $subColumns)
-        #if($column.isInsert == '1' || $column.isEdit == '1') // Include fields relevant for add/update
+        // 包含与添加/更新相关的字段 (Include fields relevant for add/update)
+        #if($column.isInsert == '1' || $column.isEdit == '1')
 
         /**
          * $column.columnComment (子表字段)

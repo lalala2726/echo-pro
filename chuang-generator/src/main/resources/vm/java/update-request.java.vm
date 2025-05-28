@@ -10,7 +10,8 @@ import jakarta.validation.constraints.NotNull;
 #if($tplCategory == 'sub')
 import jakarta.validation.Valid;
 import java.util.List;
-import ${packageName}.model.dto.${subClassName}Dto; // Path to the new sub-item DTO
+// 引入新子项DTO的路径 (Path to the new sub-item DTO)
+import ${packageName}.model.dto.${subClassName}Dto;
 #end
 import java.util.Date;
 
@@ -59,7 +60,9 @@ public class ${ClassName}UpdateRequest {
      * ${subTableComment}列表 (子表数据列表)
      */
     @Schema(description = "${subTableComment}列表")
-    @Valid // Crucial for triggering validation on sub-items
-    private List<${subClassName}Dto> ${subClassNameLowerList}; // e.g., orderItemList
+    // @Valid 注解对于触发子项验证至关重要 (Crucial for triggering validation on sub-items)
+    @Valid
+    // 例如: orderItemList (e.g., orderItemList)
+    private List<${subClassName}Dto> ${subClassNameLowerList};
     #end
 }

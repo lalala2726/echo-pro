@@ -201,20 +201,27 @@ public class VelocityUtils {
         }
 
         // 2. 查询子表字段信息
-        List<GenTableColumn> subColumns = genTableColumnMapper.selectGenTableColumnListByTableId(subGenTable.getTableId());
+        // Corrected: 使用表名从 genTableColumnMapper 获取子表列信息 (Using table name to get sub-table column info from genTableColumnMapper)
+        List<cn.zhangchuangla.generator.model.entity.GenTableColumn> subColumns = genTableColumnMapper.selectDbTableColumnsByTableName(subGenTable.getTableName());
         if (CollUtil.isEmpty(subColumns)) {
-            log.warn("子表 '{}' ({}) 未配置字段信息或查询结果为空。", subGenTable.getTableName(), subGenTable.getTableComment());
-            // 即使没有字段，也可能需要生成DTO，所以不直接返回
+            log.warn("子表 '{}' ({}) 未配置字段信息或通过表名查询结果为空。", subGenTable.getTableName(), subGenTable.getTableComment());
+            // 即使没有字段，也可能需要生成DTO，所以不直接返回 (Even if there are no fields, DTO might still need to be generated, so don't return directly)
         }
 
-        // 3. 准备子表相关变量
-        String subClassName = subGenTable.getClassName(); // GenTable实体中应已包含转换后的类名
+        // 3. 准备子表相关变量 (Prepare sub-table related variables)
+        String subClassName = subGenTable.getClassName(); // GenTable实体中应已包含转换后的类名 (ClassName in GenTable entity should already be converted)
         String subClassNameDto = subClassName + "Dto";
-        String subClassNameLowerList = StrUtil.lowerFirst(subClassName) + "List"; // 例如: orderItemList
-        String subTableComment = StrUtil.isNotBlank(subGenTable.getFunctionComment()) ? subGenTable.getFunctionComment() : subGenTable.getTableComment();
-        String subTableFkName = StrUtil.isNotBlank(subTableFkNameConfig) ? subTableFkNameConfig : (getPkColumn(genTable.getColumns()) != null ? getPkColumn(genTable.getColumns()).getColumnName() : "id"); // 子表外键字段名，默认为主表主键
+        String subClassNameLowerList = StrUtil.lowerFirst(subClassName) + "List"; // 例如: orderItemList (For example: orderItemList)
+        
+        // 使用子表的业务功能名作为注释，如果为空则回退到表描述 (Use sub-table's function name as comment, fallback to table comment if blank)
+        String subTableComment = subGenTable.getFunctionName(); 
+        if (cn.hutool.core.util.StrUtil.isBlank(subTableComment)) {
+            subTableComment = subGenTable.getTableComment(); // Fallback to table comment
+        }
+        
+        String subTableFkName = StrUtil.isNotBlank(subTableFkNameConfig) ? subTableFkNameConfig : (getPkColumn(genTable.getColumns()) != null ? getPkColumn(genTable.getColumns()).getColumnName() : "id"); // 子表外键字段名，默认为主表主键 (Sub-table foreign key field name, defaults to main table's primary key)
 
-        // 4. 获取子表DTO所需的导入包
+        // 4. 获取子表DTO所需的导入包 (Get required imports for sub-table DTO)
         HashSet<String> subDtoImports = new HashSet<>();
         if (subColumns != null) {
             for (GenTableColumn column : subColumns) {

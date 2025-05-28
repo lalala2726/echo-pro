@@ -7,14 +7,17 @@ import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
 import ${packageName}.service.${ClassName}Service;
 import cn.hutool.core.util.StrUtil;
-import cn.zhangchuangla.common.core.enums.ResponseCode; // 新增：导入ResponseCode
-import cn.zhangchuangla.common.core.exception.ServiceException; // 新增：导入ServiceException
+// 新增：导入ResponseCode
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+// 新增：导入ServiceException
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // 新增：导入事务注解
+// 新增：导入事务注解
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,26 +83,28 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
      * @return 操作结果
      */
     @Override
-    @Transactional(rollbackFor = Exception.class) // 新增/确保：事务注解
+    // 新增/确保：事务注解
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete${ClassName}ById(Long id) {
         // 从代码生成配置中获取当前树表的 cascadeDeleteTree 设置 (假设 'table' 是 GenTable 实例)
         // GenTable 对象 'table' 应由 VelocityUtils.prepareContext 放入上下文中
-        String cascadeDelete = "${table.cascadeDeleteTree}"; // '1' 表示 true (启用级联删除)
+        // '1' 表示 true (启用级联删除)
+        String cascadeDelete = "${table.cascadeDeleteTree}";
 
         if ("1".equals(cascadeDelete)) {
             // (级联删除已启用)
             // 递归删除所有子孙节点
             // 注意: deleteAllChildrenRecursive 需要 ${classNameLower}Mapper 作为参数
-            deleteAllChildrenRecursive(id, ${classNameLower}Mapper); 
+            deleteAllChildrenRecursive(id, ${classNameLower}Mapper);
             // 删除父节点自身
-            return removeById(id); 
+            return removeById(id);
         } else {
             // (级联删除未启用或配置非'1')
             // 检查是否有直接子节点 (原有逻辑，但使用 mapper.selectCount)
             LambdaQueryWrapper<${ClassName}> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(${ClassName}::get${TreeParentCode}, id);
             // 使用 ${classNameLower}Mapper 进行查询，更明确
-            long count = ${classNameLower}Mapper.selectCount(queryWrapper); 
+            long count = ${classNameLower}Mapper.selectCount(queryWrapper);
             
             if (count > 0) {
                 // 如果存在子节点且未启用级联删除，则抛出异常
@@ -161,16 +166,18 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
      * @return 构建好的树形结构列表 (当前层级的子节点)
      */
     @Override
-    public List<${ClassName}> buildTree(List<${ClassName}> list, Object parentIdValue) { // 修改: parentId -> parentIdValue, 类型 String -> Object
+    // 修改: parentId -> parentIdValue, 类型 String -> Object
+    public List<${ClassName}> buildTree(List<${ClassName}> list, Object parentIdValue) {
         List<${ClassName}> tree = new ArrayList<>();
         
         for (${ClassName} item : list) {
             // 使用 Objects.equals 进行 null 安全的父ID比较
             // 假设 item.get${TreeParentCode}() 返回的是实际类型的父ID (可能为 null, 例如 Long, Integer, String)
-            if (java.util.Objects.equals(parentIdValue, item.get${TreeParentCode}())) { // 修改: 使用 Objects.equals 比较, 不再需要 String.valueOf
+            // 修改: 使用 Objects.equals 比较, 不再需要 String.valueOf
+            if (java.util.Objects.equals(parentIdValue, item.get${TreeParentCode}())) {
                 // 递归查找子节点, 使用当前节点的ID (item.get${TreeCode}()) 作为子节点的父ID
                 // item.get${TreeCode}() 返回的是实际类型, 直接传递
-                List<${ClassName}> children = buildTree(list, item.get${TreeCode}()); 
+                List<${ClassName}> children = buildTree(list, item.get${TreeCode}());
                 item.setChildren(children);
                 tree.add(item);
             }
@@ -197,7 +204,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         // 如果没有子节点, 则递归终止
         // (If there are no children, terminate recursion for this branch)
         if (children == null || children.isEmpty()) {
-            return; 
+            return;
         }
 
         for (${ClassName} child : children) {
