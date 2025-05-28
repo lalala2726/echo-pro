@@ -7,10 +7,18 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+#if($tplCategory == 'sub')
+import jakarta.validation.Valid;
+import java.util.List;
+import ${packageName}.model.dto.${subClassName}Dto; // Path to the new sub-item DTO
+#end
 import java.util.Date;
 
 /**
  * ${functionName}添加请求参数
+#if($tplCategory == 'sub')
+ * (包含 ${subTableComment} 子项的添加请求)
+#end
  *
  * @author ${author}
  * @date ${datetime}
@@ -36,5 +44,14 @@ public class ${ClassName}AddRequest {
                 #end
             private $column.javaType $column.javaField;
         #end
+    #end
+
+    #if($tplCategory == 'sub')
+    /**
+     * ${subTableComment}列表 (子表数据列表)
+     */
+    @Schema(description = "${subTableComment}列表")
+    @Valid // Crucial for triggering validation on sub-items
+    private List<${subClassName}Dto> ${subClassNameLowerList}; // e.g., orderItemList, matching getter in service
     #end
 }

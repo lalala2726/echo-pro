@@ -383,17 +383,51 @@
     type: "add" as "add" | "edit",
     title: "",
     data: {} as any,
-    index: -1
+    index: -1,
+    rules: {} as FormRules // 新增：用于存储子表项的动态验证规则
   });
 
   // 子表项表单引用
   const subItemFormRef = ref<FormInstance>();
 
-  // 表单验证规则
+  // 表单验证规则 (主表)
   const formRules: FormRules = {};
 
-  // 子表项验证规则
-  const subItemRules: FormRules = {};
+  // 子表项验证规则 (此处保留为空对象，实际规则在打开对话框时动态生成并赋值给 subItemDialog.rules)
+  // const subItemRules: FormRules = {}; // 旧的静态规则，将被动态生成取代
+
+  // 假设 subTableData 从 Velocity 获取，包含了子表的元数据，特别是 columns
+  // 在实际生成时，Java端需要将 subTable 对象序列化为 JSON 并赋值给此变量
+  // 例如: const subTableData = JSON.parse('${subTableJson}');
+  // 为确保模板在没有此变量时也能运行(用于预览或旧版生成器)，添加一个空对象作为默认值
+  const subTableData = (${subTableJson} || { columns: [] }); // 新增：从 Velocity 获取子表元数据
+
+  /**
+   * 生成子表项的动态验证规则 (generateSubItemRules)
+   * @param columns 子表的列元数据数组
+   * @returns FormRules 对象
+   */
+  const generateSubItemRules = (columns: any[]): FormRules => {
+    const newRules: FormRules = {};
+    if (columns && columns.length > 0) {
+      columns.forEach(column => {
+        // 检查字段是否必需 (isRequired === '1')
+        // 并且该字段应该在表单中出现 (isInsert === '1' || isEdit === '1')
+        // (sub-item.java.vm 模板已确保只有这类字段会出现在DTO和表单中)
+        if (column.isRequired === '1') {
+          newRules[column.javaField] = [
+            {
+              required: true,
+              message: `${column.columnComment} 不能为空`, // 不能为空 (Chinese)
+              trigger: 'blur' // 对输入框使用 blur 触发器
+            }
+            // 未来可以根据 column.validationType, column.maxLength 等添加更多规则
+          ];
+        }
+      });
+    }
+    return newRules;
+  };
 
   // 获取${functionName}列表
   const handleQuery = async () => {
@@ -509,26 +543,30 @@
 
   // 添加子表项
   const handleAddSubItem = () => {
+    // 动态生成并设置子表项的验证规则
+    subItemDialog.rules = generateSubItemRules(subTableData.columns); // 新增：生成规则
     subItemDialog.visible = true;
     subItemDialog.type = "add";
     subItemDialog.title = "添加${subTable.functionName}";
     subItemDialog.data = {
         #foreach($column in $subTable.columns)
             #if($column.isInsert == '1' || $column.isEdit == '1')
-                $column.javaField: #if($column.javaType == 'String')""#else undefined#end,
+                $column.javaField: #if($column.javaType == 'String')""#else undefined#end, // 根据Java类型设置初始值
             #end
         #end
     };
-    subItemDialog.index = -1;
+    subItemDialog.index = -1; // 标记为新增
   };
 
   // 编辑子表项
   const handleEditSubItem = (row: any, index: number) => {
+    // 动态生成并设置子表项的验证规则
+    subItemDialog.rules = generateSubItemRules(subTableData.columns); // 新增：生成规则
     subItemDialog.visible = true;
     subItemDialog.type = "edit";
     subItemDialog.title = "编辑${subTable.functionName}";
-    subItemDialog.data = { ...row };
-    subItemDialog.index = index;
+    subItemDialog.data = { ...row }; // 浅拷贝行数据到表单
+    subItemDialog.index = index; // 记录编辑项的索引
   };
 
   // 删除子表项

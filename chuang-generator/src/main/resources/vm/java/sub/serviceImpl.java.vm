@@ -63,6 +63,11 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         if (result && request.get${subClassName}List() != null && !request.get${subClassName}List().isEmpty()) {
             List<${subClassName}> ${subClassNameLower}List = request.get${subClassName}List();
             for (${subClassName} ${subClassNameLower} : ${subClassNameLower}List) {
+                // 注意: 此处的 ${subTableFkName} 来源于代码生成配置中的 "子表外键名"。
+                // 它应该配置为子表实体类中表示外键的 Java 属性名 (驼峰式, 例如: orderId), 
+                // 而不是数据库中的列名 (例如: order_id), 因为它将用于生成类似 setOrderId() 和 getOrderId() 的方法调用。
+                // 例如: 如果子表实体类中有 private Long orderId; 并且它关联到主表ID,
+                // 则 "子表外键名" 应配置为 "orderId"。
                 ${subClassNameLower}.set${subTableFkName}(${classNameLower}.get${primaryKey.javaFieldCapitalize}());
             }
             result = ${subClassNameLower}Mapper.insertBatch(${subClassNameLower}List) > 0;

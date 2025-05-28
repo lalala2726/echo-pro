@@ -95,6 +95,12 @@ public class GenTable {
     private String subTableFkName;
 
     /**
+     * 是否级联删除子节点 (树表专用 '1'是 '0'否)
+     * (Indicates if child nodes should be cascade deleted for tree tables. '1' for true, '0' for false)
+     */
+    private String cascadeDeleteTree;
+
+    /**
      * 创建者
      */
     private String createBy;

@@ -29,4 +29,11 @@ public class TreeTableTypeRequest {
      */
     @Schema(description = "树表父编码字段", example = "parent_id")
     private String treeParentCode;
+
+    /**
+     * 是否级联删除子节点 ('1'是 '0'否)
+     * (Indicates if child nodes should be cascade deleted. '1' for true, '0' for false)
+     */
+    @Schema(description = "是否级联删除子节点 ('1'是 '0'否)", example = "0")
+    private String cascadeDeleteTree;
 }

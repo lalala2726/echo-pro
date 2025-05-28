@@ -1,0 +1,36 @@
+package ${packageName}.model.dto; // Assuming sub-DTOs go into a 'dto' subpackage
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+#foreach ($import in $subDtoImports) // To handle imports like Date, BigDecimal if needed for sub-item fields
+import ${import};
+#end
+import jakarta.validation.constraints.NotBlank; // Ensure these are jakarta
+import jakarta.validation.constraints.NotNull;
+
+/**
+ * ${subClassName} DTO // e.g., OrderItem DTO
+ * (为 ${subTableComment} 设计的数据传输对象)
+ *
+ * @author ${author} (代码生成器)
+ * @date ${datetime}
+ */
+@Data
+@Schema(description = "${subTableComment} DTO")
+public class ${subClassName}Dto { // Name like OrderItemDto
+    #foreach ($column in $subColumns)
+        #if($column.isInsert == '1' || $column.isEdit == '1') // Include fields relevant for add/update
+
+        /**
+         * $column.columnComment (子表字段)
+         */
+        @Schema(description = "$column.columnComment")
+            #if($column.isRequired == '1' && $column.javaType == 'String')
+        @NotBlank(message = "$column.columnComment 不能为空 (不能为空格)")
+            #elseif($column.isRequired == '1')
+        @NotNull(message = "$column.columnComment 不能为空")
+            #end
+        private $column.javaType $column.javaField;
+        #end
+    #end
+}

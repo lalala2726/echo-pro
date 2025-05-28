@@ -333,7 +333,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         VelocityUtils.initVelocity();
 
         // 设置模板变量信息
-        VelocityContext context = VelocityUtils.prepareContext(table);
+        // VelocityUtils.prepareContext 现在需要 genTableMapper 和 genTableColumnMapper 来处理子表逻辑
+        VelocityContext context = VelocityUtils.prepareContext(table, genTableMapper, genTableColumnMapper);
 
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
@@ -592,6 +593,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
             updateTable.setTreeCode(request.getTreeTableType().getTreeCode());
             updateTable.setTreeParentCode(request.getTreeTableType().getTreeParentCode());
             updateTable.setTreeName(request.getTreeTableType().getTreeName());
+            // 新增：设置是否级联删除子节点 (树表专用)
+            updateTable.setCascadeDeleteTree(request.getTreeTableType().getCascadeDeleteTree());
         } else if (Constants.Generator.SUB.equals(tplCategory) && request.getSubTableType() != null) {
             // 处理主子表配置
             updateTable.setSubTableName(request.getSubTableType().getSubTableName());
