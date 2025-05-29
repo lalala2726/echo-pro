@@ -13,7 +13,6 @@ import lombok.Data;
 @Schema(name = "定时任务调度表", description = "定时任务调度表")
 public class SysJobAddRequest {
 
-
     /**
      * 任务名称
      */

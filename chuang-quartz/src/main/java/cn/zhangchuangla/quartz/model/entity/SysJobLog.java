@@ -15,6 +15,7 @@ import java.util.Date;
 @TableName(value = "sys_job_log")
 @Data
 public class SysJobLog {
+
     /**
      * 任务日志ID
      */

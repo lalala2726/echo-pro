@@ -3,9 +3,9 @@ package cn.zhangchuangla.api.controller.tool;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.quartz.model.entity.SysJob;
+import cn.zhangchuangla.quartz.model.entity.SysJobLog;
 import cn.zhangchuangla.quartz.model.request.SysJobAddRequest;
 import cn.zhangchuangla.quartz.model.request.SysJobListQueryRequest;
 import cn.zhangchuangla.quartz.model.request.SysJobLogListQueryRequest;
@@ -101,7 +101,7 @@ public class JobController extends BaseController {
     @PreAuthorize("@ss.hasPermission('tool:job-log:list')")
     @Operation(summary = "查询定时任务日志列表")
     public AjaxResult<List<SysJobLogListVo>> listJobLogs(@Parameter @ParameterObject SysJobLogListQueryRequest request) {
-        List<SysJob> jobLogList = sysJobLogService.listJobLogs(request);
+        List<SysJobLog> jobLogList = sysJobLogService.listJobLogs(request);
         List<SysJobLogListVo> sysJobLogListVos = copyListProperties(jobLogList, SysJobLogListVo.class);
         return success(sysJobLogListVos);
     }
@@ -110,7 +110,7 @@ public class JobController extends BaseController {
     @PreAuthorize("@ss.hasPermission('tool:job-log:query')")
     @Operation(summary = "查询定时任务日志详情")
     public AjaxResult<SysJobLogListVo> getJobLogById(@PathVariable("id") Long id) {
-        SysJob job = sysJobLogService.getJobLogById(id);
+        SysJobLog job = sysJobLogService.getJobLogById(id);
         SysJobLogListVo sysJobLogListVo = copyProperties(job, SysJobLogListVo.class);
         return success(sysJobLogListVo);
     }
@@ -130,8 +130,8 @@ public class JobController extends BaseController {
     @Operation(summary = "清除定时任务日志")
     @OperationLog(title = "定时任务管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanJobLog() {
-        boolean result = sysJobLogService.cleanJobLog();
-        return toAjax(result);
+        sysJobLogService.cleanJobLog();
+        return success();
     }
 
     @GetMapping("/log/export")

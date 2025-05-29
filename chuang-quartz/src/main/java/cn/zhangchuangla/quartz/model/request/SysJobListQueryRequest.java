@@ -15,7 +15,6 @@ import lombok.EqualsAndHashCode;
 @Schema(name = "定时任务调度表", description = "定时任务调度表")
 public class SysJobListQueryRequest extends BasePageRequest {
 
-
     /**
      * 任务名称
      */

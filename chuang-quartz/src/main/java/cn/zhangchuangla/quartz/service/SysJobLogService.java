@@ -12,11 +12,11 @@ import java.util.List;
  */
 public interface SysJobLogService extends IService<SysJobLog> {
 
-    List<SysJob> listJobLogs(SysJobLogListQueryRequest request);
+    List<SysJobLog> listJobLogs(SysJobLogListQueryRequest request);
 
-    SysJob getJobLogById(Long id);
+    SysJobLog getJobLogById(Long id);
 
     boolean deleteJobLog(List<Long> ids);
 
-    boolean cleanJobLog();
+    void cleanJobLog();
 }

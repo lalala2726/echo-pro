@@ -14,4 +14,11 @@
         <result property="exceptionInfo" column="exception_info"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+    <select id="listJobLogs"  resultMap="BaseResultMap">
+        select *
+        from sys_job_log
+    </select>
+    <select id="cleanJobLog" resultType="java.lang.Boolean">
+        truncate table sys_job_log
+    </select>
 </mapper>

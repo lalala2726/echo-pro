@@ -1,7 +1,9 @@
 package cn.zhangchuangla.quartz.model.request;
 
+import cn.zhangchuangla.common.core.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -10,8 +12,9 @@ import java.util.Date;
  *
  * @author Chuang
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class SysJobLogListQueryRequest {
+public class SysJobLogListQueryRequest extends BasePageRequest {
 
     /**
      * 任务日志ID
