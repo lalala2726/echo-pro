@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -14,7 +15,9 @@ import java.util.Date;
  */
 @TableName(value = "sys_job")
 @Data
-public class SysJob {
+public class SysJob implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 任务ID
@@ -25,13 +28,11 @@ public class SysJob {
     /**
      * 任务名称
      */
-    @TableId
     private String jobName;
 
     /**
      * 任务组名
      */
-    @TableId
     private String jobGroup;
 
     /**

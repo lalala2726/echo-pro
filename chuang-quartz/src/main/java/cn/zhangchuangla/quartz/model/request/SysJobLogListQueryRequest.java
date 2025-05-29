@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 定时任务调度日志表
  *
@@ -58,9 +56,4 @@ public class SysJobLogListQueryRequest extends BasePageRequest {
     @Schema(description = "异常信息")
     private String exceptionInfo;
 
-    /**
-     * 创建时间
-     */
-    @Schema(description = "创建时间")
-    private Date createTime;
 }

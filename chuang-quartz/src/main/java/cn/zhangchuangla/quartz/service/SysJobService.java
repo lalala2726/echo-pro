@@ -24,4 +24,20 @@ public interface SysJobService extends IService<SysJob> {
     boolean deleteJob(List<Long> ids);
 
     boolean runJob(Long id);
+
+    /**
+     * 暂停任务
+     *
+     * @param id 任务ID
+     * @return 结果
+     */
+    boolean pauseJob(Long id);
+
+    /**
+     * 恢复任务
+     *
+     * @param id 任务ID
+     * @return 结果
+     */
+    boolean resumeJob(Long id);
 }

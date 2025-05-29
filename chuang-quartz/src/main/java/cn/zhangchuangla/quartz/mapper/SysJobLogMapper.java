@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface SysJobLogMapper extends BaseMapper<SysJobLog> {
 
-    List<SysJobLog> listJobLogs(Page<SysJobLog> page,@Param("request") SysJobLogListQueryRequest request);
+    List<SysJobLog> listJobLogs(Page<SysJobLog> page, @Param("request") SysJobLogListQueryRequest request);
 
     void cleanJobLog();
 

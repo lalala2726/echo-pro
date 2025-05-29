@@ -14,11 +14,29 @@
         <result property="exceptionInfo" column="exception_info"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
-    <select id="listJobLogs"  resultMap="BaseResultMap">
-        select *
+
+    <select id="listJobLogs" resultMap="BaseResultMap">
+        select job_log_id, job_name, job_group, invoke_target, job_message, status, exception_info, create_time
         from sys_job_log
+        <where>
+            <if test="request.jobName != null and request.jobName != ''">
+                AND job_name like concat('%', #{request.jobName}, '%')
+            </if>
+            <if test="request.jobGroup != null and request.jobGroup != ''">
+                AND job_group = #{request.jobGroup}
+            </if>
+            <if test="request.status != null and request.status != ''">
+                AND status = #{request.status}
+            </if>
+            <if test="request.invokeTarget != null and request.invokeTarget != ''">
+                AND invoke_target like concat('%', #{request.invokeTarget}, '%')
+            </if>
+        </where>
+        order by create_time desc
     </select>
-    <select id="cleanJobLog" resultType="java.lang.Boolean">
+
+    <delete id="cleanJobLog">
         truncate table sys_job_log
-    </select>
+    </delete>
+
 </mapper>
