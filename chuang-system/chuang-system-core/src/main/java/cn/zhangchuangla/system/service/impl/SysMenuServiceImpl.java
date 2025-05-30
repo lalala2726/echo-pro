@@ -655,7 +655,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             // 外部跳转链接不使用frameSrc
             meta.setFrameSrc(null);
             // 外部跳转链接无组件
-            componentPathValue = null;
             log.debug("外部链接跳转: path='{}', name (URL)='{}'", routerPathValue, routerNameValue);
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, external_link != 1, 且 menu.path 是 HTTP(S) URL)
@@ -664,7 +663,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             isKeepAlive = true;
             String segment = StrUtil.isNotBlank(menu.getRouteName()) ? menu.getRouteName() : "iframe-" + menu.getMenuId();
             routerPathValue = buildInternalPathStructure(parentPath, segment);
-            componentPathValue = getComponentPathForRouter(menu);
             log.debug("内嵌Iframe: path='{}', name='{}', frameSrc='{}'", routerPathValue, routerNameValue, meta.getFrameSrc());
         }
         // 情况3: 普通内部菜单或目录
@@ -687,7 +685,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         } else {
             router.setName(StrUtil.isNotBlank(routerNameValue) ? routerNameValue : menu.getMenuId().toString());
         }
-        router.setComponent(componentPathValue);
         meta.setKeepAlive(isKeepAlive);
     }
 

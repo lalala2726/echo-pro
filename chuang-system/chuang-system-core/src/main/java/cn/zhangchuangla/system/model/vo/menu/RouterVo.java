@@ -47,12 +47,6 @@ public class RouterVo {
     private String redirect;
 
     /**
-     * 组件地址
-     */
-    @Schema(description = "组件地址")
-    private String component;
-
-    /**
      * 路由参数：如 {"id": 1, "name": "ry"}
      */
     @Schema(description = "路由参数")
