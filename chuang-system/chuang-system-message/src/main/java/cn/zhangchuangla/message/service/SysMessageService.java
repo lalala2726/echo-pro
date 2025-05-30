@@ -73,13 +73,6 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     boolean sendMessageByUserId(List<Long> userIds, SysMessage message);
 
-    /**
-     * 用户发送消息
-     *
-     * @param request 发送消息请求参数
-     * @return 结果
-     */
-    boolean userSendMessage(UserSendMessageRequest request);
 
     /**
      * 获取用户消息数量
@@ -117,4 +110,12 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 消息列表
      */
     List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId);
+
+    /**
+     * 批量删除消息
+     *
+     * @param ids 消息ID列表
+     * @return 删除结果
+     */
+    boolean deleteMessages(List<Long> ids);
 }

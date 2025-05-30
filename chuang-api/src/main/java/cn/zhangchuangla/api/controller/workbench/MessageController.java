@@ -1,14 +1,11 @@
 package cn.zhangchuangla.api.controller.workbench;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
-import cn.zhangchuangla.message.model.request.UserSendMessageRequest;
 import cn.zhangchuangla.message.model.vo.UserMessageListVo;
 import cn.zhangchuangla.message.model.vo.UserMessageVo;
 import cn.zhangchuangla.message.service.MessageQueryService;
@@ -55,19 +52,6 @@ public class MessageController extends BaseController {
         extra.put("unread", userMessageReadCountDto.getUnRead());
         List<UserMessageListVo> userMessageListVos = copyListProperties(sysMessagePage, UserMessageListVo.class);
         return getTableData(sysMessagePage, userMessageListVos, extra);
-    }
-
-    /**
-     * 发送消息
-     *
-     * @return 操作结果
-     */
-    @PostMapping
-    @Operation(summary = "发送消息")
-    @OperationLog(title = "发送消息", businessType = BusinessType.SEND_MESSAGES)
-    public AjaxResult<Void> sendMessage(@RequestBody UserSendMessageRequest request) {
-        boolean result = sysMessageService.userSendMessage(request);
-        return toAjax(result);
     }
 
     /**
@@ -139,6 +123,14 @@ public class MessageController extends BaseController {
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
 
+        return toAjax(result);
+    }
+
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除消息")
+    public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
+        checkParam(ids == null || ids.isEmpty(), "消息ID不能为空!");
+        boolean result = sysMessageService.deleteMessages(ids);
         return toAjax(result);
     }
 
