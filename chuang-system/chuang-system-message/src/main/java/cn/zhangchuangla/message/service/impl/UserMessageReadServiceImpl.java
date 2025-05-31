@@ -221,10 +221,10 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
         }
 
         // 将已读状态设置为未读，但保留阅读时间记录（用于数据分析）
-        boolean result = this.lambdaUpdate()
+        boolean result = lambdaUpdate()
                 .eq(UserMessageExt::getUserId, userId)
                 .in(UserMessageExt::getMessageId, messageIds)
-                .set(UserMessageExt::getIsRead, 0)
+                .set(UserMessageExt::getIsRead, MessageConstants.StatusConstants.MESSAGE_UN_READ)
                 .set(UserMessageExt::getUpdateTime, new Date())
                 .update();
 

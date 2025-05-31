@@ -126,6 +126,12 @@ public class MessageController extends BaseController {
         return toAjax(result);
     }
 
+    /**
+     * 删除消息
+     *
+     * @param ids 消息ID集合
+     * @return 操作结果
+     */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除消息")
     public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
