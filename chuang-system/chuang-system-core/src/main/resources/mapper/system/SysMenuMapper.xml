@@ -20,6 +20,7 @@
         <result property="menuType" column="menu_type"/>
         <result property="visible" column="visible"/>
         <result property="status" column="status"/>
+        <result property="showParent" column="show_parent"/>
         <result property="permission" column="permission"/>
         <result property="icon" column="icon"/>
         <result property="sort" column="sort"/>
@@ -40,6 +41,7 @@
                m.query         AS query,
                m.route_name    AS route_name,
                m.is_frame      AS is_frame,
+               m.show_parent   AS show_parent,
                m.external_link AS external_link,
                m.is_cache      AS is_cache,
                m.menu_type     AS menu_type,
@@ -72,6 +74,7 @@
                m.visible,
                m.status,
                m.is_frame,
+               m.show_parent,
                m.is_cache,
                m.menu_type,
                m.icon,
@@ -98,6 +101,7 @@
                         m.route_name,
                         m.visible,
                         m.status,
+                        m.show_parent,
                         m.is_frame,
                         m.is_cache,
                         m.menu_type,
@@ -121,7 +125,7 @@
     <select id="selectMenuList" resultMap="BaseResultMap">
         SELECT m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.route_name,
         m.visible, m.status, m.is_frame, m.is_cache, m.menu_type, m.icon, m.sort,
-        m.permission, m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+        m.permission, m.create_by,m.show_parent, m.create_time, m.update_by, m.update_time, m.remark
         FROM sys_menu m
         <where>
             <if test="menuName != null and menuName != ''">
@@ -154,6 +158,7 @@
         menu_type,
         visible,
         status,
+        show_parent,
         permission,
         icon,
         sort,

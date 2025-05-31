@@ -92,6 +92,11 @@ public class SysMenu extends BaseEntity {
     private Integer status;
 
     /**
+     * 显示父级菜单(0不显示,1显示)
+     */
+    private Integer showParent;
+
+    /**
      * 权限标识
      */
     private String permission;

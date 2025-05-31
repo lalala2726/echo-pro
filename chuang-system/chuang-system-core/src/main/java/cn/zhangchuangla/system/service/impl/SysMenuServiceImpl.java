@@ -686,6 +686,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             router.setName(StrUtil.isNotBlank(routerNameValue) ? routerNameValue : menu.getMenuId().toString());
         }
         meta.setKeepAlive(isKeepAlive);
+
     }
 
     /**
@@ -742,7 +743,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private void fillBaseMetaInfo(MetaVo meta, SysMenu menu) {
         meta.setTitle(menu.getMenuName());
         meta.setIcon(menu.getIcon());
-        meta.setShowParent(true);
+        if (Constants.MenuConstants.SHOW_PARENT.equals(menu.getShowParent())) {
+            meta.setShowParent(true);
+        }
         meta.setShowLink(Constants.MenuConstants.VISIBLE.equals(menu.getVisible()));
         if (StrUtil.isNotBlank(menu.getPermission())) {
             meta.setAuths(new String[]{menu.getPermission()});

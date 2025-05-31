@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.request.menu;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -65,6 +67,13 @@ public class SysMenuUpdateRequest {
      */
     @Schema(description = "路由参数", example = "id=1&name=test", type = "string")
     private String query;
+
+    /**
+     * 是否显示父级菜单 0否 1是
+     */
+    @Schema(description = "是否显示父级菜单 0否 1是")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer showParent;
 
 
     /**

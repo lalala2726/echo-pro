@@ -68,6 +68,13 @@ public class SysMenuVo extends BaseVo {
     private String query;
 
     /**
+     * 是否显示父级菜单 0否 1是
+     */
+    @Schema(description = "是否显示父级菜单 0否 1是")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer showParent;
+
+    /**
      * 路由名称
      */
     @Schema(description = "路由名称")
