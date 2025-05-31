@@ -65,7 +65,6 @@ public class MetaVo {
     @Schema(description = "是否显示父级菜单")
     private Boolean showParent;
 
-
     /**
      * 按钮级别权限设置
      */
