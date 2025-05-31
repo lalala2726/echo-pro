@@ -100,9 +100,6 @@
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
                 </if>
-                <if test="request.sentByMyself != null and request.sentByMyself == true">
-                    AND sm.sender_id = #{userId}
-                </if>
             </if>
         </where>
 
