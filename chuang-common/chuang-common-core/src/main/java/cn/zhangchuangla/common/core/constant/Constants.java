@@ -146,5 +146,6 @@ public class Constants {
         String STATUS_DISABLE = "1";
         String MENU_TYPE_DIR = "M";
         Integer CACHE_ENABLED = 1;
+        Integer SHOW_PARENT = 1;
     }
 }

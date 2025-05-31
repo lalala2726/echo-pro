@@ -28,14 +28,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     private Integer type;
 
     /**
-     * 是否查询我发送的消息
-     * true：仅查询我自己发送的消息
-     * false 或 null：查询我接收到的消息
-     */
-    @Schema(description = "是否查询我发送的消息（true：我发送的；false：接收的）")
-    private Boolean sentByMyself;
-
-    /**
      * 消息级别：1-普通 2-重要 3-紧急
      */
     @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
@@ -46,7 +38,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      */
     @Schema(description = "是否已读")
     private Boolean isRead;
-
 
     /**
      * 发送者姓名

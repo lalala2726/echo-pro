@@ -1,7 +1,7 @@
 app:
   config:
-    upload-path: D:\\DevelopUploads\\personApp # This seems to be an old config, will be superseded by new storage config if local is active
-    enable-trash: true # This too might be superseded
+    upload-path: D:\\DevelopUploads\\personApp
+    enable-trash: true
   name: Chuang
   version: 0.1
 #开发环境数据库文件
@@ -9,7 +9,7 @@ server:
   port: 8080
 spring:
   profiles:
-    active: druid,rabbitmq  # 激活druid和rabbitmq配置
+    active: druid,rabbitmq,quartz #激活配置文件
   servlet:
     multipart:
       max-file-size: 50MB

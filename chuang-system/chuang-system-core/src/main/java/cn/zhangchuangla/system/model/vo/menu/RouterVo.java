@@ -35,22 +35,16 @@ public class RouterVo {
     private String path;
 
     /**
-     * 是否隐藏路由，当设置 true 的时候该路由不会再侧边栏出现
+     * 组件路径
      */
-    @Schema(description = "是否隐藏路由")
-    private boolean hidden;
+    @Schema(description = "组件路径")
+    private String component;
 
     /**
      * 重定向地址，当设置 noRedirect 的时候该路由在面包屑导航中不可被点击
      */
     @Schema(description = "重定向地址")
     private String redirect;
-
-    /**
-     * 组件地址
-     */
-    @Schema(description = "组件地址")
-    private String component;
 
     /**
      * 路由参数：如 {"id": 1, "name": "ry"}

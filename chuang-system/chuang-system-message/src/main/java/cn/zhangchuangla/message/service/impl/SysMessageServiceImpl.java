@@ -4,8 +4,6 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.message.constant.MessageConstants;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
@@ -170,24 +168,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             removeById(message.getId());
             throw new ServiceException("消息发送失败");
         }
-    }
-
-    /**
-     * 用户发送消息
-     *
-     * @param request 发送消息请求参数
-     * @return 结果
-     */
-    @Override
-    public boolean userSendMessage(UserSendMessageRequest request) {
-        Long userId = SecurityUtils.getUserId();
-        SysMessage sysMessage = SysMessage.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .targetType(MessageConstants.MessageTypeConstants.USER_MESSAGE)
-                .senderId(userId)
-                .build();
-        return sendMessageByUserId(request.getReceiveId(), sysMessage);
     }
 
     /**
@@ -393,5 +373,17 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     public List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId) {
         return List.of();
+    }
+
+    /**
+     * 批量删除消息
+     *
+     * @param ids 消息ID
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteMessages(List<Long> ids) {
+        return removeBatchByIds(ids);
     }
 }

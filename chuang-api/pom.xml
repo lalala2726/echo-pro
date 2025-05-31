@@ -41,10 +41,6 @@
         <!-- 常用工具模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common-excel</artifactId>
         </dependency>
         <!-- 代码生成模块 -->
@@ -57,18 +53,7 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-quartz</artifactId>
         </dependency>
-        <!-- 缓存模块 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!-- Swagger3 API文档 -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

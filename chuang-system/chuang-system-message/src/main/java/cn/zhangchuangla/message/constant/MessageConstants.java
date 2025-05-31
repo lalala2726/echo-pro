@@ -14,6 +14,7 @@ public class MessageConstants {
      */
     public interface StatusConstants {
         Integer MESSAGE_IS_READ = 1;
+        Integer MESSAGE_UN_READ = 0;
     }
 
     public interface MessageTypeConstants {
