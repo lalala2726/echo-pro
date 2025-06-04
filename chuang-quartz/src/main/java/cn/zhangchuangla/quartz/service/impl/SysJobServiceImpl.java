@@ -68,7 +68,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob>
     @Transactional(rollbackFor = Exception.class)
     public boolean addJob(SysJobAddRequest request) {
         // 验证CRON表达式
-        if (CronUtils.isValid(request.getCronExpression())) {
+        if (!CronUtils.isValid(request.getCronExpression())) {
             throw new ServiceException("新增任务'" + request.getJobName() + "'失败，Cron表达式不正确");
         }
 
@@ -114,7 +114,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob>
     @Transactional(rollbackFor = Exception.class)
     public boolean updateJob(SysJobUpdateRequest request) {
         // 验证CRON表达式
-        if (CronUtils.isValid(request.getCronExpression())) {
+        if (!CronUtils.isValid(request.getCronExpression())) {
             throw new ServiceException("修改任务'" + request.getJobName() + "'失败，Cron表达式不正确");
         }
 
