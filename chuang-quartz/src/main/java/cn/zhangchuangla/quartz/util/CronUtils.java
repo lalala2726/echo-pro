@@ -15,7 +15,7 @@ public class CronUtils {
      * @return boolean 表达式是否有效
      */
     public static boolean isValid(String cronExpression) {
-        return !CronExpression.isValidExpression(cronExpression);
+        return CronExpression.isValidExpression(cronExpression);
     }
 
 }
