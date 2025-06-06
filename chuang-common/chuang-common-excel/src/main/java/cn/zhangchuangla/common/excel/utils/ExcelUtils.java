@@ -1,6 +1,12 @@
 package cn.zhangchuangla.common.excel.utils;
 
 import org.apache.commons.collections4.CollectionUtils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
 import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +139,7 @@ public class ExcelUtils {
     private <T> List<ExcelField> getExcelFields(Class<T> clazz) {
         List<ExcelField> excelFields = new ArrayList<>();
 
-        Field[] fields = ReflectUtil.getFields(clazz);
+        Field[] fields = FieldUtils.getAllFieldsList(clazz).toArray(new Field[0]);
         for (Field field : fields) {
             Excel excel = field.getAnnotation(Excel.class);
             if (excel != null && excel.isExport()) {
@@ -249,7 +255,7 @@ public class ExcelUtils {
                 // 支持多级属性获取
                 return getNestedFieldValue(item, excelField.getTargetAttr());
             } else {
-                return ReflectUtil.getFieldValue(item, excelField.getField());
+                return FieldUtils.readField(excelField.getField(), item, true);
             }
         } catch (Exception e) {
             log.warn("获取字段值失败: {}", excelField.getFieldName(), e);
@@ -276,7 +282,12 @@ public class ExcelUtils {
             if (currentValue == null) {
                 return null;
             }
-            currentValue = ReflectUtil.getFieldValue(currentValue, attr);
+            try {
+                currentValue = FieldUtils.readField(currentValue, attr, true);
+            } catch (IllegalAccessException e) {
+                log.warn("无法读取字段 {}", attr, e);
+                return null;
+            }
         }
 
         return currentValue;
@@ -325,18 +336,19 @@ public class ExcelUtils {
         if (value instanceof Date) {
             String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
                     : "yyyy-MM-dd HH:mm:ss";
-            return DateUtil.format((Date) value, dateFormat);
+            return new SimpleDateFormat(dateFormat).format((Date) value);
         }
 
         if (value instanceof LocalDateTime) {
             String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
                     : "yyyy-MM-dd HH:mm:ss";
-            return DateUtil.format((LocalDateTime) value, dateFormat);
+            return ((LocalDateTime) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
         if (value instanceof LocalDate) {
             String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat() : "yyyy-MM-dd";
-            return ((LocalDate) value).format(java.time.format.DateTimeFormatter.ofPattern(dateFormat));
+
+            return ((LocalDate) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
         // 数字格式化
