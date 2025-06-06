@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.hutool.core.bean.BeanUtil;
+import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -54,7 +54,7 @@ public class SysFileManageController extends BaseController {
         List<SysFileListVo> sysFileListVos = sysFileManagementPage.getRecords().stream()
                 .map(sysFileManagement -> {
                     SysFileListVo sysFileListVo = new SysFileListVo();
-                    BeanUtil.copyProperties(sysFileManagement, sysFileListVo);
+                    BeanUtils.copyProperties(sysFileManagement, sysFileListVo);
                     String previewImageUrl = sysFileManagement.getPreviewImageUrl();
                     sysFileListVo.setIsIncludePreviewImage(previewImageUrl != null && previewImageUrl.contains("preview"));
                     return sysFileListVo;

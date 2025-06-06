@@ -287,10 +287,10 @@ public class AliyunOssStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return true;
+            return false;
         }
         try {
-            return !getClient().doesObjectExist(config.getRootPathOrBucketName(), relativePath);
+            return getClient().doesObjectExist(config.getRootPathOrBucketName(), relativePath);
         } catch (OSSException | ClientException e) {
             log.error("Error checking file existence in Aliyun OSS: {}", relativePath, e);
             throw new StorageException("检查Aliyun OSS文件是否存在失败: " + relativePath, e);
@@ -308,11 +308,11 @@ public class AliyunOssStorageServiceImpl implements StorageService {
 
     @Override
     public FileInfo moveToTrash(String relativePath) {
-        if (config.isEnableTrash()) {
+        if (!config.isEnableTrash()) {
             log.warn("Trash is not enabled for Aliyun OSS. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to Aliyun OSS trash: {}", relativePath);
             return null;
         }
@@ -342,7 +342,7 @@ public class AliyunOssStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的Aliyun OSS回收站路径: " + trashPath);
         }
-        if (fileExists(trashPath)) {
+        if (!fileExists(trashPath)) {
             log.warn("File not found in Aliyun OSS trash: {}", trashPath);
             return null;
         }

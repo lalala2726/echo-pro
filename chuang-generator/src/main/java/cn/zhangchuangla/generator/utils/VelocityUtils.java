@@ -1,7 +1,7 @@
 package cn.zhangchuangla.generator.utils;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.CaseUtils;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
@@ -45,17 +45,17 @@ public class VelocityUtils {
         velocityContext.put("tplCategory", tplCategory);
         velocityContext.put("tableName", genTable.getTableName());
         velocityContext.put("tableComment", genTable.getTableComment());
-        velocityContext.put("functionName", StrUtil.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        velocityContext.put("functionName", StringUtils.isNotBlank(functionName) ? functionName : "【请填写功能名称】");
         velocityContext.put("ClassName", genTable.getClassName());
-        velocityContext.put("className", StrUtil.lowerFirst(genTable.getClassName()));
-        velocityContext.put("classNameLower", StrUtil.lowerFirst(genTable.getClassName()));
+        velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
+        velocityContext.put("classNameLower", StringUtils.uncapitalize(genTable.getClassName()));
         velocityContext.put("moduleName", moduleName);
-        velocityContext.put("BusinessName", StrUtil.upperFirst(businessName));
+        velocityContext.put("BusinessName", StringUtils.capitalize(businessName));
         velocityContext.put("businessName", businessName);
         velocityContext.put("basePackage", getPackagePrefix(packageName));
         velocityContext.put("packageName", packageName);
         velocityContext.put("author", genTable.getFunctionAuthor());
-        velocityContext.put("datetime", DateUtil.format(new Date(), "yyyy-MM-dd"));
+        velocityContext.put("datetime", java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         velocityContext.put("pkColumn", getPkColumn(genTable.getColumns()));
         velocityContext.put("importList", getImportList(genTable.getColumns()));
         velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
@@ -93,7 +93,7 @@ public class VelocityUtils {
         String treeName = genTable.getTreeName();
 
         // 如果没有配置，则自动推断
-        if (StrUtil.isBlank(treeCode) || StrUtil.isBlank(treeParentCode) || StrUtil.isBlank(treeName)) {
+        if (StringUtils.isBlank(treeCode) || StringUtils.isBlank(treeParentCode) || StringUtils.isBlank(treeName)) {
             GenTableColumn treeCodeColumn = null;
             GenTableColumn treeParentCodeColumn = null;
             GenTableColumn treeNameColumn = null;
@@ -102,30 +102,30 @@ public class VelocityUtils {
                 String columnName = column.getColumnName().toLowerCase();
 
                 // 如果没有配置树编码字段，使用主键
-                if (StrUtil.isBlank(treeCode) && Constants.Generator.YES.equals(column.getIsPk())) {
+                if (StringUtils.isBlank(treeCode) && Constants.Generator.YES.equals(column.getIsPk())) {
                     treeCodeColumn = column;
                     treeCode = column.getColumnName();
                 }
 
                 // 如果没有配置父编码字段，查找包含parent和id的字段
-                if (StrUtil.isBlank(treeParentCode) && columnName.contains("parent") && columnName.contains("id")) {
+                if (StringUtils.isBlank(treeParentCode) && columnName.contains("parent") && columnName.contains("id")) {
                     treeParentCodeColumn = column;
                     treeParentCode = column.getColumnName();
                 }
 
                 // 如果没有配置名称字段，查找包含name或title的字段
-                if (StrUtil.isBlank(treeName) && (columnName.contains("name") || columnName.contains("title"))) {
+                if (StringUtils.isBlank(treeName) && (columnName.contains("name") || columnName.contains("title"))) {
                     treeNameColumn = column;
                     treeName = column.getColumnName();
                 }
             }
 
             // 设置默认值
-            if (StrUtil.isBlank(treeCode) && !columns.isEmpty()) {
+            if (StringUtils.isBlank(treeCode) && !columns.isEmpty()) {
                 treeCodeColumn = getPkColumn(columns);
                 treeCode = treeCodeColumn != null ? treeCodeColumn.getColumnName() : "id";
             }
-            if (StrUtil.isBlank(treeName) && columns.size() > 1) {
+            if (StringUtils.isBlank(treeName) && columns.size() > 1) {
                 treeNameColumn = columns.get(1); // 取第二个字段作为名称字段
                 treeName = treeNameColumn.getColumnName();
             }
@@ -140,9 +140,9 @@ public class VelocityUtils {
         context.put("treeCode", treeCodeColumn != null ? treeCodeColumn.getJavaField() : toCamelCase(treeCode));
         context.put("treeParentCode", treeParentCodeColumn != null ? treeParentCodeColumn.getJavaField() : toCamelCase(treeParentCode));
         context.put("treeName", treeNameColumn != null ? treeNameColumn.getJavaField() : toCamelCase(treeName));
-        context.put("TreeCode", treeCodeColumn != null ? StrUtil.upperFirst(treeCodeColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeCode)));
-        context.put("TreeParentCode", treeParentCodeColumn != null ? StrUtil.upperFirst(treeParentCodeColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeParentCode)));
-        context.put("TreeName", treeNameColumn != null ? StrUtil.upperFirst(treeNameColumn.getJavaField()) : StrUtil.upperFirst(toCamelCase(treeName)));
+        context.put("TreeCode", treeCodeColumn != null ? StringUtils.capitalize(treeCodeColumn.getJavaField()) : StringUtils.capitalize(toCamelCase(treeCode)));
+        context.put("TreeParentCode", treeParentCodeColumn != null ? StringUtils.capitalize(treeParentCodeColumn.getJavaField()) : StringUtils.capitalize(toCamelCase(treeParentCode)));
+        context.put("TreeName", treeNameColumn != null ? StringUtils.capitalize(treeNameColumn.getJavaField()) : StringUtils.capitalize(toCamelCase(treeName)));
     }
 
     /**
@@ -154,17 +154,17 @@ public class VelocityUtils {
         String subTableFkName = genTable.getSubTableFkName();
 
         // 如果没有配置，设置默认值
-        if (StrUtil.isBlank(subTableName)) {
+        if (StringUtils.isBlank(subTableName)) {
             subTableName = "sub_" + genTable.getTableName();
         }
-        if (StrUtil.isBlank(subTableFkName)) {
+        if (StringUtils.isBlank(subTableFkName)) {
             GenTableColumn pkColumn = getPkColumn(genTable.getColumns());
             subTableFkName = pkColumn != null ? pkColumn.getColumnName() : "id";
         }
 
         // 生成子表类名和业务名称
         String subClassName = genTable.getClassName() + "Detail";
-        String subClassNameLower = StrUtil.lowerFirst(subClassName);
+        String subClassNameLower = StringUtils.uncapitalize(subClassName);
         String subBusinessName = genTable.getBusinessName() + "Detail";
         String subFunctionName = genTable.getFunctionName() + "详情";
 
@@ -245,14 +245,14 @@ public class VelocityUtils {
         context.put("subClassNameLower", subClassNameLower);
         context.put("subTableFkName", subTableFkName);
         context.put("subTableFkJavaField", toCamelCase(subTableFkName));
-        context.put("SubTableFkJavaField", StrUtil.upperFirst(toCamelCase(subTableFkName)));
+        context.put("SubTableFkJavaField", StringUtils.capitalize(toCamelCase(subTableFkName)));
     }
 
     /**
      * 根据字段名查找对应的GenTableColumn对象
      */
     private static GenTableColumn findColumnByName(List<GenTableColumn> columns, String columnName) {
-        if (StrUtil.isBlank(columnName) || columns == null) {
+        if (StringUtils.isBlank(columnName) || columns == null) {
             return null;
         }
         return columns.stream()
@@ -265,10 +265,10 @@ public class VelocityUtils {
      * 将下划线命名转换为驼峰命名
      */
     private static String toCamelCase(String str) {
-        if (StrUtil.isBlank(str)) {
+        if (StringUtils.isBlank(str)) {
             return str;
         }
-        return StrUtil.toCamelCase(str);
+        return CaseUtils.toCamelCase(str, false, '_');
     }
 
     /**
@@ -338,42 +338,42 @@ public class VelocityUtils {
         // 业务名称
         String businessName = genTable.getBusinessName();
 
-        String javaPath = PROJECT_PATH + "/" + StrUtil.replace(packageName, ".", "/");
+        String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
         String mapperXmlPath = "main/resources/mapper/" + moduleName;
         String vuePath = "src/views/" + moduleName + "/" + businessName;
         String apiPath = "src/api/" + moduleName;
         String typesPath = "src/types/" + moduleName;
 
         if (template.contains("entity.java.vm")) {
-            fileName = StrUtil.format("{}/model/entity/{}.java", javaPath, className);
+            fileName = String.format("%s/model/entity/%s.java", javaPath, className);
         } else if (template.contains("mapper.java.vm")) {
-            fileName = StrUtil.format("{}/mapper/{}Mapper.java", javaPath, className);
+            fileName = String.format("%s/mapper/%sMapper.java", javaPath, className);
         } else if (template.contains("service.java.vm")) {
-            fileName = StrUtil.format("{}/service/{}Service.java", javaPath, className);
+            fileName = String.format("%s/service/%sService.java", javaPath, className);
         } else if (template.contains("serviceImpl.java.vm")) {
-            fileName = StrUtil.format("{}/service/impl/{}ServiceImpl.java", javaPath, className);
+            fileName = String.format("%s/service/impl/%sServiceImpl.java", javaPath, className);
         } else if (template.contains("controller.java.vm")) {
-            fileName = StrUtil.format("{}/controller/{}Controller.java", javaPath, className);
+            fileName = String.format("%s/controller/%sController.java", javaPath, className);
         } else if (template.contains("mapper.xml.vm")) {
-            fileName = StrUtil.format("{}/{}Mapper.xml", mapperXmlPath, className);
+            fileName = String.format("%s/%sMapper.xml", mapperXmlPath, className);
         } else if (template.contains("list-vo.java.vm")) {
-            fileName = StrUtil.format("{}/model/vo/{}/{}ListVo.java", javaPath, businessName, className);
+            fileName = String.format("%s/model/vo/%s/%sListVo.java", javaPath, businessName, className);
         } else if (template.contains("vo.java.vm")) {
-            fileName = StrUtil.format("{}/model/vo/{}/{}Vo.java", javaPath, businessName, className);
+            fileName = String.format("%s/model/vo/%s/%sVo.java", javaPath, businessName, className);
         } else if (template.contains("add-request.java.vm")) {
-            fileName = StrUtil.format("{}/model/request/{}/{}AddRequest.java", javaPath, businessName, className);
+            fileName = String.format("%s/model/request/%s/%sAddRequest.java", javaPath, businessName, className);
         } else if (template.contains("update-request.java.vm")) {
-            fileName = StrUtil.format("{}/model/request/{}/{}UpdateRequest.java", javaPath, businessName, className);
+            fileName = String.format("%s/model/request/%s/%sUpdateRequest.java", javaPath, businessName, className);
         } else if (template.contains("request.java.vm")) {
-            fileName = StrUtil.format("{}/model/request/{}/{}QueryRequest.java", javaPath, businessName, className);
+            fileName = String.format("%s/model/request/%s/%sQueryRequest.java", javaPath, businessName, className);
         }
         // 前端文件名处理
         else if (template.contains("api.ts.vm")) {
-            fileName = StrUtil.format("{}/{}.ts", apiPath, businessName);
+            fileName = String.format("%s/%s.ts", apiPath, businessName);
         } else if (template.contains("types.ts.vm")) {
-            fileName = StrUtil.format("{}/type{}.ts", typesPath, StrUtil.upperFirst(businessName));
+            fileName = String.format("%s/type%s.ts", typesPath, StringUtils.capitalize(businessName));
         } else if (template.contains("index.vue.vm")) {
-            fileName = StrUtil.format("{}/index.vue", vuePath);
+            fileName = String.format("%s/index.vue", vuePath);
         }
 
         return fileName;
@@ -435,7 +435,7 @@ public class VelocityUtils {
      * @return 返回权限前缀
      */
     public static String getPermissionPrefix(String moduleName, String businessName) {
-        return StrUtil.format("{}.{}", moduleName, businessName);
+        return String.format("%s.%s", moduleName, businessName);
     }
 
     /**
@@ -484,7 +484,7 @@ public class VelocityUtils {
         // 获取所有配置了字典类型的列的字典类型
         return columns.stream()
                 .map(GenTableColumn::getDictType)
-                .filter(StrUtil::isNotEmpty)
+                .filter(StringUtils::isNotBlank)
                 .distinct()
                 .collect(Collectors.toList());
     }

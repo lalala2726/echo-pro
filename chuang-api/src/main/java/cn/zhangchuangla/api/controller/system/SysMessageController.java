@@ -57,7 +57,7 @@ public class SysMessageController extends BaseController {
     }
 
     /**
-     * 发送消息
+     * 管理员发送消息
      *
      * @return 操作结果
      */
