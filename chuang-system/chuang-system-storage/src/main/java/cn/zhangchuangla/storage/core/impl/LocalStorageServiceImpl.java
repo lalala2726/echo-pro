@@ -220,14 +220,14 @@ public class LocalStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return true;
+            return false;
         }
-        return !Files.exists(getAbsolutePath(relativePath));
+        return Files.exists(getAbsolutePath(relativePath));
     }
 
     @Override
     public FileInfo moveToTrash(String relativePath) {
-        if (config.isEnableTrash()) {
+        if (!config.isEnableTrash()) {
             log.warn("Trash is not enabled. Cannot move file to trash: {}", relativePath);
             return null;
         }

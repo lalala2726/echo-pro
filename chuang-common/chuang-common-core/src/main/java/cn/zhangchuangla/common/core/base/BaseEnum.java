@@ -1,6 +1,5 @@
 package cn.zhangchuangla.common.core.base;
 
-import cn.hutool.core.util.ObjectUtil;
 
 import java.util.EnumSet;
 import java.util.Objects;
@@ -22,7 +21,7 @@ public interface BaseEnum<T> {
      */
     static <E extends Enum<E> & BaseEnum<?>> E getEnumByValue(Object value, Class<E> clazz) {
         Objects.requireNonNull(value);
-        return findEnum(clazz, e -> ObjectUtil.equal(e.getValue(), value));
+        return findEnum(clazz, e -> Objects.equals(e.getValue(), value));
     }
 
     /**
@@ -47,7 +46,7 @@ public interface BaseEnum<T> {
      */
     static <E extends Enum<E> & BaseEnum<?>> Object getValueByLabel(String label, Class<E> clazz) {
         Objects.requireNonNull(label);
-        return Optional.ofNullable(findEnum(clazz, e -> ObjectUtil.equal(e.getLabel(), label)))
+        return Optional.ofNullable(findEnum(clazz, e -> Objects.equals(e.getLabel(), label)))
                 .map(BaseEnum::getValue)
                 .orElse(null);
     }

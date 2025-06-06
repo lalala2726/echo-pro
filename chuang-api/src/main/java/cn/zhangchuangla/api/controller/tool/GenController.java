@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.tool;
 
-import cn.hutool.core.bean.BeanUtil;
+import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.model.entity.KeyValue;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -76,7 +76,7 @@ public class GenController extends BaseController {
         checkParam(id == null, "id不能为空");
         GenTable genTable = genTableService.getGenTableById(id);
         GenTableVo genTableVo = new GenTableVo();
-        BeanUtil.copyProperties(genTable, genTableVo);
+        BeanUtils.copyProperties(genTable, genTableVo);
         return success(genTableVo);
     }
 

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.security.token;
 
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
@@ -78,8 +78,8 @@ public class RedisTokenManager implements TokenManager {
         String username = userDetails.getUsername();
         Long userId = userDetails.getUserId();
 
-        String accessTokenId = IdUtil.randomUUID();
-        String refreshTokenId = IdUtil.randomUUID();
+        String accessTokenId = UUID.randomUUID().toString();
+        String refreshTokenId = UUID.randomUUID().toString();
 
         OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenId);
         setClientInfo(onlineLoginUser);
@@ -130,7 +130,7 @@ public class RedisTokenManager implements TokenManager {
         // tokenType 检查已被移除，因为此方法上下文就是处理访问令牌
 
         String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StrUtil.isBlank(sessionId)) {
+        if (StringUtils.isBlank(sessionId)) {
             log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, jwtAccessToken);
             return null;
         }
@@ -176,7 +176,7 @@ public class RedisTokenManager implements TokenManager {
             return false;
         }
         String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StrUtil.isBlank(sessionId)) {
+        if (StringUtils.isBlank(sessionId)) {
             log.debug("验证访问令牌：JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, jwtAccessToken);
             return false;
         }
@@ -215,7 +215,7 @@ public class RedisTokenManager implements TokenManager {
 
         // 刷新令牌JWT中的ID是refreshTokenId
         String refreshTokenId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StrUtil.isBlank(refreshTokenId)) {
+        if (StringUtils.isBlank(refreshTokenId)) {
             log.debug("验证刷新令牌：JWT中未找到sessionId ({} 作为 refreshTokenId): {}", CLAIM_KEY_SESSION_ID, jwtRefreshToken);
             return false;
         }
@@ -247,7 +247,7 @@ public class RedisTokenManager implements TokenManager {
         // tokenType 检查已被移除
 
         String refreshTokenId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StrUtil.isBlank(refreshTokenId)) {
+        if (StringUtils.isBlank(refreshTokenId)) {
             throw new ServiceException(REFRESH_TOKEN_INVALID, "JWT刷新令牌中缺少ID (" + CLAIM_KEY_SESSION_ID + ")");
         }
 
@@ -255,7 +255,7 @@ public class RedisTokenManager implements TokenManager {
         String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
         // 获取旧的accessTokenId
         String accessTokenId = redisCache.getCacheObject(refreshTokenMappingKey);
-        if (StrUtil.isBlank(accessTokenId)) {
+        if (StringUtils.isBlank(accessTokenId)) {
             log.warn("无效的刷新令牌ID {}，在Redis中未找到对应的访问会话ID映射, Key: {}", refreshTokenId, refreshTokenMappingKey);
             throw new ServiceException(REFRESH_TOKEN_INVALID, "刷新令牌已过期或无效");
         }
@@ -281,7 +281,7 @@ public class RedisTokenManager implements TokenManager {
         }
 
         // 生成新地访问令牌 ID 和 JWT
-        String newAccessTokenId = IdUtil.fastSimpleUUID();
+        String newAccessTokenId = UUID.randomUUID().toString().replaceAll("-", "");
         // 从 Redis 中的 onlineUser 获取用户名，更可靠
         String username = onlineUser.getUsername();
 
@@ -349,7 +349,7 @@ public class RedisTokenManager implements TokenManager {
 
         // 这是 accessTokenId
         String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StrUtil.isBlank(sessionId)) {
+        if (StringUtils.isBlank(sessionId)) {
             log.warn("尝试使缺少sessionId ({}) 的JWT访问令牌失效: {}", CLAIM_KEY_SESSION_ID, jwtAccessToken);
             return;
         }
@@ -553,7 +553,7 @@ public class RedisTokenManager implements TokenManager {
         String userPreviousAccessIdKey = RedisConstants.Auth.USER_ACCESS_TOKEN + userId;
         String previousAccessTokenId = redisCache.getCacheObject(userPreviousAccessIdKey);
 
-        if (StrUtil.isNotBlank(previousAccessTokenId) && !previousAccessTokenId.equals(newAccessTokenId)) {
+        if (StringUtils.isNotBlank(previousAccessTokenId) && !previousAccessTokenId.equals(newAccessTokenId)) {
             String oldOnlineUserKey = formatOnlineUserKeyBySessionId(previousAccessTokenId);
             OnlineLoginUser oldOnlineUser = redisCache.getCacheObject(oldOnlineUserKey);
             if (oldOnlineUser != null) {

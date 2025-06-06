@@ -1,6 +1,6 @@
 package cn.zhangchuangla.generator.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -226,7 +226,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable>
         // 业务信息设置
         genTable.setBusinessName(GenUtils.getBusinessName(dbTable.getTableName()));
         genTable.setFunctionName(
-                StrUtil.isBlank(dbTable.getTableComment()) ? dbTable.getTableName() : dbTable.getTableComment());
+                StringUtils.isBlank(dbTable.getTableComment()) ? dbTable.getTableName() : dbTable.getTableComment());
 
         // 设置作者信息
         genTable.setFunctionAuthor(config.getAuthor());
