@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.core.utils.ImageUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
@@ -382,8 +382,8 @@ public class StorageUtils {
         }
 
         // 验证必要的路径信息
-        if (StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
+        if (StrUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
+                StrUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR,
                     "文件信息不完整，缺少原始路径或回收站路径");
         }
@@ -397,7 +397,7 @@ public class StorageUtils {
      */
     public static void validateRemoveParams(FileTransferDto fileTransferDto, Object configObject) {
         if (fileTransferDto == null || configObject == null ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
+                StrUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
             log.error("文件信息不完整，无法删除");
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件信息不完整，无法删除！");
         }

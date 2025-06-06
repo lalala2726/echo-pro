@@ -1,10 +1,10 @@
 package cn.zhangchuangla.generator.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.CaseUtils;
 import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.generator.model.entity.GenTable;
 import cn.zhangchuangla.generator.model.entity.GenTableColumn;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
@@ -94,28 +94,24 @@ public class VelocityUtils {
 
         // 如果没有配置，则自动推断
         if (StringUtils.isBlank(treeCode) || StringUtils.isBlank(treeParentCode) || StringUtils.isBlank(treeName)) {
-            GenTableColumn treeCodeColumn = null;
-            GenTableColumn treeParentCodeColumn = null;
-            GenTableColumn treeNameColumn = null;
+            GenTableColumn treeCodeColumn;
+            GenTableColumn treeNameColumn;
 
             for (GenTableColumn column : columns) {
                 String columnName = column.getColumnName().toLowerCase();
 
                 // 如果没有配置树编码字段，使用主键
                 if (StringUtils.isBlank(treeCode) && Constants.Generator.YES.equals(column.getIsPk())) {
-                    treeCodeColumn = column;
                     treeCode = column.getColumnName();
                 }
 
                 // 如果没有配置父编码字段，查找包含parent和id的字段
                 if (StringUtils.isBlank(treeParentCode) && columnName.contains("parent") && columnName.contains("id")) {
-                    treeParentCodeColumn = column;
                     treeParentCode = column.getColumnName();
                 }
 
                 // 如果没有配置名称字段，查找包含name或title的字段
                 if (StringUtils.isBlank(treeName) && (columnName.contains("name") || columnName.contains("title"))) {
-                    treeNameColumn = column;
                     treeName = column.getColumnName();
                 }
             }
@@ -126,7 +122,8 @@ public class VelocityUtils {
                 treeCode = treeCodeColumn != null ? treeCodeColumn.getColumnName() : "id";
             }
             if (StringUtils.isBlank(treeName) && columns.size() > 1) {
-                treeNameColumn = columns.get(1); // 取第二个字段作为名称字段
+                // 取第二个字段作为名称字段
+                treeNameColumn = columns.get(1);
                 treeName = treeNameColumn.getColumnName();
             }
         }
@@ -268,7 +265,7 @@ public class VelocityUtils {
         if (StringUtils.isBlank(str)) {
             return str;
         }
-        return CaseUtils.toCamelCase(str, false, '_');
+        return StrUtils.toCamelCase(str);
     }
 
     /**

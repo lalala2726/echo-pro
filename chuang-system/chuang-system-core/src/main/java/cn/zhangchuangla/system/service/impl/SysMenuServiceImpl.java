@@ -1,13 +1,12 @@
 package cn.zhangchuangla.system.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
@@ -22,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,7 +179,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
         String actualSegment;
-        if (StringUtils.isHttp(segmentInput)) {
+        if (StrUtils.isHttp(segmentInput)) {
             try {
                 URI uri = new URI(segmentInput);
                 String host = uri.getHost();
@@ -671,7 +671,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             log.debug("外部链接跳转: path='{}', name (URL)='{}'", routerPathValue, routerNameValue);
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, external_link != 1, 且 menu.path 是 HTTP(S) URL)
-        else if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath())) {
+        else if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StrUtils.isHttp(menu.getPath())) {
             meta.setFrameSrc(menu.getPath());
             String segment = StringUtils.isNotBlank(menu.getRouteName()) ? menu.getRouteName() : "iframe-" + menu.getMenuId();
             routerPathValue = buildInternalPathStructure(parentPath, segment);
@@ -779,7 +779,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return null;
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, path是URL, external_link != 1) -> 通常无显式组件
-        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath())) {
+        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StrUtils.isHttp(menu.getPath())) {
             // 前端根据 meta.frameSrc 渲染
             return null;
         }
@@ -852,7 +852,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 此时，用户应在routeName字段直接提供外部URL。
         if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink())) {
             // 确保routeName是URL
-            if (!StringUtils.isHttp(sysMenu.getRouteName())) {
+            if (!StrUtils.isHttp(sysMenu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
             }
             log.info("检测到“外部链接跳转”模式： path='{}', routeName (URL)='{}'. 将直接使用此routeName。",
@@ -867,7 +867,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType()) ||
                 (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType()) &&
                         StringUtils.isBlank(sysMenu.getPath()) &&
-                        (sysMenu.getRouteName() == null || !StringUtils.isHttp(sysMenu.getRouteName())))
+                        (sysMenu.getRouteName() == null || !StrUtils.isHttp(sysMenu.getRouteName())))
         ) {
             // 设置为空字符串
             sysMenu.setRouteName("");
@@ -896,10 +896,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 情况1: 内嵌Iframe (isFrame=1, path是HTTP URL, external_link!=IS_EXTERNAL_LINK)
         // routeName 应基于一个稳定的内部标识。优先使用用户在routeName字段填写的内部名（如果合法），否则基于菜单名生成。
         if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                StringUtils.isHttp(menu.getPath()) &&
+                StrUtils.isHttp(menu.getPath()) &&
                 !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
 
-            if (StringUtils.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) {
+            if (StringUtils.isNotBlank(menu.getRouteName()) && !StrUtils.isHttp(menu.getRouteName())) {
                 // 用户已提供合法的内部路由名
                 baseRouteName = capitalize(menu.getRouteName().replaceAll("[^a-zA-Z0-9]", ""));
             } else {
@@ -927,7 +927,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         }
         // 情况4: 其他（如按钮、无路径目录、或已由configureRouteName处理的外部跳转链接），不应在此生成
         else {
-            menu.setRouteName((StringUtils.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) ?
+            menu.setRouteName((StringUtils.isNotBlank(menu.getRouteName()) && !StrUtils.isHttp(menu.getRouteName())) ?
                     ensureRouteNameUnique(menu.getRouteName(), menu.getMenuId()) : "");
             return;
         }
@@ -950,7 +950,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @throws ServiceException 如果在最大尝试次数后仍无法生成唯一的内部名称。
      */
     private String ensureRouteNameUnique(String baseName, Long currentMenuId) {
-        if (StringUtils.isHttp(baseName)) {
+        if (StrUtils.isHttp(baseName)) {
             return baseName;
         }
         if (StringUtils.isBlank(baseName)) {
@@ -987,7 +987,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (!Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType())) {
             boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(sysMenu.getIsFrame()) &&
                     !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink()) &&
-                    StringUtils.isHttp(sysMenu.getPath());
+                    StrUtils.isHttp(sysMenu.getPath());
             boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink());
 
             if (!isEmbeddedIframe && !isExternalRedirect && StringUtils.isBlank(sysMenu.getPath())) {
@@ -1057,21 +1057,21 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 明确为外部链接跳转模式
         if (isExternalRedirect) {
             // routeName 必须是 URL
-            if (!StringUtils.isHttp(menu.getRouteName())) {
+            if (!StrUtils.isHttp(menu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
             }
             // path 必须是内部路径段且非空
-            if (StringUtils.isHttp(menu.getPath()) || StringUtils.isBlank(menu.getPath())) {
+            if (StrUtils.isHttp(menu.getPath()) || StringUtils.isBlank(menu.getPath())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由路径必须是一个非空、非HTTP(S)的内部路径段。");
             }
             // 明确为内嵌iframe模式
         } else if (isEmbeddedIframe) {
             // path 必须是 URL
-            if (!StringUtils.isHttp(menu.getPath())) {
+            if (!StrUtils.isHttp(menu.getPath())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由路径必须是有效的HTTP(S)链接地址。");
             }
             // routeName 不应是 URL
-            if (StringUtils.isHttp(menu.getRouteName())) {
+            if (StrUtils.isHttp(menu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由名称不应是HTTP(S)链接，应为内部路由名。");
             }
         }
@@ -1091,7 +1091,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
         boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
                 !isExternalRedirect &&
-                StringUtils.isHttp(menu.getPath());
+                StrUtils.isHttp(menu.getPath());
 
         boolean requiresComponent = Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
                 !isExternalRedirect &&

@@ -3,7 +3,6 @@ package cn.zhangchuangla.storage.core;
 import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.exception.ProfileException;
-import cn.zhangchuangla.common.core.utils.StringUtils;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.enums.StorageType;
 import cn.zhangchuangla.storage.exception.StorageException;

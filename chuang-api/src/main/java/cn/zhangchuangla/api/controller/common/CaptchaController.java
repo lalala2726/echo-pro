@@ -1,7 +1,5 @@
 package cn.zhangchuangla.api.controller.common;
 
-import org.apache.commons.codec.binary.Base64;
-import java.util.UUID;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -13,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,7 +54,7 @@ public class CaptchaController extends BaseController {
     @AccessLimit(maxCount = 20)
     public AjaxResult<HashMap<String, String>> getCaptcha() {
         // 保存验证码信息
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "")();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         HashMap<String, String> ajax = new HashMap<>(2);
 
         // 生成数学公式验证码
