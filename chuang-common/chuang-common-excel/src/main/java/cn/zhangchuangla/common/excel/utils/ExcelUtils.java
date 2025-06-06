@@ -1,9 +1,12 @@
 package cn.zhangchuangla.common.excel.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.collections4.CollectionUtils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import cn.zhangchuangla.common.excel.core.DictDataHandler;
 import cn.zhangchuangla.common.excel.core.ExcelField;
@@ -81,7 +84,7 @@ public class ExcelUtils {
 
             // 获取Excel字段信息
             List<ExcelField> excelFields = getExcelFields(clazz);
-            if (CollUtil.isEmpty(excelFields)) {
+            if (CollectionUtils.isEmpty(excelFields)) {
                 log.warn("类 {} 中没有找到@Excel注解的字段", clazz.getSimpleName());
                 return;
             }
@@ -133,7 +136,7 @@ public class ExcelUtils {
     private <T> List<ExcelField> getExcelFields(Class<T> clazz) {
         List<ExcelField> excelFields = new ArrayList<>();
 
-        Field[] fields = ReflectUtil.getFields(clazz);
+        Field[] fields = FieldUtils.getAllFieldsList(clazz).toArray(new Field[0]);
         for (Field field : fields) {
             Excel excel = field.getAnnotation(Excel.class);
             if (excel != null && excel.isExport()) {
@@ -156,11 +159,11 @@ public class ExcelUtils {
     private void preloadDictData(List<ExcelField> excelFields) {
         List<String> dictTypes = excelFields.stream()
                 .map(ExcelField::getDictType)
-                .filter(StrUtil::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .distinct()
                 .collect(Collectors.toList());
 
-        if (CollUtil.isNotEmpty(dictTypes)) {
+        if (CollectionUtils.isNotEmpty(dictTypes)) {
             dictDataHandler.preloadDictData(dictTypes);
         }
     }
@@ -174,7 +177,7 @@ public class ExcelUtils {
     private void writeHeader(Worksheet worksheet, List<ExcelField> excelFields) {
         for (int i = 0; i < excelFields.size(); i++) {
             ExcelField excelField = excelFields.get(i);
-            String title = StrUtil.isNotBlank(excelField.getTitle()) ? excelField.getTitle() : excelField.getFieldName();
+            String title = StringUtils.isNotBlank(excelField.getTitle()) ? excelField.getTitle() : excelField.getFieldName();
 
             // 写入表头
             worksheet.value(0, i, title);
@@ -184,11 +187,11 @@ public class ExcelUtils {
                 worksheet.style(0, i).bold().set();
             }
 
-            if (StrUtil.isNotBlank(excelField.getColor())) {
+            if (StringUtils.isNotBlank(excelField.getColor())) {
                 // 这里可以根据需要设置字体颜色
             }
 
-            if (StrUtil.isNotBlank(excelField.getBackgroundColor())) {
+            if (StringUtils.isNotBlank(excelField.getBackgroundColor())) {
                 // 这里可以根据需要设置背景颜色
             }
         }
@@ -203,7 +206,7 @@ public class ExcelUtils {
      * @param <T>         数据类型
      */
     private <T> void writeData(Worksheet worksheet, List<T> data, List<ExcelField> excelFields) {
-        if (CollUtil.isEmpty(data)) {
+        if (CollectionUtils.isEmpty(data)) {
             return;
         }
 
@@ -245,11 +248,11 @@ public class ExcelUtils {
      */
     private Object getFieldValue(Object item, ExcelField excelField) {
         try {
-            if (StrUtil.isNotBlank(excelField.getTargetAttr())) {
+            if (StringUtils.isNotBlank(excelField.getTargetAttr())) {
                 // 支持多级属性获取
                 return getNestedFieldValue(item, excelField.getTargetAttr());
             } else {
-                return ReflectUtil.getFieldValue(item, excelField.getField());
+                return FieldUtils.readField(excelField.getField(), item, true);
             }
         } catch (Exception e) {
             log.warn("获取字段值失败: {}", excelField.getFieldName(), e);
@@ -265,7 +268,7 @@ public class ExcelUtils {
      * @return 字段值
      */
     private Object getNestedFieldValue(Object item, String attrPath) {
-        if (item == null || StrUtil.isBlank(attrPath)) {
+        if (item == null || StringUtils.isBlank(attrPath)) {
             return null;
         }
 
@@ -276,7 +279,12 @@ public class ExcelUtils {
             if (currentValue == null) {
                 return null;
             }
-            currentValue = ReflectUtil.getFieldValue(currentValue, attr);
+            try {
+                currentValue = FieldUtils.readField(currentValue, attr, true);
+            } catch (IllegalAccessException e) {
+                log.warn("无法读取字段 {}", attr, e);
+                return null;
+            }
         }
 
         return currentValue;
@@ -291,18 +299,18 @@ public class ExcelUtils {
      */
     private String processCellValue(Object value, ExcelField excelField) {
         if (value == null) {
-            return StrUtil.isNotBlank(excelField.getDefaultValue()) ? excelField.getDefaultValue() : "";
+            return StringUtils.isNotBlank(excelField.getDefaultValue()) ? excelField.getDefaultValue() : "";
         }
 
         String cellValue = convertToString(value, excelField);
 
         // 字典映射
-        if (StrUtil.isNotBlank(excelField.getDictType())) {
+        if (StringUtils.isNotBlank(excelField.getDictType())) {
             cellValue = dictDataHandler.getDictLabel(excelField.getDictType(), cellValue);
         }
 
         // 添加后缀
-        if (StrUtil.isNotBlank(excelField.getSuffix())) {
+        if (StringUtils.isNotBlank(excelField.getSuffix())) {
             cellValue += excelField.getSuffix();
         }
 
@@ -323,24 +331,25 @@ public class ExcelUtils {
 
         // 日期格式化
         if (value instanceof Date) {
-            String dateFormat = StrUtil.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
+            String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
                     : "yyyy-MM-dd HH:mm:ss";
-            return DateUtil.format((Date) value, dateFormat);
+            return new SimpleDateFormat(dateFormat).format((Date) value);
         }
 
         if (value instanceof LocalDateTime) {
-            String dateFormat = StrUtil.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
+            String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat()
                     : "yyyy-MM-dd HH:mm:ss";
-            return DateUtil.format((LocalDateTime) value, dateFormat);
+            return ((LocalDateTime) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
         if (value instanceof LocalDate) {
-            String dateFormat = StrUtil.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat() : "yyyy-MM-dd";
-            return ((LocalDate) value).format(java.time.format.DateTimeFormatter.ofPattern(dateFormat));
+            String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat() : "yyyy-MM-dd";
+
+            return ((LocalDate) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
         // 数字格式化
-        if (value instanceof BigDecimal && StrUtil.isNotBlank(excelField.getNumFormat())) {
+        if (value instanceof BigDecimal && StringUtils.isNotBlank(excelField.getNumFormat())) {
             return String.format(excelField.getNumFormat(), value);
         }
 
@@ -387,7 +396,7 @@ public class ExcelUtils {
      * @return 是否为数字
      */
     private boolean isNumeric(String str) {
-        if (StrUtil.isBlank(str)) {
+        if (StringUtils.isBlank(str)) {
             return false;
         }
         try {

@@ -39,7 +39,8 @@ public class SysDictLoader implements DataLoader {
 
     @Override
     public int getOrder() {
-        return 20; // 优先级适中
+        // 优先级适中
+        return 20;
     }
 
     @Override
@@ -49,7 +50,8 @@ public class SysDictLoader implements DataLoader {
 
             // 1. 查询所有启用的字典类型
             LambdaQueryWrapper<SysDictType> dictTypeWrapper = new LambdaQueryWrapper<SysDictType>()
-                    .eq(SysDictType::getStatus, 0); // 0表示启用状态
+                    // 0表示启用状态
+                    .eq(SysDictType::getStatus, 0);
             List<SysDictType> dictTypes = sysDictTypeService.list(dictTypeWrapper);
 
             if (dictTypes.isEmpty()) {
@@ -66,8 +68,10 @@ public class SysDictLoader implements DataLoader {
                     // 查询该字典类型下所有启用的字典项
                     LambdaQueryWrapper<SysDictItem> dictItemWrapper = new LambdaQueryWrapper<SysDictItem>()
                             .eq(SysDictItem::getDictType, dictType.getDictType())
-                            .eq(SysDictItem::getStatus, 0) // 0表示启用状态
-                            .orderByAsc(SysDictItem::getSort); // 按排序字段升序
+                            // 0表示启用状态
+                            .eq(SysDictItem::getStatus, 0)
+                            // 按排序字段升序
+                            .orderByAsc(SysDictItem::getSort);
 
                     List<SysDictItem> dictItems = sysDictItemService.list(dictItemWrapper);
 
@@ -99,6 +103,7 @@ public class SysDictLoader implements DataLoader {
 
     @Override
     public boolean isAsync() {
-        return true; // 支持异步加载
+        // 支持异步加载
+        return true;
     }
 }

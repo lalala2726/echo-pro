@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
@@ -98,7 +98,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public void logout() {
         String token = SecurityUtils.getTokenFromRequest();
-        if (StrUtil.isNotBlank(token)) {
+        if (StringUtils.isNotBlank(token)) {
             // 将JWT令牌加入黑名单
             tokenManager.invalidateToken(token);
             // 清除Security上下文

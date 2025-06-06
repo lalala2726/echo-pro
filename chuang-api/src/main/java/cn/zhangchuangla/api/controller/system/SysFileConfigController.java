@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.hutool.core.bean.BeanUtil;
+import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
@@ -62,7 +62,7 @@ public class SysFileConfigController extends BaseController {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
-            BeanUtil.copyProperties(item, storageFileConfigListVo);
+            BeanUtils.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
                 case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
                         JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));
@@ -90,9 +90,9 @@ public class SysFileConfigController extends BaseController {
                                             @Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
-        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
 
@@ -114,9 +114,9 @@ public class SysFileConfigController extends BaseController {
                                                 @Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
-        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);
@@ -136,9 +136,9 @@ public class SysFileConfigController extends BaseController {
                                                  @Validated @RequestBody TencentCOSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getRegion();
-        request.setRegion(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setRegion(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);

@@ -6,7 +6,7 @@ import ${packageName}.model.request.${businessName}.${ClassName}AddRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}QueryRequest;
 import ${packageName}.model.request.${businessName}.${ClassName}UpdateRequest;
 import ${packageName}.service.${ClassName}Service;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;

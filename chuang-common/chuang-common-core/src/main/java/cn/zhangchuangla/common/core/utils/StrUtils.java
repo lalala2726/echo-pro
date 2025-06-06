@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
  * @author Ruoyi
  * created on 2025/1/12 11:23
  */
-public class StringUtils {
+public class StrUtils {
 
     /**
      * 空字符串

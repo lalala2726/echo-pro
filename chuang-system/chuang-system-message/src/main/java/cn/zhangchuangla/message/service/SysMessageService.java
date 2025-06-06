@@ -65,6 +65,14 @@ public interface SysMessageService extends IService<SysMessage> {
     boolean sysSendMessage(SysSendMessageRequest request);
 
     /**
+     * 系统自动发送消息（无登录用户）
+     *
+     * @param request 发送消息请求参数
+     * @return 发送结果
+     */
+    boolean systemSendMessage(SysSendMessageRequest request);
+
+    /**
      * 根据用户ID批量发送消息
      *
      * @param userIds 用户ID列表

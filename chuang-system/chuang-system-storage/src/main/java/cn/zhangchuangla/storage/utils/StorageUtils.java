@@ -1,13 +1,13 @@
 package cn.zhangchuangla.storage.utils;
 
-import cn.hutool.core.util.IdUtil;
+import java.util.UUID;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.dto.FileTransferDto;
 import cn.zhangchuangla.common.core.utils.ImageUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
@@ -84,7 +84,7 @@ public class StorageUtils {
     public static String generateFilePath(String fileName) {
         String datePath = StorageUtils.generateYearMonthDir();
         String fileExtension = StorageUtils.getFileExtension(fileName);
-        String uuid = IdUtil.simpleUUID();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         return buildFinalPath(datePath, StorageConstants.STORAGE_DIR_FILE, uuid + fileExtension);
     }
 
@@ -97,7 +97,7 @@ public class StorageUtils {
     public static String generateOriginalImagePath(String fileName) {
         String datePath = StorageUtils.generateYearMonthDir();
         String fileExtension = StorageUtils.getFileExtension(fileName);
-        String uuid = IdUtil.simpleUUID();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String fileName1 = uuid + fileExtension;
         String originalDir = buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_ORIGINAL_FOLDER);
@@ -221,7 +221,7 @@ public class StorageUtils {
     public static String generateCompressedImagePath(String fileName) {
         String datePath = generateYearMonthDir();
         String fileExtension = getFileExtension(fileName);
-        String uuid = IdUtil.simpleUUID();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String fileName1 = uuid + fileExtension;
         String compressedDir = buildFinalPath(datePath, StorageConstants.STORAGE_DIR_IMAGES,
                 StorageConstants.FILE_PREVIEW_FOLDER);
@@ -382,8 +382,8 @@ public class StorageUtils {
         }
 
         // 验证必要的路径信息
-        if (StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
+        if (StrUtils.isEmpty(fileTransferDto.getOriginalRelativePath()) ||
+                StrUtils.isEmpty(fileTransferDto.getOriginalTrashPath())) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR,
                     "文件信息不完整，缺少原始路径或回收站路径");
         }
@@ -397,7 +397,7 @@ public class StorageUtils {
      */
     public static void validateRemoveParams(FileTransferDto fileTransferDto, Object configObject) {
         if (fileTransferDto == null || configObject == null ||
-                StringUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
+                StrUtils.isEmpty(fileTransferDto.getOriginalRelativePath())) {
             log.error("文件信息不完整，无法删除");
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件信息不完整，无法删除！");
         }

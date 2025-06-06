@@ -1,9 +1,8 @@
 package cn.zhangchuangla.storage.core;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.exception.ProfileException;
-import cn.zhangchuangla.common.core.utils.StringUtils;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.enums.StorageType;
 import cn.zhangchuangla.storage.exception.StorageException;
@@ -90,7 +89,7 @@ public class StorageManager {
         }
         return switch (type) {
             case LOCAL -> Optional.ofNullable(storageSystemProperties.getLocal())
-                    .filter(c -> StrUtil.isNotBlank(c.getRootPathOrBucketName()))
+                    .filter(c -> StringUtils.isNotBlank(c.getRootPathOrBucketName()))
                     .orElseThrow(() -> new StorageException("LOCAL 存储配置不完整或未找到 (local.rootPathOrBucketName 缺失)"));
             case MINIO -> Optional.ofNullable(storageSystemProperties.getMinio())
                     .filter(c -> org.apache.commons.lang3.StringUtils.isNoneBlank(c.getEndpoint(), c.getAccessKey(), c.getSecretKey(), c.getRootPathOrBucketName()))
