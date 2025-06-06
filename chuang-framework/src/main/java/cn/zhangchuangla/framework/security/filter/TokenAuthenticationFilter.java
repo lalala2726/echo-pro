@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.security.filter;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
@@ -49,7 +49,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader(header);
         log.info("当前请求令牌：{}", authorizationHeader);
         try {
-            if (StrUtil.isNotBlank(authorizationHeader)) {
+            if (StringUtils.isNotBlank(authorizationHeader)) {
 
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
                 boolean isValidToken = tokenManager.validateAccessToken(authorizationHeader);

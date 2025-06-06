@@ -52,7 +52,6 @@
         <javax.activation.version>2.1.2</javax.activation.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
-        <cn.hutool.version>5.8.37</cn.hutool.version>
         <apache.velocity>2.4.1</apache.velocity>
         <google.protobuf.version>4.28.2</google.protobuf.version>
         <fast.excel.version>1.2.0</fast.excel.version>
@@ -363,9 +362,9 @@
             <!-- ===================== 项目模块依赖 ===================== -->
             <!-- 通用工具模块依赖 -->
             <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${cn.hutool.version}</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.14.0</version>
             </dependency>
 
             <dependency>

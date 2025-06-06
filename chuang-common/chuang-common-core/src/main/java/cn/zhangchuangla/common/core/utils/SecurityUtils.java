@@ -1,7 +1,7 @@
 package cn.zhangchuangla.common.core.utils;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
@@ -124,13 +124,13 @@ public class SecurityUtils {
     public static Set<String> getRoles() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getAuthorities)
-                .filter(CollectionUtil::isNotEmpty)
+                .filter(CollectionUtils::isNotEmpty)
                 .stream()
                 .flatMap(Collection::stream)
                 .map(GrantedAuthority::getAuthority)
                 // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
                 .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
-                .map(authority -> StrUtil.removePrefix(authority, SecurityConstants.ROLE_PREFIX))
+                .map(authority -> StringUtils.removeStart(authority, SecurityConstants.ROLE_PREFIX))
                 .collect(Collectors.toSet());
     }
 

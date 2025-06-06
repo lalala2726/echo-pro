@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.hutool.core.bean.BeanUtil;
+import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
@@ -62,7 +62,7 @@ public class SysFileConfigController extends BaseController {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
-            BeanUtil.copyProperties(item, storageFileConfigListVo);
+            BeanUtils.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
                 case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
                         JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));

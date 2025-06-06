@@ -1,7 +1,7 @@
 package cn.zhangchuangla.quartz.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.db.Page;
+import org.springframework.beans.BeanUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.zhangchuangla.common.core.constants.ScheduleConstants;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.quartz.constants.QuartzConstants;
@@ -78,7 +78,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob>
         }
 
         SysJob sysJob = new SysJob();
-        BeanUtil.copyProperties(request, sysJob);
+        BeanUtils.copyProperties(request, sysJob);
 
         // 设置默认值
         if (sysJob.getJobGroup() == null) {
@@ -124,7 +124,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob>
         }
 
         SysJob sysJob = new SysJob();
-        BeanUtil.copyProperties(request, sysJob);
+        BeanUtils.copyProperties(request, sysJob);
         sysJob.setUpdateTime(new Date());
 
         boolean result = updateById(sysJob);

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.quartz.mapper;
 
-import cn.hutool.db.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.zhangchuangla.quartz.model.entity.SysJob;
 import cn.zhangchuangla.quartz.model.request.SysJobListQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

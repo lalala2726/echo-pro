@@ -1,6 +1,6 @@
 package cn.zhangchuangla.generator.utils;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.generator.enums.FileType;
 
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public class GenUtils {
      * @return 驼峰命名的字符串
      */
     public static String toCamelCase(String name) {
-        if (StrUtil.isBlank(name)) {
+        if (StringUtils.isBlank(name)) {
             return "";
         }
 
@@ -83,7 +83,7 @@ public class GenUtils {
      * @return 类名
      */
     public static String convertClassName(String tableName) {
-        if (StrUtil.isBlank(tableName)) {
+        if (StringUtils.isBlank(tableName)) {
             return "";
         }
 
@@ -107,7 +107,7 @@ public class GenUtils {
      * @return Java类型
      */
     public static String getJavaType(String columnType) {
-        if (StrUtil.isBlank(columnType)) {
+        if (StringUtils.isBlank(columnType)) {
             return "String";
         }
 
@@ -149,7 +149,7 @@ public class GenUtils {
      * @return 表单显示类型
      */
     public static String getHtmlType(String columnType) {
-        if (StrUtil.isBlank(columnType)) {
+        if (StringUtils.isBlank(columnType)) {
             return "input";
         }
 
@@ -176,7 +176,7 @@ public class GenUtils {
      * @return 模块名
      */
     public static String getModuleName(String packageName) {
-        if (StrUtil.isBlank(packageName)) {
+        if (StringUtils.isBlank(packageName)) {
             return "";
         }
 
@@ -191,7 +191,7 @@ public class GenUtils {
      * @return 业务名
      */
     public static String getBusinessName(String tableName) {
-        if (StrUtil.isBlank(tableName)) {
+        if (StringUtils.isBlank(tableName)) {
             return "";
         }
 

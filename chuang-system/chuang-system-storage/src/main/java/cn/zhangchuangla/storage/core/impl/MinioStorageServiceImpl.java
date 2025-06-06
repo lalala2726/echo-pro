@@ -305,15 +305,15 @@ public class MinioStorageServiceImpl implements StorageService {
     @Override
     public boolean fileExists(String relativePath) {
         if (!StringUtils.hasText(relativePath)) {
-            return true;
+            return false;
         }
         try {
             getClient().statObject(
                     StatObjectArgs.builder().bucket(config.getRootPathOrBucketName()).object(relativePath).build());
-            return false;
+            return true;
         } catch (ErrorResponseException e) {
             if ("NoSuchKey".equals(e.errorResponse().code())) {
-                return true;
+                return false;
             }
             log.error("Error checking file existence in MinIO: {}", relativePath, e);
             throw new StorageException("检查MinIO文件是否存在失败: " + relativePath, e);
@@ -342,11 +342,11 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public FileInfo moveToTrash(String relativePath) {
-        if (config.isEnableTrash()) {
+        if (!config.isEnableTrash()) {
             log.warn("Trash is not enabled for MinIO. File will not be moved: {}", relativePath);
             return null;
         }
-        if (!StringUtils.hasText(relativePath) || fileExists(relativePath)) {
+        if (!StringUtils.hasText(relativePath) || !fileExists(relativePath)) {
             log.warn("File not found or path is empty, cannot move to trash: {}", relativePath);
             return null;
         }
@@ -374,7 +374,7 @@ public class MinioStorageServiceImpl implements StorageService {
         if (!StringUtils.hasText(trashPath) || !trashPath.startsWith(config.getTrashDirectoryName())) {
             throw new StorageException("无效的MinIO回收站路径: " + trashPath);
         }
-        if (fileExists(trashPath)) {
+        if (!fileExists(trashPath)) {
             log.warn("File not found in MinIO trash: {}", trashPath);
             return null;
         }

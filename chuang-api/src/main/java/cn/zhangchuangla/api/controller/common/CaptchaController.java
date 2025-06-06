@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.IdUtil;
+import org.apache.commons.codec.binary.Base64;
+import java.util.UUID;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -54,7 +54,7 @@ public class CaptchaController extends BaseController {
     @AccessLimit(maxCount = 20)
     public AjaxResult<HashMap<String, String>> getCaptcha() {
         // 保存验证码信息
-        String uuid = IdUtil.simpleUUID();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "")();
         HashMap<String, String> ajax = new HashMap<>(2);
 
         // 生成数学公式验证码
@@ -77,7 +77,7 @@ public class CaptchaController extends BaseController {
         }
 
         ajax.put("captchaKey", uuid);
-        ajax.put("captchaBase64", Constants.BASE64_CODE + Base64.encode(os.toByteArray()));
+        ajax.put("captchaBase64", Constants.BASE64_CODE + Base64.encodeBase64String(os.toByteArray()));
         return success(ajax);
     }
 

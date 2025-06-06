@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.utils.client;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.model.entity.IPEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -85,7 +85,7 @@ public class IPUtils {
         }
 
         // 处理多级代理情况，取第一个有效 IP
-        if (StrUtil.isNotBlank(ip) && ip.contains(",")) {
+        if (StringUtils.isNotBlank(ip) && ip.contains(",")) {
             String[] ips = ip.split(",");
             for (String singleIp : ips) {
                 if (isValidIp(singleIp.trim())) {
@@ -107,7 +107,7 @@ public class IPUtils {
      */
     private static boolean isValidIp(String ip) {
         String unknown = "unknown";
-        return StrUtil.isNotBlank(ip) && !unknown.equalsIgnoreCase(ip);
+        return StringUtils.isNotBlank(ip) && !unknown.equalsIgnoreCase(ip);
     }
 
 
@@ -140,14 +140,14 @@ public class IPUtils {
             return null;
         }
         // 基础校验
-        if (StrUtil.isBlank(ip)) {
+        if (StringUtils.isBlank(ip)) {
             return null;
         }
 
         try {
             String region = searcher.search(ip);
             // ip2region 可能返回 null 或空字符串
-            return StrUtil.isBlank(region) ? null : region;
+            return StringUtils.isBlank(region) ? null : region;
         } catch (Exception e) {
             log.error("Ip2region search error for IP: {}", ip, e);
             return null;
@@ -161,7 +161,7 @@ public class IPUtils {
      * @return boolean
      */
     private static boolean isPrivateOrCgnIp(String ip) {
-        if (StrUtil.isBlank(ip)) {
+        if (StringUtils.isBlank(ip)) {
             return false;
         }
         try {
@@ -215,25 +215,25 @@ public class IPUtils {
         IPEntity regionEntity = getRegionEntity(ip);
         StringBuilder region = new StringBuilder();
 
-        if (StrUtil.isNotBlank(regionEntity.getCountry()) && !UNKNOWN_IP_INFO.equals(regionEntity.getCountry())) {
+        if (StringUtils.isNotBlank(regionEntity.getCountry()) && !UNKNOWN_IP_INFO.equals(regionEntity.getCountry())) {
             region.append(regionEntity.getCountry());
         }
 
-        if (StrUtil.isNotBlank(regionEntity.getArea()) && !UNKNOWN_IP_INFO.equals(regionEntity.getArea())) {
+        if (StringUtils.isNotBlank(regionEntity.getArea()) && !UNKNOWN_IP_INFO.equals(regionEntity.getArea())) {
             if (!region.isEmpty()) {
                 region.append(" ");
             }
             region.append(regionEntity.getArea());
         }
 
-        if (StrUtil.isNotBlank(regionEntity.getRegion()) && !UNKNOWN_IP_INFO.equals(regionEntity.getRegion())) {
+        if (StringUtils.isNotBlank(regionEntity.getRegion()) && !UNKNOWN_IP_INFO.equals(regionEntity.getRegion())) {
             if (!region.isEmpty()) {
                 region.append(" ");
             }
             region.append(regionEntity.getRegion());
         }
 
-        if (StrUtil.isNotBlank(regionEntity.getISP()) && !UNKNOWN_IP_INFO.equals(regionEntity.getISP())) {
+        if (StringUtils.isNotBlank(regionEntity.getISP()) && !UNKNOWN_IP_INFO.equals(regionEntity.getISP())) {
             if (!region.isEmpty()) {
                 region.append(" ");
             }
@@ -256,7 +256,7 @@ public class IPUtils {
         ipEntity.setIp(ip);
 
         // 1. 基础校验
-        if (StrUtil.isBlank(ip)) {
+        if (StringUtils.isBlank(ip)) {
             // 或设置所有字段为未知
             ipEntity.setRegion(UNKNOWN_IP_INFO);
             ipEntity.setISP(UNKNOWN_IP_INFO);
