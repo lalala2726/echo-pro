@@ -1,10 +1,15 @@
 package cn.zhangchuangla.common.excel.utils;
 
 import org.apache.commons.collections4.CollectionUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+
+import java.time.format.DateTimeFormatter;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import cn.zhangchuangla.common.excel.core.DictDataHandler;
 import cn.zhangchuangla.common.excel.core.ExcelField;
@@ -342,6 +347,7 @@ public class ExcelUtils {
 
         if (value instanceof LocalDate) {
             String dateFormat = StringUtils.isNotBlank(excelField.getDateFormat()) ? excelField.getDateFormat() : "yyyy-MM-dd";
+
             return ((LocalDate) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
