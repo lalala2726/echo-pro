@@ -18,6 +18,13 @@ import java.util.Date;
 public class SysMessageListVo {
 
     /**
+     * 消息ID
+     */
+    @Schema(description = "消息ID")
+    @Excel(name = "消息ID", sort = 0)
+    private Long id;
+
+    /**
      * 消息标题
      */
     @Schema(description = "消息标题")
@@ -45,12 +52,6 @@ public class SysMessageListVo {
     @Excel(name = "消息级别：1-普通 2-重要 3-紧急", sort = 4)
     private Integer level;
 
-    /**
-     * 发送者ID，NULL表示系统发送
-     */
-    @Schema(description = "发送者ID，NULL表示系统发送")
-    @Excel(name = "发送者ID，NULL表示系统发送", sort = 5)
-    private Long senderId;
 
     /**
      * 发送者姓名

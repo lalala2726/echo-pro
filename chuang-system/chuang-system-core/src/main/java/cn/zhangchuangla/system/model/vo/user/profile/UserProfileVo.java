@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.model.vo.user;
+package cn.zhangchuangla.system.model.vo.user.profile;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
