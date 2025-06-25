@@ -19,7 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserMessageExt {
+public class SysUserMessageExt {
     /**
      * 主键ID
      */

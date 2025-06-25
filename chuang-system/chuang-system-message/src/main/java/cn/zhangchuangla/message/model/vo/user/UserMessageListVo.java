@@ -46,7 +46,7 @@ public class UserMessageListVo {
      * 是否已读
      */
     @Schema(description = "是否已读")
-    private Boolean isRead;
+    private Integer isRead;
 
     /**
      * 发送者名称

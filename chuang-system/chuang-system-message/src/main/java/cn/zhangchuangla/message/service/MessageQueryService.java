@@ -40,13 +40,5 @@ public interface MessageQueryService {
     UserMessageReadCountDto getUserMessageReadCount();
 
 
-    /**
-     * 批量查询消息的已读状态
-     *
-     * @param userId     用户ID
-     * @param messageIds 消息ID列表
-     * @return 已读的消息ID列表
-     */
-    List<Long> getReadMessageIds(Long userId, List<Long> messageIds);
 
 }

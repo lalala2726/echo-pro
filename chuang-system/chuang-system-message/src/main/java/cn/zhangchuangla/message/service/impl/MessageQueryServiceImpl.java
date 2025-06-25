@@ -3,10 +3,12 @@ package cn.zhangchuangla.message.service.impl;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.message.constant.MessageConstants;
+import cn.zhangchuangla.message.model.bo.MessageReadStatusBo;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
-import cn.zhangchuangla.message.model.entity.UserMessageExt;
+import cn.zhangchuangla.message.model.entity.SysUserMessageExt;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.vo.user.UserMessageVo;
 import cn.zhangchuangla.message.service.MessageQueryService;
@@ -20,6 +22,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 消息查询服务实现类
@@ -47,19 +51,24 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         Page<SysMessage> sysMessagePage = new Page<>(request.getPageNum(), request.getPageSize());
         sysMessagePage = sysMessageService.pageUserMessage(sysMessagePage, userId, request);
 
-        // 获取当前页面消息的已读状态（优化：只查询当前页面的消息）
+        // 获取当前页面消息的已读状态（优化：只查询当前页的消息）
         List<Long> currentPageMessageIds = sysMessagePage.getRecords().stream()
                 .map(SysMessage::getId)
                 .toList();
 
-        List<Long> readMessageIds = getReadMessageIds(userId, currentPageMessageIds);
+        List<MessageReadStatusBo> messageReadStatusBos = userMessageExtService.getMessageReadStatus(userId, currentPageMessageIds);
+
+        // 将已读状态列表转换为Map，方便快速查找
+        Map<Long, Integer> readStatusMap = messageReadStatusBos.stream()
+                .collect(Collectors.toMap(MessageReadStatusBo::getMessageId, MessageReadStatusBo::getIsRead, (a, b) -> b));
 
         // 转换为DTO并设置已读状态
         List<UserMessageDto> userMessageDtos = sysMessagePage.getRecords().stream()
                 .map(message -> {
                     UserMessageDto dto = new UserMessageDto();
                     BeanUtils.copyProperties(message, dto);
-                    dto.setIsRead(readMessageIds.contains(message.getId()));
+                    // 从map中获取已读状态，如果不存在，则默认为未读
+                    dto.setIsRead(readStatusMap.getOrDefault(message.getId(), MessageConstants.StatusConstants.MESSAGE_UN_READ));
                     return dto;
                 })
                 .toList();
@@ -110,32 +119,10 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         if (userMessageCount == 0L) {
             return new UserMessageReadCountDto(userId, 0L, 0L, 0L);
         }
-        LambdaQueryWrapper<UserMessageExt> eq = new LambdaQueryWrapper<UserMessageExt>().eq(UserMessageExt::getUserId, userId);
+        LambdaQueryWrapper<SysUserMessageExt> eq = new LambdaQueryWrapper<SysUserMessageExt>().eq(SysUserMessageExt::getUserId, userId);
         long read = userMessageExtService.count(eq);
         long unRead = userMessageCount - read;
         return new UserMessageReadCountDto(userId, userMessageCount, read, unRead);
     }
 
-
-    /**
-     * 获取已读消息ID
-     *
-     * @param userId     用户ID
-     * @param messageIds 消息ID列表
-     * @return 已读消息ID列表
-     */
-    @Override
-    public List<Long> getReadMessageIds(Long userId, List<Long> messageIds) {
-        if (userId == null || messageIds == null || messageIds.isEmpty()) {
-            return List.of();
-        }
-
-        return userMessageExtService.list(
-                        new LambdaQueryWrapper<UserMessageExt>()
-                                .eq(UserMessageExt::getUserId, userId)
-                                .in(UserMessageExt::getMessageId, messageIds))
-                .stream()
-                .map(UserMessageExt::getMessageId)
-                .toList();
-    }
 }
