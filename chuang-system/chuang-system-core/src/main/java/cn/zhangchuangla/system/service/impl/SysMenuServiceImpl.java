@@ -281,21 +281,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<SysMenu> getMenuListByUserId(Long userId) {
         if (userId == null) {
-            log.warn("根据用户ID查询菜单列表时，用户ID为空。");
             return Collections.emptyList();
         }
         Set<String> roles = SecurityUtils.getRoles();
         if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
-            log.info("用户ID {} (角色: {}) 是超级管理员，返回所有有效菜单，并按父ID和排序值排序。", userId, roles);
             return list(new LambdaQueryWrapper<SysMenu>()
                     .orderByAsc(SysMenu::getParentId)
-                    .orderByAsc(SysMenu::getSort));
+                    .orderByDesc(SysMenu::getOrderNum));
         }
-        log.debug("用户ID {} (角色: {}) 非超级管理员，根据权限查询菜单。", userId, roles);
         List<SysMenu> userMenus = menuMapper.getMenuListByUserId(userId);
         if (userMenus != null) {
             userMenus.sort(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
-                    .thenComparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())));
+                    .thenComparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())));
         } else {
             userMenus = Collections.emptyList();
         }
@@ -621,7 +618,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         List<SysMenu> processableMenus = menus.stream()
                 .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getMenuType()))
                 .sorted(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
-                        .thenComparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .thenComparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
 
         if (processableMenus.isEmpty()) {
@@ -635,7 +632,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .collect(Collectors.groupingBy(SysMenu::getParentId));
 
         parentChildrenMap.forEach((parentId, childrenList) ->
-                childrenList.sort(Comparator.comparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
+                childrenList.sort(Comparator.comparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())))
         );
 
         // 递归转换为 RouterVo 树形结构
@@ -855,8 +852,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             if (!StrUtils.isHttp(sysMenu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
             }
-            log.info("检测到“外部链接跳转”模式： path='{}', routeName (URL)='{}'. 将直接使用此routeName。",
-                    sysMenu.getPath(), sysMenu.getRouteName());
             // routeName已经是外部URL，ensureRouteNameUnique 方法会直接返回它，不尝试唯一化。
             sysMenu.setRouteName(ensureRouteNameUnique(sysMenu.getRouteName(), sysMenu.getMenuId()));
             return;
