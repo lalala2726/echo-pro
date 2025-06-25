@@ -8,7 +8,7 @@ import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.entity.UserMessageExt;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
-import cn.zhangchuangla.message.model.vo.UserMessageVo;
+import cn.zhangchuangla.message.model.vo.user.UserMessageVo;
 import cn.zhangchuangla.message.service.MessageQueryService;
 import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.message.service.UserMessageExtService;

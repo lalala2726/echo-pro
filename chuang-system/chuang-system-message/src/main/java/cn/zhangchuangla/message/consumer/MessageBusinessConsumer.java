@@ -1,7 +1,7 @@
 package cn.zhangchuangla.message.consumer;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.message.model.entity.SysUserMessageMapping;
+import cn.zhangchuangla.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
@@ -66,8 +66,8 @@ public class MessageBusinessConsumer {
         }
 
         // 批量创建用户消息记录
-        List<SysUserMessageMapping> userMessages = userIds.stream()
-                .map(userId -> SysUserMessageMapping.builder()
+        List<SysUserMessage> userMessages = userIds.stream()
+                .map(userId -> SysUserMessage.builder()
                         .messageId(messageSendDTO.getMessageId())
                         .userId(userId)
                         .createTime(new Date())
@@ -90,8 +90,8 @@ public class MessageBusinessConsumer {
         }
 
         // 批量创建角色消息记录
-        List<SysUserMessageMapping> roleMessages = roleIds.stream()
-                .map(roleId -> SysUserMessageMapping.builder()
+        List<SysUserMessage> roleMessages = roleIds.stream()
+                .map(roleId -> SysUserMessage.builder()
                         .messageId(messageSendDTO.getMessageId())
                         .roleId(roleId)
                         .createTime(new Date())
@@ -114,8 +114,8 @@ public class MessageBusinessConsumer {
         }
 
         // 批量创建部门消息记录
-        List<SysUserMessageMapping> deptMessages = deptIds.stream()
-                .map(deptId -> SysUserMessageMapping.builder()
+        List<SysUserMessage> deptMessages = deptIds.stream()
+                .map(deptId -> SysUserMessage.builder()
                         .messageId(messageSendDTO.getMessageId())
                         .deptId(deptId)
                         .createTime(new Date())

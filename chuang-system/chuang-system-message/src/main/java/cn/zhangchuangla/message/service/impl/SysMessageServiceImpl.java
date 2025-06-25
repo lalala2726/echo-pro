@@ -8,7 +8,9 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
+import cn.zhangchuangla.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
+import cn.zhangchuangla.message.service.SysUserMessageService;
 import cn.zhangchuangla.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.mq.production.MessageProducer;
 import cn.zhangchuangla.system.model.entity.SysDept;
@@ -47,6 +49,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final MessageProducer messageProducer;
 
     private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
+    private final SysUserMessageService sysUserMessageService;
 
     /**
      * 分页查询系统消息表
@@ -67,8 +70,20 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 系统消息表
      */
     @Override
-    public SysMessage getSysMessageById(Long id) {
-        return getById(id);
+    public SysMessageVo getSysMessageById(Long id) {
+        SysMessage sysMessage = getById(id);
+        if (sysMessage == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
+        }
+        SysMessageVo sysMessageVo = new SysMessageVo();
+        // 如果消息发送目标类型不是"全部用户"，则需要处理目标ID的关联查询，否则不需要传入目标ID
+        if (Constants.MessageConstants.SEND_METHOD_ALL != sysMessage.getTargetType()) {
+            List<Long> targetIds = sysUserMessageService.getRecipientIdsByMessageId(id);
+            sysMessageVo.setTargetIds(targetIds);
+        }
+        BeanUtils.copyProperties(sysMessage, sysMessageVo);
+        sysMessageVo.setPublishTime(sysMessage.getCreateTime());
+        return sysMessageVo;
     }
 
     /**

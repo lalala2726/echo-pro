@@ -102,8 +102,7 @@
                 </if>
             </if>
         </where>
-
-        order by sm.create_by
+        order by sm.create_time desc
     </select>
 
     <select id="getCurrentUserMessage" resultMap="BaseResultMap">

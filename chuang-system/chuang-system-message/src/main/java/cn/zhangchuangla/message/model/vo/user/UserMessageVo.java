@@ -1,4 +1,4 @@
-package cn.zhangchuangla.message.model.vo;
+package cn.zhangchuangla.message.model.vo.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;

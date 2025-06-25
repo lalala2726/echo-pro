@@ -3,7 +3,7 @@ package cn.zhangchuangla.message.service;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
-import cn.zhangchuangla.message.model.vo.UserMessageVo;
+import cn.zhangchuangla.message.model.vo.user.UserMessageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;

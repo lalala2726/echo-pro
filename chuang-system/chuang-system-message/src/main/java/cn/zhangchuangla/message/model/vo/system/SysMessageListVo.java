@@ -1,4 +1,4 @@
-package cn.zhangchuangla.message.model.vo;
+package cn.zhangchuangla.message.model.vo.system;
 
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;

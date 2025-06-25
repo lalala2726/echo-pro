@@ -647,7 +647,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * 填充RouterVo对象的path, name, component和MetaVo的frameSrc, keepAlive属性。
+     * 填充RouterVo对象的path, name, component和MetaVo的frameSrc
      * 此方法是convertToRouterVoRecursive的核心逻辑抽取，用于根据菜单类型和外链设置决定路由的关键属性。
      *
      * @param menu       当前SysMenu实体。

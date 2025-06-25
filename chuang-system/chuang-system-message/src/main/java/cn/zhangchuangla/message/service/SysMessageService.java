@@ -2,6 +2,7 @@ package cn.zhangchuangla.message.service;
 
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
+import cn.zhangchuangla.message.model.vo.system.SysMessageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -30,7 +31,7 @@ public interface SysMessageService extends IService<SysMessage> {
      * @param id ID
      * @return 系统消息表
      */
-    SysMessage getSysMessageById(Long id);
+    SysMessageVo getSysMessageById(Long id);
 
     /**
      * 新增系统消息表
