@@ -24,6 +24,8 @@
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-common/chuang-common-core/chuang-common-security/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-generator/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-quartz/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/chuang-message-service/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/system/pom.xml" />
         <option value="$PROJECT_DIR$/model/pom.xml" />
