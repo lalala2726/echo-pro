@@ -8,14 +8,12 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.message.service.SysMessageService;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.model.vo.user.UserListVo;
-import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -51,20 +49,8 @@ public class SysUserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final ExcelUtils excelUtils;
-    private final SysMessageService sysMessageService;
 
-    /**
-     * 获取用户信息
-     * 获取当前登录用户的详细信息，包括个人资料
-     *
-     * @return 用户个人资料信息
-     */
-    @GetMapping("/profile")
-    @Operation(summary = "获取用户信息")
-    public AjaxResult<UserProfileVo> userProfile() {
-        UserProfileVo profileVo = sysUserService.getUserProfile();
-        return success(profileVo);
-    }
+
 
     /**
      * 获取用户列表

@@ -3,15 +3,14 @@ package cn.zhangchuangla.message.service.impl;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.message.constant.MessageConstants;
 import cn.zhangchuangla.message.mapper.UserMessageExtMapper;
-import cn.zhangchuangla.message.model.entity.UserMessageExt;
+import cn.zhangchuangla.message.model.entity.SysUserMessageExt;
 import cn.zhangchuangla.message.service.UserMessageReadService;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,14 +20,13 @@ import java.util.stream.Collectors;
 /**
  * 用户消息已读状态服务实现类
  * 专门负责消息的已读/未读状态管理，区分真实阅读和批量标记
- * //todo 后续添加一个统一的异步工厂接口,统一处理异步任务
  *
  * @author Chuang
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper, UserMessageExt>
+public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper, SysUserMessageExt>
         implements UserMessageReadService {
 
     /**
@@ -61,24 +59,24 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
         }
 
         // 查询已存在的记录
-        List<UserMessageExt> existingRecords = lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .in(UserMessageExt::getMessageId, messageIds)
+        List<SysUserMessageExt> existingRecords = lambdaQuery()
+                .eq(SysUserMessageExt::getUserId, userId)
+                .in(SysUserMessageExt::getMessageId, messageIds)
                 .list();
 
         // 处理不存在的 messageId
         List<Long> newMessageIds = new ArrayList<>(messageIds);
         if (!existingRecords.isEmpty()) {
             newMessageIds.removeAll(existingRecords.stream()
-                    .map(UserMessageExt::getMessageId)
+                    .map(SysUserMessageExt::getMessageId)
                     .toList());
         }
 
         Date now = new Date();
 
         // 创建新记录
-        List<UserMessageExt> toCreate = newMessageIds.stream()
-                .map(messageId -> UserMessageExt.builder()
+        List<SysUserMessageExt> toCreate = newMessageIds.stream()
+                .map(messageId -> SysUserMessageExt.builder()
                         .userId(userId)
                         .messageId(messageId)
                         .isRead(MessageConstants.StatusConstants.MESSAGE_IS_READ)
@@ -112,7 +110,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
 
             if (!updated) {
                 log.warn("部分已有消息记录更新阅读状态失败: userId={}, messageIds={}", userId,
-                        existingRecords.stream().map(UserMessageExt::getMessageId).collect(Collectors.toList()));
+                        existingRecords.stream().map(SysUserMessageExt::getMessageId).collect(Collectors.toList()));
                 // 根据业务需求决定是否返回false
             }
         }
@@ -141,20 +139,20 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
 
         // 查询用户已有的阅读记录
         List<Long> existingMessageIds = this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .in(UserMessageExt::getMessageId, messageIds)
+                .eq(SysUserMessageExt::getUserId, userId)
+                .in(SysUserMessageExt::getMessageId, messageIds)
                 .list()
                 .stream()
-                .map(UserMessageExt::getMessageId)
+                .map(SysUserMessageExt::getMessageId)
                 .collect(Collectors.toList());
 
         // 更新已存在的记录为已读状态（不修改阅读时间）
         if (!existingMessageIds.isEmpty()) {
             boolean updateResult = this.lambdaUpdate()
-                    .eq(UserMessageExt::getUserId, userId)
-                    .in(UserMessageExt::getMessageId, existingMessageIds)
-                    .set(UserMessageExt::getIsRead, 1)
-                    .set(UserMessageExt::getUpdateTime, now)
+                    .eq(SysUserMessageExt::getUserId, userId)
+                    .in(SysUserMessageExt::getMessageId, existingMessageIds)
+                    .set(SysUserMessageExt::getIsRead, 1)
+                    .set(SysUserMessageExt::getUpdateTime, now)
                     // 注意：批量标记不修改 firstReadTime 和 lastReadTime
                     .update();
 
@@ -170,8 +168,8 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
                 .collect(Collectors.toList());
 
         if (!newMessageIds.isEmpty()) {
-            List<UserMessageExt> newRecords = newMessageIds.stream()
-                    .map(messageId -> UserMessageExt.builder()
+            List<SysUserMessageExt> newRecords = newMessageIds.stream()
+                    .map(messageId -> SysUserMessageExt.builder()
                             .userId(userId)
                             .messageId(messageId)
                             .isRead(1)
@@ -222,11 +220,14 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
 
         // 将已读状态设置为未读，但保留阅读时间记录（用于数据分析）
         boolean result = lambdaUpdate()
-                .eq(UserMessageExt::getUserId, userId)
-                .in(UserMessageExt::getMessageId, messageIds)
-                .set(UserMessageExt::getIsRead, MessageConstants.StatusConstants.MESSAGE_UN_READ)
-                .set(UserMessageExt::getUpdateTime, new Date())
+                .eq(SysUserMessageExt::getUserId, userId)
+                .in(SysUserMessageExt::getMessageId, messageIds)
+                .set(SysUserMessageExt::getIsRead, MessageConstants.StatusConstants.MESSAGE_UN_READ)
+                .set(SysUserMessageExt::getUpdateTime, new Date())
                 .update();
+
+        new LambdaQueryWrapper<SysUserMessageExt>().eq(SysUserMessageExt::getUserId, userId)
+                        .in(SysUserMessageExt::getMessageId, messageIds);
 
         log.info("批量标记消息未读: userId={}, messageIds={}, result={}", userId, messageIds, result);
         return result;
@@ -246,9 +247,9 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
         }
 
         return this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .eq(UserMessageExt::getMessageId, messageId)
-                .eq(UserMessageExt::getIsRead, 1)
+                .eq(SysUserMessageExt::getUserId, userId)
+                .eq(SysUserMessageExt::getMessageId, messageId)
+                .eq(SysUserMessageExt::getIsRead, 1)
                 .exists();
     }
 
@@ -266,11 +267,11 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
         }
 
         return this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .eq(UserMessageExt::getMessageId, messageId)
-                .eq(UserMessageExt::getIsRead, 1)
+                .eq(SysUserMessageExt::getUserId, userId)
+                .eq(SysUserMessageExt::getMessageId, messageId)
+                .eq(SysUserMessageExt::getIsRead, 1)
                 // 有首次阅读时间才算真实阅读
-                .isNotNull(UserMessageExt::getFirstReadTime)
+                .isNotNull(SysUserMessageExt::getFirstReadTime)
                 .exists();
     }
 
@@ -288,12 +289,12 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
         }
 
         return this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .in(UserMessageExt::getMessageId, messageIds)
-                .eq(UserMessageExt::getIsRead, 1)
+                .eq(SysUserMessageExt::getUserId, userId)
+                .in(SysUserMessageExt::getMessageId, messageIds)
+                .eq(SysUserMessageExt::getIsRead, 1)
                 .list()
                 .stream()
-                .map(UserMessageExt::getMessageId)
+                .map(SysUserMessageExt::getMessageId)
                 .collect(Collectors.toList());
     }
 
@@ -310,9 +311,9 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
             throw new ParamException("参数错误");
         }
 
-        UserMessageExt record = this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .eq(UserMessageExt::getMessageId, messageId)
+        SysUserMessageExt record = this.lambdaQuery()
+                .eq(SysUserMessageExt::getUserId, userId)
+                .eq(SysUserMessageExt::getMessageId, messageId)
                 .one();
 
         return record != null ? record.getFirstReadTime() : null;
@@ -331,9 +332,9 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
             throw new ParamException("参数错误");
         }
 
-        UserMessageExt record = this.lambdaQuery()
-                .eq(UserMessageExt::getUserId, userId)
-                .eq(UserMessageExt::getMessageId, messageId)
+        SysUserMessageExt record = this.lambdaQuery()
+                .eq(SysUserMessageExt::getUserId, userId)
+                .eq(SysUserMessageExt::getMessageId, messageId)
                 .one();
 
         return record != null ? record.getLastReadTime() : null;

@@ -11,8 +11,8 @@ import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
 import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.message.model.request.SysSendMessageRequest;
-import cn.zhangchuangla.message.model.vo.SysMessageListVo;
-import cn.zhangchuangla.message.model.vo.SysMessageVo;
+import cn.zhangchuangla.message.model.vo.system.SysMessageListVo;
+import cn.zhangchuangla.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,10 +92,8 @@ public class SysMessageController extends BaseController {
     public AjaxResult<SysMessageVo> getInfo(@Parameter(description = "系统消息表ID")
                                             @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
-        SysMessage sysMessage = sysMessageService.getSysMessageById(id);
-        SysMessageVo vo = new SysMessageVo();
-        BeanUtils.copyProperties(sysMessage, vo);
-        return success(vo);
+        SysMessageVo sysMessage = sysMessageService.getSysMessageById(id);
+        return success(sysMessage);
     }
 
     /**

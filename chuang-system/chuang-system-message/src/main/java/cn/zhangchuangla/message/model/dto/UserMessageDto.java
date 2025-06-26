@@ -36,7 +36,7 @@ public class UserMessageDto {
     /**
      * 是否已读
      */
-    private Boolean isRead;
+    private Integer isRead;
 
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.message.service;
 
-import cn.zhangchuangla.message.model.entity.UserMessageExt;
+import cn.zhangchuangla.message.model.bo.MessageReadStatusBo;
+import cn.zhangchuangla.message.model.entity.SysUserMessageExt;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @author Chuang
  */
-public interface UserMessageExtService extends IService<UserMessageExt> {
+public interface UserMessageExtService extends IService<SysUserMessageExt> {
 
     /**
      * 标记单个消息为已读
@@ -66,4 +67,13 @@ public interface UserMessageExtService extends IService<UserMessageExt> {
      * @return 已读的消息ID列表
      */
     List<Long> getReadMessageIds(Long userId, List<Long> messageIds);
+
+    /**
+     * 批量获取消息已读状态
+     *
+     * @param userId     用户ID
+     * @param messageIds 待查询的消息ID列表
+     * @return 已读消息ID列表
+     */
+    List<MessageReadStatusBo> getMessageReadStatus(Long userId, List<Long> messageIds);
 }
