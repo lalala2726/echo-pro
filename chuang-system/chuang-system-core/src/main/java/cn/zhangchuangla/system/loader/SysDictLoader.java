@@ -44,7 +44,7 @@ public class SysDictLoader implements DataLoader {
     }
 
     @Override
-    public void load() {
+    public boolean load() {
         try {
             log.info("开始加载系统字典数据到缓存...");
 
@@ -56,7 +56,7 @@ public class SysDictLoader implements DataLoader {
 
             if (dictTypes.isEmpty()) {
                 log.info("没有找到启用的字典类型，跳过字典缓存加载");
-                return;
+                return false;
             }
 
             int successCount = 0;
@@ -97,13 +97,20 @@ public class SysDictLoader implements DataLoader {
 
         } catch (Exception e) {
             log.error("加载系统字典数据失败", e);
-            throw new RuntimeException("系统字典加载失败: " + e.getMessage(), e);
+            return false;
         }
+        return true;
     }
 
     @Override
     public boolean isAsync() {
         // 支持异步加载
+        return true;
+    }
+
+    @Override
+    public boolean allowStartupOnFailure() {
+        // 字典加载失败不应阻止项目启动
         return true;
     }
 }

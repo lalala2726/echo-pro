@@ -14,8 +14,6 @@
         <module>chuang-system</module>
         <module>chuang-framework</module>
         <module>chuang-api</module>
-        <module>chuang-generator</module>
-        <module>chuang-quartz</module>
     </modules>
 
 
@@ -133,22 +131,11 @@
                 <artifactId>chuang-system-message</artifactId>
                 <version>${app.version}</version>
             </dependency>
-            <!-- 代码生成模块 -->
-            <dependency>
-                <groupId>cn.zhangchuangla</groupId>
-                <artifactId>chuang-generator</artifactId>
-                <version>${app.version}</version>
-            </dependency>
+
             <!-- 系统模块依赖 -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <!-- Quartz定时任务模块 -->
-            <dependency>
-                <groupId>cn.zhangchuangla</groupId>
-                <artifactId>chuang-quartz</artifactId>
                 <version>${app.version}</version>
             </dependency>
 

@@ -1,64 +1,12 @@
 package cn.zhangchuangla.storage.service;
 
-import cn.zhangchuangla.storage.model.entity.FileInfo;
 import cn.zhangchuangla.storage.model.entity.SysFile;
-import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
 
 /**
  * @author Chuang
  */
 public interface StorageFileService extends IService<SysFile> {
 
-    /**
-     * 保存文件信息
-     *
-     * @param fileInfo 文件上传结果
-     */
-    void saveFileInfo(FileInfo fileInfo);
 
-    /**
-     * 查询文件列表
-     *
-     * @param request 查询参数
-     * @return 分页结果
-     */
-    Page<SysFile> listFileManage(SysFileQueryRequest request);
-
-    /**
-     * 删除文件
-     *
-     * @param ids           文件id列表
-     * @param isPermanently true代表永久删除文件，false将会转移到回收站
-     * @return true: 删除成功, false: 删除失败
-     */
-    boolean removeFile(List<Long> ids, final Boolean isPermanently);
-
-
-    /**
-     * 根据id查询文件信息
-     *
-     * @param id 文件id
-     * @return 文件信息
-     */
-    SysFile getFileManageById(Long id);
-
-    /**
-     * 查询回收站文件列表
-     *
-     * @param request 查询参数
-     * @return 分页结果
-     */
-    Page<SysFile> listFileTrash(SysFileQueryRequest request);
-
-    /**
-     * 恢复文件
-     *
-     * @param id 文件id
-     * @return true: 恢复成功, false: 恢复失败
-     */
-    boolean recoverFile(Long id);
 }

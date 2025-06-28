@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -16,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysFileManageController extends BaseController {
 
-    private final StorageFileService storageFileService;
 
     /**
      * 文件资源列表
@@ -48,20 +47,7 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
                                                       @Validated @ParameterObject SysFileQueryRequest request) {
-        Page<SysFile> sysFileManagementPage = storageFileService.listFileManage(request);
-
-        // 使用流式处理优化代码
-        List<SysFileListVo> sysFileListVos = sysFileManagementPage.getRecords().stream()
-                .map(sysFileManagement -> {
-                    SysFileListVo sysFileListVo = new SysFileListVo();
-                    BeanUtils.copyProperties(sysFileManagement, sysFileListVo);
-                    String previewImageUrl = sysFileManagement.getPreviewImageUrl();
-                    sysFileListVo.setIsIncludePreviewImage(previewImageUrl != null && previewImageUrl.contains("preview"));
-                    return sysFileListVo;
-                })
-                .toList();
-
-        return getTableData(sysFileManagementPage, sysFileListVos);
+        return success();
     }
 
     /**
@@ -75,10 +61,7 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
                                                      @Validated @ParameterObject SysFileQueryRequest request) {
-        Page<SysFile> sysFileManagementPage = storageFileService.listFileTrash(request);
-        List<SysFileListVo> sysFileListVos = copyListProperties(sysFileManagementPage,
-                SysFileListVo.class);
-        return getTableData(sysFileManagementPage, sysFileListVos);
+        return success();
     }
 
     /**
@@ -93,9 +76,7 @@ public class SysFileManageController extends BaseController {
     @PutMapping("/recover/{id}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
     public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "文件ID不能为空!");
-        boolean result = storageFileService.recoverFile(id);
-        return toAjax(result);
+        return success();
     }
 
     /**
@@ -111,9 +92,6 @@ public class SysFileManageController extends BaseController {
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                        @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "文件ID不能为空!"));
-        checkParam(ids.size() > 100, "最多只能删除100个文件!");
-        boolean result = storageFileService.removeFile(ids, isPermanently);
-        return toAjax(result);
+        return success();
     }
 }

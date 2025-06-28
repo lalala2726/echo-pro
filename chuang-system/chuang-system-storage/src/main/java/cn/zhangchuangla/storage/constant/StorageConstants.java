@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.constant;
+package cn.zhangchuangla.storage.constant;
 
 /**
  * 存储类型常量

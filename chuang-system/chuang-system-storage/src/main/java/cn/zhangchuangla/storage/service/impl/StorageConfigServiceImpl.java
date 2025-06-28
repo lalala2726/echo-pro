@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.core.constant.StorageConstants;
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
 import cn.zhangchuangla.common.core.model.entity.file.LocalFileConfigEntity;
@@ -224,7 +224,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 主配置
      */
     @Override
-    public StorageConfig getMasterConfig() {
+    public StorageConfig getPrimaryConfig() {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
                 .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
@@ -253,7 +253,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public boolean setMasterConfig(Long id) {
         // 取消当前主配置
-        StorageConfig currentMasterConfig = getMasterConfig();
+        StorageConfig currentMasterConfig = getPrimaryConfig();
         if (currentMasterConfig != null) {
             currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
             updateById(currentMasterConfig);

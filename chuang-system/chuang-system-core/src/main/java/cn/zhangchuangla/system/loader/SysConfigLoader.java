@@ -27,7 +27,7 @@ public class SysConfigLoader implements DataLoader {
     }
 
     @Override
-    public void load() {
+    public boolean load() {
         log.info("开始加载系统配置...");
         try {
             // 模拟加载过程
@@ -37,15 +37,22 @@ public class SysConfigLoader implements DataLoader {
             // TODO: 实际实现中应该从数据库加载系统配置
 
             log.info("系统配置加载完成");
+            return true;
         } catch (Exception e) {
             log.error("系统配置加载失败", e);
-            throw new RuntimeException("系统配置加载失败: " + e.getMessage(), e);
+            return false;
         }
     }
 
     @Override
     public boolean isAsync() {
         // 系统配置必须同步加载
+        return false;
+    }
+
+    @Override
+    public boolean allowStartupOnFailure() {
+        // 系统配置加载失败应阻止项目启动
         return false;
     }
 }

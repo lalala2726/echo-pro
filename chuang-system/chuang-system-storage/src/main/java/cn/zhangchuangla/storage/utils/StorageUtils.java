@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.utils;
 
 import java.util.UUID;
-import cn.zhangchuangla.common.core.constant.StorageConstants;
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ServiceException;

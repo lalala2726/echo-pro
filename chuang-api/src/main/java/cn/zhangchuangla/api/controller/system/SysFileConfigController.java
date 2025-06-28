@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import org.springframework.beans.BeanUtils;
-import cn.zhangchuangla.common.core.constant.StorageConstants;
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 public class SysFileConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
-    private final StorageConfigLoader sysFileConfigLoader;
 
     /**
      * 文件配置列表
@@ -175,8 +174,8 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult<Void> refreshCache() {
-        String currentConfigName = sysFileConfigLoader.refreshCache();
-        return AjaxResult.success(currentConfigName);
+        //todo 刷新缓存
+        return success();
     }
 
     /**
