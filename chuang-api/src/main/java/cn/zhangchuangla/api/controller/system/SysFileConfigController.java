@@ -191,9 +191,6 @@ public class SysFileConfigController extends BaseController {
                                              @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件配置ID不能为空!");
-            checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID),
-                    String.format("ID为 %s 是默认配置！无法删除:",
-                            StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID));
         });
         boolean result = storageConfigService.deleteFileConfig(ids);
         return toAjax(result);

@@ -89,10 +89,10 @@ public class StorageService {
      */
     private String getBeanNameByType(String type) {
         return switch (type) {
-            case StorageConstants.StorageType.LOCAL -> StorageConstants.LOCAL_STORAGE_SERVICE;
-            case StorageConstants.StorageType.MINIO -> StorageConstants.MINIO_STORAGE_SERVICE;
-            case StorageConstants.StorageType.ALIYUN_OSS -> StorageConstants.ALIYUN_OSS_STORAGE_SERVICE;
-            case StorageConstants.StorageType.TENCENT_COS -> StorageConstants.TENCENT_COS_STORAGE_SERVICE;
+            case StorageConstants.StorageType.LOCAL -> StorageConstants.springBeanName.LOCAL_STORAGE_SERVICE;
+            case StorageConstants.StorageType.MINIO -> StorageConstants.springBeanName.MINIO_STORAGE_SERVICE;
+            case StorageConstants.StorageType.ALIYUN_OSS -> StorageConstants.springBeanName.ALIYUN_OSS_STORAGE_SERVICE;
+            case StorageConstants.StorageType.TENCENT_COS -> StorageConstants.springBeanName.TENCENT_COS_STORAGE_SERVICE;
             default -> throw new FileException("未知存储类型: " + type);
         };
     }

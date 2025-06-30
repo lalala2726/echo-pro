@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Chuang
  */
 @Slf4j
-@Service(StorageConstants.ALIYUN_OSS_STORAGE_SERVICE)
+@Service(StorageConstants.springBeanName.ALIYUN_OSS_STORAGE_SERVICE)
 public class AliyunOssFileOperationServiceImpl implements FileOperationService {
 
 

@@ -28,7 +28,7 @@ import java.util.Objects;
  * @author Chuang
  */
 @Slf4j
-@Service(StorageConstants.LOCAL_STORAGE_SERVICE)
+@Service(StorageConstants.springBeanName.LOCAL_STORAGE_SERVICE)
 public class LocalFileOperationServiceImpl implements FileOperationService {
 
 
@@ -208,7 +208,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             return FileUtils.deleteQuietly(file);
         } else {
             // 移动到回收站
-            File trashDir = new File(localFileStorageConfig.getUploadPath(), StorageConstants.TRASH_DIR);
+            File trashDir = new File(localFileStorageConfig.getUploadPath(), "trash");
             try {
                 FileUtils.moveFileToDirectory(file, trashDir, true);
                 return true;

@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Chuang
  */
 @Slf4j
-@Service(StorageConstants.MINIO_STORAGE_SERVICE)
+@Service(StorageConstants.springBeanName.MINIO_STORAGE_SERVICE)
 public class MinioFileOperationServiceImpl implements FileOperationService {
 
     @Override

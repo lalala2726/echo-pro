@@ -214,7 +214,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isMaster(Integer id) {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
                 .eq(StorageConfig::getId, id)
-                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
     }
 
@@ -226,7 +226,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public StorageConfig getPrimaryConfig() {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
-                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
 
@@ -255,7 +255,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         // 取消当前主配置
         StorageConfig currentMasterConfig = getPrimaryConfig();
         if (currentMasterConfig != null) {
-            currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
+            currentMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_NOT_FILE_UPLOAD_MASTER);
             updateById(currentMasterConfig);
         }
         // 设置新的主配置
@@ -263,7 +263,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (newMasterConfig == null) {
             throw new ServiceException("文件配置不存在");
         }
-        newMasterConfig.setIsMaster(StorageConstants.IS_FILE_UPLOAD_MASTER);
+        newMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return updateById(newMasterConfig);
     }
 
@@ -275,13 +275,6 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean deleteFileConfig(List<Long> ids) {
-        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>().eq(StorageConfig::getId, ids);
-        List<StorageConfig> list = list(eq);
-        list.forEach(sysFileConfig -> {
-            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(sysFileConfig.getIsMaster())) {
-                throw new ServiceException(String.format("文件配置【%s】为当前主配置，不能删除", sysFileConfig.getStorageName()));
-            }
-        });
         return removeByIds(ids);
     }
 

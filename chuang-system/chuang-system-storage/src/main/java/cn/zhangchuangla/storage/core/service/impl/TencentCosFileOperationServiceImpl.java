@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Chuang
  */
 @Slf4j
-@Service(StorageConstants.TENCENT_COS_STORAGE_SERVICE)
+@Service(StorageConstants.springBeanName.TENCENT_COS_STORAGE_SERVICE)
 public class TencentCosFileOperationServiceImpl implements FileOperationService {
 
 
