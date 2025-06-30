@@ -12,6 +12,42 @@ import java.util.List;
 public class StorageConstants {
 
     /**
+     * 文件上传路径格式
+     */
+    public static final String FILE_UPLOAD_PATH_FORMAT = "yyyy/MM/dd";
+
+    /**
+     * 文件目录常量
+     */
+    public interface dirName {
+
+        /**
+         * 图片目录
+         */
+        String IMAGE = "image";
+
+        /**
+         * 文件目录
+         */
+        String FILE = "file";
+
+        /**
+         * 回收站文件夹
+         */
+        String TRASH = "trash";
+
+        /**
+         * 原图目录
+         */
+        String ORIGINAL = "original";
+
+        /**
+         * 预览目录
+         */
+        String PREVIEW = "preview";
+    }
+
+    /**
      * 存储类型常量
      */
     public interface StorageType {

@@ -34,6 +34,12 @@ public class FileController extends BaseController {
 
     @PostMapping
     public AjaxResult<UploadedFileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        UploadedFileInfo upload = storageService.upload(file);
+        return success(upload);
+    }
+
+    @PostMapping("/image")
+    public AjaxResult<UploadedFileInfo> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         UploadedFileInfo upload = storageService.uploadImage(file);
         return success(upload);
     }

@@ -54,24 +54,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         this.localFileStorageConfig = JSON.parseObject(json, LocalFileStorageConfig.class);
     }
 
-    /**
-     * 通用日期目录 "yyyy/MM/dd"
-     */
-    private String todayDir() {
-        return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-    }
-
-    /**
-     * 根据目录确保存在
-     */
-    private File ensureDir(String datePath) throws IOException {
-        File dir = new File(localFileStorageConfig.getUploadPath(), datePath);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new IOException("无法创建目录: " + dir.getAbsolutePath());
-        }
-        return dir;
-    }
-
 
     /**
      * 保存原始文件到本地。
@@ -82,12 +64,13 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         try {
             String datePath = todayDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
-            File destDir = ensureDir(datePath);
+            String targetDirectory = Paths.get(datePath, StorageConstants.dirName.FILE).toString();
+            File destDir = ensureDir(targetDirectory);
             File destFile = new File(destDir, newFileName);
 
             file.transferTo(destFile);
 
-            return buildFileInfo(file, destFile, datePath, newFileName);
+            return buildFileInfo(file, destFile, targetDirectory, newFileName);
         } catch (IOException e) {
             log.error("文件上传传失败", e);
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
@@ -95,10 +78,28 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
     }
 
     /**
-     * 1. 保存原图 -> 2. 基于磁盘文件流式压缩 -> 3. 保存压缩图 -> 返回压缩图信息
+     * 图片上传处理方法
+     * <p>
+     * 处理流程：
+     * 1. 校验文件为有效图片格式
+     * 2. 创建日期目录结构（包含原图和压缩图目录）
+     * 3. 先保存原始图片到指定路径
+     * 4. 对原始图片进行压缩处理并保存
+     * 5. 返回压缩后的图片信息
+     *
+     * @param file 上传的MultipartFile对象
+     * @return 包含上传文件信息的UploadedFileInfo对象
+     * @throws IOException 文件操作异常时抛出
      */
     @Override
     public UploadedFileInfo uploadImage(MultipartFile file) throws IOException {
+        //最大宽
+        int maxWidth = 1024;
+        //最大高
+        int maxHeight = 1024;
+        //压缩质量
+        float quality = 0.9f;
+
         initConfig();
 
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
@@ -108,82 +109,40 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
 
         String datePath = todayDir();
-        File destDir = ensureDir(datePath);
+        String originalImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.ORIGINAL)
+                .toString();
+        String previewImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
+                .toString();
+        File originalDir = ensureDir(originalImageDir);
+        File previewDir = ensureDir(previewImageDir);
 
-        // 1. 先保存原图
+        // 1. 生成并保存原图文件
         String originalFileName = StorageUtils.generateFileName(originalFilename);
-        File originalFile = new File(destDir, originalFileName);
+        File originalFile = new File(originalDir, originalFileName);
 
-        // 2. 生成压缩图文件名（加上compressed前缀或后缀标识）
-        String compressedFileName = "compressed_" + originalFileName;
-        File compressedFile = new File(destDir, compressedFileName);
+        // 2. 准备压缩图目标文件
+        File compressedFile = new File(previewDir, originalFileName);
 
         try {
             // 保存原图
             file.transferTo(originalFile);
 
-            // 基于已保存的原图文件进行压缩
+            // 使用流式处理压缩图片
             try (InputStream in = new FileInputStream(originalFile);
                  OutputStream out = new FileOutputStream(compressedFile)) {
-                ImageStreamUtils.compress(in, out, 1024, 1024, 0.9f, originalFilename);
+                ImageStreamUtils.compress(in, out, maxWidth, maxHeight,quality, originalFilename);
             }
 
         } catch (IOException e) {
             log.error("图片保存或压缩失败", e);
-            // 清理可能已创建的文件
+            // 清理可能已创建的文件，避免残留
             FileUtils.deleteQuietly(originalFile);
             FileUtils.deleteQuietly(compressedFile);
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "图片处理失败：" + e.getMessage());
         }
 
-        // 返回压缩图的信息，但保留原图在磁盘上
-        return buildFileInfo(originalFilename, compressedFile, datePath, compressedFileName, file.getContentType());
-    }
-
-
-    /**
-     * 构建文件信息
-     *
-     * @param src         文件源
-     * @param savedFile   保存文件
-     * @param datePath    文件保存路径
-     * @param newFileName 新文件名
-     * @return 文件信息
-     * @throws IOException 构建文件信息异常
-     */
-    private UploadedFileInfo buildFileInfo(MultipartFile src, File savedFile, String datePath, String newFileName) throws IOException {
-        UploadedFileInfo info = new UploadedFileInfo();
-        info.setFileOriginalName(src.getOriginalFilename());
-        info.setFileName(newFileName);
-        info.setFileExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileSize(String.valueOf(savedFile.length()));
-        info.setFileType(src.getContentType());
-        info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
-        info.setFileRelativePath(Paths.get(datePath, newFileName).toString());
-        return info;
-    }
-
-    /**
-     * 构建文件信息
-     *
-     * @param originalFileName 文件源
-     * @param savedFile        保存文件
-     * @param datePath         文件保存路径
-     * @param newFileName      新文件名
-     * @return 文件信息
-     */
-    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String datePath, String newFileName, String fileType) {
-        UploadedFileInfo info = new UploadedFileInfo();
-        info.setFileOriginalName(originalFileName);
-        info.setFileName(newFileName);
-        info.setFileExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileSize(String.valueOf(savedFile.length()));
-        info.setFileType(fileType);
-        info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
-        info.setFileRelativePath(Paths.get(datePath, newFileName).toString());
-        return info;
+        // 返回压缩图的信息，同时保留原图在磁盘上供后续使用
+        return buildFileInfo(originalFilename, compressedFile, previewImageDir, originalFileName, file.getContentType());
     }
 
 
@@ -261,5 +220,72 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
         return FileUtils.deleteQuietly(file);
     }
+
+    /**
+     * 构建文件信息
+     *
+     * @param src         文件源
+     * @param savedFile   保存文件
+     * @param targetPath  文件保存路径
+     * @param newFileName 新文件名
+     * @return 文件信息
+     * @throws IOException 构建文件信息异常
+     */
+    private UploadedFileInfo buildFileInfo(MultipartFile src, File savedFile, String targetPath, String newFileName) throws IOException {
+        UploadedFileInfo info = new UploadedFileInfo();
+        info.setFileOriginalName(src.getOriginalFilename());
+        info.setFileName(newFileName);
+        info.setFileExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileSize(String.valueOf(savedFile.length()));
+        info.setFileType(src.getContentType());
+        info.setExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, targetPath, newFileName).toString());
+        info.setFileRelativePath(Paths.get(targetPath, newFileName).toString());
+        return info;
+    }
+
+    /**
+     * 构建文件信息
+     *
+     * @param originalFileName 文件源
+     * @param savedFile        保存文件
+     * @param datePath         文件保存路径
+     * @param newFileName      新文件名
+     * @return 文件信息
+     */
+    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String datePath, String newFileName, String fileType) {
+        UploadedFileInfo info = new UploadedFileInfo();
+        info.setFileOriginalName(originalFileName);
+        info.setFileName(newFileName);
+        info.setFileExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileSize(String.valueOf(savedFile.length()));
+        info.setFileType(fileType);
+        info.setExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
+        info.setFileRelativePath(Paths.get(datePath, newFileName).toString());
+        return info;
+    }
+
+
+    /**
+     * 日期目录可以在这边统一修改{@link StorageConstants}
+     */
+    private String todayDir() {
+        return new SimpleDateFormat(StorageConstants.FILE_UPLOAD_PATH_FORMAT).format(new Date());
+    }
+
+    /**
+     * 根据目录确保存在,并返回文件夹
+     */
+    private File ensureDir(String path) throws IOException {
+        File dir = new File(localFileStorageConfig.getUploadPath(), path);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                throw new IOException("无法创建目录: " + dir.getAbsolutePath());
+            }
+        }
+        return dir;
+    }
+
 }
 

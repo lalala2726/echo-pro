@@ -1,8 +1,12 @@
 package cn.zhangchuangla.storage.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 
-import java.util.Objects;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -33,6 +37,8 @@ public class StorageUtils {
     }
 
 
+
+
     /**
      * 获取文件后缀名
      *
@@ -49,4 +55,5 @@ public class StorageUtils {
         }
         return originalFilename.substring(dotIndex + 1);
     }
+
 }
