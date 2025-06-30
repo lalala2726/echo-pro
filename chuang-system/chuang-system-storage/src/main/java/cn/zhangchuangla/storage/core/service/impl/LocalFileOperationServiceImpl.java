@@ -8,6 +8,7 @@ import cn.zhangchuangla.storage.core.service.FileOperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.service.StorageAsyncService;
 import cn.zhangchuangla.storage.utils.ImageStreamUtils;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import com.alibaba.fastjson2.JSON;
@@ -16,7 +17,8 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,10 +35,13 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
+    private final StorageAsyncService storageAsyncService;
     private LocalFileStorageConfig localFileStorageConfig;
 
-    public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService) {
+    public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService,
+                                         StorageAsyncService storageAsyncService) {
         this.storageConfigRetrievalService = storageConfigRetrievalService;
+        this.storageAsyncService = storageAsyncService;
     }
 
     /**
@@ -89,10 +94,10 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      *
      * @param file 上传的MultipartFile对象
      * @return 包含上传文件信息的UploadedFileInfo对象
-     * @throws IOException 文件操作异常时抛出
      */
+
     @Override
-    public UploadedFileInfo uploadImage(MultipartFile file) throws IOException {
+    public UploadedFileInfo uploadImage(MultipartFile file) {
         //最大宽
         int maxWidth = 1024;
         //最大高
@@ -113,36 +118,48 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
                 .toString();
         String previewImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
                 .toString();
-        File originalDir = ensureDir(originalImageDir);
-        File previewDir = ensureDir(previewImageDir);
 
-        // 1. 生成并保存原图文件
-        String originalFileName = StorageUtils.generateFileName(originalFilename);
-        File originalFile = new File(originalDir, originalFileName);
-
-        // 2. 准备压缩图目标文件
-        File compressedFile = new File(previewDir, originalFileName);
-
+        File originalDir = null;
+        File previewDir = null;
+        File originalFile = null;
+        File compressedFile = null;
+        String originalFileName = null;
         try {
-            // 保存原图
-            file.transferTo(originalFile);
+            // 目录创建
+            originalDir = ensureDir(originalImageDir);
+            previewDir = ensureDir(previewImageDir);
 
-            // 使用流式处理压缩图片
-            try (InputStream in = new FileInputStream(originalFile);
-                 OutputStream out = new FileOutputStream(compressedFile)) {
-                ImageStreamUtils.compress(in, out, maxWidth, maxHeight,quality, originalFilename);
-            }
+            // 原图保存
+            originalFileName = StorageUtils.generateFileName(originalFilename);
+            originalFile = new File(originalDir, originalFileName);
+            file.transferTo(originalFile);
+            log.info("原图保存成功: {}", originalFile.getAbsolutePath());
+
+            // 压缩图目标文件
+            compressedFile = new File(previewDir, originalFileName);
+
+            // 提交异步压缩
+            storageAsyncService.compressImage(
+                    originalFile.getAbsolutePath(),
+                    compressedFile.getAbsolutePath(),
+                    maxWidth,
+                    maxHeight,
+                    quality,
+                    originalFilename
+            );
+            log.info("图片压缩任务已提交到后台执行: {}", compressedFile.getAbsolutePath());
 
         } catch (IOException e) {
-            log.error("图片保存或压缩失败", e);
+            log.error("图片处理失败", e);
             // 清理可能已创建的文件，避免残留
-            FileUtils.deleteQuietly(originalFile);
-            FileUtils.deleteQuietly(compressedFile);
+            if (originalFile != null) {
+                FileUtils.deleteQuietly(originalFile);
+            }
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "图片处理失败：" + e.getMessage());
         }
 
-        // 返回压缩图的信息，同时保留原图在磁盘上供后续使用
-        return buildFileInfo(originalFilename, compressedFile, previewImageDir, originalFileName, file.getContentType());
+        // 返回原图的信息，压缩图正在后台处理
+        return buildFileInfo(originalFilename, originalFile, originalImageDir, originalFileName, file.getContentType());
     }
 
 
@@ -229,9 +246,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * @param targetPath  文件保存路径
      * @param newFileName 新文件名
      * @return 文件信息
-     * @throws IOException 构建文件信息异常
      */
-    private UploadedFileInfo buildFileInfo(MultipartFile src, File savedFile, String targetPath, String newFileName) throws IOException {
+    private UploadedFileInfo buildFileInfo(MultipartFile src, File savedFile, String targetPath, String newFileName) {
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
         info.setFileName(newFileName);
@@ -239,7 +255,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setFileSize(String.valueOf(savedFile.length()));
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, targetPath, newFileName).toString());
+        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX,
+                targetPath, newFileName).toString());
         info.setFileRelativePath(Paths.get(targetPath, newFileName).toString());
         return info;
     }
@@ -253,7 +270,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * @param newFileName      新文件名
      * @return 文件信息
      */
-    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String datePath, String newFileName, String fileType) {
+    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String datePath,
+                                           String newFileName, String fileType) {
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
         info.setFileName(newFileName);
@@ -263,6 +281,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
         info.setFileRelativePath(Paths.get(datePath, newFileName).toString());
+        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath,
+                Constants.PREVIEW, newFileName).toString());
         return info;
     }
 

@@ -55,5 +55,10 @@ public class UploadedFileInfo {
      */
     private String fileExtension;
 
+    /**
+     * 预览图片(图片资源特有)
+     */
+    private String previewImage;
+
 
 }
