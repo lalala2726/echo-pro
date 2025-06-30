@@ -3,7 +3,11 @@ package cn.zhangchuangla.api.controller.common;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.storage.model.vo.ImageVo;
+import cn.zhangchuangla.storage.model.vo.SimpleFileVO;
 import cn.zhangchuangla.storage.service.StorageService;
+import cn.zhangchuangla.storage.utils.StorageUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * 文件相关接口
@@ -32,16 +34,38 @@ public class FileController extends BaseController {
     private final StorageService storageService;
 
 
+    /**
+     * 普通文件上传
+     *
+     * @param file 文件
+     * @return 文件信息
+     */
+    @Operation(summary = "普通文件上传")
     @PostMapping
-    public AjaxResult<UploadedFileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
+    public AjaxResult<SimpleFileVO> upload(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageService.upload(file);
-        return success(upload);
+        SimpleFileVO simpleFileVO = SimpleFileVO.builder()
+                .fileName(upload.getFileName())
+                .fileSize(StorageUtils.formatFileSize(upload.getFileSize()))
+                .fileType(upload.getFileType())
+                .fileUrl(upload.getFileUrl())
+                .build();
+        return success(simpleFileVO);
     }
 
+    /**
+     * 上传图片
+     *
+     * @param file 图片文件
+     * @return 上传结果
+     */
+
     @PostMapping("/image")
-    public AjaxResult<UploadedFileInfo> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    @Operation(summary = "上传图片")
+    public AjaxResult<ImageVo> uploadImage(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageService.uploadImage(file);
-        return success(upload);
+        ImageVo imageVo = new ImageVo(upload.getFileUrl(), upload.getPreviewImage());
+        return success(imageVo);
     }
 
 }

@@ -3,8 +3,6 @@ package cn.zhangchuangla.storage.core.service;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 
 /**
  * 存储操作的核心接口。
@@ -25,7 +23,7 @@ public interface FileOperationService {
      *
      * @return 文件上传结果
      */
-    UploadedFileInfo uploadImage(MultipartFile file) throws IOException;
+    UploadedFileInfo uploadImage(MultipartFile file);
 
     /**
      * 删除文件 (默认到回收站)

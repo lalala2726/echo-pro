@@ -49,11 +49,6 @@ public class FileRecord {
     private Long fileSize;
 
     /**
-     * 文件MD5值，用于文件完整性校验
-     */
-    private String fileMd5;
-
-    /**
      * 原始文件URL，直接访问地址
      */
     private String originalFileUrl;

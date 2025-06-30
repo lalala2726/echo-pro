@@ -1,4 +1,4 @@
-package cn.zhangchuangla.storage.service;
+package cn.zhangchuangla.storage.async;
 
 import cn.zhangchuangla.storage.utils.ImageStreamUtils;
 import lombok.extern.slf4j.Slf4j;

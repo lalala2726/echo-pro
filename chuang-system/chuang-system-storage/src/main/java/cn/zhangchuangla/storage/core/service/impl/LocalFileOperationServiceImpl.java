@@ -3,13 +3,12 @@ package cn.zhangchuangla.storage.core.service.impl;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
+import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
-import cn.zhangchuangla.storage.service.StorageAsyncService;
-import cn.zhangchuangla.storage.utils.ImageStreamUtils;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -108,10 +107,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         initConfig();
 
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
-        String fileExtension = StorageUtils.getFileExtension(originalFilename);
-        if (!ImageStreamUtils.isImage(fileExtension)) {
-            throw new FileException(ResponseCode.FileUploadFailed, "请上传有效的图片文件！");
-        }
 
         String datePath = todayDir();
         String originalImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.ORIGINAL)
@@ -119,11 +114,11 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         String previewImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
                 .toString();
 
-        File originalDir = null;
-        File previewDir = null;
+        File originalDir;
+        File previewDir;
         File originalFile = null;
-        File compressedFile = null;
-        String originalFileName = null;
+        File compressedFile;
+        String originalFileName;
         try {
             // 目录创建
             originalDir = ensureDir(originalImageDir);
@@ -252,7 +247,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setFileOriginalName(src.getOriginalFilename());
         info.setFileName(newFileName);
         info.setFileExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileSize(String.valueOf(savedFile.length()));
+        info.setFileSize(savedFile.length());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX,
@@ -266,23 +261,24 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      *
      * @param originalFileName 文件源
      * @param savedFile        保存文件
-     * @param datePath         文件保存路径
+     * @param filePath         文件保存路径
      * @param newFileName      新文件名
      * @return 文件信息
      */
-    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String datePath,
+    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String filePath,
                                            String newFileName, String fileType) {
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
         info.setFileName(newFileName);
         info.setFileExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileSize(String.valueOf(savedFile.length()));
+        info.setFileSize(savedFile.length());
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
-        info.setFileRelativePath(Paths.get(datePath, newFileName).toString());
-        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath,
+        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
+        info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
+        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath,
                 Constants.PREVIEW, newFileName).toString());
+        info.setPreviewImageRelativePath(Paths.get(filePath, Constants.PREVIEW, newFileName).toString());
         return info;
     }
 

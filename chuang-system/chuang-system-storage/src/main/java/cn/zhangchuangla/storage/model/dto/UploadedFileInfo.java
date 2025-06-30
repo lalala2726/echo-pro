@@ -30,10 +30,6 @@ public class UploadedFileInfo {
      */
     private String fileRelativePath;
 
-    /**
-     * 文件MD5
-     */
-    private String md5;
 
     /**
      * 文件扩展名
@@ -43,7 +39,7 @@ public class UploadedFileInfo {
     /**
      * 文件大小
      */
-    private String fileSize;
+    private Long fileSize;
 
     /**
      * 文件类型
@@ -59,6 +55,11 @@ public class UploadedFileInfo {
      * 预览图片(图片资源特有)
      */
     private String previewImage;
+
+    /**
+     * 预览图片相对路径(图片资源特有)
+     */
+    private String previewImageRelativePath;
 
 
 }

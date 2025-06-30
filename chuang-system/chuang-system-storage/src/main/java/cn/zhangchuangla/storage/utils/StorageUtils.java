@@ -49,4 +49,20 @@ public class StorageUtils {
         return originalFilename.substring(dotIndex + 1);
     }
 
+    /**
+     * 格式化文件大小
+     *
+     * @param size 文件大小
+     * @return 格式化后的文件大小
+     */
+    public static String formatFileSize(long size) {
+        if (size < 0) {
+            return "0MB";
+        }
+        // 直接以 MB 格式返回，1MB = 1024KB = 1024 * 1024 Bytes
+        double mbSize = size / (1024.0 * 1024.0);
+        return String.format("%.2fMB", mbSize);
+    }
+
+
 }

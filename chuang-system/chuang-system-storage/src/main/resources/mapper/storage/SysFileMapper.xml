@@ -10,7 +10,6 @@
         <result property="fileName" column="file_name"/>
         <result property="contentType" column="content_type"/>
         <result property="fileSize" column="file_size"/>
-        <result property="fileMd5" column="file_md5"/>
         <result property="originalFileUrl" column="original_file_url"/>
         <result property="originalRelativePath" column="original_relative_path"/>
         <result property="previewImagePath" column="preview_image_path"/>
