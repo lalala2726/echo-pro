@@ -20,7 +20,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SysFile {
+public class FileRecord {
 
     /**
      * 主键ID
@@ -29,14 +29,14 @@ public class SysFile {
     private Long id;
 
     /**
-     * 文件名
+     * 原始文件名
      */
     private String originalName;
 
     /**
-     * 新文件名 (存储系统中的唯一文件名)
+     * 当前文件名
      */
-    private String newFileName;
+    private String fileName;
 
     /**
      * 文件类型，如 image/jpeg, application/pdf 等
@@ -121,7 +121,7 @@ public class SysFile {
     /**
      * 是否回收站 (0-否, 1-是)
      */
-    private Integer isTrash;
+    private Integer isTrash = 0;
 
     /**
      * 更新时间

@@ -30,6 +30,15 @@ public class UploadedFileInfo {
      */
     private String fileRelativePath;
 
+    /**
+     * 文件MD5
+     */
+    private String md5;
+
+    /**
+     * 文件扩展名
+     */
+    private String extension;
 
     /**
      * 文件大小

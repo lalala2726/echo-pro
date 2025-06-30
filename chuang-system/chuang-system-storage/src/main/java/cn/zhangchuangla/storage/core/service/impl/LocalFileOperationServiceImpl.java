@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * 本地文件存储服务实现类
@@ -71,6 +72,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             uploadedFileInfo.setFileSize(String.valueOf(file.getSize()));
             uploadedFileInfo.setFileType(file.getContentType());
             uploadedFileInfo.setFileOriginalName(file.getOriginalFilename());
+            uploadedFileInfo.setMd5(StorageUtils.getFileSha256(file.getBytes()));
+            uploadedFileInfo.setExtension(StorageUtils.getFileExtension(Objects.requireNonNull(file.getOriginalFilename())));
 
             // 生成文件名并保存文件
             String newFileName = StorageUtils.generateFileName(file.getOriginalFilename());
@@ -79,7 +82,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
             uploadedFileInfo.setFileName(newFileName);
             uploadedFileInfo.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, datePath, newFileName).toString());
-            uploadedFileInfo.setFileRelativePath(Paths.get(datePath,newFileName).toString());
+            uploadedFileInfo.setFileRelativePath(Paths.get(datePath, newFileName).toString());
 
 
             return uploadedFileInfo;

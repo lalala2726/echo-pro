@@ -4,9 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zhangchuangla.storage.mapper.SysFileMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.storage.model.entity.SysFile">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.storage.model.entity.FileRecord">
         <id property="id" column="id"/>
         <result property="originalName" column="original_name"/>
+        <result property="fileName" column="file_name"/>
         <result property="contentType" column="content_type"/>
         <result property="fileSize" column="file_size"/>
         <result property="fileMd5" column="file_md5"/>

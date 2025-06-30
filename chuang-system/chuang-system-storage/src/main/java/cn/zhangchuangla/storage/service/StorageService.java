@@ -1,14 +1,18 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.common.core.exception.FileException;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.storage.components.SpringContextHolder;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.storage.model.entity.FileRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 /**
  * @author Chuang
@@ -18,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class StorageService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
+    private final StorageManageService storageManageService;
+
 
     /**
-     * 上传文件
+     * 普通文件上传
      *
      * @param file 文件
      * @return 上传结果
@@ -29,7 +35,23 @@ public class StorageService {
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         FileOperationService service = getService(activeStorageType);
         UploadedFileInfo upload = service.upload(file);
-        //todo 存储文件信息
+
+
+        // 保存文件信息
+        String username = SecurityUtils.getUsername();
+        FileRecord fileRecord = FileRecord.builder()
+                .originalName(file.getOriginalFilename())
+                .fileName(upload.getFileName())
+                .contentType(file.getContentType())
+                .fileSize(file.getSize())
+                .fileMd5(upload.getMd5())
+                .originalFileUrl(upload.getFileUrl())
+                .originalRelativePath(upload.getFileRelativePath())
+                .uploadTime(new Date())
+                .uploaderName(username)
+                .fileExtension(upload.getFileExtension())
+                .build();
+        storageManageService.saveFileInfo(fileRecord);
         return upload;
     }
 
