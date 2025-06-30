@@ -44,7 +44,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     private void initConfig() {
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        if (!StorageConstants.LOCAL.equals(activeStorageType)) {
+        if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
             throw new FileException("存储配置异常!请刷新配置后再试!");
         }
         String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
@@ -109,11 +109,11 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
         String datePath = todayDir();
         File destDir = ensureDir(datePath);
-        
+
         // 1. 先保存原图
         String originalFileName = StorageUtils.generateFileName(originalFilename);
         File originalFile = new File(destDir, originalFileName);
-        
+
         // 2. 生成压缩图文件名（加上compressed前缀或后缀标识）
         String compressedFileName = "compressed_" + originalFileName;
         File compressedFile = new File(destDir, compressedFileName);
@@ -121,13 +121,13 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         try {
             // 保存原图
             file.transferTo(originalFile);
-            
+
             // 基于已保存的原图文件进行压缩
             try (InputStream in = new FileInputStream(originalFile);
                  OutputStream out = new FileOutputStream(compressedFile)) {
                 ImageStreamUtils.compress(in, out, 1024, 1024, 0.9f, originalFilename);
             }
-            
+
         } catch (IOException e) {
             log.error("图片保存或压缩失败", e);
             // 清理可能已创建的文件

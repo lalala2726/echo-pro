@@ -28,7 +28,7 @@ public class StorageSystemProperties implements Serializable {
      * 可选值: "local", "minio", "aliyun_oss", "tencent_cos"。
      * 如果为空或未设置，将尝试从数据库加载或降级到本地。
      */
-    private String activeType = StorageConstants.LOCAL;
+    private String activeType = StorageConstants.StorageType.LOCAL;
     private LocalConfig local;
     private MinioConfig minio;
     private AliyunOssConfig aliyunOss;

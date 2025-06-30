@@ -19,12 +19,12 @@ public class AliyunOssStorageLoader implements StorageLoader {
 
     @Override
     public String getStorageType() {
-        return StorageConstants.ALIYUN_OSS;
+        return StorageConstants.StorageType.ALIYUN_OSS;
     }
 
     @Override
     public void loadConfig(String json, RedisCache redisCache) {
         redisCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
-        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.ALIYUN_OSS);
+        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.ALIYUN_OSS);
     }
 }

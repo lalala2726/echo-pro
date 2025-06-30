@@ -11,25 +11,28 @@ import java.util.List;
  */
 public class StorageConstants {
 
-    /**
-     * 本地存储
-     */
-    public static final String LOCAL = "local";
+    public interface StorageType {
+        /**
+         * 本地存储
+         */
+        String LOCAL = "local";
 
-    /**
-     * 阿里云OSS存储
-     */
-    public static final String ALIYUN_OSS = "aliyun_oss";
+        /**
+         * 阿里云OSS存储
+         */
+        String ALIYUN_OSS = "aliyun_oss";
 
-    /**
-     * 腾讯云COS存储
-     */
-    public static final String TENCENT_COS = "tencent_cos";
+        /**
+         * 腾讯云COS存储
+         */
+        String TENCENT_COS = "tencent_cos";
 
-    /**
-     * MinIO存储
-     */
-    public static final String MINIO = "minio";
+        /**
+         * MinIO存储
+         */
+        String MINIO = "minio";
+    }
+
 
     /**
      * 图片后缀

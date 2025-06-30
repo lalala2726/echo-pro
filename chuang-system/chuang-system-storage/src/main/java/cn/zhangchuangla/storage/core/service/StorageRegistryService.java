@@ -91,16 +91,16 @@ public class StorageRegistryService {
         String activeType = storageSystemProperties.getActiveType();
         String configJson;
         switch (activeType) {
-            case StorageConstants.LOCAL:
+            case StorageConstants.StorageType.LOCAL:
                 configJson = storageSystemProperties.getLocal().toJson();
                 break;
-            case StorageConstants.MINIO:
+            case StorageConstants.StorageType.MINIO:
                 configJson = storageSystemProperties.getMinio().toJson();
                 break;
-            case StorageConstants.ALIYUN_OSS:
+            case StorageConstants.StorageType.ALIYUN_OSS:
                 configJson = storageSystemProperties.getAliyunOss().toJson();
                 break;
-            case StorageConstants.TENCENT_COS:
+            case StorageConstants.StorageType.TENCENT_COS:
                 configJson = storageSystemProperties.getTencentCos().toJson();
                 break;
             default:
@@ -118,7 +118,7 @@ public class StorageRegistryService {
      * 降级为本地存储服务
      */
     public void fallbackToLocalStorage() {
-        loadConfig(StorageConstants.LOCAL, storageSystemProperties.getLocal().toJson());
+        loadConfig(StorageConstants.StorageType.LOCAL, storageSystemProperties.getLocal().toJson());
         log.info("降级为本地存储服务");
     }
 

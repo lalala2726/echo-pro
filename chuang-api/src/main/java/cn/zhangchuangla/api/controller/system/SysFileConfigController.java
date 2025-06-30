@@ -62,11 +62,11 @@ public class SysFileConfigController extends BaseController {
             StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
             BeanUtils.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
-                case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
+                case StorageConstants.StorageType.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
                         JSON.parseObject(item.getStorageValue(), AliyunOSSStorageConfig.class));
-                case StorageConstants.MINIO -> storageFileConfigListVo.setMinioConfig(
+                case StorageConstants.StorageType.MINIO -> storageFileConfigListVo.setMinioConfig(
                         JSON.parseObject(item.getStorageValue(), MinioStorageConfig.class));
-                case StorageConstants.TENCENT_COS -> storageFileConfigListVo.setTencentCOSConfig(
+                case StorageConstants.StorageType.TENCENT_COS -> storageFileConfigListVo.setTencentCOSConfig(
                         JSON.parseObject(item.getStorageValue(), TencentCOSStorageConfig.class));
             }
             return storageFileConfigListVo;

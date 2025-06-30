@@ -17,12 +17,12 @@ public class TencentCosStorageLoader implements StorageLoader {
 
     @Override
     public String getStorageType() {
-        return StorageConstants.TENCENT_COS;
+        return StorageConstants.StorageType.TENCENT_COS;
     }
 
     @Override
     public void loadConfig(String json, RedisCache redisCache) {
         redisCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
-        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.TENCENT_COS);
+        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.TENCENT_COS);
     }
 }

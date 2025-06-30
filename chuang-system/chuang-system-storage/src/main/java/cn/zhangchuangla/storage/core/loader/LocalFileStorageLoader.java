@@ -17,12 +17,12 @@ public class LocalFileStorageLoader implements StorageLoader {
 
     @Override
     public String getStorageType() {
-        return StorageConstants.LOCAL;
+        return StorageConstants.StorageType.LOCAL;
     }
 
     @Override
     public void loadConfig(String json, RedisCache redisCache) {
         redisCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
-        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.LOCAL);
+        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.LOCAL);
     }
 }

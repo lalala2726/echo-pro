@@ -101,10 +101,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(TencentCOSConfigRequest request) {
-        TencentCOSStorageConfig tencentCOSStorageConfig = new TencentCOSStorageConfig();
-        BeanUtils.copyProperties(request, tencentCOSStorageConfig);
-        String value = JSON.toJSONString(tencentCOSStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
+        TencentCOSStorageConfig tencent = new TencentCOSStorageConfig();
+        BeanUtils.copyProperties(request, tencent);
+        String value = JSON.toJSONString(tencent);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
     }
 
     /**
@@ -118,7 +118,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         LocalFileStorageConfig localFileStorageConfig = new LocalFileStorageConfig();
         BeanUtils.copyProperties(request, localFileStorageConfig);
         String value = JSON.toJSONString(localFileStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.LOCAL, value);
     }
 
     /**
@@ -129,10 +129,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSStorageConfig aliyunOSSStorageConfig = new AliyunOSSStorageConfig();
-        BeanUtils.copyProperties(request, aliyunOSSStorageConfig);
-        String value = JSON.toJSONString(aliyunOSSStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
+        AliyunOSSStorageConfig aliyun = new AliyunOSSStorageConfig();
+        BeanUtils.copyProperties(request, aliyun);
+        String value = JSON.toJSONString(aliyun);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
     }
 
     /**
@@ -145,7 +145,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean saveFileConfig(MinioConfigRequest request) {
         MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
         String value = JSON.toJSONString(minioStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
     }
 
 
