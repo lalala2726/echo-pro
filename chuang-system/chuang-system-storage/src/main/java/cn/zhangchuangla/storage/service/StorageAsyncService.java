@@ -30,7 +30,7 @@ public class StorageAsyncService {
      */
     @Async("imageProcessExecutor")
     public void compressImage(String originalFilePath, String compressedFilePath,
-                             int maxWidth, int maxHeight, float quality, String originalFilename) {
+                              int maxWidth, int maxHeight, float quality, String originalFilename) {
         try {
             log.info("开始异步压缩图片: {} -> {}", originalFilePath, compressedFilePath);
 
@@ -61,4 +61,4 @@ public class StorageAsyncService {
             }
         }
     }
-} 
+}

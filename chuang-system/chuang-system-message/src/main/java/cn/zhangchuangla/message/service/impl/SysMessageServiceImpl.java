@@ -43,12 +43,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage> implements SysMessageService {
 
+    private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
     private final SysMessageMapper sysMessageMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final MessageProducer messageProducer;
-
-    private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
     private final SysUserMessageService sysUserMessageService;
 
     /**

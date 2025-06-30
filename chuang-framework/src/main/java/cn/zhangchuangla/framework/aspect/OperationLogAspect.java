@@ -37,26 +37,23 @@ import java.util.stream.IntStream;
 @Slf4j
 public class OperationLogAspect {
 
+    /**
+     * 默认排除的敏感字段，防止敏感信息被记录
+     */
+    private static final List<String> EXCLUDE_PROPERTIES = Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword", "accessToken", "accessKey", "secretKey");
+    /**
+     * 线程变量，记录方法执行的开始时间，用于计算方法耗时
+     */
+    private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
+    /**
+     * 标记当前线程是否是清空日志的操作，用于防止递归调用
+     */
+    private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
     private final AsyncService asyncService;
 
     public OperationLogAspect(AsyncService asyncService) {
         this.asyncService = asyncService;
     }
-
-    /**
-     * 默认排除的敏感字段，防止敏感信息被记录
-     */
-    private static final List<String> EXCLUDE_PROPERTIES = Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword", "accessToken", "accessKey", "secretKey");
-
-    /**
-     * 线程变量，记录方法执行的开始时间，用于计算方法耗时
-     */
-    private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
-
-    /**
-     * 标记当前线程是否是清空日志的操作，用于防止递归调用
-     */
-    private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
 
     /**
      * 在方法执行前记录开始时间

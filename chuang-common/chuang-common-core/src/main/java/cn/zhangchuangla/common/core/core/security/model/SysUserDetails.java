@@ -1,9 +1,9 @@
 package cn.zhangchuangla.common.core.core.security.model;
 
-import org.apache.commons.collections4.CollectionUtils;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

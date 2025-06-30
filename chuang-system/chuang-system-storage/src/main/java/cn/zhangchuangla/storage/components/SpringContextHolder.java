@@ -13,17 +13,17 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
-    @Override
-    public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
-        context = applicationContext;
-    }
-
     public static <T> T getBean(String name, Class<T> clazz) {
         return context.getBean(name, clazz);
     }
 
     public static Object getBean(String name) {
         return context.getBean(name);
+    }
+
+    @Override
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
+        context = applicationContext;
     }
 
 }

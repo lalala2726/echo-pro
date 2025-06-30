@@ -27,7 +27,7 @@ public class AsyncConfig {
     @Bean("taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        
+
         // 核心线程数
         executor.setCorePoolSize(5);
         // 最大线程数
@@ -38,19 +38,19 @@ public class AsyncConfig {
         executor.setKeepAliveSeconds(60);
         // 线程名前缀
         executor.setThreadNamePrefix("async-task-");
-        
+
         // 拒绝策略：由调用线程执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        
+
         // 等待所有任务结束后再关闭线程池
         executor.setWaitForTasksToCompleteOnShutdown(true);
         // 等待时间
         executor.setAwaitTerminationSeconds(60);
-        
+
         executor.initialize();
-        log.info("Spring异步任务线程池初始化完成 - 核心线程数: {}, 最大线程数: {}, 队列容量: {}", 
-            executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
-        
+        log.info("Spring异步任务线程池初始化完成 - 核心线程数: {}, 最大线程数: {}, 队列容量: {}",
+                executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
+
         return executor;
     }
 
@@ -61,7 +61,7 @@ public class AsyncConfig {
     @Bean("imageProcessExecutor")
     public Executor imageProcessExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        
+
         // 根据CPU核心数设置线程数
         int processors = Runtime.getRuntime().availableProcessors();
         executor.setCorePoolSize(Math.max(2, processors / 2));
@@ -69,17 +69,17 @@ public class AsyncConfig {
         executor.setQueueCapacity(50);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("image-process-");
-        
+
         // 拒绝策略：由调用线程执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        
+
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
-        
+
         executor.initialize();
-        log.info("图片处理异步线程池初始化完成 - 核心线程数: {}, 最大线程数: {}", 
-            executor.getCorePoolSize(), executor.getMaxPoolSize());
-        
+        log.info("图片处理异步线程池初始化完成 - 核心线程数: {}, 最大线程数: {}",
+                executor.getCorePoolSize(), executor.getMaxPoolSize());
+
         return executor;
     }
 
@@ -90,23 +90,23 @@ public class AsyncConfig {
     @Bean("logProcessExecutor")
     public Executor logProcessExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        
+
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(500);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("log-process-");
-        
+
         // 拒绝策略：由调用线程执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        
+
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
-        
+
         executor.initialize();
-        log.info("日志处理异步线程池初始化完成 - 核心线程数: {}, 最大线程数: {}", 
-            executor.getCorePoolSize(), executor.getMaxPoolSize());
-        
+        log.info("日志处理异步线程池初始化完成 - 核心线程数: {}, 最大线程数: {}",
+                executor.getCorePoolSize(), executor.getMaxPoolSize());
+
         return executor;
     }
-} 
+}

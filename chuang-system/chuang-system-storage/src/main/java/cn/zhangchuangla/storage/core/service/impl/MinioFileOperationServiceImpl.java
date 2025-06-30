@@ -2,7 +2,6 @@ package cn.zhangchuangla.storage.core.service.impl;
 
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
-import cn.zhangchuangla.storage.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

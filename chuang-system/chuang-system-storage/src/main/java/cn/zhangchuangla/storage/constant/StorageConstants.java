@@ -15,6 +15,21 @@ public class StorageConstants {
      * 文件上传路径格式
      */
     public static final String FILE_UPLOAD_PATH_FORMAT = "yyyy/MM/dd";
+    /**
+     * 图片后缀
+     */
+    public static List<String> imageSuffix = List.of(
+            "jpg",
+            "jpeg",
+            "png",
+            "gif",
+            "bmp",
+            "webp",
+            "heic",
+            "heif",
+            "jfif",
+            "raw"
+    );
 
     /**
      * 文件目录常量
@@ -47,6 +62,7 @@ public class StorageConstants {
         String PREVIEW = "preview";
     }
 
+
     /**
      * 存储类型常量
      */
@@ -71,23 +87,6 @@ public class StorageConstants {
          */
         String MINIO = "minio";
     }
-
-
-    /**
-     * 图片后缀
-     */
-    public static List<String> imageSuffix = List.of(
-            "jpg",
-            "jpeg",
-            "png",
-            "gif",
-            "bmp",
-            "webp",
-            "heic",
-            "heif",
-            "jfif",
-            "raw"
-    );
 
     /**
      * 数据验证常量

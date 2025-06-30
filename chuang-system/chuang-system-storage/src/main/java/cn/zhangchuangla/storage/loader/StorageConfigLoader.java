@@ -34,7 +34,7 @@ public class StorageConfigLoader implements DataLoader {
 
     @Override
     public boolean load() {
-       return storageRegistryService.initializeStorage();
+        return storageRegistryService.initializeStorage();
     }
 
 

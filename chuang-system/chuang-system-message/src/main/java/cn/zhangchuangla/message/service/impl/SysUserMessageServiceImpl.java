@@ -21,7 +21,6 @@ public class SysUserMessageServiceImpl extends ServiceImpl<SysUserMessageMapper,
         implements SysUserMessageService {
 
 
-
     /**
      * 获取消息接收相关联的接收者 ID。
      * - 如果是部门消息，返回部门ID列表；

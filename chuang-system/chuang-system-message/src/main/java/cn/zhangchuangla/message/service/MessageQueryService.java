@@ -6,8 +6,6 @@ import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.message.model.vo.user.UserMessageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import java.util.List;
-
 /**
  * 消息查询服务接口
  * 专门负责消息的查询相关操作，包括已读状态的查询
@@ -38,7 +36,6 @@ public interface MessageQueryService {
      * @return 统计信息
      */
     UserMessageReadCountDto getUserMessageReadCount();
-
 
 
 }

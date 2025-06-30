@@ -175,8 +175,8 @@ public class UserMessageExtServiceImpl extends ServiceImpl<UserMessageExtMapper,
             return new ArrayList<>();
         }
         List<SysUserMessageExt> list = lambdaQuery().eq(SysUserMessageExt::getUserId, userId)
-            .in(SysUserMessageExt::getMessageId, messageIds)
-            .list();
+                .in(SysUserMessageExt::getMessageId, messageIds)
+                .list();
 
         return list.stream().map(sysUserMessageExt -> {
             MessageReadStatusBo messageReadStatusBo = new MessageReadStatusBo();

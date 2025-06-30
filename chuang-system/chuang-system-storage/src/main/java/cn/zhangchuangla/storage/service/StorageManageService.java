@@ -13,5 +13,4 @@ public interface StorageManageService extends IService<FileRecord> {
     boolean saveFileInfo(FileRecord fileInfo);
 
 
-
 }

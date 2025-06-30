@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
