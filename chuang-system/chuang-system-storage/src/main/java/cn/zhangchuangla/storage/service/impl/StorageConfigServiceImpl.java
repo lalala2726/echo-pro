@@ -2,10 +2,10 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
@@ -101,9 +101,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(TencentCOSConfigRequest request) {
-        TencentCOSConfigEntity tencentCOSConfigEntity = new TencentCOSConfigEntity();
-        BeanUtils.copyProperties(request, tencentCOSConfigEntity);
-        String value = JSON.toJSONString(tencentCOSConfigEntity);
+        TencentCOSStorageConfig tencentCOSStorageConfig = new TencentCOSStorageConfig();
+        BeanUtils.copyProperties(request, tencentCOSStorageConfig);
+        String value = JSON.toJSONString(tencentCOSStorageConfig);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
     }
 
@@ -115,9 +115,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(LocalFileConfigRequest request) {
-        LocalFileConfigEntity localFileConfigEntity = new LocalFileConfigEntity();
-        BeanUtils.copyProperties(request, localFileConfigEntity);
-        String value = JSON.toJSONString(localFileConfigEntity);
+        LocalFileStorageConfig localFileStorageConfig = new LocalFileStorageConfig();
+        BeanUtils.copyProperties(request, localFileStorageConfig);
+        String value = JSON.toJSONString(localFileStorageConfig);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
     }
 
@@ -129,9 +129,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSConfigEntity aliyunOSSConfigEntity = new AliyunOSSConfigEntity();
-        BeanUtils.copyProperties(request, aliyunOSSConfigEntity);
-        String value = JSON.toJSONString(aliyunOSSConfigEntity);
+        AliyunOSSStorageConfig aliyunOSSStorageConfig = new AliyunOSSStorageConfig();
+        BeanUtils.copyProperties(request, aliyunOSSStorageConfig);
+        String value = JSON.toJSONString(aliyunOSSStorageConfig);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
     }
 
@@ -143,8 +143,8 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(MinioConfigRequest request) {
-        MinioConfigEntity minioConfigEntity = new MinioConfigEntity();
-        String value = JSON.toJSONString(minioConfigEntity);
+        MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
+        String value = JSON.toJSONString(minioStorageConfig);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
     }
 

@@ -1,6 +1,6 @@
 app:
   config:
-    upload-path: D:\\DevelopUploads\\personApp
+    upload-path: /Users/zhangchuang/DevelopFileUpload
     enable-trash: true
   name: Chuang
   version: 0.1
@@ -12,8 +12,8 @@ spring:
     active: druid,rabbitmq,quartz #激活配置文件
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 100MB
+      max-file-size: 1024MB
+      max-request-size: 1024MB
   data:
     redis:
       host: 192.168.10.110
@@ -39,18 +39,15 @@ springdoc:
 
 # 存储系统配置
 storage:
-  # 主配置类型 - 可选值: local, minio, aliyun_oss, tencent_cos
-  # 如果不设置，系统将按以下顺序查找：
-  # 1. 从数据库加载主配置 (is_master = 1)
-  # 2. 使用本地存储作为降级方案
+  # 当数据库中未找到主存储配置时，将使用此默认配置。设置为 "local" 表示优先使用本地存储；
+  # 若设置为 "minio"，则表示在数据库配置不可用时降级使用 MinIO 配置；若未指定 MinIO 配置，则仍将默认使用本地存储。
   active-type: local
-  
   # 本地存储配置
   local:
-    root-path-or-bucket-name: ${app.config.upload-path}
-    file-domain: http://localhost:8080/storage
+    uploadPath: ${app.config.upload-path}
+    file-domain: http://localhost:8080/
     enable-trash: ${app.config.enable-trash}
-    
+
   # MinIO 配置
   minio:
     endpoint: http://localhost:9000
@@ -59,7 +56,7 @@ storage:
     bucket-name: echopro
     file-domain: http://localhost:9000/echopro
     real-delete: false
-    
+
   # 阿里云 OSS 配置
   aliyun-oss:
     endpoint: oss-cn-hangzhou.aliyuncs.com
@@ -68,7 +65,7 @@ storage:
     bucket-name: echopro-oss
     file-domain: https://echopro-oss.oss-cn-hangzhou.aliyuncs.com
     real-delete: false
-    
+
   # 腾讯云 COS 配置
   tencent-cos:
     region: ap-guangzhou

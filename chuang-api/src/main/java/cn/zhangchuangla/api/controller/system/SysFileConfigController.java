@@ -4,9 +4,9 @@ import org.springframework.beans.BeanUtils;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
@@ -14,7 +14,6 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.loader.StorageConfigLoader;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
@@ -64,11 +63,11 @@ public class SysFileConfigController extends BaseController {
             BeanUtils.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
                 case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
-                        JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));
+                        JSON.parseObject(item.getStorageValue(), AliyunOSSStorageConfig.class));
                 case StorageConstants.MINIO -> storageFileConfigListVo.setMinioConfig(
-                        JSON.parseObject(item.getStorageValue(), MinioConfigEntity.class));
+                        JSON.parseObject(item.getStorageValue(), MinioStorageConfig.class));
                 case StorageConstants.TENCENT_COS -> storageFileConfigListVo.setTencentCOSConfig(
-                        JSON.parseObject(item.getStorageValue(), TencentCOSConfigEntity.class));
+                        JSON.parseObject(item.getStorageValue(), TencentCOSStorageConfig.class));
             }
             return storageFileConfigListVo;
         }).collect(Collectors.toList());

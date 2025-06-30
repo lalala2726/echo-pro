@@ -1,11 +1,18 @@
 package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.storage.model.dto.FileTransferDto;
+import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.storage.service.StorageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件相关接口
@@ -21,5 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FileController extends BaseController {
 
+    private final StorageService storageService;
+
+
+    @PostMapping
+    public AjaxResult<UploadedFileInfo> upload(@RequestParam("file") MultipartFile file) {
+        UploadedFileInfo upload = storageService.upload(file);
+        return success(upload);
+    }
 
 }

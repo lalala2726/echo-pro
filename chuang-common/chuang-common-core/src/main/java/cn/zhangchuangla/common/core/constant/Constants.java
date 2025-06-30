@@ -35,7 +35,7 @@ public class Constants {
      * 系统相关常量
      */
     public static final String SYSTEM_CREATE = "系统自动创建";
-    public static final String RESOURCE_PREFIX = "/profile";
+    public static final String RESOURCE_PREFIX = "/static";
 
     /**
      * 权限相关常量

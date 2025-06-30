@@ -30,7 +30,7 @@ public class SysUserAddRequest {
     @Schema(description = "用户名", example = "admin123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户名不能为空")
     @Size(min = 5, max = 20, message = "用户名不能超过20个字符")
-    @ValidRegex(regexp = RegularConstants.User.USERNAME, message = "用户名只能是英文数字和下划线")
+    @ValidRegex(regexp = RegularConstants.User.USERNAME, message = "用户名只能是英文数字和下划线", allowEmpty = false)
     private String username;
 
     /**

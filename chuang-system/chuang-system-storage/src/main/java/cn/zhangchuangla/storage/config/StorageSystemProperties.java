@@ -5,6 +5,9 @@ import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 统一存储系统配置属性。
  * <p>
@@ -18,7 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "storage")
-public class StorageSystemProperties {
+public class StorageSystemProperties implements Serializable {
 
     /**
      * 在 application.yml 中显式指定的活动存储类型。
@@ -35,13 +38,18 @@ public class StorageSystemProperties {
      * 本地存储配置
      */
     @Data
-    public static class LocalConfig {
+    public static class LocalConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = 4295014936740407753L;
+
         /**
          * 本地存储的根路径 (绝对路径)。
          * 示例: /var/www/uploads 或 D:/uploads
          * 应用程序需要对此路径有写权限。
          */
-        private String rootPathOrBucketName; // 对应旧的 rootPathOrBucketName
+        private String uploadPath;
 
         /**
          * 文件的公共可访问基础URL (如果由Web服务器或Spring资源处理器直接提供服务)。
@@ -64,7 +72,11 @@ public class StorageSystemProperties {
      * MinIO 配置
      */
     @Data
-    public static class MinioConfig {
+    public static class MinioConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -237517564861379358L;
 
         /**
          * MinIO 服务器的端点。
@@ -106,7 +118,11 @@ public class StorageSystemProperties {
      * 阿里云OSS 配置
      */
     @Data
-    public static class AliyunOssConfig {
+    public static class AliyunOssConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -2047201893309898520L;
 
         /**
          * 访问端点
@@ -147,7 +163,11 @@ public class StorageSystemProperties {
      * 腾讯云COS 配置
      */
     @Data
-    public static class TencentCosConfig {
+    public static class TencentCosConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -7118344925027990875L;
 
         /**
          * 访问区域
