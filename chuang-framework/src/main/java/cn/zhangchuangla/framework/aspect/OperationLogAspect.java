@@ -6,8 +6,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.manager.AsyncManager;
-import cn.zhangchuangla.framework.manager.factory.AsyncFactory;
+import cn.zhangchuangla.framework.service.AsyncService;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +36,12 @@ import java.util.stream.IntStream;
 @Component
 @Slf4j
 public class OperationLogAspect {
+
+    private final AsyncService asyncService;
+
+    public OperationLogAspect(AsyncService asyncService) {
+        this.asyncService = asyncService;
+    }
 
     /**
      * 默认排除的敏感字段，防止敏感信息被记录
@@ -130,9 +135,9 @@ public class OperationLogAspect {
                 }
                 log.info("===========================");
 
-                // 使用异步工厂执行清空操作，但不记录日志
+                // 使用异步服务执行清空操作，但不记录日志
                 if (methodName.contains("cleanOperationLog")) {
-                    AsyncManager.me().execute(AsyncFactory.cleanOperationLog());
+                    asyncService.cleanOperationLog();
                 }
 
                 return; // 跳过后续的日志记录逻辑
@@ -188,8 +193,8 @@ public class OperationLogAspect {
             // 设置创建时间
             sysOperationLog.setCreateTime(new Date());
 
-            // 使用异步管理器和异步工厂记录日志，不再直接调用SysOperationLogService
-            AsyncManager.me().execute(AsyncFactory.recordOperationLog(sysOperationLog));
+            // 使用Spring异步服务记录日志
+            asyncService.recordOperationLog(sysOperationLog);
             log.debug("操作日志已提交异步处理: {}", sysOperationLog.getModule());
 
         } catch (Exception e) {

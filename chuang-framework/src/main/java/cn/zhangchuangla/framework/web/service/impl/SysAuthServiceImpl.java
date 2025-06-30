@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.web.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
 import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
@@ -8,14 +7,14 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
-import cn.zhangchuangla.framework.manager.AsyncManager;
-import cn.zhangchuangla.framework.manager.factory.AsyncFactory;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.security.token.TokenManager;
+import cn.zhangchuangla.framework.service.AsyncService;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,6 +35,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenManager tokenManager;
+    private final AsyncService asyncService;
 
     /**
      * 实现登录逻辑
@@ -55,10 +55,10 @@ public class SysAuthServiceImpl implements SysAuthService {
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
             log.error("用户名:{},登录失败！", request.getUsername(), e);
-            // 使用异步工厂记录登录失败日志
+            // 使用异步服务记录登录失败日志
             String ipAddr = IPUtils.getIpAddr(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-            AsyncManager.me().execute(AsyncFactory.recordLoginLog(request.getUsername(), ipAddr, userAgent, false));
+            asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
             throw e;
         }
 
@@ -66,10 +66,10 @@ public class SysAuthServiceImpl implements SysAuthService {
         AuthenticationToken authenticationTokenResponse = tokenManager.generateToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 使用异步工厂记录登录成功日志
+        // 使用异步服务记录登录成功日志
         String ipAddr = IPUtils.getIpAddr(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-        AsyncManager.me().execute(AsyncFactory.recordLoginLog(request.getUsername(), ipAddr, userAgent, true));
+        asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
         return authenticationTokenResponse;
     }
