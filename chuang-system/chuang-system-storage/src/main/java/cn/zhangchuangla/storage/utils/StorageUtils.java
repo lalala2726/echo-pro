@@ -1,7 +1,6 @@
 package cn.zhangchuangla.storage.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -25,18 +24,12 @@ public class StorageUtils {
      * @return 文件名
      */
     public static String generateFileName(String originalFilename) {
-        String replace = UUID.randomUUID().toString().replace("-", "");
-        return replace + "." + Objects.requireNonNull(originalFilename).split("\\.")[1];
-    }
-
-    /**
-     * 获取文件md5
-     *
-     * @param bytes 文件字节数组
-     * @return 文件md5
-     */
-    public static String getFileSha256(byte[] bytes) {
-        return DigestUtils.md5Hex(bytes);
+        String extension = getFileExtension(originalFilename);
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        if (extension.isEmpty()) {
+            return uuid;
+        }
+        return uuid + "." + extension;
     }
 
 
@@ -44,9 +37,16 @@ public class StorageUtils {
      * 获取文件后缀名
      *
      * @param originalFilename 文件名
-     * @return 文件后缀名
+     * @return 文件后缀名, 如果没有则返回空字符串
      */
     public static String getFileExtension(String originalFilename) {
-        return originalFilename.split("\\.")[1];
+        if (originalFilename == null) {
+            return "";
+        }
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == originalFilename.length() - 1) {
+            return "";
+        }
+        return originalFilename.substring(dotIndex + 1);
     }
 }

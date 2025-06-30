@@ -21,6 +21,11 @@ public class MinioFileOperationServiceImpl implements FileOperationService {
     }
 
     @Override
+    public UploadedFileInfo uploadImage(MultipartFile file) {
+        return null;
+    }
+
+    @Override
     public boolean delete(String relativePath, boolean realDelete) {
         return false;
     }

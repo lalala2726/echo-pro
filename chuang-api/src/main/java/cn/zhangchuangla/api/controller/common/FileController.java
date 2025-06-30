@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.storage.model.dto.FileTransferDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.service.StorageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * 文件相关接口
@@ -32,8 +33,8 @@ public class FileController extends BaseController {
 
 
     @PostMapping
-    public AjaxResult<UploadedFileInfo> upload(@RequestParam("file") MultipartFile file) {
-        UploadedFileInfo upload = storageService.upload(file);
+    public AjaxResult<UploadedFileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        UploadedFileInfo upload = storageService.uploadImage(file);
         return success(upload);
     }
 

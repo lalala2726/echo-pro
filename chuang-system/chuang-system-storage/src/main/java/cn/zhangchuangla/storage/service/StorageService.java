@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -53,6 +54,19 @@ public class StorageService {
                 .build();
         storageManageService.saveFileInfo(fileRecord);
         return upload;
+    }
+
+    /**
+     * 图片上传
+     *
+     * @param file 文件
+     * @return 上传结果
+     */
+    public UploadedFileInfo uploadImage(MultipartFile file) throws IOException {
+        String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
+        FileOperationService service = getService(activeStorageType);
+
+        return service.uploadImage(file);
     }
 
 

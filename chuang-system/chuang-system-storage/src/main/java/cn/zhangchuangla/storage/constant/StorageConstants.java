@@ -1,5 +1,7 @@
 package cn.zhangchuangla.storage.constant;
 
+import java.util.List;
+
 /**
  * 存储类型常量
  *
@@ -8,6 +10,7 @@ package cn.zhangchuangla.storage.constant;
  * created on 2025/4/3
  */
 public class StorageConstants {
+
     /**
      * 本地存储
      */
@@ -27,6 +30,22 @@ public class StorageConstants {
      * MinIO存储
      */
     public static final String MINIO = "minio";
+
+    /**
+     * 图片后缀
+     */
+    public static List<String> imageSuffix = List.of(
+            "jpg",
+            "jpeg",
+            "png",
+            "gif",
+            "bmp",
+            "webp",
+            "heic",
+            "heif",
+            "jfif",
+            "raw"
+    );
 
     /**
      * 文件URL
