@@ -136,8 +136,12 @@ public class StorageServiceImpl implements StorageService {
 
         // 1. 获取文件信息
         FileRecord fileRecord = storageManageService.getById(fileId);
+
         if (fileRecord == null) {
             throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件不存在");
+        }
+        if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件已经在回收站中!无法再次删除!");
         }
 
         // 2. 获取当前激活的存储类型
@@ -258,7 +262,7 @@ public class StorageServiceImpl implements StorageService {
         //恢复成功后将数据库中文件状态改为正常
         if (restore) {
             fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
-            fileRecord.setIsDeleted(0);
+            fileRecord.setIsDeleted(Constants.LogicDelete.NOT_DELETED);
             // 清空回收站路径信息，恢复原始路径信息
             fileRecord.setOriginalTrashPath(null);
             fileRecord.setPreviewTrashPath(null);
