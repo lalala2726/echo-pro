@@ -1,7 +1,5 @@
 package cn.zhangchuangla.common.core.utils;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
@@ -9,6 +7,8 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

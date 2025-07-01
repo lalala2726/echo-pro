@@ -1,7 +1,12 @@
 package cn.zhangchuangla.storage.config;
 
+import cn.zhangchuangla.storage.constant.StorageConstants;
+import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 统一存储系统配置属性。
@@ -16,14 +21,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "storage")
-public class StorageSystemProperties {
+public class StorageSystemProperties implements Serializable {
 
     /**
      * 在 application.yml 中显式指定的活动存储类型。
      * 可选值: "local", "minio", "aliyun_oss", "tencent_cos"。
      * 如果为空或未设置，将尝试从数据库加载或降级到本地。
      */
-    private String activeType;
+    private String activeType = StorageConstants.StorageType.LOCAL;
     private LocalConfig local;
     private MinioConfig minio;
     private AliyunOssConfig aliyunOss;
@@ -33,13 +38,18 @@ public class StorageSystemProperties {
      * 本地存储配置
      */
     @Data
-    public static class LocalConfig implements TrashConfigurable {
+    public static class LocalConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = 4295014936740407753L;
+
         /**
          * 本地存储的根路径 (绝对路径)。
          * 示例: /var/www/uploads 或 D:/uploads
          * 应用程序需要对此路径有写权限。
          */
-        private String rootPathOrBucketName; // 对应旧的 rootPathOrBucketName
+        private String uploadPath;
 
         /**
          * 文件的公共可访问基础URL (如果由Web服务器或Spring资源处理器直接提供服务)。
@@ -47,57 +57,151 @@ public class StorageSystemProperties {
          */
         private String fileDomain;
 
-        /**
-         * 是否启用回收站功能。
-         */
-        private boolean enableTrash = true;
 
         /**
-         * 回收站目录的名称。
-         * 默认为 "trash"。
+         * 是否真实删除文件
          */
-        private String trashDirectoryName = "trash";
+        private boolean realDelete = false;
+
+        public String toJson() {
+            return JSON.toJSONString(this);
+        }
+
     }
 
     /**
      * MinIO 配置
      */
     @Data
-    public static class MinioConfig implements TrashConfigurable {
+    public static class MinioConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -237517564861379358L;
+
+        /**
+         * MinIO 服务器的端点。
+         */
         private String endpoint;
+
+        /**
+         * MinIO 的访问密钥。
+         */
         private String accessKey;
+
+        /**
+         * MinIO 的密钥。
+         */
         private String secretKey;
-        private String rootPathOrBucketName;
+
+        /**
+         * MinIO 的存储桶名称。
+         */
+        private String bucketName;
+
+        /**
+         * MinIO 的文件访问域名。
+         */
         private String fileDomain;
-        private boolean enableTrash = true;
-        private String trashDirectoryName = "trash";
+
+        /**
+         * 是否真实删除
+         */
+        private boolean realDelete = true;
+
+        public String toJson() {
+            return JSON.toJSONString(this);
+        }
+
     }
 
     /**
      * 阿里云OSS 配置
      */
     @Data
-    public static class AliyunOssConfig implements TrashConfigurable {
+    public static class AliyunOssConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -2047201893309898520L;
+
+        /**
+         * 访问端点
+         */
         private String endpoint;
+
+        /**
+         * 访问密钥
+         */
         private String accessKeyId;
+
+        /**
+         * 密钥
+         */
         private String accessKeySecret;
-        private String rootPathOrBucketName;
+
+        /**
+         * 存储桶名称
+         */
+        private String bucketName;
+
+        /**
+         * 文件域名
+         */
         private String fileDomain;
-        private boolean enableTrash = true;
-        private String trashDirectoryName = "trash";
+
+        /**
+         * 是否真实删除
+         */
+        private boolean realDelete = true;
+
+        public String toJson() {
+            return JSON.toJSONString(this);
+        }
     }
 
     /**
      * 腾讯云COS 配置
      */
     @Data
-    public static class TencentCosConfig implements TrashConfigurable {
+    public static class TencentCosConfig implements Serializable {
+
+
+        @Serial
+        private static final long serialVersionUID = -7118344925027990875L;
+
+        /**
+         * 访问区域
+         */
         private String region;
+
+        /**
+         * 访问密钥
+         */
         private String secretId;
+
+        /**
+         * 访问密钥
+         */
         private String secretKey;
-        private String rootPathOrBucketName;
+
+        /**
+         * 存储桶名称
+         */
+        private String bucketName;
+
+        /**
+         * 文件访问域名
+         */
         private String fileDomain;
-        private boolean enableTrash = true;
-        private String trashDirectoryName = "trash";
+
+        /**
+         * 是否真实删除
+         */
+        private boolean realDelete = true;
+
+        public String toJson() {
+            return JSON.toJSONString(this);
+        }
     }
 }

@@ -76,6 +76,16 @@ public interface RedisConstants {
         }
     }
 
+
+    interface StorageConfig {
+        String ACTIVE_TYPE = "storage:active_type";
+        String CURRENT_STORAGE_CONFIG = "storage:current_storage_config";
+        String CONFIGURATION_FILE_TYPE = "storage:configuration_file_type";
+
+        String CONFIG_TYPE_DATABASE = "database";
+        String CONFIG_TYPE_LOCAL = "local";
+    }
+
     /**
      * 代码生成
      */

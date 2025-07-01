@@ -29,7 +29,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 
     private final SysConfigMapper sysConfigMapper;
 
-
     /**
      * 分页查询系统配置
      *

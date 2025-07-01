@@ -122,7 +122,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      *
      * @return 返回主配置
      */
-    StorageConfig getMasterConfig();
+    StorageConfig getPrimaryConfig();
 
 
     /**

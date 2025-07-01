@@ -18,8 +18,7 @@ public interface SysOperationLogMapper extends BaseMapper<SysOperationLog> {
      * @param request 查询参数
      * @return 返回分页数据
      */
-    Page<SysOperationLog> listOperationLog(Page<SysOperationLog> page,
-                                           @Param("request") SysOperationLogQueryRequest request);
+    Page<SysOperationLog> listOperationLog(Page<SysOperationLog> page, @Param("request") SysOperationLogQueryRequest request);
 
     /**
      * 清空操作日志

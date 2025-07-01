@@ -43,7 +43,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     private final SysRoleMenuService sysRoleMenuService;
     private final RedisCache redisCache;
 
-
     /**
      * 角色列表
      *

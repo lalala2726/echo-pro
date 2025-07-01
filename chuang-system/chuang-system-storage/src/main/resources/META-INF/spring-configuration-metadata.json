@@ -1,0 +1,64 @@
+{
+  "properties": [
+    {
+      "name": "storage.strategy",
+      "type": "java.lang.String",
+      "description": "配置加载策略。默认 'auto'。",
+      "defaultValue": "auto"
+    },
+    {
+      "name": "storage.active-type",
+      "type": "java.lang.String",
+      "description": "在 application.yml 中显式指定的活动存储类型。",
+      "defaultValue": "local"
+    }
+  ],
+  "hints": [
+    {
+      "name": "storage.strategy",
+      "values": [
+        {
+          "value": "auto",
+          "description": "优先读取 active-type, 然后是数据库, 最后默认本地。"
+        },
+        {
+          "value": "local-first",
+          "description": "强制使用本地配置, 跳过数据库。"
+        },
+        {
+          "value": "minio-first",
+          "description": "强制使用MinIO配置, 跳过数据库。"
+        },
+        {
+          "value": "aliyun-first",
+          "description": "强制使用阿里云OSS配置, 跳过数据库。"
+        },
+        {
+          "value": "tencent-first",
+          "description": "强制使用腾讯云COS配置, 跳过数据库。"
+        }
+      ]
+    },
+    {
+      "name": "storage.active-type",
+      "values": [
+        {
+          "value": "local",
+          "description": "本地存储"
+        },
+        {
+          "value": "minio",
+          "description": "MinIO存储"
+        },
+        {
+          "value": "aliyun_oss",
+          "description": "阿里云OSS存储"
+        },
+        {
+          "value": "tencent_cos",
+          "description": "腾讯云COS存储"
+        }
+      ]
+    }
+  ]
+}

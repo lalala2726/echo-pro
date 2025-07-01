@@ -1,6 +1,6 @@
 app:
   config:
-    upload-path: D:\\DevelopUploads\\personApp
+    upload-path: /Users/zhangchuang/DevelopFileUpload
     enable-trash: true
   name: Chuang
   version: 0.1
@@ -12,8 +12,8 @@ spring:
     active: druid,rabbitmq,quartz #激活配置文件
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 100MB
+      max-file-size: 1024MB
+      max-request-size: 1024MB
   data:
     redis:
       host: 192.168.10.110
@@ -36,6 +36,45 @@ springdoc:
   default-consumes-media-type: application/json
   cache:
     disabled: true
+
+# 存储系统配置
+storage:
+  # 当数据库中未找到主存储配置时，将使用此默认配置。设置为 "local" 表示优先使用本地存储；
+  # 若设置为 "minio"，则表示在数据库配置不可用时降级使用 MinIO 配置；若未指定 MinIO 配置，则仍将默认使用本地存储。
+  active-type: local
+  # 本地存储配置
+  local:
+    uploadPath: ${app.config.upload-path}
+    file-domain: http://localhost:8080/
+    real-delete: false
+
+  # MinIO 配置
+  minio:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket-name: echopro
+    file-domain: http://localhost:9000/echopro
+    real-delete: false
+
+  # 阿里云 OSS 配置
+  aliyun-oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    access-key-id: ${ALIYUN_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:}
+    bucket-name: echopro-oss
+    file-domain: https://echopro-oss.oss-cn-hangzhou.aliyuncs.com
+    real-delete: false
+
+  # 腾讯云 COS 配置
+  tencent-cos:
+    region: ap-guangzhou
+    secret-id: ${TENCENT_SECRET_ID:}
+    secret-key: ${TENCENT_SECRET_KEY:}
+    bucket-name: echopro-1234567890
+    file-domain: https://echopro-1234567890.cos.ap-guangzhou.myqcloud.com
+    real-delete: false
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -60,49 +99,3 @@ security:
     access-token-expire-time: 7200000
     refresh-token-expire-time: 2592000
     single-login: false
-
-# ===================================================================
-# 新的存储配置
-# ===================================================================
-storage:
-  # --- 本地存储配置 ---
-  local:
-    # 本地存储的根路径（推荐使用绝对路径）
-    # 示例：/var/www/uploads 或 D:/uploads
-    # 确保此路径存在，并且应用程序具有写入权限。
-    root-path-or-bucket-name: "/Users/zhangchuang/projects/app-backend/uploads" # <<< 请更新此路径
-    # 文件的公开访问基础URL（如果由Web服务器或Spring资源处理程序直接提供）
-    # 示例：https://yourdomain.com/uploads 或者如果是通过Spring提供，可以是 /resources/uploads
-    file-domain: "/static-uploads" # 如果你为root-path设置了名为/static-uploads的资源处理器，请参考此示例
-    enable-trash: true
-    trash-directory-name: "trash"
-
-  # --- MinIO 配置 ---
-  minio:
-    endpoint: "http://your-minio-server:9000"
-    access-key: "YOUR_MINIO_ACCESS_KEY"
-    secret-key: "YOUR_MINIO_SECRET_KEY"
-    root-path-or-bucket-name: "your-minio-bucket-name" # 这里填写的是存储桶名称
-    file-domain: "" # 示例："https://minio.yourdomain.com/your-bucket-name"
-    enable-trash: true
-    trash-directory-name: "trash"
-
-  # --- 阿里云OSS 配置 ---
-  aliyun-oss:
-    endpoint: "oss-cn-beijing.aliyuncs.com"
-    access-key-id: "YOUR_ALIYUN_ACCESS_KEY_ID"
-    access-key-secret: "YOUR_ALIYUN_ACCESS_KEY_SECRET"
-    root-path-or-bucket-name: "your-aliyun-oss-bucket-name"
-    file-domain: "" # 示例："https://your-oss-domain.com"
-    enable-trash: true
-    trash-directory-name: "trash"
-
-  # --- 腾讯COS 配置 ---
-  tencent-cos:
-    region: "ap-beijing"
-    secret-id: "YOUR_TENCENT_COS_SECRET_ID"
-    secret-key: "YOUR_TENCENT_COS_SECRET_KEY"
-    root-path-or-bucket-name: "your-tencent-cos-bucket-name-appid"
-    file-domain: "" # 示例："https://your-cos-domain.com"
-    enable-trash: true
-    trash-directory-name: "trash"

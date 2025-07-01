@@ -16,7 +16,6 @@ import lombok.Data;
 @Schema(name = "菜单添加请求对象", description = "菜单添加请求对象")
 public class SysMenuAddRequest {
 
-
     /**
      * 菜单名称
      */

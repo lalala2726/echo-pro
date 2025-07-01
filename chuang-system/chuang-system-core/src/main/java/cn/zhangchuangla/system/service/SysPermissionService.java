@@ -22,7 +22,6 @@ public interface SysPermissionService {
      */
     Set<String> getUserPermissionByRole(Set<String> roleSet);
 
-
     /**
      * 根据角色标识符查询权限列表
      *
@@ -30,7 +29,6 @@ public interface SysPermissionService {
      * @return 权限列表
      */
     Set<String> getUserPermissionByRole(String role);
-
 
     /**
      * 根据角色id获取权限列表

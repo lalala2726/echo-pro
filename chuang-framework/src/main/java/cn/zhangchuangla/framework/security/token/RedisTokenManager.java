@@ -1,7 +1,5 @@
 package cn.zhangchuangla.framework.security.token;
 
-import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
@@ -23,16 +21,14 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.zhangchuangla.common.core.enums.ResponseCode.ACCESS_TOKEN_INVALID;

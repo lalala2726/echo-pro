@@ -227,7 +227,7 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
                 .update();
 
         new LambdaQueryWrapper<SysUserMessageExt>().eq(SysUserMessageExt::getUserId, userId)
-                        .in(SysUserMessageExt::getMessageId, messageIds);
+                .in(SysUserMessageExt::getMessageId, messageIds);
 
         log.info("批量标记消息未读: userId={}, messageIds={}, result={}", userId, messageIds, result);
         return result;

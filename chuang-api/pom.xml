@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.zhangchuangla</groupId>
-      <artifactId>echo-pro</artifactId>
+        <artifactId>echo-pro</artifactId>
         <version>1.0.0</version>
     </parent>
 
@@ -42,16 +42,6 @@
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common-excel</artifactId>
-        </dependency>
-        <!-- 代码生成模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-generator</artifactId>
-        </dependency>
-        <!-- Quartz定时任务模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-quartz</artifactId>
         </dependency>
     </dependencies>
     <build>

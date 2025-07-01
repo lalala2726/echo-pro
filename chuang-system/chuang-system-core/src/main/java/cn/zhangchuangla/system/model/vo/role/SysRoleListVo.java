@@ -16,6 +16,7 @@ import java.util.Date;
 @Data
 @Schema(name = "角色列表视图对象", description = "返回前端展示的数据")
 public class SysRoleListVo {
+
     /**
      * 主键
      */

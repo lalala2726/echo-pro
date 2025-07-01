@@ -1,8 +1,8 @@
 package cn.zhangchuangla.storage.model.vo.config;
 
-import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -51,19 +51,19 @@ public class StorageFileConfigListVo {
      * Minio配置
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MinioConfigEntity minioConfig;
+    private MinioStorageConfig minioConfig;
 
     /**
      * 阿里云配置
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private AliyunOSSConfigEntity aliyunOSSConfig;
+    private AliyunOSSStorageConfig aliyunOssConfig;
 
     /**
      * 腾讯云配置
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private TencentCOSConfigEntity tencentCOSConfig;
+    private TencentCOSStorageConfig tencentCosConfig;
 
     /**
      * 备注
