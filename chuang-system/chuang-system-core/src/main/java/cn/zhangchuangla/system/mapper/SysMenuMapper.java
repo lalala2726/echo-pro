@@ -22,7 +22,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
      */
     List<SysMenu> getMenuListByUserId(@Param("userId") Long userId);
 
-
     /**
      * 根据角色ID查询菜单ID列表
      *
@@ -46,7 +45,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
      * @return 菜单列表
      */
     List<SysMenu> selectMenuList(SysMenu menu);
-
 
     /**
      * 根据角色ID查询权限列表

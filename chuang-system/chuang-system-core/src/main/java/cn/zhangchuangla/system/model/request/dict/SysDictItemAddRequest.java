@@ -12,7 +12,6 @@ import lombok.Data;
 @Schema(name = "系统字典项添加请求对象", description = "系统字典项添加请求对象")
 public class SysDictItemAddRequest {
 
-
     /**
      * 所属字典类型编码
      */

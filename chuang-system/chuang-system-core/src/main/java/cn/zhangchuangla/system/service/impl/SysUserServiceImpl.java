@@ -45,7 +45,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
 
-
     /**
      * 进行条件查询
      *

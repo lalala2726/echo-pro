@@ -16,7 +16,6 @@ import java.util.List;
  */
 public interface SysDeptService extends IService<SysDept> {
 
-
     /**
      * 获取部门列表
      *

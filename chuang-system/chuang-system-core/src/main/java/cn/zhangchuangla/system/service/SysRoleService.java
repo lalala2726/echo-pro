@@ -18,7 +18,6 @@ import java.util.Set;
  */
 public interface SysRoleService extends IService<SysRole> {
 
-
     /**
      * 角色列表
      *

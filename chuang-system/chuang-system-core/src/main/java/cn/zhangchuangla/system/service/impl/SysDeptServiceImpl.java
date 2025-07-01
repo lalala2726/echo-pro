@@ -29,7 +29,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
 
     private final SysDeptMapper sysDeptMapper;
 
-
     @Override
     public List<SysDept> listDept(SysDeptQueryRequest request) {
         SysDept sysDept = new SysDept();
