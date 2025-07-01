@@ -18,12 +18,10 @@ import cn.zhangchuangla.storage.service.StorageManageService;
 import cn.zhangchuangla.storage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
@@ -170,7 +168,7 @@ public class StorageServiceImpl implements StorageService {
             // 标记数据库记录为已删除
             fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
             // 清空回收站相关字段
-            fileRecord.setIsTrash(0);
+            fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
             fileRecord.setOriginalTrashPath(null);
             fileRecord.setPreviewTrashPath(null);
         } else {
@@ -252,9 +250,10 @@ public class StorageServiceImpl implements StorageService {
         FileOperationService service = getService(activeStorageType);
         Integer isDeleted = fileRecord.getIsDeleted();
         Integer isTrash = fileRecord.getIsTrash();
+
         //只有处于回收站且未被彻底删除的文件才能恢复
         if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(isTrash)
-                || Integer.valueOf(1).equals(isDeleted)) {
+                || Constants.LogicDelete.DELETED.equals(isDeleted)) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件未处于回收站中或已被删除，无法恢复");
         }
         //进行文件操作
@@ -266,18 +265,6 @@ public class StorageServiceImpl implements StorageService {
             // 清空回收站路径信息，恢复原始路径信息
             fileRecord.setOriginalTrashPath(null);
             fileRecord.setPreviewTrashPath(null);
-            // 恢复原始文件URL（如果有域名配置的话）
-            if (StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
-                LocalFileStorageConfig config = service.getConfig();
-                if (StringUtils.isNotBlank(config.getFileDomain())) {
-                    fileRecord.setOriginalFileUrl(Paths.get(config.getFileDomain(),
-                            Constants.RESOURCE_PREFIX, fileRecord.getOriginalRelativePath()).toString());
-                    if (StringUtils.isNotBlank(fileRecord.getPreviewImagePath())) {
-                        fileRecord.setPreviewImageUrl(Paths.get(config.getFileDomain(),
-                                Constants.RESOURCE_PREFIX, fileRecord.getPreviewImagePath()).toString());
-                    }
-                }
-            }
             fileRecord.setUpdateTime(new Date());
             storageManageService.updateById(fileRecord);
             return true;
