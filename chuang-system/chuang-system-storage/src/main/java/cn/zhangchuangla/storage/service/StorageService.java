@@ -34,7 +34,7 @@ public interface StorageService {
      * @param id 文件id
      * @return 是否成功
      */
-    boolean delete(Long id, boolean forceDelete);
+    boolean deleteFileById(Long id, boolean forceDelete);
 
     /**
      * 批量删除文件
@@ -42,6 +42,23 @@ public interface StorageService {
      * @param ids 文件id
      * @return 是否成功
      */
-    boolean delete(List<Long> ids, boolean forceDelete);
+    boolean deleteFileById(List<Long> ids, boolean forceDelete);
+
+
+    /**
+     * 根据文件编号从回收站还原文件
+     *
+     * @param fileId 文件id
+     * @return 是否成功
+     */
+    boolean restoreFileFromRecycleBin(Long fileId);
+
+    /**
+     * 根据文件编号从回收站还原文件
+     *
+     * @param fileId 文件id
+     * @return 是否成功
+     */
+    boolean restoreFileFromRecycleBin(List<Long> fileId);
 
 }

@@ -111,6 +111,11 @@ public class StorageConstants {
          * 在回收站
          */
         Integer IN_TRASH = 1;
+
+        /**
+         * 不在回收站
+         */
+        Integer NOT_IN_TRASH = 0;
     }
 
 

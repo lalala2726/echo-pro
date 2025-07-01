@@ -11,6 +11,16 @@ package cn.zhangchuangla.common.core.constant;
 public class Constants {
 
     /**
+     * 逻辑删除
+     */
+    public interface LogicDelete {
+        //逻辑删除
+        Integer DELETED = 1;
+        //未删除
+        Integer NOT_DELETED = 0;
+    }
+
+    /**
      * 验证码相关
      */
     public static final String BASE64_CODE = "data:image/png;base64,";

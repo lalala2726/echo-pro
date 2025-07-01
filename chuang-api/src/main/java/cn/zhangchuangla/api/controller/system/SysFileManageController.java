@@ -66,16 +66,17 @@ public class SysFileManageController extends BaseController {
     /**
      * 恢复文件
      *
-     * @param id 文件ID
+     * @param ids 文件ID
      * @return 恢复结果
      */
     // todo 对文件进行操作的时候当前配置必须和文件上传配置一致才可以进行修改，如果不一致则不允许修改
     @PreAuthorize("@ss.hasPermission('system:file-manage:recover')")
     @Operation(summary = "恢复文件")
-    @PutMapping("/recover/{id}")
+    @PutMapping("/recover/{ids}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
-    public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("id") Long id) {
-        return success();
+    public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("ids") List<Long> ids) {
+        boolean result = storageService.restoreFileFromRecycleBin(ids);
+        return toAjax(result);
     }
 
     /**
@@ -92,7 +93,7 @@ public class SysFileManageController extends BaseController {
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                        @Parameter(description = "是否永久删除")
                                        @RequestParam(value = "forceDelete", required = false, defaultValue = "false") boolean forceDelete) {
-        boolean result = storageService.delete(ids, forceDelete);
+        boolean result = storageService.deleteFileById(ids, forceDelete);
         return toAjax(result);
     }
 }

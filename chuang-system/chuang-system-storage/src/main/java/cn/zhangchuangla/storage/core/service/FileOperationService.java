@@ -2,10 +2,9 @@ package cn.zhangchuangla.storage.core.service;
 
 import cn.zhangchuangla.storage.model.dto.FileTrashInfoDTO;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.storage.model.entity.FileRecord;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 
 /**
@@ -39,18 +38,15 @@ public interface FileOperationService {
      * @param previewRelativePath  预览文件（如果存在）的相对路径
      * @param forceDelete          true: 强制从文件系统删除；false: 移入回收站
      * @return 如果是移入回收站，返回包含新路径的DTO；如果是强制删除或文件不存在，返回null
-     * @throws IOException 文件操作异常
      */
     FileTrashInfoDTO delete(String originalRelativePath, String previewRelativePath, boolean forceDelete);
 
     /**
      * 恢复文件
      *
-     * @param originalRelativePath 文件原始相对路径
-     * @param trashRelativePath    文件回收相对路径
      * @return 恢复结果
      */
-    boolean restore(String originalRelativePath, String trashRelativePath);
+    boolean restore(FileRecord fileRecord);
 
     /**
      * 删除文件回收站文件
@@ -58,7 +54,7 @@ public interface FileOperationService {
      * @param relativePath 文件相对路径
      * @return 删除结果
      */
-    boolean deleteTrash(String relativePath);
+    boolean deleteTrashFile(String relativePath);
 
 
 }

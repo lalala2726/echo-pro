@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
@@ -17,10 +18,12 @@ import cn.zhangchuangla.storage.service.StorageManageService;
 import cn.zhangchuangla.storage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +39,7 @@ public class StorageServiceImpl implements StorageService {
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 50;
     //图片最大大小
     private static final long MAX_IMAGE_SIZE = 1024 * 1024 * 5;
+
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageManageService storageManageService;
 
@@ -125,7 +129,7 @@ public class StorageServiceImpl implements StorageService {
      */
     @Override
     @Transactional(rollbackFor = FileException.class)
-    public boolean delete(Long fileId, boolean forceDelete) {
+    public boolean deleteFileById(Long fileId, boolean forceDelete) {
         if (fileId == null || fileId <= 0) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
         }
@@ -211,11 +215,76 @@ public class StorageServiceImpl implements StorageService {
      */
     @Override
     @Transactional(rollbackFor = FileException.class)
-    public boolean delete(List<Long> ids, boolean forceDelete) {
+    public boolean deleteFileById(List<Long> ids, boolean forceDelete) {
         for (Long id : ids) {
-            if (!delete(id, forceDelete)) {
-                return false;
+            return deleteFileById(id, forceDelete);
+        }
+        return true;
+    }
+
+    /**
+     * 从回收站还原文件
+     *
+     * @param fileId 文件id
+     * @return 是否还原成功
+     */
+    @Override
+    public boolean restoreFileFromRecycleBin(Long fileId) {
+        if (fileId == null || fileId <= 0) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
+        }
+        FileRecord fileRecord = storageManageService.getById(fileId);
+        if (fileRecord == null) {
+            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件不存在");
+        }
+        String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
+        if (!activeStorageType.equals(fileRecord.getStorageType())) {
+            throw new ServiceException(
+                    ResponseCode.OPERATION_ERROR,
+                    String.format("存储类型不匹配，无法执行恢复操作。当前存储类型: %s，文件ID: %d 的实际存储类型: %s",
+                            activeStorageType, fileId, fileRecord.getStorageType())
+            );
+        }
+        FileOperationService service = getService(activeStorageType);
+        Integer isDeleted = fileRecord.getIsDeleted();
+        Integer isTrash = fileRecord.getIsTrash();
+        //只有处于回收站且未被彻底删除的文件才能恢复
+        if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(isTrash)
+                || Integer.valueOf(1).equals(isDeleted)) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件未处于回收站中或已被删除，无法恢复");
+        }
+        //进行文件操作
+        boolean restore = service.restore(fileRecord);
+        //恢复成功后将数据库中文件状态改为正常
+        if (restore) {
+            fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
+            fileRecord.setIsDeleted(0);
+            // 清空回收站路径信息，恢复原始路径信息
+            fileRecord.setOriginalTrashPath(null);
+            fileRecord.setPreviewTrashPath(null);
+            // 恢复原始文件URL（如果有域名配置的话）
+            if (StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
+                LocalFileStorageConfig config = service.getConfig();
+                if (StringUtils.isNotBlank(config.getFileDomain())) {
+                    fileRecord.setOriginalFileUrl(Paths.get(config.getFileDomain(),
+                            Constants.RESOURCE_PREFIX, fileRecord.getOriginalRelativePath()).toString());
+                    if (StringUtils.isNotBlank(fileRecord.getPreviewImagePath())) {
+                        fileRecord.setPreviewImageUrl(Paths.get(config.getFileDomain(),
+                                Constants.RESOURCE_PREFIX, fileRecord.getPreviewImagePath()).toString());
+                    }
+                }
             }
+            fileRecord.setUpdateTime(new Date());
+            storageManageService.updateById(fileRecord);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean restoreFileFromRecycleBin(List<Long> fileIds) {
+        for (Long fileId : fileIds) {
+            return restoreFileFromRecycleBin(fileId);
         }
         return true;
     }
