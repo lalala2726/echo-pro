@@ -31,6 +31,19 @@ public class StorageConstants {
             "raw"
     );
 
+
+    /**
+     * 图片压缩常量
+     */
+    public interface imageCompression {
+        //图片最大宽
+        int MAX_WIDTH = 1920;
+        //图片最大高
+        int MAX_HEIGHT = 1080;
+        //图片压缩率
+        float QUALITY = 0.8f;
+    }
+
     /**
      * 文件目录常量
      */

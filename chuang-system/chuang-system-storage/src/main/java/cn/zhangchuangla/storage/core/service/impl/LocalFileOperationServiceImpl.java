@@ -101,16 +101,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
     @Override
     public UploadedFileInfo uploadImage(MultipartFile file) {
-        //todo 压缩图片的逻辑统一放到常量里面
-        //最大宽
-        int maxWidth = 1024;
-        //最大高
-        int maxHeight = 1024;
-        //压缩质量
-        float quality = 0.9f;
-
-        getConfig();
-
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
 
         String datePath = todayDir();
@@ -142,9 +132,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             storageAsyncService.compressImage(
                     originalFile.getAbsolutePath(),
                     compressedFile.getAbsolutePath(),
-                    maxWidth,
-                    maxHeight,
-                    quality,
+                    StorageConstants.imageCompression.MAX_WIDTH,
+                    StorageConstants.imageCompression.MAX_HEIGHT,
+                    StorageConstants.imageCompression.QUALITY,
                     originalFilename
             );
             log.info("图片压缩任务已提交到后台执行: {}", compressedFile.getAbsolutePath());
@@ -243,8 +233,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
 
-        LocalFileStorageConfig config = getConfig();
-        File uploadRootDir = new File(config.getUploadPath());
+        File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
 
         // 获取回收站中的文件路径
         String originalTrashPath = fileRecord.getOriginalTrashPath();
@@ -313,8 +302,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean deleteTrashFile(String relativePath) {
-        LocalFileStorageConfig config = getConfig();
-        File file = new File(config.getUploadPath(), relativePath);
+        File file = new File(localFileStorageConfig.getUploadPath(), relativePath);
         if (!file.exists()) {
             log.warn("回收站文件不存在，删除失败: {}", relativePath);
             return false;
