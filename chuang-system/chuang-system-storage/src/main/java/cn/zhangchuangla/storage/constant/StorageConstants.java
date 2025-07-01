@@ -60,6 +60,11 @@ public class StorageConstants {
          * 预览目录
          */
         String PREVIEW = "preview";
+
+        /**
+         * 资源目录
+         */
+        String RESOURCE = "resource";
     }
 
 

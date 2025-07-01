@@ -72,7 +72,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         try {
             String datePath = todayDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
-            String targetDirectory = Paths.get(datePath, StorageConstants.dirName.FILE).toString();
+            String targetDirectory = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.FILE).toString();
             File destDir = ensureDir(targetDirectory);
             File destFile = new File(destDir, newFileName);
 
@@ -114,9 +114,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
 
         String datePath = todayDir();
-        String originalImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.ORIGINAL)
+        String originalImageDir = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.ORIGINAL)
                 .toString();
-        String previewImageDir = Paths.get(datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
+        String previewImageDir = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
                 .toString();
 
         File originalDir;
@@ -200,7 +200,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
 
         // 构造回收站路径，通过在原路径前加上"trash"目录来保留目录结构
-        String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, originalRelativePath).toString();
+        // 去掉StorageConstants.dirName.RESOURCE前缀，保留其余路径结构
+        String pathWithoutResourcePrefix = removeResourcePrefix(originalRelativePath);
+        String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, pathWithoutResourcePrefix).toString();
         File originalTrashFile = new File(uploadRootDir, originalTrashPath);
         String previewTrashPath = null;
 
@@ -210,7 +212,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             FileUtils.moveFile(originalFile, originalTrashFile);
 
             if (previewFile != null && previewFile.exists()) {
-                previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewRelativePath).toString();
+                String previewPathWithoutResourcePrefix = removeResourcePrefix(previewRelativePath);
+                previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewPathWithoutResourcePrefix).toString();
                 File previewTrashFile = new File(uploadRootDir, previewTrashPath);
                 FileUtils.forceMkdir(previewTrashFile.getParentFile());
                 FileUtils.moveFile(previewFile, previewTrashFile);
@@ -387,6 +390,25 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             }
         }
         return dir;
+    }
+
+
+    /**
+     * 从路径中移除resource前缀
+     *
+     * @param path 原始路径
+     * @return 移除resource前缀后的路径
+     */
+    private String removeResourcePrefix(String path) {
+        if (path == null || path.isBlank()) {
+            return path;
+        }
+
+        String resourcePrefix = StorageConstants.dirName.RESOURCE + "/";
+        if (path.startsWith(resourcePrefix)) {
+            return path.substring(resourcePrefix.length());
+        }
+        return path;
     }
 
 }
