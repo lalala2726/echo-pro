@@ -32,14 +32,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StorageServiceImpl implements StorageService {
 
-    private final StorageConfigRetrievalService storageConfigRetrievalService;
-    private final StorageManageService storageManageService;
-
     //文件最大大小
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 50;
     //图片最大大小
     private static final long MAX_IMAGE_SIZE = 1024 * 1024 * 5;
-
+    private final StorageConfigRetrievalService storageConfigRetrievalService;
+    private final StorageManageService storageManageService;
 
     /**
      * 普通文件上传

@@ -37,7 +37,6 @@ public class MinioFileOperationServiceImpl implements FileOperationService {
     }
 
 
-
     @Override
     public boolean restore(String originalRelativePath, String trashRelativePath) {
         return false;

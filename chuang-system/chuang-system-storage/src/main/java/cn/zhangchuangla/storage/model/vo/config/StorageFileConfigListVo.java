@@ -57,13 +57,13 @@ public class StorageFileConfigListVo {
      * 阿里云配置
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private AliyunOSSStorageConfig aliyunOSSConfig;
+    private AliyunOSSStorageConfig aliyunOssConfig;
 
     /**
      * 腾讯云配置
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private TencentCOSStorageConfig tencentCOSConfig;
+    private TencentCOSStorageConfig tencentCosConfig;
 
     /**
      * 备注
