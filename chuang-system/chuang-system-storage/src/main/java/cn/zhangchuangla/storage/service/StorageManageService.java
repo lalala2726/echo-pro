@@ -10,7 +10,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface StorageManageService extends IService<FileRecord> {
 
-    boolean saveFileInfo(FileRecord fileInfo);
+    void saveFileInfo(FileRecord fileInfo);
+
+
 
 
 }

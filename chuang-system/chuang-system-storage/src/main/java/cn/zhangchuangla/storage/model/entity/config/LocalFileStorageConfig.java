@@ -27,5 +27,10 @@ public class LocalFileStorageConfig {
      */
     private String fileDomain;
 
+    /**
+     * 是否真实删除文件
+     */
+    private boolean realDelete = false;
+
 
 }

@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
+import cn.zhangchuangla.storage.service.StorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +31,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysFileManageController extends BaseController {
 
+    private final StorageService storageService;
+
 
     /**
      * 文件资源列表
@@ -42,6 +45,7 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
                                                       @Validated @ParameterObject SysFileQueryRequest request) {
+
         return success();
     }
 
@@ -77,8 +81,8 @@ public class SysFileManageController extends BaseController {
     /**
      * 删除文件,支持批量删除，因为涉及IO操作所以最大支持批量删除100个文件
      *
-     * @param ids           文件ID集合
-     * @param isPermanently 是否永久删除
+     * @param ids         文件ID集合
+     * @param forceDelete 是否永久删除
      * @return 删除结果
      */
     @DeleteMapping("/{ids}")
@@ -86,7 +90,9 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
-                                       @Parameter(description = "是否永久删除") @RequestParam("isPermanently") Boolean isPermanently) {
-        return success();
+                                       @Parameter(description = "是否永久删除")
+                                       @RequestParam(value = "forceDelete", required = false, defaultValue = "false") boolean forceDelete) {
+        boolean result = storageService.delete(ids, forceDelete);
+        return toAjax(result);
     }
 }

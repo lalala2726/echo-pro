@@ -45,7 +45,7 @@ public class FileController extends BaseController {
     public AjaxResult<SimpleFileVO> upload(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageService.upload(file);
         SimpleFileVO simpleFileVO = SimpleFileVO.builder()
-                .fileName(upload.getFileName())
+                .fileName(upload.getFileOriginalName())
                 .fileSize(StorageUtils.formatFileSize(upload.getFileSize()))
                 .fileType(upload.getFileType())
                 .fileUrl(upload.getFileUrl())

@@ -7,6 +7,7 @@ import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
+import cn.zhangchuangla.storage.model.dto.FileTrashInfoDTO;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
 import cn.zhangchuangla.storage.utils.StorageUtils;
@@ -35,18 +36,20 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageAsyncService storageAsyncService;
-    private LocalFileStorageConfig localFileStorageConfig;
+    private final LocalFileStorageConfig localFileStorageConfig;
 
     public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService,
                                          StorageAsyncService storageAsyncService) {
         this.storageConfigRetrievalService = storageConfigRetrievalService;
         this.storageAsyncService = storageAsyncService;
+        this.localFileStorageConfig = getConfig();
     }
 
     /**
      * 每次操作前拉取最新配置
      */
-    private void initConfig() {
+    @Override
+    public LocalFileStorageConfig getConfig() {
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
             throw new FileException("存储配置异常!请刷新配置后再试!");
@@ -55,7 +58,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         if (json == null || json.isBlank()) {
             throw new FileException("本地文件存储配置未找到");
         }
-        this.localFileStorageConfig = JSON.parseObject(json, LocalFileStorageConfig.class);
+        return JSON.parseObject(json, LocalFileStorageConfig.class);
     }
 
 
@@ -64,7 +67,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public UploadedFileInfo upload(MultipartFile file) {
-        initConfig();
         try {
             String datePath = todayDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
@@ -97,6 +99,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
     @Override
     public UploadedFileInfo uploadImage(MultipartFile file) {
+        //todo 压缩图片的逻辑统一放到常量里面
         //最大宽
         int maxWidth = 1024;
         //最大高
@@ -104,7 +107,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         //压缩质量
         float quality = 0.9f;
 
-        initConfig();
+        getConfig();
 
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
 
@@ -161,33 +164,66 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
     /**
      * 删除文件
      *
-     * @param relativePath 文件相对路径
-     * @param realDelete   是否真实删除
-     * @return 操作是否成功
+     * @param originalRelativePath 原始文件相对路径
+     * @param previewRelativePath  预览文件（如果存在）的相对路径
+     * @param forceDelete          true: 强制从文件系统删除；false: 移入回收站
+     * @return 如果是移入回收站，返回包含新路径的DTO；如果是强制删除或文件不存在，返回null
      */
     @Override
-    public boolean delete(String relativePath, boolean realDelete) {
-        initConfig();
-        File file = new File(localFileStorageConfig.getUploadPath(), relativePath);
-        if (!file.exists()) {
-            log.warn("文件不存在，删除失败: {}", relativePath);
-            return false;
+    public FileTrashInfoDTO delete(String originalRelativePath, String previewRelativePath, boolean forceDelete) {
+        File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
+        File originalFile = new File(uploadRootDir, originalRelativePath);
+
+        File previewFile = null;
+        if (previewRelativePath != null && !previewRelativePath.isBlank()) {
+            previewFile = new File(uploadRootDir, previewRelativePath);
         }
 
-        if (realDelete) {
-            // 真实删除
-            return FileUtils.deleteQuietly(file);
-        } else {
-            // 移动到回收站
-            File trashDir = new File(localFileStorageConfig.getUploadPath(), "trash");
-            try {
-                FileUtils.moveFileToDirectory(file, trashDir, true);
-                return true;
-            } catch (IOException e) {
-                log.error("文件移入回收站失败", e);
-                return false;
+        // 强制删除模式
+        if (forceDelete) {
+            boolean originalDeleted = FileUtils.deleteQuietly(originalFile);
+            // 默认为true，如果没有预览文件或删除成功
+            boolean previewDeleted = true;
+            if (previewFile != null) {
+                previewDeleted = FileUtils.deleteQuietly(previewFile);
             }
+            log.info("强制删除文件: {}, 结果: {}, 预览图删除结果: {}", originalRelativePath, originalDeleted, previewDeleted);
+            return null;
         }
+
+        // 移入回收站模式
+        if (!originalFile.exists()) {
+            log.warn("文件不存在，无法移入回收站: {}", originalRelativePath);
+            return null;
+        }
+
+        // 构造回收站路径，通过在原路径前加上"trash"目录来保留目录结构
+        String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, originalRelativePath).toString();
+        File originalTrashFile = new File(uploadRootDir, originalTrashPath);
+        String previewTrashPath = null;
+
+        try {
+            // 创建目标目录并移动文件
+            FileUtils.forceMkdir(originalTrashFile.getParentFile());
+            FileUtils.moveFile(originalFile, originalTrashFile);
+
+            if (previewFile != null && previewFile.exists()) {
+                previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewRelativePath).toString();
+                File previewTrashFile = new File(uploadRootDir, previewTrashPath);
+                FileUtils.forceMkdir(previewTrashFile.getParentFile());
+                FileUtils.moveFile(previewFile, previewTrashFile);
+            }
+        } catch (IOException e) {
+            log.error("文件删除失败", e);
+            throw new FileException("文件删除失败!" + e.getMessage());
+        }
+
+        log.info("文件已移入回收站. 原图新路径: {}, 预览图新路径: {}", originalTrashPath, previewTrashPath);
+
+        return FileTrashInfoDTO.builder()
+                .originalTrashPath(originalTrashPath)
+                .previewTrashPath(previewTrashPath)
+                .build();
     }
 
     /**
@@ -199,7 +235,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean restore(String originalRelativePath, String trashRelativePath) {
-        initConfig();
         File trashFile = new File(localFileStorageConfig.getUploadPath(), trashRelativePath);
         if (!trashFile.exists()) {
             log.warn("回收站文件不存在，恢复失败: {}", trashRelativePath);
@@ -224,7 +259,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean deleteTrash(String relativePath) {
-        initConfig();
         File file = new File(localFileStorageConfig.getUploadPath(), relativePath);
         if (!file.exists()) {
             log.warn("回收站文件不存在，删除失败: {}", relativePath);

@@ -11,7 +11,7 @@ import lombok.Data;
 public class UploadedFileInfo {
 
     /**
-     * 文件名
+     * 文件新名字
      */
     private String fileName;
 

@@ -57,10 +57,11 @@ public class StorageSystemProperties implements Serializable {
          */
         private String fileDomain;
 
+
         /**
-         * 是否启用回收站功能。
+         * 是否真实删除文件
          */
-        private boolean enableTrash = true;
+        private boolean realDelete = false;
 
         public String toJson() {
             return JSON.toJSONString(this);

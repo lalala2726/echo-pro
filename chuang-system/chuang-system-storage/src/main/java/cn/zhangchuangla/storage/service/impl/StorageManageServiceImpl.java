@@ -21,9 +21,10 @@ public class StorageManageServiceImpl extends ServiceImpl<SysFileMapper, FileRec
 
 
     @Override
-    public boolean saveFileInfo(FileRecord fileInfo) {
-        return save(fileInfo);
+    public void saveFileInfo(FileRecord fileInfo) {
+        save(fileInfo);
     }
+
 }
 
 

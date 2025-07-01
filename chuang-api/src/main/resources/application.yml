@@ -46,7 +46,7 @@ storage:
   local:
     uploadPath: ${app.config.upload-path}
     file-domain: http://localhost:8080/
-    enable-trash: ${app.config.enable-trash}
+    real-delete: false
 
   # MinIO 配置
   minio:
