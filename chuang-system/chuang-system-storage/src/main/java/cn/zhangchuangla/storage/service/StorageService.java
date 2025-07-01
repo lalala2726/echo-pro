@@ -1,6 +1,9 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.storage.model.entity.FileRecord;
+import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,6 +14,22 @@ import java.util.List;
  * created on 2025/7/1 02:49
  */
 public interface StorageService {
+
+    /**
+     * 获取文件列表
+     *
+     * @param request 查询参数
+     * @return 文件列表
+     */
+    Page<FileRecord> listFileManage(FileRecordQueryRequest request);
+
+    /**
+     * 获取回收站文件列表
+     *
+     * @param request 文件列表查询参数
+     * @return 文件列表
+     */
+    Page<FileRecord> listFileTrashManage(FileRecordQueryRequest request);
 
     /**
      * 上传文件
@@ -54,11 +73,11 @@ public interface StorageService {
     boolean restoreFileFromRecycleBin(Long fileId);
 
     /**
-     * 根据文件编号从回收站还原文件
+     * 根据文件编号列表从回收站批量还原文件
      *
-     * @param fileId 文件id
+     * @param fileIds 文件id列表
      * @return 是否成功
      */
-    boolean restoreFileFromRecycleBin(List<Long> fileId);
+    boolean restoreFileFromRecycleBin(List<Long> fileIds);
 
 }

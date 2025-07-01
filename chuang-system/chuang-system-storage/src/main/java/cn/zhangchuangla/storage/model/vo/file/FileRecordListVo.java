@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SysFileListVo {
+public class FileRecordListVo {
 
     /**
      * 主键ID

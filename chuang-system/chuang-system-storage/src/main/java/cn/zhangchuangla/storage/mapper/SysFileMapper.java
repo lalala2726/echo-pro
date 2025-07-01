@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.mapper;
 
 import cn.zhangchuangla.storage.model.entity.FileRecord;
-import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
+import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -18,16 +18,18 @@ public interface SysFileMapper extends BaseMapper<FileRecord> {
      * @param request 请求参数
      * @return 结果
      */
-    Page<FileRecord> listFileManage(Page<FileRecord> page, @Param("request") SysFileQueryRequest request);
+    Page<FileRecord> listFileManage(Page<FileRecord> page, @Param("request") FileRecordQueryRequest request);
+
 
     /**
-     * 文件回收列表
+     * 回收站文件列表
      *
-     * @param sysFileManagementPage 分页对象
-     * @param request               请求参数
+     * @param page    分页对象
+     * @param request 请求参数
      * @return 结果
      */
-    Page<FileRecord> listFileTrash(Page<FileRecord> sysFileManagementPage, @Param("request") SysFileQueryRequest request);
+    Page<FileRecord> listFileTrashManage(Page<FileRecord> page, @Param("request") FileRecordQueryRequest request);
+
 }
 
 

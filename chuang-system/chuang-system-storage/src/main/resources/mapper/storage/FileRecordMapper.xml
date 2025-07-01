@@ -27,35 +27,42 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
     <select id="listFileManage" resultMap="BaseResultMap">
-        select *
-        from storage_file_management
-        where is_trash = 0
-        and is_deleted = 0
-        <if test="request.originalName != null and request.originalName != ''">
-            and original_name like concat('%', #{request.originalName}, '%')
-        </if>
-        <if test="request.storageType != null and request.storageType != ''">
-            and storage_type = #{request.storageType}
-        </if>
-        <if test="request.contentType != null and request.contentType != ''">
-            and content_type = #{request.contentType}
-        </if>
+        select id, original_name, content_type, file_size, original_file_url, original_relative_path, preview_image_url,
+        preview_image_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name, upload_time,
+        is_trash, original_trash_path, preview_trash_path, is_deleted, update_time, file_name
+        from storage_file
+        <where>
+            <if test="request.originalName != null and request.originalName != ''">
+                and original_name like concat('%', #{request.originalName}, '%')
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+            <if test="request.contentType != null and request.contentType != ''">
+                and content_type = #{request.contentType}
+            </if>
+            is_deleted = 0
+        </where>
         order by upload_time desc
     </select>
-    <select id="listFileTrash" resultMap="BaseResultMap">
-        select *
-        from storage_file_management
-        where is_trash = 1
-        and is_deleted = 0
-        <if test="request.originalName != null and request.originalName != ''">
-            and original_name like concat('%', #{request.originalName}, '%')
-        </if>
-        <if test="request.storageType != null and request.storageType != ''">
-            and storage_type = #{request.storageType}
-        </if>
-        <if test="request.contentType != null and request.contentType != ''">
-            and content_type = #{request.contentType}
-        </if>
+
+    <select id="listFileTrashManage" resultMap="BaseResultMap">
+        select id, original_name, content_type, file_size, original_file_url, original_relative_path, preview_image_url,
+        preview_image_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name, upload_time,
+        is_trash, original_trash_path, preview_trash_path, is_deleted, update_time, file_name
+        from storage_file
+        <where>
+            <if test="request.originalName != null and request.originalName != ''">
+                and original_name like concat('%', #{request.originalName}, '%')
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+            <if test="request.contentType != null and request.contentType != ''">
+                and content_type = #{request.contentType}
+            </if>
+            is_deleted = 0 and is_trash = 1
+        </where>
         order by upload_time desc
     </select>
 </mapper>

@@ -11,6 +11,41 @@ package cn.zhangchuangla.common.core.constant;
 public class Constants {
 
     /**
+     * 验证码相关
+     */
+    public static final String BASE64_CODE = "data:image/png;base64,";
+    /**
+     * JSON 序列化白名单
+     */
+    public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
+    /**
+     * 账号状态常量
+     */
+    public static final Integer ACCOUNT_LOCK_KEY = 1;
+    public static final Integer ACCOUNT_UNLOCK_KEY = 0;
+    /**
+     * 登录状态常量
+     */
+    public static final Integer LOGIN_SUCCESS = 0;
+    public static final Integer LOGIN_FAIL = 1;
+    /**
+     * 系统相关常量
+     */
+    public static final String SYSTEM_CREATE = "系统自动创建";
+    public static final String RESOURCE_PREFIX = "/profile";
+    /**
+     * 权限相关常量
+     */
+    public static final String ALL_PERMISSION = "*:*:*";
+    /**
+     * HTTP 相关常量
+     */
+    public static final String HTTP = "http://";
+    public static final String HTTPS = "https://";
+    public static final String WWW = "www.";
+    public static final String ORIGINAL = "original";
+    public static final String PREVIEW = "preview";
+    /**
      * 逻辑删除
      */
     public interface LogicDelete {
@@ -19,48 +54,6 @@ public class Constants {
         //未删除
         Integer NOT_DELETED = 0;
     }
-
-    /**
-     * 验证码相关
-     */
-    public static final String BASE64_CODE = "data:image/png;base64,";
-    /**
-     * JSON 序列化白名单
-     */
-    public static final String[] JSON_WHITELIST_STR = {"org.springframework", "cn.zhangchuangla"};
-
-    /**
-     * 账号状态常量
-     */
-    public static final Integer ACCOUNT_LOCK_KEY = 1;
-    public static final Integer ACCOUNT_UNLOCK_KEY = 0;
-
-    /**
-     * 登录状态常量
-     */
-    public static final Integer LOGIN_SUCCESS = 0;
-    public static final Integer LOGIN_FAIL = 1;
-
-    /**
-     * 系统相关常量
-     */
-    public static final String SYSTEM_CREATE = "系统自动创建";
-    public static final String RESOURCE_PREFIX = "/profile";
-
-    /**
-     * 权限相关常量
-     */
-    public static final String ALL_PERMISSION = "*:*:*";
-
-    /**
-     * HTTP 相关常量
-     */
-    public static final String HTTP = "http://";
-    public static final String HTTPS = "https://";
-    public static final String WWW = "www.";
-
-    public static final String ORIGINAL = "original";
-    public static final String PREVIEW = "preview";
 
     /**
      * 字典相关常量

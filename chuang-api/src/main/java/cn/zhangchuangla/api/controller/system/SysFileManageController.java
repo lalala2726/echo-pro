@@ -5,8 +5,11 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.model.request.file.SysFileQueryRequest;
+import cn.zhangchuangla.storage.model.entity.FileRecord;
+import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.vo.file.FileRecordListVo;
 import cn.zhangchuangla.storage.service.StorageService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,9 +47,10 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                                      @Validated @ParameterObject SysFileQueryRequest request) {
-
-        return success();
+                                                      @Validated @ParameterObject FileRecordQueryRequest request) {
+        Page<FileRecord> page = storageService.listFileManage(request);
+        List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
+        return getTableData(page, fileRecordListVos);
     }
 
     /**
@@ -59,8 +63,10 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:file-manage:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                                     @Validated @ParameterObject SysFileQueryRequest request) {
-        return success();
+                                                     @Validated @ParameterObject FileRecordQueryRequest request) {
+        Page<FileRecord> page = storageService.listFileTrashManage(request);
+        List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
+        return getTableData(page, fileRecordListVos);
     }
 
     /**
@@ -69,7 +75,6 @@ public class SysFileManageController extends BaseController {
      * @param ids 文件ID
      * @return 恢复结果
      */
-    // todo 对文件进行操作的时候当前配置必须和文件上传配置一致才可以进行修改，如果不一致则不允许修改
     @PreAuthorize("@ss.hasPermission('system:file-manage:recover')")
     @Operation(summary = "恢复文件")
     @PutMapping("/recover/{ids}")

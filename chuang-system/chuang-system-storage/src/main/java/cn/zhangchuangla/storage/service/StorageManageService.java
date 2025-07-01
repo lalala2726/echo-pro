@@ -1,6 +1,8 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.entity.FileRecord;
+import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,7 +12,27 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface StorageManageService extends IService<FileRecord> {
 
+
+    /**
+     * 保存文件信息
+     *
+     * @param fileInfo 文件信息
+     */
     void saveFileInfo(FileRecord fileInfo);
 
+    /**
+     * 获取文件列表
+     *
+     * @param request 查询条件
+     * @return 文件信息
+     */
+    Page<FileRecord> listFileManage(FileRecordQueryRequest request);
 
+    /**
+     * 获取文件列表
+     *
+     * @param request 查询条件
+     * @return 文件信息
+     */
+    Page<FileRecord> listFileTrashManage(FileRecordQueryRequest request);
 }

@@ -14,8 +14,10 @@ import cn.zhangchuangla.storage.model.dto.FileTrashInfoDTO;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.FileRecord;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
 import cn.zhangchuangla.storage.service.StorageManageService;
 import cn.zhangchuangla.storage.service.StorageService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,28 @@ public class StorageServiceImpl implements StorageService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageManageService storageManageService;
+
+    /**
+     * 列出文件列表
+     *
+     * @param request 查询参数
+     * @return 文件列表
+     */
+    @Override
+    public Page<FileRecord> listFileManage(FileRecordQueryRequest request) {
+        return storageManageService.listFileManage(request);
+    }
+
+    /**
+     * 列出回收站文件列表
+     *
+     * @param request 删除参数
+     * @return 回收站文件列表
+     */
+    @Override
+    public Page<FileRecord> listFileTrashManage(FileRecordQueryRequest request) {
+        return storageManageService.listFileTrashManage(request);
+    }
 
     /**
      * 普通文件上传
@@ -219,7 +243,9 @@ public class StorageServiceImpl implements StorageService {
     @Transactional(rollbackFor = FileException.class)
     public boolean deleteFileById(List<Long> ids, boolean forceDelete) {
         for (Long id : ids) {
-            return deleteFileById(id, forceDelete);
+            if (!deleteFileById(id, forceDelete)) {
+                throw new ServiceException(String.format("文件ID: %d 删除失败", id));
+            }
         }
         return true;
     }
@@ -272,13 +298,25 @@ public class StorageServiceImpl implements StorageService {
         return false;
     }
 
+    /**
+     * 批量从回收站还原文件
+     *
+     * @param fileIds 文件ID列表
+     * @return 是否全部还原成功
+     */
     @Override
     public boolean restoreFileFromRecycleBin(List<Long> fileIds) {
+        if (fileIds == null || fileIds.isEmpty()) {
+            throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID列表不能为空");
+        }
         for (Long fileId : fileIds) {
-            return restoreFileFromRecycleBin(fileId);
+            if (!restoreFileFromRecycleBin(fileId)) {
+                throw new ServiceException(String.format("文件ID: %d 恢复失败", fileId));
+            }
         }
         return true;
     }
+
 
     /**
      * 根据存储类型获取对应的存储服务
