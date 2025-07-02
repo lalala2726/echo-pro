@@ -67,18 +67,18 @@ public interface StorageService {
     /**
      * 根据文件编号从回收站还原文件
      *
+     * @param fileIds 文件id集合
+     * @return 是否成功
+     */
+    boolean restoreFileFromRecycleBin(List<Long> fileIds);
+
+    /**
+     * 根据文件编号从回收站删除文件
+     *
      * @param fileId 文件id
      * @return 是否成功
      */
     boolean restoreFileFromRecycleBin(Long fileId);
-
-    /**
-     * 根据文件编号列表从回收站批量还原文件
-     *
-     * @param fileIds 文件id列表
-     * @return 是否成功
-     */
-    boolean restoreFileFromRecycleBin(List<Long> fileIds);
 
 
     /**

@@ -21,12 +21,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -255,68 +256,62 @@ public class StorageServiceImpl implements StorageService {
     /**
      * 从回收站还原文件
      *
-     * @param fileId 文件id
+     * @param fileIds 文件ID集合
      * @return 是否还原成功
      */
     @Override
-    public boolean restoreFileFromRecycleBin(Long fileId) {
-        if (fileId == null || fileId <= 0) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
+    public boolean restoreFileFromRecycleBin(List<Long> fileIds) {
+        if (CollectionUtils.isEmpty(fileIds)) {
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "文件ID不能为空");
         }
-        FileRecord fileRecord = storageManageService.getById(fileId);
-        if (fileRecord == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件不存在");
+        LambdaQueryWrapper<FileRecord> in = new LambdaQueryWrapper<FileRecord>().in(FileRecord::getId, fileIds);
+        List<FileRecord> fileRecords = storageManageService.list(in);
+        if (CollectionUtils.isEmpty(fileRecords)) {
+            throw new ServiceException(ResponseCode.DATA_NOT_FOUND, "文件不存在");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
 
-        // 校验文件存储类型一致性
-        validateFileStorageConsistency(activeStorageType, fileRecord);
+        // 校验文件存储类型一致性和判断是否在回收站中
+        fileRecords.forEach(fileRecord -> {
+            validateFileStorageConsistency(activeStorageType, fileRecord);
+            if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
+                throw new ServiceException(ResponseCode.FILE_OPERATION_FAILED, "文件未处于回收站中或已被删除，无法恢复");
+            }
+        });
 
         FileOperationService service = getService(activeStorageType);
-        Integer isDeleted = fileRecord.getIsDeleted();
-        Integer isTrash = fileRecord.getIsTrash();
-
-        //只有处于回收站且未被彻底删除的文件才能恢复
-        if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(isTrash)
-                || Constants.LogicDelete.DELETED.equals(isDeleted)) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件未处于回收站中或已被删除，无法恢复");
-        }
         //进行文件操作
-        FileOperationDto fileOperationDto = new FileOperationDto();
-        BeanUtils.copyProperties(fileRecord, fileOperationDto);
-        boolean restore = service.restore(fileOperationDto);
-        //恢复成功后将数据库中文件状态改为正常
-        if (restore) {
-            fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
-            fileRecord.setIsDeleted(Constants.LogicDelete.NOT_DELETED);
-            // 清空回收站路径信息，恢复原始路径信息
-            fileRecord.setOriginalTrashPath(null);
-            fileRecord.setPreviewTrashPath(null);
-            fileRecord.setUpdateTime(new Date());
-            storageManageService.updateById(fileRecord);
-            return true;
-        }
-        return false;
+        fileRecords.forEach(fileRecord -> {
+            FileOperationDto fileOperationDto = new FileOperationDto();
+            BeanUtils.copyProperties(fileRecord, fileOperationDto);
+            boolean restore = service.restore(fileOperationDto);
+            //恢复成功后将数据库中文件状态改为正常
+            if (restore) {
+                fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
+                fileRecord.setIsDeleted(Constants.LogicDelete.NOT_DELETED);
+                // 清空回收站路径信息，恢复原始路径信息
+                fileRecord.setOriginalTrashPath(null);
+                fileRecord.setPreviewTrashPath(null);
+                fileRecord.setUpdateTime(new Date());
+                storageManageService.updateById(fileRecord);
+            }
+        });
+
+        return true;
     }
 
     /**
-     * 批量从回收站还原文件
+     * 根据文件ID恢复文件
      *
-     * @param fileIds 文件ID列表
-     * @return 是否全部还原成功
+     * @param fileId 文件ID
+     * @return 是否成功
      */
     @Override
-    public boolean restoreFileFromRecycleBin(List<Long> fileIds) {
-        if (fileIds == null || fileIds.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID列表不能为空");
-        }
-        for (Long fileId : fileIds) {
-            if (!restoreFileFromRecycleBin(fileId)) {
-                throw new ServiceException(String.format("文件ID: %d 恢复失败", fileId));
-            }
-        }
-        return true;
+    public boolean restoreFileFromRecycleBin(Long fileId) {
+        List<Long> list = Collections.singletonList(fileId);
+        return restoreFileFromRecycleBin(list);
     }
+
 
     /**
      * 批量删除回收站中的文件
