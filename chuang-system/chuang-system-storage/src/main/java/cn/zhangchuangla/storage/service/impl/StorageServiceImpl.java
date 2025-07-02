@@ -149,109 +149,132 @@ public class StorageServiceImpl implements StorageService {
     /**
      * 删除文件
      *
-     * @param fileId      文件ID
+     * @param fileIds     文件ID集合
      * @param forceDelete 是否强制删除（不经过回收站）
      * @return 是否删除成功
      */
     @Override
     @Transactional(rollbackFor = {FileException.class})
-    public boolean deleteFileById(Long fileId, boolean forceDelete) {
-        if (fileId == null || fileId <= 0) {
+    public boolean deleteFileById(List<Long> fileIds, boolean forceDelete) {
+        // 1. 参数校验
+        if (CollectionUtils.isEmpty(fileIds)) {
             throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
         }
 
-        // 1. 获取文件信息
-        FileRecord fileRecord = storageManageService.getById(fileId);
+        // 2. 获取文件记录并校验
+        List<FileRecord> fileRecords = getAndValidateFileRecords(fileIds);
 
-        if (fileRecord == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件不存在");
-        }
-        if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件已经在回收站中!无法再次删除!");
-        }
-
-        // 2. 获取当前激活的存储类型
+        // 3. 获取存储服务和配置
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        // 校验文件存储类型一致性
-        validateFileStorageConsistency(activeStorageType, fileRecord);
-
-        // 3. 获取对应的文件操作服务
         FileOperationService service = getService(activeStorageType);
-
-        // 4. 获取存储配置，判断是否真实删除
         LocalFileStorageConfig config = service.getConfig();
         boolean realDelete = config.isRealDelete();
 
-        // 创建文件操作DTO
-        FileOperationDto fileOperationDto = FileOperationDto.builder()
-                .previewRelativePath(fileRecord.getPreviewImagePath())
-                .originalRelativePath(fileRecord.getOriginalRelativePath())
-                .build();
-        // 5. 执行删除操作
-        if (realDelete) {
-            // 配置为真实删除模式，无论是否强制删除，都会物理删除文件
-            log.info("执行物理删除文件，文件ID: {}", fileId);
-            service.delete(fileOperationDto, true);
+        // 4. 批量处理文件删除操作
+        processFileDeletion(fileRecords, service, realDelete, forceDelete);
 
-            // 标记数据库记录为已删除
-            fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
-            // 清空回收站相关字段
-            fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
-            fileRecord.setOriginalTrashPath(null);
-            fileRecord.setPreviewTrashPath(null);
-        } else {
-            // 配置为逻辑删除模式
-            if (forceDelete) {
-                // 虽然指定强制删除，但配置为逻辑删除，所以只在数据库标记为已删除
-                log.info("配置为逻辑删除模式，执行数据库标记删除，文件ID: {}", fileId);
-                fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
-            } else {
-                // 移入回收站模式
-                log.info("执行移入回收站操作，文件ID: {}", fileId);
-
-                FileOperationDto trashInfo = service.delete(fileOperationDto, false
-                );
-
-                if (trashInfo != null) {
-                    // 更新记录为已放入回收站
-                    fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.IN_TRASH);
-                    fileRecord.setOriginalTrashPath(trashInfo.getOriginalTrashPath());
-                    fileRecord.setPreviewTrashPath(trashInfo.getPreviewTrashPath());
-                    // 清空原路径信息
-                    fileRecord.setOriginalRelativePath(null);
-                    fileRecord.setPreviewImagePath(null);
-                    fileRecord.setOriginalFileUrl(null);
-                    fileRecord.setPreviewImageUrl(null);
-                } else {
-                    // 如果文件在磁盘上不存在，但记录存在，直接标记为逻辑删除
-                    log.warn("文件在物理存储中不存在，但数据库记录存在。文件ID: {}. 将执行逻辑删除。", fileId);
-                    fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
-                }
-            }
-        }
-
-        // 6. 更新数据库记录
-        return storageManageService.updateById(fileRecord);
+        // 5. 批量更新数据库
+        return storageManageService.updateBatchById(fileRecords);
     }
 
     /**
-     * 批量删除文件
+     * 删除文件
      *
-     * @param ids         文件ID列表
-     * @param forceDelete 是否强制删除（不经过回收站）
-     * @return 是否删除成功
+     * @param fileId      文件UD
+     * @param forceDelete 是否强制删除(不经过回收站)
+     * @return 操作结果
      */
     @Override
-    @Transactional(rollbackFor = FileException.class)
-    public boolean deleteFileById(List<Long> ids, boolean forceDelete) {
-        //fixme 这边涉及批量的操作的时候,需要统一从数据库中获取数据,然后进行批量操作
-        for (Long id : ids) {
-            if (!deleteFileById(id, forceDelete)) {
-                throw new ServiceException(String.format("文件ID: %d 删除失败", id));
-            }
-        }
-        return true;
+    @Transactional(rollbackFor = {FileException.class})
+    public boolean deleteFileById(Long fileId, boolean forceDelete) {
+        List<Long> list = Collections.singletonList(fileId);
+        return deleteFileById(list, forceDelete);
     }
+
+
+    /**
+     * 获取并校验文件记录
+     */
+    private List<FileRecord> getAndValidateFileRecords(List<Long> fileIds) {
+        LambdaQueryWrapper<FileRecord> queryWrapper = new LambdaQueryWrapper<FileRecord>()
+                .in(FileRecord::getId, fileIds);
+        List<FileRecord> fileRecords = storageManageService.list(queryWrapper);
+
+        if (CollectionUtils.isEmpty(fileRecords)) {
+            throw new ServiceException(ResponseCode.DATA_NOT_FOUND, "文件不存在");
+        }
+
+        String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
+
+        // 批量校验文件状态
+        fileRecords.forEach(fileRecord -> {
+            validateFileStorageConsistency(activeStorageType, fileRecord);
+            if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR,
+                        String.format("文件编号: %s 已经在回收站中!无法再次删除!", fileRecord.getId()));
+            }
+        });
+
+        return fileRecords;
+    }
+
+    /**
+     * 批量处理文件删除操作
+     */
+    private void processFileDeletion(List<FileRecord> fileRecords, FileOperationService service,
+                                     boolean realDelete, boolean forceDelete) {
+        fileRecords.forEach(fileRecord -> {
+            // 构建文件操作DTO
+            FileOperationDto fileOperationDto = FileOperationDto.builder()
+                    .previewRelativePath(fileRecord.getPreviewImagePath())
+                    .originalRelativePath(fileRecord.getOriginalRelativePath())
+                    .build();
+            if (realDelete) {
+                log.info("执行物理删除文件，文件ID: {}", fileRecord.getId());
+                service.delete(fileOperationDto, true);
+
+                // 更新文件记录状态
+                fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
+                fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
+                fileRecord.setOriginalTrashPath(null);
+                fileRecord.setPreviewTrashPath(null);
+            } else {
+                if (forceDelete) {
+                    log.info("配置为逻辑删除模式，执行数据库标记删除，文件ID: {}", fileRecord.getId());
+                    fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
+                } else {
+                    handleMoveToTrash(fileRecord, service, fileOperationDto);
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 处理移入回收站
+     */
+    private void handleMoveToTrash(FileRecord fileRecord, FileOperationService service, FileOperationDto fileOperationDto) {
+        log.info("执行移入回收站操作，文件ID: {}", fileRecord.getId());
+
+        FileOperationDto trashInfo = service.delete(fileOperationDto, false);
+
+        if (trashInfo != null) {
+            // 更新记录为已放入回收站
+            fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.IN_TRASH);
+            fileRecord.setOriginalTrashPath(trashInfo.getOriginalTrashPath());
+            fileRecord.setPreviewTrashPath(trashInfo.getPreviewTrashPath());
+            // 清空原路径信息
+            fileRecord.setOriginalRelativePath(null);
+            fileRecord.setPreviewImagePath(null);
+            fileRecord.setOriginalFileUrl(null);
+            fileRecord.setPreviewImageUrl(null);
+        } else {
+            // 如果文件在磁盘上不存在，但记录存在，直接标记为逻辑删除
+            log.warn("文件在物理存储中不存在，但数据库记录存在。文件ID: {}. 将执行逻辑删除。", fileRecord.getId());
+            fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
+        }
+    }
+
 
     /**
      * 从回收站还原文件

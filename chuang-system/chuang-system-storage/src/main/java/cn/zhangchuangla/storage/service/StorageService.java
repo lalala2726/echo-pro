@@ -48,20 +48,22 @@ public interface StorageService {
     UploadedFileInfo uploadImage(MultipartFile file);
 
     /**
-     * 删除文件
-     *
-     * @param id 文件id
-     * @return 是否成功
-     */
-    boolean deleteFileById(Long id, boolean forceDelete);
-
-    /**
      * 批量删除文件
      *
-     * @param ids 文件id
+     * @param fileIds     文件id集合
+     * @param forceDelete 是否强制删除 （不经过回收站）
      * @return 是否成功
      */
-    boolean deleteFileById(List<Long> ids, boolean forceDelete);
+    boolean deleteFileById(List<Long> fileIds, boolean forceDelete);
+
+    /**
+     * 删除文件
+     *
+     * @param fileId      文件UD
+     * @param forceDelete 是否强制删除(不经过回收站)
+     * @return 是否成功
+     */
+    boolean deleteFileById(Long fileId, boolean forceDelete);
 
 
     /**
