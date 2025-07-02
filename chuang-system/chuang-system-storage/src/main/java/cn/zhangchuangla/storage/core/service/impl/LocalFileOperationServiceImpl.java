@@ -296,9 +296,47 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
     }
 
+    /**
+     * 删除回收站文件
+     *
+     * @param fileOperationDto 文件传输对象
+     * @return 操作结果
+     */
     @Override
     public boolean deleteTrashFile(FileOperationDto fileOperationDto) {
-        return false;
+        getConfig();
+        if (fileOperationDto == null) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+        }
+        if (fileOperationDto.getOriginalTrashPath().isBlank()) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
+        }
+        //如果不是真实删除，则直接返回成功
+        boolean realDelete = localFileStorageConfig.isRealDelete();
+        if (!realDelete) {
+            log.info("文件不是真实删除，系统将不会执行实际的删除操作!");
+            return true;
+        }
+        //1.删除文件
+        String originalTrash = Paths.get(localFileStorageConfig.getUploadPath(), fileOperationDto.getOriginalTrashPath())
+                .toString();
+        File uploadRootDir = new File(originalTrash);
+        try {
+            FileUtils.delete(uploadRootDir);
+            log.info("文件删除成功：{}", originalTrash);
+            //2.如果预览图存在，则删除预览图
+            if (fileOperationDto.getPreviewTrashPath() != null && !fileOperationDto.getPreviewTrashPath().isBlank()) {
+                String previewTrash = Paths.get(localFileStorageConfig.getUploadPath(), fileOperationDto.getPreviewTrashPath()).toString();
+                File previewTrashFile = new File(previewTrash);
+                if (previewTrashFile.exists()) {
+                    FileUtils.delete(previewTrashFile);
+                }
+                log.info("预览图删除成功：{}", previewTrash);
+            }
+            return true;
+        } catch (IOException e) {
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
+        }
     }
 
 

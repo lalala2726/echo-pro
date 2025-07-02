@@ -80,4 +80,14 @@ public interface StorageService {
      */
     boolean restoreFileFromRecycleBin(List<Long> fileIds);
 
+
+    /**
+     * 根据文件编号从回收站删除文件文件
+     * 如果全局参数设置realDelete为true，则永久删除文件,否则只是将文件记录标记为逻辑删除不会调用删除文件方法
+     *
+     * @param fileIds 文件id集合
+     * @return 是否成功
+     */
+    boolean deleteTrashFileById(List<Long> fileIds);
+
 }

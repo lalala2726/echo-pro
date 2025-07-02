@@ -70,6 +70,23 @@ public class SysFileManageController extends BaseController {
     }
 
     /**
+     * 从回收站删除文件
+     *
+     * @param ids 文件ID集合
+     * @return 操作结果
+     */
+    @DeleteMapping("/trash/{ids}")
+    @Operation(summary = "删除回收站文件")
+    @OperationLog(title = "文件管理", businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermission('system:file-manage:delete')")
+    public AjaxResult<Void> deleteTrashFile(@Parameter(description = "文件ID集合，支持批量删除")
+                                            @PathVariable("ids") List<Long> ids) {
+        boolean result = storageService.deleteTrashFileById(ids);
+        return toAjax(result);
+    }
+
+
+    /**
      * 恢复文件
      *
      * @param ids 文件ID
