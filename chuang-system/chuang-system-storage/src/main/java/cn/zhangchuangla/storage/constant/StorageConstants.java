@@ -14,7 +14,8 @@ public class StorageConstants {
     /**
      * 文件上传路径格式
      */
-    public static final String FILE_UPLOAD_PATH_FORMAT = "yyyy/MM/dd";
+    public static final String FILE_UPLOAD_PATH_FORMAT = "yyyy/MM";
+
     /**
      * 图片后缀
      */
