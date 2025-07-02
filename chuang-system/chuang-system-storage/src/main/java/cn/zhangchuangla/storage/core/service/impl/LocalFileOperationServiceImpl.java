@@ -300,10 +300,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * 删除回收站文件
      *
      * @param fileOperationDto 文件传输对象
-     * @return 操作结果
      */
     @Override
-    public boolean deleteTrashFile(FileOperationDto fileOperationDto) {
+    public void deleteTrashFile(FileOperationDto fileOperationDto) {
         getConfig();
         if (fileOperationDto == null) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
@@ -315,7 +314,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         boolean realDelete = localFileStorageConfig.isRealDelete();
         if (!realDelete) {
             log.info("文件不是真实删除，系统将不会执行实际的删除操作!");
-            return true;
+            return;
         }
         //1.删除文件
         String originalTrash = Paths.get(localFileStorageConfig.getUploadPath(), fileOperationDto.getOriginalTrashPath())
@@ -333,7 +332,6 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
                 }
                 log.info("预览图删除成功：{}", previewTrash);
             }
-            return true;
         } catch (IOException e) {
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
         }

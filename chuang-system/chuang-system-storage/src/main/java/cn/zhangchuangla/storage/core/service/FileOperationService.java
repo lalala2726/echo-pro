@@ -55,8 +55,7 @@ public interface FileOperationService {
      * 删除回收站文件
      *
      * @param fileOperationDto 文件传输对象
-     * @return 删除结果
      */
-    boolean deleteTrashFile(FileOperationDto fileOperationDto);
+    void deleteTrashFile(FileOperationDto fileOperationDto);
 
 }
