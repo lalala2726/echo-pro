@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictItem;
 import cn.zhangchuangla.system.model.entity.SysDictType;
@@ -169,7 +169,7 @@ public class SysDictController extends BaseController {
     public AjaxResult<TableDataResult> listDictItem(@PathVariable("dictType") String dictType,
                                                     @Parameter(description = "字典项列表查询参数")
                                                     @Validated @ParameterObject SysDictItemQueryRequest request) {
-        if (StringUtils.isBlank(dictType)) {
+        if (StrUtils.isBlank(dictType)) {
             return error("字典类型编码不能为空!");
         }
         Page<SysDictItem> page = new Page<>(request.getPageNum(), request.getPageSize());
@@ -187,7 +187,7 @@ public class SysDictController extends BaseController {
     @GetMapping("/item/option/{dictType}")
     @Operation(summary = "字典项选项")
     public AjaxResult<List<Option<String>>> getDictItemOption(@PathVariable("dictType") String dictType) {
-        if (StringUtils.isBlank(dictType)) {
+        if (StrUtils.isBlank(dictType)) {
             return error("字典类型编码不能为空!");
         }
         List<Option<String>> options = sysDictItemService.getDictItemOption(dictType);

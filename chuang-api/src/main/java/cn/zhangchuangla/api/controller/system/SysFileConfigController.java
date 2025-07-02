@@ -1,21 +1,19 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.loader.StorageConfigLoader;
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
@@ -26,12 +24,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +43,6 @@ import java.util.stream.Collectors;
 public class SysFileConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
-    private final StorageConfigLoader sysFileConfigLoader;
 
     /**
      * 文件配置列表
@@ -62,14 +59,14 @@ public class SysFileConfigController extends BaseController {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
             StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
-            BeanUtil.copyProperties(item, storageFileConfigListVo);
+            BeanUtils.copyProperties(item, storageFileConfigListVo);
             switch (item.getStorageType()) {
-                case StorageConstants.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOSSConfig(
-                        JSON.parseObject(item.getStorageValue(), AliyunOSSConfigEntity.class));
-                case StorageConstants.MINIO -> storageFileConfigListVo.setMinioConfig(
-                        JSON.parseObject(item.getStorageValue(), MinioConfigEntity.class));
-                case StorageConstants.TENCENT_COS -> storageFileConfigListVo.setTencentCOSConfig(
-                        JSON.parseObject(item.getStorageValue(), TencentCOSConfigEntity.class));
+                case StorageConstants.StorageType.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOssConfig(
+                        JSON.parseObject(item.getStorageValue(), AliyunOSSStorageConfig.class));
+                case StorageConstants.StorageType.MINIO -> storageFileConfigListVo.setMinioConfig(
+                        JSON.parseObject(item.getStorageValue(), MinioStorageConfig.class));
+                case StorageConstants.StorageType.TENCENT_COS -> storageFileConfigListVo.setTencentCosConfig(
+                        JSON.parseObject(item.getStorageValue(), TencentCOSStorageConfig.class));
             }
             return storageFileConfigListVo;
         }).collect(Collectors.toList());
@@ -90,9 +87,9 @@ public class SysFileConfigController extends BaseController {
                                             @Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
-        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
 
@@ -114,9 +111,9 @@ public class SysFileConfigController extends BaseController {
                                                 @Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
-        request.setEndpoint(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);
@@ -136,9 +133,9 @@ public class SysFileConfigController extends BaseController {
                                                  @Validated @RequestBody TencentCOSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getRegion();
-        request.setRegion(StringUtils.removeTrailingSlash(endpoint));
-        if (!StringUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StringUtils.removeTrailingSlash(request.getFileDomain()));
+        request.setRegion(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
         boolean result = storageConfigService.saveFileConfig(request);
         return toAjax(result);
@@ -175,8 +172,8 @@ public class SysFileConfigController extends BaseController {
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
     public AjaxResult<Void> refreshCache() {
-        String currentConfigName = sysFileConfigLoader.refreshCache();
-        return AjaxResult.success(currentConfigName);
+        //todo 刷新缓存
+        return success();
     }
 
     /**
@@ -193,9 +190,6 @@ public class SysFileConfigController extends BaseController {
                                              @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {
             checkParam(id == null || id <= 0, "文件配置ID不能为空!");
-            checkParam(Objects.equals(id, StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID),
-                    String.format("ID为 %s 是默认配置！无法删除:",
-                            StorageConstants.SYSTEM_DEFAULT_FILE_CONFIG_ID));
         });
         boolean result = storageConfigService.deleteFileConfig(ids);
         return toAjax(result);

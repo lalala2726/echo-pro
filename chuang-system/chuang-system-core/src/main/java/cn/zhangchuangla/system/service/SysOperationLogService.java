@@ -20,7 +20,6 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
      */
     Page<SysOperationLog> listOperationLog(SysOperationLogQueryRequest request);
 
-
     /**
      * 清空操作日志
      *

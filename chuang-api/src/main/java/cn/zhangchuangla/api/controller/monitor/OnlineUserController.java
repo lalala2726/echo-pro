@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.monitor;
 
-import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.core.security.model.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
@@ -17,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -101,13 +101,13 @@ public class OnlineUserController extends BaseController {
      */
     private boolean matchesFilter(OnlineLoginUser user, OnlineUserQueryRequest request) {
         // 会话ID匹配
-        if (StrUtil.isNotBlank(request.getSessionId()) &&
+        if (StringUtils.isNotBlank(request.getSessionId()) &&
                 !request.getSessionId().equals(user.getSessionId())) {
             return false;
         }
 
         // 用户名匹配
-        if (StrUtil.isNotBlank(request.getUsername()) &&
+        if (StringUtils.isNotBlank(request.getUsername()) &&
                 !request.getUsername().contains(user.getUsername())) {
             return false;
         }
@@ -119,25 +119,25 @@ public class OnlineUserController extends BaseController {
         }
 
         // IP地址匹配
-        if (StrUtil.isNotBlank(request.getIp()) &&
+        if (StringUtils.isNotBlank(request.getIp()) &&
                 !request.getIp().equals(user.getIP())) {
             return false;
         }
 
         // 登录地点匹配
-        if (StrUtil.isNotBlank(request.getRegion()) &&
+        if (StringUtils.isNotBlank(request.getRegion()) &&
                 !request.getRegion().contains(user.getRegion())) {
             return false;
         }
 
         // 浏览器匹配
-        if (StrUtil.isNotBlank(request.getBrowser()) &&
+        if (StringUtils.isNotBlank(request.getBrowser()) &&
                 !request.getBrowser().equals(user.getBrowser())) {
             return false;
         }
 
         // 操作系统匹配
-        return !StrUtil.isNotBlank(request.getOs()) ||
+        return !StringUtils.isNotBlank(request.getOs()) ||
                 request.getOs().equals(user.getOs());
     }
 }

@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictItemMapper;
@@ -70,7 +70,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public List<Option<String>> getDictItemOption(String dictType) {
-        if (StringUtils.isBlank(dictType)) {
+        if (StrUtils.isBlank(dictType)) {
             return List.of();
         }
 
@@ -220,7 +220,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public void updateDictItemDictType(String oldDictType, String newDictType) {
-        if (StringUtils.isBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
+        if (StrUtils.isBlank(oldDictType, newDictType) || oldDictType.equals(newDictType)) {
             return;
         }
         LambdaUpdateWrapper<SysDictItem> updateWrapper = Wrappers.lambdaUpdate();
@@ -241,7 +241,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      */
     @Override
     public boolean isDictItemValueExist(String dictType, String itemValue, Long itemId) {
-        if (StringUtils.isBlank(dictType, itemValue)) {
+        if (StrUtils.isBlank(dictType, itemValue)) {
             // 关键参数为空，无法判断，或者认为不重复
             return false;
         }
@@ -259,7 +259,7 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
      * 清除指定字典类型的缓存
      */
     private void clearDictCache(String dictType) {
-        if (!StringUtils.isBlank(dictType)) {
+        if (!StrUtils.isBlank(dictType)) {
             String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType);
             try {
                 redisCache.deleteObject(cacheKey);

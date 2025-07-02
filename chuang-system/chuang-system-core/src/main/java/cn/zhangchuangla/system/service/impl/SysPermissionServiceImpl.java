@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -20,6 +19,7 @@ import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
@@ -69,7 +69,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
                 //如果缓存中没有，则从数据库中获取权限列表
                 set = sysMenuService.list().stream()
                         .map(SysMenu::getPermission)
-                        .filter(StrUtil::isNotEmpty)
+                        .filter(StringUtils::isNotBlank)
                         .collect(Collectors.toSet());
                 //将权限列表存入缓存
                 redisCache.setCacheObject(RedisConstants.Auth.PERMISSIONS_PREFIX + SysRolesConstant.SUPER_ADMIN, set);
@@ -87,7 +87,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         List<SysMenu> userPermissionListByRole = sysMenuMapper.getUserPermissionListByRole(roleSet);
         set = userPermissionListByRole.stream()
                 .map(SysMenu::getPermission)
-                .filter(StrUtil::isNotEmpty)
+                .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toSet());
         //将权限列表存入缓存
         redisCache.setCacheObject(cacheKey, set);
@@ -115,7 +115,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             if (set == null) {
                 set = sysMenuService.list().stream()
                         .map(SysMenu::getPermission)
-                        .filter(StrUtil::isNotEmpty)
+                        .filter(StringUtils::isNotBlank)
                         .collect(Collectors.toSet());
                 redisCache.setCacheObject(cacheKey, set);
             }
@@ -133,7 +133,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         List<SysMenu> userPermissionListByRole = sysMenuMapper.getUserPermissionListByRole(roleSet);
         set = userPermissionListByRole.stream()
                 .map(SysMenu::getPermission)
-                .filter(StrUtil::isNotEmpty)
+                .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toSet());
         redisCache.setCacheObject(cacheKey, set);
         return set;

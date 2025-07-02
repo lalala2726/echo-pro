@@ -108,14 +108,27 @@ public class LoaderCoordinator implements CommandLineRunner {
 
             logger.info("开始执行同步加载器: {}", loaderName);
             try {
-                loader.load();
-                status.markSuccess();
+                boolean load = loader.load();
+                if (load) {
+                    status.markSuccess();
+                } else {
+                    allSuccess = false;
+                    String errorMsg = "加载器返回false，表示加载失败";
+                    status.markFailure(errorMsg);
+                    logger.error("同步加载器执行失败: {} - {}", loaderName, errorMsg);
+                    if (loader.allowStartupOnFailure()) {
+                        throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
+                    }
+                }
                 logger.info("同步加载器执行完成: {} (耗时: {}ms)", loaderName, status.getDuration());
             } catch (Exception e) {
                 allSuccess = false;
                 String errorMsg = e.getMessage();
                 status.markFailure(errorMsg);
                 logger.error("同步加载器执行失败: {} - {}", loaderName, errorMsg, e);
+                if (loader.allowStartupOnFailure()) {
+                    throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
+                }
 
                 if (failFast) {
                     logger.error("系统配置为快速失败模式，中止后续加载器执行");
@@ -156,13 +169,25 @@ public class LoaderCoordinator implements CommandLineRunner {
 
                         logger.info("开始执行异步加载器: {}", loaderName);
                         try {
-                            loader.load();
-                            status.markSuccess();
+                            boolean load = loader.load();
+                            if (load) {
+                                status.markSuccess();
+                            } else {
+                                String errorMsg = "加载器返回false，表示加载失败";
+                                status.markFailure(errorMsg);
+                                logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg);
+                                if (loader.allowStartupOnFailure()) {
+                                    throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
+                                }
+                            }
                             logger.info("异步加载器执行完成: {} (耗时: {}ms)", loaderName, status.getDuration());
                         } catch (Exception e) {
                             String errorMsg = e.getMessage();
                             status.markFailure(errorMsg);
                             logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg, e);
+                            if (loader.allowStartupOnFailure()) {
+                                throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
+                            }
                         }
                     }, executorService))
                     .toList();

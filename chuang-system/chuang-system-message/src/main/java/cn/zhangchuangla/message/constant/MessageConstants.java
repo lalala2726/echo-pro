@@ -13,7 +13,10 @@ public class MessageConstants {
      * 状态常量
      */
     public interface StatusConstants {
+        //消息已读
         Integer MESSAGE_IS_READ = 1;
+        //消息未读
+        Integer MESSAGE_UN_READ = 0;
     }
 
     public interface MessageTypeConstants {

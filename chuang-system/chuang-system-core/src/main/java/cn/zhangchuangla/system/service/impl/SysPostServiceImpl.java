@@ -28,7 +28,6 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
 
     private final SysPostMapper sysPostMapper;
 
-
     /**
      * 岗位列表
      *

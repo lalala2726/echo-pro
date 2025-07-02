@@ -2,6 +2,7 @@ package cn.zhangchuangla.message.service;
 
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.*;
+import cn.zhangchuangla.message.model.vo.system.SysMessageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -30,7 +31,7 @@ public interface SysMessageService extends IService<SysMessage> {
      * @param id ID
      * @return 系统消息表
      */
-    SysMessage getSysMessageById(Long id);
+    SysMessageVo getSysMessageById(Long id);
 
     /**
      * 新增系统消息表
@@ -65,6 +66,14 @@ public interface SysMessageService extends IService<SysMessage> {
     boolean sysSendMessage(SysSendMessageRequest request);
 
     /**
+     * 系统自动发送消息（无登录用户）
+     *
+     * @param request 发送消息请求参数
+     * @return 发送结果
+     */
+    boolean systemSendMessage(SysSendMessageRequest request);
+
+    /**
      * 根据用户ID批量发送消息
      *
      * @param userIds 用户ID列表
@@ -73,13 +82,6 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     boolean sendMessageByUserId(List<Long> userIds, SysMessage message);
 
-    /**
-     * 用户发送消息
-     *
-     * @param request 发送消息请求参数
-     * @return 结果
-     */
-    boolean userSendMessage(UserSendMessageRequest request);
 
     /**
      * 获取用户消息数量
@@ -117,4 +119,12 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 消息列表
      */
     List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId);
+
+    /**
+     * 批量删除消息
+     *
+     * @param ids 消息ID列表
+     * @return 删除结果
+     */
+    boolean deleteMessages(List<Long> ids);
 }

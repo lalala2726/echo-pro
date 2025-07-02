@@ -21,7 +21,6 @@ public class SysRoleAddRequest {
     @Schema(description = "角色名", example = "管理员", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String roleName;
 
-
     /**
      * 角色权限字符串
      */

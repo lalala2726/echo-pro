@@ -21,7 +21,7 @@ public interface SysDictItemService extends IService<SysDictItem> {
      * 获取字典项列表
      *
      * @param page    分页
-     * @param request 请求
+     * @param request 请求参数
      * @return 分页结果
      */
     Page<SysDictItem> listDictItem(Page<SysDictItem> page, String dictType, SysDictItemQueryRequest request);

@@ -100,13 +100,9 @@
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
                 </if>
-                <if test="request.sentByMyself != null and request.sentByMyself == true">
-                    AND sm.sender_id = #{userId}
-                </if>
             </if>
         </where>
-
-        order by sm.create_by
+        order by sm.create_time desc
     </select>
 
     <select id="getCurrentUserMessage" resultMap="BaseResultMap">

@@ -6,8 +6,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.manager.AsyncManager;
-import cn.zhangchuangla.framework.manager.factory.AsyncFactory;
+import cn.zhangchuangla.framework.service.AsyncService;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,16 +41,19 @@ public class OperationLogAspect {
      * 默认排除的敏感字段，防止敏感信息被记录
      */
     private static final List<String> EXCLUDE_PROPERTIES = Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword", "accessToken", "accessKey", "secretKey");
-
     /**
      * 线程变量，记录方法执行的开始时间，用于计算方法耗时
      */
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
-
     /**
      * 标记当前线程是否是清空日志的操作，用于防止递归调用
      */
     private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
+    private final AsyncService asyncService;
+
+    public OperationLogAspect(AsyncService asyncService) {
+        this.asyncService = asyncService;
+    }
 
     /**
      * 在方法执行前记录开始时间
@@ -130,9 +132,9 @@ public class OperationLogAspect {
                 }
                 log.info("===========================");
 
-                // 使用异步工厂执行清空操作，但不记录日志
+                // 使用异步服务执行清空操作，但不记录日志
                 if (methodName.contains("cleanOperationLog")) {
-                    AsyncManager.me().execute(AsyncFactory.cleanOperationLog());
+                    asyncService.cleanOperationLog();
                 }
 
                 return; // 跳过后续的日志记录逻辑
@@ -188,8 +190,8 @@ public class OperationLogAspect {
             // 设置创建时间
             sysOperationLog.setCreateTime(new Date());
 
-            // 使用异步管理器和异步工厂记录日志，不再直接调用SysOperationLogService
-            AsyncManager.me().execute(AsyncFactory.recordOperationLog(sysOperationLog));
+            // 使用Spring异步服务记录日志
+            asyncService.recordOperationLog(sysOperationLog);
             log.debug("操作日志已提交异步处理: {}", sysOperationLog.getModule());
 
         } catch (Exception e) {

@@ -49,6 +49,12 @@ public class SysMenuVo extends BaseVo {
     private String path;
 
     /**
+     * 菜单激活
+     */
+    @Schema(description = "菜单激活")
+    private String activePath;
+
+    /**
      * 是否外部跳转（0否 1是）
      */
     @Schema(description = "是否外部跳转（0否 1是）", type = "string", format = "int32")
@@ -66,6 +72,13 @@ public class SysMenuVo extends BaseVo {
      */
     @Schema(description = "路由参数")
     private String query;
+
+    /**
+     * 是否显示父级菜单 0否 1是
+     */
+    @Schema(description = "是否显示父级菜单 0否 1是")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer showParent;
 
     /**
      * 路由名称

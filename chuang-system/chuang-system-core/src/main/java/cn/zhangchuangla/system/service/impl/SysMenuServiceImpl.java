@@ -1,13 +1,12 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
@@ -22,10 +21,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -71,7 +73,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * }</pre>
      */
     public static String buildRouteNameFromComponentPath(String pathOrComponent) {
-        if (cn.hutool.core.util.StrUtil.isBlank(pathOrComponent)) {
+        if (StringUtils.isBlank(pathOrComponent)) {
             return "";
         }
         String pathWithoutExtension = pathOrComponent.replaceFirst("\\.(vue|js|ts|tsx|jsx)$", "");
@@ -113,7 +115,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * }</pre>
      */
     public static String capitalize(String str) {
-        if (cn.hutool.core.util.StrUtil.isBlank(str)) {
+        if (StringUtils.isBlank(str)) {
             return str;
         }
         return Character.toUpperCase(str.charAt(0)) + str.substring(1);
@@ -140,12 +142,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * }</pre>
      */
     public static String buildInternalPathStructure(String parentPath, String pathSegment) {
-        String segment = cn.hutool.core.util.StrUtil.trimToEmpty(pathSegment);
+        String segment = StringUtils.trimToEmpty(pathSegment);
         String fullPath;
         if (segment.startsWith("/")) {
             fullPath = segment;
         } else {
-            if (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath)) {
+            if (StringUtils.isBlank(parentPath) || "/".equals(parentPath)) {
                 fullPath = "/" + segment;
             } else {
                 String formattedParent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
@@ -156,10 +158,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (fullPath.length() > 1 && fullPath.endsWith("/")) {
             fullPath = fullPath.substring(0, fullPath.length() - 1);
         }
-        if (cn.hutool.core.util.StrUtil.isBlank(segment) && (cn.hutool.core.util.StrUtil.isBlank(parentPath) || "/".equals(parentPath))) {
+        if (StringUtils.isBlank(segment) && (StringUtils.isBlank(parentPath) || "/".equals(parentPath))) {
             return "/";
         }
-        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+        return StringUtils.isBlank(fullPath) ? "/" : fullPath;
     }
 
     /**
@@ -177,11 +179,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     public static String buildAndNormalizePathSegmentStructure(String parentPath, String segmentInput) {
         String actualSegment;
-        if (StringUtils.isHttp(segmentInput)) {
+        if (StrUtils.isHttp(segmentInput)) {
             try {
-                java.net.URI uri = new java.net.URI(segmentInput);
+                URI uri = new URI(segmentInput);
                 String host = uri.getHost();
-                if (cn.hutool.core.util.StrUtil.isNotBlank(host)) {
+                if (StringUtils.isNotBlank(host)) {
                     String[] parts = host.split("\\.");
                     StringBuilder hostCamelCase = new StringBuilder();
                     for (String part : parts) {
@@ -191,25 +193,25 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                         }
                     }
                     actualSegment = hostCamelCase.toString();
-                    if (cn.hutool.core.util.StrUtil.isBlank(actualSegment)) {
+                    if (StringUtils.isBlank(actualSegment)) {
                         actualSegment = "ExternalLinkPath";
                     }
                 } else {
                     actualSegment = "ExternalHostMissing";
                 }
-            } catch (java.net.URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 actualSegment = "InvalidExternalLink";
             }
         } else {
-            actualSegment = cn.hutool.core.util.StrUtil.trimToEmpty(segmentInput);
+            actualSegment = StringUtils.trimToEmpty(segmentInput);
         }
         String fullPath;
         if (actualSegment.startsWith("/")) {
             fullPath = actualSegment;
         } else {
-            String normalizedParentPath = cn.hutool.core.util.StrUtil.isBlank(parentPath) ? "/" : parentPath;
+            String normalizedParentPath = StringUtils.isBlank(parentPath) ? "/" : parentPath;
             if ("/".equals(normalizedParentPath)) {
-                fullPath = cn.hutool.core.util.StrUtil.isBlank(actualSegment) ? "/" : "/" + actualSegment;
+                fullPath = StringUtils.isBlank(actualSegment) ? "/" : "/" + actualSegment;
             } else {
                 String formattedParent = normalizedParentPath.endsWith("/") ? normalizedParentPath : normalizedParentPath + "/";
                 fullPath = formattedParent + actualSegment;
@@ -219,7 +221,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (fullPath.length() > 1 && fullPath.endsWith("/")) {
             fullPath = fullPath.substring(0, fullPath.length() - 1);
         }
-        return cn.hutool.core.util.StrUtil.isBlank(fullPath) ? "/" : fullPath;
+        return StringUtils.isBlank(fullPath) ? "/" : fullPath;
     }
 
     /**
@@ -232,7 +234,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      *   <li>当前路由路径为根路径 "/" </li>
      *   <li>当前路由路径以斜杠结尾</li>
      * </ul>
-     * 则在当前路由路径后追加 "/index"。</p>
+     * 并且原始路径中不含动态参数（例如 :id、:messageId 等）的情况下才会追加 "/index"。</p>
      *
      * @param currentRouterPath  当前已构建的完整路由路径，不能为空。
      * @param componentPathValue 当前菜单项关联的组件路径标识符，例如 "Layout", "ParentView" 等。
@@ -246,15 +248,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * appendIndexToMenuPath("/user", "Layout", "user") => "/user"
      * appendIndexToMenuPath("/user", "UserComponent", "user") => "/user/index"
      * appendIndexToMenuPath("/user/", "UserComponent", "") => "/user//index"
+     * appendIndexToMenuPath("/jobs/log", "JobsLogComponent", "jobs/log/:id") => "/jobs/log/:id?"
+     * appendIndexToMenuPath("/jobs/log", "JobsLogComponent", "jobs/log/:id?") => "/jobs/log/:id?"
+     * appendIndexToMenuPath("/messages/view", "MessageComponent", "view/:messageId") => "/messages/view"
      * }</pre>
      */
     public static String appendIndexToMenuPath(String currentRouterPath, String componentPathValue, String menuPathOriginal) {
         if (!Constants.MenuConstants.LAYOUT.equals(componentPathValue) &&
                 !Constants.MenuConstants.PARENT_VIEW.equals(componentPathValue)) {
-            String pathSegmentForIndexCheck = cn.hutool.core.util.StrUtil.trimToEmpty(menuPathOriginal);
+            String pathSegmentForIndexCheck = StringUtils.trimToEmpty(menuPathOriginal);
+            // 检查是否存在动态参数，例如 :id、:messageId 等格式
+            boolean containsDynamicParam = pathSegmentForIndexCheck.matches(".*:\\s*\\w+.*");
+
+            // 判断是否已经包含可选参数后缀，比如 :id? 这样的模式
+            boolean containsOptionalParam = pathSegmentForIndexCheck.matches(".*:\\s*\\w+\\?.*");
+
+            if (!containsDynamicParam || containsOptionalParam) {
+                return currentRouterPath;
+            }
+
             if (!pathSegmentForIndexCheck.endsWith("index") &&
-                    (cn.hutool.core.util.StrUtil.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))
-            ) {
+                    (StringUtils.isNotBlank(pathSegmentForIndexCheck) || "/".equals(currentRouterPath) || currentRouterPath.endsWith("/"))) {
                 return currentRouterPath.endsWith("/") ? (currentRouterPath + "index") : (currentRouterPath + "/index");
             }
         }
@@ -267,21 +281,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<SysMenu> getMenuListByUserId(Long userId) {
         if (userId == null) {
-            log.warn("根据用户ID查询菜单列表时，用户ID为空。");
             return Collections.emptyList();
         }
         Set<String> roles = SecurityUtils.getRoles();
         if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
-            log.info("用户ID {} (角色: {}) 是超级管理员，返回所有有效菜单，并按父ID和排序值排序。", userId, roles);
             return list(new LambdaQueryWrapper<SysMenu>()
                     .orderByAsc(SysMenu::getParentId)
-                    .orderByAsc(SysMenu::getSort));
+                    .orderByDesc(SysMenu::getOrderNum));
         }
-        log.debug("用户ID {} (角色: {}) 非超级管理员，根据权限查询菜单。", userId, roles);
         List<SysMenu> userMenus = menuMapper.getMenuListByUserId(userId);
         if (userMenus != null) {
             userMenus.sort(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
-                    .thenComparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())));
+                    .thenComparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())));
         } else {
             userMenus = Collections.emptyList();
         }
@@ -368,7 +379,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
         if (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType())
                 && (sysMenu.getParentId() == null || sysMenu.getParentId() == 0L)
-                && StrUtil.isBlank(sysMenu.getComponent())) {
+                && StringUtils.isBlank(sysMenu.getComponent())) {
             sysMenu.setComponent(Constants.MenuConstants.LAYOUT);
         }
 
@@ -437,7 +448,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean checkMenuNameUnique(SysMenu menu) {
-        if (menu == null || StrUtil.isEmpty(menu.getMenuName())) {
+        if (menu == null || StringUtils.isEmpty(menu.getMenuName())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称不能为空。");
         }
         Long menuId = Objects.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
@@ -517,7 +528,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
         if (Constants.MenuConstants.TYPE_DIRECTORY.equals(request.getMenuType())
                 && (request.getParentId() == null || request.getParentId() == 0L)
-                && StrUtil.isBlank(sysMenu.getComponent())) {
+                && StringUtils.isBlank(sysMenu.getComponent())) {
             sysMenu.setComponent(Constants.MenuConstants.LAYOUT);
         }
         // 检查外链模式
@@ -568,7 +579,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<SysMenuListVo> listMenu(SysMenuQueryRequest request) {
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
-        if (request != null && StrUtil.isNotBlank(request.getMenuName())) {
+        if (request != null && StringUtils.isNotBlank(request.getMenuName())) {
             queryWrapper.like(SysMenu::getMenuName, request.getMenuName());
         }
         queryWrapper.orderByAsc(SysMenu::getParentId).orderByAsc(SysMenu::getSort);
@@ -607,7 +618,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         List<SysMenu> processableMenus = menus.stream()
                 .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getMenuType()))
                 .sorted(Comparator.comparing(SysMenu::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
-                        .thenComparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .thenComparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
 
         if (processableMenus.isEmpty()) {
@@ -621,7 +632,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .collect(Collectors.groupingBy(SysMenu::getParentId));
 
         parentChildrenMap.forEach((parentId, childrenList) ->
-                childrenList.sort(Comparator.comparing(SysMenu::getSort, Comparator.nullsLast(Comparator.naturalOrder())))
+                childrenList.sort(Comparator.comparing(SysMenu::getOrderNum, Comparator.nullsLast(Comparator.reverseOrder())))
         );
 
         // 递归转换为 RouterVo 树形结构
@@ -633,7 +644,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     }
 
     /**
-     * 填充RouterVo对象的path, name, component和MetaVo的frameSrc, keepAlive属性。
+     * 填充RouterVo对象的path, name, component和MetaVo的frameSrc
      * 此方法是convertToRouterVoRecursive的核心逻辑抽取，用于根据菜单类型和外链设置决定路由的关键属性。
      *
      * @param menu       当前SysMenu实体。
@@ -645,8 +656,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String routerPathValue;
         // 默认使用数据库中的routeName (可能已被configureRouteName处理)
         String routerNameValue = menu.getRouteName();
-        String componentPathValue;
-        boolean isKeepAlive = false;
+        String componentPathValue = "";
 
         // 情况1: "外部链接跳转"模式 (external_link = 1)
         if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())
@@ -655,14 +665,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             // 外部跳转链接不使用frameSrc
             meta.setFrameSrc(null);
             // 外部跳转链接无组件
-            componentPathValue = null;
             log.debug("外部链接跳转: path='{}', name (URL)='{}'", routerPathValue, routerNameValue);
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, external_link != 1, 且 menu.path 是 HTTP(S) URL)
-        else if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath())) {
+        else if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StrUtils.isHttp(menu.getPath())) {
             meta.setFrameSrc(menu.getPath());
-            isKeepAlive = true;
-            String segment = StrUtil.isNotBlank(menu.getRouteName()) ? menu.getRouteName() : "iframe-" + menu.getMenuId();
+            String segment = StringUtils.isNotBlank(menu.getRouteName()) ? menu.getRouteName() : "iframe-" + menu.getMenuId();
             routerPathValue = buildInternalPathStructure(parentPath, segment);
             componentPathValue = getComponentPathForRouter(menu);
             log.debug("内嵌Iframe: path='{}', name='{}', frameSrc='{}'", routerPathValue, routerNameValue, meta.getFrameSrc());
@@ -672,9 +680,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             routerPathValue = buildInternalPathStructure(parentPath, menu.getPath());
             componentPathValue = getComponentPathForRouter(menu);
 
-            if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) && StrUtil.isNotBlank(componentPathValue)) {
+            if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) && StringUtils.isNotBlank(componentPathValue)) {
                 routerPathValue = appendIndexToMenuPath(routerPathValue, componentPathValue, menu.getPath());
-                isKeepAlive = Constants.MenuConstants.CACHE_ENABLED.equals(menu.getIsCache());
             }
             log.debug("内部菜单/目录: path='{}', name='{}', component='{}'", routerPathValue, routerNameValue, componentPathValue);
         }
@@ -685,10 +692,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
             router.setName(menu.getPath());
         } else {
-            router.setName(StrUtil.isNotBlank(routerNameValue) ? routerNameValue : menu.getMenuId().toString());
+            router.setName(StringUtils.isNotBlank(routerNameValue) ? routerNameValue : menu.getMenuId().toString());
         }
         router.setComponent(componentPathValue);
-        meta.setKeepAlive(isKeepAlive);
     }
 
     /**
@@ -714,7 +720,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
         router.setMeta(meta);
         router.setQuery(menu.getQuery());
-        router.setHidden(Constants.MenuConstants.HIDDEN.equals(menu.getVisible()));
 
         List<SysMenu> childrenEntities = parentChildrenMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
 
@@ -745,9 +750,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private void fillBaseMetaInfo(MetaVo meta, SysMenu menu) {
         meta.setTitle(menu.getMenuName());
         meta.setIcon(menu.getIcon());
-        meta.setShowParent(true);
+        meta.setActivePath(menu.getActivePath());
+        meta.setShowParent(Constants.MenuConstants.SHOW_PARENT.equals(menu.getShowParent()));
         meta.setShowLink(Constants.MenuConstants.VISIBLE.equals(menu.getVisible()));
-        if (StrUtil.isNotBlank(menu.getPermission())) {
+        if (StringUtils.isNotBlank(menu.getPermission())) {
             meta.setAuths(new String[]{menu.getPermission()});
         } else if (Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType())) {
             meta.setAuths(new String[]{""});
@@ -770,7 +776,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             return null;
         }
         // 情况2: "内嵌Iframe"模式 (is_frame = 1, path是URL, external_link != 1) -> 通常无显式组件
-        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StringUtils.isHttp(menu.getPath())) {
+        if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) && StrUtils.isHttp(menu.getPath())) {
             // 前端根据 meta.frameSrc 渲染
             return null;
         }
@@ -778,7 +784,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 情况3: 目录类型 (TYPE_DIRECTORY)
         if (Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType())) {
             // 如果DB中已配置component
-            if (StrUtil.isNotBlank(menu.getComponent())) {
+            if (StringUtils.isNotBlank(menu.getComponent())) {
                 return menu.getComponent();
             }
             return (menu.getParentId() == null || menu.getParentId() == 0L) ?
@@ -843,11 +849,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 此时，用户应在routeName字段直接提供外部URL。
         if (Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink())) {
             // 确保routeName是URL
-            if (!StringUtils.isHttp(sysMenu.getRouteName())) {
+            if (!StrUtils.isHttp(sysMenu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
             }
-            log.info("检测到“外部链接跳转”模式： path='{}', routeName (URL)='{}'. 将直接使用此routeName。",
-                    sysMenu.getPath(), sysMenu.getRouteName());
             // routeName已经是外部URL，ensureRouteNameUnique 方法会直接返回它，不尝试唯一化。
             sysMenu.setRouteName(ensureRouteNameUnique(sysMenu.getRouteName(), sysMenu.getMenuId()));
             return;
@@ -857,8 +861,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 这些类型的菜单通常没有或不需要路由名称。
         if (Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType()) ||
                 (Constants.MenuConstants.TYPE_DIRECTORY.equals(sysMenu.getMenuType()) &&
-                        StrUtil.isBlank(sysMenu.getPath()) &&
-                        (sysMenu.getRouteName() == null || !StringUtils.isHttp(sysMenu.getRouteName())))
+                        StringUtils.isBlank(sysMenu.getPath()) &&
+                        (sysMenu.getRouteName() == null || !StrUtils.isHttp(sysMenu.getRouteName())))
         ) {
             // 设置为空字符串
             sysMenu.setRouteName("");
@@ -887,10 +891,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 情况1: 内嵌Iframe (isFrame=1, path是HTTP URL, external_link!=IS_EXTERNAL_LINK)
         // routeName 应基于一个稳定的内部标识。优先使用用户在routeName字段填写的内部名（如果合法），否则基于菜单名生成。
         if (Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
-                StringUtils.isHttp(menu.getPath()) &&
+                StrUtils.isHttp(menu.getPath()) &&
                 !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
 
-            if (StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) {
+            if (StringUtils.isNotBlank(menu.getRouteName()) && !StrUtils.isHttp(menu.getRouteName())) {
                 // 用户已提供合法的内部路由名
                 baseRouteName = capitalize(menu.getRouteName().replaceAll("[^a-zA-Z0-9]", ""));
             } else {
@@ -898,32 +902,32 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 baseRouteName = capitalize(menu.getMenuName().replaceAll("[^a-zA-Z0-9]", ""));
             }
             // 如果菜单名全是特殊字符
-            if (StrUtil.isBlank(baseRouteName)) {
+            if (StringUtils.isBlank(baseRouteName)) {
                 baseRouteName = "Iframe" + (menu.getMenuId() == null ? System.currentTimeMillis() % 10000 : menu.getMenuId());
             }
         }
         // 情况2: 普通菜单 (有组件路径，且非特殊外链类型)
         else if (Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
-                StrUtil.isNotBlank(menu.getComponent()) &&
+                StringUtils.isNotBlank(menu.getComponent()) &&
                 !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
                 !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
             baseRouteName = buildRouteNameFromComponentPath(menu.getComponent());
         }
         // 情况3: 有路径的目录 (且非特殊外链类型)
         else if (Constants.MenuConstants.TYPE_DIRECTORY.equals(menu.getMenuType()) &&
-                StrUtil.isNotBlank(menu.getPath()) &&
+                StringUtils.isNotBlank(menu.getPath()) &&
                 !Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
                 !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink())) {
             baseRouteName = buildRouteNameFromComponentPath(menu.getPath());
         }
         // 情况4: 其他（如按钮、无路径目录、或已由configureRouteName处理的外部跳转链接），不应在此生成
         else {
-            menu.setRouteName((StrUtil.isNotBlank(menu.getRouteName()) && !StringUtils.isHttp(menu.getRouteName())) ?
+            menu.setRouteName((StringUtils.isNotBlank(menu.getRouteName()) && !StrUtils.isHttp(menu.getRouteName())) ?
                     ensureRouteNameUnique(menu.getRouteName(), menu.getMenuId()) : "");
             return;
         }
 
-        if (StrUtil.isBlank(baseRouteName)) {
+        if (StringUtils.isBlank(baseRouteName)) {
             menu.setRouteName("");
             return;
         }
@@ -941,10 +945,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @throws ServiceException 如果在最大尝试次数后仍无法生成唯一的内部名称。
      */
     private String ensureRouteNameUnique(String baseName, Long currentMenuId) {
-        if (StringUtils.isHttp(baseName)) {
+        if (StrUtils.isHttp(baseName)) {
             return baseName;
         }
-        if (StrUtil.isBlank(baseName)) {
+        if (StringUtils.isBlank(baseName)) {
             return "";
         }
         final int maxRetries = 100;
@@ -978,7 +982,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (!Constants.MenuConstants.TYPE_BUTTON.equals(sysMenu.getMenuType())) {
             boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(sysMenu.getIsFrame()) &&
                     !Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink()) &&
-                    StringUtils.isHttp(sysMenu.getPath());
+                    StrUtils.isHttp(sysMenu.getPath());
             boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(sysMenu.getExternalLink());
 
             if (!isEmbeddedIframe && !isExternalRedirect && StringUtils.isBlank(sysMenu.getPath())) {
@@ -1029,7 +1033,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * </ul>
      */
     private void menuBaseCheck(SysMenu menu) {
-        if (StrUtil.isNotBlank(menu.getComponent()) && (menu.getComponent().contains(Constants.HTTP) || menu.getComponent().contains(Constants.HTTPS))) {
+        if (StringUtils.isNotBlank(menu.getComponent()) && (menu.getComponent().contains(Constants.HTTP) || menu.getComponent().contains(Constants.HTTPS))) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径不应是外部链接。如需添加外链，请参考外链配置方式。");
         }
         if (menu.getMenuId() != null && hasChildByMenuId(menu.getMenuId())) {
@@ -1048,21 +1052,21 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 明确为外部链接跳转模式
         if (isExternalRedirect) {
             // routeName 必须是 URL
-            if (!StringUtils.isHttp(menu.getRouteName())) {
+            if (!StrUtils.isHttp(menu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由名称必须是有效的HTTP(S)链接地址。");
             }
             // path 必须是内部路径段且非空
-            if (StringUtils.isHttp(menu.getPath()) || StrUtil.isBlank(menu.getPath())) {
+            if (StrUtils.isHttp(menu.getPath()) || StringUtils.isBlank(menu.getPath())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "外部链接跳转模式下，路由路径必须是一个非空、非HTTP(S)的内部路径段。");
             }
             // 明确为内嵌iframe模式
         } else if (isEmbeddedIframe) {
             // path 必须是 URL
-            if (!StringUtils.isHttp(menu.getPath())) {
+            if (!StrUtils.isHttp(menu.getPath())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由路径必须是有效的HTTP(S)链接地址。");
             }
             // routeName 不应是 URL
-            if (StringUtils.isHttp(menu.getRouteName())) {
+            if (StrUtils.isHttp(menu.getRouteName())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR, "内嵌iframe模式下，路由名称不应是HTTP(S)链接，应为内部路由名。");
             }
         }
@@ -1082,16 +1086,16 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         boolean isExternalRedirect = Constants.MenuConstants.IS_EXTERNAL_LINK.equals(menu.getExternalLink());
         boolean isEmbeddedIframe = Constants.MenuConstants.IS_FRAME.equals(menu.getIsFrame()) &&
                 !isExternalRedirect &&
-                StringUtils.isHttp(menu.getPath());
+                StrUtils.isHttp(menu.getPath());
 
         boolean requiresComponent = Constants.MenuConstants.TYPE_MENU.equals(menu.getMenuType()) &&
                 !isExternalRedirect &&
                 !isEmbeddedIframe;
 
-        if (requiresComponent && StrUtil.isBlank(menu.getComponent())) {
+        if (requiresComponent && StringUtils.isBlank(menu.getComponent())) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "普通菜单类型的组件路径不能为空。");
         }
-        if (StrUtil.isNotBlank(menu.getComponent()) && menu.getComponent().startsWith("/")) {
+        if (StringUtils.isNotBlank(menu.getComponent()) && menu.getComponent().startsWith("/")) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "组件路径预期为相对于views目录的相对路径，不应以 / 开头。例如：system/user/index");
         }
     }

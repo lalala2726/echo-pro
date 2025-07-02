@@ -11,8 +11,8 @@ import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
 import cn.zhangchuangla.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.message.model.request.SysSendMessageRequest;
-import cn.zhangchuangla.message.model.vo.SysMessageListVo;
-import cn.zhangchuangla.message.model.vo.SysMessageVo;
+import cn.zhangchuangla.message.model.vo.system.SysMessageListVo;
+import cn.zhangchuangla.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.message.service.SysMessageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +56,7 @@ public class SysMessageController extends BaseController {
     }
 
     /**
-     * 发送消息
+     * 管理员发送消息
      *
      * @return 操作结果
      */
@@ -92,10 +91,8 @@ public class SysMessageController extends BaseController {
     public AjaxResult<SysMessageVo> getInfo(@Parameter(description = "系统消息表ID")
                                             @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
-        SysMessage sysMessage = sysMessageService.getSysMessageById(id);
-        SysMessageVo vo = new SysMessageVo();
-        BeanUtils.copyProperties(sysMessage, vo);
-        return success(vo);
+        SysMessageVo sysMessage = sysMessageService.getSysMessageById(id);
+        return success(sysMessage);
     }
 
     /**

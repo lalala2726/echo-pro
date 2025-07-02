@@ -32,4 +32,5 @@ public final class FileException extends RuntimeException {
         this.code = ResponseCode.PROFILE_ERROR.getCode();
     }
 
+
 }

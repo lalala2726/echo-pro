@@ -1,9 +1,9 @@
 package cn.zhangchuangla.common.core.core.security.model;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -71,7 +71,7 @@ public class SysUserDetails implements UserDetails, Serializable {
         this.deptId = sysUser.getDeptId();
         this.username = sysUser.getUsername();
         // 初始化角色权限集合
-        this.authorities = CollectionUtil.isNotEmpty(roles)
+        this.authorities = CollectionUtils.isNotEmpty(roles)
                 ? roles.stream()
                 .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
                 .collect(Collectors.toSet())

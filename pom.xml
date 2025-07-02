@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.zhangchuangla</groupId>
-    <artifactId>chuang-backend</artifactId>
+    <artifactId>echo-pro</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
@@ -14,8 +14,6 @@
         <module>chuang-system</module>
         <module>chuang-framework</module>
         <module>chuang-api</module>
-        <module>chuang-generator</module>
-        <module>chuang-quartz</module>
     </modules>
 
 
@@ -52,7 +50,6 @@
         <javax.activation.version>2.1.2</javax.activation.version>
         <google.gvava.version>32.1.2-jre</google.gvava.version>
         <version.apache.tika>2.9.0</version.apache.tika>
-        <cn.hutool.version>5.8.37</cn.hutool.version>
         <apache.velocity>2.4.1</apache.velocity>
         <google.protobuf.version>4.28.2</google.protobuf.version>
         <fast.excel.version>1.2.0</fast.excel.version>
@@ -134,22 +131,11 @@
                 <artifactId>chuang-system-message</artifactId>
                 <version>${app.version}</version>
             </dependency>
-            <!-- 代码生成模块 -->
-            <dependency>
-                <groupId>cn.zhangchuangla</groupId>
-                <artifactId>chuang-generator</artifactId>
-                <version>${app.version}</version>
-            </dependency>
+
             <!-- 系统模块依赖 -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system</artifactId>
-                <version>${app.version}</version>
-            </dependency>
-            <!-- Quartz定时任务模块 -->
-            <dependency>
-                <groupId>cn.zhangchuangla</groupId>
-                <artifactId>chuang-quartz</artifactId>
                 <version>${app.version}</version>
             </dependency>
 
@@ -363,9 +349,9 @@
             <!-- ===================== 项目模块依赖 ===================== -->
             <!-- 通用工具模块依赖 -->
             <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${cn.hutool.version}</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.14.0</version>
             </dependency>
 
             <dependency>

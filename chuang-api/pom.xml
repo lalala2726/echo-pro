@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.zhangchuangla</groupId>
-        <artifactId>chuang-backend</artifactId>
+        <artifactId>echo-pro</artifactId>
         <version>1.0.0</version>
     </parent>
 
@@ -41,34 +41,9 @@
         <!-- 常用工具模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common-excel</artifactId>
         </dependency>
-        <!-- 代码生成模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-generator</artifactId>
-        </dependency>
-        <!-- Quartz定时任务模块 -->
-        <dependency>
-            <groupId>cn.zhangchuangla</groupId>
-            <artifactId>chuang-quartz</artifactId>
-        </dependency>
-        <!-- 缓存模块 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!-- Swagger3 API文档 -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

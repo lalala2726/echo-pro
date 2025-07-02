@@ -39,22 +39,24 @@ public class SysDictLoader implements DataLoader {
 
     @Override
     public int getOrder() {
-        return 20; // 优先级适中
+        // 优先级适中
+        return 20;
     }
 
     @Override
-    public void load() {
+    public boolean load() {
         try {
             log.info("开始加载系统字典数据到缓存...");
 
             // 1. 查询所有启用的字典类型
             LambdaQueryWrapper<SysDictType> dictTypeWrapper = new LambdaQueryWrapper<SysDictType>()
-                    .eq(SysDictType::getStatus, 0); // 0表示启用状态
+                    // 0表示启用状态
+                    .eq(SysDictType::getStatus, 0);
             List<SysDictType> dictTypes = sysDictTypeService.list(dictTypeWrapper);
 
             if (dictTypes.isEmpty()) {
                 log.info("没有找到启用的字典类型，跳过字典缓存加载");
-                return;
+                return false;
             }
 
             int successCount = 0;
@@ -66,8 +68,10 @@ public class SysDictLoader implements DataLoader {
                     // 查询该字典类型下所有启用的字典项
                     LambdaQueryWrapper<SysDictItem> dictItemWrapper = new LambdaQueryWrapper<SysDictItem>()
                             .eq(SysDictItem::getDictType, dictType.getDictType())
-                            .eq(SysDictItem::getStatus, 0) // 0表示启用状态
-                            .orderByAsc(SysDictItem::getSort); // 按排序字段升序
+                            // 0表示启用状态
+                            .eq(SysDictItem::getStatus, 0)
+                            // 按排序字段升序
+                            .orderByAsc(SysDictItem::getSort);
 
                     List<SysDictItem> dictItems = sysDictItemService.list(dictItemWrapper);
 
@@ -93,12 +97,20 @@ public class SysDictLoader implements DataLoader {
 
         } catch (Exception e) {
             log.error("加载系统字典数据失败", e);
-            throw new RuntimeException("系统字典加载失败: " + e.getMessage(), e);
+            return false;
         }
+        return true;
     }
 
     @Override
     public boolean isAsync() {
-        return true; // 支持异步加载
+        // 支持异步加载
+        return true;
+    }
+
+    @Override
+    public boolean allowStartupOnFailure() {
+        // 字典加载失败不应阻止项目启动
+        return true;
     }
 }

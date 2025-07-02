@@ -5,10 +5,8 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
-import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
-import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -117,6 +115,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     boolean addMenu(SysMenuAddRequest request);
+
     /**
      * 更新角色权限
      *

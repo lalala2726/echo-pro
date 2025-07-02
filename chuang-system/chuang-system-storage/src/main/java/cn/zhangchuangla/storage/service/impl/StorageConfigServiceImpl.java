@@ -1,17 +1,17 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.core.constant.StorageConstants;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.model.entity.file.AliyunOSSConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.LocalFileConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.MinioConfigEntity;
-import cn.zhangchuangla.common.core.model.entity.file.TencentCOSConfigEntity;
 import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
 import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
 import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
 import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
@@ -101,10 +101,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(TencentCOSConfigRequest request) {
-        TencentCOSConfigEntity tencentCOSConfigEntity = new TencentCOSConfigEntity();
-        BeanUtils.copyProperties(request, tencentCOSConfigEntity);
-        String value = JSON.toJSONString(tencentCOSConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.TENCENT_COS, value);
+        TencentCOSStorageConfig tencent = new TencentCOSStorageConfig();
+        BeanUtils.copyProperties(request, tencent);
+        String value = JSON.toJSONString(tencent);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
     }
 
     /**
@@ -115,10 +115,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(LocalFileConfigRequest request) {
-        LocalFileConfigEntity localFileConfigEntity = new LocalFileConfigEntity();
-        BeanUtils.copyProperties(request, localFileConfigEntity);
-        String value = JSON.toJSONString(localFileConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.LOCAL, value);
+        LocalFileStorageConfig localFileStorageConfig = new LocalFileStorageConfig();
+        BeanUtils.copyProperties(request, localFileStorageConfig);
+        String value = JSON.toJSONString(localFileStorageConfig);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.LOCAL, value);
     }
 
     /**
@@ -129,10 +129,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSConfigEntity aliyunOSSConfigEntity = new AliyunOSSConfigEntity();
-        BeanUtils.copyProperties(request, aliyunOSSConfigEntity);
-        String value = JSON.toJSONString(aliyunOSSConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.ALIYUN_OSS, value);
+        AliyunOSSStorageConfig aliyun = new AliyunOSSStorageConfig();
+        BeanUtils.copyProperties(request, aliyun);
+        String value = JSON.toJSONString(aliyun);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
     }
 
     /**
@@ -143,9 +143,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(MinioConfigRequest request) {
-        MinioConfigEntity minioConfigEntity = new MinioConfigEntity();
-        String value = JSON.toJSONString(minioConfigEntity);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.MINIO, value);
+        MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
+        String value = JSON.toJSONString(minioStorageConfig);
+        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
     }
 
 
@@ -214,7 +214,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     public boolean isMaster(Integer id) {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
                 .eq(StorageConfig::getId, id)
-                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return count(eq) > 0;
     }
 
@@ -224,9 +224,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 主配置
      */
     @Override
-    public StorageConfig getMasterConfig() {
+    public StorageConfig getPrimaryConfig() {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
-                .eq(StorageConfig::getIsMaster, StorageConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return getOne(eq);
     }
 
@@ -253,9 +253,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public boolean setMasterConfig(Long id) {
         // 取消当前主配置
-        StorageConfig currentMasterConfig = getMasterConfig();
+        StorageConfig currentMasterConfig = getPrimaryConfig();
         if (currentMasterConfig != null) {
-            currentMasterConfig.setIsMaster(StorageConstants.IS_NOT_FILE_UPLOAD_MASTER);
+            currentMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_NOT_FILE_UPLOAD_MASTER);
             updateById(currentMasterConfig);
         }
         // 设置新的主配置
@@ -263,7 +263,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         if (newMasterConfig == null) {
             throw new ServiceException("文件配置不存在");
         }
-        newMasterConfig.setIsMaster(StorageConstants.IS_FILE_UPLOAD_MASTER);
+        newMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
         return updateById(newMasterConfig);
     }
 
@@ -275,13 +275,6 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean deleteFileConfig(List<Long> ids) {
-        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>().eq(StorageConfig::getId, ids);
-        List<StorageConfig> list = list(eq);
-        list.forEach(sysFileConfig -> {
-            if (StorageConstants.IS_FILE_UPLOAD_MASTER.equals(sysFileConfig.getIsMaster())) {
-                throw new ServiceException(String.format("文件配置【%s】为当前主配置，不能删除", sysFileConfig.getStorageName()));
-            }
-        });
         return removeByIds(ids);
     }
 

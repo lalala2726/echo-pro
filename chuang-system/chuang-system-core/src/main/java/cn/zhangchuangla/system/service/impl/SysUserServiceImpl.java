@@ -11,7 +11,9 @@ import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
-import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
+import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
 import cn.zhangchuangla.system.service.SysDeptService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -42,7 +44,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
-
 
     /**
      * 进行条件查询
@@ -318,6 +319,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     @Override
     public boolean resetPassword(String password, Long userId) {
         Long currentUserId = SecurityUtils.getUserId();
+        Set<String> current = SecurityUtils.getRoles();
+
         //不允许用户重置自己密码
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置当前用户密码");
@@ -332,5 +335,35 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
                 .password(password)
                 .build();
         return updateById(sysUser);
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updatePassword(UpdatePasswordRequest request) {
+        String newPassword = SecurityUtils.encryptPassword(request.getNewPassword());
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
+        SysUser sysUser = SysUser.builder()
+                .password(newPassword)
+                .build();
+        return update(sysUser, eq);
+    }
+
+    /**
+     * 修改用户个人信息
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateUserProfile(UserProfileUpdateRequest request) {
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(request, sysUser);
+        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
+        return update(sysUser, eq);
     }
 }

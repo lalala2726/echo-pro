@@ -21,7 +21,6 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MetaVo {
 
-
     /**
      * 设置该路由在侧边栏和面包屑中展示的名字
      */
@@ -64,7 +63,6 @@ public class MetaVo {
      */
     @Schema(description = "是否显示父级菜单")
     private Boolean showParent;
-
 
     /**
      * 按钮级别权限设置

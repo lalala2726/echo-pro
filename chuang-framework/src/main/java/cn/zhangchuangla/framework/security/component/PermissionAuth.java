@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class PermissionAuth {
      * @return true - 角色匹配，false - 角色不匹配
      */
     public boolean isSpecificRole(String role) {
-        if (isSuperAdmin() || isSuperAdmin() || StringUtils.isBlank(role)) {
+        if (isSuperAdmin() || isSuperAdmin() || StrUtils.isBlank(role)) {
             return true;
         }
         SysUserDetails sysUserDetails = getLoginUser();
@@ -78,7 +78,7 @@ public class PermissionAuth {
      * @return true - 拥有该权限，false - 没有该权限
      */
     private boolean isAllow(Set<String> permissions, String permission) {
-        return permissions.contains(Constants.ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
+        return permissions.contains(Constants.ALL_PERMISSION) || permissions.contains(StrUtils.trim(permission));
     }
 
     /**

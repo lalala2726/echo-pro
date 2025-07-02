@@ -20,7 +20,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * 获取字典类型列表
      *
      * @param page    分页
-     * @param request 请求
+     * @param request 请求参数
      * @return 分页结果
      */
     Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request);
@@ -36,7 +36,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
     /**
      * 添加字典类型
      *
-     * @param request 请求
+     * @param request 请求参数
      * @return 是否添加成功
      */
     boolean addDictType(SysDictTypeAddRequest request);
@@ -44,7 +44,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
     /**
      * 修改字典类型
      *
-     * @param request 请求
+     * @param request 请求参数
      * @return 是否修改成功
      */
     boolean updateDictType(SysDictTypeUpdateRequest request);
@@ -52,7 +52,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
     /**
      * 删除字典类型
      *
-     * @param id id
+     * @param id 字典ID
      * @return 是否删除成功
      */
     boolean deleteDictType(List<Long> id);

@@ -47,6 +47,23 @@ public class BaseController {
         return targetList;
     }
 
+    /**
+     * 将 source 对象的属性复制到一个新的 targetClass 实例中
+     *
+     * @param source      原对象
+     * @param targetClass 目标类 class 对象
+     * @return 拷贝后的目标对象
+     */
+    protected static <T, V> V copyProperties(T source, Class<V> targetClass) {
+        try {
+            V target = targetClass.getDeclaredConstructor().newInstance();
+            BeanUtils.copyProperties(source, target);
+            return target;
+        } catch (Exception e) {
+            throw new RuntimeException("属性拷贝失败", e);
+        }
+    }
+
 
     /**
      * 将 Page<T> 转换为 List<V>，使用 BeanUtils 进行属性拷贝

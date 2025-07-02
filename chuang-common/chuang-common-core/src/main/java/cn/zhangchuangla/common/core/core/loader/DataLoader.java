@@ -21,12 +21,19 @@ public interface DataLoader {
     /**
      * 执行数据加载
      */
-    void load();
+    boolean load();
 
     /**
      * 是否允许异步加载
      */
     default boolean isAsync() {
+        return false;
+    }
+
+    /**
+     * 加载失败时是否允许继续启动项目,true将阻止项目启动
+     */
+    default boolean allowStartupOnFailure() {
         return false;
     }
 }

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.message.service;
 
-import cn.zhangchuangla.message.model.entity.UserMessageExt;
+import cn.zhangchuangla.message.model.entity.SysUserMessageExt;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Chuang
  */
-public interface UserMessageReadService extends IService<UserMessageExt> {
+public interface UserMessageReadService extends IService<SysUserMessageExt> {
 
     /**
      * 真实阅读单个消息（用户实际查看消息内容）
@@ -54,7 +54,7 @@ public interface UserMessageReadService extends IService<UserMessageExt> {
     boolean unread(Long userId, Long messageId);
 
     /**
-     * 批量标记消息为未读
+     * 批量标记消息为未读,这个方法仅用于批量标记未读，不记录真实阅读时间
      *
      * @param userId     用户ID
      * @param messageIds 消息ID集合

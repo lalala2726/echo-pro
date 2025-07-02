@@ -1,11 +1,11 @@
 package cn.zhangchuangla.common.excel.core;
 
-import cn.hutool.core.util.StrUtil;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class DictDataHandler {
      * @return 字典标签，如果未找到则返回原值
      */
     public String getDictLabel(String dictType, String dictValue) {
-        if (StrUtil.isBlank(dictType) || StrUtil.isBlank(dictValue)) {
+        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(dictValue)) {
             return dictValue;
         }
 
@@ -104,7 +104,7 @@ public class DictDataHandler {
      * @param dictType 字典类型，如果为空则清除所有缓存
      */
     public void clearCache(String dictType) {
-        if (StrUtil.isBlank(dictType)) {
+        if (StringUtils.isBlank(dictType)) {
             localCache.clear();
             log.debug("清除所有字典本地缓存");
         } else {
@@ -124,7 +124,7 @@ public class DictDataHandler {
         }
 
         for (String dictType : dictTypes) {
-            if (StrUtil.isNotBlank(dictType) && !localCache.containsKey(dictType)) {
+            if (StringUtils.isNotBlank(dictType) && !localCache.containsKey(dictType)) {
                 Map<String, String> dictMap = loadDictFromRedis(dictType);
                 if (dictMap != null && !dictMap.isEmpty()) {
                     localCache.put(dictType, dictMap);

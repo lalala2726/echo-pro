@@ -19,7 +19,6 @@ import java.util.Date;
 @Data
 public class SysUserRole extends BaseEntity {
 
-
     /**
      * 主键
      */

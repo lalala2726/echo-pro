@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StringUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
@@ -140,7 +140,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      */
     @Override
     public boolean isDictTypeExist(String dictType) {
-        if (StringUtils.isBlank(dictType)) {
+        if (StrUtils.isBlank(dictType)) {
             return false;
         }
         LambdaQueryWrapper<SysDictType> eq = new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType);

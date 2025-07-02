@@ -5,7 +5,9 @@ import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserUpdateRequest;
-import cn.zhangchuangla.system.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
+import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +16,7 @@ import java.util.List;
 
 /**
  * 用户服务接口
+ * @author Chuang
  */
 public interface SysUserService extends IService<SysUser> {
 
@@ -137,4 +140,21 @@ public interface SysUserService extends IService<SysUser> {
      * @return 操作结果
      */
     boolean resetPassword(String password, Long userId);
+
+    /**
+     * 修改用户密码
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean updatePassword(UpdatePasswordRequest request);
+
+
+    /**
+     * 修改用户个人资料
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean updateUserProfile(UserProfileUpdateRequest request);
 }

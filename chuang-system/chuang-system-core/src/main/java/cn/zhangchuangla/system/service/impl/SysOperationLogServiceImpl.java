@@ -24,7 +24,6 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
 
     private final SysOperationLogMapper sysOperationLogMapper;
 
-
     /**
      * 获取系统操作日志列表
      *

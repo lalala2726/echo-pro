@@ -1,0 +1,49 @@
+spring:
+  quartz:
+    # 任务存储类型
+    job-store-type: jdbc
+    # 关闭时等待任务完成
+    wait-for-jobs-to-complete-on-shutdown: false
+    # 是否覆盖已有的任务
+    overwrite-existing-jobs: true
+    # 是否自动启动计划程序
+    auto-startup: true
+    # 延迟启动
+    startup-delay: 0s
+    jdbc:
+      # 数据库架构初始化模式
+      initialize-schema: always
+    # 相关属性配置 - Spring Boot 3.x 版本
+    properties:
+      org:
+        quartz:
+          scheduler:
+            # 调度器实例名称
+            instanceName: QuartzScheduler
+            # 分布式节点ID自动生成
+            instanceId: AUTO
+            # 跳过更新检查
+            skipUpdateCheck: true
+          jobStore:
+            # MySQL数据库驱动委托类
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            # 表前缀（必须与数据库中的表前缀一致）
+            tablePrefix: QRTZ_
+            # 是否开启集群
+            isClustered: true
+            # 分布式节点有效性检查时间间隔（毫秒）
+            clusterCheckinInterval: 15000
+            # 失火阈值（毫秒）
+            misfireThreshold: 60000
+            # 是否使用属性传递JobDataMap参数
+            useProperties: false
+          # 线程池配置
+          threadPool:
+            # 线程池实现类
+            class: org.quartz.simpl.SimpleThreadPool
+            # 线程数量
+            threadCount: 10
+            # 线程优先级
+            threadPriority: 5
+            # 线程继承初始化线程的上下文类加载器
+            threadsInheritContextClassLoaderOfInitializingThread: true

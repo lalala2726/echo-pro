@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.model.request.menu;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +15,6 @@ import lombok.Data;
 @Data
 @Schema(name = "菜单添加请求对象", description = "菜单添加请求对象")
 public class SysMenuAddRequest {
-
 
     /**
      * 菜单名称
@@ -41,6 +42,12 @@ public class SysMenuAddRequest {
     @Schema(description = "路由地址", example = "/user/list", type = "string")
     @NotNull(message = "路由地址不能为空")
     private String path;
+
+    /**
+     * 菜单激活
+     */
+    @Schema(description = "菜单激活", example = "/user/list", type = "string")
+    private String activePath;
 
     /**
      * 是否外部跳转（0否 1是）
@@ -84,6 +91,13 @@ public class SysMenuAddRequest {
      */
     @Schema(description = "菜单状态（0显示 1隐藏）", example = "0", type = "string")
     private String visible;
+
+    /**
+     * 是否显示父级菜单 0否 1是
+     */
+    @Schema(description = "是否显示父级菜单 0否 1是")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer showParent;
 
     /**
      * 菜单状态（0正常 1停用）
