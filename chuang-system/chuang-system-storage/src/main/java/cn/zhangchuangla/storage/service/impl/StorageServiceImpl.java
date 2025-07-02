@@ -10,7 +10,7 @@ import cn.zhangchuangla.storage.components.SpringContextHolder;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
-import cn.zhangchuangla.storage.model.dto.FileTrashInfoDTO;
+import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.FileRecord;
 import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
@@ -20,6 +20,7 @@ import cn.zhangchuangla.storage.service.StorageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -183,11 +184,16 @@ public class StorageServiceImpl implements StorageService {
         LocalFileStorageConfig config = service.getConfig();
         boolean realDelete = config.isRealDelete();
 
+        // 创建文件操作DTO
+        FileOperationDto fileOperationDto = FileOperationDto.builder()
+                .previewRelativePath(fileRecord.getPreviewImagePath())
+                .originalRelativePath(fileRecord.getOriginalRelativePath())
+                .build();
         // 5. 执行删除操作
         if (realDelete) {
             // 配置为真实删除模式，无论是否强制删除，都会物理删除文件
             log.info("执行物理删除文件，文件ID: {}", fileId);
-            service.delete(fileRecord.getOriginalRelativePath(), fileRecord.getPreviewImagePath(), true);
+            service.delete(fileOperationDto, true);
 
             // 标记数据库记录为已删除
             fileRecord.setIsDeleted(StorageConstants.dataVerifyConstants.FILE_DELETED);
@@ -204,10 +210,8 @@ public class StorageServiceImpl implements StorageService {
             } else {
                 // 移入回收站模式
                 log.info("执行移入回收站操作，文件ID: {}", fileId);
-                FileTrashInfoDTO trashInfo = service.delete(
-                        fileRecord.getOriginalRelativePath(),
-                        fileRecord.getPreviewImagePath(),
-                        false
+
+                FileOperationDto trashInfo = service.delete(fileOperationDto, false
                 );
 
                 if (trashInfo != null) {
@@ -283,7 +287,9 @@ public class StorageServiceImpl implements StorageService {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件未处于回收站中或已被删除，无法恢复");
         }
         //进行文件操作
-        boolean restore = service.restore(fileRecord);
+        FileOperationDto fileOperationDto = new FileOperationDto();
+        BeanUtils.copyProperties(fileRecord, fileOperationDto);
+        boolean restore = service.restore(fileOperationDto);
         //恢复成功后将数据库中文件状态改为正常
         if (restore) {
             fileRecord.setIsTrash(StorageConstants.dataVerifyConstants.NOT_IN_TRASH);
