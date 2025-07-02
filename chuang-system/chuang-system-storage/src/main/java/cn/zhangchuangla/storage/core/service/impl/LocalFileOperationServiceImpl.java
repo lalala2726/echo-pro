@@ -38,14 +38,13 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageAsyncService storageAsyncService;
-    private final LocalFileStorageConfig localFileStorageConfig;
+    private LocalFileStorageConfig localFileStorageConfig;
 
-    public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService,
-                                         StorageAsyncService storageAsyncService) {
+    public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService, StorageAsyncService storageAsyncService) {
         this.storageConfigRetrievalService = storageConfigRetrievalService;
         this.storageAsyncService = storageAsyncService;
-        this.localFileStorageConfig = getConfig();
     }
+
 
     /**
      * 每次操作前拉取最新配置
@@ -53,10 +52,11 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
     @Override
     public LocalFileStorageConfig getConfig() {
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
-            throw new FileException("存储配置异常!请刷新配置后再试!");
-        }
         String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
+        if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
+            throw new FileException(String.format("当前调用的服务是:%s,而你激活的配置是:%s,调用的服务和激活的配置不符合!请你仔细检查配置!"
+                    , StorageConstants.StorageType.LOCAL, activeStorageType));
+        }
         if (json == null || json.isBlank()) {
             throw new FileException("本地文件存储配置未找到");
         }
@@ -69,6 +69,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public UploadedFileInfo upload(MultipartFile file) {
+        getConfig();
         try {
             String datePath = todayDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
@@ -101,6 +102,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
     @Override
     public UploadedFileInfo uploadImage(MultipartFile file) {
+        getConfig();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
 
         String datePath = todayDir();
@@ -163,6 +165,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public FileTrashInfoDTO delete(String originalRelativePath, String previewRelativePath, boolean forceDelete) {
+        getConfig();
         File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
         File originalFile = new File(uploadRootDir, originalRelativePath);
 
@@ -229,6 +232,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean restore(FileRecord fileRecord) {
+        getConfig();
         if (fileRecord == null) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
@@ -302,6 +306,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean deleteTrashFile(String relativePath) {
+        getConfig();
         File file = new File(localFileStorageConfig.getUploadPath(), relativePath);
         if (!file.exists()) {
             log.warn("回收站文件不存在，删除失败: {}", relativePath);
