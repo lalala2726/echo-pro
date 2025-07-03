@@ -3,12 +3,10 @@ package cn.zhangchuangla.storage.async;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.utils.AliyunOssOperationUtils;
-import cn.zhangchuangla.storage.utils.ImageStreamUtils;
-import cn.zhangchuangla.storage.utils.MinioOperationUtils;
-import cn.zhangchuangla.storage.utils.TencentCosOperationUtils;
+import cn.zhangchuangla.storage.utils.*;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.OSS;
 import com.qcloud.cos.COSClient;
@@ -18,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.*;
 
@@ -30,6 +29,7 @@ import java.io.*;
  *   <li>MinIO存储异步压缩</li>
  *   <li>阿里云OSS存储异步压缩</li>
  *   <li>腾讯云COS存储异步压缩</li>
+ *   <li>亚马逊S3存储异步压缩</li>
  * </ul>
  *
  * @author Chuang
@@ -44,6 +44,7 @@ public class StorageAsyncService {
     private final MinioOperationUtils minioOperationUtils;
     private final AliyunOssOperationUtils aliyunOssOperationUtils;
     private final TencentCosOperationUtils tencentCosOperationUtils;
+    private final AmazonS3OperationUtils amazonS3OperationUtils;
 
     /**
      * 异步压缩图片 - 本地存储专用
@@ -306,6 +307,79 @@ public class StorageAsyncService {
     }
 
     /**
+     * 异步压缩图片 - 亚马逊S3存储专用
+     * <p>
+     * 此方法专门为亚马逊S3存储设计，从S3下载原图，压缩后上传预览图
+     * 兼容标准S3协议和其他S3兼容的存储服务
+     *
+     * @param bucketName        存储桶名称
+     * @param originalImagePath 原图在S3中的路径
+     * @param previewImagePath  预览图在S3中的路径
+     * @param maxWidth          最大宽度
+     * @param maxHeight         最大高度
+     * @param quality           压缩质量
+     * @param originalFilename  原始文件名
+     */
+    @Async("imageProcessExecutor")
+    public void compressImageAmazonS3(String bucketName, String originalImagePath, String previewImagePath,
+                                      int maxWidth, int maxHeight, float quality, String originalFilename) {
+        S3Client s3Client = null;
+        InputStream originalInputStream = null;
+        ByteArrayOutputStream compressedOutputStream = null;
+
+        try {
+            log.info("开始亚马逊S3异步图片压缩: {}/{} -> {}/{}", bucketName, originalImagePath, bucketName, previewImagePath);
+
+            // 获取亚马逊S3配置
+            AmazonS3StorageConfig config = getAmazonS3Config();
+            s3Client = amazonS3OperationUtils.createS3Client(config);
+
+            // 确保存储桶存在
+            amazonS3OperationUtils.ensureBucketExists(s3Client, bucketName);
+
+            // 检查原图是否存在
+            if (!amazonS3OperationUtils.objectExists(s3Client, bucketName, originalImagePath)) {
+                log.error("亚马逊S3原图不存在: {}/{}", bucketName, originalImagePath);
+                return;
+            }
+
+            // 从亚马逊S3下载原图
+            originalInputStream = amazonS3OperationUtils.getObjectStream(s3Client, bucketName, originalImagePath);
+
+            // 创建压缩输出流
+            compressedOutputStream = new ByteArrayOutputStream();
+
+            // 执行图片压缩
+            ImageStreamUtils.compress(
+                    originalInputStream,
+                    compressedOutputStream,
+                    maxWidth,
+                    maxHeight,
+                    quality,
+                    originalFilename
+            );
+
+            // 上传压缩后的图片到亚马逊S3
+            byte[] compressedData = compressedOutputStream.toByteArray();
+            amazonS3OperationUtils.uploadByteArray(s3Client, bucketName, previewImagePath, compressedData, "image/jpeg");
+
+            log.info("亚马逊S3异步图片压缩完成: {}/{} -> {}/{}, 压缩后大小: {} bytes",
+                    bucketName, originalImagePath, bucketName, previewImagePath, compressedData.length);
+
+        } catch (Exception e) {
+            log.error("亚马逊S3异步图片压缩失败: {}/{} -> {}/{}, 错误: {}",
+                    bucketName, originalImagePath, bucketName, previewImagePath, e.getMessage(), e);
+        } finally {
+            // 确保所有流都被正确关闭
+            closeStreams(originalInputStream, compressedOutputStream);
+            // 关闭S3客户端
+            if (s3Client != null) {
+                amazonS3OperationUtils.closeS3Client(s3Client);
+            }
+        }
+    }
+
+    /**
      * 获取MinIO配置
      *
      * @return MinIO存储配置
@@ -356,6 +430,24 @@ public class StorageAsyncService {
         } catch (Exception e) {
             log.error("获取腾讯云COS配置失败: {}", e.getMessage(), e);
             throw new RuntimeException("获取腾讯云COS配置失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取亚马逊S3配置
+     *
+     * @return 亚马逊S3存储配置
+     */
+    private AmazonS3StorageConfig getAmazonS3Config() {
+        try {
+            String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
+            if (json == null || json.isBlank()) {
+                throw new RuntimeException("亚马逊S3配置未找到");
+            }
+            return JSON.parseObject(json, AmazonS3StorageConfig.class);
+        } catch (Exception e) {
+            log.error("获取亚马逊S3配置失败: {}", e.getMessage(), e);
+            throw new RuntimeException("获取亚马逊S3配置失败: " + e.getMessage());
         }
     }
 
@@ -418,6 +510,13 @@ public class StorageAsyncService {
                     // 腾讯云COS存储需要额外的桶名称参数，这里从配置获取
                     TencentCOSStorageConfig cosConfig = getTencentCosConfig();
                     compressImageTencentCos(cosConfig.getBucketName(), originalPath, compressedPath,
+                            maxWidth, maxHeight, quality, originalFilename);
+                    break;
+
+                case StorageConstants.StorageType.AMAZON_S3:
+                    // 亚马逊S3存储需要额外的桶名称参数，这里从配置获取
+                    AmazonS3StorageConfig s3Config = getAmazonS3Config();
+                    compressImageAmazonS3(s3Config.getBucketName(), originalPath, compressedPath,
                             maxWidth, maxHeight, quality, originalFilename);
                     break;
 

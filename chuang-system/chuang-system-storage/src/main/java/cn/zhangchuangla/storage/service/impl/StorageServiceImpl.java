@@ -399,6 +399,7 @@ public class StorageServiceImpl implements StorageService {
             case StorageConstants.StorageType.ALIYUN_OSS -> StorageConstants.springBeanName.ALIYUN_OSS_STORAGE_SERVICE;
             case StorageConstants.StorageType.TENCENT_COS ->
                     StorageConstants.springBeanName.TENCENT_COS_STORAGE_SERVICE;
+            case StorageConstants.StorageType.AMAZON_S3 -> StorageConstants.springBeanName.AMAZON_S3_STORAGE_SERVICE;
             default -> throw new ServiceException("未知存储类型: " + type);
         };
     }
