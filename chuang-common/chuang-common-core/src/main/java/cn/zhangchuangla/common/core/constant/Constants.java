@@ -45,6 +45,7 @@ public class Constants {
     public static final String WWW = "www.";
     public static final String ORIGINAL = "original";
     public static final String PREVIEW = "preview";
+
     /**
      * 逻辑删除
      */

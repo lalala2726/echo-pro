@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.model.request;
+package cn.zhangchuangla.storage.model.request;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -70,5 +70,11 @@ public class AliyunOSSConfigRequest {
             message = "访问端点域名格式不正确")
     @Schema(description = "文件访问路径,如果为空将直接返回相对路径")
     private String fileDomain;
+
+    /**
+     * 是否真实删除
+     */
+    @Schema(description = "是否真实删除")
+    private boolean realDelete;
 
 }

@@ -29,7 +29,7 @@ public @interface OperationLog {
     /**
      * 是否保存请求的参数
      */
-    boolean isSaveRequestData() default true;
+    boolean saveRequestData() default true;
 
     /**
      * 是否保存响应的参数

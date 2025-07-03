@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.model.request;
+package cn.zhangchuangla.storage.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -57,4 +57,10 @@ public class TencentCOSConfigRequest {
      */
     @Schema(description = "文件域名,如果为空将返回相对路径")
     private String fileDomain;
+
+    /**
+     * 是否真实删除
+     */
+    @Schema(description = "是否真实删除")
+    private boolean realDelete;
 }
