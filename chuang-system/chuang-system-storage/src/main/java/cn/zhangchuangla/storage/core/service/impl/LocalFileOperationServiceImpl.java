@@ -270,61 +270,33 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      */
     @Override
     public boolean restore(FileOperationDto fileOperationDto) {
-        getConfig();
+        // 1. 参数校验
         if (fileOperationDto == null) {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
 
+        // 2. 获取配置和初始化
+        getConfig();
         File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
 
-        // 获取回收站中的文件路径
+        // 3. 获取路径信息
         String originalTrashPath = fileOperationDto.getOriginalTrashPath();
         String previewTrashPath = fileOperationDto.getPreviewTrashPath();
-
-        // 获取原始文件路径
         String originalRelativePath = fileOperationDto.getOriginalRelativePath();
         String previewImagePath = fileOperationDto.getPreviewRelativePath();
 
+        // 4. 校验必要路径
         if (StringUtils.isBlank(originalTrashPath) || StringUtils.isBlank(originalRelativePath)) {
             log.error("文件恢复失败：回收站路径或原始路径为空，文件ID: {}", fileOperationDto.getFileId());
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在计算机中已经被删除!");
         }
 
         try {
-            // 1. 恢复主文件
-            File trashFile = new File(uploadRootDir, originalTrashPath);
-            File originalFile = new File(uploadRootDir, originalRelativePath);
+            // 5. 恢复原始文件
+            restoreOriginalFile(uploadRootDir, originalTrashPath, originalRelativePath);
 
-            if (!trashFile.exists()) {
-                log.error("回收站中的文件不存在：{}", originalTrashPath);
-                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
-            }
-
-            // 创建原始文件的目标目录
-            String originalDir = Paths.get(originalRelativePath).getParent().toString();
-            ensureDir(originalDir);
-
-            // 移动文件从回收站到原位置
-            FileUtils.moveFile(trashFile, originalFile);
-            log.info("主文件恢复成功：{} -> {}", originalTrashPath, originalRelativePath);
-
-            // 2. 恢复预览图（仅当预览图路径不为空时）
-            if (StringUtils.isNotBlank(previewTrashPath) && StringUtils.isNotBlank(previewImagePath)) {
-                File previewTrashFile = new File(uploadRootDir, previewTrashPath);
-                File previewOriginalFile = new File(uploadRootDir, previewImagePath);
-
-                if (previewTrashFile.exists()) {
-                    // 创建预览图的目标目录
-                    String previewDir = Paths.get(previewImagePath).getParent().toString();
-                    ensureDir(previewDir);
-
-                    // 移动预览图从回收站到原位置
-                    FileUtils.moveFile(previewTrashFile, previewOriginalFile);
-                    log.info("预览图恢复成功：{} -> {}", previewTrashPath, previewImagePath);
-                } else {
-                    log.warn("预览图在回收站中不存在，跳过预览图恢复：{}", previewTrashPath);
-                }
-            }
+            // 6. 恢复预览文件（如果存在）
+            restorePreviewFile(uploadRootDir, previewTrashPath, previewImagePath);
 
             log.info("文件恢复成功，文件ID: {}, 原始路径: {}", fileOperationDto.getFileId(), originalRelativePath);
             return true;
@@ -332,6 +304,52 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         } catch (IOException e) {
             log.error("文件恢复失败，文件ID: {}, 错误信息: {}", fileOperationDto.getFileId(), e.getMessage(), e);
             throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 恢复原始文件
+     */
+    private void restoreOriginalFile(File uploadRootDir, String originalTrashPath, String originalRelativePath) throws IOException {
+        File trashFile = new File(uploadRootDir, originalTrashPath);
+        File originalFile = new File(uploadRootDir, originalRelativePath);
+
+        if (!trashFile.exists()) {
+            log.error("回收站中的文件不存在：{}", originalTrashPath);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
+        }
+
+        // 创建原始文件的目标目录
+        String originalDir = Paths.get(originalRelativePath).getParent().toString();
+        ensureDir(originalDir);
+
+        // 移动文件从回收站到原位置
+        FileUtils.moveFile(trashFile, originalFile);
+        log.info("主文件恢复成功：{} -> {}", originalTrashPath, originalRelativePath);
+    }
+
+    /**
+     * 恢复预览文件
+     */
+    private void restorePreviewFile(File uploadRootDir, String previewTrashPath, String previewImagePath) throws IOException {
+        if (StringUtils.isBlank(previewTrashPath) || StringUtils.isBlank(previewImagePath)) {
+            log.debug("预览文件路径为空，跳过预览文件恢复");
+            return;
+        }
+
+        File previewTrashFile = new File(uploadRootDir, previewTrashPath);
+        File previewOriginalFile = new File(uploadRootDir, previewImagePath);
+
+        if (previewTrashFile.exists()) {
+            // 创建预览图的目标目录
+            String previewDir = Paths.get(previewImagePath).getParent().toString();
+            ensureDir(previewDir);
+
+            // 移动预览图从回收站到原位置
+            FileUtils.moveFile(previewTrashFile, previewOriginalFile);
+            log.info("预览图恢复成功：{} -> {}", previewTrashPath, previewImagePath);
+        } else {
+            log.warn("预览图在回收站中不存在，跳过预览图恢复：{}", previewTrashPath);
         }
     }
 
