@@ -152,7 +152,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
 
         // 返回原图的信息，压缩图正在后台处理
-        return buildFileInfo(originalFilename, originalFile, originalImageDir, originalFileName, file.getContentType());
+        return buildFileInfo(originalFilename, originalFile, originalImageDir, previewImageDir, originalFileName, file.getContentType());
     }
 
 
@@ -427,7 +427,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * @param newFileName      新文件名
      * @return 文件信息
      */
-    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String filePath,
+    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile,String filePath,String previewPath,
                                            String newFileName, String fileType) {
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -438,9 +438,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
         info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
-        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath,
-                Constants.PREVIEW, newFileName).toString());
-        info.setPreviewImageRelativePath(Paths.get(filePath, Constants.PREVIEW, newFileName).toString());
+        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath
+                ,newFileName).toString());
+        info.setPreviewImageRelativePath(Paths.get(previewPath, newFileName).toString());
         return info;
     }
 

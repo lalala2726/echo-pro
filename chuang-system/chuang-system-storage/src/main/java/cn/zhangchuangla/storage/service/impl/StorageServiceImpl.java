@@ -134,7 +134,7 @@ public class StorageServiceImpl implements StorageService {
                 .previewImageUrl(uploadedFileInfo.getPreviewImage())
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
-                .previewImagePath(uploadedFileInfo.getPreviewImageRelativePath())
+                .previewRelativePath(uploadedFileInfo.getPreviewImageRelativePath())
                 .originalFileUrl(uploadedFileInfo.getFileUrl())
                 .originalRelativePath(uploadedFileInfo.getFileRelativePath())
                 .uploadTime(new Date())
@@ -223,7 +223,7 @@ public class StorageServiceImpl implements StorageService {
         fileRecords.forEach(fileRecord -> {
             // 构建文件操作DTO
             FileOperationDto fileOperationDto = FileOperationDto.builder()
-                    .previewRelativePath(fileRecord.getPreviewImagePath())
+                    .previewRelativePath(fileRecord.getPreviewRelativePath())
                     .originalRelativePath(fileRecord.getOriginalRelativePath())
                     .build();
             if (forceDelete) {
