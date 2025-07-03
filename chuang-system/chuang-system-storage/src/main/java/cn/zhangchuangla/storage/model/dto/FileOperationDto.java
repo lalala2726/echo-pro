@@ -32,11 +32,6 @@ public class FileOperationDto {
     private String originalTrashPath;
 
     /**
-     * 压缩文件相对路径，存储在服务器上的路径
-     */
-    private String previewImagePath;
-
-    /**
      * 预览文件（如果存在）在回收站的相对路径
      */
     private String previewTrashPath;
