@@ -2,7 +2,6 @@ package cn.zhangchuangla.storage.core.service;
 
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -12,13 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Chuang
  */
 public interface FileOperationService {
-
-    /**
-     * 获取本地文件存储配置
-     *
-     * @return 当前存储配置
-     */
-    LocalFileStorageConfig getConfig();
 
     /**
      * 上传文件
@@ -55,8 +47,7 @@ public interface FileOperationService {
      * 删除回收站文件
      *
      * @param fileOperationDto 文件传输对象
-     * @return 删除结果
      */
-    boolean deleteTrashFile(FileOperationDto fileOperationDto);
+    void deleteTrashFile(FileOperationDto fileOperationDto);
 
 }
