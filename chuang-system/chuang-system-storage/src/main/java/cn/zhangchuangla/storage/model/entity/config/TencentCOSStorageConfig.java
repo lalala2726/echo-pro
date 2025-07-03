@@ -36,7 +36,7 @@ public class TencentCOSStorageConfig {
     private String fileDomain;
 
     /**
-     * 是否使用回收站 1 使用 0 不使用
+     * 是否真实删除
      */
-    private Integer enableTrash;
+    private boolean realDelete;
 }

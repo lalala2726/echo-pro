@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Service
 @RequiredArgsConstructor
-public class RegisterService{
+public class RegisterService {
 
     private final BCryptPasswordEncoder passwordEncoder;
     private final SysUserService sysUserService;

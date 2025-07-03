@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 用户服务接口
+ *
  * @author Chuang
  */
 public interface SysUserService extends IService<SysUser> {

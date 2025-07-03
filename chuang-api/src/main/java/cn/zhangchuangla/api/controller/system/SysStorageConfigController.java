@@ -2,18 +2,20 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
-import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.constant.StorageConstants;
+import cn.zhangchuangla.storage.core.service.StorageRegistryService;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
+import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
+import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
+import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
@@ -40,9 +42,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/system/file/config")
 @RequiredArgsConstructor
 @Tag(name = "文件存储配置", description = "提供本地存储、MinIO、阿里云OSS、腾讯云COS等文件存储配置的增删改查及主配置设置、缓存刷新等相关接口")
-public class SysFileConfigController extends BaseController {
+public class SysStorageConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
+    private final StorageRegistryService storageRegistryService;
 
     /**
      * 文件配置列表
@@ -53,7 +56,7 @@ public class SysFileConfigController extends BaseController {
      */
     @Operation(summary = "文件配置列表", description = "文件配置列表")
     @GetMapping("/list")
-    @PreAuthorize("@ss.hasPermission('system:file-config:list')")
+    @PreAuthorize("@ss.hasPermission('system:file:list')")
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                                          @Validated @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
@@ -80,18 +83,18 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增Minio配置")
-    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file:add')")
     @PostMapping("/add/minio")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult<Void> saveMinioConfig(@Parameter(description = "Minio配置请求参数")
-                                            @Validated @RequestBody MinioConfigRequest request) {
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
+    public AjaxResult<Void> addMinioConfig(@Parameter(description = "Minio配置请求参数")
+                                           @Validated @RequestBody MinioConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
         if (!StrUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = storageConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.addStorageConfig(request);
 
         return toAjax(result);
     }
@@ -104,20 +107,43 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增阿里云OSS配置")
-    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file:add')")
     @PostMapping("/add/aliyun")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
-    public AjaxResult<Void> saveAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
-                                                @Validated @RequestBody AliyunOSSConfigRequest request) {
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
+    public AjaxResult<Void> addAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
+                                               @Validated @RequestBody AliyunOSSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
         String endpoint = request.getEndpoint();
         request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
         if (!StrUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = storageConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.addStorageConfig(request);
         return toAjax(result);
     }
+
+    /**
+     * 新增亚马逊S3存储配置
+     *
+     * @param request 亚马逊S3存储配置请求参数
+     * @return 操作结果
+     */
+    @Operation(summary = "亚马逊S3存储配置")
+    @PreAuthorize("@ss.hasPermission('system:file:add')")
+    @PostMapping("/add/s3")
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
+    public AjaxResult<Void> addAmazonS3Config(@Parameter(description = "亚马逊S3配置请求参数")
+                                              @Validated @RequestBody AmazonS3ConfigRequest request) {
+        // 去除末尾的斜杠,确保一致性
+        String endpoint = request.getEndpoint();
+        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getFileDomain())) {
+            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
+        }
+        boolean result = storageConfigService.addStorageConfig(request);
+        return toAjax(result);
+    }
+
 
     /**
      * 新增腾讯云COS配置
@@ -126,9 +152,9 @@ public class SysFileConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增腾讯云COS配置")
-    @PreAuthorize("@ss.hasPermission('system:file-config:add')")
+    @PreAuthorize("@ss.hasPermission('system:file:add')")
     @PostMapping("/add/tencent")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, isSaveRequestData = false)
+    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
     public AjaxResult<Void> saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
                                                  @Validated @RequestBody TencentCOSConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
@@ -137,7 +163,7 @@ public class SysFileConfigController extends BaseController {
         if (!StrUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = storageConfigService.saveFileConfig(request);
+        boolean result = storageConfigService.addStorageConfig(request);
         return toAjax(result);
     }
 
@@ -149,12 +175,12 @@ public class SysFileConfigController extends BaseController {
      */
     @PutMapping("/setMaster/{id}")
     @Operation(summary = "设置主配置")
-    @PreAuthorize("@ss.hasPermission('system:file-config:update')")
-    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
-    public AjaxResult<Void> setIsMasterConfig(@Parameter(description = "文件配置ID")
-                                              @PathVariable("id") Long id) {
+    @PreAuthorize("@ss.hasPermission('system:file:update')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
+    public AjaxResult<Void> updatePrimaryConfig(@Parameter(description = "文件配置ID")
+                                                @PathVariable("id") Long id) {
         checkParam(id == null || id <= 0, "文件配置ID不能为空!");
-        boolean result = storageConfigService.setMasterConfig(id);
+        boolean result = storageConfigService.updatePrimaryConfig(id);
         // 刷新缓存
         if (result) {
             refreshCache();
@@ -168,11 +194,11 @@ public class SysFileConfigController extends BaseController {
      * @return 刷新结果
      */
     @PutMapping("/refreshCache")
-    @PreAuthorize("@ss.hasPermission('system:file-config:refreshCache')")
+    @PreAuthorize("@ss.hasPermission('system:file:refreshCache')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
-    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, isSaveRequestData = false)
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> refreshCache() {
-        //todo 刷新缓存
+        storageRegistryService.initializeStorage();
         return success();
     }
 
@@ -184,8 +210,8 @@ public class SysFileConfigController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除文件配置")
-    @PreAuthorize("@ss.hasPermission('system:file-config:delete')")
-    @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, isSaveRequestData = false)
+    @PreAuthorize("@ss.hasPermission('system:file:delete')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, saveRequestData = false)
     public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
                                              @PathVariable("ids") List<Long> ids) {
         ids.forEach(id -> {

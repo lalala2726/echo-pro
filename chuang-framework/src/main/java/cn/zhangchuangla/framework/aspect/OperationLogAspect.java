@@ -163,7 +163,7 @@ public class OperationLogAspect {
             sysOperationLog.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
 
             // 记录请求参数
-            if (controllerOperationLog.isSaveRequestData()) {
+            if (controllerOperationLog.saveRequestData()) {
                 sysOperationLog.setRequestParams(getRequestParams(joinPoint, controllerOperationLog.excludeParamNames()));
             }
 

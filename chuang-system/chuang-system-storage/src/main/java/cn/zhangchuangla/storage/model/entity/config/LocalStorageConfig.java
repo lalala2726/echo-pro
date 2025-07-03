@@ -30,7 +30,7 @@ public class LocalStorageConfig {
     /**
      * 是否真实删除文件
      */
-    private boolean realDelete = false;
+    private boolean realDelete;
 
 
 }

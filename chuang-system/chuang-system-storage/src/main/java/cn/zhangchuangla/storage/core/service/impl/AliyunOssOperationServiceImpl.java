@@ -253,7 +253,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         String bucketName = aliyunOssStorageConfig.getBucketName();
 
         // 3. 判断删除模式 - 核心删除逻辑分发
-        if (forceDelete && aliyunOssStorageConfig.getEnableTrash() != null && aliyunOssStorageConfig.getEnableTrash() == 0) {
+        if (forceDelete && aliyunOssStorageConfig.isRealDelete()) {
             // 物理删除模式
             return performPhysicalDelete(bucketName, fileOperationDto);
         } else {
@@ -460,7 +460,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         }
 
         // 如果不是真实删除，则直接返回成功
-        boolean realDelete = aliyunOssStorageConfig.getEnableTrash() != null && aliyunOssStorageConfig.getEnableTrash() == 0;
+        boolean realDelete = aliyunOssStorageConfig.isRealDelete();
         if (!realDelete) {
             log.info("文件不是真实删除，系统将不会执行实际的删除操作!");
             return;
