@@ -66,7 +66,7 @@ public class FileRecord {
     /**
      * 压缩文件相对路径，存储在服务器上的路径
      */
-    private String previewImagePath;
+    private String previewRelativePath;
 
     /**
      * 文件扩展名
