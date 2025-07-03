@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
-import cn.zhangchuangla.storage.core.service.FileOperationService;
+import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
@@ -35,7 +35,7 @@ import java.util.Objects;
 @Slf4j
 @Service(StorageConstants.springBeanName.ALIYUN_OSS_STORAGE_SERVICE)
 @RequiredArgsConstructor
-public class AliyunOssFileOperationServiceImpl implements FileOperationService {
+public class AliyunOssOperationServiceImpl implements OperationService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final AliyunOssOperationUtils aliyunOssOperationUtils;

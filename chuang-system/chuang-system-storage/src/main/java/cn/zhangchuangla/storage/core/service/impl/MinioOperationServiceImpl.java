@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
-import cn.zhangchuangla.storage.core.service.FileOperationService;
+import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
@@ -36,7 +36,7 @@ import java.util.Objects;
 @Slf4j
 @Service(StorageConstants.springBeanName.MINIO_STORAGE_SERVICE)
 @RequiredArgsConstructor
-public class MinioFileOperationServiceImpl implements FileOperationService {
+public class MinioOperationServiceImpl implements OperationService {
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageAsyncService storageAsyncService;

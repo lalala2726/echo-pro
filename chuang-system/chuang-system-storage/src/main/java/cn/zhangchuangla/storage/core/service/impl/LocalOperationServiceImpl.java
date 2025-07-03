@@ -6,11 +6,11 @@ import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
-import cn.zhangchuangla.storage.core.service.FileOperationService;
+import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.LocalStorageConfig;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +32,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service(StorageConstants.springBeanName.LOCAL_STORAGE_SERVICE)
-public class LocalFileOperationServiceImpl implements FileOperationService {
+public class LocalOperationServiceImpl implements OperationService {
 
 
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final StorageAsyncService storageAsyncService;
-    private LocalFileStorageConfig localFileStorageConfig;
+    private LocalStorageConfig localStorageConfig;
 
-    public LocalFileOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService, StorageAsyncService storageAsyncService) {
+    public LocalOperationServiceImpl(StorageConfigRetrievalService storageConfigRetrievalService, StorageAsyncService storageAsyncService) {
         this.storageConfigRetrievalService = storageConfigRetrievalService;
         this.storageAsyncService = storageAsyncService;
     }
@@ -48,7 +48,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
     /**
      * 每次操作前拉取最新配置
      */
-    public LocalFileStorageConfig getConfig() {
+    public LocalStorageConfig getConfig() {
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
         if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
@@ -58,8 +58,8 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         if (json == null || json.isBlank()) {
             throw new FileException("本地文件存储配置未找到");
         }
-        localFileStorageConfig = JSON.parseObject(json, LocalFileStorageConfig.class);
-        return localFileStorageConfig;
+        localStorageConfig = JSON.parseObject(json, LocalStorageConfig.class);
+        return localStorageConfig;
     }
 
 
@@ -173,7 +173,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
         // 2. 获取配置和初始化
         getConfig();
-        File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
+        File uploadRootDir = new File(localStorageConfig.getUploadPath());
         File originalFile = new File(uploadRootDir, fileOperationDto.getOriginalRelativePath());
 
         File previewFile = null;
@@ -182,7 +182,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         }
 
         // 3. 判断删除模式
-        if (forceDelete && localFileStorageConfig.isRealDelete()) {
+        if (forceDelete && localStorageConfig.isRealDelete()) {
             // 物理删除模式
             return performPhysicalDelete(originalFile, previewFile, fileOperationDto);
         } else {
@@ -275,7 +275,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
         // 2. 获取配置和初始化
         getConfig();
-        File uploadRootDir = new File(localFileStorageConfig.getUploadPath());
+        File uploadRootDir = new File(localStorageConfig.getUploadPath());
 
         // 3. 获取路径信息
         String originalTrashPath = fileOperationDto.getOriginalTrashPath();
@@ -366,13 +366,13 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
         }
         //如果不是真实删除，则直接返回成功
-        boolean realDelete = localFileStorageConfig.isRealDelete();
+        boolean realDelete = localStorageConfig.isRealDelete();
         if (!realDelete) {
             log.info("文件不是真实删除，系统将不会执行实际的删除操作!");
             return;
         }
         //1.删除文件
-        String originalTrash = Paths.get(localFileStorageConfig.getUploadPath(), fileOperationDto.getOriginalTrashPath())
+        String originalTrash = Paths.get(localStorageConfig.getUploadPath(), fileOperationDto.getOriginalTrashPath())
                 .toString();
         File uploadRootDir = new File(originalTrash);
         try {
@@ -380,7 +380,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             log.info("文件删除成功：{}", originalTrash);
             //2.如果预览图存在，则删除预览图
             if (fileOperationDto.getPreviewTrashPath() != null && !fileOperationDto.getPreviewTrashPath().isBlank()) {
-                String previewTrash = Paths.get(localFileStorageConfig.getUploadPath(), fileOperationDto.getPreviewTrashPath()).toString();
+                String previewTrash = Paths.get(localStorageConfig.getUploadPath(), fileOperationDto.getPreviewTrashPath()).toString();
                 File previewTrashFile = new File(previewTrash);
                 if (previewTrashFile.exists()) {
                     FileUtils.delete(previewTrashFile);
@@ -410,7 +410,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setFileSize(savedFile.length());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX,
+        info.setFileUrl(Paths.get(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX,
                 targetPath, newFileName).toString());
         info.setFileRelativePath(Paths.get(targetPath, newFileName).toString());
         return info;
@@ -434,9 +434,9 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setFileSize(savedFile.length());
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
+        info.setFileUrl(Paths.get(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
         info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
-        info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath
+        info.setPreviewImage(Paths.get(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath
                 , newFileName).toString());
         info.setPreviewImageRelativePath(Paths.get(previewPath, newFileName).toString());
         return info;
@@ -447,7 +447,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * 根据目录确保存在,并返回文件夹
      */
     private File ensureDir(String path) throws IOException {
-        File dir = new File(localFileStorageConfig.getUploadPath(), path);
+        File dir = new File(localStorageConfig.getUploadPath(), path);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 throw new IOException("无法创建目录: " + dir.getAbsolutePath());

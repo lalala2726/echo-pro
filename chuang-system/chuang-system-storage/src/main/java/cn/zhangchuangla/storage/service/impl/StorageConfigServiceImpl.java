@@ -9,7 +9,7 @@ import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.LocalStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
@@ -115,9 +115,9 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean saveFileConfig(LocalFileConfigRequest request) {
-        LocalFileStorageConfig localFileStorageConfig = new LocalFileStorageConfig();
-        BeanUtils.copyProperties(request, localFileStorageConfig);
-        String value = JSON.toJSONString(localFileStorageConfig);
+        LocalStorageConfig localStorageConfig = new LocalStorageConfig();
+        BeanUtils.copyProperties(request, localStorageConfig);
+        String value = JSON.toJSONString(localStorageConfig);
         return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.LOCAL, value);
     }
 
