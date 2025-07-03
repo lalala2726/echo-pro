@@ -56,7 +56,7 @@ public class SysStorageConfigController extends BaseController {
      */
     @Operation(summary = "文件配置列表", description = "文件配置列表")
     @GetMapping("/list")
-    @PreAuthorize("@ss.hasPermission('system:file:list')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:list')")
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                                          @Validated @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
@@ -83,7 +83,7 @@ public class SysStorageConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增Minio配置")
-    @PreAuthorize("@ss.hasPermission('system:file:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @PostMapping("/add/minio")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
     public AjaxResult<Void> addMinioConfig(@Parameter(description = "Minio配置请求参数")
@@ -107,7 +107,7 @@ public class SysStorageConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增阿里云OSS配置")
-    @PreAuthorize("@ss.hasPermission('system:file:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @PostMapping("/add/aliyun")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
     public AjaxResult<Void> addAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
@@ -129,7 +129,7 @@ public class SysStorageConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "亚马逊S3存储配置")
-    @PreAuthorize("@ss.hasPermission('system:file:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @PostMapping("/add/s3")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
     public AjaxResult<Void> addAmazonS3Config(@Parameter(description = "亚马逊S3配置请求参数")
@@ -152,7 +152,7 @@ public class SysStorageConfigController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "新增腾讯云COS配置")
-    @PreAuthorize("@ss.hasPermission('system:file:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @PostMapping("/add/tencent")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
     public AjaxResult<Void> saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
@@ -175,7 +175,7 @@ public class SysStorageConfigController extends BaseController {
      */
     @PutMapping("/setMaster/{id}")
     @Operation(summary = "设置主配置")
-    @PreAuthorize("@ss.hasPermission('system:file:update')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> updatePrimaryConfig(@Parameter(description = "文件配置ID")
                                                 @PathVariable("id") Long id) {
@@ -194,7 +194,7 @@ public class SysStorageConfigController extends BaseController {
      * @return 刷新结果
      */
     @PutMapping("/refreshCache")
-    @PreAuthorize("@ss.hasPermission('system:file:refreshCache')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:refreshCache')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> refreshCache() {
@@ -210,7 +210,7 @@ public class SysStorageConfigController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除文件配置")
-    @PreAuthorize("@ss.hasPermission('system:file:delete')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, saveRequestData = false)
     public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
                                              @PathVariable("ids") List<Long> ids) {
