@@ -4,11 +4,14 @@ import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.storage.utils.AliyunOssOperationUtils;
 import cn.zhangchuangla.storage.utils.ImageStreamUtils;
 import cn.zhangchuangla.storage.utils.MinioOperationUtils;
+import cn.zhangchuangla.storage.utils.TencentCosOperationUtils;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.OSS;
+import com.qcloud.cos.COSClient;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +23,17 @@ import java.io.*;
 
 /**
  * 存储模块异步服务
- * 专门处理存储相关的异步任务
  * <p>
- * 此方法专门为本地存储设计，直接操作本地文件系统
- * 适用于LocalFileOperationServiceImpl中的图片压缩需求
+ * 专门处理存储相关的异步任务，支持多种存储类型的图片压缩功能：
+ * <ul>
+ *   <li>本地文件系统异步压缩</li>
+ *   <li>MinIO存储异步压缩</li>
+ *   <li>阿里云OSS存储异步压缩</li>
+ *   <li>腾讯云COS存储异步压缩</li>
+ * </ul>
  *
  * @author Chuang
+ * @since 2025/7/3
  */
 @Slf4j
 @Service
@@ -35,6 +43,7 @@ public class StorageAsyncService {
     private final StorageConfigRetrievalService storageConfigRetrievalService;
     private final MinioOperationUtils minioOperationUtils;
     private final AliyunOssOperationUtils aliyunOssOperationUtils;
+    private final TencentCosOperationUtils tencentCosOperationUtils;
 
     /**
      * 异步压缩图片 - 本地存储专用
@@ -225,6 +234,78 @@ public class StorageAsyncService {
     }
 
     /**
+     * 异步压缩图片 - 腾讯云COS存储专用
+     * <p>
+     * 此方法专门为腾讯云COS存储设计，从COS下载原图，压缩后上传预览图
+     *
+     * @param bucketName        存储桶名称
+     * @param originalImagePath 原图在COS中的路径
+     * @param previewImagePath  预览图在COS中的路径
+     * @param maxWidth          最大宽度
+     * @param maxHeight         最大高度
+     * @param quality           压缩质量
+     * @param originalFilename  原始文件名
+     */
+    @Async("imageProcessExecutor")
+    public void compressImageTencentCos(String bucketName, String originalImagePath, String previewImagePath,
+                                        int maxWidth, int maxHeight, float quality, String originalFilename) {
+        COSClient cosClient = null;
+        InputStream originalInputStream = null;
+        ByteArrayOutputStream compressedOutputStream = null;
+
+        try {
+            log.info("开始腾讯云COS异步图片压缩: {}/{} -> {}/{}", bucketName, originalImagePath, bucketName, previewImagePath);
+
+            // 获取腾讯云COS配置
+            TencentCOSStorageConfig config = getTencentCosConfig();
+            cosClient = tencentCosOperationUtils.createCosClient(config);
+
+            // 确保存储桶存在
+            tencentCosOperationUtils.ensureBucketExists(cosClient, bucketName);
+
+            // 检查原图是否存在
+            if (!tencentCosOperationUtils.objectExists(cosClient, bucketName, originalImagePath)) {
+                log.error("腾讯云COS原图不存在: {}/{}", bucketName, originalImagePath);
+                return;
+            }
+
+            // 从腾讯云COS下载原图
+            originalInputStream = tencentCosOperationUtils.getObjectStream(cosClient, bucketName, originalImagePath);
+
+            // 创建压缩输出流
+            compressedOutputStream = new ByteArrayOutputStream();
+
+            // 执行图片压缩
+            ImageStreamUtils.compress(
+                    originalInputStream,
+                    compressedOutputStream,
+                    maxWidth,
+                    maxHeight,
+                    quality,
+                    originalFilename
+            );
+
+            // 上传压缩后的图片到腾讯云COS
+            byte[] compressedData = compressedOutputStream.toByteArray();
+            tencentCosOperationUtils.uploadByteArray(cosClient, bucketName, previewImagePath, compressedData, "image/jpeg");
+
+            log.info("腾讯云COS异步图片压缩完成: {}/{} -> {}/{}, 压缩后大小: {} bytes",
+                    bucketName, originalImagePath, bucketName, previewImagePath, compressedData.length);
+
+        } catch (Exception e) {
+            log.error("腾讯云COS异步图片压缩失败: {}/{} -> {}/{}, 错误: {}",
+                    bucketName, originalImagePath, bucketName, previewImagePath, e.getMessage(), e);
+        } finally {
+            // 确保所有流都被正确关闭
+            closeStreams(originalInputStream, compressedOutputStream);
+            // 关闭COS客户端
+            if (cosClient != null) {
+                tencentCosOperationUtils.closeCosClient(cosClient);
+            }
+        }
+    }
+
+    /**
      * 获取MinIO配置
      *
      * @return MinIO存储配置
@@ -261,6 +342,24 @@ public class StorageAsyncService {
     }
 
     /**
+     * 获取腾讯云COS配置
+     *
+     * @return 腾讯云COS存储配置
+     */
+    private TencentCOSStorageConfig getTencentCosConfig() {
+        try {
+            String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
+            if (json == null || json.isBlank()) {
+                throw new RuntimeException("腾讯云COS配置未找到");
+            }
+            return JSON.parseObject(json, TencentCOSStorageConfig.class);
+        } catch (Exception e) {
+            log.error("获取腾讯云COS配置失败: {}", e.getMessage(), e);
+            throw new RuntimeException("获取腾讯云COS配置失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 关闭流资源
      *
      * @param streams 要关闭的流
@@ -281,8 +380,8 @@ public class StorageAsyncService {
      * 通用异步压缩图片方法
      * 根据当前存储类型自动选择对应的压缩方式
      *
-     * @param originalPath     原图路径（本地路径或MinIO对象路径）
-     * @param compressedPath   压缩图路径（本地路径或MinIO对象路径）
+     * @param originalPath     原图路径（本地路径或对象存储路径）
+     * @param compressedPath   压缩图路径（本地路径或对象存储路径）
      * @param maxWidth         最大宽度
      * @param maxHeight        最大高度
      * @param quality          压缩质量
@@ -316,8 +415,10 @@ public class StorageAsyncService {
                     break;
 
                 case StorageConstants.StorageType.TENCENT_COS:
-                    // 腾讯云COS的异步压缩可以在这里扩展
-                    log.info("存储类型 {} 的异步压缩暂未实现，建议在各自的Service中同步处理", activeStorageType);
+                    // 腾讯云COS存储需要额外的桶名称参数，这里从配置获取
+                    TencentCOSStorageConfig cosConfig = getTencentCosConfig();
+                    compressImageTencentCos(cosConfig.getBucketName(), originalPath, compressedPath,
+                            maxWidth, maxHeight, quality, originalFilename);
                     break;
 
                 default:
