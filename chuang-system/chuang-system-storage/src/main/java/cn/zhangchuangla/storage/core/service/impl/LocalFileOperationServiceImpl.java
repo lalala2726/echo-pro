@@ -23,8 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -72,7 +70,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
     public UploadedFileInfo upload(MultipartFile file) {
         getConfig();
         try {
-            String datePath = todayDir();
+            String datePath = StorageUtils.createDateDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
             String targetDirectory = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.FILE).toString();
             File destDir = ensureDir(targetDirectory);
@@ -106,7 +104,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         getConfig();
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
 
-        String datePath = todayDir();
+        String datePath = StorageUtils.createDateDir();
         String originalImageDir = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.ORIGINAL)
                 .toString();
         String previewImageDir = Paths.get(StorageConstants.dirName.RESOURCE, datePath, StorageConstants.dirName.IMAGE, StorageConstants.dirName.PREVIEW)
@@ -132,7 +130,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             compressedFile = new File(previewDir, originalFileName);
 
             // 提交异步压缩
-            storageAsyncService.compressImage(
+            storageAsyncService.compressImageLocal(
                     originalFile.getAbsolutePath(),
                     compressedFile.getAbsolutePath(),
                     StorageConstants.imageCompression.MAX_WIDTH,
@@ -228,7 +226,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
 
         try {
             // 处理原始文件
-            String pathWithoutResourcePrefix = removeResourcePrefix(fileOperationDto.getOriginalRelativePath());
+            String pathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(fileOperationDto.getOriginalRelativePath());
             String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, pathWithoutResourcePrefix).toString();
             File originalTrashFile = new File(uploadRootDir, originalTrashPath);
 
@@ -240,7 +238,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
             // 处理预览文件
             String previewTrashPath = null;
             if (previewFile != null && previewFile.exists()) {
-                String previewPathWithoutResourcePrefix = removeResourcePrefix(fileOperationDto.getPreviewRelativePath());
+                String previewPathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(fileOperationDto.getPreviewRelativePath());
                 previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewPathWithoutResourcePrefix).toString();
                 File previewTrashFile = new File(uploadRootDir, previewTrashPath);
 
@@ -427,7 +425,7 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
      * @param newFileName      新文件名
      * @return 文件信息
      */
-    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile,String filePath,String previewPath,
+    private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String filePath, String previewPath,
                                            String newFileName, String fileType) {
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -439,18 +437,11 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         info.setFileUrl(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
         info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
         info.setPreviewImage(Paths.get(localFileStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath
-                ,newFileName).toString());
+                , newFileName).toString());
         info.setPreviewImageRelativePath(Paths.get(previewPath, newFileName).toString());
         return info;
     }
 
-
-    /**
-     * 日期目录可以在这边统一修改{@link StorageConstants}
-     */
-    private String todayDir() {
-        return new SimpleDateFormat(StorageConstants.FILE_UPLOAD_PATH_FORMAT).format(new Date());
-    }
 
     /**
      * 根据目录确保存在,并返回文件夹
@@ -465,23 +456,5 @@ public class LocalFileOperationServiceImpl implements FileOperationService {
         return dir;
     }
 
-
-    /**
-     * 从路径中移除resource前缀
-     *
-     * @param path 原始路径
-     * @return 移除resource前缀后的路径
-     */
-    private String removeResourcePrefix(String path) {
-        if (path == null || path.isBlank()) {
-            return path;
-        }
-
-        String resourcePrefix = StorageConstants.dirName.RESOURCE + "/";
-        if (path.startsWith(resourcePrefix)) {
-            return path.substring(resourcePrefix.length());
-        }
-        return path;
-    }
 
 }
