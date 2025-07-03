@@ -1,6 +1,8 @@
 package cn.zhangchuangla.storage.core.service.impl;
 
+import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
+import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.FileOperationService;
@@ -14,7 +16,10 @@ import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.OSS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Paths;
@@ -22,31 +27,7 @@ import java.util.Objects;
 
 /**
  * 阿里云OSS文件操作服务实现类
- * <p>
- * 提供阿里云OSS存储的完整文件操作功能，包括：
- * <ul>
- *   <li>普通文件上传</li>
- *   <li>图片上传（支持异步压缩生成预览图）</li>
- *   <li>文件删除（支持软删除和强制删除）</li>
- *   <li>文件恢复（从回收站恢复）</li>
- *   <li>回收站文件永久删除</li>
- * </ul>
- *
- * <p>目录结构：</p>
- * <pre>
- * resource/
- * ├── yyyy/MM/
- * │   ├── file/           # 普通文件存储
- * │   └── image/          # 图片文件存储
- * │       ├── original/   # 原图存储
- * │       └── preview/    # 预览图存储
- * └── trash/              # 回收站
- *     └── yyyy/MM/
- *         ├── file/
- *         └── image/
- *             ├── original/
- *             └── preview/
- * </pre>
+ * 支持运行时动态切换存储类型，使用AliyunOssOperationUtils进行OSS操作
  *
  * @author Chuang
  * @since 2025/7/3
@@ -60,342 +41,488 @@ public class AliyunOssFileOperationServiceImpl implements FileOperationService {
     private final AliyunOssOperationUtils aliyunOssOperationUtils;
     private final StorageAsyncService storageAsyncService;
 
+    // 内部管理的OSS客户端，支持动态创建和缓存
+    private volatile OSS ossClient;
+    private volatile AliyunOSSStorageConfig aliyunOssStorageConfig;
+
     /**
-     * 上传普通文件到阿里云OSS
-     * <p>
-     * 将文件上传到阿里云OSS的指定路径，路径格式为：resource/yyyy/MM/file/文件名
+     * 获取当前存储配置
+     * 每次操作前都会重新拉取最新配置确保配置的时效性
      *
-     * @param file 要上传的文件，不能为null
-     * @return 上传成功后的文件信息，包含文件访问URL、相对路径等
-     * @throws FileException 当文件上传失败时抛出
+     * @return 阿里云OSS存储配置
+     */
+    public AliyunOSSStorageConfig getConfig() {
+        String json = getStorageConfigJson();
+        AliyunOSSStorageConfig newConfig = JSON.parseObject(json, AliyunOSSStorageConfig.class);
+
+        // 检查配置是否发生变化，如果变化则重置客户端
+        if (configChanged(newConfig)) {
+            log.info("检测到阿里云OSS配置变更，将重新创建客户端");
+            synchronized (this) {
+                if (configChanged(newConfig)) {
+                    // 重置客户端，下次使用时重新创建
+                    this.ossClient = null;
+                    this.aliyunOssStorageConfig = newConfig;
+                }
+            }
+        } else {
+            this.aliyunOssStorageConfig = newConfig;
+        }
+
+        return aliyunOssStorageConfig;
+    }
+
+    @NotNull
+    private String getStorageConfigJson() {
+        String storageType = storageConfigRetrievalService.getActiveStorageType();
+        String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
+
+        // 验证当前激活的存储类型是否为阿里云OSS
+        if (!StorageConstants.StorageType.ALIYUN_OSS.equals(storageType)) {
+            throw new FileException(String.format("当前调用的服务是:%s,而你激活的配置是:%s,调用的服务和激活的配置不符合!请你仔细检查配置!",
+                    StorageConstants.StorageType.ALIYUN_OSS, storageType));
+        }
+
+        // 验证配置JSON是否存在
+        if (json == null || json.isBlank()) {
+            throw new FileException("阿里云OSS文件存储配置未找到");
+        }
+        return json;
+    }
+
+    /**
+     * 检查配置是否发生变化
+     *
+     * @param newConfig 新配置
+     * @return 是否发生变化
+     */
+    private boolean configChanged(AliyunOSSStorageConfig newConfig) {
+        if (aliyunOssStorageConfig == null) {
+            return true;
+        }
+
+        return !Objects.equals(aliyunOssStorageConfig.getEndpoint(), newConfig.getEndpoint()) ||
+                !Objects.equals(aliyunOssStorageConfig.getAccessKeyId(), newConfig.getAccessKeyId()) ||
+                !Objects.equals(aliyunOssStorageConfig.getAccessKeySecret(), newConfig.getAccessKeySecret()) ||
+                !Objects.equals(aliyunOssStorageConfig.getBucketName(), newConfig.getBucketName());
+    }
+
+    /**
+     * 获取或创建阿里云OSS客户端
+     * 支持运行时动态创建客户端，实现存储类型的热切换
+     * 使用双重检查锁定确保线程安全
+     *
+     * @return OSS实例
+     */
+    private OSS getOssClient() {
+        // 双重检查锁定模式
+        if (ossClient == null) {
+            synchronized (this) {
+                if (ossClient == null) {
+                    getConfig(); // 确保配置已加载
+                    ossClient = aliyunOssOperationUtils.createOssClient(aliyunOssStorageConfig);
+                }
+            }
+        }
+        return ossClient;
+    }
+
+    /**
+     * 普通文件上传到阿里云OSS
+     * 核心逻辑：
+     * 1. 获取配置信息
+     * 2. 生成新的文件名和对象路径
+     * 3. 确保存储桶存在
+     * 4. 上传文件到阿里云OSS
+     * 5. 构建并返回文件信息
+     *
+     * @param file 要上传的文件
+     * @return 上传后的文件信息
      */
     @Override
     public UploadedFileInfo upload(MultipartFile file) {
-        OSS ossClient = null;
+        getConfig();
         try {
-            // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
-            ossClient = aliyunOssOperationUtils.createOssClient(config);
-            String bucketName = config.getBucketName();
+            String bucketName = aliyunOssStorageConfig.getBucketName();
             String dateDir = StorageUtils.createDateDir();
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
 
-            // 确保存储桶存在
-            aliyunOssOperationUtils.ensureBucketExists(ossClient, bucketName);
+            // 构建OSS对象路径：日期目录/file/文件名
+            String objectPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName).toString().replace("\\", "/");
 
-            // 构建文件路径 (包含RESOURCE前缀): resource/yyyy/MM/file/文件名
-            String filePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName)
-                    .toString();
+            // 获取OSS客户端并确保存储桶存在
+            OSS client = getOssClient();
+            aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
 
-            // 上传文件到阿里云OSS
-            aliyunOssOperationUtils.uploadFile(ossClient, bucketName, filePath, file.getInputStream(),
-                    file.getSize(), file.getContentType());
+            // 上传文件到阿里云OSS - 核心上传逻辑
+            aliyunOssOperationUtils.uploadFile(client, bucketName, objectPath, file.getInputStream(), file.getSize(), file.getContentType());
 
-            // 构建返回的文件信息
-            UploadedFileInfo uploadedFileInfo = new UploadedFileInfo();
-            uploadedFileInfo.setFileOriginalName(file.getOriginalFilename());
-            uploadedFileInfo.setFileName(newFileName);
-            uploadedFileInfo.setFileRelativePath(filePath);
-            uploadedFileInfo.setFileSize(file.getSize());
-            uploadedFileInfo.setFileType(file.getContentType());
-            uploadedFileInfo.setFileExtension(StorageUtils.getFileExtension(file.getOriginalFilename()));
-            uploadedFileInfo.setFileUrl(config.getFileDomain() + "/" + filePath);
+            log.info("文件上传成功到阿里云OSS: {}/{}", bucketName, objectPath);
 
-            log.info("阿里云OSS文件上传成功: {}", filePath);
-            return uploadedFileInfo;
+            // 构建文件信息返回给调用方
+            return buildFileInfo(file, objectPath, newFileName);
 
         } catch (Exception e) {
             log.error("阿里云OSS文件上传失败", e);
-            throw new FileException("阿里云OSS文件上传失败: " + e.getMessage());
-        } finally {
-            if (ossClient != null) {
-                aliyunOssOperationUtils.closeOssClient(ossClient);
-            }
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
         }
     }
 
     /**
-     * 上传图片到阿里云OSS并异步生成预览图
-     * <p>
-     * 图片上传处理流程：
-     * <ol>
-     *   <li>上传原图到阿里云OSS的指定路径</li>
-     *   <li>异步压缩原图并生成预览图</li>
-     *   <li>返回包含原图和预览图信息的上传结果</li>
-     * </ol>
+     * 图片上传处理方法
+     * 核心逻辑：
+     * 1. 校验文件为有效图片格式
+     * 2. 上传原图到阿里云OSS指定路径
+     * 3. 异步处理图片压缩并上传到预览路径
+     * 4. 返回包含原图和预览图路径的文件信息
      *
-     * <p>目录结构：</p>
-     * <ul>
-     *   <li>原图路径：resource/yyyy/MM/image/original/文件名</li>
-     *   <li>预览图路径：resource/yyyy/MM/image/preview/文件名</li>
-     * </ul>
-     *
-     * @param file 要上传的图片文件，不能为null
-     * @return 上传成功后的文件信息，包含原图和预览图的访问URL、相对路径等
-     * @throws FileException 当图片上传失败时抛出
+     * @param file 上传的图片文件
+     * @return 包含上传文件信息的UploadedFileInfo对象
      */
     @Override
     public UploadedFileInfo uploadImage(MultipartFile file) {
-        OSS ossClient = null;
+        getConfig();
+        String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
+
         try {
-            // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
-            ossClient = aliyunOssOperationUtils.createOssClient(config);
-            String bucketName = config.getBucketName();
+            String bucketName = aliyunOssStorageConfig.getBucketName();
             String dateDir = StorageUtils.createDateDir();
-            String originalFilename = file.getOriginalFilename();
             String newFileName = StorageUtils.generateFileName(originalFilename);
 
-            // 确保存储桶存在
-            aliyunOssOperationUtils.ensureBucketExists(ossClient, bucketName);
+            // 构建阿里云OSS中的原图和预览图路径
+            String originalImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
+                    StorageConstants.dirName.ORIGINAL, newFileName).toString().replace("\\", "/");
+            String previewImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
+                    StorageConstants.dirName.PREVIEW, newFileName).toString().replace("\\", "/");
 
-            // 构建原图路径：resource/yyyy/MM/image/original/文件名
-            String originalPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.ORIGINAL, newFileName).toString();
+            // 获取OSS客户端并确保存储桶存在
+            OSS client = getOssClient();
+            aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
 
-            // 构建预览图路径：resource/yyyy/MM/image/preview/文件名
-            String previewPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.PREVIEW, newFileName).toString();
+            // 1. 先上传原图到阿里云OSS - 核心原图上传逻辑
+            aliyunOssOperationUtils.uploadFile(client, bucketName, originalImagePath, file.getInputStream(), file.getSize(), file.getContentType());
 
-            // 上传原图到阿里云OSS
-            aliyunOssOperationUtils.uploadFile(ossClient, bucketName, originalPath, file.getInputStream(),
-                    file.getSize(), file.getContentType());
+            log.info("原图上传成功到阿里云OSS: {}/{}", bucketName, originalImagePath);
 
-            // 异步生成预览图
-            storageAsyncService.compressImageAliyunOss(bucketName, originalPath, previewPath,
-                    StorageConstants.imageCompression.MAX_WIDTH, StorageConstants.imageCompression.MAX_HEIGHT,
-                    StorageConstants.imageCompression.QUALITY, originalFilename);
+            // 2. 异步处理图片压缩并上传预览图 - 使用StorageAsyncService的阿里云OSS异步压缩
+            storageAsyncService.compressImageAliyunOss(
+                    bucketName,
+                    originalImagePath,
+                    previewImagePath,
+                    StorageConstants.imageCompression.MAX_WIDTH,
+                    StorageConstants.imageCompression.MAX_HEIGHT,
+                    StorageConstants.imageCompression.QUALITY,
+                    originalFilename
+            );
 
-            // 构建返回的文件信息
-            UploadedFileInfo uploadedFileInfo = buildImageFileInfo(originalFilename, originalPath, previewPath, newFileName,
-                    file.getContentType(), file.getSize());
+            log.info("图片压缩任务已提交到异步服务: {}", previewImagePath);
 
-            log.info("阿里云OSS图片上传成功: {} (异步生成预览图: {})", originalPath, previewPath);
-            return uploadedFileInfo;
+            // 3. 构建并返回文件信息（包含原图和预览图路径）
+            return buildImageFileInfo(originalFilename, originalImagePath, previewImagePath,
+                    newFileName, file.getContentType(), file.getSize());
 
         } catch (Exception e) {
             log.error("阿里云OSS图片上传失败", e);
-            throw new FileException("阿里云OSS图片上传失败: " + e.getMessage());
-        } finally {
-            if (ossClient != null) {
-                aliyunOssOperationUtils.closeOssClient(ossClient);
-            }
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "图片上传失败：" + e.getMessage());
         }
     }
 
     /**
-     * 删除文件
-     * <p>
-     * 支持两种删除模式：
-     * <ul>
-     *   <li>软删除（默认）：将文件移动到回收站，保留文件数据</li>
-     *   <li>强制删除：直接从阿里云OSS删除文件，不可恢复</li>
-     * </ul>
+     * 删除文件方法
+     * 核心逻辑：
+     * 1. 参数校验
+     * 2. 获取阿里云OSS配置
+     * 3. 根据删除模式执行物理删除或移入回收站
      *
-     * <p>回收站目录结构与原目录结构保持一致：</p>
-     * <pre>
-     * trash/yyyy/MM/image/original/文件名
-     * trash/yyyy/MM/image/preview/文件名
-     * </pre>
-     *
-     * @param fileOperationDto 文件操作DTO，包含文件路径信息
-     * @param forceDelete      删除模式，true为强制删除，false为软删除
-     * @return 软删除时返回包含回收站路径的DTO，强制删除时返回原DTO
-     * @throws FileException 当删除操作失败时抛出
+     * @param fileOperationDto 文件操作DTO
+     * @param forceDelete      true: 强制从阿里云OSS删除；false: 移入回收站目录
+     * @return 如果是移入回收站，返回包含新路径的DTO；如果是强制删除，返回null
      */
     @Override
     public FileOperationDto delete(FileOperationDto fileOperationDto, boolean forceDelete) {
-        OSS ossClient = null;
-        try {
-            // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
-            ossClient = aliyunOssOperationUtils.createOssClient(config);
-            String bucketName = config.getBucketName();
+        // 1. 参数校验
+        if (ObjectUtils.isEmpty(fileOperationDto)) {
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "参数不能为空");
+        }
+        if (StringUtils.isEmpty(fileOperationDto.getOriginalRelativePath())) {
+            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "原始文件路径不能为空");
+        }
 
-            // 确保存储桶存在
-            aliyunOssOperationUtils.ensureBucketExists(ossClient, bucketName);
+        // 2. 获取配置和初始化
+        getConfig();
+        String bucketName = aliyunOssStorageConfig.getBucketName();
 
-            String originalPath = fileOperationDto.getOriginalRelativePath();
-            String previewTrashPath = null;
-
-            if (forceDelete) {
-                // 强制删除，直接从阿里云OSS删除文件
-                aliyunOssOperationUtils.deleteObject(ossClient, bucketName, originalPath);
-                log.info("阿里云OSS文件强制删除成功: {}", originalPath);
-
-                // 删除预览文件
-                String previewPath = fileOperationDto.getPreviewRelativePath();
-                if (previewPath != null && aliyunOssOperationUtils.objectExists(ossClient, bucketName, previewPath)) {
-                    aliyunOssOperationUtils.deleteObject(ossClient, bucketName, previewPath);
-                    log.info("阿里云OSS预览文件强制删除成功: {}", previewPath);
-                }
-            } else {
-                // 软删除，移动到回收站
-                // 处理原始文件移动到回收站
-                String pathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(originalPath);
-                String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, pathWithoutResourcePrefix)
-                        .toString();
-                aliyunOssOperationUtils.moveObject(ossClient, bucketName, originalPath, originalTrashPath);
-
-                // 处理预览文件移动到回收站
-                String previewPath = fileOperationDto.getPreviewRelativePath();
-                if (previewPath != null && aliyunOssOperationUtils.objectExists(ossClient, bucketName, previewPath)) {
-                    String previewPathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(previewPath);
-                    previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewPathWithoutResourcePrefix)
-                            .toString();
-                    aliyunOssOperationUtils.moveObject(ossClient, bucketName, previewPath, previewTrashPath);
-                }
-
-                log.info("阿里云OSS文件移动到回收站成功: {} -> {}", originalPath, originalTrashPath);
-
-                // 更新FileOperationDto中的路径信息为回收站路径
-                fileOperationDto.setOriginalTrashPath(originalTrashPath);
-                fileOperationDto.setPreviewTrashPath(previewTrashPath);
-            }
-
-            return fileOperationDto;
-
-        } catch (Exception e) {
-            log.error("阿里云OSS文件删除失败", e);
-            throw new FileException("阿里云OSS文件删除失败: " + e.getMessage());
-        } finally {
-            if (ossClient != null) {
-                aliyunOssOperationUtils.closeOssClient(ossClient);
-            }
+        // 3. 判断删除模式 - 核心删除逻辑分发
+        if (forceDelete && aliyunOssStorageConfig.getEnableTrash() != null && aliyunOssStorageConfig.getEnableTrash() == 0) {
+            // 物理删除模式
+            return performPhysicalDelete(bucketName, fileOperationDto);
+        } else {
+            // 移入回收站模式
+            return performMoveToTrash(bucketName, fileOperationDto);
         }
     }
 
     /**
-     * 从回收站恢复文件
-     * <p>
-     * 将回收站中的文件移动回原始位置，恢复文件的正常访问。
-     * 同时处理原图和预览图的恢复。
+     * 执行阿里云OSS物理删除操作
      *
-     * @param fileOperationDto 文件操作DTO，包含回收站路径信息
-     * @return 恢复成功返回true，失败返回false
-     * @throws FileException 当恢复操作失败时抛出
+     * @param bucketName       存储桶名称
+     * @param fileOperationDto 文件操作DTO
+     * @return null（物理删除完成）
+     */
+    private FileOperationDto performPhysicalDelete(String bucketName, FileOperationDto fileOperationDto) {
+        log.info("开始执行阿里云OSS物理删除操作，原始文件路径: {}", fileOperationDto.getOriginalRelativePath());
+
+        try {
+            OSS client = getOssClient();
+
+            // 删除原始文件
+            aliyunOssOperationUtils.deleteObject(client, bucketName, fileOperationDto.getOriginalRelativePath());
+            log.info("阿里云OSS原始文件删除成功: {}", fileOperationDto.getOriginalRelativePath());
+
+            // 删除预览文件（如果存在）
+            if (StringUtils.isNotBlank(fileOperationDto.getPreviewRelativePath())) {
+                aliyunOssOperationUtils.deleteObject(client, bucketName, fileOperationDto.getPreviewRelativePath());
+                log.info("阿里云OSS预览文件删除成功: {}", fileOperationDto.getPreviewRelativePath());
+            }
+
+            log.info("阿里云OSS物理删除操作完成");
+            return null;
+
+        } catch (Exception e) {
+            log.error("阿里云OSS物理删除失败", e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件物理删除失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 执行移入回收站操作
+     * 在阿里云OSS中通过复制文件到trash目录实现逻辑删除
+     *
+     * @param bucketName       存储桶名称
+     * @param fileOperationDto 文件操作DTO
+     * @return 包含回收站路径的DTO
+     */
+    private FileOperationDto performMoveToTrash(String bucketName, FileOperationDto fileOperationDto) {
+        log.info("开始执行阿里云OSS移入回收站操作，原始文件路径: {}", fileOperationDto.getOriginalRelativePath());
+
+        try {
+            OSS client = getOssClient();
+
+            // 检查原始文件是否存在
+            String originalPath = fileOperationDto.getOriginalRelativePath();
+
+            if (!aliyunOssOperationUtils.objectExists(client, bucketName, originalPath)) {
+                log.warn("阿里云OSS文件不存在，无法移入回收站: {}", originalPath);
+                return null;
+            }
+
+            // 处理原始文件移动到回收站
+            String pathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(originalPath);
+            String originalTrashPath = Paths.get(StorageConstants.dirName.TRASH, pathWithoutResourcePrefix).toString().replace("\\", "/");
+            aliyunOssOperationUtils.moveObject(client, bucketName, originalPath, originalTrashPath);
+            log.info("原始文件移动到回收站成功: {} -> {}", originalPath, originalTrashPath);
+
+            // 处理预览文件移动到回收站
+            String previewTrashPath = null;
+            if (StringUtils.isNotBlank(fileOperationDto.getPreviewRelativePath())) {
+                String previewPath = fileOperationDto.getPreviewRelativePath();
+                if (aliyunOssOperationUtils.objectExists(client, bucketName, previewPath)) {
+                    String previewPathWithoutResourcePrefix = StorageUtils.removeResourcePrefix(previewPath);
+                    previewTrashPath = Paths.get(StorageConstants.dirName.TRASH, previewPathWithoutResourcePrefix).toString().replace("\\", "/");
+                    aliyunOssOperationUtils.moveObject(client, bucketName, previewPath, previewTrashPath);
+                    log.info("预览文件移动到回收站成功: {} -> {}", previewPath, previewTrashPath);
+                }
+            }
+
+            log.info("文件已成功移入阿里云OSS回收站. 原始文件新路径: {}, 预览文件新路径: {}", originalTrashPath, previewTrashPath);
+
+            return FileOperationDto.builder()
+                    .originalTrashPath(originalTrashPath)
+                    .previewTrashPath(previewTrashPath)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("阿里云OSS移入回收站失败", e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件移入回收站失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 恢复文件
+     * 核心逻辑：
+     * 1. 参数校验
+     * 2. 获取阿里云OSS配置
+     * 3. 从回收站恢复原始文件和预览文件
+     *
+     * @param fileOperationDto 文件操作DTO
+     * @return 是否恢复成功
      */
     @Override
     public boolean restore(FileOperationDto fileOperationDto) {
-        OSS ossClient = null;
+        // 1. 参数校验
+        if (fileOperationDto == null) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+        }
+
+        // 2. 获取配置和初始化
+        getConfig();
+        String bucketName = aliyunOssStorageConfig.getBucketName();
+
+        // 3. 获取路径信息
+        String originalTrashPath = fileOperationDto.getOriginalTrashPath();
+        String previewTrashPath = fileOperationDto.getPreviewTrashPath();
+        String originalRelativePath = fileOperationDto.getOriginalRelativePath();
+        String previewImagePath = fileOperationDto.getPreviewRelativePath();
+
+        // 4. 校验必要路径
+        if (StringUtils.isBlank(originalTrashPath) || StringUtils.isBlank(originalRelativePath)) {
+            log.error("文件恢复失败：回收站路径或原始路径为空，文件ID: {}", fileOperationDto.getFileId());
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在阿里云OSS中已经被删除!");
+        }
+
         try {
-            // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
-            ossClient = aliyunOssOperationUtils.createOssClient(config);
-            String bucketName = config.getBucketName();
+            // 5. 恢复原始文件
+            restoreOriginalFile(bucketName, originalTrashPath, originalRelativePath);
 
-            // 确保存储桶存在
-            aliyunOssOperationUtils.ensureBucketExists(ossClient, bucketName);
+            // 6. 恢复预览文件（如果存在）
+            restorePreviewFile(bucketName, previewTrashPath, previewImagePath);
 
-            String trashPath = fileOperationDto.getOriginalTrashPath();
-
-            // 检查回收站文件是否存在
-            if (!aliyunOssOperationUtils.objectExists(ossClient, bucketName, trashPath)) {
-                log.warn("阿里云OSS回收站文件不存在: {}", trashPath);
-                return false;
-            }
-
-            // 构建恢复后的路径：从回收站路径恢复到resource路径
-            String restoredPath;
-            if (trashPath.startsWith(StorageConstants.dirName.TRASH + "/")) {
-                String pathAfterTrash = trashPath.substring((StorageConstants.dirName.TRASH + "/").length());
-                restoredPath = Paths.get(StorageConstants.dirName.RESOURCE, pathAfterTrash)
-                        .toString();
-            } else {
-                log.error("阿里云OSS文件路径格式错误，不是有效的回收站路径: {}", trashPath);
-                return false;
-            }
-
-            // 移动文件从回收站到正常位置
-            aliyunOssOperationUtils.moveObject(ossClient, bucketName, trashPath, restoredPath);
-
-            // 处理预览文件恢复
-            String previewTrashPath = fileOperationDto.getPreviewTrashPath();
-            String restoredPreviewPath = null;
-            if (previewTrashPath != null && aliyunOssOperationUtils.objectExists(ossClient, bucketName, previewTrashPath)) {
-                if (previewTrashPath.startsWith(StorageConstants.dirName.TRASH + "/")) {
-                    String previewPathAfterTrash = previewTrashPath.substring((StorageConstants.dirName.TRASH + "/").length());
-                    restoredPreviewPath = Paths.get(StorageConstants.dirName.RESOURCE, previewPathAfterTrash)
-                            .toString();
-                    aliyunOssOperationUtils.moveObject(ossClient, bucketName, previewTrashPath, restoredPreviewPath);
-                }
-            }
-
-            // 更新FileOperationDto中的路径信息
-            fileOperationDto.setOriginalRelativePath(restoredPath);
-            fileOperationDto.setPreviewRelativePath(restoredPreviewPath);
-
-            log.info("阿里云OSS文件恢复成功: {} -> {}", trashPath, restoredPath);
+            log.info("文件恢复成功，文件ID: {}, 原始路径: {}", fileOperationDto.getFileId(), originalRelativePath);
             return true;
 
         } catch (Exception e) {
-            log.error("阿里云OSS文件恢复失败", e);
-            throw new FileException("阿里云OSS文件恢复失败: " + e.getMessage());
-        } finally {
-            if (ossClient != null) {
-                aliyunOssOperationUtils.closeOssClient(ossClient);
-            }
+            log.error("文件恢复失败，文件ID: {}, 错误信息: {}", fileOperationDto.getFileId(), e.getMessage(), e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
         }
     }
 
     /**
-     * 永久删除回收站中的文件
-     * <p>
-     * 从阿里云OSS中彻底删除回收站中的文件，包括原图和预览图。
-     * 此操作不可恢复，请谨慎使用。
-     *
-     * @param fileOperationDto 文件操作DTO，包含回收站路径信息
-     * @throws FileException 当删除操作失败时抛出
+     * 恢复原始文件
      */
-    @Override
-    public void deleteTrashFile(FileOperationDto fileOperationDto) {
-        OSS ossClient = null;
+    private void restoreOriginalFile(String bucketName, String originalTrashPath, String originalRelativePath) {
         try {
-            // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
-            ossClient = aliyunOssOperationUtils.createOssClient(config);
-            String bucketName = config.getBucketName();
+            OSS client = getOssClient();
 
-            // 确保存储桶存在
-            aliyunOssOperationUtils.ensureBucketExists(ossClient, bucketName);
-
-            // 删除回收站中的原文件
-            String trashPath = fileOperationDto.getOriginalTrashPath();
-            if (aliyunOssOperationUtils.objectExists(ossClient, bucketName, trashPath)) {
-                aliyunOssOperationUtils.deleteObject(ossClient, bucketName, trashPath);
-                log.info("阿里云OSS回收站文件删除成功: {}", trashPath);
+            if (!aliyunOssOperationUtils.objectExists(client, bucketName, originalTrashPath)) {
+                log.error("回收站中的文件不存在：{}", originalTrashPath);
+                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
             }
 
-            // 删除回收站中的预览文件
-            String previewTrashPath = fileOperationDto.getPreviewTrashPath();
-            if (previewTrashPath != null && aliyunOssOperationUtils.objectExists(ossClient, bucketName, previewTrashPath)) {
-                aliyunOssOperationUtils.deleteObject(ossClient, bucketName, previewTrashPath);
-                log.info("阿里云OSS回收站预览文件删除成功: {}", previewTrashPath);
+            // 移动文件从回收站到原位置
+            aliyunOssOperationUtils.moveObject(client, bucketName, originalTrashPath, originalRelativePath);
+            log.info("主文件恢复成功：{} -> {}", originalTrashPath, originalRelativePath);
+
+        } catch (Exception e) {
+            log.error("恢复原始文件失败", e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复原始文件失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 恢复预览文件
+     */
+    private void restorePreviewFile(String bucketName, String previewTrashPath, String previewImagePath) {
+        if (StringUtils.isBlank(previewTrashPath) || StringUtils.isBlank(previewImagePath)) {
+            log.debug("预览文件路径为空，跳过预览文件恢复");
+            return;
+        }
+
+        try {
+            OSS client = getOssClient();
+
+            if (aliyunOssOperationUtils.objectExists(client, bucketName, previewTrashPath)) {
+                // 移动预览图从回收站到原位置
+                aliyunOssOperationUtils.moveObject(client, bucketName, previewTrashPath, previewImagePath);
+                log.info("预览图恢复成功：{} -> {}", previewTrashPath, previewImagePath);
+            } else {
+                log.warn("预览图在回收站中不存在，跳过预览图恢复：{}", previewTrashPath);
             }
 
         } catch (Exception e) {
-            log.error("阿里云OSS回收站文件删除失败", e);
-            throw new FileException("阿里云OSS回收站文件删除失败: " + e.getMessage());
-        } finally {
-            if (ossClient != null) {
-                aliyunOssOperationUtils.closeOssClient(ossClient);
-            }
+            log.error("恢复预览文件失败", e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复预览文件失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 删除回收站文件
+     *
+     * @param fileOperationDto 文件传输对象
+     */
+    @Override
+    public void deleteTrashFile(FileOperationDto fileOperationDto) {
+        getConfig();
+        if (fileOperationDto == null) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+        }
+        if (StringUtils.isBlank(fileOperationDto.getOriginalTrashPath())) {
+            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
+        }
+
+        // 如果不是真实删除，则直接返回成功
+        boolean realDelete = aliyunOssStorageConfig.getEnableTrash() != null && aliyunOssStorageConfig.getEnableTrash() == 0;
+        if (!realDelete) {
+            log.info("文件不是真实删除，系统将不会执行实际的删除操作!");
+            return;
+        }
+
+        try {
+            String bucketName = aliyunOssStorageConfig.getBucketName();
+            OSS client = getOssClient();
+
+            // 1. 删除原始文件
+            String originalTrashPath = fileOperationDto.getOriginalTrashPath();
+            if (aliyunOssOperationUtils.objectExists(client, bucketName, originalTrashPath)) {
+                aliyunOssOperationUtils.deleteObject(client, bucketName, originalTrashPath);
+                log.info("回收站原始文件删除成功：{}", originalTrashPath);
+            }
+
+            // 2. 如果预览图存在，则删除预览图
+            if (StringUtils.isNotBlank(fileOperationDto.getPreviewTrashPath())) {
+                String previewTrashPath = fileOperationDto.getPreviewTrashPath();
+                if (aliyunOssOperationUtils.objectExists(client, bucketName, previewTrashPath)) {
+                    aliyunOssOperationUtils.deleteObject(client, bucketName, previewTrashPath);
+                    log.info("回收站预览图删除成功：{}", previewTrashPath);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("删除回收站文件失败", e);
+            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 构建文件信息
+     *
+     * @param src         文件源
+     * @param objectPath  阿里云OSS对象路径
+     * @param newFileName 新文件名
+     * @return 文件信息
+     */
+    private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        UploadedFileInfo info = new UploadedFileInfo();
+        info.setFileOriginalName(src.getOriginalFilename());
+        info.setFileName(newFileName);
+        info.setFileExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileSize(src.getSize());
+        info.setFileType(src.getContentType());
+        info.setExtension(StorageUtils.getFileExtension(newFileName));
+        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileRelativePath(objectPath);
+        return info;
     }
 
     /**
      * 构建图片文件信息
-     * <p>
-     * 根据上传的图片信息构建返回给客户端的文件信息对象，
-     * 包含原图和预览图的URL、路径等信息。
      *
      * @param originalFileName  原始文件名
-     * @param originalImagePath 原图在阿里云OSS中的路径
-     * @param previewImagePath  预览图在阿里云OSS中的路径
-     * @param newFileName       生成的新文件名
-     * @param fileType          文件MIME类型
-     * @param fileSize          文件大小（字节）
-     * @return 包含完整文件信息的UploadedFileInfo对象
+     * @param originalImagePath 原图阿里云OSS路径
+     * @param previewImagePath  预览图阿里云OSS路径
+     * @param newFileName       新文件名
+     * @param fileType          文件类型
+     * @param fileSize          文件大小
+     * @return 文件信息
      */
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
@@ -407,31 +534,10 @@ public class AliyunOssFileOperationServiceImpl implements FileOperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(getAliyunOssConfig().getFileDomain(), originalImagePath).toString());
+        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(getAliyunOssConfig().getFileDomain(), previewImagePath).toString());
+        info.setPreviewImage(Paths.get(aliyunOssStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
-    }
-
-    /**
-     * 获取阿里云OSS配置
-     * <p>
-     * 从配置服务中获取当前激活的阿里云OSS存储配置信息。
-     *
-     * @return 阿里云OSS存储配置对象
-     * @throws RuntimeException 当配置获取失败时抛出
-     */
-    private AliyunOSSStorageConfig getAliyunOssConfig() {
-        try {
-            String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
-            if (json == null || json.isBlank()) {
-                throw new RuntimeException("阿里云OSS配置未找到");
-            }
-            return JSON.parseObject(json, AliyunOSSStorageConfig.class);
-        } catch (Exception e) {
-            log.error("获取阿里云OSS配置失败: {}", e.getMessage(), e);
-            throw new RuntimeException("获取阿里云OSS配置失败: " + e.getMessage());
-        }
     }
 }
