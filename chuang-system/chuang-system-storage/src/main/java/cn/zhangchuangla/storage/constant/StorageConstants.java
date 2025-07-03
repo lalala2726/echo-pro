@@ -105,6 +105,11 @@ public class StorageConstants {
          * MinIO存储
          */
         String MINIO = "minio";
+
+        /**
+         * Amazon S3存储
+         */
+        String AMAZON_S3 = "amazon_s3";
     }
 
     /**
@@ -161,6 +166,11 @@ public class StorageConstants {
          * 腾讯云COS存储服务名称
          */
         String TENCENT_COS_STORAGE_SERVICE = "tencentCosStorageService";
+
+        /**
+         * 亚马逊S3存储服务名称
+         */
+        String AMAZON_S3_STORAGE_SERVICE = "amazonS3StorageService";
     }
 
 

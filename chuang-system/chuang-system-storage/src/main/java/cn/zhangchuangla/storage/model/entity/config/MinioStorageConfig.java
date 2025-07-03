@@ -51,9 +51,9 @@ public class MinioStorageConfig implements Serializable {
     private String bucketRegion;
 
     /**
-     * 是否启用回收站
+     * 是否真实删除
      */
-    private Integer enableTrash;
+    private boolean realDelete;
 
 
 }

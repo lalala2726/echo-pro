@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Chuang
  */
-public interface FileOperationService {
+public interface OperationService {
 
     /**
      * 上传文件

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "本地文件配置实体类")
-public class LocalFileStorageConfig {
+public class LocalStorageConfig {
 
     /**
      * 文件上传路径
@@ -30,7 +30,7 @@ public class LocalFileStorageConfig {
     /**
      * 是否真实删除文件
      */
-    private boolean realDelete = false;
+    private boolean realDelete;
 
 
 }

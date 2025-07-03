@@ -1,17 +1,17 @@
 package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
-import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.LocalFileStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
+import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
+import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
+import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
@@ -84,7 +84,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean saveFileConfig(StorageConfigAddRequest request) {
+    public boolean addStorageConfig(StorageConfigAddRequest request) {
         if (isStorageKeyExist(request.getStorageKey())) {
             throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
         }
@@ -100,26 +100,13 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean saveFileConfig(TencentCOSConfigRequest request) {
+    public boolean addStorageConfig(TencentCOSConfigRequest request) {
         TencentCOSStorageConfig tencent = new TencentCOSStorageConfig();
         BeanUtils.copyProperties(request, tencent);
         String value = JSON.toJSONString(tencent);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
+        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
     }
 
-    /**
-     * 添加本地文件配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean saveFileConfig(LocalFileConfigRequest request) {
-        LocalFileStorageConfig localFileStorageConfig = new LocalFileStorageConfig();
-        BeanUtils.copyProperties(request, localFileStorageConfig);
-        String value = JSON.toJSONString(localFileStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.LOCAL, value);
-    }
 
     /**
      * 添加阿里云OSS配置文件
@@ -128,11 +115,25 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean saveFileConfig(AliyunOSSConfigRequest request) {
+    public boolean addStorageConfig(AliyunOSSConfigRequest request) {
         AliyunOSSStorageConfig aliyun = new AliyunOSSStorageConfig();
         BeanUtils.copyProperties(request, aliyun);
         String value = JSON.toJSONString(aliyun);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
+        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
+    }
+
+    /**
+     * 添加亚马逊S3存储配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean addStorageConfig(AmazonS3ConfigRequest request) {
+        AmazonS3StorageConfig amazonS3StorageConfig = new AmazonS3StorageConfig();
+        BeanUtils.copyProperties(request, amazonS3StorageConfig);
+        String value = JSON.toJSONString(amazonS3StorageConfig);
+        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.AMAZON_S3, value);
     }
 
     /**
@@ -142,10 +143,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean saveFileConfig(MinioConfigRequest request) {
+    public boolean addStorageConfig(MinioConfigRequest request) {
         MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
         String value = JSON.toJSONString(minioStorageConfig);
-        return saveFileConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
+        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
     }
 
 
@@ -158,7 +159,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @param value       文件配置文件（JSON）
      * @return 保存结果
      */
-    private boolean saveFileConfig(String storageName, String storageKey, String storageType, String value) {
+    private boolean addStorageConfig(String storageName, String storageKey, String storageType, String value) {
         if (isStorageKeyExist(storageKey)) {
             throw new ServiceException(String.format("存储key【%s】已存在", storageName));
         }
@@ -251,7 +252,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return 操作结果
      */
     @Override
-    public boolean setMasterConfig(Long id) {
+    public boolean updatePrimaryConfig(Long id) {
         // 取消当前主配置
         StorageConfig currentMasterConfig = getPrimaryConfig();
         if (currentMasterConfig != null) {

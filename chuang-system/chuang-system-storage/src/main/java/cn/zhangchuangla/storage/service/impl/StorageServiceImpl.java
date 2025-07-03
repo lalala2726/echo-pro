@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.storage.components.SpringContextHolder;
 import cn.zhangchuangla.storage.constant.StorageConstants;
-import cn.zhangchuangla.storage.core.service.FileOperationService;
+import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
@@ -83,7 +83,7 @@ public class StorageServiceImpl implements StorageService {
             throw new ServiceException(ResponseCode.FileUploadFailed, "此接口文件大小最大不能超过50M");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        FileOperationService service = getService(activeStorageType);
+        OperationService service = getService(activeStorageType);
         UploadedFileInfo upload = service.upload(file);
 
 
@@ -123,7 +123,7 @@ public class StorageServiceImpl implements StorageService {
             throw new ServiceException(ResponseCode.FileUploadFailed, "只能上传图片类型的资源");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        FileOperationService service = getService(activeStorageType);
+        OperationService service = getService(activeStorageType);
         UploadedFileInfo uploadedFileInfo = service.uploadImage(file);
 
         //保存文件信息
@@ -166,7 +166,7 @@ public class StorageServiceImpl implements StorageService {
 
         // 3. 获取存储服务和配置
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        FileOperationService service = getService(activeStorageType);
+        OperationService service = getService(activeStorageType);
 
         // 4. 批量处理文件删除操作
         processFileDeletion(fileRecords, service, forceDelete);
@@ -219,7 +219,7 @@ public class StorageServiceImpl implements StorageService {
     /**
      * 批量处理文件删除操作
      */
-    private void processFileDeletion(List<FileRecord> fileRecords, FileOperationService service, boolean forceDelete) {
+    private void processFileDeletion(List<FileRecord> fileRecords, OperationService service, boolean forceDelete) {
         fileRecords.forEach(fileRecord -> {
             // 构建文件操作DTO
             FileOperationDto fileOperationDto = FileOperationDto.builder()
@@ -269,7 +269,7 @@ public class StorageServiceImpl implements StorageService {
             }
         });
 
-        FileOperationService service = getService(activeStorageType);
+        OperationService service = getService(activeStorageType);
         //进行文件操作
         fileRecords.forEach(fileRecord -> {
             FileOperationDto fileOperationDto = new FileOperationDto();
@@ -339,7 +339,7 @@ public class StorageServiceImpl implements StorageService {
         });
 
         // 获取当前存储服务
-        FileOperationService service = getService(activeStorageType);
+        OperationService service = getService(activeStorageType);
         // 对每个文件执行物理删除并更新数据库状态
         recordList.forEach(fileRecord -> {
             // 构造文件操作DTO，包含回收站路径信息
@@ -365,9 +365,9 @@ public class StorageServiceImpl implements StorageService {
      * @param type 存储类型
      * @return 存储服务
      */
-    private FileOperationService getService(String type) {
+    private OperationService getService(String type) {
         String beanName = getBeanNameByType(type);
-        return SpringContextHolder.getBean(beanName, FileOperationService.class);
+        return SpringContextHolder.getBean(beanName, OperationService.class);
     }
 
     /**
@@ -399,6 +399,7 @@ public class StorageServiceImpl implements StorageService {
             case StorageConstants.StorageType.ALIYUN_OSS -> StorageConstants.springBeanName.ALIYUN_OSS_STORAGE_SERVICE;
             case StorageConstants.StorageType.TENCENT_COS ->
                     StorageConstants.springBeanName.TENCENT_COS_STORAGE_SERVICE;
+            case StorageConstants.StorageType.AMAZON_S3 -> StorageConstants.springBeanName.AMAZON_S3_STORAGE_SERVICE;
             default -> throw new ServiceException("未知存储类型: " + type);
         };
     }

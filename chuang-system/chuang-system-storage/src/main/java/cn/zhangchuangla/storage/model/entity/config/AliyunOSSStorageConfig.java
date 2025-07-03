@@ -47,9 +47,9 @@ public class AliyunOSSStorageConfig implements Serializable {
     private String fileDomain;
 
     /**
-     * 是否开启回收站 0:关闭 1:开启
+     * 是否真实删除
      */
-    private Integer enableTrash;
+    private boolean realDelete;
 
 
 }

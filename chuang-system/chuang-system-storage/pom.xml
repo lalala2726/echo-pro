@@ -39,6 +39,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+
         <!-- MinIO 客户端 -->
         <dependency>
             <groupId>io.minio</groupId>

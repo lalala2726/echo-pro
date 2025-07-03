@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.model.request;
+package cn.zhangchuangla.storage.model.request;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -74,10 +74,10 @@ public class MinioConfigRequest {
     private String fileDomain;
 
     /**
-     * 是否启用文件回收站 0 否 1 是
+     * 是否真实删除
      */
-    @Schema(description = "是否启用文件回收站，当选择此功能后文件就算是永久删除了也不会真正删除，而是放入回收站，默认不启用,1启用，0不启用")
-    private Integer enableTrash = 0;
+    @Schema(description = "是否真实删除")
+    private boolean realDelete;
 
 
 }

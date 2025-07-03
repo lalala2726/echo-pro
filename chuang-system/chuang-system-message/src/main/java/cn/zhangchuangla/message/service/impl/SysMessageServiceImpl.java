@@ -43,14 +43,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage> implements SysMessageService {
 
+    // 批量发送消息数量
+    private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
     private final SysMessageMapper sysMessageMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final MessageProducer messageProducer;
     private final SysUserMessageService sysUserMessageService;
-
-    // 批量发送消息数量
-    private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
 
     /**
      * 分页查询系统消息表
