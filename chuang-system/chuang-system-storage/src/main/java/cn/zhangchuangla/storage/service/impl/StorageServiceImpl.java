@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
@@ -13,9 +14,14 @@ import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.FileRecord;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
 import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
 import cn.zhangchuangla.storage.service.StorageManageService;
 import cn.zhangchuangla.storage.service.StorageService;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +94,7 @@ public class StorageServiceImpl implements StorageService {
 
 
         // 保存文件信息
-        String username = SecurityUtils.getUsername();
+        SysUserDetails loginUser = SecurityUtils.getLoginUser();
         FileRecord fileRecord = FileRecord.builder()
                 .originalName(file.getOriginalFilename())
                 .fileName(upload.getFileName())
@@ -96,8 +102,10 @@ public class StorageServiceImpl implements StorageService {
                 .fileSize(file.getSize())
                 .originalFileUrl(upload.getFileUrl())
                 .originalRelativePath(upload.getFileRelativePath())
+                .bucketName(upload.getBucketName())
                 .uploadTime(new Date())
-                .uploaderName(username)
+                .uploaderId(loginUser.getUserId())
+                .uploaderName(loginUser.getUsername())
                 .fileExtension(upload.getFileExtension())
                 .storageType(activeStorageType)
                 .build();
@@ -127,18 +135,20 @@ public class StorageServiceImpl implements StorageService {
         UploadedFileInfo uploadedFileInfo = service.uploadImage(file);
 
         //保存文件信息
-        String username = SecurityUtils.getUsername();
+        SysUserDetails loginUser = SecurityUtils.getLoginUser();
         FileRecord fileRecord = FileRecord.builder()
                 .originalName(file.getOriginalFilename())
                 .fileName(uploadedFileInfo.getFileName())
                 .previewImageUrl(uploadedFileInfo.getPreviewImage())
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
+                .bucketName(uploadedFileInfo.getBucketName())
+                .uploaderId(loginUser.getUserId())
+                .uploaderName(loginUser.getUsername())
                 .previewRelativePath(uploadedFileInfo.getPreviewImageRelativePath())
                 .originalFileUrl(uploadedFileInfo.getFileUrl())
                 .originalRelativePath(uploadedFileInfo.getFileRelativePath())
                 .uploadTime(new Date())
-                .uploaderName(username)
                 .fileExtension(uploadedFileInfo.getFileExtension())
                 .storageType(activeStorageType)
                 .build();
@@ -206,7 +216,7 @@ public class StorageServiceImpl implements StorageService {
 
         // 批量校验文件状态
         fileRecords.forEach(fileRecord -> {
-            validateFileStorageConsistency(activeStorageType, fileRecord);
+            validateStorageConsistency(activeStorageType, fileRecord);
             if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR,
                         String.format("文件编号: %s 已经在回收站中!无法再次删除!", fileRecord.getId()));
@@ -263,7 +273,7 @@ public class StorageServiceImpl implements StorageService {
 
         // 校验文件存储类型一致性和判断是否在回收站中
         fileRecords.forEach(fileRecord -> {
-            validateFileStorageConsistency(activeStorageType, fileRecord);
+            validateStorageConsistency(activeStorageType, fileRecord);
             if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
                 throw new ServiceException(ResponseCode.FILE_OPERATION_FAILED, "文件未处于回收站中或已被删除，无法恢复");
             }
@@ -327,7 +337,7 @@ public class StorageServiceImpl implements StorageService {
         // 校验文件存储类型一致性，并检查文件是否确实在回收站中
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         recordList.forEach(fileRecord -> {
-            validateFileStorageConsistency(activeStorageType, fileRecord);
+            validateStorageConsistency(activeStorageType, fileRecord);
 
             // 确保文件处于回收站状态
             if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(fileRecord.getIsTrash())) {
@@ -376,7 +386,7 @@ public class StorageServiceImpl implements StorageService {
      * @param activeStorageType 当前系统使用的存储类型
      * @param fileRecord        文件记录
      */
-    private void validateFileStorageConsistency(String activeStorageType, FileRecord fileRecord) {
+    private void validateStorageConsistency(String activeStorageType, FileRecord fileRecord) {
         if (!activeStorageType.equals(fileRecord.getStorageType())) {
             throw new ServiceException(
                     ResponseCode.OPERATION_ERROR,
@@ -384,6 +394,43 @@ public class StorageServiceImpl implements StorageService {
                             activeStorageType, fileRecord.getId(), fileRecord.getStorageType())
             );
         }
+        // 非本地存储
+        if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
+            if (!getCurrentBucketName().equals(fileRecord.getBucketName())) {
+                throw new ServiceException(ResponseCode.OPERATION_ERROR,
+                        String.format("存储桶名称不匹配，无法执行删除操作。当前存储桶名称: %s，当前文件ID为 %d 的实际存储桶名称: %s",
+                                getCurrentBucketName(), fileRecord.getId(), fileRecord.getBucketName()));
+            }
+        }
+    }
+
+    /**
+     * 获取当前存储桶名称
+     *
+     * @return 当前存储桶名称
+     */
+    private String getCurrentBucketName() {
+        String currentStorageConfigJson = storageConfigRetrievalService.getCurrentStorageConfigJson();
+        String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
+        return switch (activeStorageType) {
+            case StorageConstants.StorageType.MINIO -> {
+                MinioStorageConfig minioStorageConfig = JSON.parseObject(currentStorageConfigJson, MinioStorageConfig.class);
+                yield minioStorageConfig.getBucketName();
+            }
+            case StorageConstants.StorageType.ALIYUN_OSS -> {
+                AliyunOSSStorageConfig aliyunOssStorageConfig = JSON.parseObject(currentStorageConfigJson, AliyunOSSStorageConfig.class);
+                yield aliyunOssStorageConfig.getBucketName();
+            }
+            case StorageConstants.StorageType.TENCENT_COS -> {
+                TencentCOSStorageConfig tencentCosStorageConfig = JSON.parseObject(currentStorageConfigJson, TencentCOSStorageConfig.class);
+                yield tencentCosStorageConfig.getBucketName();
+            }
+            case StorageConstants.StorageType.AMAZON_S3 -> {
+                AmazonS3StorageConfig amazonS3StorageConfig = JSON.parseObject(currentStorageConfigJson, AmazonS3StorageConfig.class);
+                yield amazonS3StorageConfig.getBucketName();
+            }
+            default -> throw new ServiceException("未知存储类型: " + activeStorageType);
+        };
     }
 
     /**

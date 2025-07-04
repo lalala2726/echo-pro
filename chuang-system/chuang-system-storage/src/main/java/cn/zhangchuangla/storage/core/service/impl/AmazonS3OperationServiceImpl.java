@@ -503,9 +503,11 @@ public class AmazonS3OperationServiceImpl implements OperationService {
      * @return 文件信息
      */
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
         info.setFileName(newFileName);
+        info.setBucketName(bucketName);
         info.setFileExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
@@ -529,8 +531,10 @@ public class AmazonS3OperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
+        info.setBucketName(bucketName);
         info.setFileName(newFileName);
         info.setFileExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileSize(fileSize);

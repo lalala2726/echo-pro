@@ -79,7 +79,7 @@ public class FileRecord {
     private String storageType;
 
     /**
-     * 存储桶名称（OSS/MINIO 使用）
+     * 存储桶名称
      */
     private String bucketName;
 
