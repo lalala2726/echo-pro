@@ -368,6 +368,17 @@ public class StorageServiceImpl implements StorageService {
         return storageManageService.updateBatchById(recordList);
     }
 
+    /**
+     * 根据文件ID获取文件信息
+     *
+     * @param id 文件ID
+     * @return 文件信息
+     */
+    @Override
+    public FileRecord getFileById(Long id) {
+        return storageManageService.getById(id);
+    }
+
 
     /**
      * 根据存储类型获取对应的存储服务

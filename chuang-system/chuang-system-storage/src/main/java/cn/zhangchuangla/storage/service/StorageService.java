@@ -92,4 +92,11 @@ public interface StorageService {
      */
     boolean deleteTrashFileById(List<Long> fileIds);
 
+    /**
+     * 根据文件编号获取文件信息
+     *
+     * @param id 文件id
+     * @return 文件信息
+     */
+    FileRecord getFileById(Long id);
 }

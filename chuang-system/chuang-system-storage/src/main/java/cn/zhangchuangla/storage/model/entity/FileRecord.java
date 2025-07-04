@@ -59,7 +59,7 @@ public class FileRecord {
     private String originalRelativePath;
 
     /**
-     * 压缩文件URL，用于图片预览等场景
+     * 预览图
      */
     private String previewImageUrl;
 

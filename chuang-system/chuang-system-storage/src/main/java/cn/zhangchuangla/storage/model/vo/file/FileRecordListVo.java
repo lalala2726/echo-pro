@@ -35,30 +35,15 @@ public class FileRecordListVo {
     private String contentType;
 
     /**
+     * 压缩文件URL，用于图片预览等场景
+     */
+    private String previewImageUrl;
+
+    /**
      * 文件大小
      */
     @Schema(description = "文件大小")
     private String fileSize;
-
-
-    /**
-     * 原始文件URL，直接访问地址
-     */
-    @Schema(description = "原始文件URL，直接访问地址")
-    private String originalFileUrl;
-
-    /**
-     * 原始文件相对路径，存储在服务器上的路径
-     */
-    @Schema(description = "原始文件相对路径，存储在服务器上的路径")
-    private String originalRelativePath;
-
-    /**
-     * 压缩文件URL，用于图片预览等场景
-     */
-    @Schema(description = "压缩文件URL，用于图片预览等场景")
-    private String previewImageUrl;
-
 
     /**
      * 文件扩展名
@@ -78,15 +63,6 @@ public class FileRecordListVo {
     @Schema(description = "存储桶名称（OSS/MINIO 使用）")
     private String bucketName;
 
-    @Schema(description = "是否包含预览图片")
-    private Boolean isIncludePreviewImage;
-
-    /**
-     * 上传者ID
-     */
-    @Schema(description = "上传者ID")
-    private Long uploaderId;
-
     /**
      * 上传者名称
      */
@@ -101,10 +77,4 @@ public class FileRecordListVo {
     private Date uploadTime;
 
 
-    /**
-     * 更新时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Schema(description = "更新时间")
-    private Date updateTime;
 }
