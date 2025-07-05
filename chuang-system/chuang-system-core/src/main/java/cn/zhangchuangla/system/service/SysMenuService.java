@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.service;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
@@ -73,5 +74,12 @@ public interface SysMenuService {
      * @return 返回前端路由
      */
     RouterVo buildRouter(SysMenu sysMenu);
+
+    /**
+     * 获取菜单选项
+     *
+     * @return 菜单选项
+     */
+    List<Option<String>> getMenuOptions();
 
 }

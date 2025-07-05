@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.vo.post;
 
-import cn.zhangchuangla.common.core.core.entity.base.BaseVo;
+import cn.zhangchuangla.common.core.entity.base.BaseVo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;

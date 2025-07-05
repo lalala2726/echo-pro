@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.security.component;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.service.SysPermissionService;

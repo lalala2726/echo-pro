@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.core.annotation.ValidRegex;
 import cn.zhangchuangla.common.core.constant.RegularConstants;
-import cn.zhangchuangla.common.core.core.entity.base.BasePageRequest;
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;

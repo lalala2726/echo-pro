@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.common.core.core.entity.security.SysUser;
-import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.service.SysRoleService;

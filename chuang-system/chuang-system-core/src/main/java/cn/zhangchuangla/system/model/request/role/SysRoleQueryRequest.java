@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.request.role;
 
-import cn.zhangchuangla.common.core.core.entity.base.BasePageRequest;
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.enums;
 
-import cn.zhangchuangla.common.core.core.entity.base.BaseEnum;
+import cn.zhangchuangla.common.core.entity.base.BaseEnum;
 import lombok.Getter;
 
 /**

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.mapper;
 
-import cn.zhangchuangla.common.core.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

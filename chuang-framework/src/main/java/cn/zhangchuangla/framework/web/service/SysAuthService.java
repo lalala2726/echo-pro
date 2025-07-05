@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.common.core.core.entity.security.AuthenticationToken;
-import cn.zhangchuangla.common.core.core.entity.security.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.LoginException;
 import cn.zhangchuangla.common.core.exception.ServiceException;

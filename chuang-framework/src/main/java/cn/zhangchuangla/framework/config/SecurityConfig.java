@@ -1,8 +1,8 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;

@@ -1,8 +1,9 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
@@ -44,7 +45,13 @@ public class SysMenuController extends BaseController {
         return getTableData(sysMenuPage, sysMenuListVos);
     }
 
-    public AjaxResult<>
+    @GetMapping("/option")
+    @Operation(summary = "获取菜单选项")
+    @PreAuthorize("@ss.hasPermission('system:menu:list')")
+    public AjaxResult<List<Option<String>>> getMenuOptions() {
+        List<Option<String>> options = sysMenuService.getMenuOptions();
+        return success(options);
+    }
 
     /**
      * 添加菜单

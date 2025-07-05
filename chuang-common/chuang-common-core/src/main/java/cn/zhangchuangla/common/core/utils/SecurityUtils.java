@@ -2,7 +2,7 @@ package cn.zhangchuangla.common.core.utils;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;

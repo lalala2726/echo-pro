@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.core.entity.Option;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
