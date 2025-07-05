@@ -46,20 +46,19 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = securityProperties.getHeader();
-        String authorizationHeader = request.getHeader(header);
-        log.info("当前请求令牌：{}", authorizationHeader);
+        String token = request.getHeader(header);
         try {
-            if (StringUtils.isNotBlank(authorizationHeader)) {
+            if (StringUtils.isNotBlank(token)) {
 
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
-                boolean isValidToken = tokenManager.validateAccessToken(authorizationHeader);
+                boolean isValidToken = tokenManager.validateAccessToken(token);
                 if (!isValidToken) {
                     ResponseUtils.writeErrMsg(response, ResponseCode.ACCESS_TOKEN_INVALID);
                     return;
                 }
 
                 // 将令牌解析为 Spring Security 上下文认证对象
-                Authentication authentication = tokenManager.parseToken(authorizationHeader);
+                Authentication authentication = tokenManager.parseToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {

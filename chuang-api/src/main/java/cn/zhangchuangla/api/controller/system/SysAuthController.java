@@ -1,18 +1,13 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
-import cn.zhangchuangla.common.core.core.security.model.SysUser;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.entity.security.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.core.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.web.service.SysAuthService;
-import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
-import cn.zhangchuangla.system.service.SysMenuService;
-import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,9 +37,7 @@ public class SysAuthController extends BaseController {
 
     private final SysAuthService sysAuthService;
     private final SysUserService sysUserService;
-    private final SysMenuService sysMenuService;
     private final SysRoleService sysRoleService;
-    private final SysPermissionService sysPermissionService;
 
     /**
      * 登录
@@ -82,22 +74,6 @@ public class SysAuthController extends BaseController {
 
 
     /**
-     * 获取用户路由
-     *
-     * @return 用户路由
-     */
-    @Operation(summary = "菜单路由列表")
-    @GetMapping("/routes")
-    public AjaxResult<List<RouterVo>> getCurrentUserRoutes() {
-
-        Long userId = SecurityUtils.getUserId();
-        log.info("当前用户USERID:{}", userId);
-        List<SysMenu> menuListByUserId = sysMenuService.getMenuListByUserId(userId);
-        List<RouterVo> routerVos = sysMenuService.buildMenus(menuListByUserId);
-        return success(routerVos);
-    }
-
-    /**
      * 获取用户信息
      * 获取当前登录用户的详细信息，包括用户基本信息、角色集合、权限集合等
      *
@@ -110,12 +86,10 @@ public class SysAuthController extends BaseController {
         Long userId = getUserId();
         Set<String> roles = sysRoleService.getRoleSetByUserId(userId);
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        Set<String> permissions = sysPermissionService.getUserPermissionByRole(roles);
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(sysUser, userInfoVo);
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
         return success(ajax);
     }
 

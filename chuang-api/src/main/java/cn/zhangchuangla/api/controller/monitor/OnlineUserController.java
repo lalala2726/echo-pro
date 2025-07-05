@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.core.security.model.OnlineLoginUser;
+import cn.zhangchuangla.common.core.core.entity.security.OnlineLoginUser;
+import cn.zhangchuangla.common.core.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.PageUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;

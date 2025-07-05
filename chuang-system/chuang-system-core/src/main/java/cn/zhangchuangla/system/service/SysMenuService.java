@@ -1,70 +1,51 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
-import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * 菜单服务接口
- *
  * @author Chuang
+ * <p>
+ * created on 2025/7/5 12:47
  */
-public interface SysMenuService extends IService<SysMenu> {
+public interface SysMenuService {
 
     /**
-     * 根据用户ID查询菜单列表
+     * 查询系统菜单列表
      *
-     * @param userId 用户ID
-     * @return 菜单列表
+     * @param request 查询参数
+     * @return 系统菜单列表
      */
-    List<SysMenu> getMenuListByUserId(Long userId);
-
+    Page<SysMenu> listMenu(SysMenuQueryRequest request);
 
     /**
-     * 构造前端需要的路由界面
-     *
-     * @param menus 菜单列表
-     * @return 返回前端需要的路由界面
-     */
-    List<RouterVo> buildMenus(List<SysMenu> menus);
-
-    /**
-     * 根据菜单ID查询信息
+     * 根据菜单ID查询菜单信息
      *
      * @param menuId 菜单ID
      * @return 菜单信息
      */
     SysMenu getMenuById(Long menuId);
 
-
     /**
-     * 构建前端选择菜单树（Option结构）
+     * 添加菜单
      *
-     * @param menus 菜单列表
-     * @return Option树列表
+     * @param request 添加参数
+     * @return 是否添加成功
      */
-    List<Option<Long>> buildMenuTree(List<SysMenu> menus);
-
-    /**
-     * 构建前端选项树
-     *
-     * @return 选项树
-     */
-    List<Option<Long>> buildMenuOption(List<SysMenu> menus);
-
+    boolean addMenu(SysMenuAddRequest request);
 
     /**
      * 修改菜单
      *
-     * @param request 菜单信息
-     * @return 结果
+     * @param request 修改参数
+     * @return 是否修改成功
      */
     boolean updateMenu(SysMenuUpdateRequest request);
 
@@ -72,56 +53,25 @@ public interface SysMenuService extends IService<SysMenu> {
      * 删除菜单
      *
      * @param menuId 菜单ID
-     * @return 结果
+     * @return 是否删除成功
      */
-    boolean deleteMenuById(Long menuId);
+    boolean deleteMenu(Long menuId);
+
 
     /**
-     * 校验菜单名称是否唯一
+     * 根据角色名称获取菜单列表
      *
-     * @param menu 菜单信息
-     * @return 结果
+     * @param roleName 角色名称
+     * @return 菜单列表
      */
-    boolean checkMenuNameUnique(SysMenu menu);
+    List<SysMenu> getSysMenuListByRoleName(Set<String> roleName);
 
     /**
-     * 是否存在菜单子节点
+     * 构造前端路由
      *
-     * @param menuId 菜单ID
-     * @return 结果 true 存在 false 不存在
+     * @param sysMenu 系统
+     * @return 返回前端路由
      */
-    boolean hasChildByMenuId(Long menuId);
-
-    /**
-     * 查询菜单是否存在角色
-     *
-     * @param menuId 菜单ID
-     * @return 结果 true 存在 false 不存在
-     */
-    boolean checkMenuExistRole(Long menuId);
-
-    /**
-     * 获取菜单路由列表
-     *
-     * @param onlyParent 是否只查询父级菜单
-     * @return 菜单路由列表
-     */
-    List<Option<Long>> getMenuOptions(boolean onlyParent);
-
-    /**
-     * 添加菜单
-     *
-     * @param request 请求参数
-     * @return 结果
-     */
-    boolean addMenu(SysMenuAddRequest request);
-
-    /**
-     * 更新角色权限
-     *
-     * @param request 请求参数
-     * @return 结果
-     */
-    List<SysMenuListVo> listMenu(SysMenuQueryRequest request);
+    RouterVo buildRouter(SysMenu sysMenu);
 
 }

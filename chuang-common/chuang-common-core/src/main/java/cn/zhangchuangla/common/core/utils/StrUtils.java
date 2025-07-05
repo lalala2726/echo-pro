@@ -9,8 +9,9 @@ import static java.util.Objects.isNull;
 /**
  * 字符串工具类，提供常见的字符串操作方法
  *
- * @author Ruoyi
+ * @author Chuang
  * created on 2025/1/12 11:23
+ * //todo 逐步转移到Apache Commons Lang3
  */
 public class StrUtils {
 

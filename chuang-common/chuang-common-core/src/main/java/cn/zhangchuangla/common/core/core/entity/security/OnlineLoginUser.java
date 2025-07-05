@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.core.security.model;
+package cn.zhangchuangla.common.core.core.entity.security;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

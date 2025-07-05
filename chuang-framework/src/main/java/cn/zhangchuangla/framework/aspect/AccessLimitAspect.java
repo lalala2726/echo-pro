@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.aspect;
 
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.AccessType;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.TooManyRequestException;

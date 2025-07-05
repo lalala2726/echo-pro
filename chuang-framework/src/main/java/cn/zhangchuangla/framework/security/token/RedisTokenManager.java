@@ -2,9 +2,9 @@ package cn.zhangchuangla.framework.security.token;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.core.security.model.OnlineLoginUser;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.entity.security.OnlineLoginUser;
+import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;

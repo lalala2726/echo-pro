@@ -1,10 +1,10 @@
 package cn.zhangchuangla.common.core.core.controller;
 
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;

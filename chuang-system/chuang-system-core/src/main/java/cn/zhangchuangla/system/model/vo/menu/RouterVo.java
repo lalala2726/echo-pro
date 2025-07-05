@@ -40,23 +40,6 @@ public class RouterVo {
     @Schema(description = "组件路径")
     private String component;
 
-    /**
-     * 重定向地址，当设置 noRedirect 的时候该路由在面包屑导航中不可被点击
-     */
-    @Schema(description = "重定向地址")
-    private String redirect;
-
-    /**
-     * 路由参数：如 {"id": 1, "name": "ry"}
-     */
-    @Schema(description = "路由参数")
-    private String query;
-
-    /**
-     * 当你一个路由下面的 children 声明的路由大于1个时，自动会变成嵌套的模式--如组件页面
-     */
-    @Schema(description = "是否嵌套路由")
-    private Boolean alwaysShow;
 
     /**
      * 路由元数据

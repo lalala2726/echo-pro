@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.loader;
 
+import cn.zhangchuangla.common.core.core.entity.Option;
 import cn.zhangchuangla.common.core.core.loader.DataLoader;
-import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.model.entity.SysDictItem;

@@ -1,8 +1,9 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.core.security.model.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.LoginException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -57,7 +58,7 @@ public class SysAuthService {
             String ipAddr = IPUtils.getIpAddr(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
             asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
-            throw e;
+            throw new LoginException(ResponseCode.LOGIN_ERROR, "账号或密码错误!");
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）

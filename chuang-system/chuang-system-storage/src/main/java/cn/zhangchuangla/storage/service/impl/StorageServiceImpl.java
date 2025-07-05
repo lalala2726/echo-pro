@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;

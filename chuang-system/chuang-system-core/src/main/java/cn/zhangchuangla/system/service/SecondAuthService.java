@@ -7,6 +7,8 @@ package cn.zhangchuangla.system.service;
  */
 public interface SecondAuthService {
 
+    //todo 移动到framework模块中
+
     /**
      * 验证当前用户的密码
      *

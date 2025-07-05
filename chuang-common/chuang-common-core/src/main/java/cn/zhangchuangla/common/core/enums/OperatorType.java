@@ -3,7 +3,7 @@ package cn.zhangchuangla.common.core.enums;
 /**
  * 操作人类别
  *
- * @author ruoyi
+ * @author Chuang
  */
 public enum OperatorType {
     /**

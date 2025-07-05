@@ -3,7 +3,7 @@ package cn.zhangchuangla.common.core.enums;
 /**
  * 业务操作类型
  *
- * @author ruoyi
+ * @author Chuang
  */
 public enum BusinessType {
     /**

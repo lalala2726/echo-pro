@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.security.handel;
 
+import cn.zhangchuangla.common.core.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;

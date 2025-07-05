@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.core.security.model;
+package cn.zhangchuangla.common.core.core.entity.security;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;

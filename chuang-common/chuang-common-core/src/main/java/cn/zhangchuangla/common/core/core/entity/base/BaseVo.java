@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.base;
+package cn.zhangchuangla.common.core.core.entity.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

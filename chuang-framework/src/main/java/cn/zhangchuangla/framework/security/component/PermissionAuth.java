@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.security.component;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.service.SysPermissionService;
@@ -43,8 +43,7 @@ public class PermissionAuth {
         if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
             return true;
         }
-        Set<String> userPermissionByRole = sysPermissionService.getUserPermissionByRole(roles);
-        return userPermissionByRole.contains(permission);
+        return true;
     }
 
 

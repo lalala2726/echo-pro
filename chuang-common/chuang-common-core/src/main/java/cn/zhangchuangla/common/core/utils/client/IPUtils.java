@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.utils.client;
 
-import cn.zhangchuangla.common.core.model.entity.IPEntity;
+import cn.zhangchuangla.common.core.core.entity.IPEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

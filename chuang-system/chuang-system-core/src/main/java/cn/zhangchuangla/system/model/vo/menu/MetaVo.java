@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,97 +21,135 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MetaVo {
+    /**
+     * 激活图标（菜单）
+     */
+    private String activeIcon;
 
     /**
-     * 设置该路由在侧边栏和面包屑中展示的名字
+     * 当前激活的菜单，有时候不想激活现有菜单，需要激活父级菜单时使用
      */
-    @Schema(description = "设置该路由在侧边栏和面包屑中展示的名字")
-    private String title;
-
-    /**
-     * 设置该路由的图标，对应路径src/assets/icons/svg
-     */
-    @Schema(description = "设置该路由的图标，对应路径src/assets/icons/svg")
-    private String icon;
-
-    /**
-     * 是否在菜单中显示
-     */
-    @Schema(description = "是否在菜单中显示")
-    private Boolean showLink;
-
-
-    /**
-     * 设置为true，则不会被 <keep-alive>缓存
-     */
-    @Schema(description = "设置为true，则不会被 <keep-alive>缓存")
-    private Boolean noCache;
-
-    /**
-     * 内链地址（http(s)://开头）
-     */
-    @Schema(description = "内链地址（http(s)://开头）")
-    private String link;
-
-    /**
-     * 菜单名称右侧的额外图标
-     */
-    @Schema(description = "菜单名称右侧的额外图标")
-    private String extraIcon;
-
-    /**
-     * 是否显示父级菜单
-     */
-    @Schema(description = "是否显示父级菜单")
-    private Boolean showParent;
-
-    /**
-     * 按钮级别权限设置
-     */
-    @Schema(description = "按钮级别权限设置")
-    private String[] auths;
-
-    /**
-     * 是否缓存该路由页面
-     */
-    @Schema(description = "是否缓存该路由页面")
-    private Boolean keepAlive;
-
-    /**
-     * 需要内嵌的iframe链接地址
-     */
-    @Schema(description = "需要内嵌的iframe链接地址")
-    private String frameSrc;
-
-    /**
-     * 内嵌的iframe页面是否开启首次加载动画
-     */
-    @Schema(description = "内嵌的iframe页面是否开启首次加载动画")
-    private Boolean frameLoading;
-
-    /**
-     * 当前菜单名称或自定义信息禁止添加到标签页
-     */
-    @Schema(description = "当前菜单名称或自定义信息禁止添加到标签页")
-    private Boolean hiddenTag;
-
-    /**
-     * 将某个菜单激活
-     */
-    @Schema(description = "将某个菜单激活")
     private String activePath;
 
     /**
-     * 角色权限
+     * 是否固定标签页，默认 false
      */
-    @Schema(description = "角色权限")
-    private Set<String> roles;
+    private Boolean affixTab;
 
     /**
-     * 显示在标签页的最大数量
+     * 固定标签页的顺序，默认 0
      */
-    @Schema(description = "显示在标签页的最大数量")
-    private Integer dynamicLevel;
+    private Integer affixTabOrder;
 
+    /**
+     * 需要特定的角色标识才可以访问，默认 []
+     */
+    private Set<String> authority;
+
+    /**
+     * 徽标
+     */
+    private String badge;
+
+    /**
+     * 徽标类型，dot 或 normal
+     */
+    private String badgeType;
+
+    /**
+     * 徽标颜色
+     * 可选: default, destructive, primary, success, warning, 或自定义字符串
+     */
+    private String badgeVariants;
+
+    /**
+     * 路由的完整路径作为key（默认 true）
+     */
+    private Boolean fullPathKey;
+
+    /**
+     * 当前路由的子级在菜单中不展现，默认 false
+     */
+    private Boolean hideChildrenInMenu;
+
+    /**
+     * 当前路由在面包屑中不展现，默认 false
+     */
+    private Boolean hideInBreadcrumb;
+
+    /**
+     * 当前路由在菜单中不展现，默认 false
+     */
+    private Boolean hideInMenu;
+
+    /**
+     * 当前路由在标签页不展现，默认 false
+     */
+    private Boolean hideInTab;
+
+    /**
+     * 图标（菜单/tab）
+     */
+    private String icon;
+
+    /**
+     * iframe 地址
+     */
+    private String iframeSrc;
+
+    /**
+     * 忽略权限，直接可以访问，默认 false
+     */
+    private Boolean ignoreAccess;
+
+    /**
+     * 开启KeepAlive缓存
+     */
+    private Boolean keepAlive;
+
+    /**
+     * 外链-跳转路径
+     */
+    private String link;
+
+    /**
+     * 路由是否已经加载过
+     */
+    private Boolean loaded;
+
+    /**
+     * 标签页最大打开数量
+     */
+    private Integer maxNumOfOpenTab;
+
+    /**
+     * 菜单可以看到，但是访问会被重定向到403
+     */
+    private Boolean menuVisibleWithForbidden;
+
+    /**
+     * 当前路由不使用基础布局（仅在顶级生效）
+     */
+    private Boolean noBasicLayout;
+
+    /**
+     * 在新窗口打开
+     */
+    private Boolean openInNewWindow;
+
+    /**
+     * 用于路由->菜单排序
+     */
+    private Integer order;
+
+    /**
+     * 菜单所携带的参数
+     */
+    private Map<String, Object> query;
+
+    /**
+     * 标题名称（必填）
+     */
+    private String title;
 
 }
