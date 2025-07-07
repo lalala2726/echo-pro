@@ -5,12 +5,11 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -34,17 +33,7 @@ public class BaseController {
      * @return 转换后的目标数据列表
      */
     protected static <T, V> List<V> copyListProperties(List<T> sourceList, Class<V> targetClass) {
-        List<V> targetList = new ArrayList<>();
-        try {
-            for (T source : sourceList) {
-                V target = targetClass.getDeclaredConstructor().newInstance();
-                BeanUtils.copyProperties(source, target);
-                targetList.add(target);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("List 属性拷贝失败", e);
-        }
-        return targetList;
+        return BeanCotyUtils.copyListProperties(sourceList, targetClass);
     }
 
     /**
@@ -55,13 +44,7 @@ public class BaseController {
      * @return 拷贝后的目标对象
      */
     protected static <T, V> V copyProperties(T source, Class<V> targetClass) {
-        try {
-            V target = targetClass.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(source, target);
-            return target;
-        } catch (Exception e) {
-            throw new RuntimeException("属性拷贝失败", e);
-        }
+        return BeanCotyUtils.copyProperties(source, targetClass);
     }
 
 
@@ -75,7 +58,7 @@ public class BaseController {
      * @return 转换后的目标数据列表
      */
     protected static <T, V> List<V> copyListProperties(Page<T> sourceList, Class<V> targetClass) {
-        return copyListProperties(sourceList.getRecords(), targetClass);
+        return BeanCotyUtils.copyListProperties(sourceList, targetClass);
     }
 
     /**
