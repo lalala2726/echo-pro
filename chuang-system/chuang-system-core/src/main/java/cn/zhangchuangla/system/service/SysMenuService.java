@@ -5,8 +5,10 @@ import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
+import cn.zhangchuangla.system.model.vo.menu.MenuOption;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +18,7 @@ import java.util.Set;
  * <p>
  * created on 2025/7/5 12:47
  */
-public interface SysMenuService {
+public interface SysMenuService extends IService<SysMenu> {
 
     /**
      * 查询系统菜单列表
@@ -24,7 +26,7 @@ public interface SysMenuService {
      * @param request 查询参数
      * @return 系统菜单列表
      */
-    Page<SysMenu> listMenu(SysMenuQueryRequest request);
+    List<SysMenu> listMenu(SysMenuQueryRequest request);
 
     /**
      * 根据菜单ID查询菜单信息
@@ -65,7 +67,7 @@ public interface SysMenuService {
      * @param roleName 角色名称
      * @return 菜单列表
      */
-    List<SysMenu> getSysMenuListByRoleName(Set<String> roleName);
+    List<SysMenu> listSysMenuByRoleName(Set<String> roleName);
 
     /**
      * 构造前端路由
@@ -73,7 +75,7 @@ public interface SysMenuService {
      * @param sysMenu 系统
      * @return 返回前端路由
      */
-    RouterVo buildRouter(SysMenu sysMenu);
+    List<RouterVo> buildRouteVo(List<SysMenu> sysMenu);
 
     /**
      * 获取菜单选项
@@ -81,5 +83,33 @@ public interface SysMenuService {
      * @return 菜单选项
      */
     List<Option<String>> getMenuOptions();
+
+    /**
+     * 检查菜单名称是否已经存在
+     *
+     * @param id   菜单ID
+     * @param name 菜单名称
+     * @return 是否已经存在
+     */
+    boolean isMenuNameExists(Long id, String name);
+
+
+    /**
+     * 检查菜单路径是否已经存在
+     *
+     * @param id   菜单ID
+     * @param path 菜单路径
+     * @return 是否已经存在
+     */
+    boolean isMenuPathExists(Long id, String path);
+
+    /**
+     * 获取菜单树
+     *
+     * @return 菜单树
+     */
+    List<MenuOption> menuTree();
+
+    List<SysMenuListVo> buildMenuList(List<SysMenu> menuList);
 
 }

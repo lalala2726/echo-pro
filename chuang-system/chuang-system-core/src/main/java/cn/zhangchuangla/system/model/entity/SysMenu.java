@@ -1,105 +1,77 @@
 package cn.zhangchuangla.system.model.entity;
 
 import cn.zhangchuangla.common.core.entity.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
 /**
- * 菜单实体
+ * 菜单表
  *
- * @author Ray.Hao
- * @since 2023/3/6
+ * @author Chuang
  */
-@TableName("sys_menu")
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "sys_menu")
+@Data
 public class SysMenu extends BaseEntity {
-
     /**
-     * 菜单ID
+     * ID
      */
-    @TableId(type = IdType.AUTO)
-    private Long menuId;
+    @TableId
+    private Long id;
 
     /**
-     * 菜单名称
+     * 名称
      */
-    private String menuName;
+    private String name;
 
     /**
-     * 父菜单ID
+     * 标题
      */
-    private Long parentId;
+    private String title;
 
     /**
-     * 显示顺序
-     */
-    private Integer orderNum;
-
-    /**
-     * 路由地址
+     * 路径
      */
     private String path;
 
     /**
-     * 组件路径
+     * 类型
      */
-    private String component;
+    private String type;
 
     /**
-     * 路由参数
-     */
-    private String query;
-
-    /**
-     * 路由名称
-     */
-    private String routeName;
-
-    /**
-     * 是否为外链（0是 1否）
-     */
-    private Integer isFrame;
-
-    /**
-     * 是否外链
-     */
-    private Integer externalLink;
-
-    /**
-     * 是否缓存（0缓存 1不缓存）
-     */
-    private Integer isCache;
-
-    /**
-     * 菜单类型（M目录 C菜单 F按钮）
-     */
-    private String menuType;
-
-    /**
-     * 菜单状态（0显示 1隐藏）
-     */
-    private String visible;
-
-    /**
-     * 菜单状态（0正常 1停用）
+     * 状态
      */
     private Integer status;
 
     /**
-     * 显示父级菜单(0不显示,1显示)
+     * 父级ID
      */
-    private Integer showParent;
+    private Long parentId;
 
     /**
-     * 菜单激活
+     * 激活路径
      */
     private String activePath;
+
+    /**
+     * 激活图标
+     */
+    private String activeIcon;
+
+    /**
+     * 图标
+     */
+    private String icon;
+
+    /**
+     * 组件
+     */
+    private String component;
 
     /**
      * 权限标识
@@ -107,9 +79,49 @@ public class SysMenu extends BaseEntity {
     private String permission;
 
     /**
-     * 菜单图标
+     * 徽标类型
      */
-    private String icon;
+    private String badgeType;
+
+    /**
+     * 徽标
+     */
+    private String badge;
+
+    /**
+     * 徽标颜色
+     */
+    private String badgeVariants;
+
+    /**
+     * 是否缓存
+     */
+    private Integer keepAlive;
+
+    /**
+     * 是否固定标签页
+     */
+    private Integer affixTab;
+
+    /**
+     * 隐藏菜单
+     */
+    private Integer hideInMenu;
+
+    /**
+     * 隐藏子菜单
+     */
+    private Integer hideChildrenInMenu;
+
+    /**
+     * 隐藏在面包屑中
+     */
+    private Integer hideInBreadcrumb;
+
+    /**
+     * 隐藏在标签页中
+     */
+    private Integer hideInTab;
 
     /**
      * 排序
@@ -117,27 +129,8 @@ public class SysMenu extends BaseEntity {
     private Integer sort;
 
     /**
-     * 创建者
-     */
-    private String createBy;
-
-    /**
      * 创建时间
      */
     private Date createTime;
 
-    /**
-     * 更新者
-     */
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

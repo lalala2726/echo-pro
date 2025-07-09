@@ -106,50 +106,30 @@ public class Constants {
      * 菜单常量
      */
     public interface MenuConstants {
-        /**
-         * 顶级菜单ID
-         */
-        Long TOP_MENU_ID = 0L;
-        /**
-         * 是否外部跳转 0否 1是
-         */
-        Integer IS_EXTERNAL_LINK = 1;
-        Integer NOT_EXTERNAL_LINK = 0;
-        /**
-         * 是否是外链
-         */
-        Integer IS_FRAME = 1;
-        /**
-         * 路由组件
-         */
-        String LAYOUT = "Layout";
-        String PARENT_VIEW = "ParentView";
-        String INNER_LINK = "InnerLink";
-        /**
-         * 菜单类型（M目录 C菜单 F按钮）
-         */
-        String TYPE_DIRECTORY = "M";
-        String TYPE_MENU = "C";
-        String TYPE_BUTTON = "F";
-        /**
-         * 菜单状态（0显示 1隐藏）
-         */
-        String VISIBLE = "0";
-        String HIDDEN = "1";
-        /**
-         * 菜单状态（0正常 1停用）
-         */
-        String STATUS_NORMAL = "0";
-        String STATUS_DISABLED = "1";
-        /**
-         * 是否缓存（0缓存 1不缓存）
-         */
-        Integer CACHE = 0;
-        Integer NOT_CACHE = 1;
 
-        String STATUS_DISABLE = "1";
-        String MENU_TYPE_DIR = "M";
-        Integer CACHE_ENABLED = 1;
-        Integer SHOW_PARENT = 1;
+        /**
+         * 目录
+         */
+        String TYPE_DIR = "catalog";
+
+        /**
+         * 菜单
+         */
+        String TYPE_MENU = "menu";
+
+        /**
+         * 按钮
+         */
+        String TYPE_BUTTON = "button";
+
+        /**
+         * 内嵌
+         */
+        String TYPE_INTERNAL = "embedded";
+
+        /**
+         * 外链
+         */
+        String TYPE_EXTERNAL = "link";
     }
 }

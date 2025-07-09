@@ -3,14 +3,14 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
+import cn.zhangchuangla.system.model.vo.menu.MenuOption;
+import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.service.SysMenuService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,10 +24,25 @@ import java.util.List;
  * created on 2025/7/6 05:03
  */
 @RequestMapping("/system/menu")
+@RestController
 @RequiredArgsConstructor
 public class SysMenuController extends BaseController {
 
     private final SysMenuService sysMenuService;
+
+
+    /**
+     * 获取当前用户路由信息
+     *
+     * @return 路由信息
+     */
+    @Operation(summary = "获取路由")
+    @GetMapping("/route")
+    public AjaxResult<List<RouterVo>> getRoute() {
+        List<SysMenu> list = sysMenuService.list();
+        List<RouterVo> routerVos = sysMenuService.buildRouteVo(list);
+        return AjaxResult.success(routerVos);
+    }
 
 
     /**
@@ -39,18 +54,40 @@ public class SysMenuController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "获取菜单列表")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
-    public AjaxResult<TableDataResult> listMenu(SysMenuQueryRequest request) {
-        Page<SysMenu> sysMenuPage = sysMenuService.listMenu(request);
-        List<SysMenuListVo> sysMenuListVos = copyListProperties(sysMenuPage, SysMenuListVo.class);
-        return getTableData(sysMenuPage, sysMenuListVos);
+    public AjaxResult<List<SysMenuListVo>> listMenu(SysMenuQueryRequest request) {
+        List<SysMenu> sysMenus = sysMenuService.listMenu(request);
+        List<SysMenuListVo> sysMenuListVos = sysMenuService.buildMenuList(sysMenus);
+        return success(sysMenuListVos);
     }
 
-    @GetMapping("/option")
+    /**
+     * 获取菜单详情
+     *
+     * @param menuId 菜单ID
+     * @return 菜单详情
+     */
+    @GetMapping("/{menuId:\\d+}")
+    @Operation(summary = "获取菜单详情")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    public AjaxResult<SysMenu> getMenuById(@PathVariable("menuId") Long menuId) {
+        SysMenu sysMenu = sysMenuService.getMenuById(menuId);
+        return AjaxResult.success(sysMenu);
+    }
+
+    @GetMapping("/options")
     @Operation(summary = "获取菜单选项")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
     public AjaxResult<List<Option<String>>> getMenuOptions() {
         List<Option<String>> options = sysMenuService.getMenuOptions();
         return success(options);
+    }
+
+    @GetMapping("/tree")
+    @Operation(summary = "菜单树")
+    @PreAuthorize("@ss.hasPermission('system:menu:list')")
+    public AjaxResult<List<MenuOption>> menuTree() {
+        List<MenuOption> sysMenu = sysMenuService.menuTree();
+        return success(sysMenu);
     }
 
     /**
@@ -63,9 +100,39 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "添加菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
 
-    public AjaxResult<Void> addMenu(SysMenuAddRequest request) {
+    public AjaxResult<Void> addMenu(@RequestBody SysMenuAddRequest request) {
         boolean result = sysMenuService.addMenu(request);
         return toAjax(result);
+    }
+
+
+    /**
+     * 检查菜单的名字是否已存在
+     *
+     * @param id   菜单id
+     * @param name 菜单名称
+     * @return 检查结果
+     */
+    @Operation(summary = "检查菜单名称是否已经存在")
+    @GetMapping("/name-exists")
+    public AjaxResult<Boolean> isMenuNameExists(@RequestParam(value = "id", required = false) Long id,
+                                                @RequestParam("name") String name) {
+        boolean exists = sysMenuService.isMenuNameExists(id, name);
+        return success(exists);
+    }
+
+    /**
+     * 检查菜单路径是否已经存在
+     *
+     * @param id   菜单id
+     * @param path 路由地址
+     * @return 存在返回true，不存在返回false
+     */
+    @GetMapping("/path-exists")
+    public AjaxResult<Boolean> isMenuPathExists(@RequestParam(value = "id", required = false) Long id,
+                                                @RequestParam("path") String path) {
+        boolean exists = sysMenuService.isMenuPathExists(id, path);
+        return success(exists);
     }
 
     /**
@@ -94,20 +161,6 @@ public class SysMenuController extends BaseController {
     public AjaxResult<Void> deleteMenu(Long menuId) {
         boolean result = sysMenuService.deleteMenu(menuId);
         return toAjax(result);
-    }
-
-    /**
-     * 获取菜单详情
-     *
-     * @param menuId 菜单ID
-     * @return 菜单详情
-     */
-    @GetMapping("/{menuId}")
-    @Operation(summary = "获取菜单详情")
-    @PreAuthorize("@ss.hasPermission('system:menu:query')")
-    public AjaxResult<SysMenu> getMenuById(@PathVariable("menuId") Long menuId) {
-        SysMenu sysMenu = sysMenuService.getMenuById(menuId);
-        return AjaxResult.success(sysMenu);
     }
 
 

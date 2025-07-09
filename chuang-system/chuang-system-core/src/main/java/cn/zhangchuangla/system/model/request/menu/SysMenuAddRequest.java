@@ -1,10 +1,6 @@
 package cn.zhangchuangla.system.model.request.menu;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -17,115 +13,122 @@ import lombok.Data;
 public class SysMenuAddRequest {
 
     /**
-     * 菜单名称
+     * 名称
      */
-    @Schema(description = "菜单名称", example = "用户管理", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "菜单名称不能为空")
-    private String menuName;
+    @Schema(description = "名称", type = "string", example = "System")
+    private String name;
 
     /**
-     * 父菜单ID
+     * 路径
      */
-    @Schema(description = "父菜单ID", example = "1", type = "string", format = "int64")
-    @Min(value = 0, message = "父菜单ID不能小于0")
-    private Long parentId;
-
-    /**
-     * 显示顺序
-     */
-    @Schema(description = "显示顺序", example = "1", type = "string", format = "int32")
-    private Integer orderNum;
-
-    /**
-     * 路由地址
-     */
-    @Schema(description = "路由地址", example = "/user/list", type = "string")
-    @NotNull(message = "路由地址不能为空")
+    @Schema(description = "路径", type = "string", example = "/system")
     private String path;
 
     /**
-     * 菜单激活
+     * 类型
      */
-    @Schema(description = "菜单激活", example = "/user/list", type = "string")
+    @Schema(description = "类型", type = "string", example = "catalog")
+    private String type;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "状态", type = "integer", example = "1")
+    private Integer status;
+
+    /**
+     * 父级ID
+     */
+    @Schema(description = "父级ID", type = "int64", example = "0")
+    private Long parentId;
+
+    /**
+     * 标题
+     */
+    @Schema(description = "标题", type = "string", example = "系统菜单")
+    private String title;
+
+    /**
+     * 激活路径
+     */
+    @Schema(description = "激活路径", type = "string", example = "/system")
     private String activePath;
 
     /**
-     * 是否外部跳转（0否 1是）
+     * 图标
      */
-    @Schema(description = "是否外部跳转（0否 1是）", example = "0", type = "string", format = "int32")
-    private Integer externalLink;
+    @Schema(description = "图标", type = "string", example = "el-icon-setting")
+    private String icon;
+
+    /**
+     * 激活图标
+     */
+    @Schema(description = "激活图标", type = "string", example = "el-icon-setting")
+    private String activeIcon;
 
     /**
      * 组件路径
      */
-    @Schema(description = "组件路径", example = "system/user/index", type = "string")
+    @Schema(description = "组件路径", type = "string", example = "system/index")
     private String component;
-
-    /**
-     * 路由参数
-     */
-    @Schema(description = "路由参数", example = "{\"userId\": \"1\"}", type = "string")
-    private String query;
-
-
-    /**
-     * 是否为外链（0是 1否）
-     */
-    @Schema(description = "是否为外链（0是 1否）", example = "0", type = "string", format = "int32")
-    private Integer isFrame;
-
-    /**
-     * 是否缓存（0缓存 1不缓存）
-     */
-    @Schema(description = "是否缓存（0缓存 1不缓存）", example = "0", type = "string", format = "int32")
-    private Integer isCache;
-
-    /**
-     * 菜单类型（M目录 C菜单 F按钮）
-     */
-    @Schema(description = "菜单类型（M目录 C菜单 F按钮）", example = "C", type = "string")
-    private String menuType;
-
-    /**
-     * 菜单状态（0显示 1隐藏）
-     */
-    @Schema(description = "菜单状态（0显示 1隐藏）", example = "0", type = "string")
-    private String visible;
-
-    /**
-     * 是否显示父级菜单 0否 1是
-     */
-    @Schema(description = "是否显示父级菜单 0否 1是")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer showParent;
-
-    /**
-     * 菜单状态（0正常 1停用）
-     */
-    @Schema(description = "菜单状态（0正常 1停用）", example = "0", type = "string", format = "int32")
-    private Integer status;
 
     /**
      * 权限标识
      */
-    @Schema(description = "权限标识", example = "system:user:list", type = "string")
+    @Schema(description = "权限标识", type = "string", example = "system:menu:list")
     private String permission;
 
     /**
-     * 菜单图标
+     * 徽标类型
      */
-    @Schema(description = "菜单图标", example = "user", type = "string")
-    private String icon;
+    @Schema(description = "徽标类型", type = "string", example = "primary")
+    private String badgeType;
 
     /**
-     * 排序
+     * 徽标
      */
-    @Schema(description = "排序", example = "1", type = "string", format = "int32")
-    private Integer sort;
+    @Schema(description = "徽标", type = "string", example = "1")
+    private String badge;
 
     /**
-     * 备注
+     * 徽标颜色
      */
-    @Schema(description = "备注", example = "用户信息管理页面", type = "string")
-    private String remark;
+    @Schema(description = "徽标颜色", type = "string", example = "red")
+    private String badgeVariants;
+
+    /**
+     * 是否缓存
+     */
+    @Schema(description = "是否缓存", type = "boolean", example = "true")
+    private Boolean keepAlive;
+
+    /**
+     * 是否固定标签
+     */
+    @Schema(description = "是否固定标签", type = "boolean", example = "true")
+    private Boolean affixTab;
+
+    /**
+     * 是否在菜单中隐藏
+     */
+    @Schema(description = "是否在菜单中隐藏", type = "boolean", example = "true")
+    private Boolean hideInMenu;
+
+    /**
+     * 是否在菜单中隐藏子项
+     */
+    @Schema(description = "是否在菜单中隐藏子项", type = "boolean", example = "true")
+    private Boolean hideChildrenInMenu;
+
+    /**
+     * 面包屑中隐藏
+     */
+    @Schema(description = "面包屑中隐藏", type = "boolean", example = "true")
+    private Boolean hideInBreadcrumb;
+
+    /**
+     * 标签页中隐藏
+     */
+    @Schema(description = "标签页中隐藏", type = "boolean", example = "true")
+    private Boolean hideInTab;
 }
