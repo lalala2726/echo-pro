@@ -1,8 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
@@ -14,7 +14,6 @@ import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
-import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +44,6 @@ import java.util.List;
 public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final SysPermissionService sysPermissionService;
 
 
     /**
@@ -74,8 +72,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "根据角色ID获取角色权限")
     public AjaxResult<SysRolePermVo> getRolePermission(@Parameter(description = "角色ID")
                                                        @PathVariable("roleId") Long roleId) {
-        SysRolePermVo result = sysPermissionService.getRolePermByRoleId(roleId);
-        return success(result);
+        return success();
     }
 
     /**
@@ -89,8 +86,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:permission')")
     @OperationLog(title = "角色权限管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateRolePermission(@RequestBody SysUpdateRolePermissionRequest request) {
-        boolean result = sysPermissionService.updateRolePermission(request);
-        return toAjax(result);
+        return success();
     }
 
     /**

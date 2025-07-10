@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.excel.core;
 
-import cn.zhangchuangla.common.core.model.entity.Option;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.core.loader;
+package cn.zhangchuangla.common.core.loader;
 
 /**
  * 数据加载器接口，所有模块加载器需实现此接口

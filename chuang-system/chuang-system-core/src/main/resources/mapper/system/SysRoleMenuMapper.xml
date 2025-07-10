@@ -10,11 +10,6 @@
     </resultMap>
 
 
-    <select id="checkMenuExistRole" resultType="java.lang.Integer" parameterType="java.lang.Long">
-        select count(1)
-        from sys_role_menu
-        where menu_id = #{menuId}
-    </select>
 
     <select id="selectMenuListByRoleId" resultType="java.lang.Long">
         select menu_id

@@ -1,8 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDept;

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.aspect;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;

@@ -42,8 +42,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
      * @return 分配数量
      */
     @Override
-    public int checkMenuExistRole(Long menuId) {
-        return sysRoleMenuMapper.checkMenuExistRole(menuId);
+    public boolean isMenuAssignedToRoles(Long menuId) {
+        LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getMenuId, menuId);
+        return count(eq) > 0;
     }
 
     /**
