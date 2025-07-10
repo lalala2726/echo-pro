@@ -154,4 +154,11 @@ public class SysMenuUpdateRequest {
     @Schema(description = "在标签栏中隐藏", type = "boolean", example = "true")
     private Boolean hideInTab;
 
+    /**
+     * 排序
+     */
+    @Schema(description = "排序", type = "integer", example = "1")
+    private Integer sort;
+
+
 }

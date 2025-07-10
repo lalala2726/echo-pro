@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -181,8 +182,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 路由树
      */
     private List<RouterVo> buildRouterTree(List<SysMenu> menuList, Long parentId) {
+        int statusEnable = 0;
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
+                .filter(menu -> menu.getStatus() == statusEnable)
+                .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
                     RouterVo routerVo = new RouterVo();
                     routerVo.setName(menu.getName());
@@ -322,6 +326,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private List<SysMenuListVo> buildMenuList(List<SysMenu> menuList, Long parentId) {
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
+                .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
                     SysMenuListVo sysMenuListVo = BeanCotyUtils.copyProperties(menu, SysMenuListVo.class);
                     sysMenuListVo.setChildren(buildMenuList(menuList, menu.getId()));
@@ -340,6 +345,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     public List<MenuOption> buildMenuTreeOption(List<SysMenu> menuList, Long parentId) {
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
+                .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
                     MenuOption menuOption = new MenuOption();
                     menuOption.setId(menu.getId());
@@ -351,4 +357,3 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
     }
 }
-

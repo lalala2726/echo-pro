@@ -386,7 +386,6 @@ public class RedisTokenManager implements TokenManager {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_SESSION_ID, id);
         claims.put(CLAIM_KEY_USERNAME, username);
-        // REMOVED: claims.put(CLAIM_KEY_TOKEN_TYPE, tokenType);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMillis);
