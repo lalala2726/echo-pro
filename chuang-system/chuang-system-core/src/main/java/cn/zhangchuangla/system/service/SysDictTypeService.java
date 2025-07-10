@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.core.model.entity.Option;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;

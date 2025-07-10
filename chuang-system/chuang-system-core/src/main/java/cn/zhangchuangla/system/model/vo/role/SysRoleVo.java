@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.vo.role;
 
-import cn.zhangchuangla.common.core.base.BaseVo;
+import cn.zhangchuangla.common.core.entity.base.BaseVo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;

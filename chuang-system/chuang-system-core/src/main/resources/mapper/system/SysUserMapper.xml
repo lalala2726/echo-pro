@@ -27,7 +27,7 @@
     </resultMap>
 
     <!-- 基础用户信息映射 -->
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.core.security.model.SysUser">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.common.core.entity.security.SysUser">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>

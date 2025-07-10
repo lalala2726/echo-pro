@@ -1,8 +1,8 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
-import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;

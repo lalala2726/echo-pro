@@ -1,8 +1,6 @@
 package cn.zhangchuangla.system.model.vo.menu;
 
-import cn.zhangchuangla.common.core.base.BaseVo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import cn.zhangchuangla.common.core.entity.base.BaseVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,105 +17,70 @@ import lombok.EqualsAndHashCode;
 public class SysMenuVo extends BaseVo {
 
     /**
-     * 菜单ID
+     * ID
      */
-    @Schema(description = "菜单ID")
-    private Long menuId;
+    @Schema(description = "编号")
+    private Long id;
 
     /**
-     * 菜单名称
+     * 名称
      */
-    @Schema(description = "菜单名称")
-    private String menuName;
+    @Schema(description = "名称")
+    private String name;
 
     /**
-     * 父菜单ID
+     * 标题
      */
-    @Schema(description = "父菜单ID")
-    private Long parentId;
+    @Schema(description = "标题")
+    private String title;
 
     /**
-     * 显示顺序
+     * 路径
      */
-    @Schema(description = "显示顺序")
-    private Integer orderNum;
-
-    /**
-     * 路由地址
-     */
-    @Schema(description = "路由地址")
+    @Schema(description = "路径")
     private String path;
 
     /**
-     * 菜单激活
+     * 类型
      */
-    @Schema(description = "菜单激活")
+    @Schema(description = "类型")
+    private String type;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "状态")
+    private Integer status;
+
+    /**
+     * 父级ID
+     */
+    @Schema(description = "父级ID")
+    private Long parentId;
+
+    /**
+     * 激活路径
+     */
+    @Schema(description = "激活路径")
     private String activePath;
 
     /**
-     * 是否外部跳转（0否 1是）
+     * 激活图标
      */
-    @Schema(description = "是否外部跳转（0否 1是）", type = "string", format = "int32")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer externalLink;
+    @Schema(description = "激活图标")
+    private String activeIcon;
 
     /**
-     * 组件路径
+     * 图标
      */
-    @Schema(description = "组件路径")
+    @Schema(description = "图标")
+    private String icon;
+
+    /**
+     * 组件
+     */
+    @Schema(description = "组件")
     private String component;
-
-    /**
-     * 路由参数
-     */
-    @Schema(description = "路由参数")
-    private String query;
-
-    /**
-     * 是否显示父级菜单 0否 1是
-     */
-    @Schema(description = "是否显示父级菜单 0否 1是")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer showParent;
-
-    /**
-     * 路由名称
-     */
-    @Schema(description = "路由名称")
-    private String routeName;
-
-    /**
-     * 是否为外链（0是 1否）
-     */
-    @Schema(description = "是否为外链（0是 1否）")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer isFrame;
-
-    /**
-     * 是否缓存（0缓存 1不缓存）
-     */
-    @Schema(description = "是否缓存（0缓存 1不缓存）")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer isCache;
-
-    /**
-     * 菜单类型（M目录 C菜单 F按钮）
-     */
-    @Schema(description = "菜单类型（M目录 C菜单 F按钮）")
-    private String menuType;
-
-    /**
-     * 菜单状态（0显示 1隐藏）
-     */
-    @Schema(description = "菜单状态（0显示 1隐藏）")
-    private String visible;
-
-    /**
-     * 菜单状态（0正常 1停用）
-     */
-    @Schema(description = "菜单状态（0正常 1停用）")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer status;
 
     /**
      * 权限标识
@@ -126,10 +89,64 @@ public class SysMenuVo extends BaseVo {
     private String permission;
 
     /**
-     * 菜单图标
+     * 徽标类型
      */
-    @Schema(description = "菜单图标")
-    private String icon;
+    @Schema(description = "徽标类型")
+    private String badgeType;
+
+    /**
+     * 徽标
+     */
+    @Schema(description = "徽标")
+    private String badge;
+
+    /**
+     * 徽标颜色
+     */
+    @Schema(description = "徽标颜色")
+    private String badgeVariants;
+
+    /**
+     * 是否缓存
+     */
+    @Schema(description = "是否缓存")
+    private Integer keepAlive;
+
+    /**
+     * 是否固定标签页
+     */
+    @Schema(description = "是否固定标签页")
+    private Boolean affixTab;
+
+    /**
+     * 隐藏菜单
+     */
+    @Schema(description = "隐藏菜单")
+    private Boolean hideInMenu;
+
+    /**
+     * 隐藏子菜单
+     */
+    @Schema(description = "隐藏子菜单")
+    private Boolean hideChildrenInMenu;
+
+    /**
+     * 隐藏在面包屑中
+     */
+    @Schema(description = "隐藏在面包屑中")
+    private Boolean hideInBreadcrumb;
+
+    /**
+     * 隐藏在标签页中
+     */
+    @Schema(description = "隐藏在标签页中")
+    private Boolean hideInTab;
+
+    /**
+     * 外部链接地址
+     */
+    @Schema(description = "外部链接地址")
+    private String link;
 
     /**
      * 排序

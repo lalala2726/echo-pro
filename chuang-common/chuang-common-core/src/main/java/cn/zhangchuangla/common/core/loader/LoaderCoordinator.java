@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.core.loader;
+package cn.zhangchuangla.common.core.loader;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

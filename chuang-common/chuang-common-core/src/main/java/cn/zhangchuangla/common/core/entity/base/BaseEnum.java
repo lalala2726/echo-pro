@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.base;
+package cn.zhangchuangla.common.core.entity.base;
 
 
 import java.util.EnumSet;

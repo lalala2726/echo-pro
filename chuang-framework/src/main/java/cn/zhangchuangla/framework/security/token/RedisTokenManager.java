@@ -2,12 +2,13 @@ package cn.zhangchuangla.framework.security.token;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.core.security.model.AuthenticationToken;
-import cn.zhangchuangla.common.core.core.security.model.OnlineLoginUser;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
-import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.exception.LoginException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
@@ -74,8 +75,8 @@ public class RedisTokenManager implements TokenManager {
         String username = userDetails.getUsername();
         Long userId = userDetails.getUserId();
 
-        String accessTokenId = UUID.randomUUID().toString();
-        String refreshTokenId = UUID.randomUUID().toString();
+        String accessTokenId = UUIDUtils.simple();
+        String refreshTokenId = UUIDUtils.simple();
 
         OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenId);
         setClientInfo(onlineLoginUser);
@@ -162,7 +163,7 @@ public class RedisTokenManager implements TokenManager {
         try {
             // 如果解析失败或过期，getClaimsFromToken会抛出异常
             claims = getClaimsFromToken(jwtAccessToken);
-        } catch (ParamException | ServiceException e) { // 捕获自定义的token无效异常
+        } catch (LoginException | ServiceException e) { // 捕获自定义的token无效异常
             log.debug("验证访问令牌：JWT解析失败或无效: {}, 原因: {}", jwtAccessToken, e.getMessage());
             throw e;
         }
@@ -199,7 +200,7 @@ public class RedisTokenManager implements TokenManager {
         Claims claims;
         try {
             claims = getClaimsFromToken(jwtRefreshToken);
-        } catch (ParamException | ServiceException e) {
+        } catch (LoginException | ServiceException e) {
             log.debug("验证刷新令牌：JWT解析失败或无效: {}, 原因: {}", jwtRefreshToken, e.getMessage());
             return false;
         }
@@ -332,7 +333,7 @@ public class RedisTokenManager implements TokenManager {
         Claims claims;
         try {
             claims = getClaimsFromToken(jwtAccessToken);
-        } catch (ParamException | ServiceException e) {
+        } catch (LoginException | ServiceException e) {
             log.warn("尝试使无效的JWT访问令牌失效 (解析失败): {}, 原因: {}", jwtAccessToken, e.getMessage());
             return;
         }
@@ -386,7 +387,6 @@ public class RedisTokenManager implements TokenManager {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_SESSION_ID, id);
         claims.put(CLAIM_KEY_USERNAME, username);
-        // REMOVED: claims.put(CLAIM_KEY_TOKEN_TYPE, tokenType);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMillis);
@@ -411,7 +411,7 @@ public class RedisTokenManager implements TokenManager {
      *
      * @param token JWT字符串
      * @return Claims对象，包含JWT的声明信息
-     * @throws ParamException 如果JWT无效 (例如格式错误、签名错误、过期)
+     * @throws LoginException 如果JWT无效 (例如格式错误、签名错误、过期)
      */
     @Override
     public Claims getClaimsFromToken(String token) {
@@ -424,19 +424,19 @@ public class RedisTokenManager implements TokenManager {
         } catch (ExpiredJwtException e) {
             log.warn("JWT已过期, message: {}", e.getMessage());
             // 或者更具体的 REFRESH_TOKEN_EXPIRED
-            throw new ParamException(ACCESS_TOKEN_INVALID, "令牌已过期");
+            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌已过期");
         } catch (UnsupportedJwtException e) {
             log.warn("不支持的JWT格式, message: {}", e.getMessage());
-            throw new ParamException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
+            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
         } catch (MalformedJwtException e) {
             log.warn("JWT结构错误, message: {}", e.getMessage());
-            throw new ParamException(ACCESS_TOKEN_INVALID, "令牌结构错误");
+            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌结构错误");
         } catch (SignatureException e) {
             log.warn("JWT签名验证失败, message: {}", e.getMessage());
-            throw new ParamException(ACCESS_TOKEN_INVALID, "令牌签名无效");
+            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌签名无效");
         } catch (IllegalArgumentException e) { // 通常是token为空或null
             log.warn("JWT claims字符串为空或无效参数, message: {}", e.getMessage());
-            throw new ParamException(ACCESS_TOKEN_INVALID, "令牌参数无效");
+            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌参数无效");
         }
     }
 
@@ -561,6 +561,7 @@ public class RedisTokenManager implements TokenManager {
                         oldOnlineUserKey);
             }
         }
+
 
         redisCache.setCacheObject(userPreviousAccessIdKey, newAccessTokenId,
                 securityProperties.getSession().getAccessTokenExpireTime());

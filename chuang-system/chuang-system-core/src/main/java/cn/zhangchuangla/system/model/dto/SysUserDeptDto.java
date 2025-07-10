@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.model.dto;
 
-import cn.zhangchuangla.common.core.base.BaseEntity;
+import cn.zhangchuangla.common.core.entity.base.BaseEntity;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

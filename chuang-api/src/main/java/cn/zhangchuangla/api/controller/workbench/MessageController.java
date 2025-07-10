@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.workbench;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;

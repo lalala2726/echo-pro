@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;

@@ -21,19 +21,31 @@ public class SysMenuListVo {
      * 菜单ID
      */
     @Schema(description = "菜单ID")
-    private Long menuId;
+    private Long id;
 
     /**
      * 菜单名称
      */
     @Schema(description = "菜单名称")
-    private String menuName;
+    private String title;
 
     /**
      * 父菜单ID
      */
     @Schema(description = "父菜单ID")
     private Long parentId;
+
+    /**
+     * 路由地址
+     */
+    @Schema(description = "路由地址")
+    private String path;
+
+    /**
+     * 组件路径
+     */
+    @Schema(description = "组件路径")
+    private String component;
 
     /**
      * 显示顺序
@@ -65,7 +77,7 @@ public class SysMenuListVo {
      * 菜单类型（M目录 C菜单 F按钮）
      */
     @Schema(description = "菜单类型（M目录 C菜单 F按钮）")
-    private String menuType;
+    private String type;
 
     /**
      * 菜单状态（0显示 1隐藏）
@@ -85,12 +97,6 @@ public class SysMenuListVo {
      */
     @Schema(description = "菜单图标")
     private String icon;
-
-    /**
-     * 排序
-     */
-    @Schema(description = "排序")
-    private Integer sort;
 
     /**
      * 子菜单

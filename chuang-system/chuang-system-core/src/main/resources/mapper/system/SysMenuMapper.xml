@@ -6,179 +6,42 @@
 
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysMenu">
-        <id property="menuId" column="menu_id"/>
-        <result property="menuName" column="menu_name"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="orderNum" column="order_num"/>
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="title" column="title"/>
         <result property="path" column="path"/>
-        <result property="component" column="component"/>
-        <result property="query" column="query"/>
-        <result property="routeName" column="route_name"/>
-        <result property="isFrame" column="is_frame"/>
-        <result property="externalLink" column="external_link"/>
-        <result property="isCache" column="is_cache"/>
-        <result property="menuType" column="menu_type"/>
-        <result property="visible" column="visible"/>
+        <result property="type" column="type"/>
         <result property="status" column="status"/>
-        <result property="showParent" column="show_parent"/>
+        <result property="parentId" column="parent_id"/>
         <result property="activePath" column="active_path"/>
-        <result property="permission" column="permission"/>
+        <result property="activeIcon" column="active_icon"/>
         <result property="icon" column="icon"/>
+        <result property="component" column="component"/>
+        <result property="permission" column="permission"/>
+        <result property="badgeType" column="badge_type"/>
+        <result property="badge" column="badge"/>
+        <result property="badgeVariants" column="badge_variants"/>
+        <result property="keepAlive" column="keep_alive"/>
+        <result property="affixTab" column="affix_tab"/>
+        <result property="hideInMenu" column="hide_in_menu"/>
+        <result property="hideChildrenInMenu" column="hide_children_in_menu"/>
+        <result property="hideInBreadcrumb" column="hide_in_breadcrumb"/>
+        <result property="hideInTab" column="hide_in_tab"/>
+        <result property="link" column="link"/>
         <result property="sort" column="sort"/>
-        <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
-        <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
     </resultMap>
 
-    <select id="getMenuListByUserId" resultMap="BaseResultMap">
-        select m.menu_id       AS menu_id,
-               m.menu_name     AS menu_name,
-               m.parent_id     AS parent_id,
-               m.order_num     AS order_num,
-               m.path          AS path,
-               m.component     AS component,
-               m.query         AS query,
-               m.route_name    AS route_name,
-               m.is_frame      AS is_frame,
-               m.show_parent   AS show_parent,
-               m.external_link AS external_link,
-               m.active_path   AS active_path,
-               m.is_cache      AS is_cache,
-               m.menu_type     AS menu_type,
-               m.visible       AS visible,
-               m.status        AS status,
-               m.permission    AS permission,
-               m.icon          AS icon,
-               m.sort          AS sort,
-               m.create_by     AS create_by,
-               m.create_time   AS create_time,
-               m.update_by     AS update_by,
-               m.update_time   AS update_time,
-               m.remark        AS remark
-        from sys_menu m
-                 inner join sys_role_menu rm on m.menu_id = rm.menu_id
-                 inner join sys_user_role ur on rm.role_id = ur.role_id
-        where ur.user_id = #{userId}
-          and m.visible = 1
-        order by m.order_num desc
-    </select>
-
-    <select id="selectMenuListByRoleId" resultMap="BaseResultMap">
-        select m.menu_id,
-               m.parent_id,
-               m.menu_name,
-               m.path,
-               m.component,
-               m.query,
-               m.route_name,
-               m.visible,
-               m.active_path,
-               m.status,
-               m.is_frame,
-               m.show_parent,
-               m.is_cache,
-               m.menu_type,
-               m.icon,
-               m.sort,
-               m.permission,
-               m.create_by,
-               m.create_time,
-               m.update_by,
-               m.update_time,
-               m.remark
-        from sys_menu m
-                 inner join sys_role_menu rm on m.menu_id = rm.menu_id
-        where rm.role_id = #{roleId}
-        order by m.order_num desc
-    </select>
-
-    <select id="selectMenuListByUserId" resultMap="BaseResultMap">
-        SELECT DISTINCT m.menu_id,
-                        m.parent_id,
-                        m.menu_name,
-                        m.path,
-                        m.component,
-                        m.query,
-                        m.route_name,
-                        m.visible,
-                        m.status,
-                        m.show_parent,
-                        m.is_frame,
-                        m.is_cache,
-                        m.active_path,
-                        m.menu_type,
-                        m.icon,
-                        m.sort,
-                        m.permission,
-                        m.create_by,
-                        m.create_time,
-                        m.update_by,
-                        m.update_time,
-                        m.remark
-        FROM sys_menu m
-                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-                 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
-                 LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
-        WHERE ur.user_id = #{userId}
-          AND m.status = '0'
-          AND ro.status = '0'
-        ORDER BY m.parent_id, m.order_num desc
-    </select>
-    <select id="selectMenuList" resultMap="BaseResultMap">
-        SELECT m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.route_name,
-        m.visible, m.status, m.is_frame, m.is_cache, m.menu_type, m.icon, m.sort,
-        m.permission, m.create_by,m.active_path,m.show_parent, m.create_time, m.update_by, m.update_time, m.remark
-        FROM sys_menu m
-        <where>
-            <if test="menuName != null and menuName != ''">
-                AND m.menu_name LIKE CONCAT('%', #{menuName}, '%')
-            </if>
-            <if test="visible != null and visible != ''">
-                AND m.visible = #{visible}
-            </if>
-            <if test="status != null and status != ''">
-                AND m.status = #{status}
-            </if>
-            <if test="menuType != null and menuType != ''">
-                AND m.menu_type = #{menuType}
-            </if>
-        </where>
-        ORDER BY m.parent_id, m.order_num desc
-    </select>
-
-    <select id="getUserPermissionListByRole" resultMap="BaseResultMap">
-        select sm.menu_id,
-        menu_name,
-        parent_id,
-        order_num,
-        path,
-        component,
-        query,
-        route_name,
-        is_frame,
-        is_cache,
-        menu_type,
-        visible,
-        status,
-        show_parent,
-        permission,
-        icon,
-        sort,
-        create_by,
-        create_time,
-        update_by,
-        update_time,
-        remark
+    <select id="listSysMenuByRoleName" resultMap="BaseResultMap">
+        select distinct sm.*
         from sys_menu sm
-        join sys_role_menu srm on sm.menu_id = srm.menu_id
-        where srm.role_id in
-        <foreach collection="roleSet" item="role" open="(" separator="," close=")">
-            #{role}
-        </foreach>
-        and sm.status = 0
-        and sm.visible = 0
+                 join sys_role_menu srm on sm.id = srm.menu_id
+                 join sys_role sr on srm.role_id = sr.role_id
+        where sr.role_name in #{roleName}
     </select>
 
 
