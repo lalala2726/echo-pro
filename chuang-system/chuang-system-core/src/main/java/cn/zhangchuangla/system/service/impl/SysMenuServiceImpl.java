@@ -8,7 +8,6 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
-import cn.zhangchuangla.system.model.request.menu.MetaRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
@@ -81,7 +80,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         SysMenu sysMenu = BeanCotyUtils.copy(request, SysMenu.class);
-        MetaRequest meta = request.getMeta();
+
+        sysMenu.setKeepAlive(request.getKeepAlive() ? Constants.TRUE : Constants.FALSE);
 
         // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
         if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
@@ -89,28 +89,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             sysMenu.setLink(request.getLink());
         }
 
-        if (meta != null) {
-            setMeta(sysMenu, meta);
-        }
+        sysMenu.setHideInMenu(request.getHideInMenu() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setAffixTab(request.getAffixTab() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideChildrenInMenu(request.getHideChildrenInMenu() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideInBreadcrumb(request.getHideInBreadcrumb() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideInTab(request.getHideInTab() ? Constants.TRUE : Constants.FALSE);
+
         return save(sysMenu);
-    }
-
-
-    /**
-     * 设置菜单元数据
-     *
-     * @param sysMenu 菜单
-     * @param meta    元数据
-     */
-    private void setMeta(SysMenu sysMenu, MetaRequest meta) {
-        Boolean hideInBreadcrumb = meta.getHideInBreadcrumb();
-        Boolean hideInTab = meta.getHideInTab();
-        if (hideInBreadcrumb != null) {
-            sysMenu.setHideInBreadcrumb(hideInBreadcrumb ? 1 : 0);
-        }
-        if (hideInTab != null) {
-            sysMenu.setHideInTab(hideInTab ? 1 : 0);
-        }
     }
 
     /**
@@ -128,17 +113,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
-        MetaRequest meta = request.getMeta();
-
         // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
         if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
                 || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType())) {
             sysMenu.setLink(request.getLink());
         }
 
-        if (meta != null) {
-            setMeta(sysMenu, meta);
-        }
+        sysMenu.setHideInMenu(request.getHideInMenu() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setAffixTab(request.getAffixTab() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideChildrenInMenu(request.getHideChildrenInMenu() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideInBreadcrumb(request.getHideInBreadcrumb() ? Constants.TRUE : Constants.FALSE);
+        sysMenu.setHideInTab(request.getHideInTab() ? Constants.TRUE : Constants.FALSE);
+
         return updateById(sysMenu);
     }
 
@@ -228,11 +214,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         metaVo.setIcon(sysMenu.getIcon());
         metaVo.setActivePath(sysMenu.getActivePath());
         metaVo.setActiveIcon(sysMenu.getActiveIcon());
-        metaVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
-        metaVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
         metaVo.setBadge(sysMenu.getBadge());
         metaVo.setBadgeType(sysMenu.getBadgeType());
         metaVo.setBadgeVariants(sysMenu.getBadgeVariants());
+        metaVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
+        metaVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
+        metaVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
+        metaVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
+
 
         // 处理链接
         if (Constants.MenuConstants.TYPE_EXTERNAL.equals(sysMenu.getType())) {

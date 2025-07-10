@@ -116,43 +116,37 @@ public class SysMenuVo extends BaseVo {
      * 是否固定标签页
      */
     @Schema(description = "是否固定标签页")
-    private Integer affixTab;
+    private Boolean affixTab;
 
     /**
      * 隐藏菜单
      */
     @Schema(description = "隐藏菜单")
-    private Integer hideInMenu;
+    private Boolean hideInMenu;
 
     /**
      * 隐藏子菜单
      */
     @Schema(description = "隐藏子菜单")
-    private Integer hideChildrenInMenu;
+    private Boolean hideChildrenInMenu;
 
     /**
      * 隐藏在面包屑中
      */
     @Schema(description = "隐藏在面包屑中")
-    private Integer hideInBreadcrumb;
+    private Boolean hideInBreadcrumb;
 
     /**
      * 隐藏在标签页中
      */
     @Schema(description = "隐藏在标签页中")
-    private Integer hideInTab;
+    private Boolean hideInTab;
 
     /**
      * 外部链接地址
      */
     @Schema(description = "外部链接地址")
     private String link;
-
-    /**
-     * 内嵌页面地址
-     */
-
-    private String iframeSrc;
 
     /**
      * 排序

@@ -1,9 +1,11 @@
 package cn.zhangchuangla.api.controller.system;
 
+import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
@@ -12,6 +14,7 @@ import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
 import cn.zhangchuangla.system.model.vo.menu.MenuOption;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
+import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -71,9 +74,16 @@ public class SysMenuController extends BaseController {
     @GetMapping("/{menuId:\\d+}")
     @Operation(summary = "获取菜单详情")
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
-    public AjaxResult<SysMenu> getMenuById(@PathVariable("menuId") Long menuId) {
+    public AjaxResult<SysMenuVo> getMenuById(@PathVariable("menuId") Long menuId) {
         SysMenu sysMenu = sysMenuService.getMenuById(menuId);
-        return AjaxResult.success(sysMenu);
+        SysMenuVo sysMenuVo = BeanCotyUtils.copyProperties(sysMenu, SysMenuVo.class);
+        sysMenuVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
+        sysMenuVo.setHideChildrenInMenu(sysMenu.getHideChildrenInMenu() == Constants.TRUE);
+        sysMenuVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
+        sysMenuVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
+        sysMenuVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
+
+        return AjaxResult.success(sysMenuVo);
     }
 
     /**

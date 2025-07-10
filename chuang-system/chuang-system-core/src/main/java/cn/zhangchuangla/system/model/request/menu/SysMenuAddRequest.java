@@ -135,10 +135,16 @@ public class SysMenuAddRequest {
     private String link;
 
     /**
-     * 元数据
+     * 在面包屑中隐藏
      */
-    @Schema(description = "元数据", type = "object")
-    private MetaRequest meta;
+    @Schema(description = "在面包屑中隐藏", type = "boolean", example = "true")
+    private Boolean hideInBreadcrumb;
+
+    /**
+     * 在标签栏中隐藏
+     */
+    @Schema(description = "在标签栏中隐藏", type = "boolean", example = "true")
+    private Boolean hideInTab;
 
 
 }
