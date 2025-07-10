@@ -59,7 +59,7 @@ public class FileRecord {
     private String originalRelativePath;
 
     /**
-     * 压缩文件URL，用于图片预览等场景
+     * 预览图
      */
     private String previewImageUrl;
 
@@ -79,7 +79,7 @@ public class FileRecord {
     private String storageType;
 
     /**
-     * 存储桶名称（OSS/MINIO 使用）
+     * 存储桶名称
      */
     private String bucketName;
 

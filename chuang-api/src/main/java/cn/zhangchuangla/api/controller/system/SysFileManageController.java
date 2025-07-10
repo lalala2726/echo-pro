@@ -8,6 +8,7 @@ import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.entity.FileRecord;
 import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
 import cn.zhangchuangla.storage.model.vo.file.FileRecordListVo;
+import cn.zhangchuangla.storage.model.vo.file.FileRecordVo;
 import cn.zhangchuangla.storage.service.StorageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +53,17 @@ public class SysFileManageController extends BaseController {
         Page<FileRecord> page = storageService.listFileManage(request);
         List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
         return getTableData(page, fileRecordListVos);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "文件资源详情")
+    @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
+    public AjaxResult<FileRecordVo> getFileById(@Parameter(description = "文件ID")
+                                                @PathVariable("id") Long id) {
+        FileRecord fileRecord = storageService.getFileById(id);
+        FileRecordVo fileRecordVo = new FileRecordVo();
+        BeanUtils.copyProperties(fileRecord, fileRecordVo);
+        return success(fileRecordVo);
     }
 
     /**

@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
+import cn.zhangchuangla.common.core.annotation.DataMasking;
 import lombok.Data;
 
 /**
@@ -23,6 +24,7 @@ public class TencentCOSStorageConfig {
     /**
      * 密钥Key
      */
+    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String secretKey;
 
     /**

@@ -30,7 +30,6 @@ public class UploadedFileInfo {
      */
     private String fileRelativePath;
 
-
     /**
      * 文件扩展名
      */
@@ -61,5 +60,9 @@ public class UploadedFileInfo {
      */
     private String previewImageRelativePath;
 
+    /**
+     * 存储桶名称（OSS/MINIO 使用）
+     */
+    private String bucketName;
 
 }

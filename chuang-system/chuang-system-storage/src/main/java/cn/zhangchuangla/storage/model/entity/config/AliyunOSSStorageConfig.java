@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
+import cn.zhangchuangla.common.core.annotation.DataMasking;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,6 +35,7 @@ public class AliyunOSSStorageConfig implements Serializable {
     /**
      * 阿里云账号AccessKey Secret
      */
+    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String accessKeySecret;
 
     /**
