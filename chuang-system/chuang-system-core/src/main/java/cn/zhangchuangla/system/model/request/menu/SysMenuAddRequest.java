@@ -1,6 +1,9 @@
 package cn.zhangchuangla.system.model.request.menu;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 /**
@@ -16,18 +19,21 @@ public class SysMenuAddRequest {
      * 名称
      */
     @Schema(description = "名称", type = "string", example = "System")
+    @NotBlank(message = "名称不能为空")
     private String name;
 
     /**
      * 路径
      */
     @Schema(description = "路径", type = "string", example = "/system")
+    @NotEmpty(message = "路径不能为空")
     private String path;
 
     /**
      * 类型
      */
     @Schema(description = "类型", type = "string", example = "catalog")
+    @NotEmpty(message = "类型不能为空")
     private String type;
 
     /**
@@ -46,6 +52,7 @@ public class SysMenuAddRequest {
      * 标题
      */
     @Schema(description = "标题", type = "string", example = "系统菜单")
+    @NotEmpty(message = "标题不能为空")
     private String title;
 
     /**
@@ -119,6 +126,13 @@ public class SysMenuAddRequest {
      */
     @Schema(description = "是否在菜单中隐藏子项", type = "boolean", example = "true")
     private Boolean hideChildrenInMenu;
+
+    /**
+     * 外部链接地址
+     */
+    @Schema(description = "外部链接地址", type = "string", example = "https://www.baidu.com")
+    @Pattern(regexp = "^https?://.*$", message = "请输入正确的链接地址")
+    private String link;
 
     /**
      * 元数据

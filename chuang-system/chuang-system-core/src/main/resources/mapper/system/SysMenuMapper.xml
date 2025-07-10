@@ -28,7 +28,6 @@
         <result property="hideInBreadcrumb" column="hide_in_breadcrumb"/>
         <result property="hideInTab" column="hide_in_tab"/>
         <result property="link" column="link"/>
-        <result property="iframeSrc" column="iframe_src"/>
         <result property="sort" column="sort"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>

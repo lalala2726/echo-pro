@@ -1,12 +1,11 @@
 package cn.zhangchuangla.system.service.impl;
 
+import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.MetaRequest;
@@ -84,11 +83,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         SysMenu sysMenu = BeanCotyUtils.copy(request, SysMenu.class);
         MetaRequest meta = request.getMeta();
 
+        // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
+        if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
+                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType())) {
+            sysMenu.setLink(request.getLink());
+        }
+
         if (meta != null) {
             setMeta(sysMenu, meta);
         }
         return save(sysMenu);
     }
+
 
     /**
      * 设置菜单元数据
@@ -105,28 +111,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (hideInTab != null) {
             sysMenu.setHideInTab(hideInTab ? 1 : 0);
         }
-
-        String link = meta.getLink();
-        if (StrUtils.hasText(link)) {
-            Assert.isParamTrue(StrUtils.isHttp(link), "请输入正确的外部链接地址");
-            sysMenu.setLink(link);
-        }
-
-        String iframeSrc = meta.getIframeSrc();
-        if (StrUtils.hasText(iframeSrc)) {
-            Assert.isParamTrue(StrUtils.isHttp(iframeSrc), "请输入正确的iframeSrc地址");
-            sysMenu.setIframeSrc(iframeSrc);
-        }
-    }
-
-    /**
-     * 根据Path生成唯一路由名
-     *
-     * @param sysMenu 菜单
-     * @return 路由名
-     */
-    private String generateName(SysMenu sysMenu) {
-        return sysMenu.getPath().replace("/", "");
     }
 
     /**
@@ -145,6 +129,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         }
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         MetaRequest meta = request.getMeta();
+
+        // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
+        if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
+                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType())) {
+            sysMenu.setLink(request.getLink());
+        }
 
         if (meta != null) {
             setMeta(sysMenu, meta);
@@ -210,6 +200,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .map(menu -> {
                     RouterVo routerVo = new RouterVo();
                     routerVo.setName(menu.getName());
+                    routerVo.setType(menu.getType());
                     routerVo.setPath(menu.getPath());
                     routerVo.setComponent(menu.getComponent());
                     routerVo.setMeta(setMateVo(menu));
@@ -235,6 +226,20 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         metaVo.setTitle(sysMenu.getTitle());
         metaVo.setOrder(sysMenu.getSort());
         metaVo.setIcon(sysMenu.getIcon());
+        metaVo.setActivePath(sysMenu.getActivePath());
+        metaVo.setActiveIcon(sysMenu.getActiveIcon());
+        metaVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
+        metaVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
+        metaVo.setBadge(sysMenu.getBadge());
+        metaVo.setBadgeType(sysMenu.getBadgeType());
+        metaVo.setBadgeVariants(sysMenu.getBadgeVariants());
+
+        // 处理链接
+        if (Constants.MenuConstants.TYPE_EXTERNAL.equals(sysMenu.getType())) {
+            metaVo.setLink(sysMenu.getLink());
+        } else if (Constants.MenuConstants.TYPE_INTERNAL.equals(sysMenu.getType())) {
+            metaVo.setIframeSrc(sysMenu.getLink());
+        }
         return metaVo;
     }
 
@@ -318,6 +323,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return count(eq) > 0;
     }
 
+    /**
+     * 构建菜单列表
+     *
+     * @param menuList 菜单列表
+     * @param parentId 父菜单ID
+     * @return 菜单列表
+     */
     private List<SysMenuListVo> buildMenuList(List<SysMenu> menuList, Long parentId) {
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
@@ -329,6 +341,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
     }
 
+    /**
+     * 构建菜单树选项
+     *
+     * @param menuList 菜单列表
+     * @param parentId 父菜单ID
+     * @return 菜单树选项
+     */
     public List<MenuOption> buildMenuTreeOption(List<SysMenu> menuList, Long parentId) {
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))

@@ -17,6 +17,7 @@ import java.util.Date;
 @TableName(value = "sys_menu")
 @Data
 public class SysMenu extends BaseEntity {
+
     /**
      * ID
      */
@@ -127,11 +128,6 @@ public class SysMenu extends BaseEntity {
      * 外部链接地址
      */
     private String link;
-
-    /**
-     * 内嵌页面地址
-     */
-    private String iframeSrc;
 
     /**
      * 排序

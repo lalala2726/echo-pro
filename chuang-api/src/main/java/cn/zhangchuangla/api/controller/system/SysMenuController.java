@@ -2,7 +2,9 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
@@ -83,7 +85,7 @@ public class SysMenuController extends BaseController {
     @PostMapping
     @Operation(summary = "添加菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
-
+    @OperationLog(title = "菜单管理", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addMenu(@RequestBody SysMenuAddRequest request) {
         boolean result = sysMenuService.addMenu(request);
         return toAjax(result);
@@ -109,14 +111,19 @@ public class SysMenuController extends BaseController {
      * @param menuId 菜单ID
      * @return 删除结果
      */
-    @DeleteMapping
+    @DeleteMapping("/{id:\\d+}")
     @Operation(summary = "删除菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
-    public AjaxResult<Void> deleteMenu(Long menuId) {
+    public AjaxResult<Void> deleteMenu(@PathVariable("id") Long menuId) {
         boolean result = sysMenuService.deleteMenu(menuId);
         return toAjax(result);
     }
 
+    /**
+     * 获取菜单选项
+     *
+     * @return 菜单选项
+     */
     @GetMapping("/options")
     @Operation(summary = "获取菜单选项")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
@@ -125,6 +132,11 @@ public class SysMenuController extends BaseController {
         return success(options);
     }
 
+    /**
+     * 获取菜单树
+     *
+     * @return 菜单树
+     */
     @GetMapping("/tree")
     @Operation(summary = "菜单树")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
@@ -132,7 +144,6 @@ public class SysMenuController extends BaseController {
         List<MenuOption> sysMenu = sysMenuService.menuTree();
         return success(sysMenu);
     }
-
 
     /**
      * 检查菜单的名字是否已存在

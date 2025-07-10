@@ -40,6 +40,12 @@ public class RouterVo {
     @Schema(description = "组件路径")
     private String component;
 
+    /**
+     * 菜单类型
+     */
+    @Schema(description = "菜单类型")
+    private String type;
+
 
     /**
      * 路由元数据
