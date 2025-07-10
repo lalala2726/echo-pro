@@ -74,6 +74,49 @@ public class SysMenuController extends BaseController {
         return AjaxResult.success(sysMenu);
     }
 
+    /**
+     * 添加菜单
+     *
+     * @param request 添加菜单请求参数
+     * @return 添加结果
+     */
+    @PostMapping
+    @Operation(summary = "添加菜单")
+    @PreAuthorize("@ss.hasPermission('system:menu:add')")
+
+    public AjaxResult<Void> addMenu(@RequestBody SysMenuAddRequest request) {
+        boolean result = sysMenuService.addMenu(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 修改菜单
+     *
+     * @param request 修改菜单请求参数
+     * @return 修改结果
+     */
+    @PutMapping
+    @Operation(summary = "修改菜单")
+    @PreAuthorize("@ss.hasPermission('system:menu:update')")
+    public AjaxResult<Void> updateMenu(@RequestBody SysMenuUpdateRequest request) {
+        boolean result = sysMenuService.updateMenu(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 删除菜单
+     *
+     * @param menuId 菜单ID
+     * @return 删除结果
+     */
+    @DeleteMapping
+    @Operation(summary = "删除菜单")
+    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    public AjaxResult<Void> deleteMenu(Long menuId) {
+        boolean result = sysMenuService.deleteMenu(menuId);
+        return toAjax(result);
+    }
+
     @GetMapping("/options")
     @Operation(summary = "获取菜单选项")
     @PreAuthorize("@ss.hasPermission('system:menu:list')")
@@ -88,21 +131,6 @@ public class SysMenuController extends BaseController {
     public AjaxResult<List<MenuOption>> menuTree() {
         List<MenuOption> sysMenu = sysMenuService.menuTree();
         return success(sysMenu);
-    }
-
-    /**
-     * 添加菜单
-     *
-     * @param request 添加菜单请求参数
-     * @return 添加结果
-     */
-    @PostMapping
-    @Operation(summary = "添加菜单")
-    @PreAuthorize("@ss.hasPermission('system:menu:add')")
-
-    public AjaxResult<Void> addMenu(@RequestBody SysMenuAddRequest request) {
-        boolean result = sysMenuService.addMenu(request);
-        return toAjax(result);
     }
 
 
@@ -133,34 +161,6 @@ public class SysMenuController extends BaseController {
                                                 @RequestParam("path") String path) {
         boolean exists = sysMenuService.isMenuPathExists(id, path);
         return success(exists);
-    }
-
-    /**
-     * 修改菜单
-     *
-     * @param request 修改菜单请求参数
-     * @return 修改结果
-     */
-    @PutMapping
-    @Operation(summary = "修改菜单")
-    @PreAuthorize("@ss.hasPermission('system:menu:update')")
-    public AjaxResult<Void> updateMenu(SysMenuUpdateRequest request) {
-        boolean result = sysMenuService.updateMenu(request);
-        return toAjax(result);
-    }
-
-    /**
-     * 删除菜单
-     *
-     * @param menuId 菜单ID
-     * @return 删除结果
-     */
-    @DeleteMapping
-    @Operation(summary = "删除菜单")
-    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
-    public AjaxResult<Void> deleteMenu(Long menuId) {
-        boolean result = sysMenuService.deleteMenu(menuId);
-        return toAjax(result);
     }
 
 

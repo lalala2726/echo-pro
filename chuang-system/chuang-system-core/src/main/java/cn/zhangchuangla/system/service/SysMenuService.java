@@ -103,6 +103,7 @@ public interface SysMenuService extends IService<SysMenu> {
      */
     boolean isMenuPathExists(Long id, String path);
 
+
     /**
      * 获取菜单树
      *
@@ -111,5 +112,13 @@ public interface SysMenuService extends IService<SysMenu> {
     List<MenuOption> menuTree();
 
     List<SysMenuListVo> buildMenuList(List<SysMenu> menuList);
+
+    /**
+     * 判断菜单是否有子菜单
+     *
+     * @param menuId 菜单ID
+     * @return 是否有子菜单
+     */
+    boolean hasChildren(Long menuId);
 
 }

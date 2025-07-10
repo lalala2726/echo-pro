@@ -121,14 +121,10 @@ public class SysMenuAddRequest {
     private Boolean hideChildrenInMenu;
 
     /**
-     * 面包屑中隐藏
+     * 元数据
      */
-    @Schema(description = "面包屑中隐藏", type = "boolean", example = "true")
-    private Boolean hideInBreadcrumb;
+    @Schema(description = "元数据", type = "object")
+    private MetaRequest meta;
 
-    /**
-     * 标签页中隐藏
-     */
-    @Schema(description = "标签页中隐藏", type = "boolean", example = "true")
-    private Boolean hideInTab;
+
 }

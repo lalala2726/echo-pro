@@ -124,6 +124,16 @@ public class SysMenu extends BaseEntity {
     private Integer hideInTab;
 
     /**
+     * 外部链接地址
+     */
+    private String link;
+
+    /**
+     * 内嵌页面地址
+     */
+    private String iframeSrc;
+
+    /**
      * 排序
      */
     private Integer sort;

@@ -2,9 +2,14 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
+import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
+import cn.zhangchuangla.system.model.request.menu.MetaRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuAddRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuQueryRequest;
 import cn.zhangchuangla.system.model.request.menu.SysMenuUpdateRequest;
@@ -13,11 +18,11 @@ import cn.zhangchuangla.system.model.vo.menu.MetaVo;
 import cn.zhangchuangla.system.model.vo.menu.RouterVo;
 import cn.zhangchuangla.system.model.vo.menu.SysMenuListVo;
 import cn.zhangchuangla.system.service.SysMenuService;
+import cn.zhangchuangla.system.service.SysRoleMenuService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +40,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         implements SysMenuService {
 
     private final SysMenuMapper sysMenuMapper;
-
+    private final SysRoleMenuService sysRoleMenuService;
     private final long ROOT_MENU_ID = 0L;
 
 
@@ -70,8 +75,48 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean addMenu(SysMenuAddRequest request) {
+        if (isMenuNameExists(null, request.getName())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+        }
+        if (isMenuPathExists(null, request.getPath())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+        }
         SysMenu sysMenu = BeanCotyUtils.copy(request, SysMenu.class);
+        MetaRequest meta = request.getMeta();
+
+        if (meta != null) {
+            setMeta(sysMenu, meta);
+        }
         return save(sysMenu);
+    }
+
+    /**
+     * 设置菜单元数据
+     *
+     * @param sysMenu 菜单
+     * @param meta    元数据
+     */
+    private void setMeta(SysMenu sysMenu, MetaRequest meta) {
+        Boolean hideInBreadcrumb = meta.getHideInBreadcrumb();
+        Boolean hideInTab = meta.getHideInTab();
+        if (hideInBreadcrumb != null) {
+            sysMenu.setHideInBreadcrumb(hideInBreadcrumb ? 1 : 0);
+        }
+        if (hideInTab != null) {
+            sysMenu.setHideInTab(hideInTab ? 1 : 0);
+        }
+
+        String link = meta.getLink();
+        if (StrUtils.hasText(link)) {
+            Assert.isParamTrue(StrUtils.isHttp(link), "请输入正确的外部链接地址");
+            sysMenu.setLink(link);
+        }
+
+        String iframeSrc = meta.getIframeSrc();
+        if (StrUtils.hasText(iframeSrc)) {
+            Assert.isParamTrue(StrUtils.isHttp(iframeSrc), "请输入正确的iframeSrc地址");
+            sysMenu.setIframeSrc(iframeSrc);
+        }
     }
 
     /**
@@ -92,8 +137,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean updateMenu(SysMenuUpdateRequest request) {
-        SysMenu sysMenu = new SysMenu();
-        BeanUtils.copyProperties(request, sysMenu);
+        if (isMenuNameExists(request.getId(), request.getName())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+        }
+        if (isMenuPathExists(request.getId(), request.getPath())) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+        }
+        SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
+        MetaRequest meta = request.getMeta();
+
+        if (meta != null) {
+            setMeta(sysMenu, meta);
+        }
         return updateById(sysMenu);
     }
 
@@ -105,6 +160,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean deleteMenu(Long menuId) {
+        //判断当前是否包含子菜单
+        if (hasChildren(menuId)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单包含子菜单，请先删除子菜单");
+        }
+        //判断当前菜单是否已分配
+        if (sysRoleMenuService.isMenuAssignedToRoles(menuId)) {
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单已分配，请先解除分配");
+        }
         return removeById(menuId);
     }
 
@@ -242,6 +305,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return buildMenuList(list, ROOT_MENU_ID);
     }
 
+
+    /**
+     * 判断菜单是否有子菜单
+     *
+     * @param menuId 菜单ID
+     * @return true有子菜单，false无子菜单
+     */
+    @Override
+    public boolean hasChildren(Long menuId) {
+        LambdaQueryWrapper<SysMenu> eq = new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getParentId, menuId);
+        return count(eq) > 0;
+    }
+
     private List<SysMenuListVo> buildMenuList(List<SysMenu> menuList, Long parentId) {
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
@@ -267,3 +343,4 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 .toList();
     }
 }
+
