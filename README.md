@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-Echo-Pro 是一个基于 Spring Boot 的企业级后台管理系统，采用前后端分离架构设计，提供了完善的权限管理、文件存储、数据处理等核心功能。系统设计灵活，支持多种文件存储方式，高度可配置，适合各类企业级应用开发。
+Echo-Pro 是一套基于 Spring Boot 3.x 构建的企业级后台管理系统，采用前后端分离架构，聚焦于高可扩展性、高可维护性和高安全性。系统集成了完善的权限管理、灵活的文件存储、丰富的业务模块和高效的开发工具，适用于各类企业信息化、SaaS 平台、管理后台等场景。
 
 ## 技术栈
 
@@ -10,119 +10,102 @@ Echo-Pro 是一个基于 Spring Boot 的企业级后台管理系统，采用前�
 
 - **核心框架**：Spring Boot 3.x
 - **安全框架**：Spring Security + JWT
-- **持久层**：MyBatis Plus + MySQL
-- **缓存技术**：Redis
-- **文件存储**：本地存储 + MinIO + 阿里云OSS + 腾讯云COS
+- **ORM 框架**：MyBatis Plus
+- **数据库**：MySQL 8.0+
+- **缓存**：Redis 6.0+
+- **消息队列**：RabbitMQ（可选）
+- **文件存储**：本地、MinIO、阿里云 OSS、腾讯云 COS
+- **定时任务**：Quartz
 - **数据校验**：Spring Validation
 - **日志管理**：SLF4J
-- **API文档**：Swagger / OpenAPI
-- **其他工具**：Lombok
+- **API 文档**：Swagger / OpenAPI
+- **工具类**：Lombok、MapStruct 等
 
 ### 前端技术
 
-- Vue.js
-- Axios
-- Element Plus
+- Vue 3.x
+- Ant Design Pro
 - Pinia
+- Axios
 
-## 系统架构
-
-### 模块结构
+## 项目结构
 
 ```
-echo-pro/
-├── chuang-api/               # 接口模块，包含控制器等入口层代码
-├── chuang-common/            # 公共模块，存放常量、工具类、通用配置等
-├── chuang-framework/         # 框架模块，封装安全、权限等框架扩展功能
-│   └── security/             # 安全框架相关配置与扩展实现
-├── chuang-system/            # 系统模块，核心业务模块聚合层
-│   ├── chuang-system-core/   # 用户管理、系统配置等核心业务逻辑
-│   ├── chuang-system-storage/# 文件上传、文件管理等存储相关逻辑
-│   └── chuang-system-message/# 站内信、用于系统通知或管理员通知
-├── chuang-generator/         # 代码生成模块，生成项目代码
+echoPro/
+├── chuang-api/                # 接口层，RESTful 控制器、入口主程序
+│   └── controller/            # 各业务模块 Controller
+├── chuang-common/             # 公共模块，常量、工具类、通用配置
+│   ├── chuang-common-core/    # 基础工具、异常、结果封装等
+│   ├── chuang-common-excel/   # Excel 导入导出工具
+│   ├── chuang-common-mq/      # 消息队列封装
+│   ├── chuang-common-redis/   # Redis 工具与封装
+│   └── chuang-common-websocket/# WebSocket 支持
+├── chuang-framework/          # 框架扩展，安全、权限、日志、拦截器等
+├── chuang-system/             # 业务核心模块聚合
+│   ├── chuang-system-core/    # 用户、角色、部门、菜单、字典等
+│   ├── chuang-system-storage/ # 文件上传、存储、图片处理
+│   └── chuang-system-message/ # 站内信、消息通知
+├── chuang-quartz/             # 定时任务调度模块
 ```
 
-### 架构设计
+> 各模块均采用分层架构（Controller-Service-Mapper-Entity），便于维护和扩展。
 
-1. **分层设计**
-   - 控制层 (Controller)：处理HTTP请求，参数验证，调用服务层
-   - 服务层 (Service)：实现业务逻辑，事务管理
-   - 数据访问层 (Mapper)：数据库交互
-   - 实体层 (Entity)：数据模型与映射
-
-2. **安全架构**
-   - 基于JWT的无状态认证
-   - 细粒度的权限控制
-   - 防XSS, CSRF攻击
-
-3. **缓存设计**
-   - 使用Redis缓存配置项和常用数据
-   - 多级缓存策略
-
-4. **文件存储架构**
-   - 多存储源支持（本地、MinIO、阿里云OSS，腾讯云）
-   - 文件管理与元数据记录
-   - 图片处理与压缩
-   - 动态切换文件存储
-
-## 核心功能
+## 主要功能
 
 ### 用户与权限管理
 
-- 用户管理：创建、编辑、查询用户信息
-- 角色管理：角色创建、权限分配
-- 部门管理：组织架构维护
-- 菜单管理：动态菜单配置
+- 用户、角色、部门、菜单、字典等基础数据管理
+- 动态权限分配，支持细粒度接口权限
+- JWT 无状态认证，支持多端登录
+- 登录、操作、异常日志记录
 
 ### 文件管理系统
 
-- 多存储源支持：本地存储、MinIO对象存储、阿里云OSS
-- 图片智能处理：自动压缩、预览图生成
-- 文件元数据管理：记录文件信息、来源、使用情况
+- 支持本地、MinIO、阿里云 OSS、腾讯云 COS 多存储源
+- 文件元数据管理、图片压缩与预览
+- 存储策略可动态切换
 
-### 系统配置
+### 消息与通知
 
-- 参数配置：系统运行参数维护
-- 字典管理：系统字典数据维护
-- 存储配置：文件存储方式与参数配置
+- 站内信、系统通知、管理员消息推送
+- 消息队列支持（RabbitMQ，可选）
 
-### 日志与监控
+### 系统配置与监控
 
-- 操作日志：记录用户操作
-- 登录日志：记录登录尝试
-- 异常日志：系统异常记录与告警
+- 参数配置、字典管理
+- 在线用户、缓存、服务监控
+- 定时任务管理（Quartz）
 
 ## 安装部署
 
 ### 环境要求
 
-- JDK 17+
-- MySQL 8.0+
-- Redis 6.0+
-- Maven 3.6+
-- (可选) MinIO/阿里云OSS
+- JDK 17 及以上
+- MySQL 8.0 及以上
+- Redis 6.0 及以上
+- Maven 3.6 及以上
+- (可选) MinIO/阿里云 OSS/腾讯云 COS
 
-### 快速开始
+### 快速启动
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/username/app-backend.git
-   cd app-backend
+   git clone https://github.com/lalala2726/echo-pro.git
+   cd echoPro
    ```
 
-2. **配置数据库**
-   - 创建数据库并导入初始SQL
-   - 修改 `application.yml` 中的数据库配置
+2. **初始化数据库**
+   - 创建数据库，导入 `docs/sql` 目录下的初始化 SQL 脚本
+   - 修改 `chuang-api/src/main/resources/application.yml` 数据库配置
 
 3. **配置文件存储**
    - 本地存储：配置上传路径
-   - MinIO：配置服务地址、访问密钥
-   - 阿里云OSS：配置服务地址、密钥
+   - MinIO/OSS/COS：配置服务地址、密钥等参数
 
 4. **构建与运行**
    ```bash
-   mvn clean package
-   java -jar admin/target/admin.jar
+   mvn clean package -DskipTests
+   java -jar chuang-api/target/chuang-api.jar
    ```
 
 5. **访问系统**
@@ -132,35 +115,29 @@ echo-pro/
    默认密码：admin123
    ```
 
-## 开发指南
+## 开发规范
 
-### 代码规范
+- 遵循阿里巴巴 Java 开发手册
+- 统一异常处理与日志规范
+- 代码注释齐全，类/方法注释规范
+- 分支管理：`master`（主分支）、`dev`（开发分支）、`feature/*`（新功能）、`hotfix/*`（紧急修复）
 
-- 遵循阿里巴巴Java开发手册规范
-- 类注释与代码注释规范
-- 统一的异常处理与日志记录
+## 贡献指南
 
-### 分支管理
-
-- master: 主分支，稳定版本
-- develop: 开发分支
-- feature/*: 功能分支
-- hotfix/*: 紧急修复分支
-
-### 贡献代码
-
-1. Fork项目
-2. 创建功能分支 (`git checkout -b feature/xxxx`)
-3. 提交变更 (`git commit -am 'Add feature xxxx'`)
-4. 推送到远程分支 (`git push origin feature/xxxx`)
-5. 创建Pull Request
+1. Fork 本项目
+2. 新建分支 (`git checkout -b feature/xxx`)
+3. 提交代码 (`git commit -am 'Add feature xxx'`)
+4. 推送分支 (`git push origin feature/xxx`)
+5. 提交 Pull Request
 
 ## 许可证
 
-本项目采用 [MIT 许可证](LICENSE) 进行授权。
+本项目基于 [MIT License](LICENSE) 开源。
 
 ## 联系方式
 
 - 作者：Chuang
 - 邮箱：chuang@zhangchuangla.cn
-- 项目地址：https://github.com/lalala2726/app-backend/
+- 项目地址：https://github.com/lalala2726/echo-pro/
+
+---
