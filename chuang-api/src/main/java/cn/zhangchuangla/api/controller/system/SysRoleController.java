@@ -80,8 +80,8 @@ public class SysRoleController extends BaseController {
     @OperationLog(title = "角色管理", businessType = BusinessType.EXPORT)
     public void exportExcel(HttpServletResponse response,
                             @Parameter(description = "用户查询参数，包含分页和筛选条件")
-                            @Validated @ParameterObject SysRoleQueryRequest request) {
-        log.info("导出用户列表");
+                            @RequestBody SysRoleQueryRequest request) {
+        log.info("导出用户列表:{}", request);
         Page<SysRole> page = sysRoleService.roleList(request);
         ArrayList<SysRoleListVo> sysRoleListVos = new ArrayList<>();
         page.getRecords().forEach(user -> {

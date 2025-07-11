@@ -55,6 +55,5 @@
                 and date(create_time) &lt;= #{request.endTime}
             </if>
         </where>
-        order by sort asc, create_time desc
     </select>
 </mapper>
