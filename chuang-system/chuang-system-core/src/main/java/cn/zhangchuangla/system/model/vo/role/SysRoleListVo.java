@@ -1,7 +1,5 @@
 package cn.zhangchuangla.system.model.vo.role;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -21,8 +19,7 @@ public class SysRoleListVo {
      * 主键
      */
     @Schema(description = "主键")
-    @TableId(type = IdType.AUTO)
-    private Long roleId;
+    private Long id;
 
     /**
      * 角色名
@@ -41,6 +38,12 @@ public class SysRoleListVo {
      */
     @Schema(description = "备注")
     private String remark;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "状态")
+    private Integer status;
 
     /**
      * 显示顺序

@@ -1,8 +1,7 @@
 package cn.zhangchuangla.system.model.request.role;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -18,22 +17,32 @@ public class SysRoleUpdateRequest {
     /**
      * 主键
      */
-    @Schema(description = "角色ID", example = "1", type = "int", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1, message = "主键不能小于1")
-    private Long roleId;
+    @Schema(description = "角色ID", example = "1", type = "int64", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "角色ID不能为空")
+    private Long id;
 
     /**
      * 角色名
      */
-    @NotBlank(message = "角色名不能为空")
     @Schema(description = "角色名", example = "管理员", type = "string")
     private String roleName;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "状态", example = "1", type = "integer", format = "integer")
+    private Integer status;
+
+    /**
+     * 角色权限标识
+     */
+    @Schema(description = "角色权限标识", example = "admin", type = "string")
+    private String roleKey;
 
     /**
      * 排序
      */
     @Schema(description = "排序", example = "0", type = "integer", format = "integer")
-    @Min(value = 0, message = "排序不能小于0")
     private Integer sort;
 
     /**

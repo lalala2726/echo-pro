@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysRoleMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysRole">
-        <id property="roleId" column="role_id"/>
+        <id property="id" column="id"/>
         <result property="roleName" column="role_name"/>
         <result property="roleKey" column="role_key"/>
         <result property="sort" column="sort"/>
@@ -17,7 +17,7 @@
     </resultMap>
 
     <select id="getRoleListByUserId" resultMap="BaseResultMap">
-        select role_id,
+        select id,
                role_name,
                role_key,
                sort,
@@ -28,7 +28,7 @@
                update_by,
                remark
         from sys_role
-        where sys_role.role_id in (select sys_user_role.role_id
+        where sys_role.id in (select sys_user_role.id
                                    from sys_user_role
                                    where sys_user_role.user_id = #{userId})
     </select>
