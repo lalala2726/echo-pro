@@ -15,24 +15,6 @@ public class BeanCotyUtils {
 
 
     /**
-     * Bean复制
-     *
-     * @param source 源对象
-     * @param clazz  目标对象类型
-     * @param <T>    目标对象类型
-     * @return 目标对象
-     */
-    public static <T> T copy(Object source, Class<T> clazz) {
-        try {
-            T target = clazz.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(source, target);
-            return target;
-        } catch (Exception e) {
-            throw new RuntimeException("Bean copy failed", e);
-        }
-    }
-
-    /**
      * 将 List<T> 转换为 List<V>，使用 BeanUtils 进行属性拷贝
      *
      * @param sourceList  源数据列表

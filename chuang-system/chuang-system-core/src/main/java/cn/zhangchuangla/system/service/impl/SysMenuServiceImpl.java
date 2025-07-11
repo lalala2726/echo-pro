@@ -82,7 +82,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
-        SysMenu sysMenu = BeanCotyUtils.copy(request, SysMenu.class);
+        SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setCreateBy(username);
 
 

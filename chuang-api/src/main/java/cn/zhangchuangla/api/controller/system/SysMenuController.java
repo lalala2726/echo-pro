@@ -112,6 +112,7 @@ public class SysMenuController extends BaseController {
     @PutMapping
     @Operation(summary = "修改菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
+    @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateMenu(@RequestBody SysMenuUpdateRequest request) {
         log.info("修改菜单：{}", request);
         boolean result = sysMenuService.updateMenu(request);
@@ -127,6 +128,7 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{id:\\d+}")
     @Operation(summary = "删除菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    @OperationLog(title = "菜单管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteMenu(@PathVariable("id") Long menuId) {
         boolean result = sysMenuService.deleteMenu(menuId);
         return toAjax(result);
