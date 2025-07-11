@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
@@ -130,7 +131,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "角色ID不能小于等于0"));
+        Assert.isParamTrue(ids == null || ids.isEmpty(), "角色ID不能为空");
         boolean result = sysRoleService.deleteRoleInfo(ids);
         return toAjax(result);
     }

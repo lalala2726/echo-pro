@@ -40,8 +40,9 @@
         select distinct sm.*
         from sys_menu sm
                  join sys_role_menu srm on sm.id = srm.menu_id
-                 join sys_role sr on srm.role_id = sr.role_id
+                 join sys_role sr on srm.role_id = sr.id
         where sr.role_name in #{roleName}
+          and sm.status = 0
     </select>
 
     <select id="getPermissionByRole" resultType="java.lang.String">
@@ -55,6 +56,7 @@
         </foreach>
         AND sm.permission IS NOT NULL
         AND sm.permission != ''
+        AND sm.status = 0
     </select>
 
 
