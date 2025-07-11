@@ -18,6 +18,7 @@ import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ import java.util.List;
  * <p>
  * created on 2025/7/6 05:03
  */
+@Slf4j
 @RequestMapping("/system/menu")
 @RestController
 @RequiredArgsConstructor
@@ -111,6 +113,7 @@ public class SysMenuController extends BaseController {
     @Operation(summary = "修改菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public AjaxResult<Void> updateMenu(@RequestBody SysMenuUpdateRequest request) {
+        log.info("修改菜单：{}", request);
         boolean result = sysMenuService.updateMenu(request);
         return toAjax(result);
     }

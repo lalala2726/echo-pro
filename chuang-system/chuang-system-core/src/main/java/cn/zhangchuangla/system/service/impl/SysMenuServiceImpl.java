@@ -84,20 +84,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copy(request, SysMenu.class);
         sysMenu.setCreateBy(username);
-        sysMenu.setKeepAlive(request.getKeepAlive() ? Constants.TRUE : Constants.FALSE);
+
 
         // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
-        if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
-                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType())) {
+        if (request.getLink() != null && !request.getLink().isBlank()
+                && (Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
+                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType()))) {
             sysMenu.setLink(request.getLink());
         }
-
-        sysMenu.setHideInMenu(request.getHideInMenu() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setAffixTab(request.getAffixTab() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideChildrenInMenu(request.getHideChildrenInMenu() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideInBreadcrumb(request.getHideInBreadcrumb() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideInTab(request.getHideInTab() ? Constants.TRUE : Constants.FALSE);
-
         return save(sysMenu);
     }
 
@@ -119,17 +113,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setUpdateBy(username);
         // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
-        if (!request.getLink().isBlank() && Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
-                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType())) {
+        if (request.getLink() != null && !request.getLink().isBlank()
+                && (Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
+                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType()))) {
             sysMenu.setLink(request.getLink());
         }
-
-        sysMenu.setHideInMenu(request.getHideInMenu() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setAffixTab(request.getAffixTab() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideChildrenInMenu(request.getHideChildrenInMenu() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideInBreadcrumb(request.getHideInBreadcrumb() ? Constants.TRUE : Constants.FALSE);
-        sysMenu.setHideInTab(request.getHideInTab() ? Constants.TRUE : Constants.FALSE);
-
         return updateById(sysMenu);
     }
 
