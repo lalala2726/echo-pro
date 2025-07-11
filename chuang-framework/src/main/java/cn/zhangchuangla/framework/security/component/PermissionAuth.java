@@ -43,7 +43,8 @@ public class PermissionAuth {
         if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
             return true;
         }
-        return true;
+        Set<String> permissionByRole = sysPermissionService.getPermissionByRole(roles);
+        return isAllow(permissionByRole, permission);
     }
 
 

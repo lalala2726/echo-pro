@@ -12,7 +12,7 @@ import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
 import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
-import cn.zhangchuangla.system.model.vo.role.SysRolePermVo;
+import cn.zhangchuangla.system.model.vo.role.SysRolePermissionVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -70,7 +70,7 @@ public class SysRoleController extends BaseController {
      */
     @GetMapping("/permission/{roleId}")
     @Operation(summary = "根据角色ID获取角色权限")
-    public AjaxResult<SysRolePermVo> getRolePermission(@Parameter(description = "角色ID")
+    public AjaxResult<SysRolePermissionVo> getRolePermission(@Parameter(description = "角色ID")
                                                        @PathVariable("roleId") Long roleId) {
         return success();
     }

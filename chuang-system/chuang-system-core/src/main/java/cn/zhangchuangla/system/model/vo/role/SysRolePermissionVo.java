@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(name = "角色权限分配对象", description = "角色权限分配对象")
-public class SysRolePermVo {
+public class SysRolePermissionVo {
 
     /**
      * 角色ID

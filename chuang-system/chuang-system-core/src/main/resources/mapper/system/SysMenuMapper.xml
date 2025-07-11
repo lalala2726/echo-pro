@@ -44,5 +44,18 @@
         where sr.role_name in #{roleName}
     </select>
 
+    <select id="getPermissionByRole" resultType="java.lang.String">
+        SELECT DISTINCT sm.permission
+        FROM sys_menu sm
+        INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id
+        INNER JOIN sys_role sr ON srm.role_id = sr.role_id
+        WHERE sr.role_key IN
+        <foreach collection="roleSet" item="role" open="(" separator="," close=")">
+            #{role}
+        </foreach>
+        AND sm.permission IS NOT NULL
+        AND sm.permission != ''
+    </select>
+
 
 </mapper>
