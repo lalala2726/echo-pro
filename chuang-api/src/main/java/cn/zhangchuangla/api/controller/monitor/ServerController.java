@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.monitor;
 
-import cn.zhangchuangla.common.core.core.controller.BaseController;
+import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.framework.model.entity.Server;
 import io.swagger.v3.oas.annotations.Operation;

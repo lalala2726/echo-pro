@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysRoleMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysRole">
-        <id property="roleId" column="role_id"/>
+        <id property="id" column="id"/>
         <result property="roleName" column="role_name"/>
         <result property="roleKey" column="role_key"/>
         <result property="sort" column="sort"/>
@@ -17,7 +17,7 @@
     </resultMap>
 
     <select id="getRoleListByUserId" resultMap="BaseResultMap">
-        select role_id,
+        select id,
                role_name,
                role_key,
                sort,
@@ -28,8 +28,32 @@
                update_by,
                remark
         from sys_role
-        where sys_role.role_id in (select sys_user_role.role_id
-                                   from sys_user_role
-                                   where sys_user_role.user_id = #{userId})
+        where sys_role.id in (select sys_user_role.role_id
+                              from sys_user_role
+                              where sys_user_role.user_id = #{userId})
+    </select>
+    <select id="roleList" resultMap="BaseResultMap">
+        select id, role_name, role_key, sort, status, create_time, update_time, create_by, update_by, remark
+        from sys_role
+        <where>
+            <if test="request.roleName != null and request.roleName != ''">
+                and role_name like concat('%', #{request.roleName}, '%')
+            </if>
+            <if test="request.roleKey != null and request.roleKey != ''">
+                and role_key like concat('%', #{request.roleKey}, '%')
+            </if>
+            <if test="request.status != null">
+                and status = #{request.status}
+            </if>
+            <if test="request.remark != null and request.remark != ''">
+                and remark like concat('%', #{request.remark}, '%')
+            </if>
+            <if test="request.startTime != null">
+                and date(create_time) >= #{request.startTime}
+            </if>
+            <if test="request.endTime != null">
+                and date(create_time) &lt;= #{request.endTime}
+            </if>
+        </where>
     </select>
 </mapper>

@@ -1,7 +1,9 @@
 package cn.zhangchuangla.system.model.request.menu;
 
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 系统菜单列表查询请求对象
@@ -10,38 +12,27 @@ import lombok.Data;
  * <p>
  * created on 2025/5/14 10:47
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统菜单列表查询请求对象", description = "系统菜单列表查询请求对象")
-public class SysMenuQueryRequest {
+public class SysMenuQueryRequest extends BasePageRequest {
 
     /**
-     * 菜单名称
+     * 名称
      */
-    @Schema(description = "菜单名称", example = "用户管理", type = "string")
-    private String menuName;
+    @Schema(description = "名称", type = "string", example = "System")
+    private String name;
 
     /**
-     * 菜单类型
+     * 路径
      */
-    @Schema(description = "菜单类型", example = "目录/菜单/按钮", type = "string")
-    private String menuType;
+    @Schema(description = "路径", type = "string", example = "/system")
+    private String path;
 
     /**
-     * 显示状态
+     * 类型
      */
-    @Schema(description = "显示状态", example = "0-隐藏 1-显示", type = "string")
-    private String status;
-
-    /**
-     * 是否缓存
-     */
-    @Schema(description = "是否缓存", example = "true-是 false-否", type = "boolean")
-    private Boolean isCache;
-
-    /**
-     * 是否外链
-     */
-    @Schema(description = "是否外链", example = "true-是 false-否", type = "boolean")
-    private Boolean isFrame;
+    @Schema(description = "类型", type = "string", example = "catalog")
+    private String type;
 
 }

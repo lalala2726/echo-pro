@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.core.model.entity.Option;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
@@ -33,7 +33,6 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 角色列表
      */
     List<SysRole> getRoleListByUserId(Long userId);
-
 
     /**
      * 根据用户id获取角色

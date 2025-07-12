@@ -15,14 +15,6 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 
 
     /**
-     * 检查菜单是否已分配给角色
-     *
-     * @param menuId 菜单ID
-     * @return 分配数量
-     */
-    int checkMenuExistRole(Long menuId);
-
-    /**
      * 根据角色ID查询菜单ID列表
      *
      * @param roleId 角色ID

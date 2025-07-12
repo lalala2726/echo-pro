@@ -36,6 +36,10 @@
         {
           "value": "tencent-first",
           "description": "强制使用腾讯云COS配置, 跳过数据库。"
+        },
+        {
+          "value": "amazon-first",
+          "description": "强制使用亚马逊S3配置, 跳过数据库。"
         }
       ]
     },
@@ -57,6 +61,10 @@
         {
           "value": "tencent_cos",
           "description": "腾讯云COS存储"
+        },
+        {
+          "value": "amazon_s3",
+          "description": "亚马逊S3存储"
         }
       ]
     }

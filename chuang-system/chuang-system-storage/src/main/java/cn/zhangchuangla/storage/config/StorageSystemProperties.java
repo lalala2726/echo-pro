@@ -33,6 +33,7 @@ public class StorageSystemProperties implements Serializable {
     private MinioConfig minio;
     private AliyunOssConfig aliyunOss;
     private TencentCosConfig tencentCos;
+    private AmazonS3Config amazonS3;
 
     /**
      * 本地存储配置
@@ -197,6 +198,55 @@ public class StorageSystemProperties implements Serializable {
 
         /**
          * 是否真实删除
+         */
+        private boolean realDelete = true;
+
+        public String toJson() {
+            return JSON.toJSONString(this);
+        }
+    }
+
+    /**
+     * 亚马逊S3配置
+     */
+    @Data
+    public static class AmazonS3Config implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = -7118344925027990875L;
+
+        /**
+         * 存储服务地址
+         */
+        private String endpoint;
+
+        /**
+         * 访问密钥
+         */
+        private String accessKey;
+
+        /**
+         * 密钥
+         */
+        private String secretKey;
+
+        /**
+         * 存储桶名称
+         */
+        private String bucketName;
+
+        /**
+         * 存储桶区域
+         */
+        private String region;
+
+        /**
+         * 文件访问域名
+         */
+        private String fileDomain;
+
+        /**
+         * 是否真实删除文件
          */
         private boolean realDelete = true;
 

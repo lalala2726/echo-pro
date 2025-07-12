@@ -103,6 +103,9 @@ public class StorageRegistryService {
             case StorageConstants.StorageType.TENCENT_COS:
                 configJson = storageSystemProperties.getTencentCos().toJson();
                 break;
+            case StorageConstants.StorageType.AMAZON_S3:
+                configJson = storageSystemProperties.getAmazonS3().toJson();
+                break;
             default:
                 log.error("未找到对应的存储服务配置: {}", activeType);
                 return false;

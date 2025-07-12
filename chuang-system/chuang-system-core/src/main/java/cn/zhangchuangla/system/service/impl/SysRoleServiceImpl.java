@@ -1,10 +1,10 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.model.entity.Option;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
@@ -51,10 +51,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public Page<SysRole> roleList(SysRoleQueryRequest request) {
-        LambdaQueryWrapper<SysRole> roleLambdaQueryWrapper = new LambdaQueryWrapper<SysRole>()
-                .like(request.getRoleName() != null && !request.getRoleName().isEmpty(),
-                        SysRole::getRoleName, request.getRoleName());
-        return page(new Page<>(request.getPageNum(), request.getPageSize()), roleLambdaQueryWrapper);
+        Page<SysRole> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysRoleMapper.roleList(page, request);
     }
 
     /**
@@ -146,7 +144,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
      */
     @Override
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
-        SysRole role = getById(request.getRoleId());
+        SysRole role = getById(request.getId());
         if (role == null) {
             throw new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在");
         }
@@ -170,7 +168,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         List<SysRole> roleList = list();
         if (roleList != null && !roleList.isEmpty()) {
             return roleList.stream()
-                    .map(role -> new Option<>(role.getRoleId(), role.getRoleName()))
+                    .map(role -> new Option<>(role.getId(), role.getRoleName()))
                     .collect(Collectors.toList());
         }
         return null;
@@ -192,7 +190,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             return null;
         }
         return roleList.stream()
-                .map(SysRole::getRoleId)
+                .map(SysRole::getId)
                 .collect(Collectors.toSet());
     }
 
@@ -237,7 +235,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID集合不能为空");
         }
         LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        sysRoleLambdaQueryWrapper.in(SysRole::getRoleId, roleId);
+        sysRoleLambdaQueryWrapper.in(SysRole::getId, roleId);
         List<SysRole> roles = list(sysRoleLambdaQueryWrapper);
         return roles.stream()
                 .map(SysRole::getRoleKey)
@@ -253,7 +251,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByRoleId(Long roleId) {
         LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        sysRoleLambdaQueryWrapper.in(SysRole::getRoleId, roleId);
+        sysRoleLambdaQueryWrapper.in(SysRole::getId, roleId);
         List<SysRole> roles = list(sysRoleLambdaQueryWrapper);
         return roles.stream()
                 .map(SysRole::getRoleKey)

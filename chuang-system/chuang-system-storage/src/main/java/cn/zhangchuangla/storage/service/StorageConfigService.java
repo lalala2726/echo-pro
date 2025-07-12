@@ -1,10 +1,10 @@
 package cn.zhangchuangla.storage.service;
 
-import cn.zhangchuangla.common.core.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.common.core.model.request.LocalFileConfigRequest;
-import cn.zhangchuangla.common.core.model.request.MinioConfigRequest;
-import cn.zhangchuangla.common.core.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
+import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
+import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
+import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
+import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
@@ -54,7 +54,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean saveFileConfig(StorageConfigAddRequest request);
+    boolean addStorageConfig(StorageConfigAddRequest request);
 
 
     /**
@@ -63,16 +63,8 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean saveFileConfig(TencentCOSConfigRequest request);
+    boolean addStorageConfig(TencentCOSConfigRequest request);
 
-
-    /**
-     * 新增本地文件配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean saveFileConfig(LocalFileConfigRequest request);
 
     /**
      * 新增阿里云OSS配置
@@ -80,7 +72,16 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean saveFileConfig(AliyunOSSConfigRequest request);
+    boolean addStorageConfig(AliyunOSSConfigRequest request);
+
+
+    /**
+     * 新增亚马逊S3配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean addStorageConfig(AmazonS3ConfigRequest request);
 
 
     /**
@@ -89,7 +90,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 请求参数
      * @return 操作结果
      */
-    boolean saveFileConfig(MinioConfigRequest request);
+    boolean addStorageConfig(MinioConfigRequest request);
 
 
     /**
@@ -139,7 +140,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param id 文件配置id
      * @return 操作结果
      */
-    boolean setMasterConfig(Long id);
+    boolean updatePrimaryConfig(Long id);
 
     /**
      * 删除文件配置，支持批量删除
@@ -148,4 +149,5 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @return 操作结果
      */
     boolean deleteFileConfig(List<Long> ids);
+
 }

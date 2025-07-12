@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service;
 
-import cn.zhangchuangla.common.core.core.security.model.SysUser;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.model.request.user.SysUserQueryRequest;
@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 用户服务接口
+ *
  * @author Chuang
  */
 public interface SysUserService extends IService<SysUser> {

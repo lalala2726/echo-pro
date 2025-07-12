@@ -1,7 +1,10 @@
 package cn.zhangchuangla.storage.utils;
 
+import cn.zhangchuangla.storage.constant.StorageConstants;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -52,16 +55,50 @@ public class StorageUtils {
     /**
      * 格式化文件大小
      *
-     * @param size 文件大小
+     * @param size 文件大小（字节）
      * @return 格式化后的文件大小
      */
     public static String formatFileSize(long size) {
         if (size < 0) {
-            return "0MB";
+            return "0B";
         }
-        // 直接以 MB 格式返回，1MB = 1024KB = 1024 * 1024 Bytes
+
+        if (size < 1024) {
+            return size + "B";
+        }
+
+        if (size < 1024 * 1024) {
+            double kbSize = size / 1024.0;
+            return String.format("%.2fKB", kbSize);
+        }
+
         double mbSize = size / (1024.0 * 1024.0);
         return String.format("%.2fMB", mbSize);
+    }
+
+    /**
+     * 日期目录可以在这边统一修改{@link StorageConstants}
+     */
+    public static String createDateDir() {
+        return new SimpleDateFormat(StorageConstants.FILE_UPLOAD_PATH_FORMAT).format(new Date());
+    }
+
+    /**
+     * 从路径中移除resource前缀
+     *
+     * @param path 原始路径
+     * @return 移除resource前缀后的路径
+     */
+    public static String removeResourcePrefix(String path) {
+        if (path == null || path.isBlank()) {
+            return path;
+        }
+
+        String resourcePrefix = StorageConstants.dirName.RESOURCE + "/";
+        if (path.startsWith(resourcePrefix)) {
+            return path.substring(resourcePrefix.length());
+        }
+        return path;
     }
 
 

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.model.request.file;
 
-import cn.zhangchuangla.common.core.base.BasePageRequest;
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,29 +23,12 @@ public class FileRecordQueryRequest extends BasePageRequest {
     @Schema(description = "文件名")
     private String originalName;
 
+
     /**
      * 文件类型，如 image/jpeg, application/pdf 等
      */
     @Schema(description = "文件类型，如 image/jpeg, application/pdf 等")
     private String contentType;
-
-    /**
-     * 文件大小，格式化后的字符串，如 "1.5MB"
-     */
-    @Schema(description = "文件大小，格式化后的字符串，如 \"1.5MB\"")
-    private String fileSize;
-
-    /**
-     * 文件MD5值，用于文件完整性校验
-     */
-    @Schema(description = "文件MD5值，用于文件完整性校验")
-    private String fileMd5;
-
-    /**
-     * 文件扩展名
-     */
-    @Schema(description = "文件扩展名")
-    private String fileExtension;
 
     /**
      * 存储类型 (LOCAL/MINIO/ALIYUN_OSS)
@@ -60,12 +43,6 @@ public class FileRecordQueryRequest extends BasePageRequest {
     private String bucketName;
 
     /**
-     * 上传者ID
-     */
-    @Schema(description = "上传者ID")
-    private Long uploaderId;
-
-    /**
      * 上传者名称
      */
     @Schema(description = "上传者名称")
@@ -76,16 +53,4 @@ public class FileRecordQueryRequest extends BasePageRequest {
      */
     @Schema(description = "上传时间")
     private Date uploadTime;
-
-    /**
-     * 创建时间
-     */
-    @Schema(description = "创建时间")
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    @Schema(description = "更新时间")
-    private Date updateTime;
 }

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.aspect;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.core.security.model.SysUserDetails;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -163,7 +163,7 @@ public class OperationLogAspect {
             sysOperationLog.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
 
             // 记录请求参数
-            if (controllerOperationLog.isSaveRequestData()) {
+            if (controllerOperationLog.saveRequestData()) {
                 sysOperationLog.setRequestParams(getRequestParams(joinPoint, controllerOperationLog.excludeParamNames()));
             }
 

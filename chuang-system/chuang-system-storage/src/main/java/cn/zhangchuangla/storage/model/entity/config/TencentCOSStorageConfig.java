@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
+import cn.zhangchuangla.common.core.annotation.DataMasking;
 import lombok.Data;
 
 /**
@@ -23,6 +24,7 @@ public class TencentCOSStorageConfig {
     /**
      * 密钥Key
      */
+    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String secretKey;
 
     /**
@@ -36,7 +38,7 @@ public class TencentCOSStorageConfig {
     private String fileDomain;
 
     /**
-     * 是否使用回收站 1 使用 0 不使用
+     * 是否真实删除
      */
-    private Integer enableTrash;
+    private boolean realDelete;
 }

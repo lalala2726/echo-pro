@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
+import cn.zhangchuangla.common.core.annotation.DataMasking;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,7 +21,6 @@ public class MinioStorageConfig implements Serializable {
     @Serial
     private static final long serialVersionUID = 254651044373823297L;
 
-
     /**
      * 访问端点
      */
@@ -34,6 +34,7 @@ public class MinioStorageConfig implements Serializable {
     /**
      * 密钥
      */
+    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String secretKey;
 
     /**
@@ -52,9 +53,9 @@ public class MinioStorageConfig implements Serializable {
     private String bucketRegion;
 
     /**
-     * 是否启用回收站
+     * 是否真实删除
      */
-    private Integer enableTrash;
+    private boolean realDelete;
 
 
 }

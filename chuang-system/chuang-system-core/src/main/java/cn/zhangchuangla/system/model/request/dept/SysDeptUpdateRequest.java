@@ -1,9 +1,8 @@
 package cn.zhangchuangla.system.model.request.dept;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -19,14 +18,13 @@ public class SysDeptUpdateRequest {
      * 部门ID
      */
     @Schema(name = "部门ID", example = "1", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1, message = "部门ID不能小于1")
+    @NotNull(message = "部门ID不能为空")
     private Long deptId;
 
     /**
      * 部门名称
      */
     @NotBlank(message = "部门名称不能为空")
-    @Size(max = 50, message = "部门名称不能超过50个字符")
     @Schema(description = "部门名称", example = "研发部", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String deptName;
 
@@ -40,7 +38,7 @@ public class SysDeptUpdateRequest {
      * 部门状态（0正常 1停用）
      */
     @Schema(description = "部门状态", example = "0", type = "integer", format = "int32")
-    private Long status;
+    private Integer status;
 
     /**
      * 部门负责人

@@ -1,13 +1,11 @@
 package cn.zhangchuangla.common.core.constant;
 
-import org.springframework.stereotype.Component;
 
 /**
  * @author Chuang
  * <p>
  * created on 2025/2/26 19:22
  */
-@Component("systemRolesConstant")
 public class SysRolesConstant {
 
     /**

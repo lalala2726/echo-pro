@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.loader;
 
-import cn.zhangchuangla.common.core.core.loader.DataLoader;
+import cn.zhangchuangla.common.core.loader.DataLoader;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.core.service.StorageRegistryService;
 import lombok.RequiredArgsConstructor;

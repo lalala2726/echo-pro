@@ -24,7 +24,7 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      * @param menuId 菜单ID
      * @return 角色使用数量
      */
-    int checkMenuExistRole(Long menuId);
+    boolean isMenuAssignedToRoles(Long menuId);
 
     /**
      * 根据角色ID获取菜单列表

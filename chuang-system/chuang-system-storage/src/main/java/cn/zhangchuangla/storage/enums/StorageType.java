@@ -12,7 +12,8 @@ public enum StorageType {
     LOCAL("local", "本地存储"),
     MINIO("minio", "MinIO"),
     ALIYUN_OSS("aliyun_oss", "阿里云OSS"),
-    TENCENT_COS("tencent_cos", "腾讯云COS");
+    TENCENT_COS("tencent_cos", "腾讯云COS"),
+    AMAZON_S3("amazon_s3", "亚马逊S3");
 
     private final String code;
     private final String description;
