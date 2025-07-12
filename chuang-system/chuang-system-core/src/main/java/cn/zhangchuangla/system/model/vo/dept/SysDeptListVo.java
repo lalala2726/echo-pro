@@ -1,7 +1,5 @@
 package cn.zhangchuangla.system.model.vo.dept;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -38,7 +36,6 @@ public class SysDeptListVo {
      * 部门状态（0正常 1停用）
      */
     @Schema(description = "部门状态")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

@@ -33,7 +33,7 @@
                               where sys_user_role.user_id = #{userId})
     </select>
     <select id="roleList" resultMap="BaseResultMap">
-        select *
+        select id, role_name, role_key, sort, status, create_time, update_time, create_by, update_by, remark
         from sys_role
         <where>
             <if test="request.roleName != null and request.roleName != ''">
