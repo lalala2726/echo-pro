@@ -140,7 +140,7 @@ public class SysRoleController extends BaseController {
      * @param id 角色ID
      * @return 角色信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据id获取角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:info')")
     public AjaxResult<SysRoleVo> getRoleInfoById(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
@@ -156,7 +156,7 @@ public class SysRoleController extends BaseController {
      * @param ids 角色ID
      * @return 删除结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:\\d+}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)

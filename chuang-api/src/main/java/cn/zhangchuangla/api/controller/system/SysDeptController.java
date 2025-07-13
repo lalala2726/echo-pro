@@ -91,7 +91,7 @@ public class SysDeptController extends BaseController {
      * @param id 部门ID
      * @return 部门信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
     public AjaxResult<SysDeptVo> getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {

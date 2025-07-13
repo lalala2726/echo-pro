@@ -132,7 +132,7 @@ public class SysUserController extends BaseController {
      * @param ids 需要删除的用户ID列表
      * @return 删除操作结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:\\d+}")
     @Operation(summary = "删除用户")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
@@ -175,7 +175,7 @@ public class SysUserController extends BaseController {
      *
      * @return 重置操作结果
      */
-    @PutMapping("/password/{id}")
+    @PutMapping("/password/{id:\\d+}")
     @Operation(summary = "根据用户ID重置密码")
     @OperationLog(title = "用户管理", businessType = BusinessType.RESET_PWD)
     @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
@@ -197,7 +197,7 @@ public class SysUserController extends BaseController {
      * @param id 用户ID
      * @return 用户详细信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
