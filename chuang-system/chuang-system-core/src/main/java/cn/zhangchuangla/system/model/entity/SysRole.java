@@ -21,12 +21,17 @@ public class SysRole extends BaseEntity {
      * 角色ID
      */
     @TableId(type = IdType.AUTO)
-    private Long roleId;
+    private Long id;
 
     /**
      * 角色名
      */
     private String roleName;
+
+    /**
+     * 角色状态（0正常 1停用）
+     */
+    private Integer status;
 
     /**
      * 角色权限字符串

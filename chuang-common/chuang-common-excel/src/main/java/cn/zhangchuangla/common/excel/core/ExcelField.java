@@ -58,7 +58,7 @@ public class ExcelField {
     /**
      * 字典类型
      */
-    private String dictType;
+    private String dictKey;
 
     /**
      * 日期格式
@@ -119,7 +119,7 @@ public class ExcelField {
         this.width = excel.width();
         this.height = excel.height();
         this.align = excel.align();
-        this.dictType = excel.dictType();
+        this.dictKey = excel.dictKey();
         this.dateFormat = excel.dateFormat();
         this.defaultValue = excel.defaultValue();
         this.suffix = excel.suffix();

@@ -2,19 +2,13 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.storage.constant.StorageConstants;
+import cn.zhangchuangla.storage.core.factory.StorageConfigFactory;
 import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
-import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
-import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.request.file.UnifiedStorageConfigRequest;
 import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -94,59 +88,20 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     }
 
     /**
-     * 添加腾讯云COS配置文件
+     * 添加存储配置
+     * 支持所有存储类型的统一配置方法
      *
-     * @param request 请求参数
+     * @param request 统一存储配置请求参数
      * @return 操作结果
      */
     @Override
-    public boolean addStorageConfig(TencentCOSConfigRequest request) {
-        TencentCOSStorageConfig tencent = new TencentCOSStorageConfig();
-        BeanUtils.copyProperties(request, tencent);
-        String value = JSON.toJSONString(tencent);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
-    }
+    public boolean addStorageConfig(UnifiedStorageConfigRequest request) {
+        // 使用工厂类创建对应的存储配置对象
+        Object storageConfig = StorageConfigFactory.createStorageConfig(request);
+        String value = JSON.toJSONString(storageConfig);
+        String storageTypeCode = StorageConfigFactory.getStorageTypeCode(request.getStorageType());
 
-
-    /**
-     * 添加阿里云OSS配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSStorageConfig aliyun = new AliyunOSSStorageConfig();
-        BeanUtils.copyProperties(request, aliyun);
-        String value = JSON.toJSONString(aliyun);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
-    }
-
-    /**
-     * 添加亚马逊S3存储配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(AmazonS3ConfigRequest request) {
-        AmazonS3StorageConfig amazonS3StorageConfig = new AmazonS3StorageConfig();
-        BeanUtils.copyProperties(request, amazonS3StorageConfig);
-        String value = JSON.toJSONString(amazonS3StorageConfig);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.AMAZON_S3, value);
-    }
-
-    /**
-     * 添加Minio配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(MinioConfigRequest request) {
-        MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
-        String value = JSON.toJSONString(minioStorageConfig);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
+        return addStorageConfig(request.getStorageName(), request.getStorageKey(), storageTypeCode, value);
     }
 
 

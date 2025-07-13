@@ -18,6 +18,7 @@ import cn.zhangchuangla.system.model.vo.menu.SysMenuVo;
 import cn.zhangchuangla.system.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ import java.util.List;
  * <p>
  * created on 2025/7/6 05:03
  */
+@Slf4j
 @RequestMapping("/system/menu")
 @RestController
 @RequiredArgsConstructor
@@ -110,7 +112,9 @@ public class SysMenuController extends BaseController {
     @PutMapping
     @Operation(summary = "修改菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
+    @OperationLog(title = "菜单管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateMenu(@RequestBody SysMenuUpdateRequest request) {
+        log.info("修改菜单：{}", request);
         boolean result = sysMenuService.updateMenu(request);
         return toAjax(result);
     }
@@ -124,6 +128,7 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{id:\\d+}")
     @Operation(summary = "删除菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    @OperationLog(title = "菜单管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteMenu(@PathVariable("id") Long menuId) {
         boolean result = sysMenuService.deleteMenu(menuId);
         return toAjax(result);

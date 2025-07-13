@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
@@ -113,15 +114,9 @@ public class SysUserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
     public AjaxResult<Long> addUser(@Parameter(description = "添加用户的请求参数，包含用户名、密码等基本信息", required = true)
                                     @Validated @RequestBody SysUserAddRequest request) {
-        if (!request.getUsername().isEmpty()) {
-            checkParam(sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
-        }
-        if (!request.getPhone().isEmpty()) {
-            checkParam(sysUserService.isPhoneExist(request.getPhone()), "手机号已存在");
-        }
-        if (!request.getEmail().isEmpty()) {
-            checkParam(sysUserService.isEmailExist(request.getEmail()), "邮箱已存在");
-        }
+        Assert.isTrue(!sysUserService.isUsernameExist(request.getUsername()), "用户名已存在");
+        Assert.isTrue(!sysUserService.isPhoneExist(request.getPhone()), "手机号已存在");
+        Assert.isTrue(!sysUserService.isEmailExist(request.getEmail()), "邮箱已存在");
         return success(sysUserService.addUserInfo(request));
     }
 
@@ -132,13 +127,14 @@ public class SysUserController extends BaseController {
      * @param ids 需要删除的用户ID列表
      * @return 删除操作结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除用户")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     @OperationLog(title = "用户管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteUserById(@Parameter(description = "用户ID列表，支持批量删除", required = true)
                                            @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "用户ID不能为空!"));
+        Assert.notEmpty(ids, "用户ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "用户ID必须大于0！");
         sysUserService.deleteUserById(ids);
         return success();
     }
@@ -157,13 +153,8 @@ public class SysUserController extends BaseController {
     public AjaxResult<Void> updateUserInfoById(@Parameter(description = "修改用户信息的请求参数，包含用户ID和需要修改的字段")
                                                @Validated @RequestBody SysUserUpdateRequest request) {
         sysUserService.isAllowUpdate(request.getUserId());
-        // 参数校验
-        if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-            checkParam(sysUserService.isPhoneExist(request.getPhone(), request.getUserId()), "手机号已存在");
-        }
-        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            checkParam(sysUserService.isEmailExist(request.getEmail(), request.getUserId()), "邮箱已经存在");
-        }
+        Assert.isTrue(!sysUserService.isPhoneExist(request.getPhone(), request.getUserId()), "手机号已存在");
+        Assert.isTrue(!sysUserService.isEmailExist(request.getEmail(), request.getUserId()), "邮箱已存在");
         // 业务逻辑
         boolean result = sysUserService.updateUserInfoById(request);
         return toAjax(result);
@@ -175,13 +166,13 @@ public class SysUserController extends BaseController {
      *
      * @return 重置操作结果
      */
-    @PutMapping("/password/{id}")
+    @PutMapping("/password/{id:\\d+}")
     @Operation(summary = "根据用户ID重置密码")
     @OperationLog(title = "用户管理", businessType = BusinessType.RESET_PWD)
     @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
     public AjaxResult<Boolean> resetPassword(@PathVariable("id") Long id,
                                              @RequestParam("password") String password) {
-        checkParam(id == null || id <= 0, "用户ID不能小于等于0");
+        Assert.isTrue(id > 0, "用户ID必须大于0！");
         if (!password.matches(RegularConstants.User.PASSWORD)) {
             return error("密码格式不正确");
         }
@@ -197,12 +188,12 @@ public class SysUserController extends BaseController {
      * @param id 用户ID
      * @return 用户详细信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
                                                   @PathVariable("id") Long id) {
-        checkParam(id == null || id < 0, "用户ID不能小于0");
+        Assert.isTrue(id > 0, "用户ID必须大于0！");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);

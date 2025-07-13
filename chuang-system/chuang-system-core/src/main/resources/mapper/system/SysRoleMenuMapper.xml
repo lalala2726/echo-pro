@@ -10,7 +10,6 @@
     </resultMap>
 
 
-
     <select id="selectMenuListByRoleId" resultType="java.lang.Long">
         select menu_id
         from sys_role_menu

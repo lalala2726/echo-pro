@@ -2,7 +2,6 @@ package cn.zhangchuangla.common.core.controller;
 
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
-import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * @author Chuang
@@ -213,19 +211,6 @@ public class BaseController {
         return AjaxResult.error(responseCode);
     }
 
-
-    /**
-     * 如果表达式为true则抛出异常
-     *
-     * @param conditionSupplier 条件
-     * @param errorMessage      错误信息
-     */
-    protected void checkParam(boolean conditionSupplier, String errorMessage) {
-        if (conditionSupplier) {
-            throw new ParamException(errorMessage);
-        }
-    }
-
     /**
      * 加密密码
      *
@@ -247,43 +232,5 @@ public class BaseController {
         return SecurityUtils.matchesPassword(rawPassword, encodedPassword);
     }
 
-
-    /**
-     * 验证条件是否为true（函数方法）
-     *
-     * @param condition    条件
-     * @param errorMessage 错误信息
-     */
-    protected void checkParam(Predicate<?> condition, String errorMessage) {
-        if (condition.test(null)) {
-            throw new ParamException(errorMessage);
-        }
-    }
-
-    /**
-     * 校验参数对象是否为 null
-     *
-     * @param param     要校验的参数
-     * @param paramName 参数名 (用于错误消息)
-     * @throws ParamException 如果 param 为 null
-     */
-    protected void checkParamNotNull(Object param, String paramName) {
-        if (param == null) {
-            throw new ParamException(paramName + " cannot be null");
-        }
-    }
-
-    /**
-     * 校验字符串参数是否为空 (null 或 "")
-     *
-     * @param param     要校验的字符串参数
-     * @param paramName 参数名 (用于错误消息)
-     * @throws ParamException 如果 param 为空
-     */
-    protected void checkParamNotBlank(String param, String paramName) {
-        if (param == null || param.trim().isEmpty()) {
-            throw new ParamException(paramName + " cannot be blank");
-        }
-    }
 
 }

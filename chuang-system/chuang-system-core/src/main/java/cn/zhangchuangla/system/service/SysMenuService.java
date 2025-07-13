@@ -120,5 +120,4 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 是否有子菜单
      */
     boolean hasChildren(Long menuId);
-
 }

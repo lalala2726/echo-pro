@@ -8,14 +8,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典项表
+ * 系统字典类型表
  *
  * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_dict_item")
+@TableName(value = "sys_dict_key")
 @Data
-public class SysDictItem extends BaseEntity {
+public class SysDictKey extends BaseEntity {
 
     /**
      * 主键ID
@@ -24,29 +24,14 @@ public class SysDictItem extends BaseEntity {
     private Long id;
 
     /**
-     * 所属字典类型编码
+     * 字典类型编码
      */
-    private String dictType;
+    private String dictKey;
 
     /**
-     * 字典项名称
+     * 字典名称
      */
-    private String itemLabel;
-
-    /**
-     * 字典项值
-     */
-    private String itemValue;
-
-    /**
-     * 回显样式
-     */
-    private String tag;
-
-    /**
-     * 排序值
-     */
-    private Integer sort;
+    private String dictName;
 
     /**
      * 状态：0启用，1禁用

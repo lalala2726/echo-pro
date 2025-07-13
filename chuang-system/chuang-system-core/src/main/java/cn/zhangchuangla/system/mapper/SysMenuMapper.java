@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.mapper;
 
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,17 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
      * @param roleName 角色名称
      * @return 菜单列表
      */
-    List<SysMenu> listSysMenuByRoleName(Set<String> roleName);
+    List<SysMenu> listSysMenuByRoleName(@Param("roleName") Set<String> roleName);
+
+
+    /**
+     * 获取权限列表
+     *
+     * @param roleSet 角色标识符集合
+     * @return 权限列表
+     */
+    Set<String> getPermissionByRole(@Param("roleSet") Set<String> roleSet);
+
 }
 
 

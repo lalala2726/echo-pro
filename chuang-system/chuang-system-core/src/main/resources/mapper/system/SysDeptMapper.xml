@@ -24,14 +24,8 @@
         FROM sys_dept
         <where>
             <if test="request != null">
-                <if test="request.deptId != null">
-                    AND dept_id = #{request.deptId}
-                </if>
                 <if test="request.deptName != null and request.deptName != ''">
                     AND dept_name LIKE concat('%', #{request.deptName}, '%')
-                </if>
-                <if test="request.parentId != null">
-                    AND parent_id = #{request.parentId}
                 </if>
                 <if test="request.status != null">
                     AND status = #{status}
@@ -41,9 +35,6 @@
                 </if>
                 <if test="request.description != null and request.description != ''">
                     AND description LIKE concat('%', #{request.description}, '%')
-                </if>
-                <if test="request.remark != null and request.remark != ''">
-                    AND remark LIKE concat('%', #{request.remark}, '%')
                 </if>
             </if>
         </where>

@@ -1,13 +1,10 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
-import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
-import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.request.file.UnifiedStorageConfigRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -58,39 +55,13 @@ public interface StorageConfigService extends IService<StorageConfig> {
 
 
     /**
-     * 新增腾讯云COS配置
+     * 新增存储配置
+     * 支持所有存储类型的统一配置方法
      *
-     * @param request 请求参数
+     * @param request 统一存储配置请求参数
      * @return 操作结果
      */
-    boolean addStorageConfig(TencentCOSConfigRequest request);
-
-
-    /**
-     * 新增阿里云OSS配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(AliyunOSSConfigRequest request);
-
-
-    /**
-     * 新增亚马逊S3配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(AmazonS3ConfigRequest request);
-
-
-    /**
-     * 新增Minio配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(MinioConfigRequest request);
+    boolean addStorageConfig(UnifiedStorageConfigRequest request);
 
 
     /**

@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
@@ -31,8 +32,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
 
     @Override
     public List<SysDept> listDept(SysDeptQueryRequest request) {
-        SysDept sysDept = new SysDept();
-        BeanUtils.copyProperties(request, sysDept);
+        SysDept sysDept = BeanCotyUtils.copyProperties(request, SysDept.class);
         return sysDeptMapper.listDepartment(sysDept);
     }
 
@@ -67,8 +67,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (count(ne) > 0) {
             throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
-        SysDept sysDept = new SysDept();
-        BeanUtils.copyProperties(request, sysDept);
+        SysDept sysDept = BeanCotyUtils.copyProperties(request, SysDept.class);
         return updateById(sysDept);
     }
 

@@ -31,26 +31,28 @@ public class DictDataHandler {
     private final Map<String, Map<String, String>> localCache = new ConcurrentHashMap<>();
 
 
+    //fixme 审查这边的代码
+
     /**
      * 根据字典类型和字典值获取字典标签
      *
-     * @param dictType  字典类型
+     * @param dictKey   字典类型
      * @param dictValue 字典值
      * @return 字典标签，如果未找到则返回原值
      */
-    public String getDictLabel(String dictType, String dictValue) {
-        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(dictValue)) {
+    public String getDictLabel(String dictKey, String dictValue) {
+        if (StringUtils.isBlank(dictKey) || StringUtils.isBlank(dictValue)) {
             return dictValue;
         }
 
         try {
             // 先从本地缓存获取
-            Map<String, String> dictMap = localCache.get(dictType);
+            Map<String, String> dictMap = localCache.get(dictKey);
             if (dictMap == null) {
                 // 从Redis获取字典数据
-                dictMap = loadDictFromRedis(dictType);
+                dictMap = loadDictFromRedis(dictKey);
                 if (dictMap != null && !dictMap.isEmpty()) {
-                    localCache.put(dictType, dictMap);
+                    localCache.put(dictKey, dictMap);
                 }
             }
 
@@ -58,10 +60,10 @@ public class DictDataHandler {
                 return dictMap.get(dictValue);
             }
 
-            log.debug("未找到字典项: dictType={}, dictValue={}", dictType, dictValue);
+            log.debug("未找到字典项: dictKey={}, dictValue={}", dictKey, dictValue);
             return dictValue;
         } catch (Exception e) {
-            log.error("获取字典标签失败: dictType={}, dictValue={}", dictType, dictValue, e);
+            log.error("获取字典标签失败: dictKey={}, dictValue={}", dictKey, dictValue, e);
             return dictValue;
         }
     }
@@ -69,65 +71,49 @@ public class DictDataHandler {
     /**
      * 从Redis加载字典数据
      *
-     * @param dictType 字典类型
+     * @param dictKey 字典类型
      * @return 字典值到标签的映射
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, String> loadDictFromRedis(String dictType) {
+    private Map<String, String> loadDictFromRedis(String dictKey) {
         try {
-            String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType);
-            List<Option<String>> dictItems = redisCache.getCacheObject(cacheKey);
+            String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictKey);
+            List<Option<String>> dictValues = redisCache.getCacheObject(cacheKey);
 
-            if (dictItems == null || dictItems.isEmpty()) {
-                log.debug("Redis中未找到字典数据: dictType={}", dictType);
+            if (dictValues == null || dictValues.isEmpty()) {
+                log.debug("Redis中未找到字典数据: dictKey={}", dictKey);
                 return null;
             }
 
             Map<String, String> dictMap = new ConcurrentHashMap<>();
-            for (Option<String> item : dictItems) {
+            for (Option<String> item : dictValues) {
                 if (item != null && item.getValue() != null && item.getLabel() != null) {
                     dictMap.put(item.getValue(), item.getLabel());
                 }
             }
 
-            log.debug("从Redis加载字典数据成功: dictType={}, size={}", dictType, dictMap.size());
+            log.debug("从Redis加载字典数据成功: dictKey={}, size={}", dictKey, dictMap.size());
             return dictMap;
         } catch (Exception e) {
-            log.error("从Redis加载字典数据失败: dictType={}", dictType, e);
+            log.error("从Redis加载字典数据失败: dictKey={}", dictKey, e);
             return null;
-        }
-    }
-
-    /**
-     * 清除本地缓存
-     *
-     * @param dictType 字典类型，如果为空则清除所有缓存
-     */
-    public void clearCache(String dictType) {
-        if (StringUtils.isBlank(dictType)) {
-            localCache.clear();
-            log.debug("清除所有字典本地缓存");
-        } else {
-            localCache.remove(dictType);
-            log.debug("清除字典本地缓存: dictType={}", dictType);
         }
     }
 
     /**
      * 预加载字典数据到本地缓存
      *
-     * @param dictTypes 字典类型列表
+     * @param dictKeys 字典键列表
      */
-    public void preloadDictData(List<String> dictTypes) {
-        if (dictTypes == null || dictTypes.isEmpty()) {
+    public void preloadDictData(List<String> dictKeys) {
+        if (dictKeys == null || dictKeys.isEmpty()) {
             return;
         }
 
-        for (String dictType : dictTypes) {
-            if (StringUtils.isNotBlank(dictType) && !localCache.containsKey(dictType)) {
-                Map<String, String> dictMap = loadDictFromRedis(dictType);
+        for (String dictKey : dictKeys) {
+            if (StringUtils.isNotBlank(dictKey) && !localCache.containsKey(dictKey)) {
+                Map<String, String> dictMap = loadDictFromRedis(dictKey);
                 if (dictMap != null && !dictMap.isEmpty()) {
-                    localCache.put(dictType, dictMap);
+                    localCache.put(dictKey, dictMap);
                 }
             }
         }

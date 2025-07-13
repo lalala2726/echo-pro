@@ -2,11 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysDictTypeMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictKeyMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictType">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictKey">
         <id property="id" column="id"/>
-        <result property="dictType" column="dict_type"/>
+        <result property="dictKey" column="dict_key"/>
         <result property="dictName" column="dict_name"/>
         <result property="status" column="status"/>
         <result property="remark" column="remark"/>
@@ -16,10 +16,10 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <select id="listDictType" resultMap="BaseResultMap">
+    <select id="listDictKey" resultMap="BaseResultMap">
         SELECT
         id,
-        dict_type,
+        dict_key,
         dict_name,
         status,
         create_time,
@@ -27,11 +27,11 @@
         create_by,
         update_by,
         remark
-        FROM sys_dict_type
+        FROM sys_dict_key
         <where>
             <if test="request != null">
-                <if test="request.dictType != null and request.dictType != ''">
-                    AND dict_type LIKE CONCAT('%', #{request.dictType}, '%')
+                <if test="request.dictKey != null and request.dictKey != ''">
+                    AND dict_key LIKE CONCAT('%', #{request.dictKey}, '%')
                 </if>
                 <if test="request.dictName != null and request.dictName != ''">
                     AND dict_name LIKE CONCAT('%', #{request.dictName}, '%')

@@ -4,6 +4,8 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDept;
 import cn.zhangchuangla.system.model.request.dept.SysDeptAddRequest;
@@ -17,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -91,14 +92,14 @@ public class SysDeptController extends BaseController {
      * @param id 部门ID
      * @return 部门信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     @Operation(summary = "获取部门信息")
     public AjaxResult<SysDeptVo> getDeptById(@Parameter(description = "部门ID") @PathVariable("id") Long id) {
-        checkParam(id == null, "部门ID不能为空！");
+        Assert.notNull(id, "部门ID不能为空！");
+        Assert.isTrue(id > 0, "部门ID必须大于0！");
         SysDept dept = sysDeptService.getDeptById(id);
-        SysDeptVo sysDeptVo = new SysDeptVo();
-        BeanUtils.copyProperties(dept, sysDeptVo);
+        SysDeptVo sysDeptVo = BeanCotyUtils.copyProperties(dept, SysDeptVo.class);
         return success(sysDeptVo);
     }
 
@@ -121,14 +122,15 @@ public class SysDeptController extends BaseController {
      * @param ids 部门ID集合，支持批量删除
      * @return 操作结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
     @PreAuthorize("@ss.hasPermission('system:dept:remove')")
     public AjaxResult<Void> deleteDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {
-        checkParam(ids == null, "部门ID不能为空！");
+        Assert.notEmpty(ids, "部门ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "部门ID必须大于0！");
         boolean result = sysDeptService.deleteDeptById(ids);
         return toAjax(result);
     }

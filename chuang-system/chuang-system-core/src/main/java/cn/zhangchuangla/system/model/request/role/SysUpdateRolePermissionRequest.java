@@ -30,5 +30,5 @@ public class SysUpdateRolePermissionRequest {
      */
     @Schema(description = "分配的菜单ID", example = "[1,2,3]", type = "array", format = "int64", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分配的菜单ID不能为空")
-    private List<Long> selectedMenuId;
+    private List<Long> allocatedMenuId;
 }

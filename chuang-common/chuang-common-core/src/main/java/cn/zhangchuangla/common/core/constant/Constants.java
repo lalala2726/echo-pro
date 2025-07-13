@@ -10,6 +10,7 @@ package cn.zhangchuangla.common.core.constant;
  */
 public class Constants {
 
+
     public static final int TRUE = 1;
     public static final int FALSE = 0;
 
@@ -79,6 +80,13 @@ public class Constants {
         //全部发送
         int SEND_METHOD_ALL = 3;
 
+    }
+
+    public interface SystemStatus {
+        //正常
+        Integer NORMAL = 0;
+        //禁用
+        Integer DISABLE = 1;
     }
 
     /**

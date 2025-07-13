@@ -84,7 +84,7 @@ public class SysLogController extends BaseController {
      * @param id 登录日志ID
      * @return 登录日志详情
      */
-    @GetMapping("/login/{id}")
+    @GetMapping("/login/{id:\\d+}")
     @Operation(summary = "获取登录日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
     public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
@@ -101,7 +101,7 @@ public class SysLogController extends BaseController {
      * @param id 操作日志ID
      * @return 操作日志详情
      */
-    @GetMapping("/operation/{id}")
+    @GetMapping("/operation/{id:\\d+}")
     @Operation(summary = "获取操作日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
     public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
