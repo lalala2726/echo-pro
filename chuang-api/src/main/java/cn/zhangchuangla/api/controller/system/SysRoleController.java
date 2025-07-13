@@ -156,7 +156,7 @@ public class SysRoleController extends BaseController {
      * @param ids 角色ID
      * @return 删除结果
      */
-    @DeleteMapping("/{ids:\\d+}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)

@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.constant.StorageConstants;
@@ -109,13 +110,13 @@ public class SysStorageConfigController extends BaseController {
      * @param id 文件配置ID
      * @return 设置结果
      */
-    @PutMapping("/setMaster/{id}")
+    @PutMapping("/setMaster/{id:\\d+}")
     @Operation(summary = "设置主配置")
     @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> updatePrimaryConfig(@Parameter(description = "文件配置ID")
                                                 @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "文件配置ID不能为空!");
+        Assert.isTrue(id > 0, "文件配置ID必须大于0！");
         boolean result = storageConfigService.updatePrimaryConfig(id);
         // 刷新缓存
         if (result) {
@@ -144,15 +145,14 @@ public class SysStorageConfigController extends BaseController {
      * @param ids 文件配置ID集合，支持批量删除
      * @return 删除结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除文件配置")
     @PreAuthorize("@ss.hasPermission('system:storage-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, saveRequestData = false)
     public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
                                              @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> {
-            checkParam(id == null || id <= 0, "文件配置ID不能为空!");
-        });
+        Assert.notEmpty(ids, "文件配置ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "文件配置ID必须大于0！");
         boolean result = storageConfigService.deleteFileConfig(ids);
         return toAjax(result);
     }

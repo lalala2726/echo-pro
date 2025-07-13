@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictKey;
@@ -73,7 +74,9 @@ public class SysDictController extends BaseController {
     @Operation(summary = "字典类型详情")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public AjaxResult<SysDictKeyVo> getDictKey(@Parameter(description = "字典类型ID") @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "字典类型ID不能为空!");
+        Assert.notNull(id, "部门ID不能为空！");
+        Assert.isTrue(id > 0, "部门ID必须大于0！");
+
         SysDictKey sysDictKey = sysDictKeyService.getDictKeyById(id);
         SysDictKeyVo sysDictKeyVo = new SysDictKeyVo();
         if (sysDictKey != null) {
@@ -120,12 +123,13 @@ public class SysDictController extends BaseController {
      * @param ids 字典类型ID列表
      * @return 删除结果
      */
-    @DeleteMapping("/key/{ids:\\d+}")
-    @Operation(summary = "删除字典类型")
+    @DeleteMapping("/key/{ids:[\\d,]+}")
+    @Operation(summary = "删除字典键")
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
     @OperationLog(title = "字典类型", businessType = BusinessType.DELETE)
-    public AjaxResult<Void> deleteDictKey(@Parameter(description = "字典类型ID列表") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "字典类型ID不能为空!"));
+    public AjaxResult<Void> deleteDictKey(@Parameter(description = "字典键ID列表") @PathVariable("ids") List<Long> ids) {
+        Assert.notEmpty(ids, "字典键ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "字典键ID必须大于0！");
         boolean result = sysDictKeyService.deleteDictKey(ids);
         return toAjax(result);
     }
@@ -201,11 +205,11 @@ public class SysDictController extends BaseController {
      * @param id 字典项ID
      * @return 字典项详情
      */
-    @GetMapping("/value/{id}")
+    @GetMapping("/value/{id:\\d+}")
     @Operation(summary = "字典项详情")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public AjaxResult<SysDictValueVo> getDictValue(@Parameter(description = "字典项ID") @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "字典项ID不能为空!");
+        Assert.isTrue(id > 0, "字典项ID必须大于0！");
         SysDictValue sysDictValue = sysDictValueService.getDictValueById(id);
         SysDictValueVo sysDictValueVo = new SysDictValueVo();
         if (sysDictValue != null) {
@@ -256,12 +260,14 @@ public class SysDictController extends BaseController {
      * @param ids 字典项ID列表
      * @return 删除结果
      */
-    @DeleteMapping("/value/{ids}")
+    @DeleteMapping("/value/{ids:[\\d,]+}")
     @Operation(summary = "删除字典项")
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
     @OperationLog(title = "字典项", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteDictValue(@Parameter(description = "字典项ID列表") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "字典项ID不能为空!"));
+        Assert.notEmpty(ids, "字典值ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "字典值ID必须大于0！");
+
         boolean result = sysDictValueService.deleteDictValue(ids);
         return toAjax(result);
     }

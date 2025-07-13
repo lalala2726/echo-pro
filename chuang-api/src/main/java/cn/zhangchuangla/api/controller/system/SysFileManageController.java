@@ -88,7 +88,7 @@ public class SysFileManageController extends BaseController {
      * @param ids 文件ID集合
      * @return 操作结果
      */
-    @DeleteMapping("/trash/{ids:\\d+}")
+    @DeleteMapping("/trash/{ids:[\\d,]+}")
     @Operation(summary = "删除回收站文件")
     @OperationLog(title = "文件管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermission('system:storage-file:delete')")
@@ -107,7 +107,7 @@ public class SysFileManageController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:storage-file:recover')")
     @Operation(summary = "恢复文件")
-    @PutMapping("/recover/{ids:\\d+}")
+    @PutMapping("/recover/{ids:[\\d,]+}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
     public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("ids") List<Long> ids) {
         boolean result = storageService.restoreFileFromRecycleBin(ids);
@@ -121,7 +121,7 @@ public class SysFileManageController extends BaseController {
      * @param forceDelete 是否永久删除
      * @return 删除结果
      */
-    @DeleteMapping("/{ids:\\d+}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @PreAuthorize("@ss.hasPermission('ststem:file:list')")
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)

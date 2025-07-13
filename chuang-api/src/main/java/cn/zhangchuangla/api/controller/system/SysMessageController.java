@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
@@ -90,7 +91,7 @@ public class SysMessageController extends BaseController {
     @GetMapping("/{id:\\d+}")
     public AjaxResult<SysMessageVo> getSysMessageById(@Parameter(description = "系统消息表ID")
                                                           @PathVariable("id") Long id) {
-        checkParam(id == null, "id不能为空");
+        Assert.isTrue(id > 0, "系统消息表ID必须大于0！");
         SysMessageVo sysMessage = sysMessageService.getSysMessageById(id);
         return success(sysMessage);
     }
@@ -126,10 +127,10 @@ public class SysMessageController extends BaseController {
      */
     @Operation(summary = "删除系统消息表")
     @PreAuthorize("@ss.hasPermission('system.message:remove')")
-    @DeleteMapping("/{ids:\\d+}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteSysMessageByIds(@Parameter(description = "系统消息表ID集合，支持批量删除")
-                                                      @PathVariable("ids") List<Long> ids) {
+                                                  @PathVariable("ids") List<Long> ids) {
         boolean result = sysMessageService.deleteSysMessageByIds(ids);
         return toAjax(result);
     }
