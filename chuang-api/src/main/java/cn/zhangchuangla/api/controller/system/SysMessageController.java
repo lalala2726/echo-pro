@@ -49,7 +49,7 @@ public class SysMessageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system.message:list')")
     @GetMapping("/list")
     public AjaxResult<TableDataResult> listSysMessage(@Parameter(description = "系统消息表列表查询参数")
-                                            @Validated @ParameterObject SysMessageQueryRequest request) {
+                                                          @Validated @ParameterObject SysMessageQueryRequest request) {
         Page<SysMessage> page = sysMessageService.listSysMessage(request);
         List<SysMessageListVo> voList = copyListProperties(page, SysMessageListVo.class);
         return getTableData(page, voList);
@@ -89,7 +89,7 @@ public class SysMessageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system.message:query')")
     @GetMapping("/{id:\\d+}")
     public AjaxResult<SysMessageVo> getSysMessageById(@Parameter(description = "系统消息表ID")
-                                            @PathVariable("id") Long id) {
+                                                          @PathVariable("id") Long id) {
         checkParam(id == null, "id不能为空");
         SysMessageVo sysMessage = sysMessageService.getSysMessageById(id);
         return success(sysMessage);
@@ -103,7 +103,7 @@ public class SysMessageController extends BaseController {
     @PostMapping
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addSysMessage(@Parameter(description = "新增系统消息表请求参数")
-                                @Validated @RequestBody SysMessageAddRequest request) {
+                                              @Validated @RequestBody SysMessageAddRequest request) {
         boolean result = sysMessageService.addSysMessage(request);
         return toAjax(result);
     }
@@ -116,7 +116,7 @@ public class SysMessageController extends BaseController {
     @PutMapping
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateSysMessage(@Parameter(description = "修改系统消息表请求参数")
-                                 @Validated @RequestBody SysMessageUpdateRequest request) {
+                                                 @Validated @RequestBody SysMessageUpdateRequest request) {
         boolean result = sysMessageService.updateSysMessage(request);
         return toAjax(result);
     }
@@ -129,7 +129,7 @@ public class SysMessageController extends BaseController {
     @DeleteMapping("/{ids:\\d+}")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteSysMessageByIds(@Parameter(description = "系统消息表ID集合，支持批量删除")
-                                   @PathVariable("ids") List<Long> ids) {
+                                                      @PathVariable("ids") List<Long> ids) {
         boolean result = sysMessageService.deleteSysMessageByIds(ids);
         return toAjax(result);
     }

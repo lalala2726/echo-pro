@@ -12,11 +12,8 @@ import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
-import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
-import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
+import cn.zhangchuangla.storage.model.request.file.UnifiedStorageConfigRequest;
 import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
 import com.alibaba.fastjson.JSON;
@@ -77,92 +74,31 @@ public class SysStorageConfigController extends BaseController {
     }
 
     /**
-     * 新增Minio配置
+     * 新增存储配置
+     * 支持所有存储类型：MinIO、阿里云OSS、腾讯云COS、亚马逊S3
      *
-     * @param request Minio配置请求参数
+     * @param request 统一存储配置请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增Minio配置")
+    @Operation(summary = "新增存储配置", description = "支持所有存储类型的统一配置接口")
     @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
-    @PostMapping("/add/minio")
+    @PostMapping("/add")
     @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
-    public AjaxResult<Void> addMinioConfig(@Parameter(description = "Minio配置请求参数")
-                                           @Validated @RequestBody MinioConfigRequest request) {
+    public AjaxResult<Void> addStorageConfig(@Parameter(description = "统一存储配置请求参数")
+                                             @Validated @RequestBody UnifiedStorageConfigRequest request) {
         // 去除末尾的斜杠,确保一致性
-        String endpoint = request.getEndpoint();
-        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
+        if (!StrUtils.isEmpty(request.getEndpoint())) {
+            request.setEndpoint(StrUtils.removeTrailingSlash(request.getEndpoint()));
+        }
         if (!StrUtils.isEmpty(request.getFileDomain())) {
             request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
         }
-        boolean result = storageConfigService.addStorageConfig(request);
-
-        return toAjax(result);
-    }
-
-
-    /**
-     * 新增阿里云OSS配置
-     *
-     * @param request 阿里云OSS配置请求参数
-     * @return 操作结果
-     */
-    @Operation(summary = "新增阿里云OSS配置")
-    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
-    @PostMapping("/add/aliyun")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
-    public AjaxResult<Void> addAliyunOssConfig(@Parameter(description = "阿里云OSS配置请求参数")
-                                               @Validated @RequestBody AliyunOSSConfigRequest request) {
-        // 去除末尾的斜杠,确保一致性
-        String endpoint = request.getEndpoint();
-        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
-        if (!StrUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
+        // 对于腾讯云COS，如果region为空，则使用endpoint的值
+        if (request.getStorageType() == cn.zhangchuangla.storage.enums.StorageType.TENCENT_COS
+                && StrUtils.isEmpty(request.getRegion())) {
+            request.setRegion(request.getEndpoint());
         }
-        boolean result = storageConfigService.addStorageConfig(request);
-        return toAjax(result);
-    }
 
-    /**
-     * 新增亚马逊S3存储配置
-     *
-     * @param request 亚马逊S3存储配置请求参数
-     * @return 操作结果
-     */
-    @Operation(summary = "亚马逊S3存储配置")
-    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
-    @PostMapping("/add/s3")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
-    public AjaxResult<Void> addAmazonS3Config(@Parameter(description = "亚马逊S3配置请求参数")
-                                              @Validated @RequestBody AmazonS3ConfigRequest request) {
-        // 去除末尾的斜杠,确保一致性
-        String endpoint = request.getEndpoint();
-        request.setEndpoint(StrUtils.removeTrailingSlash(endpoint));
-        if (!StrUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
-        }
-        boolean result = storageConfigService.addStorageConfig(request);
-        return toAjax(result);
-    }
-
-
-    /**
-     * 新增腾讯云COS配置
-     *
-     * @param request 腾讯云COS配置请求参数
-     * @return 操作结果
-     */
-    @Operation(summary = "新增腾讯云COS配置")
-    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
-    @PostMapping("/add/tencent")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
-    public AjaxResult<Void> saveTencentCosConfig(@Parameter(description = "腾讯云COS配置请求参数")
-                                                 @Validated @RequestBody TencentCOSConfigRequest request) {
-        // 去除末尾的斜杠,确保一致性
-        String endpoint = request.getRegion();
-        request.setRegion(StrUtils.removeTrailingSlash(endpoint));
-        if (!StrUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
-        }
         boolean result = storageConfigService.addStorageConfig(request);
         return toAjax(result);
     }
