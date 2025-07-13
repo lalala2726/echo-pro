@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "系统字典修改请求对象", description = "系统字典修改请求对象")
-public class SysDictTypeUpdateRequest {
+public class SysDictKeyUpdateRequest {
 
     /**
      * 主键ID
@@ -21,10 +21,10 @@ public class SysDictTypeUpdateRequest {
     private Long id;
 
     /**
-     * 字典类型编码
+     * 字典编码
      */
-    @Schema(description = "字典类型编码", example = "sys_user_sex", type = "string")
-    private String dictType;
+    @Schema(description = "字典编码", example = "sys_user_sex", type = "string")
+    private String dictKey;
 
     /**
      * 字典名称

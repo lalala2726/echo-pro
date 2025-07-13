@@ -155,14 +155,14 @@ public class ExcelUtils {
      * @param excelFields Excel字段列表
      */
     private void preloadDictData(List<ExcelField> excelFields) {
-        List<String> dictTypes = excelFields.stream()
-                .map(ExcelField::getDictType)
+        List<String> dictKeys = excelFields.stream()
+                .map(ExcelField::getDictKey)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .collect(Collectors.toList());
 
-        if (CollectionUtils.isNotEmpty(dictTypes)) {
-            dictDataHandler.preloadDictData(dictTypes);
+        if (CollectionUtils.isNotEmpty(dictKeys)) {
+            dictDataHandler.preloadDictData(dictKeys);
         }
     }
 
@@ -303,8 +303,8 @@ public class ExcelUtils {
         String cellValue = convertToString(value, excelField);
 
         // 字典映射
-        if (StringUtils.isNotBlank(excelField.getDictType())) {
-            cellValue = dictDataHandler.getDictLabel(excelField.getDictType(), cellValue);
+        if (StringUtils.isNotBlank(excelField.getDictKey())) {
+            cellValue = dictDataHandler.getDictLabel(excelField.getDictKey(), cellValue);
         }
 
         // 添加后缀

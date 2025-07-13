@@ -1,13 +1,14 @@
 package cn.zhangchuangla.system.loader;
 
+import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.loader.DataLoader;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
-import cn.zhangchuangla.system.model.entity.SysDictItem;
-import cn.zhangchuangla.system.model.entity.SysDictType;
-import cn.zhangchuangla.system.service.SysDictItemService;
-import cn.zhangchuangla.system.service.SysDictTypeService;
+import cn.zhangchuangla.system.model.entity.SysDictKey;
+import cn.zhangchuangla.system.model.entity.SysDictValue;
+import cn.zhangchuangla.system.service.SysDictKeyService;
+import cn.zhangchuangla.system.service.SysDictValueService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +29,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysDictLoader implements DataLoader {
 
-    private final SysDictTypeService sysDictTypeService;
-    private final SysDictItemService sysDictItemService;
+    private final SysDictKeyService sysDictKeyService;
+    private final SysDictValueService sysDictValueService;
     private final RedisCache redisCache;
 
     @Override
@@ -49,12 +50,11 @@ public class SysDictLoader implements DataLoader {
             log.info("开始加载系统字典数据到缓存...");
 
             // 1. 查询所有启用的字典类型
-            LambdaQueryWrapper<SysDictType> dictTypeWrapper = new LambdaQueryWrapper<SysDictType>()
-                    // 0表示启用状态
-                    .eq(SysDictType::getStatus, 0);
-            List<SysDictType> dictTypes = sysDictTypeService.list(dictTypeWrapper);
+            LambdaQueryWrapper<SysDictKey> dictKeyLambdaQueryWrapper = new LambdaQueryWrapper<SysDictKey>()
+                    .eq(SysDictKey::getStatus, Constants.SystemStatus.NORMAL);
+            List<SysDictKey> dictKeys = sysDictKeyService.list(dictKeyLambdaQueryWrapper);
 
-            if (dictTypes.isEmpty()) {
+            if (dictKeys.isEmpty()) {
                 log.info("没有找到启用的字典类型，跳过字典缓存加载");
                 return false;
             }
@@ -63,33 +63,31 @@ public class SysDictLoader implements DataLoader {
             int failCount = 0;
 
             // 2. 为每个字典类型加载字典项到缓存
-            for (SysDictType dictType : dictTypes) {
+            for (SysDictKey dictKey : dictKeys) {
                 try {
                     // 查询该字典类型下所有启用的字典项
-                    LambdaQueryWrapper<SysDictItem> dictItemWrapper = new LambdaQueryWrapper<SysDictItem>()
-                            .eq(SysDictItem::getDictType, dictType.getDictType())
-                            // 0表示启用状态
-                            .eq(SysDictItem::getStatus, 0)
+                    LambdaQueryWrapper<SysDictValue> dictValueWrapper = new LambdaQueryWrapper<SysDictValue>()
+                            .eq(SysDictValue::getDictKey, dictKey.getDictKey())
+                            .eq(SysDictValue::getStatus, Constants.SystemStatus.NORMAL)
                             // 按排序字段升序
-                            .orderByAsc(SysDictItem::getSort);
+                            .orderByAsc(SysDictValue::getSort);
 
-                    List<SysDictItem> dictItems = sysDictItemService.list(dictItemWrapper);
+                    List<SysDictValue> dictValues = sysDictValueService.list(dictValueWrapper);
 
                     // 转换为Option格式
-                    List<Option<String>> options = dictItems.stream()
-                            .map(item -> new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag()))
+                    List<Option<String>> options = dictValues.stream()
+                            .map(item -> new Option<>(item.getValue(), item.getLabel(), item.getTag()))
                             .toList();
 
                     // 3. 将数据放入缓存
-                    String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType.getDictType());
+                    String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictKey.getDictKey());
                     redisCache.setCacheObject(cacheKey, options, RedisConstants.DICT_CACHE_EXPIRE_TIME);
 
                     successCount++;
-                    log.debug("字典类型 [{}] 缓存成功，共 {} 个字典项", dictType.getDictType(), dictItems.size());
 
                 } catch (Exception e) {
                     failCount++;
-                    log.error("字典类型 [{}] 缓存失败: {}", dictType.getDictType(), e.getMessage(), e);
+                    log.error("字典类型 [{}] 缓存失败: {}", dictKey.getDictKey(), e.getMessage(), e);
                 }
             }
 

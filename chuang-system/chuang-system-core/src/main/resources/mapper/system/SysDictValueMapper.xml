@@ -2,13 +2,13 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysDictItemMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictValueMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictItem">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictValue">
         <id property="id" column="id"/>
-        <result property="dictType" column="dict_type"/>
-        <result property="itemLabel" column="item_label"/>
-        <result property="itemValue" column="item_value"/>
+        <result property="dictKey" column="dict_key"/>
+        <result property="label" column="label"/>
+        <result property="value" column="value"/>
         <result property="sort" column="sort"/>
         <result property="tag" column="tag"/>
         <result property="status" column="status"/>
@@ -19,21 +19,21 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
-    <select id="listDictItem" resultMap="BaseResultMap">
+    <select id="listDictValue" resultMap="BaseResultMap">
         SELECT
-        id, dict_type, item_label, item_value, tag, sort, status, create_time, update_time, create_by, update_by, remark
-        FROM sys_dict_item
+        id, dict_key, label, value, tag, sort, status, create_time, update_time, create_by, update_by, remark
+        FROM sys_dict_value
         <where>
-            <if test="request.itemLabel != null and request.itemLabel != ''">
-                AND item_label LIKE CONCAT('%', #{request.itemLabel}, '%')
+            <if test="request.label != null and request.label != ''">
+                AND label LIKE CONCAT('%', #{request.label}, '%')
             </if>
-            <if test="request.itemValue != null and request.itemValue != ''">
-                AND item_value LIKE CONCAT('%', #{request.itemValue}, '%')
+            <if test="request.value != null and request.value != ''">
+                AND `value` LIKE CONCAT('%', #{request.value}, '%')
             </if>
             <if test="request.status != null">
                 AND status = #{request.status}
             </if>
-            and dict_type = #{dictType}
+            and dict_key = #{dictKey}
         </where>
         ORDER BY sort ASC, create_time DESC
     </select>

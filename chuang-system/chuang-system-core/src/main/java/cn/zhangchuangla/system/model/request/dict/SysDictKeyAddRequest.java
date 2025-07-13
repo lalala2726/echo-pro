@@ -10,13 +10,13 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "系统字典添加请求对象", description = "系统字典添加请求对象")
-public class SysDictTypeAddRequest {
+public class SysDictKeyAddRequest {
 
     /**
-     * 字典类型编码
+     * 字典编码
      */
-    @Schema(description = "字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String dictType;
+    @Schema(description = "字典编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String dictKey;
 
     /**
      * 字典名称

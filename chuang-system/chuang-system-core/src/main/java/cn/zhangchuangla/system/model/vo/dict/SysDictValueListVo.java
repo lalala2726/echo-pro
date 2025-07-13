@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @Schema(name = "系统字典项列表视图对象", description = "系统字典项列表视图对象")
-public class SysDictItemListVo {
+public class SysDictValueListVo {
 
     /**
      * 主键ID
@@ -26,7 +26,7 @@ public class SysDictItemListVo {
      * 所属字典类型编码
      */
     @Schema(description = "所属字典类型编码", type = "string")
-    private String dictType;
+    private String dictKey;
 
     /**
      * 字典项名称

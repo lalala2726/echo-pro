@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(name = "系统字典项视图对象", description = "系统字典项视图对象")
-public class SysDictItemVo extends BaseVo {
+public class SysDictValueVo extends BaseVo {
 
     /**
      * 主键ID
@@ -24,10 +24,10 @@ public class SysDictItemVo extends BaseVo {
     private Long id;
 
     /**
-     * 所属字典类型编码
+     * 所属字典键
      */
-    @Schema(description = "所属字典类型编码", type = "string")
-    private String dictType;
+    @Schema(description = "所属字典键", type = "string")
+    private String dictKey;
 
     /**
      * 字典项名称

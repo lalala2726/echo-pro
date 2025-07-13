@@ -50,7 +50,7 @@ public interface RedisConstants {
     String DICT_CACHE = "dict:cache:";
 
     /**
-     * 字典项缓存Key格式: dict:cache:dictType
+     * 字典项缓存Key格式: dict:cache:dictKey
      */
     String DICT_ITEMS_KEY = DICT_CACHE + "%s";
 

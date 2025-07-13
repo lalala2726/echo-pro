@@ -10,25 +10,25 @@ import lombok.Data;
  */
 @Data
 @Schema(name = "系统字典项添加请求对象", description = "系统字典项添加请求对象")
-public class SysDictItemAddRequest {
+public class SysDictValueAddRequest {
 
     /**
      * 所属字典类型编码
      */
     @Schema(description = "所属字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String dictType;
+    private String dictKey;
 
     /**
      * 字典项名称
      */
     @Schema(description = "字典项名称", example = "启用", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String itemLabel;
+    private String label;
 
     /**
      * 字典项值
      */
     @Schema(description = "字典项值", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String itemValue;
+    private String value;
 
     /**
      * 排序值
