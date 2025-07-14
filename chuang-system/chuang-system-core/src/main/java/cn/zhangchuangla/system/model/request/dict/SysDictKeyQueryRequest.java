@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * 系统字典列表请求对象
@@ -47,13 +47,13 @@ public class SysDictKeyQueryRequest extends BasePageRequest {
      */
     @Schema(description = "开始时间", example = "2023-01-01 00:00:00", type = "string")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startTime;
+    private LocalDate startTime;
 
     /**
      * 结束时间
      */
     @Schema(description = "结束时间", example = "2023-01-01 23:59:59", type = "string")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endTime;
+    private LocalDate endTime;
 
 }
