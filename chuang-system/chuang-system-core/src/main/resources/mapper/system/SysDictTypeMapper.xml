@@ -2,11 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysDictKeyMapper">
+<mapper namespace="cn.zhangchuangla.system.mapper.SysDictTypeMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictKey">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysDictType">
         <id property="id" column="id"/>
-        <result property="dictKey" column="dict_key"/>
+        <result property="dictType" column="dict_type"/>
         <result property="dictName" column="dict_name"/>
         <result property="status" column="status"/>
         <result property="remark" column="remark"/>
@@ -16,38 +16,38 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <select id="listDictKey" resultMap="BaseResultMap">
+    <select id="listDictType" resultMap="BaseResultMap">
         SELECT
         id,
-        dict_key,
+        dict_type,
         dict_name,
         status,
+        remark,
         create_time,
         update_time,
         create_by,
-        update_by,
-        remark
-        FROM sys_dict_key
+        update_by
+        FROM sys_dict_type
         <where>
             <if test="request != null">
-                <if test="request.dictKey != null and request.dictKey != ''">
-                    AND dict_key LIKE CONCAT('%', #{request.dictKey}, '%')
+                <if test="request.dictType != null and request.dictType != ''">
+                    AND dict_type LIKE CONCAT('%', #{request.dictType}, '%')
                 </if>
                 <if test="request.dictName != null and request.dictName != ''">
                     AND dict_name LIKE CONCAT('%', #{request.dictName}, '%')
                 </if>
                 <if test="request.status != null">
-                    AND `status` = #{request.status}
+                    AND status = #{request.status}
                 </if>
                 <if test="request.startTime != null">
-                    and date(create_time) >= #{request.startTime}
+                    AND date(create_time) >= #{request.startTime}
                 </if>
                 <if test="request.endTime != null">
-                    and date(create_time) &lt;= #{request.endTime}
+                    AND date(create_time) &lt;= #{request.endTime}
                 </if>
             </if>
         </where>
         ORDER BY create_time DESC
     </select>
 
-</mapper>
+</mapper> 

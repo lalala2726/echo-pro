@@ -9,14 +9,14 @@ import lombok.EqualsAndHashCode;
 import java.time.LocalDate;
 
 /**
- * 系统字典列表请求对象
+ * 字典数据查询请求对象
  *
  * @author Chuang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Schema(name = "系统字典列表请求对象", description = "系统字典列表请求对象")
-public class SysDictKeyQueryRequest extends BasePageRequest {
+@Schema(name = "字典数据查询请求对象", description = "字典数据查询请求对象")
+public class SysDictDataQueryRequest extends BasePageRequest {
 
     /**
      * 主键ID
@@ -25,35 +25,34 @@ public class SysDictKeyQueryRequest extends BasePageRequest {
     private Long id;
 
     /**
-     * 字典编码
+     * 字典标签
      */
-    @Schema(description = "字典编码", example = "user_status", type = "string")
-    private String dictKey;
+    @Schema(description = "字典标签", example = "启用", type = "string")
+    private String dictLabel;
 
     /**
-     * 字典名称
+     * 字典值
      */
-    @Schema(description = "字典名称", example = "用户状态", type = "string")
-    private String dictName;
+    @Schema(description = "字典值", example = "0", type = "string")
+    private String dictValue;
 
     /**
-     * 状态：0启用，1禁用
+     * 状态：1启用，0禁用
      */
-    @Schema(description = "状态：0启用，1禁用", example = "0", type = "string")
+    @Schema(description = "状态：1启用，0禁用", example = "1", type = "integer")
     private Integer status;
 
     /**
      * 开始时间
      */
-    @Schema(description = "开始时间", example = "2023-01-01 00:00:00", type = "string")
+    @Schema(description = "开始时间", example = "2023-01-01", type = "string")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate startTime;
 
     /**
      * 结束时间
      */
-    @Schema(description = "结束时间", example = "2023-01-01 23:59:59", type = "string")
+    @Schema(description = "结束时间", example = "2023-12-31", type = "string")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate endTime;
-
-}
+} 
