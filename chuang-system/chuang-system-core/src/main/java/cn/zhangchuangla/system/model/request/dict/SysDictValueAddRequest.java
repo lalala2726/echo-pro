@@ -13,9 +13,9 @@ import lombok.Data;
 public class SysDictValueAddRequest {
 
     /**
-     * 所属字典类型编码
+     * 所属字典键
      */
-    @Schema(description = "所属字典类型编码", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "所属字典键", example = "user_status", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictKey;
 
     /**

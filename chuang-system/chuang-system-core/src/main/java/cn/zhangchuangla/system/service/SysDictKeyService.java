@@ -75,9 +75,9 @@ public interface SysDictKeyService extends IService<SysDictKey> {
     boolean refreshCache();
 
     /**
-     * 获取所有字典类型
+     * 获取所有字典键
      *
-     * @return 字典类型列表
+     * @return 字典键列表
      */
     List<Option<String>> getAllDictKey();
 }

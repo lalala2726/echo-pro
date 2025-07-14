@@ -41,22 +41,22 @@ import java.util.List;
 @RequestMapping("/system/dict")
 @RequiredArgsConstructor
 @RestController
-@Tag(name = "字典管理", description = "提供字典类型与字典项的增删改查、缓存刷新等相关接口。")
+@Tag(name = "字典管理", description = "提供字典键与字典项的增删改查、缓存刷新等相关接口。")
 public class SysDictController extends BaseController {
 
     private final SysDictKeyService sysDictKeyService;
     private final SysDictValueService sysDictValueService;
 
     /**
-     * 获取字典类型列表
+     * 获取字典键列表
      *
-     * @param request 字典类型列表查询参数
-     * @return 字典类型列表
+     * @param request 字典键列表查询参数
+     * @return 字典键列表
      */
     @GetMapping("/key/list")
-    @Operation(summary = "字典类型列表")
+    @Operation(summary = "字典键列表")
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    public AjaxResult<TableDataResult> listDictKey(@Parameter(description = "字典类型列表查询参数")
+    public AjaxResult<TableDataResult> listDictKey(@Parameter(description = "字典键列表查询参数")
                                                    @Validated @ParameterObject SysDictKeyQueryRequest request) {
         Page<SysDictKey> page = new Page<>(request.getPageNum(), request.getPageSize());
         Page<SysDictKey> sysDictKeyPage = sysDictKeyService.listDictKey(page, request);
@@ -65,15 +65,15 @@ public class SysDictController extends BaseController {
     }
 
     /**
-     * 获取字典类型详情
+     * 获取字典键详情
      *
-     * @param id 字典类型ID
-     * @return 字典类型详情
+     * @param id 字典键ID
+     * @return 字典键详情
      */
     @GetMapping("/key/{id:\\d+}")
-    @Operation(summary = "字典类型详情")
+    @Operation(summary = "字典键详情")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
-    public AjaxResult<SysDictKeyVo> getDictKey(@Parameter(description = "字典类型ID") @PathVariable("id") Long id) {
+    public AjaxResult<SysDictKeyVo> getDictKey(@Parameter(description = "字典键ID") @PathVariable("id") Long id) {
         Assert.notNull(id, "部门ID不能为空！");
         Assert.isTrue(id > 0, "部门ID必须大于0！");
 
@@ -86,47 +86,47 @@ public class SysDictController extends BaseController {
     }
 
     /**
-     * 添加字典类型
+     * 添加字典键
      *
-     * @param request 字典类型添加请求参数
+     * @param request 字典键添加请求参数
      * @return 添加结果
      */
     @PostMapping("/key")
-    @Operation(summary = "添加字典类型")
+    @Operation(summary = "添加字典键")
     @PreAuthorize("@ss.hasPermission('system:dict:add')")
-    @OperationLog(title = "字典类型", businessType = BusinessType.INSERT)
-    public AjaxResult<Void> addDictKey(@Parameter(description = "字典类型添加请求参数")
+    @OperationLog(title = "字典键", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> addDictKey(@Parameter(description = "字典键添加请求参数")
                                        @Validated @RequestBody SysDictKeyAddRequest request) {
         boolean result = sysDictKeyService.addDictKey(request);
         return toAjax(result);
     }
 
     /**
-     * 修改字典类型
+     * 修改字典键
      *
-     * @param request 字典类型修改请求参数
+     * @param request 字典键修改请求参数
      * @return 修改结果
      */
     @PutMapping("/key")
-    @Operation(summary = "修改字典类型")
+    @Operation(summary = "修改字典键")
     @PreAuthorize("@ss.hasPermission('system:dict:edit')")
-    @OperationLog(title = "字典类型", businessType = BusinessType.UPDATE)
-    public AjaxResult<Void> updateDictKey(@Parameter(description = "字典类型修改请求参数")
+    @OperationLog(title = "字典键", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> updateDictKey(@Parameter(description = "字典键修改请求参数")
                                           @Validated @RequestBody SysDictKeyUpdateRequest request) {
         boolean result = sysDictKeyService.updateDictKey(request);
         return toAjax(result);
     }
 
     /**
-     * 删除字典类型
+     * 删除字典键
      *
-     * @param ids 字典类型ID列表
+     * @param ids 字典键ID列表
      * @return 删除结果
      */
     @DeleteMapping("/key/{ids:[\\d,]+}")
     @Operation(summary = "删除字典键")
     @PreAuthorize("@ss.hasPermission('system:dict:remove')")
-    @OperationLog(title = "字典类型", businessType = BusinessType.DELETE)
+    @OperationLog(title = "字典键", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteDictKey(@Parameter(description = "字典键ID列表") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "字典键ID不能为空！");
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "字典键ID必须大于0！");
@@ -135,12 +135,12 @@ public class SysDictController extends BaseController {
     }
 
     /**
-     * 获取所有字典类型
+     * 获取所有字典键
      *
-     * @return 所有字典类型
+     * @return 所有字典键
      */
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
-    @Operation(summary = "获取所有字典类型")
+    @Operation(summary = "获取所有字典键")
     @GetMapping("/key/options")
     public AjaxResult<List<Option<String>>> getAllDictKey() {
         List<Option<String>> options = sysDictKeyService.getAllDictKey();
@@ -152,7 +152,7 @@ public class SysDictController extends BaseController {
      *
      * @return 操作结果
      */
-    @OperationLog(title = "字典类型", businessType = BusinessType.REFRESH)
+    @OperationLog(title = "字典键", businessType = BusinessType.REFRESH)
     @Operation(summary = "刷新字典缓存")
     @PreAuthorize("@ss.hasPermission('system:dict:refreshCache')")
     @PostMapping("/refreshCache")
@@ -185,14 +185,14 @@ public class SysDictController extends BaseController {
     /**
      * 获取字典项选项
      *
-     * @param dictKey 字典类型编码
+     * @param dictKey 字典键
      * @return 字典项选项
      */
     @GetMapping("/value/option/{dictKey}")
     @Operation(summary = "字典项选项")
     public AjaxResult<List<Option<String>>> getDictValueOption(@PathVariable("dictKey") String dictKey) {
         if (StrUtils.isBlank(dictKey)) {
-            return error("字典类型编码不能为空!");
+            return error("字典键不能为空!");
         }
         List<Option<String>> options = sysDictValueService.getDictValueOption(dictKey);
         return success(options);
@@ -230,9 +230,9 @@ public class SysDictController extends BaseController {
     @OperationLog(title = "字典项", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addDictValue(@Parameter(description = "字典项添加请求参数")
                                          @Validated @RequestBody SysDictValueAddRequest request) {
-        // 检查字典类型是否存在
+        // 检查字典键是否存在
         if (!sysDictKeyService.isDictKeyExist(request.getDictKey())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictKey());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典键不存在: " + request.getDictKey());
         }
         boolean result = sysDictValueService.addDictValue(request);
         return toAjax(result);

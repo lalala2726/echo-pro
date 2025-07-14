@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典类型表
+ * 系统字典键表
  *
  * @author Chuang
  */
@@ -24,7 +24,7 @@ public class SysDictKey extends BaseEntity {
     private Long id;
 
     /**
-     * 字典类型编码
+     * 字典键
      */
     private String dictKey;
 

@@ -42,7 +42,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     private final RedisCache redisCache;
 
     /**
-     * 获取字典类型列表
+     * 获取字典键列表
      *
      * @param page    分页
      * @param request 请求
@@ -54,10 +54,10 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 根据id获取字典类型
+     * 根据id获取字典键
      *
      * @param id id
-     * @return 字典类型
+     * @return 字典键
      */
     @Override
     public SysDictKey getDictKeyById(Long id) {
@@ -65,7 +65,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 添加字典类型
+     * 添加字典键
      *
      * @param request 请求
      * @return 是否添加成功
@@ -73,7 +73,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     @Override
     public boolean addDictKey(SysDictKeyAddRequest request) {
         if (isDictKeyExist(request.getDictKey())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictKey());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典键已存在: " + request.getDictKey());
         }
         SysDictKey sysDictKey = new SysDictKey();
         BeanUtils.copyProperties(request, sysDictKey);
@@ -82,7 +82,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 更新字典类型
+     * 更新字典键
      *
      * @param request 请求
      * @return 是否更新成功
@@ -94,7 +94,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
                 .eq(SysDictKey::getDictKey, request.getDictKey())
                 .ne(SysDictKey::getId, request.getId());
         if (count(ne) > 0) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictKey());
+            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典键已存在: " + request.getDictKey());
         }
         SysDictKey sysDictKey = new SysDictKey();
         BeanUtils.copyProperties(request, sysDictKey);
@@ -103,7 +103,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 删除字典类型
+     * 删除字典键
      *
      * @param ids id列表
      * @return 是否删除成功
@@ -133,9 +133,9 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 判断字典类型是否存在
+     * 判断字典键是否存在
      *
-     * @param dictKey 字典类型
+     * @param dictKey 字典键
      * @return true存在，false不存在
      */
     @Override
@@ -170,17 +170,17 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
             List<SysDictKey> dictKeys = list(dictKeyWrapper);
 
             if (dictKeys.isEmpty()) {
-                log.info("没有找到启用的字典类型");
+                log.info("没有找到启用的字典键");
                 return true;
             }
 
             int successCount = 0;
             int failCount = 0;
 
-            // 3. 为每个字典类型加载字典项到缓存
+            // 3. 为每个字典键加载字典项到缓存
             for (SysDictKey dictKey : dictKeys) {
                 try {
-                    // 查询该字典类型下所有启用的字典项
+                    // 查询该字典键下所有启用的字典项
                     LambdaQueryWrapper<SysDictValue> dictValueWrapper = new LambdaQueryWrapper<SysDictValue>()
                             .eq(SysDictValue::getDictKey, dictKey.getDictKey())
                             .eq(SysDictValue::getStatus, Constants.SystemStatus.NORMAL)
@@ -201,7 +201,7 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
 
                 } catch (Exception e) {
                     failCount++;
-                    log.error("字典类型 [{}] 缓存刷新失败: {}", dictKey.getDictKey(), e.getMessage(), e);
+                    log.error("字典键 [{}] 缓存刷新失败: {}", dictKey.getDictKey(), e.getMessage(), e);
                 }
             }
 
@@ -216,9 +216,9 @@ public class SysDictKeyServiceImpl extends ServiceImpl<SysDictKeyMapper, SysDict
     }
 
     /**
-     * 获取所有字典类型
+     * 获取所有字典键
      *
-     * @return 字典类型列表
+     * @return 字典键列表
      */
     @Override
     public List<Option<String>> getAllDictKey() {

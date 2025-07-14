@@ -49,23 +49,23 @@ public class SysDictLoader implements DataLoader {
         try {
             log.info("开始加载系统字典数据到缓存...");
 
-            // 1. 查询所有启用的字典类型
+            // 1. 查询所有启用的字典键
             LambdaQueryWrapper<SysDictKey> dictKeyLambdaQueryWrapper = new LambdaQueryWrapper<SysDictKey>()
                     .eq(SysDictKey::getStatus, Constants.SystemStatus.NORMAL);
             List<SysDictKey> dictKeys = sysDictKeyService.list(dictKeyLambdaQueryWrapper);
 
             if (dictKeys.isEmpty()) {
-                log.info("没有找到启用的字典类型，跳过字典缓存加载");
+                log.info("没有找到启用的字典键，跳过字典缓存加载");
                 return false;
             }
 
             int successCount = 0;
             int failCount = 0;
 
-            // 2. 为每个字典类型加载字典项到缓存
+            // 2. 为每个字典键加载字典项到缓存
             for (SysDictKey dictKey : dictKeys) {
                 try {
-                    // 查询该字典类型下所有启用的字典项
+                    // 查询该字典键下所有启用的字典项
                     LambdaQueryWrapper<SysDictValue> dictValueWrapper = new LambdaQueryWrapper<SysDictValue>()
                             .eq(SysDictValue::getDictKey, dictKey.getDictKey())
                             .eq(SysDictValue::getStatus, Constants.SystemStatus.NORMAL)
@@ -87,7 +87,7 @@ public class SysDictLoader implements DataLoader {
 
                 } catch (Exception e) {
                     failCount++;
-                    log.error("字典类型 [{}] 缓存失败: {}", dictKey.getDictKey(), e.getMessage(), e);
+                    log.error("字典键 [{}] 缓存失败: {}", dictKey.getDictKey(), e.getMessage(), e);
                 }
             }
 

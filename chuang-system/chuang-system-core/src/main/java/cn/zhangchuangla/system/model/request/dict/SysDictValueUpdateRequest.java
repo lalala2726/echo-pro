@@ -19,9 +19,9 @@ public class SysDictValueUpdateRequest {
     private Long id;
 
     /**
-     * 所属字典类型编码
+     * 所属字典键
      */
-    @Schema(description = "所属字典类型编码", example = "sys_user_sex", type = "string")
+    @Schema(description = "所属字典键", example = "sys_user_sex", type = "string")
     private String dictKey;
 
     /**

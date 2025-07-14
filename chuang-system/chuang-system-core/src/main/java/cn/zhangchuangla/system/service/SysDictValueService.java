@@ -59,17 +59,17 @@ public interface SysDictValueService extends IService<SysDictValue> {
     boolean deleteDictValue(List<Long> ids);
 
     /**
-     * 根据字典类型编码删除字典项
+     * 根据字典键删除字典项
      *
-     * @param dictKeys 字典类型编码列表
+     * @param dictKeys 字典键列表
      */
     void deleteDictValueByDictKey(List<String> dictKeys);
 
 
     /**
-     * 检查同一字典类型下字典项值是否重复
+     * 检查同一字典键下字典项值是否重复
      *
-     * @param dictKey   字典类型编码
+     * @param dictKey   字典键
      * @param itemValue 字典项值
      * @param itemId    字典项ID (更新时排除自身)
      * @return true 重复, false 不重复
@@ -77,9 +77,9 @@ public interface SysDictValueService extends IService<SysDictValue> {
     boolean isDictValueExistByValue(String dictKey, String itemValue, Long itemId);
 
     /**
-     * 根据字典类型编码获取字典项列表
+     * 根据字典键获取字典项列表
      *
-     * @param dictKey 字典类型编码
+     * @param dictKey 字典键
      * @return 字典项列表
      */
     List<Option<String>> getDictValueOption(String dictKey);

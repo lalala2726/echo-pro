@@ -34,9 +34,9 @@ public class DictDataHandler {
     //fixme 审查这边的代码
 
     /**
-     * 根据字典类型和字典值获取字典标签
+     * 根据字典键和字典值获取字典标签
      *
-     * @param dictKey   字典类型
+     * @param dictKey   字典键
      * @param dictValue 字典值
      * @return 字典标签，如果未找到则返回原值
      */
@@ -71,7 +71,7 @@ public class DictDataHandler {
     /**
      * 从Redis加载字典数据
      *
-     * @param dictKey 字典类型
+     * @param dictKey 字典键
      * @return 字典值到标签的映射
      */
     private Map<String, String> loadDictFromRedis(String dictKey) {

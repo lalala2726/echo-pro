@@ -12,11 +12,11 @@ import org.apache.ibatis.annotations.Param;
 public interface SysDictKeyMapper extends BaseMapper<SysDictKey> {
 
     /**
-     * 查询字典类型列表
+     * 查询字典键列表
      *
      * @param sysDictKeyPage 分页对象
      * @param request        查询参数
-     * @return 字典类型列表
+     * @return 字典键列表
      */
     Page<SysDictKey> listDictKey(Page<SysDictKey> sysDictKeyPage, @Param("request") SysDictKeyQueryRequest request);
 }

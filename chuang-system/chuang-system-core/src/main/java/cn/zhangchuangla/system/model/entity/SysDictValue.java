@@ -24,7 +24,7 @@ public class SysDictValue extends BaseEntity {
     private Long id;
 
     /**
-     * 所属字典类型编码
+     * 所属字典键
      */
     private String dictKey;
 

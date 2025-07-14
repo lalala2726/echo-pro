@@ -39,6 +39,12 @@
                 <if test="request.status != null">
                     AND `status` = #{request.status}
                 </if>
+                <if test="request.startTime != null">
+                    and date(create_time) >= #{request.startTime}
+                </if>
+                <if test="request.endTime != null">
+                    and date(create_time) &lt;= #{request.endTime}
+                </if>
             </if>
         </where>
         ORDER BY create_time DESC
