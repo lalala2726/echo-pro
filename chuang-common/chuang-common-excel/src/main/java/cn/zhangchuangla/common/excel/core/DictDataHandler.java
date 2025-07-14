@@ -60,10 +60,10 @@ public class DictDataHandler {
                 return dictMap.get(dictValue);
             }
 
-            log.debug("未找到字典项: dictKey={}, dictValue={}", dictKey, dictValue);
+            log.debug("未找到字典数据: dictType={}, dictValue={}", dictKey, dictValue);
             return dictValue;
         } catch (Exception e) {
-            log.error("获取字典标签失败: dictKey={}, dictValue={}", dictKey, dictValue, e);
+            log.error("获取字典标签失败: dictType={}, dictValue={}", dictKey, dictValue, e);
             return dictValue;
         }
     }
@@ -76,11 +76,11 @@ public class DictDataHandler {
      */
     private Map<String, String> loadDictFromRedis(String dictKey) {
         try {
-            String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictKey);
+            String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictKey);
             List<Option<String>> dictValues = redisCache.getCacheObject(cacheKey);
 
             if (dictValues == null || dictValues.isEmpty()) {
-                log.debug("Redis中未找到字典数据: dictKey={}", dictKey);
+                log.debug("Redis中未找到字典数据: dictType={}", dictKey);
                 return null;
             }
 
@@ -91,10 +91,10 @@ public class DictDataHandler {
                 }
             }
 
-            log.debug("从Redis加载字典数据成功: dictKey={}, size={}", dictKey, dictMap.size());
+            log.debug("从Redis加载字典数据成功: dictType={}, size={}", dictKey, dictMap.size());
             return dictMap;
         } catch (Exception e) {
-            log.error("从Redis加载字典数据失败: dictKey={}", dictKey, e);
+            log.error("从Redis加载字典数据失败: dictType={}", dictKey, e);
             return null;
         }
     }
@@ -102,7 +102,7 @@ public class DictDataHandler {
     /**
      * 预加载字典数据到本地缓存
      *
-     * @param dictKeys 字典键列表
+     * @param dictKeys 字典类型列表
      */
     public void preloadDictData(List<String> dictKeys) {
         if (dictKeys == null || dictKeys.isEmpty()) {

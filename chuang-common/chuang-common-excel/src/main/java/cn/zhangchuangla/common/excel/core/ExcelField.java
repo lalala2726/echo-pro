@@ -56,7 +56,7 @@ public class ExcelField {
     private Excel.Align align;
 
     /**
-     * 字典类型
+     * 字典键
      */
     private String dictKey;
 

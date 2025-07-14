@@ -8,49 +8,48 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典项表
+ * 字典数据实体类
  *
  * @author Chuang
  */
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_dict_value")
 @Data
-public class SysDictValue extends BaseEntity {
+@EqualsAndHashCode(callSuper = false)
+@TableName("sys_dict_data")
+public class SysDictData extends BaseEntity {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 所属字典类型编码
+     * 字典类型（关联字典类型表dict_type）
      */
-    private String dictKey;
+    private String dictType;
 
     /**
-     * 字典项名称
+     * 字典标签（中文显示）
      */
-    private String label;
+    private String dictLabel;
 
     /**
-     * 字典项值
+     * 字典值（业务使用的值）
      */
-    private String value;
+    private String dictValue;
 
     /**
-     * 回显样式
+     * 是否默认（1=是，0=否）
      */
-    private String tag;
+    private Integer isDefault;
 
     /**
-     * 排序值
+     * 排序（越小越前）
      */
     private Integer sort;
 
     /**
-     * 状态：0启用，1禁用
+     * 状态（1=启用，0=禁用）
      */
     private Integer status;
-
 }

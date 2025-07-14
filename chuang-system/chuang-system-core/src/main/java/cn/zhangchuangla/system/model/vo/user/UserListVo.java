@@ -2,8 +2,6 @@ package cn.zhangchuangla.system.model.vo.user;
 
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -94,7 +92,6 @@ public class UserListVo {
      * 状态
      */
     @Schema(description = "状态")
-    @JsonSerialize(using = ToStringSerializer.class)
     @Excel(name = "状态", sort = 11, width = 10)
     private Integer status;
 

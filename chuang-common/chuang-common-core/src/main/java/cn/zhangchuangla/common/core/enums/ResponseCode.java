@@ -86,7 +86,7 @@ public enum ResponseCode {
 
     // region 字典相关错误状态
     DICT_NAME_EXIST(409, "字典名称已存在"),
-    DICT_TYPE_EXIST(409, "字典类型已存在"),
+    DICT_TYPE_EXIST(409, "字典键已存在"),
     DICT_NAME_ERROR(400, "只能是英文数字和下划线"),
     // endregion
 

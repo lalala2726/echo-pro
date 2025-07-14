@@ -8,25 +8,25 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典类型表
+ * 字典类型实体类
  *
  * @author Chuang
  */
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_dict_key")
 @Data
-public class SysDictKey extends BaseEntity {
+@EqualsAndHashCode(callSuper = false)
+@TableName("sys_dict_type")
+public class SysDictType extends BaseEntity {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 字典类型编码
+     * 字典类型（唯一）
      */
-    private String dictKey;
+    private String dictType;
 
     /**
      * 字典名称
@@ -34,7 +34,7 @@ public class SysDictKey extends BaseEntity {
     private String dictName;
 
     /**
-     * 状态：0启用，1禁用
+     * 状态（0=启用，1=禁用）
      */
     private Integer status;
 

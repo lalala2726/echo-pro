@@ -45,19 +45,24 @@ public interface RedisConstants {
     String ACCESS_LIMIT_CUSTOM = ACCESS_LIMIT_PREFIX + "custom:";
 
     /**
-     * 字典缓存前缀
+     * 字典模块缓存接口
      */
-    String DICT_CACHE = "dict:cache:";
+    interface Dict {
+        /**
+         * 字典缓存前缀
+         */
+        String DICT_CACHE_PREFIX = "system:dict:data:";
 
-    /**
-     * 字典项缓存Key格式: dict:cache:dictKey
-     */
-    String DICT_ITEMS_KEY = DICT_CACHE + "%s";
+        /**
+         * 字典数据缓存Key格式: system:dict:data:{dictType}
+         */
+        String DICT_DATA_KEY = DICT_CACHE_PREFIX + "%s";
 
-    /**
-     * 字典缓存过期时间（秒）- 24小时
-     */
-    int DICT_CACHE_EXPIRE_TIME = 24 * 60 * 60;
+        /**
+         * 字典缓存过期时间（秒）- 24小时
+         */
+        int DICT_CACHE_EXPIRE_TIME = 24 * 60 * 60;
+    }
 
     /**
      * access-token-expire-time: 7200
