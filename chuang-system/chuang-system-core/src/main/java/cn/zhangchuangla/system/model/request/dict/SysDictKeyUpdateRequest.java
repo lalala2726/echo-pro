@@ -1,7 +1,5 @@
 package cn.zhangchuangla.system.model.request.dict;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -36,7 +34,6 @@ public class SysDictKeyUpdateRequest {
      * 状态：0启用，1禁用
      */
     @Schema(description = "状态：0启用，1禁用", example = "0", type = "string")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

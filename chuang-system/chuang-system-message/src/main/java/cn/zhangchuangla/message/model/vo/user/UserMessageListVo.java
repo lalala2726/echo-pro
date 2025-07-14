@@ -1,7 +1,5 @@
 package cn.zhangchuangla.message.model.vo.user;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -32,14 +30,12 @@ public class UserMessageListVo {
      * 消息类型
      */
     @Schema(description = "消息类型")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer type;
 
     /**
      * 消息级别
      */
     @Schema(description = "消息级别")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer level;
 
     /**
