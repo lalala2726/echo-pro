@@ -45,12 +45,12 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     /**
      * 分页查询字典类型列表
      *
-     * @param page    分页对象
      * @param request 查询条件
      * @return 字典类型分页列表
      */
     @Override
-    public Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request) {
+    public Page<SysDictType> listDictType(SysDictTypeQueryRequest request) {
+        Page<SysDictType> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysDictTypeMapper.listDictType(page, request);
     }
 

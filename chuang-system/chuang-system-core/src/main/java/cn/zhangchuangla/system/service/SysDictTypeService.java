@@ -20,11 +20,10 @@ public interface SysDictTypeService extends IService<SysDictType> {
     /**
      * 分页查询字典类型列表
      *
-     * @param page    分页对象
      * @param request 查询条件
      * @return 字典类型分页列表
      */
-    Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request);
+    Page<SysDictType> listDictType(SysDictTypeQueryRequest request);
 
     /**
      * 根据ID获取字典类型
@@ -79,4 +78,4 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return 是否刷新成功
      */
     boolean refreshCache();
-} 
+}

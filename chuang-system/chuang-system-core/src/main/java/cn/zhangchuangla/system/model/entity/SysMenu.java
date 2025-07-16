@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 菜单表
  *
@@ -133,10 +131,5 @@ public class SysMenu extends BaseEntity {
      * 排序
      */
     private Integer sort;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
 }

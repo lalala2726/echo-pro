@@ -62,8 +62,7 @@ public class SysDictDataController extends BaseController {
         if (StrUtils.isBlank(dictType)) {
             return error("字典类型不能为空!");
         }
-        Page<SysDictData> page = new Page<>(request.getPageNum(), request.getPageSize());
-        Page<SysDictData> sysDictDataPage = sysDictDataService.listDictData(page, dictType, request);
+        Page<SysDictData> sysDictDataPage = sysDictDataService.listDictData(dictType, request);
         List<SysDictDataVo> dictDataVos = copyListProperties(sysDictDataPage, SysDictDataVo.class);
         return getTableData(sysDictDataPage, dictDataVos);
     }
@@ -156,4 +155,4 @@ public class SysDictDataController extends BaseController {
         boolean result = sysDictDataService.deleteDictData(ids);
         return toAjax(result);
     }
-} 
+}
