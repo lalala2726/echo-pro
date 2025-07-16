@@ -20,12 +20,11 @@ public interface SysDictDataService extends IService<SysDictData> {
     /**
      * 分页查询字典数据列表
      *
-     * @param page     分页对象
      * @param dictType 字典类型
      * @param request  查询条件
      * @return 字典数据分页列表
      */
-    Page<SysDictData> listDictData(Page<SysDictData> page, String dictType, SysDictDataQueryRequest request);
+    Page<SysDictData> listDictData(String dictType, SysDictDataQueryRequest request);
 
     /**
      * 根据ID获取字典数据
@@ -83,4 +82,4 @@ public interface SysDictDataService extends IService<SysDictData> {
      * @return 是否存在
      */
     boolean isDictDataExistByValue(String dictType, String dictValue, Long dataId);
-} 
+}

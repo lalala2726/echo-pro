@@ -42,13 +42,13 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     /**
      * 分页查询字典数据列表
      *
-     * @param page     分页对象
      * @param dictType 字典类型
      * @param request  查询条件
      * @return 字典数据分页列表
      */
     @Override
-    public Page<SysDictData> listDictData(Page<SysDictData> page, String dictType, SysDictDataQueryRequest request) {
+    public Page<SysDictData> listDictData(String dictType, SysDictDataQueryRequest request) {
+        Page<SysDictData> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysDictDataMapper.listDictData(page, dictType, request);
     }
 

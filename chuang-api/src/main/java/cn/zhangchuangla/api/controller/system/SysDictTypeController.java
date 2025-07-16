@@ -52,8 +52,7 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:dict:list')")
     public AjaxResult<TableDataResult> listDictType(@Parameter(description = "字典类型列表查询参数")
                                                     @Validated @ParameterObject SysDictTypeQueryRequest request) {
-        Page<SysDictType> page = new Page<>(request.getPageNum(), request.getPageSize());
-        Page<SysDictType> sysDictTypePage = sysDictTypeService.listDictType(page, request);
+        Page<SysDictType> sysDictTypePage = sysDictTypeService.listDictType(request);
         List<SysDictTypeVo> sysDictTypeVos = copyListProperties(sysDictTypePage, SysDictTypeVo.class);
         return getTableData(sysDictTypePage, sysDictTypeVos);
     }
@@ -70,7 +69,6 @@ public class SysDictTypeController extends BaseController {
     public AjaxResult<SysDictTypeVo> getDictType(@Parameter(description = "字典类型ID") @PathVariable("id") Long id) {
         Assert.notNull(id, "字典类型ID不能为空！");
         Assert.isTrue(id > 0, "字典类型ID必须大于0！");
-
         SysDictType sysDictType = sysDictTypeService.getDictTypeById(id);
         SysDictTypeVo sysDictTypeVo = new SysDictTypeVo();
         if (sysDictType != null) {
@@ -154,4 +152,4 @@ public class SysDictTypeController extends BaseController {
         boolean result = sysDictTypeService.refreshCache();
         return toAjax(result);
     }
-} 
+}

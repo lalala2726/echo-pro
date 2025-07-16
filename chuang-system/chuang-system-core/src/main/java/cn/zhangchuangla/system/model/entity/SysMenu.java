@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 菜单表
  *
@@ -102,27 +100,27 @@ public class SysMenu extends BaseEntity {
     /**
      * 是否固定标签页
      */
-    private Integer affixTab;
+    private Boolean affixTab;
 
     /**
      * 隐藏菜单
      */
-    private Integer hideInMenu;
+    private Boolean hideInMenu;
 
     /**
      * 隐藏子菜单
      */
-    private Integer hideChildrenInMenu;
+    private Boolean hideChildrenInMenu;
 
     /**
      * 隐藏在面包屑中
      */
-    private Integer hideInBreadcrumb;
+    private Boolean hideInBreadcrumb;
 
     /**
      * 隐藏在标签页中
      */
-    private Integer hideInTab;
+    private Boolean hideInTab;
 
     /**
      * 外部链接地址
@@ -133,10 +131,5 @@ public class SysMenu extends BaseEntity {
      * 排序
      */
     private Integer sort;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
 }

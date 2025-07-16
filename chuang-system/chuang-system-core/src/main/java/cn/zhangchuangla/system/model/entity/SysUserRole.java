@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 用户角色关系对应实体类
  *
@@ -35,9 +33,5 @@ public class SysUserRole extends BaseEntity {
      */
     private Long roleId;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
 }

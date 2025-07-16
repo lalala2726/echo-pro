@@ -1,9 +1,10 @@
 package cn.zhangchuangla.system.model.vo.dict;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 字典类型视图对象
@@ -48,13 +49,15 @@ public class SysDictTypeVo {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private LocalDateTime createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
     /**
      * 更新时间
      */
     @Schema(description = "更新时间")
-    private LocalDateTime updateTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
 
     /**
      * 创建人
@@ -67,4 +70,4 @@ public class SysDictTypeVo {
      */
     @Schema(description = "更新人", type = "string")
     private String updateBy;
-} 
+}

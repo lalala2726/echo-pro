@@ -204,20 +204,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 路由元信息
      */
     private MetaVo setMateVo(SysMenu sysMenu) {
-        MetaVo metaVo = new MetaVo();
-        metaVo.setTitle(sysMenu.getTitle());
-        metaVo.setOrder(sysMenu.getSort());
-        metaVo.setIcon(sysMenu.getIcon());
-        metaVo.setActivePath(sysMenu.getActivePath());
-        metaVo.setActiveIcon(sysMenu.getActiveIcon());
-        metaVo.setBadge(sysMenu.getBadge());
-        metaVo.setBadgeType(sysMenu.getBadgeType());
-        metaVo.setBadgeVariants(sysMenu.getBadgeVariants());
-        metaVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
-        metaVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
-        metaVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
-        metaVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
-
+        MetaVo metaVo = BeanCotyUtils.copyProperties(sysMenu, MetaVo.class);
 
         // 处理链接
         if (Constants.MenuConstants.TYPE_EXTERNAL.equals(sysMenu.getType())) {
