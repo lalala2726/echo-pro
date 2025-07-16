@@ -1,6 +1,5 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
@@ -79,12 +78,6 @@ public class SysMenuController extends BaseController {
     public AjaxResult<SysMenuVo> getMenuById(@PathVariable("menuId") Long menuId) {
         SysMenu sysMenu = sysMenuService.getMenuById(menuId);
         SysMenuVo sysMenuVo = BeanCotyUtils.copyProperties(sysMenu, SysMenuVo.class);
-        sysMenuVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
-        sysMenuVo.setHideChildrenInMenu(sysMenu.getHideChildrenInMenu() == Constants.TRUE);
-        sysMenuVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
-        sysMenuVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
-        sysMenuVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
-
         return AjaxResult.success(sysMenuVo);
     }
 
