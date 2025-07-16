@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermissionVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
+import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,7 @@ public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
     private final ExcelUtils excelUtils;
+    private final SysPermissionService sysPermissionService;
 
 
     /**
@@ -94,16 +96,17 @@ public class SysRoleController extends BaseController {
 
 
     /**
-     * 根据角色ID获取角色权限
+     * 获取角色权限分配信息
      *
      * @param roleId 角色ID
-     * @return 角色权限
+     * @return 角色权限分配信息
      */
-    @GetMapping("/permission/{roleId}")
-    @Operation(summary = "根据角色ID获取角色权限")
-    public AjaxResult<SysRolePermissionVo> getRolePermission(@Parameter(description = "角色ID")
-                                                                 @PathVariable("roleId") Long roleId) {
-        return success();
+    @GetMapping("/permission/{roleId:\\d+}")
+    @Operation(summary = "获取角色权限分配信息")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    public AjaxResult<SysRolePermissionVo> getPermissionByRoleId(@PathVariable("roleId") Long roleId) {
+        SysRolePermissionVo permission = sysPermissionService.getPermissionByRoleId(roleId);
+        return success(permission);
     }
 
     /**
