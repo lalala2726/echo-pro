@@ -94,6 +94,26 @@ public class SysMenuListVo {
     private String icon;
 
     /**
+     * 徽标
+     */
+    @Schema(description = "徽标")
+    private String badge;
+
+    /**
+     * 徽标类型，dot 或 normal
+     */
+    @Schema(description = "徽标类型，dot 或 normal")
+    private String badgeType;
+
+    /**
+     * 徽标颜色
+     * 可选: default, destructive, primary, success, warning, 或自定义字符串
+     */
+    @Schema(description = "徽标颜色")
+    private String badgeVariants;
+
+
+    /**
      * 子菜单
      */
     @Schema(description = "子菜单")
