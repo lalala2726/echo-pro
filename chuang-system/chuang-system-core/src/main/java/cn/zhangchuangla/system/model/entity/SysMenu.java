@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.model.entity;
 
 import cn.zhangchuangla.common.core.entity.base.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class SysMenu extends BaseEntity {
     /**
      * ID
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

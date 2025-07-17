@@ -177,7 +177,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         int statusEnable = 0;
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
+                //菜单状态为启用
                 .filter(menu -> menu.getStatus() == statusEnable)
+                //按钮类型不进行生成
+                .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getType()))
+                //排序
                 .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
                     RouterVo routerVo = new RouterVo();

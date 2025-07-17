@@ -120,7 +120,8 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:permission')")
     @OperationLog(title = "角色权限管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateRolePermission(@RequestBody SysUpdateRolePermissionRequest request) {
-        return success();
+        boolean result = sysRoleService.updateRolePermission(request);
+        return toAjax(result);
     }
 
     /**

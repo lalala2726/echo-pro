@@ -5,14 +5,18 @@ import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
+import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
+import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -42,6 +46,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleMenuService sysRoleMenuService;
     private final RedisCache redisCache;
+    private final SysMenuService sysMenuService;
 
     /**
      * 角色列表
@@ -271,6 +276,48 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
         }
         return sysRole;
+    }
+
+    /**
+     * 更新角色权限信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
+        SysRole role = getById(request.getRoleId());
+        Assert.isTrue(role != null, String.format("ID:【%s】的角色不存在", request.getRoleId()));
+        Assert.isTrue(!SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()), "超级管理员角色不允许修改权限");
+
+        // 获取所有菜单ID，过滤非法ID
+        Set<Long> validMenuIds = sysMenuService.list()
+                .stream()
+                .map(SysMenu::getId)
+                .collect(Collectors.toSet());
+
+        List<Long> allocatedMenuId = request.getAllocatedMenuId()
+                .stream()
+                .filter(validMenuIds::contains)
+                .distinct()
+                .toList();
+
+        // 删除旧权限（即使是空，也视为成功）
+        sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>()
+                .eq(SysRoleMenu::getRoleId, role.getId()));
+
+        // 如果有新权限则插入
+        if (!allocatedMenuId.isEmpty()) {
+            List<SysRoleMenu> roleMenusToInsert = allocatedMenuId.stream()
+                    .map(id -> {
+                        SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                        sysRoleMenu.setRoleId(request.getRoleId());
+                        sysRoleMenu.setMenuId(id);
+                        return sysRoleMenu;
+                    }).toList();
+            return sysRoleMenuService.saveBatch(roleMenusToInsert);
+        }
+
+        // 没有分配新权限，视为操作成功
+        return true;
     }
 
 }

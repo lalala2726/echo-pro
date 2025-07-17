@@ -39,6 +39,12 @@ public class SysMenuTreeList {
     private Long parentId;
 
     /**
+     * 图标
+     */
+    @Schema(description = "图标")
+    private String icon;
+
+    /**
      * 菜单类型
      */
     @Schema(description = "菜单类型")

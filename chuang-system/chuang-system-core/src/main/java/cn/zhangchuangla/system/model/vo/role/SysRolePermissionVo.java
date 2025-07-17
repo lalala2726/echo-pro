@@ -41,7 +41,7 @@ public class SysRolePermissionVo {
      * 菜单树
      */
     @Schema(description = "菜单树")
-    private List<SysMenuTreeList> sysMenuTreeList;
+    private List<SysMenuTreeList> sysMenuTree;
 
     /**
      * 已选中的菜单ID
