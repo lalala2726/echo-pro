@@ -253,6 +253,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean isMenuPathExists(Long id, String path) {
+        if (path.isBlank()) {
+            return false;
+        }
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<SysMenu>()
                 .eq(SysMenu::getPath, path);
         if (id != null) {
