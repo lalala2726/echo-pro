@@ -91,6 +91,7 @@ public class SysUserController extends BaseController {
     public void exportExcel(HttpServletResponse response,
                             @Parameter(description = "用户查询参数，包含分页和筛选条件")
                             @Validated @ParameterObject SysUserQueryRequest request) {
+        //fixme 这边默认会传递一份分页参数,默认分页是10条,因为这边是导出的,所以这边要处理
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {

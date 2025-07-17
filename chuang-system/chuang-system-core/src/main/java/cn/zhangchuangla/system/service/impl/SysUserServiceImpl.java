@@ -15,6 +15,7 @@ import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
 import cn.zhangchuangla.system.service.SysDeptService;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -44,6 +45,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
+    private final SysRoleService sysRoleService;
 
     /**
      * 进行条件查询
@@ -287,8 +289,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改自己的信息！");
         }
-        Set<String> roles = SecurityUtils.getRoles();
-        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
+        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员的信息！");
         }
 

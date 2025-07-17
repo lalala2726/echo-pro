@@ -98,28 +98,34 @@
         <where>
             <if test="request != null">
                 <if test="request.deptId != null">
-                    and user.dept_id = #{request.deptId}
+                    and `user`.dept_id = #{request.deptId}
                 </if>
                 <if test="request.username != null and request.username != ''">
-                    and user.username like concat('%', #{request.username}, '%')
+                    and `user`.username like concat('%', #{request.username}, '%')
                 </if>
                 <if test="request.nickName != null and request.nickName != ''">
-                    and user.nickname like concat('%', #{request.nickName}, '%')
+                    and `user`.nickname like concat('%', #{request.nickName}, '%')
                 </if>
                 <if test="request.email != null and request.email != ''">
-                    and user.email like concat('%', #{request.email}, '%')
+                    and `user`.email like concat('%', #{request.email}, '%')
                 </if>
                 <if test="request.phone != null and request.phone != ''">
-                    and user.phone like concat('%', #{request.phone}, '%')
+                    and `user`.phone like concat('%', #{request.phone}, '%')
                 </if>
                 <if test="request.gender != null">
-                    and user.gender = #{request.gender}
+                    and `user`.gender = #{request.gender}
                 </if>
                 <if test="request.status != null">
-                    and user.status = #{request.status}
+                    and `user`.status = #{request.status}
                 </if>
                 <if test="request.remark != null and request.remark != ''">
-                    and user.remark like concat('%', #{request.remark}, '%')
+                    and `user`.remark like concat('%', #{request.remark}, '%')
+                </if>
+                <if test="request.startTime != null">
+                    and date(create_time) >= #{request.startTime}
+                </if>
+                <if test="request.endTime != null">
+                    and date(create_time) &lt;= #{request.endTime}
                 </if>
             </if>
             and user.is_deleted = 0
