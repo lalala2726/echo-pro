@@ -24,7 +24,7 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 用户列表
      *
-     * @param request 请求参数
+     * @param request            请求参数
      * @return 分页数据
      */
     Page<SysUserDeptDto> listUser(SysUserQueryRequest request);
@@ -158,4 +158,12 @@ public interface SysUserService extends IService<SysUser> {
      * @return 操作结果
      */
     boolean updateUserProfile(UserProfileUpdateRequest request);
+
+    /**
+     * 导出用户列表
+     *
+     * @param request 请求参数
+     * @return 用户列表
+     */
+    List<SysUser> exportListUser(SysUserQueryRequest request);
 }

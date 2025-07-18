@@ -55,7 +55,7 @@ public class SysAuthService {
         } catch (Exception e) {
             log.error("用户名:{},登录失败！", request.getUsername(), e);
             // 使用异步服务记录登录失败日志
-            String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+            String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
             asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
             throw new LoginException(ResponseCode.LOGIN_ERROR, "账号或密码错误!");
@@ -66,7 +66,7 @@ public class SysAuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 使用异步服务记录登录成功日志
-        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 

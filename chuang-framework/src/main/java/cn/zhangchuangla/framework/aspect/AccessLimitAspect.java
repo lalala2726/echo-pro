@@ -110,7 +110,7 @@ public class AccessLimitAspect {
                 // 记录限流日志
                 if (attributes != null) {
                     HttpServletRequest request = attributes.getRequest();
-                    String ip = IPUtils.getIpAddr(request);
+                    String ip = IPUtils.getIpAddress(request);
                     log.warn("AOP接口访问频率超限 - IP: {}, 方法: {}.{}, 限制: {}次/{}秒, 限流类型: {}",
                             ip, className, methodName, maxCount, limitPeriod, limitType.getDescription());
                 } else {
@@ -161,7 +161,7 @@ public class AccessLimitAspect {
         switch (limitType) {
             // IP限流模式
             case IP -> {
-                String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
+                String ipAddress = (request != null) ? IPUtils.getIpAddress(request) : "non-web";
                 keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
             // 用户ID限流模式
@@ -172,7 +172,7 @@ public class AccessLimitAspect {
                             .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 获取用户失败，降级为IP限流
-                    String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
+                    String ipAddress = (request != null) ? IPUtils.getIpAddress(request) : "non-web";
                     keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
                     log.debug("获取用户信息失败，降级为IP限流: {}", ipAddress);
                 }
@@ -183,7 +183,7 @@ public class AccessLimitAspect {
                 keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
             }
             default -> {
-                String ipAddress = (request != null) ? IPUtils.getIpAddr(request) : "non-web";
+                String ipAddress = (request != null) ? IPUtils.getIpAddress(request) : "non-web";
                 keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
         }

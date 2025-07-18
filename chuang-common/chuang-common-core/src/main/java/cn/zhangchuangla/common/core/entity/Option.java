@@ -28,17 +28,10 @@ public class Option<T> implements Serializable {
     @Schema(description = "选项的标签")
     private String label;
 
-    @Schema(description = "标签类型")
-    @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-    private String tag;
-
     @Schema(description = "子选项列表")
     @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
     private List<Option<T>> children;
 
-    @Schema(description = "是否禁用")
-    @JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
-    private boolean disabled;
 
 
     public Option(T value, String label) {
@@ -52,9 +45,4 @@ public class Option<T> implements Serializable {
         this.children = children;
     }
 
-    public Option(T value, String label, String tag) {
-        this.value = value;
-        this.label = label;
-        this.tag = tag;
-    }
 }

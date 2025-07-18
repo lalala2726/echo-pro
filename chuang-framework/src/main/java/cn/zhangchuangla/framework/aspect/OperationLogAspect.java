@@ -154,7 +154,7 @@ public class OperationLogAspect {
             HttpServletRequest request = ServletUtils.getRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
-            String ipAddr = IPUtils.getIpAddr(request);
+            String ipAddr = IPUtils.getIpAddress(request);
             sysOperationLog.setOperationIp(ipAddr);
             sysOperationLog.setOperationRegion(IPUtils.getRegion(ipAddr));
             sysOperationLog.setRequestMethod(request.getMethod());

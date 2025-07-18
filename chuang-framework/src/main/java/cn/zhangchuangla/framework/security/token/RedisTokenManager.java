@@ -439,7 +439,7 @@ public class RedisTokenManager implements TokenManager {
 
         // 应检查是否为null
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
-        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         // IPUtils.getRegion 可能需要处理 "Unknown" IP
         String region = IPUtils.getRegion(ipAddr);
 
@@ -466,7 +466,7 @@ public class RedisTokenManager implements TokenManager {
     private void setClientInfo(OnlineLoginUser onlineUser) {
         // 应检查是否为null
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
-        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         String osName = UserAgentUtils.getOsName(userAgent);
         String browserName = UserAgentUtils.getBrowserName(userAgent);
