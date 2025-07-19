@@ -19,7 +19,7 @@ Echo-Pro 是一套基于 Spring Boot 3.x 构建的企业级后台管理系统，
 - **数据校验**：Spring Validation
 - **日志管理**：SLF4J
 - **API 文档**：Swagger / OpenAPI
-- **工具类**：Lombok、MapStruct 等
+- **工具类**：Lombok、Apache commons 等
 
 ### 前端技术
 
