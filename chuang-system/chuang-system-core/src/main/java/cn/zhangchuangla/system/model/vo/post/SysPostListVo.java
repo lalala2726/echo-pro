@@ -16,7 +16,7 @@ public class SysPostListVo {
      * 岗位ID
      */
     @Schema(name = "岗位ID")
-    private Integer postId;
+    private Long id;
 
     /**
      * 岗位编码

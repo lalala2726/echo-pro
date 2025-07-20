@@ -19,7 +19,7 @@ public class SysPostVo extends BaseVo {
      * 岗位ID
      */
     @Schema(description = "岗位ID")
-    private Integer postId;
+    private Long id;
 
     /**
      * 岗位编码

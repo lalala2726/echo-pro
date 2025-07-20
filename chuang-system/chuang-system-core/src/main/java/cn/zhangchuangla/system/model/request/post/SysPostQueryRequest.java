@@ -19,7 +19,7 @@ public class SysPostQueryRequest extends BasePageRequest {
      * 岗位ID
      */
     @Schema(name = "岗位ID", example = "1", type = "integer")
-    private Integer postId;
+    private Long id;
 
     /**
      * 岗位编码
