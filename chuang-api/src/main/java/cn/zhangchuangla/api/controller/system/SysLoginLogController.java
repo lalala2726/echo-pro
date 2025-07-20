@@ -5,17 +5,11 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.annotation.RequiresSecondAuth;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
-import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
-import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
 import cn.zhangchuangla.system.model.vo.log.SysLoginLogListVo;
 import cn.zhangchuangla.system.model.vo.log.SysLoginLogVo;
-import cn.zhangchuangla.system.model.vo.log.SysOperationLogListVo;
-import cn.zhangchuangla.system.model.vo.log.SysOperationLogVo;
 import cn.zhangchuangla.system.service.SysLoginLogService;
-import cn.zhangchuangla.system.service.SysOperationLogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,14 +30,13 @@ import java.util.List;
  * created on 2025/4/17 17:44
  */
 @RestController
-@RequestMapping("/system/log")
+@RequestMapping("/system/log/login")
 @RequiredArgsConstructor
-@Tag(name = "系统日志", description = "提供系统登录日志和操作日志的查询、详情、清空等管理接口。")
+@Tag(name = "登录日志", description = "提供系统登录日志")
 @Slf4j
-public class SysLogController extends BaseController {
+public class SysLoginLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
-    private final SysOperationLogService sysOperationLogService;
 
     /**
      * 获取登录日志列表
@@ -59,23 +52,6 @@ public class SysLogController extends BaseController {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
         List<SysLoginLogListVo> sysLoginLogListVos = copyListProperties(sysLoginLogPage, SysLoginLogListVo.class);
         return getTableData(sysLoginLogPage, sysLoginLogListVos);
-    }
-
-    /**
-     * 获取操作日志列表
-     *
-     * @param request 操作日志列表查询参数
-     * @return 操作日志列表
-     */
-    @GetMapping("/operation/list")
-    @Operation(summary = "获取操作日志列表")
-    @PreAuthorize("@ss.hasPermission('system:log:list')")
-    public AjaxResult<TableDataResult> listOperationLog(@Parameter(description = "操作日志列表查询参数")
-                                                        @Validated @ParameterObject SysOperationLogQueryRequest request) {
-        Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
-        List<SysOperationLogListVo> sysOperationLogListVos = copyListProperties(sysOperationLogPage,
-                SysOperationLogListVo.class);
-        return getTableData(sysOperationLogPage, sysOperationLogListVos);
     }
 
     /**
@@ -95,50 +71,18 @@ public class SysLogController extends BaseController {
         return success(sysLoginLogVo);
     }
 
-    /**
-     * 获取操作日志详情
-     *
-     * @param id 操作日志ID
-     * @return 操作日志详情
-     */
-    @GetMapping("/operation/{id:\\d+}")
-    @Operation(summary = "获取操作日志详情")
-    @PreAuthorize("@ss.hasPermission('system:log:query')")
-    public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
-                                                             @PathVariable("id") Long id) {
-        SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
-        SysOperationLogVo sysOperationLogVo = new SysOperationLogVo();
-        BeanUtils.copyProperties(sysOperationLog, sysOperationLogVo);
-        return success(sysOperationLogVo);
-    }
 
     /**
      * 清空登录日志
      *
      * @return 清空结果
      */
-    @DeleteMapping("/login")
+    @DeleteMapping("/clean")
     @Operation(summary = "清空登录日志", description = "此方法需要传入当前用户密码进行验证")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    @RequiresSecondAuth()
     public AjaxResult<Void> cleanLoginLog() {
         boolean result = sysLoginLogService.cleanLoginLog();
-        return toAjax(result);
-    }
-
-    /**
-     * 清空操作日志
-     *
-     * @return 清空结果
-     */
-    @DeleteMapping("/operation")
-    @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
-    @PreAuthorize("@ss.hasPermission('system:log:delete')")
-    @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
-    @RequiresSecondAuth()
-    public AjaxResult<Void> cleanOperationLog() {
-        boolean result = sysOperationLogService.cleanOperationLog();
         return toAjax(result);
     }
 

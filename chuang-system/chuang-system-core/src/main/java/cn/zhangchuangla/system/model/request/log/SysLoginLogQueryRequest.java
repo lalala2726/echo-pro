@@ -2,11 +2,8 @@ package cn.zhangchuangla.system.model.request.log;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
 
@@ -24,21 +21,18 @@ public class SysLoginLogQueryRequest extends BasePageRequest {
      * 主键
      */
     @Schema(description = "主键", example = "1", type = "integer", format = "int64")
-    @Min(value = 1, message = "主键不能小于1")
     private Long id;
 
     /**
      * 用户名
      */
     @Schema(description = "用户名", example = "admin", type = "string")
-    @Size(max = 64, min = 1, message = "用户名长度在1-64个字符")
     private String username;
 
     /**
      * 账号状态
      */
     @Schema(description = "账号状态", example = "0", type = "integer", allowableValues = {"0", "1"})
-    @Range(min = 0, max = 1, message = "账号状态只能为0或1")
     private Integer status;
 
     /**
