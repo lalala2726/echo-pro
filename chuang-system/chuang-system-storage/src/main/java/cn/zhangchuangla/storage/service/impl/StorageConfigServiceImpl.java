@@ -3,7 +3,7 @@ package cn.zhangchuangla.storage.service.impl;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.factory.StorageConfigFactory;
-import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
+import cn.zhangchuangla.storage.mapper.StorageConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
 import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
@@ -29,10 +29,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, StorageConfig>
+public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, StorageConfig>
         implements StorageConfigService {
 
-    private final SysFileConfigMapper sysFileConfigMapper;
+    private final StorageConfigMapper storageConfigMapper;
 
     /**
      * 查询文件配置列表
@@ -43,7 +43,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysFileConfigMapper.listSysFileConfig(sysFileConfigPage, request);
+        return storageConfigMapper.listSysFileConfig(sysFileConfigPage, request);
     }
 
     /**

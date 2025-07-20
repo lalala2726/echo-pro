@@ -1,9 +1,10 @@
 package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.FileRecord;
+import cn.zhangchuangla.storage.model.entity.StorageFile;
 import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * <p>
  * created on 2025/7/1 02:49
  */
-public interface StorageService {
+public interface StorageFileService extends IService<StorageFile> {
 
     /**
      * 获取文件列表
@@ -21,7 +22,7 @@ public interface StorageService {
      * @param request 查询参数
      * @return 文件列表
      */
-    Page<FileRecord> listFileManage(FileRecordQueryRequest request);
+    Page<StorageFile> listFileManage(FileRecordQueryRequest request);
 
     /**
      * 获取回收站文件列表
@@ -29,7 +30,7 @@ public interface StorageService {
      * @param request 文件列表查询参数
      * @return 文件列表
      */
-    Page<FileRecord> listFileTrashManage(FileRecordQueryRequest request);
+    Page<StorageFile> listFileTrashManage(FileRecordQueryRequest request);
 
     /**
      * 上传文件
@@ -98,5 +99,5 @@ public interface StorageService {
      * @param id 文件id
      * @return 文件信息
      */
-    FileRecord getFileById(Long id);
+    StorageFile getFileById(Long id);
 }

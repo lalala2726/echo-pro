@@ -28,8 +28,8 @@ public class StorageConfigFactory {
 
         return switch (request.getStorageType()) {
             case MINIO -> createMinioConfig(request);
-            case ALIYUN_OSS -> createAliyunOSSConfig(request);
-            case TENCENT_COS -> createTencentCOSConfig(request);
+            case ALIYUN_OSS -> createAliyunOssConfig(request);
+            case TENCENT_COS -> createTencentCosConfig(request);
             case AMAZON_S3 -> createAmazonS3Config(request);
             default -> throw new IllegalArgumentException("不支持的存储类型: " + request.getStorageType());
         };
@@ -52,7 +52,7 @@ public class StorageConfigFactory {
     /**
      * 创建阿里云OSS配置对象
      */
-    private static AliyunOSSStorageConfig createAliyunOSSConfig(UnifiedStorageConfigRequest request) {
+    private static AliyunOSSStorageConfig createAliyunOssConfig(UnifiedStorageConfigRequest request) {
         AliyunOSSStorageConfig config = new AliyunOSSStorageConfig();
         config.setEndpoint(request.getEndpoint());
         config.setAccessKeyId(request.getAccessKeyId());
@@ -66,7 +66,7 @@ public class StorageConfigFactory {
     /**
      * 创建腾讯云COS配置对象
      */
-    private static TencentCOSStorageConfig createTencentCOSConfig(UnifiedStorageConfigRequest request) {
+    private static TencentCOSStorageConfig createTencentCosConfig(UnifiedStorageConfigRequest request) {
         TencentCOSStorageConfig config = new TencentCOSStorageConfig();
         // 腾讯云COS使用region字段
         config.setRegion(request.getEndpoint());

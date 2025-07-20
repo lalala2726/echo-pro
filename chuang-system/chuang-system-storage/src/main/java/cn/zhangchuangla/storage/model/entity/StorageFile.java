@@ -20,7 +20,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileRecord {
+public class StorageFile {
 
     /**
      * 主键ID
