@@ -210,47 +210,47 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
     private List<StorageFile> getAndValidateFileRecords(List<Long> fileIds) {
         LambdaQueryWrapper<StorageFile> queryWrapper = new LambdaQueryWrapper<StorageFile>()
                 .in(StorageFile::getId, fileIds);
-        List<StorageFile> StorageFiles = list(queryWrapper);
+        List<StorageFile> storageFiles = list(queryWrapper);
 
-        if (CollectionUtils.isEmpty(StorageFiles)) {
+        if (CollectionUtils.isEmpty(storageFiles)) {
             throw new ServiceException(ResponseCode.DATA_NOT_FOUND, "文件不存在");
         }
 
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
 
         // 批量校验文件状态
-        StorageFiles.forEach(StorageFile -> {
-            validateStorageConsistency(activeStorageType, StorageFile);
-            if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(StorageFile.getIsTrash())) {
+        storageFiles.forEach(file -> {
+            validateStorageConsistency(activeStorageType, file);
+            if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(file.getIsTrash())) {
                 throw new ServiceException(ResponseCode.OPERATION_ERROR,
-                        String.format("文件编号: %s 已经在回收站中!无法再次删除!", StorageFile.getId()));
+                        String.format("文件编号: %s 已经在回收站中!无法再次删除!", file.getId()));
             }
         });
 
-        return StorageFiles;
+        return storageFiles;
     }
 
     /**
      * 批量处理文件删除操作
      */
-    private void processFileDeletion(List<StorageFile> StorageFiles, OperationService service, boolean forceDelete) {
-        StorageFiles.forEach(StorageFile -> {
+    private void processFileDeletion(List<StorageFile> storageFiles, OperationService service, boolean forceDelete) {
+        storageFiles.forEach(storageFile -> {
             // 构建文件操作DTO
             FileOperationDto fileOperationDto = FileOperationDto.builder()
-                    .previewRelativePath(StorageFile.getPreviewRelativePath())
-                    .originalRelativePath(StorageFile.getOriginalRelativePath())
+                    .previewRelativePath(storageFile.getPreviewRelativePath())
+                    .originalRelativePath(storageFile.getOriginalRelativePath())
                     .build();
             if (forceDelete) {
                 //这边是强制删除
                 service.delete(fileOperationDto, true);
                 //标记为已删除
-                StorageFile.setIsDeleted(Constants.LogicDelete.DELETED);
+                storageFile.setIsDeleted(Constants.LogicDelete.DELETED);
             } else {
                 FileOperationDto fileOperationDtoResult = service.delete(fileOperationDto, false);
-                StorageFile.setOriginalTrashPath(fileOperationDtoResult.getOriginalTrashPath());
-                StorageFile.setIsTrash(StorageConstants.dataVerifyConstants.IN_TRASH);
+                storageFile.setOriginalTrashPath(fileOperationDtoResult.getOriginalTrashPath());
+                storageFile.setIsTrash(StorageConstants.dataVerifyConstants.IN_TRASH);
                 if (StringUtils.isNotBlank(fileOperationDtoResult.getPreviewTrashPath())) {
-                    StorageFile.setPreviewTrashPath(fileOperationDtoResult.getPreviewTrashPath());
+                    storageFile.setPreviewTrashPath(fileOperationDtoResult.getPreviewTrashPath());
                 }
             }
         });
@@ -400,7 +400,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
      * 校验文件的存储和当前系统使用的存储是否一致
      *
      * @param activeStorageType 当前系统使用的存储类型
-     * @param storageFile        文件记录
+     * @param storageFile       文件记录
      */
     private void validateStorageConsistency(String activeStorageType, StorageFile storageFile) {
         if (!activeStorageType.equals(storageFile.getStorageType())) {

@@ -24,7 +24,7 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 用户列表
      *
-     * @param request            请求参数
+     * @param request 请求参数
      * @return 分页数据
      */
     Page<SysUserDeptDto> listUser(SysUserQueryRequest request);

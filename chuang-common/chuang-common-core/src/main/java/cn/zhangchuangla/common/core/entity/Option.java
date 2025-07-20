@@ -33,7 +33,6 @@ public class Option<T> implements Serializable {
     private List<Option<T>> children;
 
 
-
     public Option(T value, String label) {
         this.value = value;
         this.label = label;
