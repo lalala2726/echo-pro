@@ -1,58 +1,53 @@
 package cn.zhangchuangla.storage.model.request.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 文件配置表
- *
  * @author Chuang
+ * <p>
+ * created on 2025/7/20 22:50
  */
 @Data
-@Schema(description = "文件配置修改请求类")
+@Schema(description = "文件配置更新请求参数")
 public class StorageConfigUpdateRequest {
 
-    /**
-     * ID
-     */
-    @Schema(description = "参数ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1, message = "参数ID不能小于1")
-    private Integer id;
+    @Schema(description = "文件配置ID", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "文件配置ID不能为空")
+    private Long id;
 
     /**
-     * 参数名称
+     * 存储配置名称
      */
-    @Schema(description = "参数名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "参数名称不能为空")
+    @Schema(description = "文件配置标志", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "北京阿里云对象存储")
+    @NotBlank(message = "文件配置标志不能为空")
     private String storageName;
 
     /**
-     * 参数键名
+     * 阿里云存储配置
      */
-    @NotBlank(message = "参数键名不能为空")
-    @Schema(description = "参数键名", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String storageKey;
+    @Schema(description = "阿里云OSS配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private AliyunOssConfigSaveRequest aliyunOss;
 
     /**
-     * 存储类型
+     * AmazonS3 存储配置
      */
-    @NotBlank(message = "存储类型不能为空")
-    @Schema(description = "存储类型", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String storageType;
+    @Schema(description = "MinIO 配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private AmazonS3ConfigSaveRequest amazonS3;
 
     /**
-     * 存储值
+     * 腾讯云COS 存储配置
      */
-    @NotBlank(message = "存储值不能为空")
-    @Schema(description = "存储值", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String storageValue;
+    @Schema(description = "腾讯云COS配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private TencentCosConfigSaveRequest tencentCos;
 
     /**
-     * 备注
+     * 阿里云OSS 存储配置
      */
-    @Schema(description = "备注")
-    private String remark;
+    @Schema(description = "MinIO 配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private MinioConfigSaveRequest minio;
+
 
 }

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.mapper;
 
 import cn.zhangchuangla.storage.model.entity.StorageFile;
-import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +18,7 @@ public interface StorageFileMapper extends BaseMapper<StorageFile> {
      * @param request 请求参数
      * @return 结果
      */
-    Page<StorageFile> listFileManage(Page<StorageFile> page, @Param("request") FileRecordQueryRequest request);
+    Page<StorageFile> listFileManage(Page<StorageFile> page, @Param("request") StorageFileQueryRequest request);
 
 
     /**
@@ -28,7 +28,7 @@ public interface StorageFileMapper extends BaseMapper<StorageFile> {
      * @param request 请求参数
      * @return 结果
      */
-    Page<StorageFile> listFileTrashManage(Page<StorageFile> page, @Param("request") FileRecordQueryRequest request);
+    Page<StorageFile> listFileTrashManage(Page<StorageFile> page, @Param("request") StorageFileQueryRequest request);
 
 }
 

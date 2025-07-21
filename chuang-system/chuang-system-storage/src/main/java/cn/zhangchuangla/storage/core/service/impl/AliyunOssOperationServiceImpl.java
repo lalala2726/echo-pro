@@ -9,7 +9,7 @@ import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import cn.zhangchuangla.storage.utils.AliyunOssOperationUtils;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import com.alibaba.fastjson2.JSON;
@@ -43,7 +43,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
     // 内部管理的OSS客户端，支持动态创建和缓存
     private volatile OSS ossClient;
-    private volatile AliyunOSSStorageConfig aliyunOssStorageConfig;
+    private volatile AliyunOssStorageConfig aliyunOssStorageConfig;
 
     /**
      * 获取当前存储配置
@@ -51,9 +51,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      *
      * @return 阿里云OSS存储配置
      */
-    public AliyunOSSStorageConfig getConfig() {
+    public AliyunOssStorageConfig getConfig() {
         String json = getStorageConfigJson();
-        AliyunOSSStorageConfig newConfig = JSON.parseObject(json, AliyunOSSStorageConfig.class);
+        AliyunOssStorageConfig newConfig = JSON.parseObject(json, AliyunOssStorageConfig.class);
 
         // 检查配置是否发生变化，如果变化则重置客户端
         if (configChanged(newConfig)) {
@@ -96,7 +96,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      * @param newConfig 新配置
      * @return 是否发生变化
      */
-    private boolean configChanged(AliyunOSSStorageConfig newConfig) {
+    private boolean configChanged(AliyunOssStorageConfig newConfig) {
         if (aliyunOssStorageConfig == null) {
             return true;
         }

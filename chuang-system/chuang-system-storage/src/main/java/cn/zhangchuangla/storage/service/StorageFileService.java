@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.service;
 
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.StorageFile;
-import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +22,7 @@ public interface StorageFileService extends IService<StorageFile> {
      * @param request 查询参数
      * @return 文件列表
      */
-    Page<StorageFile> listFileManage(FileRecordQueryRequest request);
+    Page<StorageFile> listFileManage(StorageFileQueryRequest request);
 
     /**
      * 获取回收站文件列表
@@ -30,7 +30,7 @@ public interface StorageFileService extends IService<StorageFile> {
      * @param request 文件列表查询参数
      * @return 文件列表
      */
-    Page<StorageFile> listFileTrashManage(FileRecordQueryRequest request);
+    Page<StorageFile> listFileTrashManage(StorageFileQueryRequest request);
 
     /**
      * 上传文件

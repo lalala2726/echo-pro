@@ -15,11 +15,11 @@ import cn.zhangchuangla.storage.mapper.StorageFileMapper;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.entity.StorageFile;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.entity.config.TencentCosStorageConfig;
+import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
 import cn.zhangchuangla.storage.service.StorageFileService;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -62,7 +62,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
      * @return 文件列表
      */
     @Override
-    public Page<StorageFile> listFileManage(FileRecordQueryRequest request) {
+    public Page<StorageFile> listFileManage(StorageFileQueryRequest request) {
         Page<StorageFile> page = new Page<>(request.getPageNum(), request.getPageSize());
         return storageFileMapper.listFileManage(page, request);
     }
@@ -74,7 +74,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
      * @return 回收站文件列表
      */
     @Override
-    public Page<StorageFile> listFileTrashManage(FileRecordQueryRequest request) {
+    public Page<StorageFile> listFileTrashManage(StorageFileQueryRequest request) {
         Page<StorageFile> page = new Page<>(request.getPageNum(), request.getPageSize());
         return storageFileMapper.listFileTrashManage(page, request);
     }
@@ -434,11 +434,11 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
                 yield minioStorageConfig.getBucketName();
             }
             case StorageConstants.StorageType.ALIYUN_OSS -> {
-                AliyunOSSStorageConfig aliyunOssStorageConfig = JSON.parseObject(currentStorageConfigJson, AliyunOSSStorageConfig.class);
+                AliyunOssStorageConfig aliyunOssStorageConfig = JSON.parseObject(currentStorageConfigJson, AliyunOssStorageConfig.class);
                 yield aliyunOssStorageConfig.getBucketName();
             }
             case StorageConstants.StorageType.TENCENT_COS -> {
-                TencentCOSStorageConfig tencentCosStorageConfig = JSON.parseObject(currentStorageConfigJson, TencentCOSStorageConfig.class);
+                TencentCosStorageConfig tencentCosStorageConfig = JSON.parseObject(currentStorageConfigJson, TencentCosStorageConfig.class);
                 yield tencentCosStorageConfig.getBucketName();
             }
             case StorageConstants.StorageType.AMAZON_S3 -> {

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.core.exception.FileException;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCosStorageConfig;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -54,7 +54,7 @@ public class TencentCosOperationUtils {
      * @return COS客户端实例，用于后续的COS操作
      * @throws FileException 当配置不完整或客户端创建失败时抛出
      */
-    public COSClient createCosClient(TencentCOSStorageConfig config) {
+    public COSClient createCosClient(TencentCosStorageConfig config) {
         try {
             if (config.getRegion() == null || config.getRegion().isBlank() ||
                     config.getSecretId() == null || config.getSecretId().isBlank() ||

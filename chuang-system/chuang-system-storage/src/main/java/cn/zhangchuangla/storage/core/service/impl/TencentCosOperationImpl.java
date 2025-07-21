@@ -9,7 +9,7 @@ import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCosStorageConfig;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import cn.zhangchuangla.storage.utils.TencentCosOperationUtils;
 import com.alibaba.fastjson2.JSON;
@@ -67,7 +67,7 @@ public class TencentCosOperationImpl implements OperationService {
 
     // 内部管理的COS客户端，支持动态创建和缓存
     private volatile COSClient cosClient;
-    private volatile TencentCOSStorageConfig tencentCosStorageConfig;
+    private volatile TencentCosStorageConfig tencentCosStorageConfig;
 
     /**
      * 获取当前存储配置
@@ -75,9 +75,9 @@ public class TencentCosOperationImpl implements OperationService {
      *
      * @return 腾讯云COS存储配置
      */
-    public TencentCOSStorageConfig getConfig() {
+    public TencentCosStorageConfig getConfig() {
         String json = getStorageConfigJson();
-        TencentCOSStorageConfig newConfig = JSON.parseObject(json, TencentCOSStorageConfig.class);
+        TencentCosStorageConfig newConfig = JSON.parseObject(json, TencentCosStorageConfig.class);
 
         // 检查配置是否发生变化，如果变化则重置客户端
         if (configChanged(newConfig)) {
@@ -120,7 +120,7 @@ public class TencentCosOperationImpl implements OperationService {
      * @param newConfig 新配置
      * @return 是否发生变化
      */
-    private boolean configChanged(TencentCOSStorageConfig newConfig) {
+    private boolean configChanged(TencentCosStorageConfig newConfig) {
         if (tencentCosStorageConfig == null) {
             return true;
         }

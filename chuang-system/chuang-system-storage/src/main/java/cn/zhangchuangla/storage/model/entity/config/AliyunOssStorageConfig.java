@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
-import cn.zhangchuangla.common.core.annotation.DataMasking;
+import com.alibaba.fastjson2.JSON;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @Data
 @Schema(description = "阿里云OSS配置实体类")
-public class AliyunOSSStorageConfig implements Serializable {
+public class AliyunOssStorageConfig implements Serializable {
 
 
     @Serial
@@ -35,7 +35,6 @@ public class AliyunOSSStorageConfig implements Serializable {
     /**
      * 阿里云账号AccessKey Secret
      */
-    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String accessKeySecret;
 
     /**
@@ -54,4 +53,12 @@ public class AliyunOSSStorageConfig implements Serializable {
     private boolean realDelete;
 
 
+    /**
+     * 转换为JSON字符串
+     *
+     * @return JSON字符串
+     */
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }

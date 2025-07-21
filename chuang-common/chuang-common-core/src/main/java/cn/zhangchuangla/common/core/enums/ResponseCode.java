@@ -112,7 +112,8 @@ public enum ResponseCode {
     REFRESH_TOKEN_INVALID(401, "刷新令牌无效或已过期"),
     ACCESS_UNAUTHORIZED(401, "未授权访问"),
     UPDATE_ERROR(400, "更新信息失败"),
-    INVALID_ROLE_ID(400, "角色ID无效");
+    INVALID_ROLE_ID(400, "角色ID无效"),
+    SERVER_CANNOT_SUPPORT(500, "服务器无法支持本次请求");
 
     /**
      * 状态码

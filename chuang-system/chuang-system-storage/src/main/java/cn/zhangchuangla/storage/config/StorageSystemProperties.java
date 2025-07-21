@@ -74,11 +74,7 @@ public class StorageSystemProperties implements Serializable {
      * MinIO 配置
      */
     @Data
-    public static class MinioConfig implements Serializable {
-
-
-        @Serial
-        private static final long serialVersionUID = -237517564861379358L;
+    public static class MinioConfig {
 
         /**
          * MinIO 服务器的端点。
@@ -120,11 +116,7 @@ public class StorageSystemProperties implements Serializable {
      * 阿里云OSS 配置
      */
     @Data
-    public static class AliyunOssConfig implements Serializable {
-
-
-        @Serial
-        private static final long serialVersionUID = -2047201893309898520L;
+    public static class AliyunOssConfig {
 
         /**
          * 访问端点
@@ -165,11 +157,7 @@ public class StorageSystemProperties implements Serializable {
      * 腾讯云COS 配置
      */
     @Data
-    public static class TencentCosConfig implements Serializable {
-
-
-        @Serial
-        private static final long serialVersionUID = -7118344925027990875L;
+    public static class TencentCosConfig {
 
         /**
          * 访问区域
@@ -210,10 +198,7 @@ public class StorageSystemProperties implements Serializable {
      * 亚马逊S3配置
      */
     @Data
-    public static class AmazonS3Config implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = -7118344925027990875L;
+    public static class AmazonS3Config {
 
         /**
          * 存储服务地址

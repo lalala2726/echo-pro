@@ -5,39 +5,31 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.StorageRegistryService;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
-import cn.zhangchuangla.storage.model.request.file.UnifiedStorageConfigRequest;
-import cn.zhangchuangla.storage.model.vo.config.StorageFileConfigListVo;
+import cn.zhangchuangla.storage.model.request.config.*;
+import cn.zhangchuangla.storage.model.vo.config.StorageConfigListVo;
+import cn.zhangchuangla.storage.model.vo.config.StorageConfigUnifiedVo;
 import cn.zhangchuangla.storage.service.StorageConfigService;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Chuang
  * Created on 2025/4/3 21:39
  */
 @RestController
-@RequestMapping("/system/file/config")
+@RequestMapping("/system/storage/config")
 @RequiredArgsConstructor
 @Tag(name = "文件存储配置", description = "提供本地存储、MinIO、阿里云OSS、腾讯云COS等文件存储配置的增删改查及主配置设置、缓存刷新等相关接口")
 public class SysStorageConfigController extends BaseController {
@@ -47,7 +39,6 @@ public class SysStorageConfigController extends BaseController {
 
     /**
      * 文件配置列表
-     * 这边转换的值一定要和保存的类一致 {@link cn.zhangchuangla.system.service.impl.SysConfigServiceImpl}
      *
      * @param request 文件配置列表查询参数
      * @return 文件配置列表
@@ -58,49 +49,112 @@ public class SysStorageConfigController extends BaseController {
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                                          @Validated @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
-        List<StorageFileConfigListVo> storageFileConfigListVos = sysFileConfigPage.getRecords().stream().map(item -> {
-            StorageFileConfigListVo storageFileConfigListVo = new StorageFileConfigListVo();
-            BeanUtils.copyProperties(item, storageFileConfigListVo);
-            switch (item.getStorageType()) {
-                case StorageConstants.StorageType.ALIYUN_OSS -> storageFileConfigListVo.setAliyunOssConfig(
-                        JSON.parseObject(item.getStorageValue(), AliyunOSSStorageConfig.class));
-                case StorageConstants.StorageType.MINIO -> storageFileConfigListVo.setMinioConfig(
-                        JSON.parseObject(item.getStorageValue(), MinioStorageConfig.class));
-                case StorageConstants.StorageType.TENCENT_COS -> storageFileConfigListVo.setTencentCosConfig(
-                        JSON.parseObject(item.getStorageValue(), TencentCOSStorageConfig.class));
-            }
-            return storageFileConfigListVo;
-        }).collect(Collectors.toList());
-        return getTableData(sysFileConfigPage, storageFileConfigListVos);
+        List<StorageConfigListVo> storageConfigListVos = copyListProperties(sysFileConfigPage, StorageConfigListVo.class);
+        return getTableData(sysFileConfigPage, storageConfigListVos);
     }
 
     /**
-     * 新增存储配置
-     * 支持所有存储类型：MinIO、阿里云OSS、腾讯云COS、亚马逊S3
+     * 判断存储配置Key是否存在
      *
-     * @param request 统一存储配置请求参数
+     * @param id         存储配置ID
+     * @param storageKey 存储配置Key
+     * @return true存在，false不存在
+     */
+    @GetMapping("/key-exists")
+    public AjaxResult<Boolean> isStorageKeyExists(@RequestParam(value = "id", required = false) Long id,
+                                                  @RequestParam("storageKey") String storageKey) {
+        boolean result = storageConfigService.isStorageKeyExists(id, storageKey);
+        return AjaxResult.success(result);
+    }
+
+
+    /**
+     * 添加Minio存储配置
+     *
+     * @param request 请求参数
      * @return 操作结果
      */
-    @Operation(summary = "新增存储配置", description = "支持所有存储类型的统一配置接口")
+    @PostMapping("/minio")
+    @Operation(summary = "添加Minio存储配置")
     @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
-    @PostMapping("/add")
-    @OperationLog(title = "文件配置", businessType = BusinessType.INSERT, saveRequestData = false)
-    public AjaxResult<Void> addStorageConfig(@Parameter(description = "统一存储配置请求参数")
-                                             @Validated @RequestBody UnifiedStorageConfigRequest request) {
-        // 去除末尾的斜杠,确保一致性
-        if (!StrUtils.isEmpty(request.getEndpoint())) {
-            request.setEndpoint(StrUtils.removeTrailingSlash(request.getEndpoint()));
-        }
-        if (!StrUtils.isEmpty(request.getFileDomain())) {
-            request.setFileDomain(StrUtils.removeTrailingSlash(request.getFileDomain()));
-        }
-        // 对于腾讯云COS，如果region为空，则使用endpoint的值
-        if (request.getStorageType() == cn.zhangchuangla.storage.enums.StorageType.TENCENT_COS
-                && StrUtils.isEmpty(request.getRegion())) {
-            request.setRegion(request.getEndpoint());
-        }
+    @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> addMinioConfig(@Validated @RequestBody MinioConfigSaveRequest request) {
+        boolean result = storageConfigService.addMinioConfig(request);
+        return toAjax(result);
+    }
 
-        boolean result = storageConfigService.addStorageConfig(request);
+    /**
+     * 添加阿里云OSS存储配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @PostMapping("/aliyun")
+    @Operation(summary = "添加阿里云OSS存储配置")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
+    @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> addAliyunOssConfig(@Validated @RequestBody AliyunOssConfigSaveRequest request) {
+        boolean result = storageConfigService.addAliyunOssConfig(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 添加腾讯云COS存储配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @PostMapping("/tencent")
+    @Operation(summary = "添加腾讯云COS存储配置")
+    @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> addTencentCosConfig(@Validated @RequestBody TencentCosConfigSaveRequest request) {
+        boolean result = storageConfigService.addTencentCosConfig(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 添加亚马逊S3存储配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @PostMapping("/amaze")
+    @Operation(summary = "添加亚马逊S3存储配置", description = "兼容S3协议可以使用此接口")
+    @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    public AjaxResult<Void> addAmazonS3Config(@Validated @RequestBody AmazonS3ConfigSaveRequest request) {
+        boolean result = storageConfigService.addAmazonS3Config(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 根据ID查询文件配置
+     *
+     * @param id 文件配置ID
+     * @return 文件配置
+     */
+    @GetMapping("/{id:\\d+}")
+    @Operation(summary = "获取存储配置")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:query')")
+    public AjaxResult<StorageConfigUnifiedVo> getStorageConfigById(@PathVariable("id") Long id) {
+        Assert.isTrue(id > 0, "存储配置ID必须大于0！");
+        StorageConfigUnifiedVo storageConfig = storageConfigService.getStorageConfigById(id);
+        return success(storageConfig);
+    }
+
+    /**
+     * 修改存储配置
+     *
+     * @param request 修改存储配置请求参数
+     * @return 修改结果
+     */
+    @Operation(summary = "修改存储配置")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
+    @OperationLog(title = "存储配置", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult<Void> updateStorageConConfig(@Validated @RequestBody StorageConfigUpdateRequest request) {
+        boolean result = storageConfigService.updateStorageConConfig(request);
         return toAjax(result);
     }
 
@@ -110,7 +164,7 @@ public class SysStorageConfigController extends BaseController {
      * @param id 文件配置ID
      * @return 设置结果
      */
-    @PutMapping("/setMaster/{id:\\d+}")
+    @PutMapping("/primary/{id:\\d+}")
     @Operation(summary = "设置主配置")
     @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
@@ -120,7 +174,7 @@ public class SysStorageConfigController extends BaseController {
         boolean result = storageConfigService.updatePrimaryConfig(id);
         // 刷新缓存
         if (result) {
-            refreshCache();
+            storageRegistryService.initializeStorage();
         }
         return toAjax(result);
     }

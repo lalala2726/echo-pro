@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.entity.StorageFile;
-import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
 import cn.zhangchuangla.storage.model.vo.file.FileRecordListVo;
 import cn.zhangchuangla.storage.model.vo.file.FileRecordVo;
 import cn.zhangchuangla.storage.service.StorageFileService;
@@ -49,7 +49,7 @@ public class SysStorageFileController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                                      @Validated @ParameterObject FileRecordQueryRequest request) {
+                                                          @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileManage(request);
         List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
         return getTableData(page, fileRecordListVos);
@@ -82,7 +82,7 @@ public class SysStorageFileController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                                     @Validated @ParameterObject FileRecordQueryRequest request) {
+                                                         @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileTrashManage(request);
         List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
         return getTableData(page, fileRecordListVos);
