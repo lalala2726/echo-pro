@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResponseCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.mapper.SysUserMapper;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
@@ -15,6 +16,7 @@ import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
 import cn.zhangchuangla.system.service.SysDeptService;
+import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -44,6 +46,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
+    private final SysRoleService sysRoleService;
 
     /**
      * 进行条件查询
@@ -287,8 +290,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改自己的信息！");
         }
-        Set<String> roles = SecurityUtils.getRoles();
-        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
+        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许修改超级管理员的信息！");
         }
 
@@ -318,16 +321,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean resetPassword(String password, Long userId) {
+        Assert.isTrue(userId > 0, "用户ID必须大于0！");
+        Assert.isTrue(password.length() >= 6, "密码长度不能小于6位！");
         Long currentUserId = SecurityUtils.getUserId();
-        Set<String> current = SecurityUtils.getRoles();
-
         //不允许用户重置自己密码
         if (Objects.equals(currentUserId, userId)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置当前用户密码");
         }
         //不允许用户重置管理员密码
-        Set<String> roles = SecurityUtils.getRoles();
-        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
+        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResponseCode.OPERATION_ERROR, "不允许重置超级管理员密码");
         }
         SysUser sysUser = SysUser.builder()
@@ -365,5 +368,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         BeanUtils.copyProperties(request, sysUser);
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
         return update(sysUser, eq);
+    }
+
+    /**
+     * 导出用户列表
+     *
+     * @param request 请求参数
+     * @return 用户列表
+     */
+    @Override
+    public List<SysUser> exportListUser(SysUserQueryRequest request) {
+        return sysUserMapper.exportListUser(request);
     }
 }

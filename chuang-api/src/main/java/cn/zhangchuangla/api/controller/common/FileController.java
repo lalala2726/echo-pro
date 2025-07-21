@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.storage.model.vo.ImageVo;
 import cn.zhangchuangla.storage.model.vo.SimpleFileVO;
-import cn.zhangchuangla.storage.service.StorageService;
+import cn.zhangchuangla.storage.service.StorageFileService;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController extends BaseController {
 
-    private final StorageService storageService;
+    private final StorageFileService storageFileService;
 
 
     /**
@@ -43,7 +43,7 @@ public class FileController extends BaseController {
     @Operation(summary = "普通文件上传")
     @PostMapping
     public AjaxResult<SimpleFileVO> upload(@RequestParam("file") MultipartFile file) {
-        UploadedFileInfo upload = storageService.upload(file);
+        UploadedFileInfo upload = storageFileService.upload(file);
         SimpleFileVO simpleFileVO = SimpleFileVO.builder()
                 .fileName(upload.getFileOriginalName())
                 .fileSize(StorageUtils.formatFileSize(upload.getFileSize()))
@@ -63,7 +63,7 @@ public class FileController extends BaseController {
     @PostMapping("/image")
     @Operation(summary = "上传图片")
     public AjaxResult<ImageVo> uploadImage(@RequestParam("file") MultipartFile file) {
-        UploadedFileInfo upload = storageService.uploadImage(file);
+        UploadedFileInfo upload = storageFileService.uploadImage(file);
         ImageVo imageVo = new ImageVo(upload.getFileUrl(), upload.getPreviewImage());
         return success(imageVo);
     }

@@ -2,10 +2,10 @@ package cn.zhangchuangla.storage.async;
 
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.TencentCosStorageConfig;
 import cn.zhangchuangla.storage.utils.*;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.OSS;
@@ -186,7 +186,7 @@ public class StorageAsyncService {
             log.info("开始阿里云OSS异步图片压缩: {}/{} -> {}/{}", bucketName, originalImagePath, bucketName, previewImagePath);
 
             // 获取阿里云OSS配置
-            AliyunOSSStorageConfig config = getAliyunOssConfig();
+            AliyunOssStorageConfig config = getAliyunOssConfig();
             ossClient = aliyunOssOperationUtils.createOssClient(config);
 
             // 确保存储桶存在
@@ -258,7 +258,7 @@ public class StorageAsyncService {
             log.info("开始腾讯云COS异步图片压缩: {}/{} -> {}/{}", bucketName, originalImagePath, bucketName, previewImagePath);
 
             // 获取腾讯云COS配置
-            TencentCOSStorageConfig config = getTencentCosConfig();
+            TencentCosStorageConfig config = getTencentCosConfig();
             cosClient = tencentCosOperationUtils.createCosClient(config);
 
             // 确保存储桶存在
@@ -402,13 +402,13 @@ public class StorageAsyncService {
      *
      * @return 阿里云OSS存储配置
      */
-    private AliyunOSSStorageConfig getAliyunOssConfig() {
+    private AliyunOssStorageConfig getAliyunOssConfig() {
         try {
             String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
             if (json == null || json.isBlank()) {
                 throw new RuntimeException("阿里云OSS配置未找到");
             }
-            return JSON.parseObject(json, AliyunOSSStorageConfig.class);
+            return JSON.parseObject(json, AliyunOssStorageConfig.class);
         } catch (Exception e) {
             log.error("获取阿里云OSS配置失败: {}", e.getMessage(), e);
             throw new RuntimeException("获取阿里云OSS配置失败: " + e.getMessage());
@@ -420,13 +420,13 @@ public class StorageAsyncService {
      *
      * @return 腾讯云COS存储配置
      */
-    private TencentCOSStorageConfig getTencentCosConfig() {
+    private TencentCosStorageConfig getTencentCosConfig() {
         try {
             String json = storageConfigRetrievalService.getCurrentStorageConfigJson();
             if (json == null || json.isBlank()) {
                 throw new RuntimeException("腾讯云COS配置未找到");
             }
-            return JSON.parseObject(json, TencentCOSStorageConfig.class);
+            return JSON.parseObject(json, TencentCosStorageConfig.class);
         } catch (Exception e) {
             log.error("获取腾讯云COS配置失败: {}", e.getMessage(), e);
             throw new RuntimeException("获取腾讯云COS配置失败: " + e.getMessage());
@@ -501,14 +501,14 @@ public class StorageAsyncService {
 
                 case StorageConstants.StorageType.ALIYUN_OSS:
                     // 阿里云OSS存储需要额外的桶名称参数，这里从配置获取
-                    AliyunOSSStorageConfig ossConfig = getAliyunOssConfig();
+                    AliyunOssStorageConfig ossConfig = getAliyunOssConfig();
                     compressImageAliyunOss(ossConfig.getBucketName(), originalPath, compressedPath,
                             maxWidth, maxHeight, quality, originalFilename);
                     break;
 
                 case StorageConstants.StorageType.TENCENT_COS:
                     // 腾讯云COS存储需要额外的桶名称参数，这里从配置获取
-                    TencentCOSStorageConfig cosConfig = getTencentCosConfig();
+                    TencentCosStorageConfig cosConfig = getTencentCosConfig();
                     compressImageTencentCos(cosConfig.getBucketName(), originalPath, compressedPath,
                             maxWidth, maxHeight, quality, originalFilename);
                     break;

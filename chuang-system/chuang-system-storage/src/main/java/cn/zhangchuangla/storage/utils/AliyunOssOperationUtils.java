@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.utils;
 
 import cn.zhangchuangla.common.core.exception.FileException;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.*;
@@ -49,7 +49,7 @@ public class AliyunOssOperationUtils {
      * @return OSS客户端实例，用于后续的OSS操作
      * @throws FileException 当配置不完整或客户端创建失败时抛出
      */
-    public OSS createOssClient(AliyunOSSStorageConfig config) {
+    public OSS createOssClient(AliyunOssStorageConfig config) {
         try {
             if (config.getEndpoint() == null || config.getEndpoint().isBlank() ||
                     config.getAccessKeyId() == null || config.getAccessKeyId().isBlank() ||

@@ -5,11 +5,11 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.storage.model.entity.FileRecord;
-import cn.zhangchuangla.storage.model.request.file.FileRecordQueryRequest;
+import cn.zhangchuangla.storage.model.entity.StorageFile;
+import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
 import cn.zhangchuangla.storage.model.vo.file.FileRecordListVo;
 import cn.zhangchuangla.storage.model.vo.file.FileRecordVo;
-import cn.zhangchuangla.storage.service.StorageService;
+import cn.zhangchuangla.storage.service.StorageFileService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,9 +34,9 @@ import java.util.List;
 @Tag(name = "文件资源管理", description = "提供文件资源的列表查询、回收站管理、恢复、删除等相关操作接口")
 @RequestMapping("/system/file/manage")
 @RequiredArgsConstructor
-public class SysFileManageController extends BaseController {
+public class SysStorageFileController extends BaseController {
 
-    private final StorageService storageService;
+    private final StorageFileService storageFileService;
 
 
     /**
@@ -49,20 +49,26 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                                      @Validated @ParameterObject FileRecordQueryRequest request) {
-        Page<FileRecord> page = storageService.listFileManage(request);
+                                                          @Validated @ParameterObject StorageFileQueryRequest request) {
+        Page<StorageFile> page = storageFileService.listFileManage(request);
         List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
         return getTableData(page, fileRecordListVos);
     }
 
+    /**
+     * 文件资源详情
+     *
+     * @param id 文件ID
+     * @return 文件详情
+     */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "文件资源详情")
     @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
     public AjaxResult<FileRecordVo> getFileById(@Parameter(description = "文件ID")
                                                 @PathVariable("id") Long id) {
-        FileRecord fileRecord = storageService.getFileById(id);
+        StorageFile storageFile = storageFileService.getFileById(id);
         FileRecordVo fileRecordVo = new FileRecordVo();
-        BeanUtils.copyProperties(fileRecord, fileRecordVo);
+        BeanUtils.copyProperties(storageFile, fileRecordVo);
         return success(fileRecordVo);
     }
 
@@ -76,8 +82,8 @@ public class SysFileManageController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                                     @Validated @ParameterObject FileRecordQueryRequest request) {
-        Page<FileRecord> page = storageService.listFileTrashManage(request);
+                                                         @Validated @ParameterObject StorageFileQueryRequest request) {
+        Page<StorageFile> page = storageFileService.listFileTrashManage(request);
         List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
         return getTableData(page, fileRecordListVos);
     }
@@ -94,7 +100,7 @@ public class SysFileManageController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:storage-file:delete')")
     public AjaxResult<Void> deleteTrashFile(@Parameter(description = "文件ID集合，支持批量删除")
                                             @PathVariable("ids") List<Long> ids) {
-        boolean result = storageService.deleteTrashFileById(ids);
+        boolean result = storageFileService.deleteTrashFileById(ids);
         return toAjax(result);
     }
 
@@ -110,7 +116,7 @@ public class SysFileManageController extends BaseController {
     @PutMapping("/recover/{ids:[\\d,]+}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
     public AjaxResult<Void> recoverFile(@Parameter(description = "文件ID") @PathVariable("ids") List<Long> ids) {
-        boolean result = storageService.restoreFileFromRecycleBin(ids);
+        boolean result = storageFileService.restoreFileFromRecycleBin(ids);
         return toAjax(result);
     }
 
@@ -128,7 +134,7 @@ public class SysFileManageController extends BaseController {
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                        @Parameter(description = "是否永久删除")
                                        @RequestParam(value = "forceDelete", required = false, defaultValue = "false") boolean forceDelete) {
-        boolean result = storageService.deleteFileById(ids, forceDelete);
+        boolean result = storageFileService.deleteFileById(ids, forceDelete);
         return toAjax(result);
     }
 }

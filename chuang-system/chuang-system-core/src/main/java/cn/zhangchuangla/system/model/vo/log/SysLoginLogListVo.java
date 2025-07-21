@@ -32,7 +32,6 @@ public class SysLoginLogListVo {
     @Schema(description = "账号状态")
     private Integer status;
 
-
     /**
      * 登录IP
      */

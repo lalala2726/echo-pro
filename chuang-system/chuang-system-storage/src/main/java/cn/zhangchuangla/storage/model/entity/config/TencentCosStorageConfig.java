@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
-import cn.zhangchuangla.common.core.annotation.DataMasking;
+import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @author Chuang
  */
 @Data
-public class TencentCOSStorageConfig {
+public class TencentCosStorageConfig {
 
     /**
      * 服务区域
@@ -24,7 +24,6 @@ public class TencentCOSStorageConfig {
     /**
      * 密钥Key
      */
-    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String secretKey;
 
     /**
@@ -41,4 +40,13 @@ public class TencentCOSStorageConfig {
      * 是否真实删除
      */
     private boolean realDelete;
+
+    /**
+     * 转换为JSON字符串
+     *
+     * @return JSON字符串
+     */
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }

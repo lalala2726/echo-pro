@@ -52,6 +52,12 @@ public class SysMenuListVo {
     private Integer orderNum;
 
     /**
+     * 权限标志
+     */
+    @Schema(description = "权限标志")
+    private String permission;
+
+    /**
      * 路由名称
      */
     @Schema(description = "路由名称")

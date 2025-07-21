@@ -64,8 +64,8 @@ public class SysUserUpdateRequest {
      * 密码
      */
     @Schema(description = "登录密码", example = "Abc123456!")
-    @ValidRegex(regexp = RegularConstants.User.PASSWORD, message = "密码格式不正确")
     private String password;
+
 
     /**
      * 昵称

@@ -24,26 +24,31 @@ public class SysMenuTreeList {
      * 菜单ID
      */
     @Schema(description = "菜单ID")
-    private Long menuId;
+    private Long id;
 
     /**
      * 菜单名称
      */
     @Schema(description = "菜单名称")
-    private String menuName;
+    private String title;
 
     /**
      * 父菜单ID
      */
     @Schema(description = "父菜单ID")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Long parentId;
+
+    /**
+     * 图标
+     */
+    @Schema(description = "图标")
+    private String icon;
 
     /**
      * 菜单类型
      */
     @Schema(description = "菜单类型")
-    private String menuType;
+    private String type;
 
     /**
      * 子菜单

@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
@@ -90,13 +91,12 @@ public class SysUserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.EXPORT)
     public void exportExcel(HttpServletResponse response,
                             @Parameter(description = "用户查询参数，包含分页和筛选条件")
-                            @Validated @ParameterObject SysUserQueryRequest request) {
-        Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
+                            @RequestBody SysUserQueryRequest request) {
+        List<SysUser> userList = sysUserService.exportListUser(request);
         ArrayList<UserListVo> userListVos = new ArrayList<>();
-        userPage.getRecords().forEach(user -> {
-            UserListVo userInfoVo = new UserListVo();
-            BeanUtils.copyProperties(user, userInfoVo);
-            userListVos.add(userInfoVo);
+        userList.forEach(user -> {
+            UserListVo userListVo = BeanCotyUtils.copyProperties(user, UserListVo.class);
+            userListVos.add(userListVo);
         });
         excelUtils.exportExcel(response, userListVos, UserListVo.class, "用户列表");
     }
@@ -118,6 +118,22 @@ public class SysUserController extends BaseController {
         Assert.isTrue(!sysUserService.isPhoneExist(request.getPhone()), "手机号已存在");
         Assert.isTrue(!sysUserService.isEmailExist(request.getEmail()), "邮箱已存在");
         return success(sysUserService.addUserInfo(request));
+    }
+
+    /**
+     * 重置用户密码
+     *
+     * @param request 修改密码的请求参数，包含用户ID和密码
+     * @return 修改密码操作结果
+     */
+    @PutMapping("/resetPassword")
+    @Operation(summary = "重置用户密码")
+    @PreAuthorize("@ss.hasPermission('system:user:reset')")
+    @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> resetPassword(@Parameter(description = "修改密码的请求参数，传入用户ID和重置的密码即可", required = true)
+                                          @Validated @RequestBody SysUserUpdateRequest request) {
+        boolean result = sysUserService.resetPassword(request.getPassword(), request.getUserId());
+        return toAjax(result);
     }
 
     /**

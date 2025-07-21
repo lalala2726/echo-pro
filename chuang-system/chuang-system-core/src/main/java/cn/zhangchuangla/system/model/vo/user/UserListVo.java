@@ -39,7 +39,7 @@ public class UserListVo {
      * 性别
      */
     @Schema(description = "性别")
-    @Excel(name = "性别", sort = 4, width = 10)
+    @Excel(name = "性别", sort = 4, width = 10, dictKey = "gender")
     private Integer gender;
 
 

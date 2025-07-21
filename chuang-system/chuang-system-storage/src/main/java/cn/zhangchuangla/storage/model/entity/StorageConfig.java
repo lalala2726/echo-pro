@@ -23,7 +23,7 @@ public class StorageConfig extends BaseEntity {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
      * 参数名称
@@ -48,7 +48,7 @@ public class StorageConfig extends BaseEntity {
     /**
      * 是否默认
      */
-    private Integer isMaster;
+    private Boolean isPrimary;
 
     /**
      * 是否启用回收站(0不启用，1启用)

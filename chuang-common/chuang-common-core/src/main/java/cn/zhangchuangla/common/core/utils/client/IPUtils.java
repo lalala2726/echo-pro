@@ -49,7 +49,7 @@ public class IPUtils {
      * @param request HttpServletRequest对象
      * @return 客户端IP地址
      */
-    public static String getIpAddr(HttpServletRequest request) {
+    public static String getIpAddress(HttpServletRequest request) {
         String ip;
         try {
             if (request == null) {
@@ -69,17 +69,9 @@ public class IPUtils {
             if (!isValidIp(ip)) {
                 ip = request.getHeader("HTTP_X_FORWARDED_FOR");
             }
-            // 如果以上都无效，获取直接连接的 IP
-            if (!isValidIp(ip)) {
-                ip = request.getRemoteAddr();
-                if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-                    // 根据网卡取本机配置的IP
-                    ip = getLocalAddr();
-                }
-            }
         } catch (Exception e) {
             // 记录完整异常
-            log.error("IPUtils getIpAddr ERROR", e);
+            log.error("IPUtils getIpAddress ERROR", e);
             // 出错时返回空字符串
             return "";
         }

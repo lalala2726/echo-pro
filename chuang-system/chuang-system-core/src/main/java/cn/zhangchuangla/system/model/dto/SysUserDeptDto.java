@@ -94,5 +94,4 @@ public class SysUserDeptDto extends BaseEntity {
     @Schema(description = "部门对象")
     private SysDept sysDept;
 
-
 }

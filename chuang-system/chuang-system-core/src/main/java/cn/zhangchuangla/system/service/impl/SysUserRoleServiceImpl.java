@@ -59,6 +59,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void addUserRoleAssociation(List<Long> roleId, Long userId) {
+        if (roleId == null || roleId.isEmpty()) {
+            return;
+        }
         roleId.forEach(role -> {
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(role);

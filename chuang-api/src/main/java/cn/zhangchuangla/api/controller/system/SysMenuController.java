@@ -176,6 +176,7 @@ public class SysMenuController extends BaseController {
      * @return 存在返回true，不存在返回false
      */
     @GetMapping("/path-exists")
+    @Operation(summary = "检查菜单路径是否已经存在")
     public AjaxResult<Boolean> isMenuPathExists(@RequestParam(value = "id", required = false) Long id,
                                                 @RequestParam("path") String path) {
         boolean exists = sysMenuService.isMenuPathExists(id, path);

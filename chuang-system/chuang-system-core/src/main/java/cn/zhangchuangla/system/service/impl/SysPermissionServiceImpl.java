@@ -22,10 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,7 +72,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Override
     public SysRolePermissionVo getPermissionByRoleId(Long roleId) {
         SysRole role = Optional.ofNullable(sysRoleService.getById(roleId))
-                .orElseThrow(() -> new IllegalArgumentException("角色不存在，ID：" + roleId));
+                .orElseThrow(() -> new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在，ID：" + roleId));
         List<SysMenu> allMenus = sysMenuService.list(new LambdaQueryWrapper<SysMenu>()
                 .orderByAsc(SysMenu::getParentId)
                 .orderByAsc(SysMenu::getSort));
@@ -147,48 +144,37 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     /**
-     * 构建用于权限分配等场景的菜单树列表 ({@link SysMenuTreeList} 结构)。
-     *
-     * @param allMenus 原始菜单列表 (应预先按 {@code parentId} 和 {@code sort} 排序)。
-     * @return {@link SysMenuTreeList} 结构的树形菜单列表。
+     * 构建用于权限分配等场景的菜单树列表。
      */
     private List<SysMenuTreeList> buildMenuTreeList(List<SysMenu> allMenus) {
+        long rootId = 0L;
         if (allMenus == null || allMenus.isEmpty()) {
             return Collections.emptyList();
         }
         return allMenus.stream()
-                .filter(menu -> menu.getParentId() == 0L)
+                .filter(menu -> Objects.equals(menu.getParentId(), rootId))
                 .map(menu -> {
                     SysMenuTreeList treeNode = BeanCotyUtils.copyProperties(menu, SysMenuTreeList.class);
                     List<SysMenuTreeList> children = getChildrenAsMenuTreeList(allMenus, menu.getId());
-                    if (!children.isEmpty()) {
-                        treeNode.setChildren(children);
-                    }
+                    treeNode.setChildren(children);
                     return treeNode;
                 })
                 .collect(Collectors.toList());
     }
 
     /**
-     * 递归地获取指定父ID下的子菜单，并转换为 {@link SysMenuTreeList} 结构
-     *
-     * @param allMenus 所有菜单的扁平列表（应预先按sort排序）。
-     * @param parentId 父菜单ID。
-     * @return {@link SysMenuTreeList} 结构的子菜单列表。
+     * 递归地获取指定父ID下的子菜单。
      */
     private List<SysMenuTreeList> getChildrenAsMenuTreeList(List<SysMenu> allMenus, Long parentId) {
-        if (parentId == null || allMenus == null || allMenus.isEmpty()) {
+        if (allMenus == null || allMenus.isEmpty()) {
             return Collections.emptyList();
         }
         return allMenus.stream()
-                .filter(menu -> parentId.equals(menu.getParentId()))
+                .filter(menu -> Objects.equals(menu.getParentId(), parentId))
                 .map(menu -> {
-                    SysMenuTreeList treeNode = new SysMenuTreeList();
-                    BeanCotyUtils.copyProperties(menu, SysMenuTreeList.class);
+                    SysMenuTreeList treeNode = BeanCotyUtils.copyProperties(menu, SysMenuTreeList.class);
                     List<SysMenuTreeList> grandChildren = getChildrenAsMenuTreeList(allMenus, menu.getId());
-                    if (!grandChildren.isEmpty()) {
-                        treeNode.setChildren(grandChildren);
-                    }
+                    treeNode.setChildren(grandChildren);
                     return treeNode;
                 }).collect(Collectors.toList());
     }

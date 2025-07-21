@@ -1,69 +1,61 @@
-package cn.zhangchuangla.storage.model.entity.config;
+package cn.zhangchuangla.storage.model.vo.config;
 
-import com.alibaba.fastjson2.JSON;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
- * minio 配置实体类
+ * Minio配置视图对象
  *
  * @author Chuang
  * <p>
- * created on 2025/3/21 09:41
+ * created on 2025/7/20 22:06
  */
 @Data
-@Schema(description = "minio 配置实体类")
-public class MinioStorageConfig implements Serializable {
+@Schema(description = "Minio配置视图对象")
+public class MinioStorageConfigVo {
 
-    @Serial
-    private static final long serialVersionUID = 254651044373823297L;
 
     /**
      * 访问端点
      */
+    @Schema(description = "访问端点")
     private String endpoint;
 
     /**
      * 访问密钥
      */
+    @Schema(description = "访问密钥")
     private String accessKey;
 
     /**
      * 密钥
      */
+    @Schema(description = "密钥")
     private String secretKey;
 
     /**
      * 存储桶名称
      */
+    @Schema(description = "存储桶名称")
     private String bucketName;
 
     /**
      * 文件访问域名
      */
+    @Schema(description = "文件访问域名")
     private String fileDomain;
 
     /**
      * 存储桶区域
      */
+    @Schema(description = "存储桶区域")
     private String bucketRegion;
 
     /**
      * 是否真实删除
      */
-    private boolean realDelete;
-
-    /**
-     * 转换成JSON字符串
-     *
-     * @return JSON字符串
-     */
-    public String toJson() {
-        return JSON.toJSONString(this);
-    }
+    @Schema(description = "是否真实删除")
+    private Boolean realDelete;
 
 
 }

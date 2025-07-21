@@ -39,7 +39,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
      */
     @Override
     public void recordLoginLog(String username, HttpServletRequest httpServletRequest, boolean isSuccess) {
-        String ipAddr = IPUtils.getIpAddr(httpServletRequest);
+        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         UserAgentUtils.getDeviceManufacturer(userAgent);
 

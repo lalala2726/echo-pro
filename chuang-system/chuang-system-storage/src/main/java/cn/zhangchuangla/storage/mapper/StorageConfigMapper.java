@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * @author Chuang
  */
-public interface SysFileConfigMapper extends BaseMapper<StorageConfig> {
+public interface StorageConfigMapper extends BaseMapper<StorageConfig> {
 
     /**
      * 分页查询文件配置信息
