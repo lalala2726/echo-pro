@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.StrUtils;
@@ -74,7 +74,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     @Override
     public boolean addDictType(SysDictTypeAddRequest request) {
         if (isDictTypeExist(request.getDictType())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
         SysDictType sysDictType = new SysDictType();
         BeanUtils.copyProperties(request, sysDictType);
@@ -97,7 +97,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
                 .eq(SysDictType::getDictType, request.getDictType())
                 .ne(SysDictType::getId, request.getId());
         if (count(queryWrapper) > 0) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
 
         SysDictType sysDictType = new SysDictType();

@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -55,7 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw e;
         } catch (Exception e) {
             log.error("加载用户[{}]信息时发生错误", username, e);
-            throw new ServiceException(ResponseCode.SYSTEM_ERROR, "系统错误，无法加载用户信息");
+            throw new ServiceException(ResultCode.SYSTEM_ERROR, "系统错误，无法加载用户信息");
         }
     }
 }

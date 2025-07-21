@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
@@ -17,19 +17,19 @@ public final class TooManyRequestException extends RuntimeException {
     private final Integer code;
 
 
-    public TooManyRequestException(ResponseCode responseCode, String message) {
+    public TooManyRequestException(ResultCode resultCode, String message) {
         super(message);
-        this.code = responseCode.getCode();
+        this.code = resultCode.getCode();
     }
 
-    public TooManyRequestException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
+    public TooManyRequestException(ResultCode resultCode) {
+        super(resultCode.getMessage());
+        this.code = resultCode.getCode();
     }
 
     public TooManyRequestException(String message) {
         super(message);
-        this.code = ResponseCode.PROFILE_ERROR.getCode();
+        this.code = ResultCode.PROFILE_ERROR.getCode();
     }
 
 }

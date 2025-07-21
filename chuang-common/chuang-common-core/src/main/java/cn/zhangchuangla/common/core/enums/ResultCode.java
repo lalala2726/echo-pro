@@ -10,7 +10,7 @@ import lombok.Getter;
  * @author Chuang
  */
 @Getter
-public enum ResponseCode {
+public enum ResultCode {
 
     // region 通用成功与错误状态
     // 当操作成功完成时的响应
@@ -125,7 +125,7 @@ public enum ResponseCode {
      */
     private final String message;
 
-    ResponseCode(Integer code, String msg) {
+    ResultCode(Integer code, String msg) {
         this.code = code;
         this.message = msg;
     }

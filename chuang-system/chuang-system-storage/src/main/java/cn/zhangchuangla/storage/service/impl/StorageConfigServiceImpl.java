@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -136,7 +136,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
         StorageConfig primaryConfig = getPrimaryConfig();
         ids.forEach(id -> {
             if (Objects.equals(primaryConfig.getId(), id)) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "主文件配置不能删除");
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "主文件配置不能删除");
             }
         });
         return removeByIds(ids);
@@ -205,7 +205,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
         Assert.isTrue(id > 0, "文件存储配置ID不能小于0");
         StorageConfig storageConfig = getById(id);
         if (storageConfig == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件存储配置不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
         }
         return toUnifiedVo(storageConfig);
     }
@@ -220,7 +220,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
     public boolean updateStorageConConfig(StorageConfigUpdateRequest request) {
         StorageConfig storageConfig = getById(request.getId());
         if (storageConfig == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件存储配置不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
         }
         toStorageConfig(request, storageConfig);
         return updateById(storageConfig);
@@ -274,7 +274,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
                 storageConfig.setStorageValue(tencentCosStorageConfig.toJson());
                 break;
             default:
-                throw new ServiceException(ResponseCode.SERVER_CANNOT_SUPPORT);
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
         }
     }
 
@@ -308,7 +308,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
                 storageConfigUnifiedVo.setTencentCosStorageConfigVo(tencentCosStorageConfigVo);
                 break;
             default:
-                throw new ServiceException(ResponseCode.SERVER_CANNOT_SUPPORT);
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
         }
         return storageConfigUnifiedVo;
     }

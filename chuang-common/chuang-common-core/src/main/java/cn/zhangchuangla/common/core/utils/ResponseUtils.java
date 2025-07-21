@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.utils;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ public class ResponseUtils {
      * @param response   HttpServletResponse
      * @param resultCode 响应结果码
      */
-    public static void writeErrMsg(HttpServletResponse response, ResponseCode resultCode) {
+    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode) {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -48,7 +48,7 @@ public class ResponseUtils {
      * @param response   HttpServletResponse
      * @param resultCode 响应结果码
      */
-    public static void writeErrMsg(HttpServletResponse response, ResponseCode resultCode, String message) {
+    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, String message) {
         int status = getHttpStatus(resultCode);
 
         response.setStatus(status);
@@ -71,7 +71,7 @@ public class ResponseUtils {
      * @param resultCode 结果码
      * @return HTTP状态码
      */
-    private static int getHttpStatus(ResponseCode resultCode) {
+    private static int getHttpStatus(ResultCode resultCode) {
         return switch (resultCode) {
             case ACCESS_UNAUTHORIZED, ACCESS_TOKEN_INVALID, REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED.value();
             default -> HttpStatus.BAD_REQUEST.value();

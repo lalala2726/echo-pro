@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.web.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.*;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +56,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
         log.error("请求方法不支持", exception);
-        return AjaxResult.error(ResponseCode.NOT_SUPPORT);
+        return AjaxResult.error(ResultCode.NOT_SUPPORT);
     }
 
     /**
@@ -69,7 +69,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
         log.error("请求参数非法: ", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
+        return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
     }
 
     /**
@@ -90,7 +90,7 @@ public class GlobalExceptionHandel {
                     exception.getRequiredType().getSimpleName(),
                     exception.getValue());
         }
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, errorMessage);
+        return AjaxResult.error(ResultCode.PARAM_ERROR, errorMessage);
     }
 
     /**
@@ -103,7 +103,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(IllegalArgumentException.class)
     public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
         log.error("请求参数非法: ", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, "请求参数非法!");
+        return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
     }
 
 
@@ -117,7 +117,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(LoginException.class)
     public AjaxResult<Void> loginExceptionHandel(LoginException exception) {
         log.error("登录异常:", exception);
-        return AjaxResult.error(ResponseCode.LOGIN_ERROR, exception.getMessage());
+        return AjaxResult.error(ResultCode.LOGIN_ERROR, exception.getMessage());
     }
 
     /**
@@ -130,7 +130,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(AccountException.class)
     public AjaxResult<Void> accountExceptionExceptionHandel(Exception exception) {
         log.error("认证异常", exception);
-        return AjaxResult.error(ResponseCode.ACCOUNT_ERROR, exception.getMessage());
+        return AjaxResult.error(ResultCode.ACCOUNT_ERROR, exception.getMessage());
     }
 
     /**
@@ -143,7 +143,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public AjaxResult<Void> internalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
         log.error("认证失败:", exception);
-        return AjaxResult.error(ResponseCode.AUTHORIZED, exception.getMessage());
+        return AjaxResult.error(ResultCode.AUTHORIZED, exception.getMessage());
     }
 
     /**
@@ -156,7 +156,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(LockedException.class)
     public AjaxResult<Void> lockedExceptionHandel(LockedException exception) {
         log.error("账号被锁定:", exception);
-        return AjaxResult.error(ResponseCode.ACCOUNT_LOCKED, exception.getMessage());
+        return AjaxResult.error(ResultCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
     /**
@@ -169,7 +169,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(ParamException.class)
     public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
         log.error("参数异常:", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, exception.getMessage());
+        return AjaxResult.error(ResultCode.PARAM_ERROR, exception.getMessage());
     }
 
     /**
@@ -182,7 +182,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
         log.error("权限不足", exception);
-        return AjaxResult.error(ResponseCode.ACCESS_DENIED);
+        return AjaxResult.error(ResultCode.ACCESS_DENIED);
     }
 
     /**
@@ -195,7 +195,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public AjaxResult<Void> methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
         log.error("参数校验失败:", exception);
-        return AjaxResult.error(ResponseCode.PARAM_ERROR,
+        return AjaxResult.error(ResultCode.PARAM_ERROR,
                 Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
@@ -211,7 +211,7 @@ public class GlobalExceptionHandel {
     public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
         log.error("资源不存在：{}", exception.toString());
         String message = String.format("资源不存在: %s", request.getRequestURI());
-        return AjaxResult.error(ResponseCode.NOT_FOUND, message);
+        return AjaxResult.error(ResultCode.NOT_FOUND, message);
     }
 
     /**
@@ -224,7 +224,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(ProfileException.class)
     public AjaxResult<Void> profileExceptionHandel(ProfileException exception) {
         log.error("配置异常:", exception);
-        return AjaxResult.error(ResponseCode.PROFILE_ERROR, exception.getMessage());
+        return AjaxResult.error(ResultCode.PROFILE_ERROR, exception.getMessage());
     }
 
     /**
@@ -237,7 +237,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(TooManyRequestException.class)
     public AjaxResult<Void> tooManyRequestExceptionHandel(TooManyRequestException exception) {
         log.error("请求过于频繁", exception);
-        return AjaxResult.error(ResponseCode.TOO_MANY_REQUESTS, exception.getMessage());
+        return AjaxResult.error(ResultCode.TOO_MANY_REQUESTS, exception.getMessage());
     }
 
     /**
@@ -259,7 +259,7 @@ public class GlobalExceptionHandel {
                 paramName = message.substring(start, end);
             }
         }
-        return AjaxResult.error(ResponseCode.PARAM_ERROR, "缺少请求参数: " + paramName);
+        return AjaxResult.error(ResultCode.PARAM_ERROR, "缺少请求参数: " + paramName);
     }
 
     /**
@@ -272,7 +272,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(Exception.class)
     public AjaxResult<Void> exceptionHandel(Exception exception) {
         log.error("系统异常", exception);
-        return AjaxResult.error(ResponseCode.SERVER_ERROR, exception.getMessage());
+        return AjaxResult.error(ResultCode.SERVER_ERROR, exception.getMessage());
     }
 
 

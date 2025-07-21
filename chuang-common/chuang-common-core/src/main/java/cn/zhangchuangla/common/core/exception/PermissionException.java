@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
@@ -19,19 +19,19 @@ public final class PermissionException extends RuntimeException {
     private final Integer code;
 
 
-    public PermissionException(ResponseCode responseCode, String message) {
+    public PermissionException(ResultCode resultCode, String message) {
         super(message);
-        this.code = responseCode.getCode();
+        this.code = resultCode.getCode();
     }
 
-    public PermissionException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
+    public PermissionException(ResultCode resultCode) {
+        super(resultCode.getMessage());
+        this.code = resultCode.getCode();
     }
 
     public PermissionException(String message) {
         super(message);
-        this.code = ResponseCode.AUTHORIZED.getCode();
+        this.code = ResultCode.AUTHORIZED.getCode();
     }
 
 }

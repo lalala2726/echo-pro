@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.result;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,22 +63,22 @@ public class AjaxResult<T> implements Serializable {
     }
 
     /**
-     * 通过 ResponseCode 枚举和数据构造
+     * 通过 ResultCode 枚举和数据构造
      *
-     * @param responseCode ResponseCode 枚举实例
+     * @param resultCode ResultCode 枚举实例
      * @param data         数据
      */
-    private AjaxResult(ResponseCode responseCode, T data) {
-        this(responseCode.getCode(), responseCode.getMessage(), data);
+    private AjaxResult(ResultCode resultCode, T data) {
+        this(resultCode.getCode(), resultCode.getMessage(), data);
     }
 
     /**
-     * 通过 ResponseCode 枚举构造 (无数据)
+     * 通过 ResultCode 枚举构造 (无数据)
      *
-     * @param responseCode ResponseCode 枚举实例
+     * @param resultCode ResultCode 枚举实例
      */
-    private AjaxResult(ResponseCode responseCode) {
-        this(responseCode, null);
+    private AjaxResult(ResultCode resultCode) {
+        this(resultCode, null);
     }
 
 
@@ -87,7 +87,7 @@ public class AjaxResult<T> implements Serializable {
      */
     @Schema(description = "成功返回 (无消息，无数据)")
     public static <T> AjaxResult<T> success() {
-        return new AjaxResult<>(ResponseCode.SUCCESS);
+        return new AjaxResult<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -96,7 +96,7 @@ public class AjaxResult<T> implements Serializable {
      * @param message 自定义成功消息
      */
     public static <T> AjaxResult<T> success(String message) {
-        return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, null);
+        return new AjaxResult<>(ResultCode.SUCCESS.getCode(), message, null);
     }
 
     /**
@@ -105,7 +105,7 @@ public class AjaxResult<T> implements Serializable {
      * @param data 返回的数据
      */
     public static <T> AjaxResult<T> success(T data) {
-        return new AjaxResult<>(ResponseCode.SUCCESS, data);
+        return new AjaxResult<>(ResultCode.SUCCESS, data);
     }
 
     /**
@@ -115,14 +115,14 @@ public class AjaxResult<T> implements Serializable {
      * @param data    返回的数据
      */
     public static <T> AjaxResult<T> success(String message, T data) {
-        return new AjaxResult<>(ResponseCode.SUCCESS.getCode(), message, data);
+        return new AjaxResult<>(ResultCode.SUCCESS.getCode(), message, data);
     }
 
     /**
      * 失败返回 (使用默认错误码和消息，无数据)
      */
     public static <T> AjaxResult<T> error() {
-        return new AjaxResult<>(ResponseCode.ERROR);
+        return new AjaxResult<>(ResultCode.ERROR);
     }
 
     public static <T> AjaxResult<T> error(String message, Integer code) {
@@ -136,26 +136,26 @@ public class AjaxResult<T> implements Serializable {
      * @param message 自定义错误消息
      */
     public static <T> AjaxResult<T> error(String message) {
-        return new AjaxResult<>(ResponseCode.ERROR.getCode(), message, null);
+        return new AjaxResult<>(ResultCode.ERROR.getCode(), message, null);
     }
 
     /**
-     * 失败返回 (使用指定的 ResponseCode，无数据)
+     * 失败返回 (使用指定的 ResultCode，无数据)
      *
-     * @param responseCode 响应码枚举
+     * @param resultCode 响应码枚举
      */
-    public static <T> AjaxResult<T> error(ResponseCode responseCode) {
-        return new AjaxResult<>(responseCode);
+    public static <T> AjaxResult<T> error(ResultCode resultCode) {
+        return new AjaxResult<>(resultCode);
     }
 
     /**
-     * 失败返回 (使用指定的 ResponseCode 和自定义消息，无数据)
+     * 失败返回 (使用指定的 ResultCode 和自定义消息，无数据)
      *
-     * @param responseCode 响应码枚举
+     * @param resultCode 响应码枚举
      * @param message      自定义错误消息 (将覆盖枚举中的默认消息)
      */
-    public static <T> AjaxResult<T> error(ResponseCode responseCode, String message) {
-        return new AjaxResult<>(responseCode.getCode(), message, null);
+    public static <T> AjaxResult<T> error(ResultCode resultCode, String message) {
+        return new AjaxResult<>(resultCode.getCode(), message, null);
     }
 
     /**
@@ -174,7 +174,7 @@ public class AjaxResult<T> implements Serializable {
      * @param message 自定义警告消息
      */
     public static <T> AjaxResult<T> warning(String message) {
-        return new AjaxResult<>(ResponseCode.WARNING.getCode(), message, null);
+        return new AjaxResult<>(ResultCode.WARNING.getCode(), message, null);
     }
 
 }
