@@ -45,31 +45,5 @@
         </where>
     </select>
 
-    <select id="listStorageConfig" resultMap="BaseResultMap">
-        select id,
-        storage_name,
-        storage_key,
-        storage_value,
-        storage_type,
-        is_primary,
-        enable_trash,
-        create_by,
-        create_time,
-        update_by,
-        update_time,
-        remark
-        from storage_config
-        <where>
-            <if test="request.storageName != null and request.storageName != ''">
-                and storage_name like concat('%', #{request.storageName}, '%')
-            </if>
-            <if test="request.storageKey != null and request.storageKey != ''">
-                and storage_key = #{request.storageKey}
-            </if>
-            <if test="request.storageType != null and request.storageType != ''">
-                and storage_type = #{request.storageType}
-            </if>
-        </where>
-    </select>
 
 </mapper>

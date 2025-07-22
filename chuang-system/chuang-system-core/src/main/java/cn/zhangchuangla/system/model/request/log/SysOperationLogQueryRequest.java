@@ -1,11 +1,12 @@
 package cn.zhangchuangla.system.model.request.log;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * 系统操作日志列表请求类
@@ -59,10 +60,17 @@ public class SysOperationLogQueryRequest extends BasePageRequest {
     @Schema(description = "操作模块", example = "用户管理", type = "string")
     private String module;
 
+    /**
+     * 操作开始时间
+     */
+    @Schema(description = "开始时间", example = "2023-01-01", type = "string")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate startTime;
 
     /**
-     * 操作时间
+     * 操作结束时间
      */
-    @Schema(description = "操作时间", example = "2025-04-05T12:00:00Z", type = "date")
-    private Date createTime;
+    @Schema(description = "结束时间", example = "2023-12-31", type = "string")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate endTime;
 }

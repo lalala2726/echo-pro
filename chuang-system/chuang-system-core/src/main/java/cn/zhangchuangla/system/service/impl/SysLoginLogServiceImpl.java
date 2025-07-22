@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -90,6 +91,17 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
     public Page<SysLoginLog> listLoginLog(SysLoginLogQueryRequest request) {
         Page<SysLoginLog> sysLoginLogPage = new Page<>(request.getPageNum(), request.getPageSize());
         return sysLoginLogMapper.listLoginLog(sysLoginLogPage, request);
+    }
+
+    /**
+     * 导出登录日志
+     *
+     * @param request 登录日志列表查询参数
+     * @return 登录日志列表
+     */
+    @Override
+    public List<SysLoginLog> exportLoginLog(SysLoginLogQueryRequest request) {
+        return sysLoginLogMapper.listLoginLog(request);
     }
 
 
