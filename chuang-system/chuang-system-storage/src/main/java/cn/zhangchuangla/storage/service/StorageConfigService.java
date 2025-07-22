@@ -129,4 +129,12 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @return 是否已存在
      */
     boolean isStorageKeyExists(Long id, String storageKey);
+
+    /**
+     * 获取存储配置列表
+     *
+     * @param request 存储配置查询参数
+     * @return 存储配置列表
+     */
+    List<StorageConfig> listStorageConfig(StorageConfigQueryRequest request);
 }

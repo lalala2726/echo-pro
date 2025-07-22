@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @Tag(name = "文件资源管理", description = "提供文件资源的列表查询、回收站管理、恢复、删除等相关操作接口")
-@RequestMapping("/system/file/manage")
+@RequestMapping("/system/storage/file")
 @RequiredArgsConstructor
 public class SysStorageFileController extends BaseController {
 

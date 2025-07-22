@@ -50,7 +50,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
     @Override
     public Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return storageConfigMapper.listSysFileConfig(sysFileConfigPage, request);
+        return storageConfigMapper.listStorageConfig(sysFileConfigPage, request);
     }
 
 
@@ -241,6 +241,17 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
             queryWrapper.ne(StorageConfig::getId, id);
         }
         return count(queryWrapper) > 0;
+    }
+
+    /**
+     * 查询存储配置,无分页
+     *
+     * @param request 存储配置查询参数
+     * @return 存储配置列表
+     */
+    @Override
+    public List<StorageConfig> listStorageConfig(StorageConfigQueryRequest request) {
+        return storageConfigMapper.listStorageConfig(request);
     }
 
     /**

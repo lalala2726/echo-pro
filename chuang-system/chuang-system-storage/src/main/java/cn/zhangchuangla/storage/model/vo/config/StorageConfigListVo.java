@@ -1,7 +1,10 @@
 package cn.zhangchuangla.storage.model.vo.config;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 文件配置表
@@ -41,6 +44,13 @@ public class StorageConfigListVo {
      */
     @Schema(description = "是否主配置")
     private Boolean isPrimary;
+
+    /**
+     * 创建时间
+     */
+    @Schema(description = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
     /**
      * 备注
