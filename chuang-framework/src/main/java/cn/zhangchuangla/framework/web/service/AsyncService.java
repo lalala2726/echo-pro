@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.service;
+package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -122,4 +122,4 @@ public class AsyncService {
     }
 
 
-} 
+}

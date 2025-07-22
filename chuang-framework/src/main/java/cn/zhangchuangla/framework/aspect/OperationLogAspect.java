@@ -3,10 +3,9 @@ package cn.zhangchuangla.framework.aspect;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.service.AsyncService;
+import cn.zhangchuangla.framework.web.service.AsyncService;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -151,7 +150,7 @@ public class OperationLogAspect {
             sysOperationLog.setUserName(sysUserDetails != null ? sysUserDetails.getUsername() : SysRolesConstant.ANONYMOUS);
 
             // 获取 HTTP 请求对象
-            HttpServletRequest request = ServletUtils.getRequest();
+            HttpServletRequest request = SecurityUtils.getHttpServletRequest();
             sysOperationLog.setRequestUrl(request.getRequestURI());
             sysOperationLog.setMethodName(joinPoint.getSignature().getName());
             String ipAddr = IPUtils.getIpAddress(request);
