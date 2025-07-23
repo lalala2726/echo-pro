@@ -1,6 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ *
  * @author Chuang
  * Created on 2025/4/3 21:39
  */
@@ -39,6 +41,7 @@ public class SysStorageConfigController extends BaseController {
     private final StorageConfigService storageConfigService;
     private final StorageRegistryService storageRegistryService;
     private final ExcelUtils excelUtils;
+
 
     /**
      * 文件配置列表
@@ -56,6 +59,7 @@ public class SysStorageConfigController extends BaseController {
         return getTableData(sysFileConfigPage, storageConfigListVos);
     }
 
+
     /**
      * 导出存储配置
      *
@@ -66,9 +70,8 @@ public class SysStorageConfigController extends BaseController {
     @PostMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:storage-config:export')")
     public void exportStorageConfig(@ParameterObject StorageConfigQueryRequest request, HttpServletResponse response) {
-        List<StorageConfig> storageConfigs = storageConfigService.listStorageConfig(request);
-        List<StorageConfigListVo> storageConfigListVos = copyListProperties(storageConfigs, StorageConfigListVo.class);
-        excelUtils.exportExcel(response, storageConfigListVos, StorageConfigListVo.class, "存储配置列表");
+        List<StorageConfigUnifiedVo> storageConfigUnifiedVos = storageConfigService.listStorageConfig(request);
+        excelUtils.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
     }
 
 
@@ -84,6 +87,18 @@ public class SysStorageConfigController extends BaseController {
                                                   @RequestParam("storageKey") String storageKey) {
         boolean result = storageConfigService.isStorageKeyExists(id, storageKey);
         return AjaxResult.success(result);
+    }
+
+    /**
+     * 获取存储配置键选项
+     *
+     * @return 存储配置键选项
+     */
+    @GetMapping("/key-option")
+    @Operation(summary = "获取存储配置键选项")
+    public AjaxResult<List<Option<String>>> getStorageConfigKeyOption() {
+        List<Option<String>> options = storageConfigService.getStorageConfigKeyOption();
+        return success(options);
     }
 
 

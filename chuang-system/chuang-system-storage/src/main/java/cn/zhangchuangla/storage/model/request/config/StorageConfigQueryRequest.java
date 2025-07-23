@@ -32,10 +32,5 @@ public class StorageConfigQueryRequest extends BasePageRequest {
      */
     @Schema(description = "存储类型", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "minio")
     private String storageType;
-    /**
-     * 备注
-     */
-    @Schema(description = "备注", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "这是个备注")
-    private String remark;
 
 }

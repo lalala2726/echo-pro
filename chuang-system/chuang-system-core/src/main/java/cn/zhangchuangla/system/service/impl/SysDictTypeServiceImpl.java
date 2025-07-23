@@ -100,6 +100,10 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
 
+        SysDictType dictType = getById(request.getId());
+        if (dictType == null) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型不存在");
+        }
         SysDictType sysDictType = new SysDictType();
         BeanUtils.copyProperties(request, sysDictType);
         sysDictType.setUpdateBy(SecurityUtils.getUsername());

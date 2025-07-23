@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.service;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
 import cn.zhangchuangla.storage.model.request.config.*;
 import cn.zhangchuangla.storage.model.vo.config.StorageConfigUnifiedVo;
@@ -136,5 +137,12 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param request 存储配置查询参数
      * @return 存储配置列表
      */
-    List<StorageConfig> listStorageConfig(StorageConfigQueryRequest request);
+    List<StorageConfigUnifiedVo> listStorageConfig(StorageConfigQueryRequest request);
+
+    /**
+     * 获取存储配置键值选项
+     *
+     * @return 存储配置键值选项
+     */
+    List<Option<String>> getStorageConfigKeyOption();
 }

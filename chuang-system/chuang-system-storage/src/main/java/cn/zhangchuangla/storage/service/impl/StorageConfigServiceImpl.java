@@ -1,5 +1,6 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
@@ -25,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -250,8 +252,28 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
      * @return 存储配置列表
      */
     @Override
-    public List<StorageConfig> listStorageConfig(StorageConfigQueryRequest request) {
-        return storageConfigMapper.listStorageConfig(request);
+    public List<StorageConfigUnifiedVo> listStorageConfig(StorageConfigQueryRequest request) {
+        List<StorageConfig> storageConfigs = storageConfigMapper.listStorageConfig(request);
+        ArrayList<StorageConfigUnifiedVo> storageConfigUnifiedVos = new ArrayList<>();
+        storageConfigs.forEach(storageConfig -> {
+                    StorageConfigUnifiedVo unifiedVo = toUnifiedVo(storageConfig);
+                    storageConfigUnifiedVos.add(unifiedVo);
+                }
+        );
+        return storageConfigUnifiedVos;
+    }
+
+
+    /**
+     * 获取存储配置键值选项
+     *
+     * @return 存储配置键值选项
+     */
+    @Override
+    public List<Option<String>> getStorageConfigKeyOption() {
+        return list()
+                .stream()
+                .map(storageConfig -> new Option<>(storageConfig.getStorageKey(), storageConfig.getStorageName())).toList();
     }
 
     /**
