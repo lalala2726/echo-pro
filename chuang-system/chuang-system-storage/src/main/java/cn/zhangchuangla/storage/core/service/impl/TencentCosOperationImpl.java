@@ -525,6 +525,8 @@ public class TencentCosOperationImpl implements OperationService {
      * @return 文件信息
      */
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        String path = StorageUtils.joinUrl(tencentCosStorageConfig.getFileDomain(), objectPath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
@@ -534,7 +536,7 @@ public class TencentCosOperationImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(tencentCosStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(path);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -553,6 +555,9 @@ public class TencentCosOperationImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String fileUrl = StorageUtils.joinUrl(tencentCosStorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(tencentCosStorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -562,9 +567,9 @@ public class TencentCosOperationImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(tencentCosStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(tencentCosStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

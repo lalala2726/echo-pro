@@ -150,19 +150,19 @@ public class AmazonS3OperationServiceImpl implements OperationService {
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
 
             // 构建S3对象路径：日期目录/file/文件名
-            String objectPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName).toString().replace("\\", "/");
+            String path = StorageUtils.joinUrl(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName);
 
             // 获取S3客户端并确保存储桶存在
             S3Client client = getS3Client();
             amazonS3OperationUtils.ensureBucketExists(client, bucketName);
 
             // 上传文件到亚马逊S3 - 核心上传逻辑
-            amazonS3OperationUtils.uploadFile(client, bucketName, objectPath, file.getInputStream(), file.getSize(), file.getContentType());
+            amazonS3OperationUtils.uploadFile(client, bucketName, path, file.getInputStream(), file.getSize(), file.getContentType());
 
-            log.info("文件上传成功到亚马逊S3: {}/{}", bucketName, objectPath);
+            log.info("文件上传成功到亚马逊S3: {}/{}", bucketName, path);
 
             // 构建文件信息返回给调用方
-            return buildFileInfo(file, objectPath, newFileName);
+            return buildFileInfo(file, path, newFileName);
 
         } catch (Exception e) {
             log.error("亚马逊S3文件上传失败", e);
@@ -503,6 +503,8 @@ public class AmazonS3OperationServiceImpl implements OperationService {
      * @return 文件信息
      */
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        String fileUrl = StorageUtils.joinUrl(amazonS3StorageConfig.getFileDomain(), objectPath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
@@ -512,7 +514,7 @@ public class AmazonS3OperationServiceImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(amazonS3StorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -531,6 +533,9 @@ public class AmazonS3OperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String fileUrl = StorageUtils.joinUrl(amazonS3StorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(amazonS3StorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -540,9 +545,9 @@ public class AmazonS3OperationServiceImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(amazonS3StorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(amazonS3StorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

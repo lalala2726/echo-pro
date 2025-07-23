@@ -148,19 +148,19 @@ public class AliyunOssOperationServiceImpl implements OperationService {
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
 
             // 构建OSS对象路径：日期目录/file/文件名
-            String objectPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName).toString().replace("\\", "/");
+            String path = StorageUtils.joinUrl(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName);
 
             // 获取OSS客户端并确保存储桶存在
             OSS client = getOssClient();
             aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
 
             // 上传文件到阿里云OSS - 核心上传逻辑
-            aliyunOssOperationUtils.uploadFile(client, bucketName, objectPath, file.getInputStream(), file.getSize(), file.getContentType());
+            aliyunOssOperationUtils.uploadFile(client, bucketName, path, file.getInputStream(), file.getSize(), file.getContentType());
 
-            log.info("文件上传成功到阿里云OSS: {}/{}", bucketName, objectPath);
+            log.info("文件上传成功到阿里云OSS: {}/{}", bucketName, path);
 
             // 构建文件信息返回给调用方
-            return buildFileInfo(file, objectPath, newFileName);
+            return buildFileInfo(file, path, newFileName);
 
         } catch (Exception e) {
             log.error("阿里云OSS文件上传失败", e);
@@ -191,10 +191,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
             // 构建阿里云OSS中的原图和预览图路径
             String originalImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.ORIGINAL, newFileName).toString().replace("\\", "/");
+                    StorageConstants.dirName.ORIGINAL, newFileName).toString();
             String previewImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.PREVIEW, newFileName).toString().replace("\\", "/");
-
+                    StorageConstants.dirName.PREVIEW, newFileName).toString();
             // 获取OSS客户端并确保存储桶存在
             OSS client = getOssClient();
             aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
@@ -501,6 +500,8 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      * @return 文件信息
      */
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        String fileUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), objectPath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
@@ -510,7 +511,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -529,6 +530,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String fileUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -538,9 +542,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(aliyunOssStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

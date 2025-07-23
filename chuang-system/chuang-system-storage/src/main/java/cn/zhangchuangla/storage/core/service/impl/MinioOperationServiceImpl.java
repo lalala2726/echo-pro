@@ -504,6 +504,9 @@ public class MinioOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
+
+        String fileUrl = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), objectPath);
+
         info.setBucketName(bucketName);
         info.setFileOriginalName(src.getOriginalFilename());
         info.setFileName(newFileName);
@@ -511,7 +514,7 @@ public class MinioOperationServiceImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(minioStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -530,6 +533,9 @@ public class MinioOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String filePath = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -539,9 +545,9 @@ public class MinioOperationServiceImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(minioStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(filePath);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(minioStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

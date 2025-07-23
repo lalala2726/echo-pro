@@ -427,6 +427,9 @@ public class LocalOperationServiceImpl implements OperationService {
      */
     private UploadedFileInfo buildFileInfo(String originalFileName, File savedFile, String filePath, String previewPath,
                                            String newFileName, String fileType) {
+        String fileUrl = StorageUtils.joinUrl(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName);
+        String imageUrl = StorageUtils.joinUrl(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath, newFileName);
+
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
         info.setFileName(newFileName);
@@ -434,10 +437,9 @@ public class LocalOperationServiceImpl implements OperationService {
         info.setFileSize(savedFile.length());
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, filePath, newFileName).toString());
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
-        info.setPreviewImage(Paths.get(localStorageConfig.getFileDomain(), Constants.RESOURCE_PREFIX, previewPath
-                , newFileName).toString());
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(Paths.get(previewPath, newFileName).toString());
         return info;
     }
