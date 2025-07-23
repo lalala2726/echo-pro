@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -76,10 +76,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public boolean addMenu(SysMenuAddRequest request) {
         if (isMenuNameExists(null, request.getName())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
         }
         if (isMenuPathExists(null, request.getPath())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
@@ -104,10 +104,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public boolean updateMenu(SysMenuUpdateRequest request) {
         if (isMenuNameExists(request.getId(), request.getName())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
         }
         if (isMenuPathExists(request.getId(), request.getPath())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
@@ -131,11 +131,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     public boolean deleteMenu(Long menuId) {
         //判断当前是否包含子菜单
         if (hasChildren(menuId)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单包含子菜单，请先删除子菜单");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前菜单包含子菜单，请先删除子菜单");
         }
         //判断当前菜单是否已分配
         if (sysRoleMenuService.isMenuAssignedToRoles(menuId)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单已分配，请先解除分配");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前菜单已分配，请先解除分配");
         }
         return removeById(menuId);
     }

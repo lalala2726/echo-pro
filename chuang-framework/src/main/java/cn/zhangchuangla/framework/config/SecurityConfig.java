@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
@@ -166,7 +166,7 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
             ServletUtils.renderString(response, JSON.toJSONString(
-                    AjaxResult.error(ResponseCode.FORBIDDEN, format)));
+                    AjaxResult.error(ResultCode.FORBIDDEN, format)));
         };
     }
 

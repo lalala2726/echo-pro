@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
@@ -80,7 +80,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByUserId(Long userId) {
         if (userId <= 0) {
-            throw new ParamException(ResponseCode.INVALID_ROLE_ID, "用户ID无效");
+            throw new ParamException(ResultCode.INVALID_ROLE_ID, "用户ID无效");
         }
 
         String cacheKey = RedisConstants.Auth.ROLE_KEY + userId;
@@ -151,12 +151,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
         SysRole role = getById(request.getId());
         if (role == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "角色不存在");
         }
         // 检查是否包含超级管理员角色
         boolean contains = SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey());
         if (contains) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(request, sysRole);
@@ -188,7 +188,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<Long> getUserRoleIdByUserId(Long userId) {
         if (userId <= 0) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能小于等于0");
         }
         List<SysRole> roleList = getRoleListByUserId(userId);
         if (roleList == null) {
@@ -209,20 +209,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteRoleInfo(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
-            throw new ServiceException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
+            throw new ServiceException(ResultCode.PARAM_ERROR, "角色ID不能为空");
         }
 
         // 检查是否包含超级管理员角色
         List<SysRole> roles = listByIds(ids);
         if (roles.stream().anyMatch(role -> SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许删除");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许删除");
         }
 
         // 检查角色是否已分配菜单
         LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
         List<SysRoleMenu> list = sysRoleMenuService.list(eq);
         if (list != null && !list.isEmpty()) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "角色已分配用户，不能删除");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "角色已分配用户，不能删除");
         }
 
         return removeByIds(ids);
@@ -237,7 +237,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByRoleId(List<Long> roleId) {
         if (roleId == null || roleId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID集合不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "角色ID集合不能为空");
         }
         LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysRoleLambdaQueryWrapper.in(SysRole::getId, roleId);
@@ -273,7 +273,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public SysRole getRoleInfoById(Long id) {
         SysRole sysRole = getById(id);
         if (sysRole == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
         }
         return sysRole;
     }

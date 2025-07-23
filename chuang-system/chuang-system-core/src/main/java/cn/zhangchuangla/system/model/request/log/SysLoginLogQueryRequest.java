@@ -1,11 +1,12 @@
 package cn.zhangchuangla.system.model.request.log;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * 系统登录日志列表请求对象
@@ -16,12 +17,6 @@ import java.util.Date;
 @Data
 @Schema(name = "系统登录日志列表请求对象", description = "系统登录日志列表请求对象")
 public class SysLoginLogQueryRequest extends BasePageRequest {
-
-    /**
-     * 主键
-     */
-    @Schema(description = "主键", example = "1", type = "integer", format = "int64")
-    private Long id;
 
     /**
      * 用户名
@@ -59,10 +54,19 @@ public class SysLoginLogQueryRequest extends BasePageRequest {
     @Schema(description = "操作系统", example = "Windows", type = "string")
     private String os;
 
+
     /**
-     * 创建时间
+     * 开始时间
      */
-    @Schema(description = "创建时间", example = "2025-01-01 00:00:00", type = "date")
-    private Date loginTime;
+    @Schema(description = "开始时间", example = "2023-01-01", type = "string")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate startTime;
+
+    /**
+     * 结束时间
+     */
+    @Schema(description = "结束时间", example = "2023-12-31", type = "string")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate endTime;
 
 }

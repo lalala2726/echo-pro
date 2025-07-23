@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.aspect;
 
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.AccessType;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.TooManyRequestException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -119,7 +119,7 @@ public class AccessLimitAspect {
                 }
 
                 // 统一抛出TooManyRequestException，由全局异常处理器处理
-                throw new TooManyRequestException(ResponseCode.TOO_MANY_REQUESTS, message);
+                throw new TooManyRequestException(ResultCode.TOO_MANY_REQUESTS, message);
             }
         } catch (TooManyRequestException e) {
             // 直接抛出TooManyRequestException异常

@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.utils;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 
@@ -26,7 +26,7 @@ public class Assert {
      */
     public static void isTrue(boolean condition, String errorMessage) {
         if (!condition) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, errorMessage);
+            throw new ServiceException(ResultCode.OPERATION_ERROR, errorMessage);
         }
     }
 
@@ -39,7 +39,7 @@ public class Assert {
      */
     public static void isParamTrue(boolean condition, String errorMessage) {
         if (!condition) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, errorMessage);
+            throw new ParamException(ResultCode.PARAM_ERROR, errorMessage);
         }
     }
 

@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.StrUtils;
@@ -119,7 +119,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     public boolean addDictData(SysDictDataAddRequest request) {
         // 检查同一字典类型下字典值是否重复
         if (isDictDataExistByValue(request.getDictType(), request.getDictValue(), null)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,
+            throw new ServiceException(ResultCode.OPERATION_ERROR,
                     "同一字典类型下字典值不能重复: " + request.getDictValue());
         }
 
@@ -147,12 +147,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         // 检查字典数据是否存在
         SysDictData existDictData = getById(request.getId());
         if (existDictData == null) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典数据不存在");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典数据不存在");
         }
 
         // 检查同一字典类型下字典值是否重复 (排除自身)
         if (isDictDataExistByValue(request.getDictType(), request.getDictValue(), request.getId())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR,
+            throw new ServiceException(ResultCode.OPERATION_ERROR,
                     "同一字典类型下字典值不能重复: " + request.getDictValue());
         }
 

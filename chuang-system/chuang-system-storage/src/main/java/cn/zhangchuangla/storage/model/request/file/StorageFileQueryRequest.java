@@ -23,7 +23,6 @@ public class StorageFileQueryRequest extends BasePageRequest {
     @Schema(description = "文件名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2022-01-01.png")
     private String originalName;
 
-
     /**
      * 文件类型，如 image/jpeg, application/pdf 等
      */

@@ -1,10 +1,12 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.core.service.StorageRegistryService;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
@@ -16,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ *
  * @author Chuang
  * Created on 2025/4/3 21:39
  */
@@ -36,6 +40,8 @@ public class SysStorageConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
     private final StorageRegistryService storageRegistryService;
+    private final ExcelUtils excelUtils;
+
 
     /**
      * 文件配置列表
@@ -47,11 +53,27 @@ public class SysStorageConfigController extends BaseController {
     @GetMapping("/list")
     @PreAuthorize("@ss.hasPermission('system:storage-config:list')")
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
-                                                         @Validated @ParameterObject StorageConfigQueryRequest request) {
+                                                             @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
         List<StorageConfigListVo> storageConfigListVos = copyListProperties(sysFileConfigPage, StorageConfigListVo.class);
         return getTableData(sysFileConfigPage, storageConfigListVos);
     }
+
+
+    /**
+     * 导出存储配置
+     *
+     * @param request  存储配置查询参数
+     * @param response 响应对象
+     */
+    @Operation(summary = "导出存储配置")
+    @PostMapping("/export")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:export')")
+    public void exportStorageConfig(@ParameterObject StorageConfigQueryRequest request, HttpServletResponse response) {
+        List<StorageConfigUnifiedVo> storageConfigUnifiedVos = storageConfigService.listStorageConfig(request);
+        excelUtils.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
+    }
+
 
     /**
      * 判断存储配置Key是否存在
@@ -65,6 +87,18 @@ public class SysStorageConfigController extends BaseController {
                                                   @RequestParam("storageKey") String storageKey) {
         boolean result = storageConfigService.isStorageKeyExists(id, storageKey);
         return AjaxResult.success(result);
+    }
+
+    /**
+     * 获取存储配置键选项
+     *
+     * @return 存储配置键选项
+     */
+    @GetMapping("/key-option")
+    @Operation(summary = "获取存储配置键选项")
+    public AjaxResult<List<Option<String>>> getStorageConfigKeyOption() {
+        List<Option<String>> options = storageConfigService.getStorageConfigKeyOption();
+        return success(options);
     }
 
 

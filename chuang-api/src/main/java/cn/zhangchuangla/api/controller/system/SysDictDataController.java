@@ -3,7 +3,7 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
@@ -116,7 +116,7 @@ public class SysDictDataController extends BaseController {
                                         @Validated @RequestBody SysDictDataAddRequest request) {
         // 检查字典类型是否存在
         if (!sysDictTypeService.isDictTypeExist(request.getDictType())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型不存在: " + request.getDictType());
         }
         boolean result = sysDictDataService.addDictData(request);
         return toAjax(result);

@@ -1,6 +1,7 @@
 package cn.zhangchuangla.storage.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -25,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +52,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
     @Override
     public Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return storageConfigMapper.listSysFileConfig(sysFileConfigPage, request);
+        return storageConfigMapper.listStorageConfig(sysFileConfigPage, request);
     }
 
 
@@ -136,7 +138,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
         StorageConfig primaryConfig = getPrimaryConfig();
         ids.forEach(id -> {
             if (Objects.equals(primaryConfig.getId(), id)) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR, "主文件配置不能删除");
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "主文件配置不能删除");
             }
         });
         return removeByIds(ids);
@@ -205,7 +207,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
         Assert.isTrue(id > 0, "文件存储配置ID不能小于0");
         StorageConfig storageConfig = getById(id);
         if (storageConfig == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件存储配置不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
         }
         return toUnifiedVo(storageConfig);
     }
@@ -220,7 +222,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
     public boolean updateStorageConConfig(StorageConfigUpdateRequest request) {
         StorageConfig storageConfig = getById(request.getId());
         if (storageConfig == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "文件存储配置不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
         }
         toStorageConfig(request, storageConfig);
         return updateById(storageConfig);
@@ -241,6 +243,37 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
             queryWrapper.ne(StorageConfig::getId, id);
         }
         return count(queryWrapper) > 0;
+    }
+
+    /**
+     * 查询存储配置,无分页
+     *
+     * @param request 存储配置查询参数
+     * @return 存储配置列表
+     */
+    @Override
+    public List<StorageConfigUnifiedVo> listStorageConfig(StorageConfigQueryRequest request) {
+        List<StorageConfig> storageConfigs = storageConfigMapper.listStorageConfig(request);
+        ArrayList<StorageConfigUnifiedVo> storageConfigUnifiedVos = new ArrayList<>();
+        storageConfigs.forEach(storageConfig -> {
+                    StorageConfigUnifiedVo unifiedVo = toUnifiedVo(storageConfig);
+                    storageConfigUnifiedVos.add(unifiedVo);
+                }
+        );
+        return storageConfigUnifiedVos;
+    }
+
+
+    /**
+     * 获取存储配置键值选项
+     *
+     * @return 存储配置键值选项
+     */
+    @Override
+    public List<Option<String>> getStorageConfigKeyOption() {
+        return list()
+                .stream()
+                .map(storageConfig -> new Option<>(storageConfig.getStorageKey(), storageConfig.getStorageName())).toList();
     }
 
     /**
@@ -274,7 +307,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
                 storageConfig.setStorageValue(tencentCosStorageConfig.toJson());
                 break;
             default:
-                throw new ServiceException(ResponseCode.SERVER_CANNOT_SUPPORT);
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
         }
     }
 
@@ -308,7 +341,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
                 storageConfigUnifiedVo.setTencentCosStorageConfigVo(tencentCosStorageConfigVo);
                 break;
             default:
-                throw new ServiceException(ResponseCode.SERVER_CANNOT_SUPPORT);
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
         }
         return storageConfigUnifiedVo;
     }

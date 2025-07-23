@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 
 /**
  * 登录日志接口
@@ -31,6 +33,14 @@ public interface SysLoginLogService extends IService<SysLoginLog> {
      * @return 登录日志列表
      */
     Page<SysLoginLog> listLoginLog(SysLoginLogQueryRequest request);
+
+    /**
+     * 导出登录日志
+     *
+     * @param request 查询参数
+     * @return 登录日志列表
+     */
+    List<SysLoginLog> exportLoginLog(SysLoginLogQueryRequest request);
 
     /**
      * 清空登录日志

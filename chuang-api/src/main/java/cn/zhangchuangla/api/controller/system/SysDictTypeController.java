@@ -30,6 +30,8 @@ import java.util.List;
 /**
  * 字典类型控制器
  *
+ *  //todo 字典设置系统值,系统字典不允许修改和删除,仅允许修改和删除非系统字典
+ *
  * @author Chuang
  */
 @Slf4j

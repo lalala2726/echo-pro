@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
@@ -19,19 +19,19 @@ public final class LoginException extends RuntimeException {
     private final Integer code;
 
 
-    public LoginException(ResponseCode responseCode, String message) {
+    public LoginException(ResultCode resultCode, String message) {
         super(message);
-        this.code = responseCode.getCode();
+        this.code = resultCode.getCode();
     }
 
-    public LoginException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
+    public LoginException(ResultCode resultCode) {
+        super(resultCode.getMessage());
+        this.code = resultCode.getCode();
     }
 
     public LoginException(String message) {
         super(message);
-        this.code = ResponseCode.LOGIN_ERROR.getCode();
+        this.code = ResultCode.LOGIN_ERROR.getCode();
     }
 
 }

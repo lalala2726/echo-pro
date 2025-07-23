@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
@@ -19,24 +19,24 @@ public final class ProfileException extends RuntimeException {
     private final Integer code;
 
 
-    public ProfileException(ResponseCode responseCode, String message) {
+    public ProfileException(ResultCode resultCode, String message) {
         super(message);
-        this.code = responseCode.getCode();
+        this.code = resultCode.getCode();
     }
 
-    public ProfileException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
+    public ProfileException(ResultCode resultCode) {
+        super(resultCode.getMessage());
+        this.code = resultCode.getCode();
     }
 
     public ProfileException(String message) {
         super(message);
-        this.code = ResponseCode.PROFILE_ERROR.getCode();
+        this.code = ResultCode.PROFILE_ERROR.getCode();
     }
 
     public ProfileException() {
-        super(ResponseCode.PROFILE_ERROR.getMessage());
-        this.code = ResponseCode.PROFILE_ERROR.getCode();
+        super(ResultCode.PROFILE_ERROR.getMessage());
+        this.code = ResultCode.PROFILE_ERROR.getCode();
     }
 
 }

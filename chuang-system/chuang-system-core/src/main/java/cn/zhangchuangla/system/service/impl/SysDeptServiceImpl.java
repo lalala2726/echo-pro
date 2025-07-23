@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.system.mapper.SysDeptMapper;
@@ -44,7 +44,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
     @Override
     public boolean addDept(SysDeptAddRequest request) {
         if (isDeptNameExist(request.getDeptName())) {
-            throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
+            throw new ServiceException(ResultCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
         if (request.getParentId() == null || request.getParentId() == 0) {
             request.setParentId(0L);
@@ -65,7 +65,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                 .eq(SysDept::getDeptName, request.getDeptName())
                 .ne(SysDept::getDeptId, request.getDeptId());
         if (count(ne) > 0) {
-            throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "部门名称已存在！");
+            throw new ServiceException(ResultCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
         SysDept sysDept = BeanCotyUtils.copyProperties(request, SysDept.class);
         return updateById(sysDept);
@@ -119,7 +119,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
     public boolean deleteDeptById(List<Long> ids) {
         ids.forEach(id -> {
             if (deptHasSubordinates(id)) {
-                throw new ServiceException(ResponseCode.DICT_NAME_EXIST, "该部门下有子部门，不能删除！");
+                throw new ServiceException(ResultCode.DICT_NAME_EXIST, "该部门下有子部门，不能删除！");
             }
         });
         return removeByIds(ids);

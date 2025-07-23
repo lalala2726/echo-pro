@@ -4,8 +4,11 @@ import cn.zhangchuangla.storage.constant.StorageConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 存储服务通用工具类
@@ -50,6 +53,19 @@ public class StorageUtils {
             return "";
         }
         return originalFilename.substring(dotIndex + 1);
+    }
+
+    /**
+     * 拼接URL
+     *
+     * @param parts URL片段
+     * @return 拼接后的URL
+     */
+    public static String joinUrl(String... parts) {
+        return Arrays.stream(parts)
+                .filter(Objects::nonNull)
+                .map(s -> s.replaceAll("^/+", "").replaceAll("/+$", ""))
+                .collect(Collectors.joining("/"));
     }
 
     /**

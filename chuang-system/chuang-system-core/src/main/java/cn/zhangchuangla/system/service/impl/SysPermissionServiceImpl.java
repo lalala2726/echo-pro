@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
@@ -72,7 +72,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Override
     public SysRolePermissionVo getPermissionByRoleId(Long roleId) {
         SysRole role = Optional.ofNullable(sysRoleService.getById(roleId))
-                .orElseThrow(() -> new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在，ID：" + roleId));
+                .orElseThrow(() -> new ServiceException(ResultCode.RESULT_IS_NULL, "角色不存在，ID：" + roleId));
         List<SysMenu> allMenus = sysMenuService.list(new LambdaQueryWrapper<SysMenu>()
                 .orderByAsc(SysMenu::getParentId)
                 .orderByAsc(SysMenu::getSort));
@@ -92,10 +92,10 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         Long roleId = request.getRoleId();
         SysRole sysRole = sysRoleService.getById(roleId);
         if (sysRole == null) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "角色不存在");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "角色不存在");
         }
         if (SysRolesConstant.SUPER_ADMIN.equals(sysRole.getRoleKey())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
         if (request.getAllocatedMenuId() != null && !request.getAllocatedMenuId().isEmpty()) {

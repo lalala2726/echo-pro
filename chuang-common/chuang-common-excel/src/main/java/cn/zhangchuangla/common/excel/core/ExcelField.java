@@ -110,6 +110,26 @@ public class ExcelField {
      */
     private String targetAttr;
 
+    /**
+     * 是否展开对象
+     */
+    private boolean expandObject;
+
+    /**
+     * 对象展开时的列名前缀
+     */
+    private String expandPrefix;
+
+    /**
+     * 当对象为null时是否导出展开的列
+     */
+    private boolean expandIsNullExport;
+
+    /**
+     * 展开的子字段列表（当expandObject为true时使用）
+     */
+    private java.util.List<ExcelField> expandedFields;
+
     public ExcelField(Field field, Excel excel) {
         this.field = field;
         this.excel = excel;
@@ -130,5 +150,8 @@ public class ExcelField {
         this.columnType = excel.type();
         this.isExport = excel.isExport();
         this.targetAttr = excel.targetAttr();
+        this.expandObject = excel.expandObject();
+        this.expandPrefix = excel.expandPrefix();
+        this.expandIsNullExport = excel.expandIsNullExport();
     }
 }

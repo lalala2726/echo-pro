@@ -3,7 +3,7 @@ package cn.zhangchuangla.common.core.utils;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class SecurityUtils {
     public static SysUserDetails getLoginUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof SysUserDetails)) {
-            throw new ServiceException(ResponseCode.UNAUTHORIZED, "用户未登录");
+            throw new ServiceException(ResultCode.UNAUTHORIZED, "用户未登录");
         }
         return (SysUserDetails) authentication.getPrincipal();
     }

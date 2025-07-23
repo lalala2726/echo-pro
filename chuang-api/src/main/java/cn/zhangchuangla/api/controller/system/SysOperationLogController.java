@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -32,11 +34,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/log/operation")
 @RequiredArgsConstructor
-@Tag(name = "操作日子", description = "提供系统操作日志")
+@Tag(name = "操作日志", description = "提供系统操作日志")
 @Slf4j
 public class SysOperationLogController extends BaseController {
 
     private final SysOperationLogService sysOperationLogService;
+    private final ExcelUtils excelUtils;
 
 
     /**
@@ -56,13 +59,25 @@ public class SysOperationLogController extends BaseController {
         return getTableData(sysOperationLogPage, sysOperationLogListVos);
     }
 
+    @PostMapping("/export")
+    @Operation(summary = "导出操作日志")
+    @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermission('system:log-operation:export')")
+    public void exportOperationLog(@Parameter(description = "登录日志导出")
+                                   @ParameterObject SysOperationLogQueryRequest request,
+                                   HttpServletResponse response) {
+        List<SysOperationLog> sysOperationLogs = sysOperationLogService.exportOperationLog(request);
+        List<SysOperationLogVo> sysOperationLogVos = copyListProperties(sysOperationLogs, SysOperationLogVo.class);
+        excelUtils.exportExcel(response, sysOperationLogVos, SysOperationLogVo.class, "操作日志");
+    }
+
     /**
      * 获取操作日志详情
      *
      * @param id 操作日志ID
      * @return 操作日志详情
      */
-    @GetMapping("/operation/{id:\\d+}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "获取操作日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
     public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
@@ -78,8 +93,8 @@ public class SysOperationLogController extends BaseController {
      *
      * @return 清空结果
      */
-    @DeleteMapping("/operation")
-    @Operation(summary = "清空操作日志", description = "此方法需要传入当前用户密码进行验证")
+    @DeleteMapping("/clean")
+    @Operation(summary = "清空操作日志")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanOperationLog() {

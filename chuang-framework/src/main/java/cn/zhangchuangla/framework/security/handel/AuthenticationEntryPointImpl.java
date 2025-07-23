@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.security.handel;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.utils.ServletUtils;
 import com.alibaba.fastjson.JSON;
@@ -39,6 +39,6 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
         String format = String.format("请求访问:%s 认证失败，无法访问系统资源", request.getRequestURI());
         ServletUtils.renderString(response, JSON.toJSONString(
-                AjaxResult.error(ResponseCode.UNAUTHORIZED, format)));
+                AjaxResult.error(ResultCode.UNAUTHORIZED, format)));
     }
 }

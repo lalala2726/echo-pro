@@ -17,6 +17,7 @@ import java.util.List;
 @Schema(description = "下拉选项对象")
 @Data
 @NoArgsConstructor
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class Option<T> implements Serializable {
 
     @Serial
@@ -29,14 +30,17 @@ public class Option<T> implements Serializable {
     private String label;
 
     @Schema(description = "子选项列表")
-    @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
     private List<Option<T>> children;
 
+    public Option(T value) {
+        this.value = value;
+    }
 
     public Option(T value, String label) {
         this.value = value;
         this.label = label;
     }
+
 
     public Option(T value, String label, List<Option<T>> children) {
         this.value = value;

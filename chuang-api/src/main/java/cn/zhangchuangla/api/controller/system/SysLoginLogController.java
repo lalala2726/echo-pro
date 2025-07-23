@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -37,6 +39,7 @@ import java.util.List;
 public class SysLoginLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
+    private final ExcelUtils excelUtils;
 
     /**
      * 获取登录日志列表
@@ -44,7 +47,7 @@ public class SysLoginLogController extends BaseController {
      * @param request 登录日志列表查询参数
      * @return 登录日志列表
      */
-    @GetMapping("/login/list")
+    @GetMapping("/list")
     @Operation(summary = "获取登录日志列表")
     @PreAuthorize("@ss.hasPermission('system:log:list')")
     public AjaxResult<TableDataResult> listLoginLog(@Parameter(description = "登录日志列表查询参数")
@@ -54,13 +57,30 @@ public class SysLoginLogController extends BaseController {
         return getTableData(sysLoginLogPage, sysLoginLogListVos);
     }
 
+
+    /**
+     * 导出登录日志
+     *
+     * @param request  需要导出的登录日志列表查询参数
+     * @param response 响应对象
+     */
+    @Operation(summary = "导出登录日志")
+    @PostMapping("/export")
+    @PreAuthorize("@ss.hasPermission('system:log-login:export')")
+    @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
+    public void exportStorageConfig(@ParameterObject SysLoginLogQueryRequest request, HttpServletResponse response) {
+        List<SysLoginLog> loginLogs = sysLoginLogService.exportLoginLog(request);
+        List<SysLoginLogVo> storageConfigListVos = copyListProperties(loginLogs, SysLoginLogVo.class);
+        excelUtils.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
+    }
+
     /**
      * 获取登录日志详情
      *
      * @param id 登录日志ID
      * @return 登录日志详情
      */
-    @GetMapping("/login/{id:\\d+}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "获取登录日志详情")
     @PreAuthorize("@ss.hasPermission('system:log:query')")
     public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
@@ -78,7 +98,7 @@ public class SysLoginLogController extends BaseController {
      * @return 清空结果
      */
     @DeleteMapping("/clean")
-    @Operation(summary = "清空登录日志", description = "此方法需要传入当前用户密码进行验证")
+    @Operation(summary = "清空登录日志")
     @PreAuthorize("@ss.hasPermission('system:log:delete')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanLoginLog() {

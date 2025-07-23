@@ -2,7 +2,7 @@ package cn.zhangchuangla.storage.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -90,7 +90,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         //获取文件大小
         long fileSize = file.getSize();
         if (fileSize > MAX_FILE_SIZE) {
-            throw new ServiceException(ResponseCode.FileUploadFailed, "此接口文件大小最大不能超过50M");
+            throw new ServiceException(ResultCode.FileUploadFailed, "此接口文件大小最大不能超过50M");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         OperationService service = getService(activeStorageType);
@@ -128,11 +128,11 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
 
         long fileSize = file.getSize();
         if (fileSize > MAX_IMAGE_SIZE) {
-            throw new ServiceException(ResponseCode.FileUploadFailed, "图片大小不能超过5M");
+            throw new ServiceException(ResultCode.FileUploadFailed, "图片大小不能超过5M");
         }
         String contentType = file.getContentType();
         if (contentType != null && !contentType.startsWith("image")) {
-            throw new ServiceException(ResponseCode.FileUploadFailed, "只能上传图片类型的资源");
+            throw new ServiceException(ResultCode.FileUploadFailed, "只能上传图片类型的资源");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
         OperationService service = getService(activeStorageType);
@@ -172,7 +172,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
     public boolean deleteFileById(List<Long> fileIds, boolean forceDelete) {
         // 1. 参数校验
         if (CollectionUtils.isEmpty(fileIds)) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "文件ID不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "文件ID不能为空");
         }
 
         // 2. 获取文件记录并校验
@@ -213,7 +213,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         List<StorageFile> storageFiles = list(queryWrapper);
 
         if (CollectionUtils.isEmpty(storageFiles)) {
-            throw new ServiceException(ResponseCode.DATA_NOT_FOUND, "文件不存在");
+            throw new ServiceException(ResultCode.DATA_NOT_FOUND, "文件不存在");
         }
 
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
@@ -222,7 +222,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         storageFiles.forEach(file -> {
             validateStorageConsistency(activeStorageType, file);
             if (StorageConstants.dataVerifyConstants.IN_TRASH.equals(file.getIsTrash())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR,
+                throw new ServiceException(ResultCode.OPERATION_ERROR,
                         String.format("文件编号: %s 已经在回收站中!无法再次删除!", file.getId()));
             }
         });
@@ -266,12 +266,12 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
     @Override
     public boolean restoreFileFromRecycleBin(List<Long> fileIds) {
         if (CollectionUtils.isEmpty(fileIds)) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "文件ID不能为空");
+            throw new ParamException(ResultCode.PARAM_NOT_NULL, "文件ID不能为空");
         }
         LambdaQueryWrapper<StorageFile> in = new LambdaQueryWrapper<StorageFile>().in(StorageFile::getId, fileIds);
         List<StorageFile> StorageFiles = list(in);
         if (CollectionUtils.isEmpty(StorageFiles)) {
-            throw new ServiceException(ResponseCode.DATA_NOT_FOUND, "文件不存在");
+            throw new ServiceException(ResultCode.DATA_NOT_FOUND, "文件不存在");
         }
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
 
@@ -279,7 +279,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         StorageFiles.forEach(StorageFile -> {
             validateStorageConsistency(activeStorageType, StorageFile);
             if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(StorageFile.getIsTrash())) {
-                throw new ServiceException(ResponseCode.FILE_OPERATION_FAILED, "文件未处于回收站中或已被删除，无法恢复");
+                throw new ServiceException(ResultCode.FILE_OPERATION_FAILED, "文件未处于回收站中或已被删除，无法恢复");
             }
         });
 
@@ -336,7 +336,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         List<StorageFile> recordList = list(queryWrapper);
 
         if (CollectionUtils.isEmpty(recordList)) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "未找到指定的文件记录");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "未找到指定的文件记录");
         }
 
         // 校验文件存储类型一致性，并检查文件是否确实在回收站中
@@ -347,7 +347,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
             // 确保文件处于回收站状态
             if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(StorageFile.getIsTrash())) {
                 throw new ServiceException(
-                        ResponseCode.OPERATION_ERROR,
+                        ResultCode.OPERATION_ERROR,
                         String.format("文件 %s 不在回收站中，无法执行删除操作", StorageFile.getOriginalName())
                 );
             }
@@ -405,7 +405,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
     private void validateStorageConsistency(String activeStorageType, StorageFile storageFile) {
         if (!activeStorageType.equals(storageFile.getStorageType())) {
             throw new ServiceException(
-                    ResponseCode.OPERATION_ERROR,
+                    ResultCode.OPERATION_ERROR,
                     String.format("存储类型不匹配，无法执行删除操作。当前存储类型: %s，当前文件ID为 %d 的实际存储类型: %s",
                             activeStorageType, storageFile.getId(), storageFile.getStorageType())
             );
@@ -413,7 +413,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         // 非本地存储
         if (!StorageConstants.StorageType.LOCAL.equals(activeStorageType)) {
             if (!getCurrentBucketName().equals(storageFile.getBucketName())) {
-                throw new ServiceException(ResponseCode.OPERATION_ERROR,
+                throw new ServiceException(ResultCode.OPERATION_ERROR,
                         String.format("存储桶名称不匹配，无法执行删除操作。当前存储桶名称: %s，当前文件ID为 %d 的实际存储桶名称: %s",
                                 getCurrentBucketName(), storageFile.getId(), storageFile.getBucketName()));
             }

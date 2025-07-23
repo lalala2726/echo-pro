@@ -32,8 +32,8 @@ import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.zhangchuangla.common.core.enums.ResponseCode.ACCESS_TOKEN_INVALID;
-import static cn.zhangchuangla.common.core.enums.ResponseCode.REFRESH_TOKEN_INVALID;
+import static cn.zhangchuangla.common.core.enums.ResultCode.ACCESS_TOKEN_INVALID;
+import static cn.zhangchuangla.common.core.enums.ResultCode.REFRESH_TOKEN_INVALID;
 
 
 /**

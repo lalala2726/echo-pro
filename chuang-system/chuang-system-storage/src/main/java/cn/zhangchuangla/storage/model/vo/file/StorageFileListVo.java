@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class FileRecordListVo {
+public class StorageFileListVo {
 
     /**
      * 主键ID
@@ -37,7 +37,14 @@ public class FileRecordListVo {
     /**
      * 压缩文件URL，用于图片预览等场景
      */
+    @Schema(description = "压缩文件URL，用于图片预览等场景")
     private String previewImageUrl;
+
+    /**
+     * 原始文件URL，直接访问地址
+     */
+    @Schema(description = "原始文件URL，直接访问地址")
+    private String originalFileUrl;
 
     /**
      * 文件大小

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.common.core.controller;
 
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -204,11 +204,11 @@ public class BaseController {
     /**
      * 失败返回
      *
-     * @param responseCode 响应枚举
+     * @param resultCode 响应枚举
      * @return 结果
      */
-    protected <T> AjaxResult<T> error(ResponseCode responseCode) {
-        return AjaxResult.error(responseCode);
+    protected <T> AjaxResult<T> error(ResultCode resultCode) {
+        return AjaxResult.error(resultCode);
     }
 
     /**

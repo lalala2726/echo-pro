@@ -7,8 +7,8 @@ import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.entity.StorageFile;
 import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
-import cn.zhangchuangla.storage.model.vo.file.FileRecordListVo;
-import cn.zhangchuangla.storage.model.vo.file.FileRecordVo;
+import cn.zhangchuangla.storage.model.vo.file.StorageFileListVo;
+import cn.zhangchuangla.storage.model.vo.file.StorageFileVo;
 import cn.zhangchuangla.storage.service.StorageFileService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @Tag(name = "文件资源管理", description = "提供文件资源的列表查询、回收站管理、恢复、删除等相关操作接口")
-@RequestMapping("/system/file/manage")
+@RequestMapping("/system/storage/file")
 @RequiredArgsConstructor
 public class SysStorageFileController extends BaseController {
 
@@ -51,9 +51,11 @@ public class SysStorageFileController extends BaseController {
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
                                                           @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileManage(request);
-        List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
+        List<StorageFileListVo> fileRecordListVos = copyListProperties(page, StorageFileListVo.class);
         return getTableData(page, fileRecordListVos);
     }
+
+    //todo 导出文件资源列表
 
     /**
      * 文件资源详情
@@ -64,12 +66,12 @@ public class SysStorageFileController extends BaseController {
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "文件资源详情")
     @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
-    public AjaxResult<FileRecordVo> getFileById(@Parameter(description = "文件ID")
+    public AjaxResult<StorageFileVo> getFileById(@Parameter(description = "文件ID")
                                                 @PathVariable("id") Long id) {
         StorageFile storageFile = storageFileService.getFileById(id);
-        FileRecordVo fileRecordVo = new FileRecordVo();
-        BeanUtils.copyProperties(storageFile, fileRecordVo);
-        return success(fileRecordVo);
+        StorageFileVo storageFileVo = new StorageFileVo();
+        BeanUtils.copyProperties(storageFile, storageFileVo);
+        return success(storageFileVo);
     }
 
     /**
@@ -84,7 +86,7 @@ public class SysStorageFileController extends BaseController {
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
                                                          @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileTrashManage(request);
-        List<FileRecordListVo> fileRecordListVos = copyListProperties(page, FileRecordListVo.class);
+        List<StorageFileListVo> fileRecordListVos = copyListProperties(page, StorageFileListVo.class);
         return getTableData(page, fileRecordListVos);
     }
 
