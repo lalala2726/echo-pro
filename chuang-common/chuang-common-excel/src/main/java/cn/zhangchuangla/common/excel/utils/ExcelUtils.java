@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -42,8 +41,12 @@ import java.util.stream.Collectors;
 @Component
 public class ExcelUtils {
 
-    @Autowired
-    private DictDataHandler dictDataHandler;
+
+    private final DictDataHandler dictDataHandler;
+
+    public ExcelUtils(DictDataHandler dictDataHandler) {
+        this.dictDataHandler = dictDataHandler;
+    }
 
     /**
      * 导出Excel到响应流
@@ -58,7 +61,6 @@ public class ExcelUtils {
         try {
             // 设置响应头
             setResponseHeader(response, fileName);
-
             // 导出到响应流
             exportExcel(response.getOutputStream(), data, clazz, fileName);
         } catch (IOException e) {
@@ -80,8 +82,8 @@ public class ExcelUtils {
         try (Workbook workbook = new Workbook(outputStream, "ExcelApp", "1.0")) {
             Worksheet worksheet = workbook.newWorksheet(sheetName);
 
-            // 获取Excel字段信息
-            List<ExcelField> excelFields = getExcelFields(clazz);
+            // 获取Excel字段信息，传入数据用于判断对象展开
+            List<ExcelField> excelFields = getExcelFields(clazz, data);
             if (CollectionUtils.isEmpty(excelFields)) {
                 log.warn("类 {} 中没有找到@Excel注解的字段", clazz.getSimpleName());
                 return;
@@ -132,6 +134,18 @@ public class ExcelUtils {
      * @return Excel字段列表
      */
     private <T> List<ExcelField> getExcelFields(Class<T> clazz) {
+        return getExcelFields(clazz, null);
+    }
+
+    /**
+     * 获取类中的Excel字段信息
+     *
+     * @param clazz      类型
+     * @param sampleData 样本数据，用于判断对象是否需要展开
+     * @param <T>        类型参数
+     * @return Excel字段列表
+     */
+    private <T> List<ExcelField> getExcelFields(Class<T> clazz, List<T> sampleData) {
         List<ExcelField> excelFields = new ArrayList<>();
 
         Field[] fields = FieldUtils.getAllFieldsList(clazz).toArray(new Field[0]);
@@ -139,7 +153,19 @@ public class ExcelUtils {
             Excel excel = field.getAnnotation(Excel.class);
             if (excel != null && excel.isExport()) {
                 field.setAccessible(true);
-                excelFields.add(new ExcelField(field, excel));
+
+                // 如果需要展开对象，处理对象字段
+                if (excel.expandObject()) {
+                    // 检查是否需要展开（根据 expandIsNullExport 和实际数据）
+                    boolean shouldExpand = excel.expandIsNullExport() || hasNonNullObjectInData(field, sampleData);
+
+                    if (shouldExpand) {
+                        List<ExcelField> expandedFields = getExpandedFields(field, excel.expandPrefix(), excel.sort());
+                        excelFields.addAll(expandedFields);
+                    }
+                } else {
+                    excelFields.add(new ExcelField(field, excel));
+                }
             }
         }
 
@@ -147,6 +173,75 @@ public class ExcelUtils {
         excelFields.sort(Comparator.comparingInt(ExcelField::getSort));
 
         return excelFields;
+    }
+
+    /**
+     * 检查数据中是否有非null的对象
+     *
+     * @param field      字段
+     * @param sampleData 样本数据
+     * @param <T>        数据类型
+     * @return 是否有非null对象
+     */
+    private <T> boolean hasNonNullObjectInData(Field field, List<T> sampleData) {
+        if (CollectionUtils.isEmpty(sampleData)) {
+            return false;
+        }
+
+        for (T item : sampleData) {
+            try {
+                Object value = FieldUtils.readField(field, item, true);
+                if (value != null) {
+                    return true;
+                }
+            } catch (Exception e) {
+                log.warn("检查字段值失败: {}", field.getName(), e);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取展开对象的字段列表
+     *
+     * @param parentField 父字段（被展开的对象字段）
+     * @param prefix      列名前缀
+     * @param parentSort  父字段的排序值
+     * @return 展开的字段列表
+     */
+    private List<ExcelField> getExpandedFields(Field parentField, String prefix, int parentSort) {
+        List<ExcelField> expandedFields = new ArrayList<>();
+
+        Field[] fields = FieldUtils.getAllFieldsList(parentField.getType()).toArray(new Field[0]);
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            Excel excel = field.getAnnotation(Excel.class);
+            if (excel != null && excel.isExport()) {
+                field.setAccessible(true);
+
+                // 创建展开的字段，修改标题和字段路径
+                ExcelField expandedField = new ExcelField(field, excel);
+
+                // 设置展开字段的标题（添加前缀）
+                String originalTitle = StringUtils.isNotBlank(excel.name()) ? excel.name() : field.getName();
+                String expandedTitle = StringUtils.isNotBlank(prefix) ? prefix + originalTitle : originalTitle;
+                expandedField.setTitle(expandedTitle);
+
+                // 设置字段路径，用于后续获取值时使用 - 格式为 "parentField.childField"
+                expandedField.setTargetAttr(parentField.getName() + "." + field.getName());
+
+                // 设置排序值，基于父字段的排序值加上子字段的相对位置
+                int expandedSort = parentSort == Integer.MAX_VALUE ? excel.sort() : parentSort + i;
+                expandedField.setSort(expandedSort);
+
+                expandedFields.add(expandedField);
+            }
+        }
+
+        // 按sort排序
+        expandedFields.sort(Comparator.comparingInt(ExcelField::getSort));
+
+        return expandedFields;
     }
 
     /**
@@ -185,13 +280,10 @@ public class ExcelUtils {
                 worksheet.style(0, i).bold().set();
             }
 
-            if (StringUtils.isNotBlank(excelField.getColor())) {
-                // 这里可以根据需要设置字体颜色
-            }
-
-            if (StringUtils.isNotBlank(excelField.getBackgroundColor())) {
-                // 这里可以根据需要设置背景颜色
-            }
+            // 这里可以根据需要设置字体颜色
+            StringUtils.isNotBlank(excelField.getColor());
+            // 这里可以根据需要设置背景颜色
+            StringUtils.isNotBlank(excelField.getBackgroundColor());
         }
     }
 
@@ -247,7 +339,7 @@ public class ExcelUtils {
     private Object getFieldValue(Object item, ExcelField excelField) {
         try {
             if (StringUtils.isNotBlank(excelField.getTargetAttr())) {
-                // 支持多级属性获取
+                // 支持多级属性获取，包括展开对象的属性
                 return getNestedFieldValue(item, excelField.getTargetAttr());
             } else {
                 return FieldUtils.readField(excelField.getField(), item, true);
