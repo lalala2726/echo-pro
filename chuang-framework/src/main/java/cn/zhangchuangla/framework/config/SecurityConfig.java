@@ -2,13 +2,11 @@ package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.utils.ServletUtils;
+import cn.zhangchuangla.common.core.utils.ResponseUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
 import cn.zhangchuangla.framework.security.token.TokenManager;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -165,8 +163,7 @@ public class SecurityConfig {
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
             String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
-            ServletUtils.renderString(response, JSON.toJSONString(
-                    AjaxResult.error(ResultCode.FORBIDDEN, format)));
+            ResponseUtils.writeErrMsg(response, ResultCode.FORBIDDEN, format);
         };
     }
 
