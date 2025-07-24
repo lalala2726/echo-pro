@@ -12,8 +12,6 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
-import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.jsonwebtoken.Claims;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.zhangchuangla.common.core.enums.ResultCode.REFRESH_TOKEN_INVALID;
 
 /**
  * AccessToken/RefreshToken生成与校验
@@ -49,8 +46,8 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SysRoleService sysRoleService;
     private final SecurityProperties securityProperties;
-    private final RedisCache redisCache;
     private final SysUserService userService;
+    private final RedisTokenStore redisTokenStore;
 
 
     /**
@@ -64,23 +61,18 @@ public class TokenService {
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
 
-        String accessTokenId = UUIDUtils.simple();
-        String refreshTokenId = UUIDUtils.simple();
+        // 随机生成刷新令牌和访问令牌的sessionId
+        String accessTokenSessionId = UUIDUtils.simple();
+        String refreshTokenSessionId = UUIDUtils.simple();
 
-        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenId);
+        // 构造在线用户信息
+        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId);
         setClientInfo(onlineLoginUser);
 
-        String onlineUserKey = formatOnlineUserKeyBySessionId(accessTokenId);
-        redisCache.setCacheObject(onlineUserKey, onlineLoginUser,
-                securityProperties.getSession().getAccessTokenExpireTime());
-
-        String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenId, username);
-        String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenId, username);
-
-        String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
-        // 刷新令牌的Redis value 存储的是它对应的 accessTokenId
-        redisCache.setCacheObject(refreshTokenMappingKey, accessTokenId,
-                securityProperties.getSession().getRefreshTokenExpireTime());
+        redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
+        redisTokenStore.setRefreshToken(refreshTokenSessionId, accessTokenSessionId);
+        String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
+        String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenSessionId, username);
 
         return AuthTokenVo.builder()
                 .accessToken(jwtAccessToken)
@@ -97,44 +89,9 @@ public class TokenService {
      * @param jwtAccessToken JWT访问令牌。
      */
     public void invalidateToken(String jwtAccessToken) {
-        Claims claims;
-        try {
-            claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
-        } catch (AuthorizationException e) {
-            log.warn("尝试使无效的JWT访问令牌失效 (解析失败): {}, 原因: {}", jwtAccessToken, e.getMessage());
-            return;
-        }
-        if (claims == null) {
-            log.warn("尝试使无效的JWT访问令牌失效 (Claims为空): {}", jwtAccessToken);
-            return;
-        }
 
-        // tokenType 检查已被移除
 
-        // 这是 accessTokenId
-        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(sessionId)) {
-            log.warn("尝试使缺少sessionId ({}) 的JWT访问令牌失效: {}", CLAIM_KEY_SESSION_ID, jwtAccessToken);
-            return;
-        }
-
-        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
-        // 获取以便拿到userId和可能的refreshTokenId
-        OnlineLoginUser onlineUser = redisCache.getCacheObject(onlineUserKey);
-        // (如果设计如此)
-
-        redisCache.deleteObject(onlineUserKey);
-
-        if (onlineUser != null) {
-            Long userId = onlineUser.getUserId();
-            // 清理单点登录的 userId -> accessTokenId 映射
-            String userCurrentAccessIdKey = RedisConstants.Auth.USER_ACCESS_TOKEN + userId;
-            String currentMappedAccessTokenId = redisCache.getCacheObject(userCurrentAccessIdKey);
-            // 确保是当前会话被删除
-            if (sessionId.equals(currentMappedAccessTokenId)) {
-                redisCache.deleteObject(userCurrentAccessIdKey);
-            }
-        }
+        // todo 登出操作
     }
 
     /**
@@ -153,21 +110,16 @@ public class TokenService {
             return null;
         }
 
-        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(sessionId)) {
+        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(accessTokenSessionId)) {
             log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, accessToken);
             return null;
         }
 
-        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
-        OnlineLoginUser onlineUser = redisCache.getCacheObject(onlineUserKey);
-
+        OnlineLoginUser onlineUser = redisTokenStore.readAccessToken(accessTokenSessionId);
         if (onlineUser == null) {
             return null;
         }
-
-        redisCache.expire(onlineUserKey, securityProperties.getSession().getAccessTokenExpireTime());
-
         Set<SimpleGrantedAuthority> authorities = onlineUser.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
                 .collect(Collectors.toSet());
@@ -192,14 +144,12 @@ public class TokenService {
         if (claims == null) {
             return false;
         }
-        // tokenType 检查已被移除
 
-        // 刷新令牌JWT中的ID是refreshTokenId
-        String refreshTokenId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(refreshTokenId)) {
+        String refreshTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(refreshTokenSessionId)) {
             return false;
         }
-        return redisCache.hasKey(formatRefreshTokenMappingKey(refreshTokenId));
+        return redisTokenStore.isValidRefreshToken(refreshTokenSessionId);
     }
 
     /**
@@ -210,30 +160,21 @@ public class TokenService {
      * @throws AuthorizationException 如果刷新令牌无效或关联的用户会话不存在。
      */
     public AuthTokenVo refreshToken(String jwtRefreshToken) {
-        // 内部会处理过期等问题并抛异常
+
+        //先经过JWT验证
         Claims refreshClaims = jwtTokenProvider.getClaimsFromToken(jwtRefreshToken);
         if (refreshClaims == null) {
-            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "无法解析刷新令牌Claims");
+            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "无法解析刷新令牌");
         }
 
-        // 检验当前刷新令牌是否是合法的
-        if (validateAccessToken(jwtRefreshToken)) {
-            throw new AuthorizationException(ResultCode.INVALID_TOKEN);
+        String refreshTokenSessionId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (!redisTokenStore.isValidRefreshToken(refreshTokenSessionId)) {
+            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "刷新令牌已失效");
         }
-
-        String refreshTokenId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
-
-        String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
-        if (!redisCache.hasKey(refreshTokenMappingKey)) {
-            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "刷新令牌已失效");
-        }
-
         String username = refreshClaims.get(CLAIM_KEY_USERNAME, String.class);
-
         // 创建新的访问令牌
-        String simpleUuid = UUIDUtils.simple();
-        String accessToken = jwtTokenProvider.createJwt(simpleUuid, username);
-
+        String accessTokenSessionId = UUIDUtils.simple();
+        String accessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
 
         // 获取用户角色并构建用户详情对象
         SysUser user = userService.getUserInfoByUsername(username);
@@ -248,13 +189,10 @@ public class TokenService {
 
         // 设置客户端信息
         setClientInfo(onlineLoginUser);
-
-        // 保存在线用户信息
-        redisCache.setCacheObject(formatOnlineUserKeyBySessionId(simpleUuid), onlineLoginUser, securityProperties.getSession().getAccessTokenExpireTime());
-
-        //更新刷新令牌的映射关系
-        Long keyExpire = redisCache.getKeyExpire(refreshTokenMappingKey);
-        redisCache.setCacheObject(refreshTokenMappingKey, simpleUuid, keyExpire);
+        // 保存刷新令牌
+        redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
+        //重新设置新的访问令牌和刷新令牌的映射关系
+        redisTokenStore.mapRefreshTokenToAccessToken(refreshTokenSessionId, accessTokenSessionId);
         // 返回新的访问令牌
         return AuthTokenVo.builder()
                 .accessToken(accessToken)
@@ -278,37 +216,14 @@ public class TokenService {
         if (claims == null) {
             return false;
         }
-        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(sessionId)) {
+        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(accessTokenSessionId)) {
             return false;
         }
 
-        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
-        return redisCache.hasKey(onlineUserKey);
+        return redisTokenStore.isValidAccessToken(accessTokenSessionId);
     }
 
-
-    /**
-     * 构建在线用户信息的Redis Key。
-     * 例如：ACCESS_TOKEN_USER:{sessionId}
-     *
-     * @param sessionId 会话ID（访问令牌ID）
-     * @return Redis Key 字符串
-     */
-    private String formatOnlineUserKeyBySessionId(String sessionId) {
-        return RedisConstants.Auth.ACCESS_TOKEN_USER + sessionId;
-    }
-
-    /**
-     * 构建刷新令牌映射的Redis Key。
-     * 例如：REFRESH_TOKEN_MAPPING:{refreshTokenId}
-     *
-     * @param refreshTokenId 刷新令牌ID
-     * @return Redis Key 字符串
-     */
-    private String formatRefreshTokenMappingKey(String refreshTokenId) {
-        return RedisConstants.Auth.REFRESH_TOKEN_MAPPING + refreshTokenId;
-    }
 
     /**
      * 构建在线用户信息对象。

@@ -67,7 +67,7 @@ public class SysStorageFileController extends BaseController {
     @Operation(summary = "文件资源详情")
     @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
     public AjaxResult<StorageFileVo> getFileById(@Parameter(description = "文件ID")
-                                                @PathVariable("id") Long id) {
+                                                     @PathVariable("id") Long id) {
         StorageFile storageFile = storageFileService.getFileById(id);
         StorageFileVo storageFileVo = new StorageFileVo();
         BeanUtils.copyProperties(storageFile, storageFileVo);

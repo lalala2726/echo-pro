@@ -35,7 +35,7 @@ public final class AuthorizationException extends RuntimeException {
 
     public AuthorizationException(String message) {
         super(message);
-        this.code = ResultCode.LOGIN_ERROR.getCode();
+        this.code = ResultCode.FORBIDDEN.getCode();
     }
 
 }

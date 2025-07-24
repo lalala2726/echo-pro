@@ -122,7 +122,7 @@ public class GlobalExceptionHandel {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public AjaxResult<Void> loginExceptionHandel(AuthorizationException exception) {
         log.error("登录异常:", exception);
-        return AjaxResult.error(ResultCode.LOGIN_ERROR, exception.getMessage());
+        return AjaxResult.error(exception.getCode(), exception.getMessage());
     }
 
     /**
