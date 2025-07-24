@@ -50,11 +50,6 @@ public class SysAuthController extends BaseController {
     public AjaxResult<AuthenticationToken> login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
-        // 1. 校验验证码
-//        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
-//        if (!loginRequest.getCaptchaCode().equals(code)) {
-//            return error("验证码错误");
-//        }
         AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
         return success(authenticationToken);
     }

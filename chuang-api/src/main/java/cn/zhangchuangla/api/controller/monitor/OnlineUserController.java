@@ -120,7 +120,7 @@ public class OnlineUserController extends BaseController {
 
         // IP地址匹配
         if (StringUtils.isNotBlank(request.getIp()) &&
-                !request.getIp().equals(user.getIP())) {
+                !request.getIp().equals(user.getIp())) {
             return false;
         }
 

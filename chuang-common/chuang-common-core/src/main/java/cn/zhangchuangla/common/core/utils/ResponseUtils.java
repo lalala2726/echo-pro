@@ -27,8 +27,9 @@ public class ResponseUtils {
      * @param response   HttpServletResponse
      * @param resultCode 响应结果码
      */
-    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode) {
+    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, int status) {
 
+        response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
@@ -61,7 +62,6 @@ public class ResponseUtils {
             log.error("响应异常处理失败", e);
         }
     }
-
 
 
 }

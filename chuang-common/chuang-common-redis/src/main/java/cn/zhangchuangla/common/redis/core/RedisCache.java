@@ -61,7 +61,7 @@ public class RedisCache {
      * @param value   value
      * @param timeout 超时时间（秒）
      */
-    public <T> void setCacheObject(final String key, final T value, final int timeout) {
+    public <T> void setCacheObject(final String key, final T value, final long timeout) {
         redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 

@@ -53,7 +53,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
                 boolean isValidToken = tokenManager.validateAccessToken(token);
                 if (!isValidToken) {
-                    ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
+                    ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID, 401);
                     return;
                 }
 
@@ -64,7 +64,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             // 安全上下文清除保障（防止上下文残留）
             SecurityContextHolder.clearContext();
-            ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
+            ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID, 401);
             return;
         }
 
