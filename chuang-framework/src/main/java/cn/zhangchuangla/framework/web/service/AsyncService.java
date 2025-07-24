@@ -98,17 +98,5 @@ public class AsyncService {
         }
     }
 
-    /**
-     * 异步清空操作日志
-     */
-    @Async("logProcessExecutor")
-    public void cleanOperationLog() {
-        try {
-            sysOperationLogService.cleanOperationLog();
-        } catch (Exception e) {
-            log.error("异步清空操作日志失败: {}", e.getMessage(), e);
-        }
-    }
-
 
 }
