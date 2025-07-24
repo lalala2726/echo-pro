@@ -92,13 +92,7 @@ public class AsyncService {
                     .build();
 
             // 保存登录日志
-            boolean result = sysLoginLogService.save(sysLoginLog);
-
-            if (result) {
-                log.debug("异步保存登录日志成功，用户: {}, 状态: {}", username, isSuccess ? "成功" : "失败");
-            } else {
-                log.warn("异步保存登录日志失败，用户: {}", username);
-            }
+            sysLoginLogService.save(sysLoginLog);
         } catch (Exception e) {
             log.error("异步保存登录日志失败: {}", e.getMessage(), e);
         }
@@ -110,12 +104,7 @@ public class AsyncService {
     @Async("logProcessExecutor")
     public void cleanOperationLog() {
         try {
-            boolean result = sysOperationLogService.cleanOperationLog();
-            if (result) {
-                log.info("异步清空操作日志成功");
-            } else {
-                log.warn("异步清空操作日志失败");
-            }
+            sysOperationLogService.cleanOperationLog();
         } catch (Exception e) {
             log.error("异步清空操作日志失败: {}", e.getMessage(), e);
         }

@@ -1,23 +1,28 @@
 package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
-import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
+import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.security.token.TokenService;
+import cn.zhangchuangla.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * 登录服务实现类
@@ -29,11 +34,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SysAuthService {
+public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final AsyncService asyncService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final SysUserService sysUserService;
 
     /**
      * 实现登录逻辑
@@ -72,32 +79,26 @@ public class SysAuthService {
     }
 
     /**
-     * 刷新令牌
+     * 注册用户
      *
-     * @param request 刷新令牌
-     * @return 认证 Token 响应
+     * @param request 请求参数
+     * @return 用户ID
      */
-    public AuthTokenVo refreshToken(RefreshTokenRequest request) {
-        // 验证刷新令牌
-        boolean isValidate = tokenService.validateRefreshToken(request.getRefreshToken());
-
-        if (!isValidate) {
-            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
+    public Long register(RegisterRequest request) {
+        if (request.getUsername() == null || request.getPassword() == null) {
+            throw new ParamException(ResultCode.PARAM_ERROR);
         }
-        // 刷新令牌有效，生成新的访问令牌
-        return tokenService.refreshToken(request.getRefreshToken());
-    }
-
-    /**
-     * 登出
-     */
-    public void logout() {
-        String token = SecurityUtils.getTokenFromRequest();
-        if (StringUtils.isNotBlank(token)) {
-            // 将JWT令牌加入黑名单
-            tokenService.invalidateToken(token);
-            // 清除Security上下文
-            SecurityContextHolder.clearContext();
+        if (sysUserService.isUsernameExist(request.getUsername())) {
+            throw new ServiceException(String.format("用户名%s已存在", request.getUsername()));
         }
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        SysUser user = new SysUser();
+        user.setUsername(request.getUsername());
+        user.setPassword(encodedPassword);
+        user.setCreateTime(new Date());
+        // 0-正常 1-停用
+        user.setStatus(0);
+        sysUserService.save(user);
+        return user.getUserId();
     }
 }
