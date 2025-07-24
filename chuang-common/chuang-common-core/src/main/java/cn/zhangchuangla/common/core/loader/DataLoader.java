@@ -8,6 +8,7 @@ package cn.zhangchuangla.common.core.loader;
  * created on 2025/5/22 16:24
  */
 public interface DataLoader {
+
     /**
      * 获取加载器名称
      */

@@ -3,8 +3,7 @@ package cn.zhangchuangla.framework.web.service;
 import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
 import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.exception.LoginException;
-import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
@@ -57,7 +56,7 @@ public class SysAuthService {
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
             asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
-            throw new LoginException(ResultCode.LOGIN_ERROR, "账号或密码错误!");
+            throw new AuthorizationException(ResultCode.LOGIN_ERROR, "账号或密码错误!");
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
@@ -83,7 +82,7 @@ public class SysAuthService {
         boolean isValidate = tokenManager.validateRefreshToken(request.getRefreshToken());
 
         if (!isValidate) {
-            throw new ServiceException(ResultCode.REFRESH_TOKEN_INVALID);
+            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         // 刷新令牌有效，生成新的访问令牌
         return tokenManager.refreshToken(request.getRefreshToken());

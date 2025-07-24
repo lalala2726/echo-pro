@@ -6,14 +6,13 @@ import cn.zhangchuangla.common.core.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -41,6 +40,7 @@ public class GlobalExceptionHandel {
      * @return 返回包含错误信息和状态码的 AjaxResult 对象
      */
     @ExceptionHandler(ServiceException.class)
+    @ResponseStatus(HttpStatus.OK)
     public AjaxResult<Void> serviceExceptionHandel(ServiceException exception) {
         log.error("业务异常", exception);
         return AjaxResult.error(exception.getMessage(), exception.getCode());
@@ -54,6 +54,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求方法不支持”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
         log.error("请求方法不支持", exception);
         return AjaxResult.error(ResultCode.NOT_SUPPORT);
@@ -67,6 +68,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
         log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
@@ -80,6 +82,7 @@ public class GlobalExceptionHandel {
      * @return 返回详细描述类型转换失败原因的 AjaxResult 对象
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> methodArgumentTypeMismatchExceptionHandel(MethodArgumentTypeMismatchException exception) {
         log.error("请求参数类型不匹配", exception);
         String paramName = exception.getName();
@@ -101,6 +104,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
         log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
@@ -109,54 +113,16 @@ public class GlobalExceptionHandel {
 
     /**
      * 处理登录相关的自定义异常。
-     * LoginException 表示在身份验证过程中发生错误，如无效凭证或登录失败。
+     * AuthorizationException 表示在身份验证过程中发生错误，如无效凭证或登录失败。
      *
      * @param exception 包含错误信息的异常对象
      * @return 返回表示“登录失败”的 AjaxResult 对象
      */
-    @ExceptionHandler(LoginException.class)
-    public AjaxResult<Void> loginExceptionHandel(LoginException exception) {
+    @ExceptionHandler(AuthorizationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public AjaxResult<Void> loginExceptionHandel(AuthorizationException exception) {
         log.error("登录异常:", exception);
         return AjaxResult.error(ResultCode.LOGIN_ERROR, exception.getMessage());
-    }
-
-    /**
-     * 处理账户认证相关的自定义异常。
-     * AccountException 表示与账户状态或权限相关的问题，如账户锁定或未授权访问。
-     *
-     * @param exception 包含错误信息的异常对象
-     * @return 返回表示“账户异常”的 AjaxResult 对象
-     */
-    @ExceptionHandler(AccountException.class)
-    public AjaxResult<Void> accountExceptionExceptionHandel(Exception exception) {
-        log.error("认证异常", exception);
-        return AjaxResult.error(ResultCode.ACCOUNT_ERROR, exception.getMessage());
-    }
-
-    /**
-     * 处理内部身份验证服务失败的情况。
-     * InternalAuthenticationServiceException 表示在进行身份验证时发生了系统级错误。
-     *
-     * @param exception 包含错误信息的异常对象
-     * @return 返回表示“认证失败”的 AjaxResult 对象
-     */
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public AjaxResult<Void> internalAuthenticationServiceExceptionHandel(InternalAuthenticationServiceException exception) {
-        log.error("认证失败:", exception);
-        return AjaxResult.error(ResultCode.AUTHORIZED, exception.getMessage());
-    }
-
-    /**
-     * 处理账号被锁定的情况。
-     * LockedException 表示用户尝试登录次数过多，导致账户暂时被锁定。
-     *
-     * @param exception 包含错误信息的异常对象
-     * @return 返回表示“账号被锁定”的 AjaxResult 对象
-     */
-    @ExceptionHandler(LockedException.class)
-    public AjaxResult<Void> lockedExceptionHandel(LockedException exception) {
-        log.error("账号被锁定:", exception);
-        return AjaxResult.error(ResultCode.ACCOUNT_LOCKED, exception.getMessage());
     }
 
     /**
@@ -167,23 +133,12 @@ public class GlobalExceptionHandel {
      * @return 返回表示“参数异常”的 AjaxResult 对象
      */
     @ExceptionHandler(ParamException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
         log.error("参数异常:", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, exception.getMessage());
     }
 
-    /**
-     * 处理没有足够权限访问特定资源的情况。
-     * AccessDeniedException 表示当前用户没有足够的权限执行某个操作。
-     *
-     * @param exception 包含错误信息的异常对象
-     * @return 返回表示“权限不足”的 AjaxResult 对象
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
-        log.error("权限不足", exception);
-        return AjaxResult.error(ResultCode.ACCESS_DENIED);
-    }
 
     /**
      * 处理控制器方法参数校验失败的情况。
@@ -208,6 +163,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“资源不存在”的 AjaxResult 对象，并附带请求的 URI
      */
     @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
         log.error("资源不存在：{}", exception.toString());
         String message = String.format("资源不存在: %s", request.getRequestURI());
@@ -221,7 +177,9 @@ public class GlobalExceptionHandel {
      * @param exception 包含错误信息的异常对象
      * @return 返回表示“配置异常”的 AjaxResult 对象
      */
+
     @ExceptionHandler(ProfileException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public AjaxResult<Void> profileExceptionHandel(ProfileException exception) {
         log.error("配置异常:", exception);
         return AjaxResult.error(ResultCode.PROFILE_ERROR, exception.getMessage());
@@ -235,6 +193,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求过于频繁”的 AjaxResult 对象
      */
     @ExceptionHandler(TooManyRequestException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     public AjaxResult<Void> tooManyRequestExceptionHandel(TooManyRequestException exception) {
         log.error("请求过于频繁", exception);
         return AjaxResult.error(ResultCode.TOO_MANY_REQUESTS, exception.getMessage());
@@ -248,6 +207,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“缺少请求参数”的 AjaxResult 对象，并指出具体缺失的参数名
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> missingServletRequestParameterExceptionHandel(MissingServletRequestParameterException exception) {
         log.error("缺少请求参数", exception);
         String message = exception.getMessage();
@@ -270,6 +230,7 @@ public class GlobalExceptionHandel {
      * @return 返回表示“系统异常”的 AjaxResult 对象
      */
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public AjaxResult<Void> exceptionHandel(Exception exception) {
         log.error("系统异常", exception);
         return AjaxResult.error(ResultCode.SERVER_ERROR, exception.getMessage());

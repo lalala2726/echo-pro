@@ -11,27 +11,31 @@ import lombok.Getter;
  * created on 2025/1/11 10:04
  */
 @Getter
-public final class AccountException extends RuntimeException {
+public final class AuthorizationException extends RuntimeException {
 
     /**
      * 状态码
      */
     private final Integer code;
 
+    public AuthorizationException() {
+        super(ResultCode.AUTHORIZED.getMessage());
+        this.code = ResultCode.AUTHORIZED.getCode();
+    }
 
-    public AccountException(ResultCode resultCode, String message) {
+    public AuthorizationException(ResultCode resultCode, String message) {
         super(message);
         this.code = resultCode.getCode();
     }
 
-    public AccountException(ResultCode resultCode) {
+    public AuthorizationException(ResultCode resultCode) {
         super(resultCode.getMessage());
         this.code = resultCode.getCode();
     }
 
-    public AccountException(String message) {
+    public AuthorizationException(String message) {
         super(message);
-        this.code = ResultCode.AUTHORIZED.getCode();
+        this.code = ResultCode.LOGIN_ERROR.getCode();
     }
 
 }

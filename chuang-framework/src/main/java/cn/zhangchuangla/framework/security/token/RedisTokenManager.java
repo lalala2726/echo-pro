@@ -5,8 +5,7 @@ import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.exception.LoginException;
-import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -184,7 +183,7 @@ public class RedisTokenManager implements TokenManager {
         Claims claims;
         try {
             claims = getClaimsFromToken(jwtRefreshToken);
-        } catch (LoginException | ServiceException e) {
+        } catch (AuthorizationException e) {
             return false;
         }
         if (claims == null) {
@@ -205,7 +204,7 @@ public class RedisTokenManager implements TokenManager {
      *
      * @param jwtRefreshToken JWT刷新令牌。
      * @return 新的AuthenticationToken，包含新的JWT访问令牌和原始JWT刷新令牌。
-     * @throws ServiceException 如果刷新令牌无效或关联的用户会话不存在。
+     * @throws AuthorizationException 如果刷新令牌无效或关联的用户会话不存在。
      */
     @Override
     public AuthenticationToken refreshToken(String jwtRefreshToken) {
@@ -213,13 +212,13 @@ public class RedisTokenManager implements TokenManager {
         Claims refreshClaims = getClaimsFromToken(jwtRefreshToken);
         // 以防万一
         if (refreshClaims == null) {
-            throw new ServiceException(REFRESH_TOKEN_INVALID, "无法解析刷新令牌Claims");
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "无法解析刷新令牌Claims");
         }
         // tokenType 检查已被移除
 
         String refreshTokenId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(refreshTokenId)) {
-            throw new ServiceException(REFRESH_TOKEN_INVALID, "JWT刷新令牌中缺少ID (" + CLAIM_KEY_SESSION_ID + ")");
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "JWT刷新令牌中缺少ID (" + CLAIM_KEY_SESSION_ID + ")");
         }
 
         // 验证刷新令牌本身是否存在于Redis (这一步其实 validateRefreshToken 已经做了，但双重检查无害)
@@ -228,7 +227,7 @@ public class RedisTokenManager implements TokenManager {
         String accessTokenId = redisCache.getCacheObject(refreshTokenMappingKey);
         if (StringUtils.isBlank(accessTokenId)) {
             log.warn("无效的刷新令牌ID {}，在Redis中未找到对应的访问会话ID映射, Key: {}", refreshTokenId, refreshTokenMappingKey);
-            throw new ServiceException(REFRESH_TOKEN_INVALID, "刷新令牌已过期或无效");
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "刷新令牌已过期或无效");
         }
 
         // 用旧的accessTokenId找在线用户
@@ -239,7 +238,7 @@ public class RedisTokenManager implements TokenManager {
                     onlineUserKey);
             // 清理无效的刷新令牌映射
             redisCache.deleteObject(refreshTokenMappingKey);
-            throw new ServiceException(REFRESH_TOKEN_INVALID, "用户会话已失效，请重新登录");
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "用户会话已失效，请重新登录");
         }
 
         // （可选）校验JWT中的用户名和Redis中的用户名是否一致
@@ -248,7 +247,6 @@ public class RedisTokenManager implements TokenManager {
             log.warn("刷新令牌中的用户名 {} 与Redis中的用户名 {} 不匹配。RefreshTokenId: {}, AccessTokenId: {}",
                     usernameFromRefreshToken, onlineUser.getUsername(), refreshTokenId, accessTokenId);
             // 根据安全策略，可以选择拒绝刷新
-            // throw new ServiceException(REFRESH_TOKEN_INVALID, "令牌信息不一致");
         }
 
         // 生成新地访问令牌 ID 和 JWT
@@ -300,7 +298,7 @@ public class RedisTokenManager implements TokenManager {
         Claims claims;
         try {
             claims = getClaimsFromToken(jwtAccessToken);
-        } catch (LoginException | ServiceException e) {
+        } catch (AuthorizationException e) {
             log.warn("尝试使无效的JWT访问令牌失效 (解析失败): {}, 原因: {}", jwtAccessToken, e.getMessage());
             return;
         }
@@ -360,7 +358,7 @@ public class RedisTokenManager implements TokenManager {
      *
      * @param token JWT字符串
      * @return Claims对象，包含JWT的声明信息
-     * @throws LoginException 如果JWT无效 (例如格式错误、签名错误、过期)
+     * @throws AuthorizationException 如果JWT无效 (例如格式错误、签名错误、过期)
      */
     @Override
     public Claims getClaimsFromToken(String token) {
@@ -373,19 +371,19 @@ public class RedisTokenManager implements TokenManager {
         } catch (ExpiredJwtException e) {
             log.warn("JWT已过期, message: {}", e.getMessage());
             // 或者更具体的 REFRESH_TOKEN_EXPIRED
-            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌已过期");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌已过期");
         } catch (UnsupportedJwtException e) {
             log.warn("不支持的JWT格式, message: {}", e.getMessage());
-            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
         } catch (MalformedJwtException e) {
             log.warn("JWT结构错误, message: {}", e.getMessage());
-            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌结构错误");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌结构错误");
         } catch (SignatureException e) {
             log.warn("JWT签名验证失败, message: {}", e.getMessage());
-            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌签名无效");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌签名无效");
         } catch (IllegalArgumentException e) { // 通常是token为空或null
             log.warn("JWT claims字符串为空或无效参数, message: {}", e.getMessage());
-            throw new LoginException(ACCESS_TOKEN_INVALID, "令牌参数无效");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌参数无效");
         }
     }
 
