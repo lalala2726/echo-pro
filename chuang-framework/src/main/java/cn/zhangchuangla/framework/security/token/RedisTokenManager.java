@@ -29,7 +29,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static cn.zhangchuangla.common.core.enums.ResultCode.ACCESS_TOKEN_INVALID;
@@ -71,6 +74,7 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public AuthenticationToken generateToken(Authentication authentication) {
+        // 获取当前用户的信息
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
         Long userId = userDetails.getUserId();
@@ -85,10 +89,8 @@ public class RedisTokenManager implements TokenManager {
         redisCache.setCacheObject(onlineUserKey, onlineLoginUser,
                 securityProperties.getSession().getAccessTokenExpireTime());
 
-        String jwtAccessToken = createJwt(accessTokenId, username,
-                securityProperties.getSession().getAccessTokenExpireTime() * 1000L);
-        String jwtRefreshToken = createJwt(refreshTokenId, username,
-                securityProperties.getSession().getRefreshTokenExpireTime() * 1000L);
+        String jwtAccessToken = createJwt(accessTokenId, username);
+        String jwtRefreshToken = createJwt(refreshTokenId, username);
 
         String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
         // 刷新令牌的Redis value 存储的是它对应的 accessTokenId
@@ -277,10 +279,7 @@ public class RedisTokenManager implements TokenManager {
         // 并且续期刷新令牌的映射关系
         redisCache.setCacheObject(refreshTokenMappingKey, newAccessTokenId,
                 securityProperties.getSession().getRefreshTokenExpireTime());
-
-        long accessTokenValidityMillis = securityProperties.getSession().getAccessTokenExpireTime() * 1000L;
-        String newJwtAccessToken = createJwt(newAccessTokenId, username, accessTokenValidityMillis);
-
+        String newJwtAccessToken = createJwt(newAccessTokenId, username);
         return AuthenticationToken.builder()
                 .accessToken(newJwtAccessToken)
                 // 刷新令牌通常可以保持不变，除非有刷新令牌轮换策略
@@ -341,29 +340,16 @@ public class RedisTokenManager implements TokenManager {
     /**
      * 创建JWT。不再包含tokenType。
      *
-     * @param id               令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
-     * @param username         用户名
-     * @param validityInMillis 有效期（毫秒）
+     * @param id       令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
+     * @param username 用户名
      * @return JWT字符串
      */
-    private String createJwt(String id, String username, long validityInMillis) {
+    private String createJwt(String id, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_SESSION_ID, id);
         claims.put(CLAIM_KEY_USERNAME, username);
-
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMillis);
-
         return Jwts.builder()
-                // 使用 setClaims 而不是逐个 set
                 .setClaims(claims)
-                // sub claim
-                .setSubject(username)
-                // iat claim
-                .setIssuedAt(now)
-                // exp claim
-                .setExpiration(validity)
-                // .setId(id) // jti claim, 可以考虑用 id 作为 jti，但我们已在自定义 claim 中有 sid
                 .signWith(jwtSecretKey)
                 .compact();
     }
@@ -437,10 +423,8 @@ public class RedisTokenManager implements TokenManager {
 
         Set<String> roleSetByRoleId = sysRoleService.getRoleSetByRoleId(user.getUserId());
 
-        // 应检查是否为null
         HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
         String ipAddr = IPUtils.getIpAddress(httpServletRequest);
-        // IPUtils.getRegion 可能需要处理 "Unknown" IP
         String region = IPUtils.getRegion(ipAddr);
 
         OnlineLoginUser.OnlineLoginUserBuilder builder = OnlineLoginUser.builder()
@@ -452,8 +436,6 @@ public class RedisTokenManager implements TokenManager {
                 .deptId(user.getDeptId())
                 .userId(user.getUserId())
                 .roles(roleSetByRoleId);
-        // 如果计划在登出时清理刷新令牌，或者 OnlineLoginUser 需要知道它的 refreshTokenId
-        // 可以在这里或生成token后set进去，例如：.refreshTokenId(generatedRefreshTokenId)
         return builder.build();
     }
 

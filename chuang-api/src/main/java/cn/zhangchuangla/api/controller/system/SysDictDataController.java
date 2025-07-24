@@ -8,7 +8,6 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysDictData;
 import cn.zhangchuangla.system.model.request.dict.SysDictDataAddRequest;
@@ -23,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +59,7 @@ public class SysDictDataController extends BaseController {
     public AjaxResult<TableDataResult> listDictData(@PathVariable("dictType") String dictType,
                                                     @Parameter(description = "字典数据列表查询参数")
                                                     @Validated @ParameterObject SysDictDataQueryRequest request) {
-        if (StrUtils.isBlank(dictType)) {
+        if (StringUtils.isBlank(dictType)) {
             return error("字典类型不能为空!");
         }
         Page<SysDictData> sysDictDataPage = sysDictDataService.listDictData(dictType, request);
@@ -76,7 +76,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping("/option/{dictType}")
     @Operation(summary = "字典数据选项")
     public AjaxResult<List<Option<String>>> getDictDataOption(@PathVariable("dictType") String dictType) {
-        if (StrUtils.isBlank(dictType)) {
+        if (StringUtils.isBlank(dictType)) {
             return error("字典类型不能为空!");
         }
         List<Option<String>> options = sysDictDataService.getDictDataOption(dictType);
