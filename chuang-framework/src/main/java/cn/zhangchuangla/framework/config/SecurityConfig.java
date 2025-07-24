@@ -6,7 +6,6 @@ import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
-import cn.zhangchuangla.framework.security.token.TokenManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -145,11 +144,10 @@ public class SecurityConfig {
      * 将 TokenAuthenticationFilter 声明为 Bean
      * 这样可以由 Spring 管理其生命周期，并允许注入其他依赖
      *
-     * @param tokenManager Token管理器
      * @return TokenAuthenticationFilter 实例
      */
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter(TokenManager tokenManager) {
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter();
     }
 

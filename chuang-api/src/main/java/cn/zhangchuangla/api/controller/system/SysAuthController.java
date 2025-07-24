@@ -1,7 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.result.AjaxResult;
@@ -47,11 +47,11 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/login")
     @Operation(summary = "登录")
-    public AjaxResult<AuthenticationToken> login(
+    public AjaxResult<AuthTokenVo> login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
-        AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
-        return success(authenticationToken);
+        AuthTokenVo authTokenVo = sysAuthService.login(loginRequest, request);
+        return success(authTokenVo);
     }
 
     /**
@@ -62,9 +62,9 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/refresh")
     @Operation(summary = "刷新token")
-    public AjaxResult<AuthenticationToken> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
-        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request);
-        return success(newAuthenticationToken);
+    public AjaxResult<AuthTokenVo> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
+        AuthTokenVo newAuthTokenVo = sysAuthService.refreshToken(request);
+        return success(newAuthTokenVo);
     }
 
 

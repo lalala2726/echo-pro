@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationToken implements Serializable {
+public class AuthTokenVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -546346567615391164L;

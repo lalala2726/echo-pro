@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.security.token;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
@@ -16,11 +16,7 @@ import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.annotation.PostConstruct;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,46 +24,34 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.zhangchuangla.common.core.enums.ResultCode.ACCESS_TOKEN_INVALID;
 import static cn.zhangchuangla.common.core.enums.ResultCode.REFRESH_TOKEN_INVALID;
 
-
 /**
- * Redis Token 管理器
- * <p>
- * 用于生成、解析、校验、刷新 JWT Token
+ * AccessToken/RefreshToken生成与校验
  *
- * @author Ray.Hao
- * @since 2024/11/15
+ * @author Chuang
+ * <p>
+ * created on 2025/7/24 20:34
  */
-@Service
-@Slf4j
+@Component
 @RequiredArgsConstructor
-public class RedisTokenManager implements TokenManager {
+@Slf4j
+public class TokenService {
 
     private static final String CLAIM_KEY_SESSION_ID = "session";
     private static final String CLAIM_KEY_USERNAME = "username";
 
+    private final JwtTokenProvider jwtTokenProvider;
+    private final SysRoleService sysRoleService;
     private final SecurityProperties securityProperties;
     private final RedisCache redisCache;
-    private final SysRoleService sysRoleService;
-    private SecretKey jwtSecretKey;
     private final SysUserService userService;
 
-
-    @PostConstruct
-    public void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(securityProperties.getSecret());
-        this.jwtSecretKey = Keys.hmacShaKeyFor(keyBytes);
-    }
 
     /**
      * 生成JWT Token（访问令牌和刷新令牌）。
@@ -75,12 +59,10 @@ public class RedisTokenManager implements TokenManager {
      * @param authentication Spring Security的认证信息对象。
      * @return 包含JWT访问令牌和JWT刷新令牌的AuthenticationToken对象。
      */
-    @Override
-    public AuthenticationToken generateToken(Authentication authentication) {
+    public AuthTokenVo createToken(Authentication authentication) {
         // 获取当前用户的信息
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
-        Long userId = userDetails.getUserId();
 
         String accessTokenId = UUIDUtils.simple();
         String refreshTokenId = UUIDUtils.simple();
@@ -92,174 +74,16 @@ public class RedisTokenManager implements TokenManager {
         redisCache.setCacheObject(onlineUserKey, onlineLoginUser,
                 securityProperties.getSession().getAccessTokenExpireTime());
 
-        String jwtAccessToken = createJwt(accessTokenId, username);
-        String jwtRefreshToken = createJwt(refreshTokenId, username);
+        String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenId, username);
+        String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenId, username);
 
         String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
         // 刷新令牌的Redis value 存储的是它对应的 accessTokenId
         redisCache.setCacheObject(refreshTokenMappingKey, accessTokenId,
                 securityProperties.getSession().getRefreshTokenExpireTime());
 
-        handleSingleDeviceLogin(userId, accessTokenId);
-
-        return AuthenticationToken.builder()
+        return AuthTokenVo.builder()
                 .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken)
-                .expires(securityProperties.getSession().getAccessTokenExpireTime())
-                .build();
-    }
-
-    /**
-     * 解析JWT访问令牌获取认证信息。
-     * 此方法隐含期望一个访问令牌。
-     *
-     * @param jwtAccessToken JWT访问令牌。
-     * @return 用户认证信息（Authentication对象），如果Token无效或解析失败则返回null。
-     */
-    @Override
-    public Authentication parseToken(String jwtAccessToken) {
-        // getClaimsFromToken 内部处理异常
-        Claims claims = getClaimsFromToken(jwtAccessToken);
-        // 如果getClaimsFromToken在无效时返回null而不是抛出异常
-        if (claims == null) {
-            log.warn("解析访问令牌失败或Claims为空: {}", jwtAccessToken);
-            return null;
-        }
-
-        // tokenType 检查已被移除，因为此方法上下文就是处理访问令牌
-
-        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(sessionId)) {
-            log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, jwtAccessToken);
-            return null;
-        }
-
-        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
-        OnlineLoginUser onlineUser = redisCache.getCacheObject(onlineUserKey);
-
-        if (onlineUser == null) {
-            return null;
-        }
-
-        redisCache.expire(onlineUserKey, securityProperties.getSession().getAccessTokenExpireTime());
-
-        Set<SimpleGrantedAuthority> authorities = onlineUser.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
-                .collect(Collectors.toSet());
-        SysUserDetails userDetails = buildUserDetails(onlineUser, authorities);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-    }
-
-    /**
-     * 校验JWT访问令牌是否有效。
-     * 验证JWT签名、是否过期，并检查Redis中是否存在对应的会话信息。
-     *
-     * @param jwtAccessToken JWT访问令牌。
-     * @return 如果有效返回true，否则返回false。
-     */
-    @Override
-    public boolean validateAccessToken(String jwtAccessToken) {
-        Claims claims;
-        // 如果解析失败或过期，getClaimsFromToken会抛出异常
-        claims = getClaimsFromToken(jwtAccessToken);
-        // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
-        if (claims == null) {
-            return false;
-        }
-        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(sessionId)) {
-            return false;
-        }
-
-        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
-        return redisCache.hasKey(onlineUserKey);
-    }
-
-    /**
-     * 校验JWT刷新令牌是否有效。
-     * 验证JWT签名、是否过期，并检查Redis中是否存在对应的映射关系。
-     *
-     * @param jwtRefreshToken JWT刷新令牌。
-     * @return 如果有效返回true，否则返回false。
-     */
-    @Override
-    public boolean validateRefreshToken(String jwtRefreshToken) {
-        Claims claims;
-        try {
-            claims = getClaimsFromToken(jwtRefreshToken);
-        } catch (AuthorizationException e) {
-            return false;
-        }
-        if (claims == null) {
-            return false;
-        }
-        // tokenType 检查已被移除
-
-        // 刷新令牌JWT中的ID是refreshTokenId
-        String refreshTokenId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(refreshTokenId)) {
-            return false;
-        }
-        return redisCache.hasKey(formatRefreshTokenMappingKey(refreshTokenId));
-    }
-
-    /**
-     * 使用JWT刷新令牌刷新访问令牌。
-     *
-     * @param jwtRefreshToken JWT刷新令牌。
-     * @return 新的AuthenticationToken，包含新的JWT访问令牌和原始JWT刷新令牌。
-     * @throws AuthorizationException 如果刷新令牌无效或关联的用户会话不存在。
-     */
-    @Override
-    public AuthenticationToken refreshToken(String jwtRefreshToken) {
-        // 内部会处理过期等问题并抛异常
-        Claims refreshClaims = getClaimsFromToken(jwtRefreshToken);
-        if (refreshClaims == null) {
-            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "无法解析刷新令牌Claims");
-        }
-
-        // 检验当前刷新令牌是否是合法的
-        if (validateAccessToken(jwtRefreshToken)) {
-            throw new AuthorizationException(ResultCode.INVALID_TOKEN);
-        }
-
-        String refreshTokenId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
-
-        String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
-        if (!redisCache.hasKey(refreshTokenMappingKey)) {
-            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "刷新令牌已失效");
-        }
-
-        String username = refreshClaims.get(CLAIM_KEY_USERNAME, String.class);
-
-        // 创建新的访问令牌
-        String simpleUuid = UUIDUtils.simple();
-        String accessToken = createJwt(simpleUuid, username);
-
-
-        // 获取用户角色并构建用户详情对象
-        SysUser user = userService.getUserInfoByUsername(username);
-        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(user.getUserId());
-        OnlineLoginUser onlineLoginUser = OnlineLoginUser.builder()
-                .userId(user.getUserId())
-                .roles(roleSetByUserId)
-                .deptId(user.getDeptId())
-                .username(user.getUsername())
-                .build();
-
-
-        // 设置客户端信息
-        setClientInfo(onlineLoginUser);
-
-        // 保存在线用户信息
-        redisCache.setCacheObject(formatOnlineUserKeyBySessionId(simpleUuid), onlineLoginUser, securityProperties.getSession().getAccessTokenExpireTime());
-
-        //更新刷新令牌的映射关系
-        Long keyExpire = redisCache.getKeyExpire(refreshTokenMappingKey);
-        redisCache.setCacheObject(refreshTokenMappingKey, simpleUuid, keyExpire);
-        // 返回新的访问令牌
-        return AuthenticationToken.builder()
-                .accessToken(accessToken)
                 .refreshToken(jwtRefreshToken)
                 .expires(securityProperties.getSession().getAccessTokenExpireTime())
                 .build();
@@ -272,11 +96,10 @@ public class RedisTokenManager implements TokenManager {
      *
      * @param jwtAccessToken JWT访问令牌。
      */
-    @Override
     public void invalidateToken(String jwtAccessToken) {
         Claims claims;
         try {
-            claims = getClaimsFromToken(jwtAccessToken);
+            claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
         } catch (AuthorizationException e) {
             log.warn("尝试使无效的JWT访问令牌失效 (解析失败): {}, 原因: {}", jwtAccessToken, e.getMessage());
             return;
@@ -315,56 +138,155 @@ public class RedisTokenManager implements TokenManager {
     }
 
     /**
-     * 创建JWT。不再包含tokenType。
+     * 解析JWT访问令牌获取认证信息。
+     * 此方法隐含期望一个访问令牌。
      *
-     * @param id       令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
-     * @param username 用户名
-     * @return JWT字符串
+     * @param accessToken JWT访问令牌。
+     * @return 用户认证信息（Authentication对象），如果Token无效或解析失败则返回null。
      */
-    private String createJwt(String id, String username) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_SESSION_ID, id);
-        claims.put(CLAIM_KEY_USERNAME, username);
-        return Jwts.builder()
-                .setClaims(claims)
-                .signWith(jwtSecretKey)
-                .compact();
+    public Authentication parseAccessToken(String accessToken) {
+        // getClaimsFromToken 内部处理异常
+        Claims claims = jwtTokenProvider.getClaimsFromToken(accessToken);
+        // 如果getClaimsFromToken在无效时返回null而不是抛出异常
+        if (claims == null) {
+            log.warn("解析访问令牌失败或Claims为空: {}", accessToken);
+            return null;
+        }
+
+        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(sessionId)) {
+            log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, accessToken);
+            return null;
+        }
+
+        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
+        OnlineLoginUser onlineUser = redisCache.getCacheObject(onlineUserKey);
+
+        if (onlineUser == null) {
+            return null;
+        }
+
+        redisCache.expire(onlineUserKey, securityProperties.getSession().getAccessTokenExpireTime());
+
+        Set<SimpleGrantedAuthority> authorities = onlineUser.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
+                .collect(Collectors.toSet());
+        SysUserDetails userDetails = buildUserDetails(onlineUser, authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
     }
 
     /**
-     * 从JWT中解析Claims。
-     * 遇到已知错误（过期、签名错误等）时抛出自定义异常。
+     * 校验JWT刷新令牌是否有效。
+     * 验证JWT签名、是否过期，并检查Redis中是否存在对应的映射关系。
      *
-     * @param token JWT字符串
-     * @return Claims对象，包含JWT的声明信息
-     * @throws AuthorizationException 如果JWT无效 (例如格式错误、签名错误、过期)
+     * @param jwtRefreshToken JWT刷新令牌。
+     * @return 如果有效返回true，否则返回false。
      */
-    @Override
-    public Claims getClaimsFromToken(String token) {
+    public boolean validateRefreshToken(String jwtRefreshToken) {
+        Claims claims;
         try {
-            Jws<Claims> jwsClaims = Jwts.parserBuilder()
-                    .setSigningKey(jwtSecretKey)
-                    .build()
-                    .parseClaimsJws(token);
-            return jwsClaims.getBody();
-        } catch (ExpiredJwtException e) {
-            log.warn("JWT已过期, message: {}", e.getMessage());
-            // 或者更具体的 REFRESH_TOKEN_EXPIRED
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌已过期");
-        } catch (UnsupportedJwtException e) {
-            log.warn("不支持的JWT格式, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
-        } catch (MalformedJwtException e) {
-            log.warn("JWT结构错误, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌结构错误");
-        } catch (SignatureException e) {
-            log.warn("JWT签名验证失败, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌签名无效");
-        } catch (IllegalArgumentException e) { // 通常是token为空或null
-            log.warn("JWT claims字符串为空或无效参数, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌参数无效");
+            claims = jwtTokenProvider.getClaimsFromToken(jwtRefreshToken);
+        } catch (AuthorizationException e) {
+            return false;
         }
+        if (claims == null) {
+            return false;
+        }
+        // tokenType 检查已被移除
+
+        // 刷新令牌JWT中的ID是refreshTokenId
+        String refreshTokenId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(refreshTokenId)) {
+            return false;
+        }
+        return redisCache.hasKey(formatRefreshTokenMappingKey(refreshTokenId));
     }
+
+    /**
+     * 使用JWT刷新令牌刷新访问令牌。
+     *
+     * @param jwtRefreshToken JWT刷新令牌。
+     * @return 新的AuthenticationToken，包含新的JWT访问令牌和原始JWT刷新令牌。
+     * @throws AuthorizationException 如果刷新令牌无效或关联的用户会话不存在。
+     */
+    public AuthTokenVo refreshToken(String jwtRefreshToken) {
+        // 内部会处理过期等问题并抛异常
+        Claims refreshClaims = jwtTokenProvider.getClaimsFromToken(jwtRefreshToken);
+        if (refreshClaims == null) {
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "无法解析刷新令牌Claims");
+        }
+
+        // 检验当前刷新令牌是否是合法的
+        if (validateAccessToken(jwtRefreshToken)) {
+            throw new AuthorizationException(ResultCode.INVALID_TOKEN);
+        }
+
+        String refreshTokenId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
+
+        String refreshTokenMappingKey = formatRefreshTokenMappingKey(refreshTokenId);
+        if (!redisCache.hasKey(refreshTokenMappingKey)) {
+            throw new AuthorizationException(REFRESH_TOKEN_INVALID, "刷新令牌已失效");
+        }
+
+        String username = refreshClaims.get(CLAIM_KEY_USERNAME, String.class);
+
+        // 创建新的访问令牌
+        String simpleUuid = UUIDUtils.simple();
+        String accessToken = jwtTokenProvider.createJwt(simpleUuid, username);
+
+
+        // 获取用户角色并构建用户详情对象
+        SysUser user = userService.getUserInfoByUsername(username);
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(user.getUserId());
+        OnlineLoginUser onlineLoginUser = OnlineLoginUser.builder()
+                .userId(user.getUserId())
+                .roles(roleSetByUserId)
+                .deptId(user.getDeptId())
+                .username(user.getUsername())
+                .build();
+
+
+        // 设置客户端信息
+        setClientInfo(onlineLoginUser);
+
+        // 保存在线用户信息
+        redisCache.setCacheObject(formatOnlineUserKeyBySessionId(simpleUuid), onlineLoginUser, securityProperties.getSession().getAccessTokenExpireTime());
+
+        //更新刷新令牌的映射关系
+        Long keyExpire = redisCache.getKeyExpire(refreshTokenMappingKey);
+        redisCache.setCacheObject(refreshTokenMappingKey, simpleUuid, keyExpire);
+        // 返回新的访问令牌
+        return AuthTokenVo.builder()
+                .accessToken(accessToken)
+                .refreshToken(jwtRefreshToken)
+                .expires(securityProperties.getSession().getAccessTokenExpireTime())
+                .build();
+    }
+
+    /**
+     * 校验JWT访问令牌是否有效。
+     * 验证JWT签名、是否过期，并检查Redis中是否存在对应的会话信息。
+     *
+     * @param jwtAccessToken JWT访问令牌。
+     * @return 如果有效返回true，否则返回false。
+     */
+    public boolean validateAccessToken(String jwtAccessToken) {
+        Claims claims;
+        // 如果解析失败或过期，getClaimsFromToken会抛出异常
+        claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
+        // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
+        if (claims == null) {
+            return false;
+        }
+        String sessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(sessionId)) {
+            return false;
+        }
+
+        String onlineUserKey = formatOnlineUserKeyBySessionId(sessionId);
+        return redisCache.hasKey(onlineUserKey);
+    }
+
 
     /**
      * 构建在线用户信息的Redis Key。
@@ -454,38 +376,5 @@ public class RedisTokenManager implements TokenManager {
         userDetails.setDeptId(onlineUser.getDeptId());
         userDetails.setAuthorities(authorities);
         return userDetails;
-    }
-
-    /**
-     * 处理单设备登录逻辑。
-     * 如果启用了单设备登录，检查当前用户的旧会话ID，并将其强制下线。
-     *
-     * @param userId           用户ID
-     * @param newAccessTokenId 新的访问令牌ID
-     */
-    private void handleSingleDeviceLogin(Long userId, String newAccessTokenId) {
-        if (!securityProperties.getSession().getSingleLogin()) {
-            return;
-        }
-
-        String userPreviousAccessIdKey = RedisConstants.Auth.USER_ACCESS_TOKEN + userId;
-        String previousAccessTokenId = redisCache.getCacheObject(userPreviousAccessIdKey);
-
-        if (StringUtils.isNotBlank(previousAccessTokenId) && !previousAccessTokenId.equals(newAccessTokenId)) {
-            String oldOnlineUserKey = formatOnlineUserKeyBySessionId(previousAccessTokenId);
-            OnlineLoginUser oldOnlineUser = redisCache.getCacheObject(oldOnlineUserKey);
-            if (oldOnlineUser != null) {
-                log.info("单设备登录：用户 {} (ID:{}) 的旧会话 {} (Key:{}) 将被新会话 {} 强制下线。",
-                        oldOnlineUser.getUsername(), userId, previousAccessTokenId, oldOnlineUserKey, newAccessTokenId);
-                redisCache.deleteObject(oldOnlineUserKey);
-            } else {
-                log.warn("单设备登录：用户ID {} 的旧会话 {} 在Redis中未找到OnlineLoginUser对象，Key: {}", userId, previousAccessTokenId,
-                        oldOnlineUserKey);
-            }
-        }
-
-
-        redisCache.setCacheObject(userPreviousAccessIdKey, newAccessTokenId,
-                securityProperties.getSession().getAccessTokenExpireTime());
     }
 }

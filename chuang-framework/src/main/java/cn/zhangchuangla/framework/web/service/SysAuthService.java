@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.web.service;
 
-import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
-import cn.zhangchuangla.framework.security.token.TokenManager;
+import cn.zhangchuangla.framework.security.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 public class SysAuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final TokenManager tokenManager;
+    private final TokenService tokenService;
     private final AsyncService asyncService;
 
     /**
@@ -41,7 +41,7 @@ public class SysAuthService {
      * @param request 请求参数
      * @return 令牌
      */
-    public AuthenticationToken login(LoginRequest request, HttpServletRequest httpServletRequest) {
+    public AuthTokenVo login(LoginRequest request, HttpServletRequest httpServletRequest) {
         // 1. 创建用于密码认证的令牌（未认证）
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername().trim(), request.getPassword().trim());
@@ -60,7 +60,7 @@ public class SysAuthService {
         }
 
         // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
-        AuthenticationToken authenticationTokenResponse = tokenManager.generateToken(authentication);
+        AuthTokenVo authTokenVoResponse = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 使用异步服务记录登录成功日志
@@ -68,7 +68,7 @@ public class SysAuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
-        return authenticationTokenResponse;
+        return authTokenVoResponse;
     }
 
     /**
@@ -77,15 +77,15 @@ public class SysAuthService {
      * @param request 刷新令牌
      * @return 认证 Token 响应
      */
-    public AuthenticationToken refreshToken(RefreshTokenRequest request) {
+    public AuthTokenVo refreshToken(RefreshTokenRequest request) {
         // 验证刷新令牌
-        boolean isValidate = tokenManager.validateRefreshToken(request.getRefreshToken());
+        boolean isValidate = tokenService.validateRefreshToken(request.getRefreshToken());
 
         if (!isValidate) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         // 刷新令牌有效，生成新的访问令牌
-        return tokenManager.refreshToken(request.getRefreshToken());
+        return tokenService.refreshToken(request.getRefreshToken());
     }
 
     /**
@@ -95,7 +95,7 @@ public class SysAuthService {
         String token = SecurityUtils.getTokenFromRequest();
         if (StringUtils.isNotBlank(token)) {
             // 将JWT令牌加入黑名单
-            tokenManager.invalidateToken(token);
+            tokenService.invalidateToken(token);
             // 清除Security上下文
             SecurityContextHolder.clearContext();
         }
