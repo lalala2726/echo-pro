@@ -135,6 +135,13 @@ public interface RedisConstants {
         String DEVICE_REFRESH_TOKEN_KEY = "auth:refresh";
 
         /**
+         * 分布式锁前缀
+         * Key 格式: auth:lock:{lockName}
+         * 类型: STRING
+         */
+        String DISTRIBUTED_LOCK_PREFIX = "auth:lock:";
+
+        /**
          * AccessToken 黑名单。
          * Key 格式: auth:blacklist:{jti}
          * 类型: STRING
