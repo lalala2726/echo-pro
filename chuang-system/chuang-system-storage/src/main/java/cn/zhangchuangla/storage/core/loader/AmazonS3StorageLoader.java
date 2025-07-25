@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.core.loader;
 
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -38,15 +38,15 @@ public class AmazonS3StorageLoader implements StorageLoader {
      * </p>
      *
      * @param json       亚马逊S3存储配置的JSON字符串
-     * @param redisCache Redis缓存实例
+     * @param redisKeyCache Redis缓存实例
      */
     @Override
-    public void loadConfig(String json, RedisCache redisCache) {
+    public void loadConfig(String json, RedisKeyCache redisKeyCache) {
         // 将配置JSON保存到Redis
-        redisCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
+        redisKeyCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
 
         // 设置当前活动的存储类型为亚马逊S3
-        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.AMAZON_S3);
+        redisKeyCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.AMAZON_S3);
 
         log.info("亚马逊S3存储配置已成功加载到Redis缓存");
     }

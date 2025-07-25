@@ -109,8 +109,44 @@ public interface RedisConstants {
 
         String USER_REFRESH_TOKEN = "auth:user:refresh:";
 
-
         String ROLE_KEY = "auth:role:";
+
+
+        /**
+         * 在线会话管理：按时间排序的在线设备列表。
+         * Key 格式: auth:sessions:{userId}:{deviceType}
+         * 类型: ZSET
+         */
+        String SESSIONS_KEY = "auth:sessions:";
+        String SESSIONS_KEY_INDEX = "auth:sessions:index:";
+
+        /**
+         * 设备信息详情。
+         * Key 格式: auth:device:{userId}:{deviceId}
+         * 类型: STRING / HASH
+         */
+        String DEVICE_INFO_KEY = "auth:device:";
+
+        /**
+         * 当前设备的 RefreshToken。
+         * Key 格式: auth:refresh:{userId}:{deviceId}
+         * 类型: STRING
+         */
+        String DEVICE_REFRESH_TOKEN_KEY = "auth:refresh";
+
+        /**
+         * AccessToken 黑名单。
+         * Key 格式: auth:blacklist:{jti}
+         * 类型: STRING
+         */
+        String ACCESS_TOKEN_BLACKLIST_KEY = "auth:blacklist:";
+
+        /**
+         * 限制登录频率。
+         * Key 格式: auth:limit:login:{userId}:{hour}
+         * 类型: STRING (INCR)
+         */
+        String LOGIN_LIMIT_KEY = "auth:limit:login:";
     }
 
 }

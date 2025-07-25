@@ -2,7 +2,7 @@ package cn.zhangchuangla.common.excel.core;
 
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class DictDataHandler {
 
-    private final RedisCache redisCache;
+    private final RedisKeyCache redisKeyCache;
 
     /**
      * 本地缓存，避免频繁访问Redis
@@ -77,7 +77,7 @@ public class DictDataHandler {
     private Map<String, String> loadDictFromRedis(String dictKey) {
         try {
             String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictKey);
-            List<Option<String>> dictValues = redisCache.getCacheObject(cacheKey);
+            List<Option<String>> dictValues = redisKeyCache.getCacheObject(cacheKey);
 
             if (dictValues == null || dictValues.isEmpty()) {
                 log.debug("Redis中未找到字典数据: dictType={}", dictKey);

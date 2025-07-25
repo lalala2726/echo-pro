@@ -6,10 +6,14 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.security.model.dto.LoginDeviceDTO;
+import cn.zhangchuangla.framework.security.model.dto.LoginSessionDTO;
+import cn.zhangchuangla.framework.security.session.SessionLimiter;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +45,7 @@ public class AuthService {
     private final AsyncService asyncService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SysUserService sysUserService;
+    private final SessionLimiter sessionLimiter;
 
     /**
      * 实现登录逻辑
@@ -66,8 +71,8 @@ public class AuthService {
             throw new AuthorizationException(ResultCode.LOGIN_ERROR, "账号或密码错误!");
         }
 
-        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文，供登录日志 AOP 使用（已认证）
-        AuthTokenVo authTokenVoResponse = tokenService.createToken(authentication);
+        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文
+        LoginSessionDTO loginSessionDTO = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 使用异步服务记录登录成功日志
@@ -75,7 +80,15 @@ public class AuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
-        return authTokenVoResponse;
+
+        LoginDeviceDTO loginDeviceDTO = LoginDeviceDTO.builder()
+                .deviceType("PC")
+                .deviceName("MacBook")
+                .refreshSessionId(loginSessionDTO.getRefreshTokenSessionId())
+                .userId(loginSessionDTO.getUserId())
+                .build();
+        sessionLimiter.addSession(loginDeviceDTO);
+        return BeanCotyUtils.copyProperties(loginSessionDTO, AuthTokenVo.class);
     }
 
     /**

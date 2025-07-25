@@ -54,6 +54,18 @@ public class UserAgentUtils {
      */
     private static OperatingSystem getOperatingSystem(String userAgentStr) {
         return parseUserAgent(userAgentStr).getOperatingSystem();
+
+    }
+
+    /**
+     * 获取操作系统对象
+     *
+     * @param request HttpServletRequest
+     * @return OperatingSystem 操作系统对象
+     */
+    private static OperatingSystem getOperatingSystem(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return parseUserAgent(userAgent).getOperatingSystem();
     }
 
     /**

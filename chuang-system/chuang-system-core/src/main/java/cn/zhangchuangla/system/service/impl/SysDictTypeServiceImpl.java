@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
 import cn.zhangchuangla.system.model.entity.SysDictData;
 import cn.zhangchuangla.system.model.entity.SysDictType;
@@ -41,7 +41,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     private final SysDictTypeMapper sysDictTypeMapper;
     private final SysDictDataService sysDictDataService;
-    private final RedisCache redisCache;
+    private final RedisKeyCache redisKeyCache;
 
     /**
      * 分页查询字典类型列表
@@ -196,9 +196,9 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             log.info("开始刷新字典缓存...");
 
             // 1. 清除现有的字典缓存
-            Collection<String> existingKeys = redisCache.keys(RedisConstants.Dict.DICT_CACHE_PREFIX + "*");
+            Collection<String> existingKeys = redisKeyCache.keys(RedisConstants.Dict.DICT_CACHE_PREFIX + "*");
             if (!existingKeys.isEmpty()) {
-                long deletedCount = redisCache.deleteObject(existingKeys);
+                long deletedCount = redisKeyCache.deleteObject(existingKeys);
                 log.info("清除了 {} 个现有字典缓存", deletedCount);
             }
 
@@ -233,7 +233,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
                     // 将数据放入缓存
                     String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType.getDictType());
-                    redisCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
+                    redisKeyCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
 
                     successCount++;
 
@@ -260,7 +260,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         if (!StringUtils.isBlank(dictType)) {
             String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
-                redisCache.deleteObject(cacheKey);
+                redisKeyCache.deleteObject(cacheKey);
                 log.debug("已清除字典缓存: {}", dictType);
             } catch (Exception e) {
                 log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());

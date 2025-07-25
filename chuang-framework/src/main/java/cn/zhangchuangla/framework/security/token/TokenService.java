@@ -12,6 +12,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
+import cn.zhangchuangla.framework.security.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.jsonwebtoken.Claims;
@@ -42,6 +43,7 @@ public class TokenService {
 
     private static final String CLAIM_KEY_SESSION_ID = "session";
     private static final String CLAIM_KEY_USERNAME = "username";
+    private static final String CLAIM_KEY_USER_ID = "userId";
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SysRoleService sysRoleService;
@@ -56,10 +58,13 @@ public class TokenService {
      * @param authentication Spring Security的认证信息对象。
      * @return 包含JWT访问令牌和JWT刷新令牌的AuthenticationToken对象。
      */
-    public AuthTokenVo createToken(Authentication authentication) {
+
+    // todo 这边内部不负责获取设备信息IP等信息,统一让上层统一传入!
+    public LoginSessionDTO createToken(Authentication authentication) {
         // 获取当前用户的信息
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
+        Long userId = userDetails.getUserId();
 
         // 随机生成刷新令牌和访问令牌的sessionId
         String accessTokenSessionId = UUIDUtils.simple();
@@ -74,10 +79,13 @@ public class TokenService {
         String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
         String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenSessionId, username);
 
-        return AuthTokenVo.builder()
+        return LoginSessionDTO.builder()
+                .userId(userId)
+                .accessTokenSessionId(accessTokenSessionId)
+                .refreshTokenSessionId(refreshTokenSessionId)
+                .username(username)
                 .accessToken(jwtAccessToken)
                 .refreshToken(jwtRefreshToken)
-                .expires(securityProperties.getSession().getAccessTokenExpireTime())
                 .build();
     }
 

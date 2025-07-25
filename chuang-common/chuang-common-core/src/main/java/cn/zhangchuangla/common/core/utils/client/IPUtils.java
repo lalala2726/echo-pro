@@ -118,8 +118,8 @@ public class IPUtils {
                 "null",
                 "undefined",
                 "localhost",
-                "0:0:0:0:0:0:0:1",  // IPv6 localhost
-                "::"                 // IPv6 any address
+                "0:0:0:0:0:0:0:1",
+                "::"
         };
 
         for (String invalid : invalidValues) {
@@ -131,10 +131,7 @@ public class IPUtils {
         // 基本的IPv4格式验证
         if (isValidIPv4(ip)) {
             // 排除一些特殊的本地地址
-            if ("0.0.0.0".equals(ip) || "127.0.0.1".equals(ip)) {
-                return false;
-            }
-            return true;
+            return !"0.0.0.0".equals(ip) && !"127.0.0.1".equals(ip);
         }
 
         // 基本的IPv6格式验证
@@ -193,8 +190,8 @@ public class IPUtils {
         return ip.contains(":") &&
                 ip.length() >= 2 &&
                 ip.length() <= 39 &&
-                !ip.equals("::") &&
-                !ip.equals("0:0:0:0:0:0:0:1");
+                !"::".equals(ip) &&
+                !"0:0:0:0:0:0:0:1".equals(ip);
     }
 
     /**

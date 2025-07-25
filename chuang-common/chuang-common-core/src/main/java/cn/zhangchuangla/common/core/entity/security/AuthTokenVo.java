@@ -40,6 +40,6 @@ public class AuthTokenVo implements Serializable {
      * 过期时间（单位：秒）
      */
     @Schema(description = "过期时间(单位：秒)")
-    private Integer expires;
+    private Long expires;
 
 }

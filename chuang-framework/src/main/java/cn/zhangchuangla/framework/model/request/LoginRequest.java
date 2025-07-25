@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.model.request;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
+import cn.zhangchuangla.common.core.enums.DeviceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -34,17 +35,11 @@ public class LoginRequest {
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "Abc123456!")
     private String password;
 
-    /**
-     * 验证码KEY
-     */
-//    @NotBlank(message = "验证码KEY不能为空!")
-    @Schema(description = "验证码KEY", requiredMode = Schema.RequiredMode.REQUIRED, example = "captchaKey")
-    private String captchaKey;
 
     /**
-     * 验证码
+     * 设备类型
      */
-//    @NotBlank(message = "验证码不能为空!")
-    @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "captchaCode")
-    private String captchaCode;
+    @Schema(description = "设备类型", type = "string", allowableValues = {"web", "pc", "ios", "android"}, defaultValue = "PC",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "PC")
+    private String deviceType = DeviceType.WEB.getValue();
 }

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.core.loader;
 
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,8 +23,8 @@ public class AliyunOssStorageLoader implements StorageLoader {
     }
 
     @Override
-    public void loadConfig(String json, RedisCache redisCache) {
-        redisCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
-        redisCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.ALIYUN_OSS);
+    public void loadConfig(String json, RedisKeyCache redisKeyCache) {
+        redisKeyCache.setCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG, json);
+        redisKeyCache.setCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE, StorageConstants.StorageType.ALIYUN_OSS);
     }
 }

@@ -59,4 +59,4 @@ security:
   session:
     access-token-expire-time: 7200000
     refresh-token-expire-time: 2592000
-    single-login: false
+    score-type: last_active
