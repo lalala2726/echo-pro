@@ -108,6 +108,7 @@ public class SecurityProperties {
          */
         private ScoreType scoreType = ScoreType.LOGIN_TIME;
 
+
         public enum ScoreType {
             LOGIN_TIME,
             LAST_ACTIVE

@@ -14,6 +14,7 @@ import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.security.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.security.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.security.session.SessionLimiter;
+import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final SysUserService sysUserService;
     private final SessionLimiter sessionLimiter;
+    private final RedisTokenStore redisTokenStore;
 
     /**
      * 实现登录逻辑
@@ -71,23 +73,38 @@ public class AuthService {
             throw new AuthorizationException(ResultCode.LOGIN_ERROR, "账号或密码错误!");
         }
 
-        // 3. 认证成功后生成 JWT 令牌，并存入 Security 上下文
+        // 3. 认证成功后，生成 JWT 令牌（但还未添加到会话管理中）
         LoginSessionDTO loginSessionDTO = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 4. 构建登录设备信息
+        LoginDeviceDTO loginDeviceDTO = LoginDeviceDTO.builder()
+                .deviceType(request.getDeviceType())
+                // TODO: 从请求中获取真实设备名称
+                .deviceName("MacBook")
+                .refreshSessionId(loginSessionDTO.getRefreshTokenSessionId())
+                .username(loginSessionDTO.getUsername())
+                .ip(IPUtils.getIpAddress(httpServletRequest))
+                .build();
+
+        // 如果为了性能考虑，可以在 checkLimitAndAddSession 的第二个参数传入 false，
+        // 表示在检查设备数量限制时跳过加锁。适用于单机部署且用户并发不高的场景。
+        // 注意：跳过加锁可能会导致会话数量限制不准确，需根据实际业务场景权衡。
+        try {
+            sessionLimiter.checkLimitAndAddSession(loginDeviceDTO);
+        } catch (AuthorizationException e) {
+            // 如果设备限制检查失败，需要清理已生成的token
+            log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
+                    request.getUsername(), request.getDeviceType(), e.getMessage());
+            redisTokenStore.deleteRefreshTokenAndAccessToken(loginSessionDTO.getRefreshTokenSessionId());
+            throw e;
+        }
 
         // 使用异步服务记录登录成功日志
         String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
-
-        LoginDeviceDTO loginDeviceDTO = LoginDeviceDTO.builder()
-                .deviceType("PC")
-                .deviceName("MacBook")
-                .refreshSessionId(loginSessionDTO.getRefreshTokenSessionId())
-                .userId(loginSessionDTO.getUserId())
-                .build();
-        sessionLimiter.addSession(loginDeviceDTO);
         return BeanCotyUtils.copyProperties(loginSessionDTO, AuthTokenVo.class);
     }
 
@@ -109,8 +126,6 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
         user.setCreateTime(new Date());
-        // 0-正常 1-停用
-        user.setStatus(0);
         sysUserService.save(user);
         return user.getUserId();
     }

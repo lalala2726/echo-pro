@@ -22,5 +22,4 @@ import org.springframework.web.bind.annotation.RestController;
 public class OnlineUserController extends BaseController {
 
 
-
 }
