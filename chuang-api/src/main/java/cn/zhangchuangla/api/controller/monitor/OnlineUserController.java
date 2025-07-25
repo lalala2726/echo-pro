@@ -1,7 +1,6 @@
 package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OnlineUserController extends BaseController {
 
-    private final RedisKeyCache<String> redisKeyCache;
 
 
 }

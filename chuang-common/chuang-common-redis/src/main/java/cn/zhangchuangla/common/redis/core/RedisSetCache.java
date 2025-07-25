@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @RequiredArgsConstructor
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings(value = {"unchecked", "rawtypes"})
 public final class RedisSetCache {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate redisTemplate;
 
     /**
      * 添加一个成员到集合
