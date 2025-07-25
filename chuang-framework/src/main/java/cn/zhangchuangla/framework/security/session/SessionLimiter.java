@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.security.session;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
+import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
@@ -8,12 +9,19 @@ import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.security.model.dto.LoginDeviceDTO;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 登录数量限制
@@ -24,43 +32,172 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SessionLimiter {
 
     private static final String DEVICE_TYPE = "device_type";
     private static final String DEVICE_NAME = "device_name";
-    private static final String IP = "ip";
-    private static final String LOCATION = "location";
-    private static final String USER_ID = "user_id";
     private static final String LOGIN_TIME = "login_time";
+
+    // 用户级别的锁，确保同一用户的会话操作是线程安全的
+    private final ConcurrentHashMap<String, ReentrantLock> userLocks = new ConcurrentHashMap<>();
+
     private final RedisKeyCache redisKeyCache;
     private final RedisHashCache redisHashCache;
     private final RedisZSetCache redisZSetCache;
     private final SecurityProperties securityProperties;
 
     /**
-     * 检查登录设备数量限制
+     * 获取用户对应的锁
      *
-     * @param userId     用户ID
-     * @param deviceType 设备类型
+     * @param username 用户名
+     * @return 用户对应的锁
      */
-    public void checkLoginDeviceLimit(Long userId, String deviceType) {
-        SecurityProperties.SessionConfig.MaxSessionsPerClient maxSessionsPerClient =
-                securityProperties.getSession().getMaxSessionsPerClient();
-        long limit = getLimit(deviceType, maxSessionsPerClient);
-        if (limit > 0) {
-            checkLoginCountLimit(userId, deviceType, limit);
-        } else if (limit == 0) {
-            throw new AuthorizationException(ResultCode.LOGIN_ERROR, "登录设备数量已达上限");
-        }
+    private ReentrantLock getUserLock(String username) {
+        return userLocks.computeIfAbsent(username, k -> new ReentrantLock());
     }
 
 
     /**
-     * 添加登录设备
+     * 检查登录设备数量限制并添加会话（原子操作）
      *
      * @param loginDeviceDTO 登录设备信息
      */
-    public void addSession(@Validated LoginDeviceDTO loginDeviceDTO) {
+    public void checkLimitAndAddSession(@Validated LoginDeviceDTO loginDeviceDTO) {
+        checkLimitAndAddSession(loginDeviceDTO, true);
+    }
+
+    /**
+     * 检查登录设备数量限制并添加会话（原子操作）
+     *
+     * @param loginDeviceDTO 登录设备信息
+     * @param needLock       是否需要加锁，true-加锁，false-不加锁
+     */
+    public void checkLimitAndAddSession(@Validated LoginDeviceDTO loginDeviceDTO, boolean needLock) {
+        if (needLock) {
+            ReentrantLock lock = getUserLock(loginDeviceDTO.getUsername());
+            lock.lock();
+            try {
+                doCheckLimitAndAddSession(loginDeviceDTO);
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            doCheckLimitAndAddSession(loginDeviceDTO);
+        }
+    }
+
+    /**
+     * 执行检查限制和添加会话的核心逻辑
+     *
+     * @param loginDeviceDTO 登录设备信息
+     */
+    private void doCheckLimitAndAddSession(LoginDeviceDTO loginDeviceDTO) {
+        // 先清理过期的会话
+        cleanOldIndex(loginDeviceDTO.getUsername());
+
+        // 检查登录数量限制
+        long limit = getLimit(loginDeviceDTO.getDeviceType());
+        if (limit == 0) {
+            throw new AuthorizationException(ResultCode.LOGIN_ERROR, "登录设备数量已达上限");
+        }
+
+        if (limit > 0) {
+            // 统计当前设备数量
+            long currentCount = countCurrentSessions(loginDeviceDTO.getUsername(), loginDeviceDTO.getDeviceType());
+            if (currentCount >= limit) {
+                throw new AuthorizationException(ResultCode.LOGIN_ERROR, "登录设备数量已达上限");
+            }
+        }
+
+        // 检查通过后，立即添加会话
+        addSessionInternal(loginDeviceDTO);
+    }
+
+    /**
+     * 清理旧索引
+     *
+     * @param username 用户名
+     */
+    public void cleanOldIndex(@NotEmpty String username) {
+        long now = System.currentTimeMillis();
+        long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
+        String zKey = RedisConstants.Auth.SESSIONS_KEY + username;
+        // 删除旧数据
+        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(zKey);
+        // 转换为毫秒
+        long needDeleteValue = now - refreshTokenExpireTime * 1000;
+        allWithScore.forEach(tuple -> {
+            Double score = tuple.getScore();
+            if (score != null && score <= needDeleteValue) {
+                String sessionId = tuple.getValue();
+                // 同时删除对应的hash数据
+                String hashKey = RedisConstants.Auth.SESSIONS_KEY + sessionId;
+                redisKeyCache.deleteObject(hashKey);
+                redisZSetCache.zRemove(zKey, sessionId);
+            }
+        });
+    }
+
+    /**
+     * 统计当前有效会话数量
+     *
+     * @param username   用户名
+     * @param deviceType 设备类型
+     * @return 当前有效会话数量
+     */
+    private long countCurrentSessions(String username, String deviceType) {
+        String indexKey = RedisConstants.Auth.SESSIONS_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(indexKey);
+        AtomicLong count = new AtomicLong();
+        // 转换为毫秒
+        long effectiveTime = System.currentTimeMillis() - securityProperties.getSession().getRefreshTokenExpireTime() * 1000;
+
+        allWithScore.forEach(tuple -> {
+            Double score = tuple.getScore();
+            if (score != null && score >= effectiveTime) {
+                String sessionId = tuple.getValue();
+                String hashKey = RedisConstants.Auth.SESSIONS_KEY + sessionId;
+                Map<String, Object> deviceInfo = redisHashCache.hGetAll(hashKey);
+                if (!deviceInfo.isEmpty()) {
+                    String loginDeviceType = deviceInfo.get(DEVICE_TYPE).toString();
+                    if (deviceType.equals(loginDeviceType)) {
+                        count.getAndIncrement();
+                    }
+                } else {
+                    // 如果hash数据不存在，说明已过期，从ZSet中移除
+                    redisZSetCache.zRemove(indexKey, sessionId);
+                }
+            }
+        });
+
+        return count.get();
+    }
+
+    /**
+     * 获取登录数量限制
+     *
+     * @param deviceType 设备类型
+     * @return 登录数量限制
+     */
+    private long getLimit(String deviceType) {
+        SecurityProperties.SessionConfig.MaxSessionsPerClient maxSessionsPerClient = securityProperties.getSession().getMaxSessionsPerClient();
+        Map<String, Long> limits = Map.of(
+                DeviceType.PC.getValue(), maxSessionsPerClient.getPc(),
+                DeviceType.MOBILE.getValue(), maxSessionsPerClient.getMobile(),
+                DeviceType.WEB.getValue(), maxSessionsPerClient.getWeb(),
+                DeviceType.MINI_PROGRAM.getValue(), maxSessionsPerClient.getMiniProgram(),
+                DeviceType.UNKNOWN.getValue(), maxSessionsPerClient.getUnknown()
+        );
+        return limits.getOrDefault(deviceType, maxSessionsPerClient.getUnknown());
+    }
+
+    /**
+     * 内部添加会话方法（不加锁，由调用方保证线程安全）
+     *
+     * @param loginDeviceDTO 登录设备信息
+     */
+    private void addSessionInternal(LoginDeviceDTO loginDeviceDTO) {
         long now = System.currentTimeMillis();
         long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
 
@@ -74,36 +211,9 @@ public class SessionLimiter {
         // 设置会话有效期
         redisKeyCache.expire(hashKey, refreshTokenExpireTime, TimeUnit.SECONDS);
 
-        //2.写入ZSet索引
-        String zKey = RedisConstants.Auth.SESSIONS_KEY + loginDeviceDTO.getUserId();
-        // 每次登录时更新 ZSet 的过期时间。如果用户在刷新令牌的有效期内未登录，
-        // 则该索引将在最长令牌有效期后自动过期。此外，定时任务也会清理过期的索引。
+        // 写入ZSet索引
+        String zKey = RedisConstants.Auth.SESSIONS_KEY + loginDeviceDTO.getUsername();
         redisZSetCache.zAdd(zKey, loginDeviceDTO.getRefreshSessionId(), now, refreshTokenExpireTime, TimeUnit.SECONDS);
     }
-
-
-    /**
-     * 检查登录数量限制
-     *
-     * @param userId     用户ID
-     * @param deviceType 设备类型
-     * @param limit      限制数量
-     */
-    public void checkLoginCountLimit(Long userId, String deviceType, final long limit) {
-
-    }
-
-
-    private long getLimit(String deviceType, SecurityProperties.SessionConfig.MaxSessionsPerClient maxSessionsPerClient) {
-        Map<String, Long> limits = Map.of(
-                "pc", maxSessionsPerClient.getPc(),
-                "mobile", maxSessionsPerClient.getMobile(),
-                "web", maxSessionsPerClient.getWeb(),
-                "miniProgram", maxSessionsPerClient.getMiniProgram(),
-                "unknown", maxSessionsPerClient.getUnknown()
-        );
-        return limits.getOrDefault(deviceType, maxSessionsPerClient.getUnknown());
-    }
-
 
 }

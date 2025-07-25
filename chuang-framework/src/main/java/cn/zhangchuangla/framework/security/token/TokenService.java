@@ -74,8 +74,7 @@ public class TokenService {
         OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId);
         setClientInfo(onlineLoginUser);
 
-        redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
-        redisTokenStore.setRefreshToken(refreshTokenSessionId, accessTokenSessionId);
+        redisTokenStore.setToken(refreshTokenSessionId, accessTokenSessionId);
         String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
         String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenSessionId, username);
 

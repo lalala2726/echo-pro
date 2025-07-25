@@ -23,35 +23,9 @@ public enum DeviceType {
     PC("pc"),
 
     /**
-     * 安卓APP
+     * 移动端
      */
-    ANDROID("android"),
-
-    /**
-     * 苹果APP
-     */
-    IOS("ios"),
-
-    /**
-     * WINDOWS端
-     */
-    WINDOWS("windows"),
-
-    /**
-     * 苹果电脑
-     */
-    MAC("mac"),
-
-    /**
-     * 鸿蒙系统
-     */
-    HARMONY("harmony"),
-
-    /**
-     * linux系统
-     */
-    LINUX("linux"),
-
+    MOBILE("mobile"),
     /**
      * 微信小程序
      */

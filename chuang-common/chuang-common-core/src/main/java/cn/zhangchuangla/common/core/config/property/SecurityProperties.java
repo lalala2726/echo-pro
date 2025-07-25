@@ -108,6 +108,11 @@ public class SecurityProperties {
          */
         private ScoreType scoreType = ScoreType.LOGIN_TIME;
 
+        /**
+         * 分布式锁配置
+         */
+        private DistributedLockConfig distributedLock = new DistributedLockConfig();
+
         public enum ScoreType {
             LOGIN_TIME,
             LAST_ACTIVE
@@ -148,6 +153,41 @@ public class SecurityProperties {
              */
             @Min(-1)
             private long unknown = -1;
+        }
+
+        /**
+         * 分布式锁配置
+         */
+        @Data
+        public static class DistributedLockConfig {
+
+            /**
+             * 是否启用分布式锁
+             * true  - 启用分布式锁（适用于多实例部署）
+             * false - 使用本地锁（适用于单实例部署，默认）
+             */
+            private boolean enabled = false;
+
+            /**
+             * 获取锁的等待时间（秒）
+             * 默认值：5秒
+             */
+            @Min(1)
+            private long waitTime = 5;
+
+            /**
+             * 锁的过期时间（秒）
+             * 默认值：30秒
+             */
+            @Min(1)
+            private long expireTime = 30;
+
+            /**
+             * 重试间隔（毫秒）
+             * 默认值：100毫秒
+             */
+            @Min(10)
+            private long retryInterval = 100;
         }
 
     }

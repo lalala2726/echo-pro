@@ -41,5 +41,5 @@ public class LoginRequest {
      */
     @Schema(description = "设备类型", type = "string", allowableValues = {"web", "pc", "ios", "android"}, defaultValue = "PC",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "PC")
-    private String deviceType = DeviceType.WEB.getValue();
+    private String deviceType = DeviceType.PC.getValue();
 }

@@ -19,10 +19,10 @@ import lombok.NoArgsConstructor;
 public class LoginDeviceDTO {
 
     /**
-     * 用户ID
+     * 用户名
      */
-    @NotNull(message = "用户ID不能为空")
-    private Long userId;
+    @NotNull(message = "用户名不能为空")
+    private String username;
 
     /**
      * 刷新令牌会话ID
