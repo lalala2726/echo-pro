@@ -9,6 +9,7 @@ import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.security.model.dto.LoginDeviceDTO;
+import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,9 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +49,7 @@ public class SessionLimiter {
     private final RedisHashCache redisHashCache;
     private final RedisZSetCache redisZSetCache;
     private final SecurityProperties securityProperties;
+    private final RedisTokenStore redisTokenStore;
 
     /**
      * 获取用户对应的锁
@@ -78,12 +82,12 @@ public class SessionLimiter {
             ReentrantLock lock = getUserLock(loginDeviceDTO.getUsername());
             lock.lock();
             try {
-                doCheckLimitAndAddSession(loginDeviceDTO);
+                handelCheckLimitAndAddSession(loginDeviceDTO);
             } finally {
                 lock.unlock();
             }
         } else {
-            doCheckLimitAndAddSession(loginDeviceDTO);
+            handelCheckLimitAndAddSession(loginDeviceDTO);
         }
     }
 
@@ -92,7 +96,7 @@ public class SessionLimiter {
      *
      * @param loginDeviceDTO 登录设备信息
      */
-    private void doCheckLimitAndAddSession(LoginDeviceDTO loginDeviceDTO) {
+    private void handelCheckLimitAndAddSession(LoginDeviceDTO loginDeviceDTO) {
         // 先清理过期的会话
         cleanOldIndex(loginDeviceDTO.getUsername());
 
@@ -106,12 +110,48 @@ public class SessionLimiter {
             // 统计当前设备数量
             long currentCount = countCurrentSessions(loginDeviceDTO.getUsername(), loginDeviceDTO.getDeviceType());
             if (currentCount >= limit) {
-                throw new AuthorizationException(ResultCode.LOGIN_ERROR, "登录设备数量已达上限");
+                clearEarliestSession(loginDeviceDTO.getUsername());
             }
         }
 
         // 检查通过后，立即添加会话
         addSessionInternal(loginDeviceDTO);
+    }
+
+
+    /**
+     * 清除当前用户设备中最早的会话
+     *
+     * @param username 用户名
+     */
+    private void clearEarliestSession(String username) {
+        String indexKey = RedisConstants.Auth.SESSIONS_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(indexKey);
+
+        if (allWithScore != null && !allWithScore.isEmpty()) {
+            Optional<ZSetOperations.TypedTuple<String>> earliestSession = allWithScore.stream()
+                    .min(Comparator.comparing(
+                            ZSetOperations.TypedTuple::getScore,
+                            Comparator.nullsLast(Double::compareTo)
+                    ));
+
+            // 如果找到了最早的会话，并且其分值不为 null，则从 Redis ZSet 中移除它
+            earliestSession.ifPresent(tuple -> {
+                String sessionIdToRemove = tuple.getValue();
+                Double score = tuple.getScore(); // 获取得分
+                String deviceKey = RedisConstants.Auth.SESSIONS_KEY + sessionIdToRemove;
+                // 额外检查 score 是否为 null，虽然 nullsLast 已经处理了比较，但移除前再次确认更好
+                if (sessionIdToRemove != null && score != null) {
+                    // 从索引中拿到刷新令牌的会话ID,并将对应访问令牌和刷新令牌都删除
+                    //1.删除刷新令牌和访问令牌
+                    redisTokenStore.deleteRefreshTokenAndAccessToken(sessionIdToRemove);
+                    //2.删除设备的数据
+                    redisKeyCache.deleteObject(deviceKey);
+                    //3.删除索引
+                    redisZSetCache.zRemove(indexKey, sessionIdToRemove);
+                }
+            });
+        }
     }
 
     /**
