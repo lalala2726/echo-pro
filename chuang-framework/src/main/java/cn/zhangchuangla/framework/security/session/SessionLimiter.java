@@ -13,6 +13,7 @@ import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -96,14 +97,14 @@ public class SessionLimiter {
      *
      * @param loginDeviceDTO 登录设备信息
      */
-    private void handelCheckLimitAndAddSession(LoginDeviceDTO loginDeviceDTO) {
+    private void handelCheckLimitAndAddSession(@NotNull LoginDeviceDTO loginDeviceDTO) {
         // 先清理过期的会话
         cleanOldIndex(loginDeviceDTO.getUsername());
 
         // 检查登录数量限制
         long limit = getLimit(loginDeviceDTO.getDeviceType());
         if (limit == 0) {
-            throw new AuthorizationException(ResultCode.LOGIN_ERROR, "登录设备数量已达上限");
+            throw new AuthorizationException(ResultCode.LOGIN_ERROR, String.format("暂不支持:%s 设备登录", loginDeviceDTO.getDeviceType()));
         }
 
         if (limit > 0) {
@@ -125,11 +126,11 @@ public class SessionLimiter {
      * @param username 用户名
      */
     private void clearEarliestSession(String username) {
-        String indexKey = RedisConstants.Auth.SESSIONS_KEY + username;
-        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(indexKey);
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allDeviceIndexSet = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
 
-        if (allWithScore != null && !allWithScore.isEmpty()) {
-            Optional<ZSetOperations.TypedTuple<String>> earliestSession = allWithScore.stream()
+        if (allDeviceIndexSet != null && !allDeviceIndexSet.isEmpty()) {
+            Optional<ZSetOperations.TypedTuple<String>> earliestSession = allDeviceIndexSet.stream()
                     .min(Comparator.comparing(
                             ZSetOperations.TypedTuple::getScore,
                             Comparator.nullsLast(Double::compareTo)
@@ -137,18 +138,18 @@ public class SessionLimiter {
 
             // 如果找到了最早的会话，并且其分值不为 null，则从 Redis ZSet 中移除它
             earliestSession.ifPresent(tuple -> {
-                String sessionIdToRemove = tuple.getValue();
+                String refreshTokenId = tuple.getValue();
                 Double score = tuple.getScore(); // 获取得分
-                String deviceKey = RedisConstants.Auth.SESSIONS_KEY + sessionIdToRemove;
+                String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
                 // 额外检查 score 是否为 null，虽然 nullsLast 已经处理了比较，但移除前再次确认更好
-                if (sessionIdToRemove != null && score != null) {
+                if (refreshTokenId != null && score != null) {
                     // 从索引中拿到刷新令牌的会话ID,并将对应访问令牌和刷新令牌都删除
                     //1.删除刷新令牌和访问令牌
-                    redisTokenStore.deleteRefreshTokenAndAccessToken(sessionIdToRemove);
+                    redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
                     //2.删除设备的数据
-                    redisKeyCache.deleteObject(deviceKey);
+                    redisKeyCache.deleteObject(deviceRedisKey);
                     //3.删除索引
-                    redisZSetCache.zRemove(indexKey, sessionIdToRemove);
+                    redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
                 }
             });
         }
@@ -162,19 +163,20 @@ public class SessionLimiter {
     public void cleanOldIndex(@NotEmpty String username) {
         long now = System.currentTimeMillis();
         long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
-        String zKey = RedisConstants.Auth.SESSIONS_KEY + username;
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
         // 删除旧数据
-        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(zKey);
+        Set<ZSetOperations.TypedTuple<String>> allDeviceSet = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
         // 转换为毫秒
         long needDeleteValue = now - refreshTokenExpireTime * 1000;
-        allWithScore.forEach(tuple -> {
+        allDeviceSet.forEach(tuple -> {
             Double score = tuple.getScore();
             if (score != null && score <= needDeleteValue) {
-                String sessionId = tuple.getValue();
-                // 同时删除对应的hash数据
-                String hashKey = RedisConstants.Auth.SESSIONS_KEY + sessionId;
-                redisKeyCache.deleteObject(hashKey);
-                redisZSetCache.zRemove(zKey, sessionId);
+                String refreshTokenId = tuple.getValue();
+                String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+                //删除设备数据
+                redisKeyCache.deleteObject(deviceRedisKey);
+                //删除索引
+                redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
             }
         });
     }
@@ -187,26 +189,25 @@ public class SessionLimiter {
      * @return 当前有效会话数量
      */
     private long countCurrentSessions(String username, String deviceType) {
-        String indexKey = RedisConstants.Auth.SESSIONS_KEY + username;
-        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(indexKey);
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allDeviceSet = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
         AtomicLong count = new AtomicLong();
         // 转换为毫秒
         long effectiveTime = System.currentTimeMillis() - securityProperties.getSession().getRefreshTokenExpireTime() * 1000;
-
-        allWithScore.forEach(tuple -> {
+        allDeviceSet.forEach(tuple -> {
             Double score = tuple.getScore();
             if (score != null && score >= effectiveTime) {
-                String sessionId = tuple.getValue();
-                String hashKey = RedisConstants.Auth.SESSIONS_KEY + sessionId;
-                Map<String, Object> deviceInfo = redisHashCache.hGetAll(hashKey);
+                String refreshTokenId = tuple.getValue();
+                String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+                Map<String, Object> deviceInfo = redisHashCache.hGetAll(deviceRedisKey);
                 if (!deviceInfo.isEmpty()) {
                     String loginDeviceType = deviceInfo.get(DEVICE_TYPE).toString();
                     if (deviceType.equals(loginDeviceType)) {
                         count.getAndIncrement();
                     }
                 } else {
-                    // 如果hash数据不存在，说明已过期，从ZSet中移除
-                    redisZSetCache.zRemove(indexKey, sessionId);
+                    // 如果设备信息为空，则删除索引
+                    redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
                 }
             }
         });
@@ -237,7 +238,7 @@ public class SessionLimiter {
      *
      * @param loginDeviceDTO 登录设备信息
      */
-    private void addSessionInternal(LoginDeviceDTO loginDeviceDTO) {
+    private void addSessionInternal(@NotNull LoginDeviceDTO loginDeviceDTO) {
         long now = System.currentTimeMillis();
         long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
 
@@ -246,14 +247,13 @@ public class SessionLimiter {
                 DEVICE_NAME, loginDeviceDTO.getDeviceName(),
                 LOGIN_TIME, now
         );
-        String hashKey = RedisConstants.Auth.SESSIONS_KEY + loginDeviceDTO.getRefreshSessionId();
-        redisHashCache.hPutAll(hashKey, deviceInfo);
+        String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + loginDeviceDTO.getRefreshSessionId();
+        redisHashCache.hPutAll(deviceRedisKey, deviceInfo);
         // 设置会话有效期
-        redisKeyCache.expire(hashKey, refreshTokenExpireTime, TimeUnit.SECONDS);
-
+        redisKeyCache.expire(deviceRedisKey, refreshTokenExpireTime, TimeUnit.SECONDS);
         // 写入ZSet索引
-        String zKey = RedisConstants.Auth.SESSIONS_KEY + loginDeviceDTO.getUsername();
-        redisZSetCache.zAdd(zKey, loginDeviceDTO.getRefreshSessionId(), now, refreshTokenExpireTime, TimeUnit.SECONDS);
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + loginDeviceDTO.getUsername();
+        redisZSetCache.zAdd(deviceIndexRedisKey, loginDeviceDTO.getRefreshSessionId(), now, refreshTokenExpireTime, TimeUnit.SECONDS);
     }
 
 }

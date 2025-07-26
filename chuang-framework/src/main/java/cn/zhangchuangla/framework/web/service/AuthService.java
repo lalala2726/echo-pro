@@ -74,16 +74,16 @@ public class AuthService {
         }
 
         // 3. 认证成功后，生成 JWT 令牌（但还未添加到会话管理中）
-        LoginSessionDTO loginSessionDTO = tokenService.createToken(authentication);
+        LoginSessionDTO authSessionInfo = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 4. 构建登录设备信息
-        LoginDeviceDTO loginDeviceDTO = LoginDeviceDTO.builder()
+        LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
                 .deviceType(request.getDeviceType())
                 // TODO: 从请求中获取真实设备名称
                 .deviceName("MacBook")
-                .refreshSessionId(loginSessionDTO.getRefreshTokenSessionId())
-                .username(loginSessionDTO.getUsername())
+                .refreshSessionId(authSessionInfo.getRefreshTokenSessionId())
+                .username(authSessionInfo.getUsername())
                 .ip(IPUtils.getIpAddress(httpServletRequest))
                 .build();
 
@@ -91,12 +91,12 @@ public class AuthService {
         // 表示在检查设备数量限制时跳过加锁。适用于单机部署且用户并发不高的场景。
         // 注意：跳过加锁可能会导致会话数量限制不准确，需根据实际业务场景权衡。
         try {
-            sessionLimiter.checkLimitAndAddSession(loginDeviceDTO);
+            sessionLimiter.checkLimitAndAddSession(deviceInfo);
         } catch (AuthorizationException e) {
             // 如果设备限制检查失败，需要清理已生成的token
             log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
                     request.getUsername(), request.getDeviceType(), e.getMessage());
-            redisTokenStore.deleteRefreshTokenAndAccessToken(loginSessionDTO.getRefreshTokenSessionId());
+            redisTokenStore.deleteRefreshTokenAndAccessToken(authSessionInfo.getRefreshTokenSessionId());
             throw e;
         }
 
@@ -105,7 +105,7 @@ public class AuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
-        return BeanCotyUtils.copyProperties(loginSessionDTO, AuthTokenVo.class);
+        return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
     }
 
     /**
