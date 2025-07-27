@@ -1,29 +1,34 @@
 package cn.zhangchuangla.common.redis.core;
 
+import cn.zhangchuangla.common.redis.config.RedisProperties;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Redis 有序集合（ZSet）操作缓存工具类
+ * 提供有序集合数据结构的各种操作方法，包括批量扫描功能
+ *
  * @author Chuang
  * <p>
  * created on 2025/7/25 15:28
  */
+@Slf4j
 @Component
+@RequiredArgsConstructor
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 public final class RedisZSetCache {
 
     public final RedisTemplate redisTemplate;
-
-    public RedisZSetCache(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+    private final RedisProperties redisProperties;
 
 
     /**
@@ -181,32 +186,76 @@ public final class RedisZSetCache {
         return redisTemplate.opsForZSet().incrementScore(key, value, delta);
     }
 
-    /**
-     * 迭代扫描有序集合ZSet中所有成员及分值（安全适配大key场景）
-     *
-     * @param key     Redis有序集合的键
-     * @param pattern 匹配模式（可选，null则表示全部）
-     * @param count   每批次扫描的元素个数（建议≤1000）
-     * @return 所有匹配的元素及其分值
-     */
-    public Set<ZSetOperations.TypedTuple<String>> scanZSet(String key, String pattern, int count) {
-        Set<ZSetOperations.TypedTuple<String>> result = new HashSet<>();
-        // 构造ScanOptions
-        ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions();
-        if (pattern != null && !pattern.isEmpty()) {
-            scanOptionsBuilder.match(pattern);
-        }
-        scanOptionsBuilder.count(count);
-        ScanOptions options = scanOptionsBuilder.build();
 
-        // 执行scan
-        try (Cursor<ZSetOperations.TypedTuple<String>> cursor = redisTemplate.opsForZSet().scan(key, options)) {
-            while (cursor.hasNext()) {
-                result.add(cursor.next());
-            }
+    /**
+     * 批量键扫描方法 - 使用 Redis SCAN 操作高效获取匹配的 ZSet 键
+     * 推荐在生产环境中使用此方法，避免阻塞 Redis 服务器
+     *
+     * @param pattern Redis 键模式，支持通配符（如：ranking:*）
+     * @return 匹配的键列表，如果没有匹配的键则返回空列表
+     */
+    public List<String> scanKeys(final String pattern) {
+        if (!StringUtils.hasText(pattern)) {
+            return new ArrayList<>();
         }
-        // 规范关闭cursor，防止连接泄露
+
+        List<String> keys = new ArrayList<>();
+        try {
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match(pattern)
+                    // 每次扫描的数量，可根据实际情况调整
+                    .count(redisProperties.scanCount)
+                    .build();
+
+            try (Cursor<String> cursor = redisTemplate.scan(options)) {
+                while (cursor.hasNext()) {
+                    keys.add(cursor.next());
+                }
+            }
+
+            log.debug("Redis ZSet scan completed, pattern: {}, found {} keys", pattern, keys.size());
+        } catch (Exception e) {
+            log.error("Redis ZSet scan keys failed, pattern: {}, error: {}", pattern, e.getMessage(), e);
+            // 发生异常时返回空列表，避免影响业务流程
+            return new ArrayList<>();
+        }
+
+        return keys;
+    }
+
+    /**
+     * 批量值获取方法 - 获取匹配模式的 ZSet 键及其所有成员（带分值）
+     * 使用 Redis SCAN 操作高效扫描键，然后批量获取每个 ZSet 的所有成员和分值
+     *
+     * @param pattern Redis 键模式，支持通配符（如：ranking:*）
+     * @return Map，键为ZSet键，值为该ZSet的所有成员（带分值），如果没有匹配的键则返回空Map
+     */
+    public Map<String, Set<ZSetOperations.TypedTuple<Object>>> scanKeysWithValues(final String pattern) {
+        if (!StringUtils.hasText(pattern)) {
+            return new HashMap<>();
+        }
+
+        // 首先扫描获取所有匹配的键
+        List<String> keys = scanKeys(pattern);
+        if (keys.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        Map<String, Set<ZSetOperations.TypedTuple<Object>>> result = new HashMap<>();
+        try {
+            // 逐个获取每个 ZSet 的所有成员（带分值）
+            for (String key : keys) {
+                Set<ZSetOperations.TypedTuple<Object>> zsetMembers =
+                        redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
+                result.put(key, zsetMembers);
+            }
+        } catch (Exception e) {
+            log.error("Redis ZSet scan keys with values failed, pattern: {}, error: {}", pattern, e.getMessage(), e);
+            return new HashMap<>();
+        }
+
         return result;
     }
+
 
 }

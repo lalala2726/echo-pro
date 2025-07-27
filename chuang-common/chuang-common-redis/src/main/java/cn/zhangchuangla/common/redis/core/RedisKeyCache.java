@@ -1,12 +1,17 @@
 package cn.zhangchuangla.common.redis.core;
 
 
+import cn.zhangchuangla.common.redis.config.RedisProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,15 +21,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 public final class RedisKeyCache {
 
 
     public final RedisTemplate redisTemplate;
+    private final RedisProperties redisProperties;
 
-    public RedisKeyCache(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 
 
     /**
@@ -119,12 +123,78 @@ public final class RedisKeyCache {
 
     /**
      * 获得缓存的基本对象列表
+     * 注意：此方法使用 KEYS 命令，在生产环境中应谨慎使用，建议使用 scanKeys 方法
      *
      * @param pattern 字符串前缀
      * @return 对象列表
      */
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
+    }
+
+    /**
+     * 批量键扫描方法 - 使用 Redis SCAN 操作高效获取匹配的键
+     * 推荐在生产环境中使用此方法替代 keys() 方法，避免阻塞 Redis 服务器
+     */
+    public List<String> scanKeys(final String pattern) {
+        if (!StringUtils.hasText(pattern)) {
+            return new ArrayList<>();
+        }
+
+        List<String> keys = new ArrayList<>();
+        try {
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match(pattern)
+                    .count(redisProperties.scanCount)
+                    .build();
+
+            try (Cursor<String> cursor = redisTemplate.scan(options)) {
+                while (cursor.hasNext()) {
+                    keys.add(cursor.next());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Redis scan keys failed, pattern: {}, error: {}", pattern, e.getMessage(), e);
+            return new ArrayList<>();
+        }
+
+        return keys;
+    }
+
+    /**
+     * 批量值获取方法 - 获取匹配模式的键及其对应的值
+     * 使用 Redis SCAN 操作高效扫描键，然后批量获取对应的值
+     *
+     * @param pattern Redis 键模式，支持通配符（如：auth:session:index:*）
+     * @return 键值对Map，键为Redis键，值为对应的Redis值，如果没有匹配的键则返回空Map
+     */
+    public Map<String, Object> scanKeysWithValues(final String pattern) {
+        if (!StringUtils.hasText(pattern)) {
+            return new HashMap<>();
+        }
+
+        // 首先扫描获取所有匹配的键
+        List<String> keys = scanKeys(pattern);
+        if (keys.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // 批量获取值以提高性能
+            List<Object> values = redisTemplate.opsForValue().multiGet(keys);
+
+            for (int i = 0; i < keys.size(); i++) {
+                String key = keys.get(i);
+                Object value = (values != null && i < values.size()) ? values.get(i) : null;
+                result.put(key, value);
+            }
+        } catch (Exception e) {
+            log.error("Redis scan keys with values failed, pattern: {}, error: {}", pattern, e.getMessage(), e);
+            return new HashMap<>();
+        }
+
+        return result;
     }
 
 
