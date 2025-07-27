@@ -29,6 +29,7 @@ public class ResponseUtils {
      */
     public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode) {
 
+        response.setStatus(resultCode.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
@@ -48,9 +49,9 @@ public class ResponseUtils {
      * @param resultCode 响应结果码
      */
     public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, String message) {
+        response.setStatus(resultCode.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
         try (PrintWriter writer = response.getWriter()) {
             String jsonResponse = JSON.toJSONString(AjaxResult.error(resultCode, message));
             writer.print(jsonResponse);

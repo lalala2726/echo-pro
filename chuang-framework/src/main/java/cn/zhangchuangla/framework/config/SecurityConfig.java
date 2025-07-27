@@ -1,7 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.exception.AccessDeniedException;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
@@ -22,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -83,8 +81,7 @@ public class SecurityConfig {
                 //.requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // 统一异常处理：未认证和访问拒绝
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler()))
+                        .authenticationEntryPoint(authenticationEntryPoint))
                 // 无状态会话
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 安全头增强：HSTS、CSP、XSS 保护
@@ -150,19 +147,6 @@ public class SecurityConfig {
         return new TokenAuthenticationFilter();
     }
 
-    /**
-     * 自定义 AccessDeniedHandler Bean
-     * 统一返回 403 JSON 响应
-     *
-     * @return AccessDeniedHandler 实例
-     */
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
-            throw new AccessDeniedException(format);
-        };
-    }
 
     /**
      * CORS (跨域资源共享) 配置

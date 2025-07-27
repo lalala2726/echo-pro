@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -125,6 +126,20 @@ public class GlobalExceptionHandel {
     public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
         log.error("权限不足:", exception);
         return AjaxResult.error(exception.getCode(), exception.getMessage());
+    }
+
+    /**
+     * 认证失败异常
+     *
+     * @param request   请求
+     * @param exception 认证失败异常
+     * @return 响应认证失败
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public AjaxResult<Void> authorizationDeniedExceptionHandel(HttpServletRequest request, AuthorizationDeniedException exception) {
+        log.error("授权失败", exception);
+        String message = String.format("请求访问:%s 认证失败，您没有权限访问此资源!", request.getRequestURI());
+        return AjaxResult.error(ResultCode.FORBIDDEN.getCode(), message);
     }
 
     /**
