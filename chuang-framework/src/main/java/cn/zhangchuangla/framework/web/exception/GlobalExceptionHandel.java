@@ -6,18 +6,14 @@ import cn.zhangchuangla.common.core.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import java.util.Objects;
 
 /**
  * 全局异常处理
@@ -40,7 +36,6 @@ public class GlobalExceptionHandel {
      * @return 返回包含错误信息和状态码的 AjaxResult 对象
      */
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.OK)
     public AjaxResult<Void> serviceExceptionHandel(ServiceException exception) {
         log.error("业务异常", exception);
         return AjaxResult.error(exception.getMessage(), exception.getCode());
@@ -54,7 +49,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求方法不支持”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> httpRequestMethodNotSupportedExceptionHandel(HttpRequestMethodNotSupportedException exception) {
         log.error("请求方法不支持", exception);
         return AjaxResult.error(ResultCode.NOT_SUPPORT);
@@ -68,7 +62,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
         log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
@@ -82,7 +75,6 @@ public class GlobalExceptionHandel {
      * @return 返回详细描述类型转换失败原因的 AjaxResult 对象
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> methodArgumentTypeMismatchExceptionHandel(MethodArgumentTypeMismatchException exception) {
         log.error("请求参数类型不匹配", exception);
         String paramName = exception.getName();
@@ -104,7 +96,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求参数非法”的 AjaxResult 对象
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
         log.error("请求参数非法: ", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
@@ -119,9 +110,29 @@ public class GlobalExceptionHandel {
      * @return 返回表示“登录失败”的 AjaxResult 对象
      */
     @ExceptionHandler(AuthorizationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public AjaxResult<Void> loginExceptionHandel(AuthorizationException exception) {
-        log.error("登录异常:", exception);
+    public AjaxResult<Void> authorizationExceptionHandel(AuthorizationException exception) {
+        log.error("认证失败:", exception);
+        return AjaxResult.error(exception.getCode(), exception.getMessage());
+    }
+
+    /**
+     * 权限不足异常
+     *
+     * @param exception 权限不足异常
+     * @return 响应权限不足
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public AjaxResult<Void> accessDeniedExceptionHandel(AccessDeniedException exception) {
+        log.error("权限不足:", exception);
+        return AjaxResult.error(exception.getCode(), exception.getMessage());
+    }
+
+    /**
+     * 登录异常
+     */
+    @ExceptionHandler(LoginException.class)
+    public AjaxResult<Void> loginExceptionHandel(LoginException exception) {
+        log.error("登录失败:", exception);
         return AjaxResult.error(exception.getCode(), exception.getMessage());
     }
 
@@ -133,7 +144,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“参数异常”的 AjaxResult 对象
      */
     @ExceptionHandler(ParamException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> paramExceptionHandel(ParamException exception) {
         log.error("参数异常:", exception);
         return AjaxResult.error(ResultCode.PARAM_ERROR, exception.getMessage());
@@ -150,8 +160,18 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public AjaxResult<Void> methodArgumentNotValidExceptionHandel(MethodArgumentNotValidException exception) {
         log.error("参数校验失败:", exception);
-        return AjaxResult.error(ResultCode.PARAM_ERROR,
-                Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+
+        // 提取具体的字段错误信息
+        StringBuilder errorMessage = new StringBuilder();
+        exception.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            if (!errorMessage.isEmpty()) {
+                errorMessage.append("; ");
+            }
+            errorMessage.append(fieldError.getDefaultMessage());
+        });
+
+        String message = !errorMessage.isEmpty() ? errorMessage.toString() : "参数校验失败";
+        return AjaxResult.error(ResultCode.PARAM_ERROR, message);
     }
 
     /**
@@ -163,27 +183,12 @@ public class GlobalExceptionHandel {
      * @return 返回表示“资源不存在”的 AjaxResult 对象，并附带请求的 URI
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public AjaxResult<Void> noResourceFoundExceptionHandel(NoResourceFoundException exception, HttpServletRequest request) {
         log.error("资源不存在：{}", exception.toString());
         String message = String.format("资源不存在: %s", request.getRequestURI());
         return AjaxResult.error(ResultCode.NOT_FOUND, message);
     }
 
-    /**
-     * 处理配置文件加载失败的情况。
-     * ProfileException 表示在读取或解析配置文件时出现问题。
-     *
-     * @param exception 包含错误信息的异常对象
-     * @return 返回表示“配置异常”的 AjaxResult 对象
-     */
-
-    @ExceptionHandler(ProfileException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public AjaxResult<Void> profileExceptionHandel(ProfileException exception) {
-        log.error("配置异常:", exception);
-        return AjaxResult.error(ResultCode.PROFILE_ERROR, exception.getMessage());
-    }
 
     /**
      * 处理请求过于频繁的情况。
@@ -193,7 +198,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“请求过于频繁”的 AjaxResult 对象
      */
     @ExceptionHandler(TooManyRequestException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     public AjaxResult<Void> tooManyRequestExceptionHandel(TooManyRequestException exception) {
         log.error("请求过于频繁", exception);
         return AjaxResult.error(ResultCode.TOO_MANY_REQUESTS, exception.getMessage());
@@ -207,7 +211,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“缺少请求参数”的 AjaxResult 对象，并指出具体缺失的参数名
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public AjaxResult<Void> missingServletRequestParameterExceptionHandel(MissingServletRequestParameterException exception) {
         log.error("缺少请求参数", exception);
         String message = exception.getMessage();
@@ -230,7 +233,6 @@ public class GlobalExceptionHandel {
      * @return 返回表示“系统异常”的 AjaxResult 对象
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public AjaxResult<Void> exceptionHandel(Exception exception) {
         log.error("系统异常", exception);
         return AjaxResult.error(ResultCode.SERVER_ERROR, exception.getMessage());
