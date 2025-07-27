@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.security.model.entity;
+package cn.zhangchuangla.framework.model.entity;
 
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import lombok.Data;

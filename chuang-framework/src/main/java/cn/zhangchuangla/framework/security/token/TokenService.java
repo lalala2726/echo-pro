@@ -12,7 +12,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
-import cn.zhangchuangla.framework.security.model.dto.LoginSessionDTO;
+import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
 import io.jsonwebtoken.Claims;

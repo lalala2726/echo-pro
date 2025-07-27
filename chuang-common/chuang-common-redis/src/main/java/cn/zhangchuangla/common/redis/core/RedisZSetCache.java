@@ -1,9 +1,12 @@
 package cn.zhangchuangla.common.redis.core;
 
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -177,4 +180,33 @@ public final class RedisZSetCache {
     public <T> Double zIncrementScore(final String key, final T value, final double delta) {
         return redisTemplate.opsForZSet().incrementScore(key, value, delta);
     }
+
+    /**
+     * 迭代扫描有序集合ZSet中所有成员及分值（安全适配大key场景）
+     *
+     * @param key     Redis有序集合的键
+     * @param pattern 匹配模式（可选，null则表示全部）
+     * @param count   每批次扫描的元素个数（建议≤1000）
+     * @return 所有匹配的元素及其分值
+     */
+    public Set<ZSetOperations.TypedTuple<String>> scanZSet(String key, String pattern, int count) {
+        Set<ZSetOperations.TypedTuple<String>> result = new HashSet<>();
+        // 构造ScanOptions
+        ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions();
+        if (pattern != null && !pattern.isEmpty()) {
+            scanOptionsBuilder.match(pattern);
+        }
+        scanOptionsBuilder.count(count);
+        ScanOptions options = scanOptionsBuilder.build();
+
+        // 执行scan
+        try (Cursor<ZSetOperations.TypedTuple<String>> cursor = redisTemplate.opsForZSet().scan(key, options)) {
+            while (cursor.hasNext()) {
+                result.add(cursor.next());
+            }
+        }
+        // 规范关闭cursor，防止连接泄露
+        return result;
+    }
+
 }

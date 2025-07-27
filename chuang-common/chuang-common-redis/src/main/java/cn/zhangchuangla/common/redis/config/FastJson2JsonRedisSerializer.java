@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.config;
+package cn.zhangchuangla.common.redis.config;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import com.alibaba.fastjson2.JSON;

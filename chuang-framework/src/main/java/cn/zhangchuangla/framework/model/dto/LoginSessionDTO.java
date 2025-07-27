@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.security.model.dto;
+package cn.zhangchuangla.framework.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

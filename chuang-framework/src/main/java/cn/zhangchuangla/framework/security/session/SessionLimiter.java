@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
-import cn.zhangchuangla.framework.security.model.dto.LoginDeviceDTO;
+import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.config;
+package cn.zhangchuangla.common.redis.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

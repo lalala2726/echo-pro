@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.security.model.dto;
+package cn.zhangchuangla.framework.model.dto;
 
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import jakarta.validation.constraints.NotNull;
