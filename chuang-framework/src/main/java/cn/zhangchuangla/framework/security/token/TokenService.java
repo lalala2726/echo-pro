@@ -43,7 +43,6 @@ public class TokenService {
 
     private static final String CLAIM_KEY_SESSION_ID = "session";
     private static final String CLAIM_KEY_USERNAME = "username";
-    private static final String CLAIM_KEY_USER_ID = "userId";
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SysRoleService sysRoleService;
@@ -74,7 +73,8 @@ public class TokenService {
         OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId);
         setClientInfo(onlineLoginUser);
 
-        redisTokenStore.setToken(refreshTokenSessionId, accessTokenSessionId);
+        redisTokenStore.setRefreshToken(refreshTokenSessionId, accessTokenSessionId);
+        redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
         String jwtAccessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
         String jwtRefreshToken = jwtTokenProvider.createJwt(refreshTokenSessionId, username);
 
@@ -86,19 +86,6 @@ public class TokenService {
                 .accessToken(jwtAccessToken)
                 .refreshToken(jwtRefreshToken)
                 .build();
-    }
-
-    /**
-     * 使Token失效（登出操作）。
-     * 会删除与JWT访问令牌关联的Redis中的在线用户信息。
-     * 注意：刷新令牌相关的映射也应该被清理。
-     *
-     * @param jwtAccessToken JWT访问令牌。
-     */
-    public void invalidateToken(String jwtAccessToken) {
-
-
-        // todo 登出操作
     }
 
     /**

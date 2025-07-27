@@ -72,7 +72,6 @@ public class AuthService {
             asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
             throw new AuthorizationException(ResultCode.LOGIN_ERROR, "账号或密码错误!");
         }
-
         // 3. 认证成功后，生成 JWT 令牌（但还未添加到会话管理中）
         LoginSessionDTO authSessionInfo = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);

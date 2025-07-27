@@ -45,8 +45,9 @@ public class RedisTokenStore {
      * @param refreshTokenSession 刷新令牌会话ID
      * @param accessTokenSession  访问令牌会话ID
      */
-    public void setToken(String refreshTokenSession, String accessTokenSession) {
+    public void setRefreshToken(String refreshTokenSession, String accessTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
+        //保存刷新令牌
         redisKeyCache.setCacheObject(refreshTokenKey, accessTokenSession,
                 securityProperties.getSession().getRefreshTokenExpireTime());
     }
