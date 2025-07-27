@@ -64,6 +64,8 @@ public class AsyncService {
      */
     @Async("logProcessExecutor")
     public void recordLoginLog(String username, String ipAddr, String userAgent, boolean isSuccess) {
+        final int loginSuccess = 0;
+        final int loginFail = 1;
         try {
             String region = IPUtils.getRegion(ipAddr);
             String osName = UserAgentUtils.getOsName(userAgent);
@@ -86,7 +88,7 @@ public class AsyncService {
                     .region(region)
                     .username(username)
                     .browser(browserName)
-                    .status(isSuccess ? Constants.LOGIN_SUCCESS : Constants.LOGIN_FAIL)
+                    .status(isSuccess ? loginSuccess : loginFail)
                     .loginTime(new Date())
                     .createBy(Constants.SYSTEM_CREATE)
                     .build();
