@@ -76,19 +76,19 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             log.warn("JWT已过期, message: {}", e.getMessage());
             // 或者更具体的 REFRESH_TOKEN_EXPIRED
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌已过期");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID);
         } catch (UnsupportedJwtException e) {
             log.warn("不支持的JWT格式, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌格式不支持");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID);
         } catch (MalformedJwtException e) {
             log.warn("JWT结构错误, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌结构错误");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID);
         } catch (SignatureException e) {
             log.warn("JWT签名验证失败, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌签名无效");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID);
         } catch (IllegalArgumentException e) { // 通常是token为空或null
             log.warn("JWT claims字符串为空或无效参数, message: {}", e.getMessage());
-            throw new AuthorizationException(ACCESS_TOKEN_INVALID, "令牌参数无效");
+            throw new AuthorizationException(ACCESS_TOKEN_INVALID);
         }
     }
 }

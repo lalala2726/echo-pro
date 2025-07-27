@@ -34,6 +34,11 @@ public class SessionDevice {
     private String username;
 
     /**
+     * 刷新令牌会话ID
+     */
+    private String refreshTokenId;
+
+    /**
      * 设备类型
      */
     private DeviceType deviceType;

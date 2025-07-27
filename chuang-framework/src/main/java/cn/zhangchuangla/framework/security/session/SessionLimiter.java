@@ -247,7 +247,8 @@ public class SessionLimiter {
                 SecurityConstants.LOCATION, loginDeviceDTO.getLocation(),
                 SecurityConstants.IP, loginDeviceDTO.getIp(),
                 SecurityConstants.USER_ID, loginDeviceDTO.getUserId(),
-                SecurityConstants.USER_NAME, loginDeviceDTO.getUsername()
+                SecurityConstants.USER_NAME, loginDeviceDTO.getUsername(),
+                SecurityConstants.REFRESH_TOKEN_ID, loginDeviceDTO.getRefreshSessionId()
         );
         String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + loginDeviceDTO.getRefreshSessionId();
         redisHashCache.hPutAll(deviceRedisKey, deviceInfo);

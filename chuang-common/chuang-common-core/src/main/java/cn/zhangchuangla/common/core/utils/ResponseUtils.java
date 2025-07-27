@@ -27,9 +27,8 @@ public class ResponseUtils {
      * @param response   HttpServletResponse
      * @param resultCode 响应结果码
      */
-    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, int status) {
+    public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode) {
 
-        response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
@@ -49,8 +48,6 @@ public class ResponseUtils {
      * @param resultCode 响应结果码
      */
     public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, String message) {
-
-        response.setStatus(resultCode.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 

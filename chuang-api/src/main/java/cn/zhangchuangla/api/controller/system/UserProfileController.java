@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.session.SessionService;
@@ -54,6 +55,19 @@ public class UserProfileController extends BaseController {
         String username = getUsername();
         PageResult<SessionDevice> deviceListByUsername = sessionService.getDeviceListByUsername(username, request);
         return getTableData(deviceListByUsername);
+    }
+
+    /**
+     * 删除用户设备
+     *
+     * @param refreshTokenId 刷新令牌ID
+     * @return 删除结果
+     */
+    @DeleteMapping("/device/{refreshTokenId}")
+    @Operation(summary = "删除用户设备")
+    public AjaxResult<Void> deleteDevice(@PathVariable("refreshTokenId") String refreshTokenId) {
+        String username = SecurityUtils.getUsername();
+        return sessionService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
     }
 
 

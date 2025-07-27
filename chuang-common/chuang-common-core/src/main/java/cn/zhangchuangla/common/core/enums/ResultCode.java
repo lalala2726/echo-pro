@@ -36,8 +36,7 @@ public enum ResultCode {
     PARAM_NOT_NULL(400, "参数不能为空"),
     // 参数超出限制
     PARAM_ERROR_TOO_LARGE(400, "请求参数过大"),
-    // 参数为0无效
-    PARAM_ERROR_ZERO(400, "参数不能小于0"),
+
     // 请求资源不存在
     NOT_FOUND(404, "未找到该资源"),
     // 请求方法不被允许
@@ -48,7 +47,7 @@ public enum ResultCode {
     // 请求未提供有效身份信息
     UNAUTHORIZED(401, "未授权"),
     // 有身份但无权限
-    FORBIDDEN(403, "禁止访问"),
+    FORBIDDEN(403, "权限不足,禁止访问"),
     // 用户未登录
     NOT_LOGIN(401, "未登录"),
     USER_NOT_LOGIN(401, "用户未登录"),
@@ -68,7 +67,7 @@ public enum ResultCode {
     USER_PASSWORD_ERROR(400, "用户名或密码错误"),
     USERNAME_FORMAT_ERROR(400, "用户名不合法"),
     PASSWORD_FORMAT_ERROR(400, "密码不合法"),
-    LOGIN_ERROR(400, "登录失败"),
+    LOGIN_ERROR(4013, "登录失败"),
     USER_NOT_ADMIN(403, "用户不是管理员"),
     USER_NOT_ACTIVE(403, "用户未激活"),
     USER_NOT_VERIFY(403, "用户未验证"),
@@ -108,11 +107,8 @@ public enum ResultCode {
     // endregion
 
     FILE_OPERATION_ERROR(500, "文件操作失败"),
-    ACCESS_TOKEN_INVALID(401, "访问令牌无效或已过期"),
-    REFRESH_TOKEN_INVALID(401, "刷新令牌无效或已过期"),
-    ACCESS_UNAUTHORIZED(401, "未授权访问"),
-    UPDATE_ERROR(400, "更新信息失败"),
-    INVALID_ROLE_ID(400, "角色ID无效"),
+    ACCESS_TOKEN_INVALID(4011, "访问令牌已过期"),
+    REFRESH_TOKEN_INVALID(4012, "刷新令牌无效或已过期"),
     SERVER_CANNOT_SUPPORT(500, "服务器无法支持本次请求");
 
     /**

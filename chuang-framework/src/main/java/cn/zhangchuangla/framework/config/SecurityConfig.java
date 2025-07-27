@@ -1,8 +1,7 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.exception.AuthorizationException;
+import cn.zhangchuangla.common.core.exception.AccessDeniedException;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
@@ -161,7 +160,7 @@ public class SecurityConfig {
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
             String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
-            throw new AuthorizationException(ResultCode.AUTHORIZED, format);
+            throw new AccessDeniedException(format);
         };
     }
 

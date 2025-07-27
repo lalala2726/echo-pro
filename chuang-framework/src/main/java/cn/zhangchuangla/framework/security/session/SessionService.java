@@ -4,12 +4,17 @@ import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
+import cn.zhangchuangla.common.core.enums.ResultCode;
+import cn.zhangchuangla.common.core.exception.AccessDeniedException;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
+import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
+import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -32,6 +37,8 @@ public class SessionService {
     private final RedisZSetCache redisZSetCache;
     private final RedisHashCache redisHashCache;
     private final SysUserService sysUserService;
+    private final RedisTokenStore redisTokenStore;
+    private final RedisKeyCache redisKeyCache;
 
     /**
      * 查询指定用户的登录设备列表
@@ -62,6 +69,76 @@ public class SessionService {
 
         List<SessionDevice> sessionDevices = new ArrayList<>(deviceSet);
         return querySessionDevice(sessionDevices, request);
+    }
+
+
+    /**
+     * 系统管理员或开发人员专用：根据刷新令牌会话ID，删除对应设备和会话。
+     *
+     * @param refreshTokenId 刷新令牌会话ID，不能为空
+     * @return 删除是否成功
+     */
+    public boolean deleteDevice(String refreshTokenId) {
+        Assert.hasText(refreshTokenId, "刷新令牌会话ID不能为空");
+
+        // 先查出这个 tokenId 所对应的用户名
+        String redisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+        boolean exists = redisKeyCache.exists(redisKey);
+        if (!exists) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在");
+        }
+        Map<String, String> info = redisHashCache.hGetAll(redisKey);
+        Assert.notEmpty(info, "设备信息不存在");
+
+        String username = info.get(SecurityConstants.USER_NAME);
+        // 直接走公共删除逻辑
+        removeDeviceSessions(refreshTokenId, username);
+        return true;
+    }
+
+    /**
+     * 终端用户专用：只能删除自己名下的设备。
+     *
+     * @param refreshTokenId 刷新令牌会话ID，不能为空
+     * @param username       当前登录用户名，不能为空
+     * @return 删除是否成功
+     */
+    public boolean deleteDeviceAsUser(String refreshTokenId, String username) {
+        Assert.hasText(refreshTokenId, "刷新令牌会话ID不能为空");
+        Assert.hasText(username, "用户名不能为空");
+
+        String redisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+        boolean exists = redisKeyCache.exists(redisKey);
+        if (!exists) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在");
+        }
+        Map<String, String> info = redisHashCache.hGetAll(redisKey);
+        Assert.notEmpty(info, "设备信息不存在");
+        String owner = info.get(SecurityConstants.USER_NAME);
+        // 只能删除自己的
+        if (!username.equals(owner)) {
+            throw new AccessDeniedException("您只能删除自己名下的设备");
+        }
+
+        removeDeviceSessions(refreshTokenId, username);
+        return true;
+    }
+
+    /**
+     * @param refreshTokenId 刷新令牌会话ID
+     * @param username       设备所属用户名，用于定位 ZSet 索引
+     */
+    private void removeDeviceSessions(String refreshTokenId, String username) {
+        // 1. 从用户的 session 索引 ZSet 中移除这条记录
+        String indexKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        redisZSetCache.zRemove(indexKey, refreshTokenId);
+
+        // 2. 删除设备详情 Hash
+        String infoKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+        redisKeyCache.deleteObject(infoKey);
+
+        // 3. 删除相关的 OAuth2 刷新令牌和访问令牌
+        redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
     }
 
 
@@ -229,6 +306,10 @@ public class SessionService {
                 .map(Object::toString)
                 .orElse(null);
 
+        String refreshTokenId = Optional.ofNullable(deviceInfo.get(SecurityConstants.REFRESH_TOKEN_ID))
+                .map(Object::toString)
+                .orElse(null);
+
         Date loginDate = null;
         Object loginObj = deviceInfo.get(SecurityConstants.LOGIN_TIME);
         long timestamp;
@@ -251,6 +332,7 @@ public class SessionService {
         return SessionDevice.builder()
                 .deviceType(deviceType)
                 .username(username)
+                .refreshTokenId(refreshTokenId)
                 .userId(userId)
                 .deviceName(deviceName)
                 .ip(ip)

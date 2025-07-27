@@ -157,12 +157,12 @@ public class TokenService {
         //先经过JWT验证
         Claims refreshClaims = jwtTokenProvider.getClaimsFromToken(jwtRefreshToken);
         if (refreshClaims == null) {
-            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "无法解析刷新令牌");
+            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 
         String refreshTokenSessionId = refreshClaims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
         if (!redisTokenStore.isValidRefreshToken(refreshTokenSessionId)) {
-            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "刷新令牌已失效");
+            throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
         String username = refreshClaims.get(SecurityConstants.CLAIM_KEY_USERNAME, String.class);
         // 创建新的访问令牌

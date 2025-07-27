@@ -247,7 +247,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
         boolean update = update(sysUser, eq);
         if (!update) {
-            throw new ServiceException(ResultCode.UPDATE_ERROR, "用户信息更新失败");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "用户信息更新失败");
         }
 
         // 删除角色所关联的全部角色信息

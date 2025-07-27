@@ -142,8 +142,8 @@ public class RedisTokenStore {
         }
 
         // 3. 拿到剩余 TTL
-        Long ttlSeconds = redisKeyCache.getKeyExpire(refreshKey);
-        if (ttlSeconds == null || ttlSeconds <= 0) {
+        long ttlSeconds = redisKeyCache.getKeyExpire(refreshKey);
+        if (ttlSeconds <= 0) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 

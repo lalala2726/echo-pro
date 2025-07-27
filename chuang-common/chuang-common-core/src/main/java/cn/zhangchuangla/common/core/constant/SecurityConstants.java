@@ -31,6 +31,8 @@ public class SecurityConstants {
 
     public static final String USER_ID = "userId";
 
+    public static final String REFRESH_TOKEN_ID = "refreshTokenId";
+
     /**
      * 登录IP
      */
