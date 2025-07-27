@@ -26,6 +26,12 @@
             <artifactId>chuang-common-core</artifactId>
         </dependency>
 
+        <!-- 依赖Redis模块 -->
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-redis</artifactId>
+        </dependency>
+
         <!-- 添加系统核心模块依赖 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>
@@ -48,12 +54,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-
-        <!-- WebSocket 支持 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
     </dependencies>
 </project>
