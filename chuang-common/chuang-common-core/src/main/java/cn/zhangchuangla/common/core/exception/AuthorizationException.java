@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
- * 授权认证异常
+ * 认证失败异常
  *
  * @author Chuang
  * <p>
@@ -35,7 +35,7 @@ public final class AuthorizationException extends RuntimeException {
 
     public AuthorizationException(String message) {
         super(message);
-        this.code = ResultCode.FORBIDDEN.getCode();
+        this.code = ResultCode.AUTHORIZED.getCode();
     }
 
 }

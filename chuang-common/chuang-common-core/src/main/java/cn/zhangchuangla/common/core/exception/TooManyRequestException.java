@@ -29,7 +29,7 @@ public final class TooManyRequestException extends RuntimeException {
 
     public TooManyRequestException(String message) {
         super(message);
-        this.code = ResultCode.PROFILE_ERROR.getCode();
+        this.code = ResultCode.FORBIDDEN.getCode();
     }
 
 }
