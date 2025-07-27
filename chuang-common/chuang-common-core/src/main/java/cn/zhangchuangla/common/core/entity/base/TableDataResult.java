@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.result;
+package cn.zhangchuangla.common.core.entity.base;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonInclude;

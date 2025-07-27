@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.result;
+package cn.zhangchuangla.common.core.entity.base;
 
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import com.fasterxml.jackson.annotation.JsonInclude;

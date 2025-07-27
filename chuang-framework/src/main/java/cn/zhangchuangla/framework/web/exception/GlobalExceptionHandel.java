@@ -1,8 +1,8 @@
 package cn.zhangchuangla.framework.web.exception;
 
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.*;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package cn.zhangchuangla.common.core.utils;
 
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
 package cn.zhangchuangla.common.core.controller;
 
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.PageResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

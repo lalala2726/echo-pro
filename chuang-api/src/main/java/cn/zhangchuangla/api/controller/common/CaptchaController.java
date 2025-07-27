@@ -2,7 +2,7 @@ package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.framework.annotation.AccessLimit;

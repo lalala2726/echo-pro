@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.result;
+package cn.zhangchuangla.common.core.entity.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

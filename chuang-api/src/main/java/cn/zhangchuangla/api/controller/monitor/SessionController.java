@@ -1,9 +1,9 @@
 package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.PageResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.session.SessionService;

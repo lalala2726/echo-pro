@@ -1,8 +1,8 @@
 package cn.zhangchuangla.framework.security.session;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.enums.DeviceType;
-import cn.zhangchuangla.common.core.result.PageResult;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;

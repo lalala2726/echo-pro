@@ -1,9 +1,9 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.excel.utils.ExcelUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
