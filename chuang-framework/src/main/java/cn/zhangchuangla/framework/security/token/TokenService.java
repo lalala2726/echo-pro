@@ -41,8 +41,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TokenService {
 
-    private static final String CLAIM_KEY_SESSION_ID = "session";
-    private static final String CLAIM_KEY_USERNAME = "username";
+
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SysRoleService sysRoleService;
@@ -104,9 +103,9 @@ public class TokenService {
             return null;
         }
 
-        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        String accessTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(accessTokenSessionId)) {
-            log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, accessToken);
+            log.warn("访问令牌JWT中未找到sessionId ({}): {}", SecurityConstants.CLAIM_KEY_SESSION_ID, accessToken);
             return null;
         }
 
@@ -139,7 +138,7 @@ public class TokenService {
             return false;
         }
 
-        String refreshTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        String refreshTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(refreshTokenSessionId)) {
             return false;
         }
@@ -161,11 +160,11 @@ public class TokenService {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "无法解析刷新令牌");
         }
 
-        String refreshTokenSessionId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
+        String refreshTokenSessionId = refreshClaims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
         if (!redisTokenStore.isValidRefreshToken(refreshTokenSessionId)) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID, "刷新令牌已失效");
         }
-        String username = refreshClaims.get(CLAIM_KEY_USERNAME, String.class);
+        String username = refreshClaims.get(SecurityConstants.CLAIM_KEY_USERNAME, String.class);
         // 创建新的访问令牌
         String accessTokenSessionId = UUIDUtils.simple();
         String accessToken = jwtTokenProvider.createJwt(accessTokenSessionId, username);
@@ -210,7 +209,7 @@ public class TokenService {
         if (claims == null) {
             return false;
         }
-        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        String accessTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(accessTokenSessionId)) {
             return false;
         }

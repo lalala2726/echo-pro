@@ -1,6 +1,10 @@
 package cn.zhangchuangla.framework.security.session;
 
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
+import cn.zhangchuangla.common.core.enums.DeviceType;
+import cn.zhangchuangla.common.core.result.PageResult;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
@@ -8,9 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 /**
  * 登录设备管理（查询、删除、踢下线）
@@ -24,27 +27,124 @@ import java.util.Set;
 public class SessionService {
 
     private final RedisZSetCache redisZSetCache;
+    private final RedisHashCache redisHashCache;
 
 
-    public List<SessionDevice> listDevice(SessionDeviceQueryRequest request) {
-        // 分批扫描数量
-        final int batchScanQuantity = 1000;
-        String deviceKey = RedisConstants.Auth.SESSIONS_INDEX_KEY;
-        List<SessionDevice> result = new ArrayList<>();
-        Set<ZSetOperations.TypedTuple<String>> typedTuples =
-                redisZSetCache.scanZSet(deviceKey, "*", batchScanQuantity);
-        for (ZSetOperations.TypedTuple<String> tuple : typedTuples) {
-            String value = tuple.getValue();
-            Double score = tuple.getScore();
-            if (value != null) {
-                SessionDevice device = convertToSessionDevice(value, score);
+    public PageResult<SessionDevice> listDevice(SessionDeviceQueryRequest request) {
+        // 1. 构造 Key 模式，匹配所有用户的 session 索引 ZSet
+        String keyPattern = RedisConstants.Auth.SESSIONS_INDEX_KEY + "*";
+
+        // 2. 批量扫描出所有符合模式的 ZSet Key 以及它们的成员和分数
+        Map<String, Set<ZSetOperations.TypedTuple<Object>>> allDeviceIndex =
+                redisZSetCache.scanKeysWithValues(keyPattern);
+        // 3. 结果集合，用于去重
+        Set<SessionDevice> deviceSet = new LinkedHashSet<>();
+        // 4. 遍历每个 ZSet Key
+        allDeviceIndex.forEach((zsetKey, tuples) -> {
+            // 5. 遍历该用户 ZSet 中的每个成员
+            for (ZSetOperations.TypedTuple<Object> tuple : tuples) {
+                String member = String.valueOf(tuple.getValue());
+                Double score = tuple.getScore();
+                // 6. 转换成 SessionDevice
+                SessionDevice device = convertToSessionDevice(member, score);
                 if (device != null) {
-                    result.add(device);
+                    deviceSet.add(device);
                 }
             }
-        }
-        return result;
+        });
+        List<SessionDevice> sessionDevices = new ArrayList<>(deviceSet);
+        return querySessionDevice(sessionDevices, request);
     }
+
+
+    /**
+     * 查询会话设备
+     *
+     * @param sessionDevices 会话设备列表
+     * @param request        查询参数
+     * @return 查询结果
+     */
+    public PageResult<SessionDevice> querySessionDevice(List<SessionDevice> sessionDevices, SessionDeviceQueryRequest request) {
+
+        // 关键字段过滤条件
+        String nameKeyword = request.getDeviceName();
+        DeviceType typeKeyword = request.getDeviceType();
+        String ipKeyword = request.getIp();
+        String locKeyword = request.getLocation();
+
+        // 分页参数
+        long pageNum = Math.max(request.getPageNum(), 1);
+        long pageSize = Math.max(request.getPageSize(), 1);
+        long skip = (pageNum - 1) * pageSize;
+
+        // 1. 先做所有过滤 + 排序，收集到中间 List
+        List<SessionDevice> filtered = sessionDevices.stream()
+
+                // 名称模糊查询
+                .filter(sd -> {
+                    if (nameKeyword == null || nameKeyword.isBlank()) {
+                        return true;
+                    }
+                    String n = sd.getDeviceName();
+                    return n != null && !n.isBlank()
+                            && n.toLowerCase().contains(nameKeyword.toLowerCase());
+                })
+
+                // 类型匹配
+                .filter(sd -> {
+                    if (typeKeyword == null) {
+                        return true;
+                    }
+                    return sd.getDeviceType() != null
+                            && sd.getDeviceType().equals(typeKeyword);
+                })
+
+                // IP 模糊匹配
+                .filter(sd -> {
+                    if (ipKeyword == null || ipKeyword.isBlank()) {
+                        return true;
+                    }
+                    String ip = sd.getIp();
+                    return ip != null && !ip.isBlank()
+                            && ip.toLowerCase().contains(ipKeyword.toLowerCase());
+                })
+
+                // location 模糊匹配
+                .filter(sd -> {
+                    if (locKeyword == null || locKeyword.isBlank()) {
+                        return true;
+                    }
+                    String loc = sd.getLocation();
+                    return loc != null && !loc.isBlank()
+                            && loc.toLowerCase().contains(locKeyword.toLowerCase());
+                })
+
+                // 排序：按 loginTime 倒序（时间晚的排前面）
+                .sorted(Comparator.comparing(
+                        SessionDevice::getLoginTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
+
+                .toList();
+
+        // 2. 计算总记录数
+        long total = filtered.size();
+
+        // 3. 分页切片
+        List<SessionDevice> pageRows = filtered.stream()
+                .skip(skip)
+                .limit(pageSize)
+                .toList();
+
+        // 4. 构造并返回分页结果
+        return PageResult.<SessionDevice>builder()
+                .pageNum(pageNum)
+                .pageSize(pageSize)
+                .total(total)
+                .rows(pageRows)
+                .build();
+    }
+
 
     /**
      * 根据字符串和值转换为SessionDevice对象。示例方法，具体实现需按你的业务补全字段解析。
@@ -54,10 +154,58 @@ public class SessionService {
      * @return SessionDevice对象或null
      */
     private SessionDevice convertToSessionDevice(String value, Double score) {
-        // TODO: 根据你的实际业务结构，例如JSON字符串转对象，或用ID查详情
-        // 示例假设value为JSON，可用FastJSON/Gson等反序列化
-        // return JSON.parseObject(value, SessionDeviceQueryRequest.class);
-        return null;
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+
+        String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + value;
+        Map<String, Object> deviceInfo = redisHashCache.hGetAll(deviceRedisKey);
+        if (deviceInfo.isEmpty()) {
+            return null;
+        }
+
+        // 1. 设备类型 & 名称 & IP & 地点
+        DeviceType deviceType = null;
+        Object typeObj = deviceInfo.get(SecurityConstants.DEVICE_TYPE);
+        if (typeObj != null) {
+            deviceType = DeviceType.getByValue(typeObj.toString());
+        }
+        String deviceName = Optional.ofNullable(deviceInfo.get(SecurityConstants.DEVICE_NAME))
+                .map(Object::toString)
+                .orElse(null);
+        String ip = Optional.ofNullable(deviceInfo.get(SecurityConstants.IP))
+                .map(Object::toString)
+                .orElse(null);
+        String location = Optional.ofNullable(deviceInfo.get(SecurityConstants.LOCATION))
+                .map(Object::toString)
+                .orElse(null);
+
+        Date loginDate = null;
+        Object loginObj = deviceInfo.get(SecurityConstants.LOGIN_TIME);
+        long timestamp;
+        if (loginObj instanceof Number) {
+            timestamp = ((Number) loginObj).longValue();
+        } else if (loginObj instanceof String) {
+            try {
+                timestamp = Long.parseLong((String) loginObj);
+            } catch (NumberFormatException e) {
+                timestamp = 0L;
+            }
+        } else {
+            timestamp = (score != null) ? score.longValue() : 0L;
+        }
+        if (timestamp > 0) {
+            loginDate = new Date(timestamp);
+        }
+
+        // 3. 构建 SessionDevice
+        return SessionDevice.builder()
+                .deviceType(deviceType)
+                .deviceName(deviceName)
+                .ip(ip)
+                .location(location)
+                .loginTime(loginDate)
+                .build();
     }
 
 

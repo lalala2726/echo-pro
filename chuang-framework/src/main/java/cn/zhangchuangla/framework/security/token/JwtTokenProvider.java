@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.security.token;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -29,9 +30,6 @@ import static cn.zhangchuangla.common.core.enums.ResultCode.ACCESS_TOKEN_INVALID
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final String CLAIM_KEY_SESSION_ID = "session";
-    private static final String CLAIM_KEY_USERNAME = "username";
-
     private final SecurityProperties securityProperties;
     private SecretKey jwtSecretKey;
 
@@ -45,14 +43,14 @@ public class JwtTokenProvider {
     /**
      * 创建JWT。不再包含tokenType。
      *
-     * @param id       令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
+     * @param tokenId       令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
      * @param username 用户名
      * @return JWT字符串
      */
-    public String createJwt(String id, String username) {
+    public String createJwt(String tokenId, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_SESSION_ID, id);
-        claims.put(CLAIM_KEY_USERNAME, username);
+        claims.put(SecurityConstants.CLAIM_KEY_SESSION_ID, tokenId);
+        claims.put(SecurityConstants.CLAIM_KEY_USERNAME, username);
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(jwtSecretKey)

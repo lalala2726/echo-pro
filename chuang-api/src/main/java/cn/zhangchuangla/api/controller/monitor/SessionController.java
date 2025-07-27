@@ -2,6 +2,8 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.result.PageResult;
+import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.session.SessionService;
@@ -11,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Chuang
@@ -29,9 +29,9 @@ public class SessionController extends BaseController {
 
 
     @GetMapping("/list")
-    public AjaxResult<List<SessionDevice>> listDevice(SessionDeviceQueryRequest request) {
-        List<SessionDevice> sessionDevices = sessionService.listDevice(request);
-        return success(sessionDevices);
+    public AjaxResult<TableDataResult> listDevice(SessionDeviceQueryRequest request) {
+        PageResult<SessionDevice> sessionDevicePageResult = sessionService.listDevice(request);
+        return getTableData(sessionDevicePageResult);
     }
 
 

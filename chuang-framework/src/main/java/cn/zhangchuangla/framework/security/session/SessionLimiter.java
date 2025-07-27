@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.security.session;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
+import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
@@ -39,9 +40,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class SessionLimiter {
 
-    private static final String DEVICE_TYPE = "device_type";
-    private static final String DEVICE_NAME = "device_name";
-    private static final String LOGIN_TIME = "login_time";
 
     // 用户级别的锁，确保同一用户的会话操作是线程安全的
     private final ConcurrentHashMap<String, ReentrantLock> userLocks = new ConcurrentHashMap<>();
@@ -199,9 +197,9 @@ public class SessionLimiter {
             if (score != null && score >= effectiveTime) {
                 String refreshTokenId = tuple.getValue();
                 String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-                Map<String, Object> deviceInfo = redisHashCache.hGetAll(deviceRedisKey);
+                Map<String, String> deviceInfo = redisHashCache.hGetAll(deviceRedisKey);
                 if (!deviceInfo.isEmpty()) {
-                    String loginDeviceType = deviceInfo.get(DEVICE_TYPE).toString();
+                    String loginDeviceType = deviceInfo.get(SecurityConstants.DEVICE_TYPE);
                     if (deviceType.equals(loginDeviceType)) {
                         count.getAndIncrement();
                     }
@@ -243,9 +241,11 @@ public class SessionLimiter {
         long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
 
         Map<String, Object> deviceInfo = Map.of(
-                DEVICE_TYPE, loginDeviceDTO.getDeviceType(),
-                DEVICE_NAME, loginDeviceDTO.getDeviceName(),
-                LOGIN_TIME, now
+                SecurityConstants.DEVICE_TYPE, loginDeviceDTO.getDeviceType(),
+                SecurityConstants.DEVICE_NAME, loginDeviceDTO.getDeviceName(),
+                SecurityConstants.LOGIN_TIME, now,
+                SecurityConstants.LOCATION, loginDeviceDTO.getLocation(),
+                SecurityConstants.IP, loginDeviceDTO.getIp()
         );
         String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + loginDeviceDTO.getRefreshSessionId();
         redisHashCache.hPutAll(deviceRedisKey, deviceInfo);

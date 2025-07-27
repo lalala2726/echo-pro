@@ -23,9 +23,6 @@ public class RedisTokenStore {
     private final RedisKeyCache redisKeyCache;
     private final SecurityProperties securityProperties;
 
-    // todo 临时设备标识后续优化
-    private final String deviceType = "web";
-
 
     /**
      * 保存访问令牌到Redis中

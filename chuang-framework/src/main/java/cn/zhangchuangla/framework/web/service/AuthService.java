@@ -2,6 +2,7 @@ package cn.zhangchuangla.framework.web.service;
 
 import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.exception.ParamException;
@@ -26,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
 
@@ -78,12 +80,12 @@ public class AuthService {
 
         // 4. 构建登录设备信息
         LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
-                .deviceType(request.getDeviceType())
-                // TODO: 从请求中获取真实设备名称
-                .deviceName("MacBook")
+                .deviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue())
+                .deviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device")
                 .refreshSessionId(authSessionInfo.getRefreshTokenSessionId())
                 .username(authSessionInfo.getUsername())
                 .ip(IPUtils.getIpAddress(httpServletRequest))
+                .location(IPUtils.getRegion(IPUtils.getIpAddress(httpServletRequest)))
                 .build();
 
         // 如果为了性能考虑，可以在 checkLimitAndAddSession 的第二个参数传入 false，
@@ -94,7 +96,9 @@ public class AuthService {
         } catch (AuthorizationException e) {
             // 如果设备限制检查失败，需要清理已生成的token
             log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
-                    request.getUsername(), request.getDeviceType(), e.getMessage());
+                    request.getUsername(),
+                    request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType() : DeviceType.UNKNOWN,
+                    e.getMessage());
             redisTokenStore.deleteRefreshTokenAndAccessToken(authSessionInfo.getRefreshTokenSessionId());
             throw e;
         }
@@ -113,7 +117,7 @@ public class AuthService {
      * @param request 请求参数
      * @return 用户ID
      */
-    public Long register(RegisterRequest request) {
+    public Long register(@RequestBody RegisterRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new ParamException(ResultCode.PARAM_ERROR);
         }

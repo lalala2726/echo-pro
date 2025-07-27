@@ -1,7 +1,9 @@
 package cn.zhangchuangla.framework.model.request;
 
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 登录设备
@@ -11,7 +13,8 @@ import lombok.Data;
  * created on 2025/7/26 20:05
  */
 @Data
-public class SessionDeviceQueryRequest {
+@EqualsAndHashCode(callSuper = true)
+public class SessionDeviceQueryRequest extends BasePageRequest {
 
     /**
      * 设备类型

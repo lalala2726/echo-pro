@@ -1,7 +1,6 @@
 package cn.zhangchuangla.framework.model.request;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
-import cn.zhangchuangla.common.core.enums.DeviceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -39,7 +38,6 @@ public class LoginRequest {
     /**
      * 设备类型
      */
-    @Schema(description = "设备类型", type = "string", allowableValues = {"web", "pc", "ios", "android"}, defaultValue = "PC",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "PC")
-    private String deviceType = DeviceType.PC.getValue();
+    @Schema(description = "设备信息", requiredMode = Schema.RequiredMode.REQUIRED)
+    private DeviceInfoRequest deviceInfo;
 }

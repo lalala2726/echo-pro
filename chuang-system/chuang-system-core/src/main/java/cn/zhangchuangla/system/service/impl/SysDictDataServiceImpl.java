@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -71,6 +70,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public List<Option<String>> getDictDataOption(String dictType) {
+        final int normal = 0;
         if (StringUtils.isBlank(dictType)) {
             return List.of();
         }
@@ -89,7 +89,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<SysDictData>()
                 .eq(SysDictData::getDictType, dictType)
                 // 只查询启用的字典数据
-                .eq(SysDictData::getStatus, Constants.SystemStatus.NORMAL)
+                .eq(SysDictData::getStatus, normal)
                 // 按排序字段升序
                 .orderByAsc(SysDictData::getSort);
 
