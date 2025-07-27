@@ -22,6 +22,17 @@ import java.util.Date;
 @Builder
 public class SessionDevice {
 
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
     /**
      * 设备类型
      */

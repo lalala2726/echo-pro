@@ -19,6 +19,12 @@ import lombok.NoArgsConstructor;
 public class LoginDeviceDTO {
 
     /**
+     * 用户ID
+     */
+    @NotNull(message = "用户ID不能为空")
+    private Long userId;
+
+    /**
      * 用户名
      */
     @NotNull(message = "用户名不能为空")

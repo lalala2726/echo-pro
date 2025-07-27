@@ -2,12 +2,15 @@ package cn.zhangchuangla.framework.security.session;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
+import cn.zhangchuangla.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -28,8 +31,46 @@ public class SessionService {
 
     private final RedisZSetCache redisZSetCache;
     private final RedisHashCache redisHashCache;
+    private final SysUserService sysUserService;
+
+    /**
+     * 查询指定用户的登录设备列表
+     *
+     * @param username 用户名
+     * @param request  查询参数
+     * @return 登录设备列表
+     */
+    public PageResult<SessionDevice> getDeviceListByUsername(String username, SessionDeviceQueryRequest request) {
+        Assert.isTrue(!username.isBlank(), "用户名不能为空");
+        SysUser user = sysUserService.getUserInfoByUsername(username);
+        Assert.isTrue(user != null, "用户不存在");
+
+        Set<SessionDevice> deviceSet = new LinkedHashSet<>();
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allDeviceIndex = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
+
+        //获取用户设备的索引信息并转换为SessionDevice
+        allDeviceIndex.forEach(tuple -> {
+            String member = tuple.getValue();
+            Double score = tuple.getScore();
+            // 转换成 SessionDevice
+            SessionDevice device = convertToSessionDevice(member, score);
+            if (device != null) {
+                deviceSet.add(device);
+            }
+        });
+
+        List<SessionDevice> sessionDevices = new ArrayList<>(deviceSet);
+        return querySessionDevice(sessionDevices, request);
+    }
 
 
+    /**
+     * 查询设备列表
+     *
+     * @param request 查询条件
+     * @return 设备列表
+     */
     public PageResult<SessionDevice> listDevice(SessionDeviceQueryRequest request) {
         // 1. 构造 Key 模式，匹配所有用户的 session 索引 ZSet
         String keyPattern = RedisConstants.Auth.SESSIONS_INDEX_KEY + "*";
@@ -64,7 +105,7 @@ public class SessionService {
      * @param request        查询参数
      * @return 查询结果
      */
-    public PageResult<SessionDevice> querySessionDevice(List<SessionDevice> sessionDevices, SessionDeviceQueryRequest request) {
+    private PageResult<SessionDevice> querySessionDevice(List<SessionDevice> sessionDevices, SessionDeviceQueryRequest request) {
 
         // 关键字段过滤条件
         String nameKeyword = request.getDeviceName();
@@ -164,7 +205,6 @@ public class SessionService {
             return null;
         }
 
-        // 1. 设备类型 & 名称 & IP & 地点
         DeviceType deviceType = null;
         Object typeObj = deviceInfo.get(SecurityConstants.DEVICE_TYPE);
         if (typeObj != null) {
@@ -173,6 +213,15 @@ public class SessionService {
         String deviceName = Optional.ofNullable(deviceInfo.get(SecurityConstants.DEVICE_NAME))
                 .map(Object::toString)
                 .orElse(null);
+
+        String username = Optional.ofNullable(deviceInfo.get(SecurityConstants.USER_NAME))
+                .map(Object::toString)
+                .orElse(null);
+
+        Long userId = Long.valueOf(Objects.requireNonNull(Optional.ofNullable(deviceInfo.get(SecurityConstants.USER_ID))
+                .map(Object::toString)
+                .orElse(null)));
+
         String ip = Optional.ofNullable(deviceInfo.get(SecurityConstants.IP))
                 .map(Object::toString)
                 .orElse(null);
@@ -201,6 +250,8 @@ public class SessionService {
         // 3. 构建 SessionDevice
         return SessionDevice.builder()
                 .deviceType(deviceType)
+                .username(username)
+                .userId(userId)
                 .deviceName(deviceName)
                 .ip(ip)
                 .location(location)

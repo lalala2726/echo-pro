@@ -27,6 +27,10 @@ public class SecurityConstants {
      */
     public static final String LOGIN_TIME = "login_time";
 
+    public static final String USER_NAME = "username";
+
+    public static final String USER_ID = "userId";
+
     /**
      * 登录IP
      */
