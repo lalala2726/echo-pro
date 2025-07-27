@@ -3,6 +3,7 @@ package cn.zhangchuangla.common.core.controller;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.result.PageResult;
 import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -88,6 +89,16 @@ public class BaseController {
      */
     protected AjaxResult<TableDataResult> getTableData(Page<?> page, List<?> rows, Map<String, Object> extra) {
         return TableDataResult.build(page, rows, extra);
+    }
+
+    /**
+     * 使用自定义分页封装分页结果
+     *
+     * @param page 自定义分页
+     * @return 封装后的分页数据
+     */
+    protected AjaxResult<TableDataResult> getTableData(PageResult<?> page) {
+        return TableDataResult.build(page);
     }
 
 

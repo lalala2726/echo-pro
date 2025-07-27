@@ -80,6 +80,17 @@ public class TableDataResult implements Serializable {
         this.pageNum = pageNum;
     }
 
+
+    public static AjaxResult<TableDataResult> build(PageResult<?> result) {
+        return AjaxResult.success(new TableDataResult(
+                result.getRows(),
+                result.getTotal(),
+                result.getPageSize(),
+                result.getPageNum()
+        ));
+    }
+
+
     /**
      * 从 Page 对象构建 TableDataResult
      *
