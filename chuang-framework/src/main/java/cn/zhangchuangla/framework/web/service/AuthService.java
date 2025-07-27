@@ -82,6 +82,7 @@ public class AuthService {
         LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
                 .deviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue())
                 .deviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device")
+                .userId(authSessionInfo.getUserId())
                 .refreshSessionId(authSessionInfo.getRefreshTokenSessionId())
                 .username(authSessionInfo.getUsername())
                 .ip(IPUtils.getIpAddress(httpServletRequest))
