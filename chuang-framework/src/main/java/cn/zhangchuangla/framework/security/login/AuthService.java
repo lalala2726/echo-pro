@@ -135,9 +135,7 @@ public class AuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncLogService.recordLoginLog(username, ipAddr, userAgent, true);
 
-        AuthTokenVo authTokenVo = BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
-        setAuthTokenInfo(authTokenVo);
-        return authTokenVo;
+        return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
     }
 
     /**
@@ -162,20 +160,4 @@ public class AuthService {
         return user.getUserId();
     }
 
-
-    /**
-     * 设置认证令牌信息
-     *
-     * @param authTokenVo 认证令牌信息
-     */
-    public void setAuthTokenInfo(AuthTokenVo authTokenVo) {
-        long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
-        long accessTokenExpireTime = securityProperties.getSession().getAccessTokenExpireTime();
-        authTokenVo.setAccessTokenExpires(refreshTokenExpireTime);
-        authTokenVo.setRefreshTokenExpires(accessTokenExpireTime);
-        String tokenPrefix = securityProperties.getSession().getTokenPrefix();
-        if (!tokenPrefix.isBlank()) {
-            authTokenVo.setAccessToken(tokenPrefix + " " + authTokenVo.getAccessToken());
-        }
-    }
 }
