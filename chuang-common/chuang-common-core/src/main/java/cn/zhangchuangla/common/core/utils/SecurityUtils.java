@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Strings;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class SecurityUtils {
+
+    @Value("${security.header}")
+    private static final String HEADER = "Authorization";
 
     /**
      * 获取用户
@@ -139,7 +142,7 @@ public class SecurityUtils {
      */
     public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        return request.getHeader(HttpHeaders.AUTHORIZATION);
+        return request.getHeader(HEADER);
     }
 
     /**
