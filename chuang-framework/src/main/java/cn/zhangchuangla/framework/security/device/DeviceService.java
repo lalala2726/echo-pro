@@ -101,18 +101,18 @@ public class DeviceService {
     public boolean deleteDevice(String refreshTokenId) {
         Assert.hasText(refreshTokenId, "刷新令牌会话ID不能为空");
 
-        // 先查出这个 tokenId 所对应的用户名
-        String redisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-        boolean exists = redisCache.exists(redisKey);
-        if (!exists) {
-            throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在");
+        String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+        Map<String, String> getAll = redisHashCache.hGetAll(deviceInfoRedisKey);
+        if (getAll.isEmpty()) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在!");
         }
-        Map<String, String> info = redisHashCache.hGetAll(redisKey);
-        Assert.notEmpty(info, "设备信息不存在");
+        String username = getAll.get(SecurityConstants.USER_NAME);
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
+        redisCache.deleteObject(deviceInfoRedisKey);
 
-        String username = info.get(SecurityConstants.USER_NAME);
-        // 直接走公共删除逻辑
-        removeDeviceSessions(refreshTokenId, username);
+        //删除对应会话
+        redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
         return true;
     }
 

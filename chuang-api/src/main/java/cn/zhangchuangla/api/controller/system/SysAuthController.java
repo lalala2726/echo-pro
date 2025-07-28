@@ -7,6 +7,7 @@ import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.security.UserSecurityManager;
 import cn.zhangchuangla.framework.security.login.AuthService;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
@@ -41,6 +42,7 @@ public class SysAuthController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final TokenService tokenService;
+    private final UserSecurityManager userSecurityManager;
 
 
     /**
@@ -117,8 +119,9 @@ public class SysAuthController extends BaseController {
     @DeleteMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult<Void> logout() {
-        //todo 退出登录
-        return success();
+        String token = getToken();
+        boolean result = userSecurityManager.logoutByToken(token);
+        return toAjax(result);
     }
 
 }
