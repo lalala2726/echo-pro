@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.model.request.user.SysUserAddRequest;
@@ -50,7 +50,7 @@ public class SysUserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
 
     /**
@@ -98,7 +98,7 @@ public class SysUserController extends BaseController {
             UserListVo userListVo = BeanCotyUtils.copyProperties(user, UserListVo.class);
             userListVos.add(userListVo);
         });
-        excelUtils.exportExcel(response, userListVos, UserListVo.class, "用户列表");
+        excelExportService.exportExcel(response, userListVos, UserListVo.class, "用户列表");
     }
 
     /**

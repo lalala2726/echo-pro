@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.message.model.entity.SysMessage;
 import cn.zhangchuangla.message.model.request.SysMessageAddRequest;
@@ -41,7 +41,7 @@ import java.util.List;
 public class SysMessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
     /**
      * 查询系统消息表列表
@@ -80,7 +80,7 @@ public class SysMessageController extends BaseController {
     public void export(HttpServletResponse response) {
         List<SysMessage> list = sysMessageService.list();
         List<SysMessageListVo> voList = copyListProperties(list, SysMessageListVo.class);
-        excelUtils.exportExcel(response, voList, SysMessageListVo.class, "系统消息表列表");
+        excelExportService.exportExcel(response, voList, SysMessageListVo.class, "系统消息表列表");
     }
 
     /**

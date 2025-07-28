@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
@@ -39,7 +39,7 @@ import java.util.List;
 public class SysOperationLogController extends BaseController {
 
     private final SysOperationLogService sysOperationLogService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
 
     /**
@@ -68,7 +68,7 @@ public class SysOperationLogController extends BaseController {
                                    HttpServletResponse response) {
         List<SysOperationLog> sysOperationLogs = sysOperationLogService.exportOperationLog(request);
         List<SysOperationLogVo> sysOperationLogVos = copyListProperties(sysOperationLogs, SysOperationLogVo.class);
-        excelUtils.exportExcel(response, sysOperationLogVos, SysOperationLogVo.class, "操作日志");
+        excelExportService.exportExcel(response, sysOperationLogVos, SysOperationLogVo.class, "操作日志");
     }
 
     /**

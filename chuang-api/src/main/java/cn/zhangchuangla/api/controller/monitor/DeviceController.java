@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
@@ -32,7 +32,7 @@ import java.util.List;
 public class DeviceController extends BaseController {
 
     private final DeviceService deviceService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
 
     /**
@@ -88,7 +88,7 @@ public class DeviceController extends BaseController {
         request.setPageNum(-1);
         PageResult<SessionDevice> sessionDevicePageResult = deviceService.listDevice(request);
         List<SessionDevice> rows = sessionDevicePageResult.getRows();
-        excelUtils.exportExcel(response, rows, SessionDevice.class, "设备列表");
+        excelExportService.exportExcel(response, rows, SessionDevice.class, "设备列表");
     }
 
 

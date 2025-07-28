@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.security.session.SessionService;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class SessionController extends BaseController {
 
     private final SessionService sessionService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
     /**
      * 会话列表
@@ -88,7 +88,7 @@ public class SessionController extends BaseController {
         request.setPageNum(-1);
         request.setPageSize(-1);
         PageResult<OnlineLoginUser> onlineLoginUserPageResult = sessionService.sessionList(request);
-        excelUtils.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUser.class, "登录用户列表");
+        excelExportService.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUser.class, "登录用户列表");
     }
 
 }
