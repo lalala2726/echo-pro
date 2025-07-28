@@ -77,6 +77,21 @@ public interface RedisConstants {
 
         String SESSIONS_DEVICE_KEY = "auth:session:device:";
 
+        /**
+         * 密码重试限制前缀
+         */
+        String PASSWORD_RETRY_PREFIX = "auth:password:retry:";
+
+        /**
+         * 密码重试次数缓存Key格式: auth:password:retry:{username}
+         */
+        String PASSWORD_RETRY_COUNT_KEY = PASSWORD_RETRY_PREFIX + "%s";
+
+        /**
+         * 密码锁定状态缓存Key格式: auth:password:lock:{username}
+         */
+        String PASSWORD_LOCK_KEY = "auth:password:lock:%s";
+
 
     }
 

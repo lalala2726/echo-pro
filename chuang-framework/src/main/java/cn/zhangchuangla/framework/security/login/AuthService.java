@@ -17,6 +17,7 @@ import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.security.device.DeviceLimiter;
+import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -52,6 +53,7 @@ public class AuthService {
     private final SysUserService sysUserService;
     private final DeviceLimiter deviceLimiter;
     private final RedisTokenStore redisTokenStore;
+    private final PasswordRetryLimiter passwordRetryLimiter;
 
     /**
      * 实现登录逻辑
@@ -60,27 +62,40 @@ public class AuthService {
      * @return 令牌
      */
     public AuthTokenVo login(LoginRequest request, HttpServletRequest httpServletRequest) {
-        // 1. 创建用于密码认证的令牌（未认证）
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                request.getUsername().trim(), request.getPassword().trim());
+        String username = request.getUsername().trim();
 
-        // 2. 执行认证（认证中）
+        // 1. 检查用户是否被锁定（密码重试限制）
+        passwordRetryLimiter.allowLogin(username);
+
+        // 2. 创建用于密码认证的令牌（未认证）
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                username, request.getPassword().trim());
+
+        // 3. 执行认证（认证中）
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
-            log.error("用户名:{},登录失败！", request.getUsername(), e);
+            log.error("用户名:{},登录失败！", username, e);
+
+            // 记录登录失败，增加重试次数
+            passwordRetryLimiter.recordFailure(username);
+
             // 使用异步服务记录登录失败日志
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-            asyncLogService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
+            asyncLogService.recordLoginLog(username, ipAddr, userAgent, false);
             throw new LoginException("账号或密码错误!");
         }
-        // 3. 认证成功后，生成 JWT 令牌（但还未添加到会话管理中）
+
+        // 4. 认证成功后，清除重试记录
+        passwordRetryLimiter.clearRecord(username);
+
+        // 5. 生成 JWT 令牌（但还未添加到会话管理中）
         LoginSessionDTO authSessionInfo = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 4. 构建登录设备信息
+        // 6. 构建登录设备信息
         LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
                 .deviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue())
                 .deviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device")
@@ -99,7 +114,7 @@ public class AuthService {
         } catch (AuthorizationException e) {
             // 如果设备限制检查失败，需要清理已生成的token
             log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
-                    request.getUsername(),
+                    username,
                     request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType() : DeviceType.UNKNOWN,
                     e.getMessage());
             redisTokenStore.deleteRefreshTokenAndAccessToken(authSessionInfo.getRefreshTokenSessionId());
@@ -109,7 +124,7 @@ public class AuthService {
         // 使用异步服务记录登录成功日志
         String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-        asyncLogService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
+        asyncLogService.recordLoginLog(username, ipAddr, userAgent, true);
 
         return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
     }
