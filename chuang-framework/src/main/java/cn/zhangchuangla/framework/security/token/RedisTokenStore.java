@@ -141,7 +141,8 @@ public class RedisTokenStore {
 
         for (Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
             if (entry.getValue() instanceof String value && accessTokenId.equals(value)) {
-                return entry.getKey();
+                String key = entry.getKey();
+                return key.replace(RedisConstants.Auth.USER_REFRESH_TOKEN, "");
             }
         }
         return null;
