@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.core.service;
 
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StorageConfigRetrievalService {
 
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
 
     /**
      * 获取当前激活的存储类型
@@ -27,7 +27,7 @@ public class StorageConfigRetrievalService {
      * @return 存储类型字符串 (e.g., "MINIO", "ALIYUN_OSS", "LOCAL", "TENCENT_COS")
      */
     public String getActiveStorageType() {
-        return redisKeyCache.getCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE);
+        return redisCache.getCacheObject(RedisConstants.StorageConfig.ACTIVE_TYPE);
     }
 
     /**
@@ -36,7 +36,7 @@ public class StorageConfigRetrievalService {
      * @return 配置JSON字符串
      */
     public String getCurrentStorageConfigJson() {
-        return redisKeyCache.getCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG);
+        return redisCache.getCacheObject(RedisConstants.StorageConfig.CURRENT_STORAGE_CONFIG);
     }
 
 }

@@ -6,8 +6,8 @@ import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
@@ -43,7 +43,7 @@ public class DeviceLimiter {
 
     // 用户级别的锁，确保同一用户的设备信息操作是线程安全的
     private final ConcurrentHashMap<String, ReentrantLock> userLocks = new ConcurrentHashMap<>();
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final RedisHashCache redisHashCache;
     private final RedisZSetCache redisZSetCache;
     private final SecurityProperties securityProperties;
@@ -144,7 +144,7 @@ public class DeviceLimiter {
                     //1.删除刷新令牌和访问令牌
                     redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
                     //2.删除设备的数据
-                    redisKeyCache.deleteObject(deviceRedisKey);
+                    redisCache.deleteObject(deviceRedisKey);
                     //3.删除索引
                     redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
                 }
@@ -171,7 +171,7 @@ public class DeviceLimiter {
                 String refreshTokenId = tuple.getValue();
                 String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
                 //删除设备数据
-                redisKeyCache.deleteObject(deviceRedisKey);
+                redisCache.deleteObject(deviceRedisKey);
                 //删除索引
                 redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
             }
@@ -252,7 +252,7 @@ public class DeviceLimiter {
         String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + loginDeviceDTO.getRefreshSessionId();
         redisHashCache.hPutAll(deviceRedisKey, deviceInfo);
         // 设置设备信息有效期
-        redisKeyCache.expire(deviceRedisKey, refreshTokenExpireTime, TimeUnit.SECONDS);
+        redisCache.expire(deviceRedisKey, refreshTokenExpireTime, TimeUnit.SECONDS);
         // 写入ZSet索引
         String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + loginDeviceDTO.getUsername();
         redisZSetCache.zAdd(deviceIndexRedisKey, loginDeviceDTO.getRefreshSessionId(), now, refreshTokenExpireTime, TimeUnit.SECONDS);

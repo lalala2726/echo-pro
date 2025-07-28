@@ -1,7 +1,7 @@
 package cn.zhangchuangla.storage.core.service;
 
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.storage.config.StorageSystemProperties;
 import cn.zhangchuangla.storage.constant.StorageConstants;
 import cn.zhangchuangla.storage.core.loader.StorageLoader;
@@ -26,16 +26,16 @@ public class StorageRegistryService {
 
     private final StorageConfigService storageConfigService;
     private final StorageSystemProperties storageSystemProperties;
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final Map<String, StorageLoader> storageLoaders;
 
     public StorageRegistryService(StorageConfigService storageConfigService,
                                   StorageSystemProperties storageSystemProperties,
-                                  RedisKeyCache redisKeyCache,
+                                  RedisCache redisCache,
                                   List<StorageLoader> storageLoaders) {
         this.storageConfigService = storageConfigService;
         this.storageSystemProperties = storageSystemProperties;
-        this.redisKeyCache = redisKeyCache;
+        this.redisCache = redisCache;
         this.storageLoaders = storageLoaders.stream()
                 .collect(Collectors.toMap(StorageLoader::getStorageType, Function.identity()));
     }
@@ -78,7 +78,7 @@ public class StorageRegistryService {
         }
         boolean loaded = loadConfig(primaryConfig.getStorageType(), primaryConfig.getStorageValue());
         if (loaded) {
-            redisKeyCache.setCacheObject(RedisConstants.StorageConfig.CONFIGURATION_FILE_TYPE, RedisConstants.StorageConfig.CONFIG_TYPE_DATABASE);
+            redisCache.setCacheObject(RedisConstants.StorageConfig.CONFIGURATION_FILE_TYPE, RedisConstants.StorageConfig.CONFIG_TYPE_DATABASE);
             log.info("数据库 - {} 加载成功, 存储Key: {}.", primaryConfig.getStorageType(), primaryConfig.getStorageType());
         }
         return loaded;
@@ -138,7 +138,7 @@ public class StorageRegistryService {
             log.error("未找到对应的存储服务加载器: {}", storageType);
             return false;
         }
-        loader.loadConfig(json, redisKeyCache);
+        loader.loadConfig(json, redisCache);
         log.info("存储服务 [{}] 配置已加载到Redis.", storageType);
         return true;
     }

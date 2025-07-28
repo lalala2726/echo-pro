@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictDataMapper;
 import cn.zhangchuangla.system.model.entity.SysDictData;
 import cn.zhangchuangla.system.model.request.dict.SysDictDataAddRequest;
@@ -36,7 +36,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         implements SysDictDataService {
 
     private final SysDictDataMapper sysDictDataMapper;
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
 
     /**
      * 分页查询字典数据列表
@@ -77,7 +77,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
         // 1. 优先从缓存中获取
         String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
-        List<Option<String>> cachedOptions = redisKeyCache.getCacheObject(cacheKey);
+        List<Option<String>> cachedOptions = redisCache.getCacheObject(cacheKey);
 
         if (cachedOptions != null) {
             log.debug("从缓存中获取字典数据: {}", dictType);
@@ -100,7 +100,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
         // 3. 将查询结果缓存起来
         try {
-            redisKeyCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
+            redisCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
             log.debug("字典数据已缓存: {}", dictType);
         } catch (Exception e) {
             log.warn("缓存字典数据失败: {}, 错误: {}", dictType, e.getMessage());
@@ -246,7 +246,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         if (!StringUtils.isBlank(dictType)) {
             String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
-                redisKeyCache.deleteObject(cacheKey);
+                redisCache.deleteObject(cacheKey);
                 log.debug("已清除字典缓存: {}", dictType);
             } catch (Exception e) {
                 log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());

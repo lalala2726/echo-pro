@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.framework.annotation.AccessLimit;
 import cn.zhangchuangla.framework.config.kaptcha.KaptchaTextCreator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CaptchaController extends BaseController {
 
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final SecureRandom random = new SecureRandom();
     @Resource(name = "captchaTextCreator")
     private KaptchaTextCreator captchaTextCreator;
@@ -67,7 +67,7 @@ public class CaptchaController extends BaseController {
 
         // 将验证码存储到redis中，有效期2分钟
         String verifyKey = RedisConstants.CAPTCHA_CODE + uuid;
-        redisKeyCache.setCacheObject(verifyKey, code, 2, TimeUnit.MINUTES);
+        redisCache.setCacheObject(verifyKey, code, 2, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();
         try {

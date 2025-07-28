@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core.loader;
 
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 
 /**
  * @author Chuang
@@ -22,7 +22,7 @@ public interface StorageLoader {
      * 加载存储配置,将存储配置保存到Redis中
      *
      * @param json          存储配置JSON
-     * @param redisKeyCache Redis缓存
+     * @param redisCache Redis缓存
      */
-    void loadConfig(String json, RedisKeyCache redisKeyCache);
+    void loadConfig(String json, RedisCache redisCache);
 }

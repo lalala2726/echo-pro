@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -45,7 +45,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleMenuService sysRoleMenuService;
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final SysMenuService sysMenuService;
 
     /**
@@ -86,13 +86,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         String cacheKey = RedisConstants.Auth.ROLE_KEY + userId;
 
         // 从缓存获取角色权限集合
-        Set<String> roleSet = redisKeyCache.getCacheObject(cacheKey);
+        Set<String> roleSet = redisCache.getCacheObject(cacheKey);
         if (roleSet == null || roleSet.isEmpty()) {
             List<SysRole> roleList = getRoleListByUserId(userId);
             roleSet = roleList.stream()
                     .map(SysRole::getRoleKey)
                     .collect(Collectors.toSet());
-            redisKeyCache.setCacheObject(cacheKey, roleSet);
+            redisCache.setCacheObject(cacheKey, roleSet);
         }
         return roleSet;
     }

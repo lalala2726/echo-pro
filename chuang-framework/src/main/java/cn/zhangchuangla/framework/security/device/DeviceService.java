@@ -10,8 +10,8 @@ import cn.zhangchuangla.common.core.exception.AccessDeniedException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
@@ -40,7 +40,7 @@ public class DeviceService {
     private final RedisHashCache redisHashCache;
     private final SysUserService sysUserService;
     private final RedisTokenStore redisTokenStore;
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final TokenService tokenService;
 
     /**
@@ -97,7 +97,7 @@ public class DeviceService {
 
         // 先查出这个 tokenId 所对应的用户名
         String redisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-        boolean exists = redisKeyCache.exists(redisKey);
+        boolean exists = redisCache.exists(redisKey);
         if (!exists) {
             throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在");
         }
@@ -122,7 +122,7 @@ public class DeviceService {
         Assert.hasText(username, "用户名不能为空");
 
         String redisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-        boolean exists = redisKeyCache.exists(redisKey);
+        boolean exists = redisCache.exists(redisKey);
         if (!exists) {
             throw new ServiceException(ResultCode.RESULT_IS_NULL, "设备信息不存在");
         }
@@ -151,7 +151,7 @@ public class DeviceService {
 
         // 2. 删除设备详情 Hash
         String infoKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-        redisKeyCache.deleteObject(infoKey);
+        redisCache.deleteObject(infoKey);
 
         // 3. 删除相关的 OAuth2 刷新令牌和访问令牌
         redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);

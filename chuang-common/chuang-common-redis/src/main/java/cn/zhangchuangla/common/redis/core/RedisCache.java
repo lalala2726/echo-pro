@@ -23,12 +23,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
-public final class RedisKeyCache {
+public final class RedisCache {
 
 
     public final RedisTemplate redisTemplate;
     private final RedisProperties redisProperties;
-
 
 
     /**

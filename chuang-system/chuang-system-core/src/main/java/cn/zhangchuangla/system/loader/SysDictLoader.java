@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.loader;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.loader.DataLoader;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.model.entity.SysDictData;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.service.SysDictDataService;
@@ -28,7 +28,7 @@ public class SysDictLoader implements DataLoader {
 
     private final SysDictTypeService sysDictTypeService;
     private final SysDictDataService sysDictDataService;
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
 
     @Override
     public String getName() {
@@ -78,7 +78,7 @@ public class SysDictLoader implements DataLoader {
 
                     // 3. 将数据放入缓存
                     String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType.getDictType());
-                    redisKeyCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
+                    redisCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
 
                     successCount++;
 

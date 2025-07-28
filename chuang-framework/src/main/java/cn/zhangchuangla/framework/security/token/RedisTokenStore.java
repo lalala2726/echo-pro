@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisKeyCache;
+import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisTokenStore {
 
-    private final RedisKeyCache redisKeyCache;
+    private final RedisCache redisCache;
     private final SecurityProperties securityProperties;
 
 
@@ -32,7 +32,7 @@ public class RedisTokenStore {
      */
     protected void setAccessToken(String accessTokenSession, OnlineLoginUser onlineLoginUser) {
         String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
-        redisKeyCache.setCacheObject(accessTokenKey, onlineLoginUser,
+        redisCache.setCacheObject(accessTokenKey, onlineLoginUser,
                 securityProperties.getSession().getAccessTokenExpireTime());
     }
 
@@ -45,7 +45,7 @@ public class RedisTokenStore {
     protected void setRefreshToken(String refreshTokenSession, String accessTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
         //保存刷新令牌
-        redisKeyCache.setCacheObject(refreshTokenKey, accessTokenSession,
+        redisCache.setCacheObject(refreshTokenKey, accessTokenSession,
                 securityProperties.getSession().getRefreshTokenExpireTime());
     }
 
@@ -56,7 +56,7 @@ public class RedisTokenStore {
      */
     public OnlineLoginUser readAccessToken(String accessTokenSession) {
         String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
-        return redisKeyCache.getCacheObject(accessTokenKey);
+        return redisCache.getCacheObject(accessTokenKey);
     }
 
     /**
@@ -66,7 +66,7 @@ public class RedisTokenStore {
      */
     public String readRefreshToken(String refreshTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        return redisKeyCache.getCacheObject(refreshTokenKey);
+        return redisCache.getCacheObject(refreshTokenKey);
     }
 
     /**
@@ -76,7 +76,7 @@ public class RedisTokenStore {
      */
     protected void deleteAccessToken(String accessTokenSession) {
         String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
-        redisKeyCache.deleteObject(accessTokenKey);
+        redisCache.deleteObject(accessTokenKey);
     }
 
     /**
@@ -86,7 +86,7 @@ public class RedisTokenStore {
      */
     protected void deleteRefreshToken(String refreshTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        redisKeyCache.deleteObject(refreshTokenKey);
+        redisCache.deleteObject(refreshTokenKey);
     }
 
     /**
@@ -96,12 +96,12 @@ public class RedisTokenStore {
      */
     public void deleteRefreshTokenAndAccessToken(String refreshTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        redisKeyCache.deleteObject(refreshTokenKey);
+        redisCache.deleteObject(refreshTokenKey);
         // 删除关联的访问令牌
-        String accessToken = redisKeyCache.getCacheObject(refreshTokenKey);
+        String accessToken = redisCache.getCacheObject(refreshTokenKey);
         if (accessToken != null) {
             String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessToken;
-            redisKeyCache.deleteObject(accessTokenKey);
+            redisCache.deleteObject(accessTokenKey);
         }
     }
 
@@ -111,7 +111,7 @@ public class RedisTokenStore {
      * @param accessToken 访问令牌
      */
     public boolean isValidAccessToken(String accessToken) {
-        return redisKeyCache.exists(RedisConstants.Auth.USER_ACCESS_TOKEN + accessToken);
+        return redisCache.exists(RedisConstants.Auth.USER_ACCESS_TOKEN + accessToken);
     }
 
     /**
@@ -120,7 +120,7 @@ public class RedisTokenStore {
      * @param refreshToken 刷新令牌
      */
     public boolean isValidRefreshToken(String refreshToken) {
-        return redisKeyCache.exists(RedisConstants.Auth.USER_REFRESH_TOKEN + refreshToken);
+        return redisCache.exists(RedisConstants.Auth.USER_REFRESH_TOKEN + refreshToken);
     }
 
     /**
@@ -131,29 +131,29 @@ public class RedisTokenStore {
     public void mapRefreshTokenToAccessToken(String refreshTokenSession, String newAccessToken) {
         String refreshKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
         // 1. 验证 refreshKey 存在
-        if (!redisKeyCache.exists(refreshKey)) {
+        if (!redisCache.exists(refreshKey)) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 
         // 2. 取出旧的 accessToken
-        String oldAccessToken = redisKeyCache.getCacheObject(refreshKey);
+        String oldAccessToken = redisCache.getCacheObject(refreshKey);
         if (oldAccessToken == null) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 
         // 3. 拿到剩余 TTL
-        long ttlSeconds = redisKeyCache.getKeyExpire(refreshKey);
+        long ttlSeconds = redisCache.getKeyExpire(refreshKey);
         if (ttlSeconds <= 0) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 
         // 4. 删除旧的双向映射
         String oldAccessKey = RedisConstants.Auth.USER_ACCESS_TOKEN + oldAccessToken;
-        if (redisKeyCache.exists(oldAccessKey)) {
-            redisKeyCache.deleteObject(oldAccessKey);
+        if (redisCache.exists(oldAccessKey)) {
+            redisCache.deleteObject(oldAccessKey);
         }
         // a) refresh → access
-        redisKeyCache.setCacheObject(refreshKey, newAccessToken, ttlSeconds);
+        redisCache.setCacheObject(refreshKey, newAccessToken, ttlSeconds);
     }
 
 
