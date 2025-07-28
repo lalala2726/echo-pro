@@ -36,16 +36,4 @@ public class AuthTokenVo implements Serializable {
     @Schema(description = "刷新令牌")
     private String refreshToken;
 
-    /**
-     * 过期时间（单位：秒）
-     */
-    @Schema(description = "访问令牌过期时间(单位：秒)")
-    private Long accessTokenExpires;
-
-    /**
-     * 刷新令牌过期时间（单位：秒）
-     */
-    @Schema(description = "刷新令牌过期时间(单位：秒)")
-    private Long refreshTokenExpires;
-
 }

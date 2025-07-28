@@ -244,4 +244,14 @@ public class BaseController {
     }
 
 
+    /**
+     * 获取当前登录用户的访问令牌
+     *
+     * @return 访问令牌
+     */
+    protected String getToken() {
+        return SecurityUtils.getToken();
+    }
+
+
 }
