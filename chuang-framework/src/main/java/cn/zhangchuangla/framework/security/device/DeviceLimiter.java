@@ -98,17 +98,24 @@ public class DeviceLimiter {
         // 先清理过期的设备信息
         cleanOldIndex(loginDeviceDTO.getUsername());
 
-        // 检查登录数量限制
-        long limit = getLimit(loginDeviceDTO.getDeviceType());
-        if (limit == 0) {
-            throw new AuthorizationException(ResultCode.LOGIN_ERROR, String.format("暂不支持:%s 设备登录", loginDeviceDTO.getDeviceType()));
-        }
+        // 检查是否允许多设备登录
+        if (!securityProperties.getSession().isMultiDevice()) {
+            // 单设备登录模式：清除用户所有现有会话
+            clearAllUserSessions(loginDeviceDTO.getUsername());
+            log.info("用户 {} 单设备登录模式，已清除所有现有会话", loginDeviceDTO.getUsername());
+        } else {
+            // 多设备登录模式：检查设备数量限制
+            long limit = getLimit(loginDeviceDTO.getDeviceType());
+            if (limit == 0) {
+                throw new AuthorizationException(ResultCode.LOGIN_ERROR, String.format("暂不支持:%s 设备登录", loginDeviceDTO.getDeviceType()));
+            }
 
-        if (limit > 0) {
-            // 统计当前设备数量
-            long currentCount = countCurrentSessions(loginDeviceDTO.getUsername(), loginDeviceDTO.getDeviceType());
-            if (currentCount >= limit) {
-                clearEarliestSession(loginDeviceDTO.getUsername());
+            if (limit > 0) {
+                // 统计当前设备数量
+                long currentCount = countCurrentSessions(loginDeviceDTO.getUsername(), loginDeviceDTO.getDeviceType());
+                if (currentCount >= limit) {
+                    clearEarliestSession(loginDeviceDTO.getUsername());
+                }
             }
         }
 
@@ -116,6 +123,33 @@ public class DeviceLimiter {
         addSessionInternal(loginDeviceDTO);
     }
 
+    /**
+     * 清除用户所有会话（单设备登录模式使用）
+     *
+     * @param username 用户名
+     */
+    private void clearAllUserSessions(String username) {
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<ZSetOperations.TypedTuple<String>> allDeviceIndexSet = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
+
+        if (allDeviceIndexSet != null && !allDeviceIndexSet.isEmpty()) {
+            allDeviceIndexSet.forEach(tuple -> {
+                String refreshTokenId = tuple.getValue();
+                String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+
+                if (refreshTokenId != null) {
+                    // 删除刷新令牌和访问令牌
+                    redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+                    // 删除设备数据
+                    redisCache.deleteObject(deviceRedisKey);
+                }
+            });
+
+            // 清空索引
+            redisCache.deleteObject(deviceIndexRedisKey);
+            log.info("用户 {} 所有会话已清除，共清除 {} 个会话", username, allDeviceIndexSet.size());
+        }
+    }
 
     /**
      * 清除当前用户设备中最早的设备信息
@@ -170,7 +204,7 @@ public class DeviceLimiter {
             if (score != null && score <= needDeleteValue) {
                 String refreshTokenId = tuple.getValue();
                 String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-                //删除设备数据
+                //删除设备数
                 redisCache.deleteObject(deviceRedisKey);
                 //删除索引
                 redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
