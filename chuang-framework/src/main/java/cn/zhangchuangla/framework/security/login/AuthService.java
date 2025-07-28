@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.web.service;
+package cn.zhangchuangla.framework.security.login;
 
 import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
@@ -11,6 +11,7 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
+import cn.zhangchuangla.framework.async.AsyncLogService;
 import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
@@ -46,7 +47,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final AsyncService asyncService;
+    private final AsyncLogService asyncLogService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SysUserService sysUserService;
     private final DeviceLimiter deviceLimiter;
@@ -72,7 +73,7 @@ public class AuthService {
             // 使用异步服务记录登录失败日志
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-            asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
+            asyncLogService.recordLoginLog(request.getUsername(), ipAddr, userAgent, false);
             throw new LoginException("账号或密码错误!");
         }
         // 3. 认证成功后，生成 JWT 令牌（但还未添加到会话管理中）
@@ -108,7 +109,7 @@ public class AuthService {
         // 使用异步服务记录登录成功日志
         String ipAddr = IPUtils.getIpAddress(httpServletRequest);
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-        asyncService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
+        asyncLogService.recordLoginLog(request.getUsername(), ipAddr, userAgent, true);
 
         return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
     }

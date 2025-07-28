@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.web.service;
+package cn.zhangchuangla.framework.async;
 
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -23,7 +23,7 @@ import java.util.Date;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AsyncService {
+public class AsyncLogService {
 
     private final SysOperationLogService sysOperationLogService;
     private final SysLoginLogService sysLoginLogService;

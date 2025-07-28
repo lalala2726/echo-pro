@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.web.exception;
+package cn.zhangchuangla.framework.exception;
 
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResultCode;

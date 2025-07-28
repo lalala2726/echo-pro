@@ -1,4 +1,4 @@
-package cn.zhangchuangla.framework.web.service;
+package cn.zhangchuangla.framework.security.login;
 
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;

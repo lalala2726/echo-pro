@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.web.service.AsyncService;
+import cn.zhangchuangla.framework.async.AsyncLogService;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +48,10 @@ public class OperationLogAspect {
      * 标记当前线程是否是清空日志的操作，用于防止递归调用
      */
     private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
-    private final AsyncService asyncService;
+    private final AsyncLogService asyncLogService;
 
-    public OperationLogAspect(AsyncService asyncService) {
-        this.asyncService = asyncService;
+    public OperationLogAspect(AsyncLogService asyncLogService) {
+        this.asyncLogService = asyncLogService;
     }
 
     /**
@@ -162,7 +162,7 @@ public class OperationLogAspect {
             sysOperationLog.setCreateTime(new Date());
 
             // 使用Spring异步服务记录日志
-            asyncService.recordOperationLog(sysOperationLog);
+            asyncLogService.recordOperationLog(sysOperationLog);
             log.debug("操作日志已提交异步处理: {}", sysOperationLog.getModule());
 
         } catch (Exception e) {
