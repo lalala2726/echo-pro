@@ -36,11 +36,6 @@ public class SecurityProperties {
      */
     private String secret;
 
-    /**
-     * 过期时间
-     */
-    private Integer expire;
-
 
     @Data
     public static class PasswordConfig {
@@ -86,6 +81,11 @@ public class SecurityProperties {
          * false - 单设备登录（新登录挤掉旧会话）
          */
         private boolean multiDevice = true;
+
+        /**
+         * 令牌前缀 系统默认会给前缀和token之间拼接一个空格如: Bearer xxxxxxxx
+         */
+        private String tokenPrefix = "Bearer";
 
         /**
          * 登录频次限制：每用户每小时最多尝试登录次数，-1 表示不限制

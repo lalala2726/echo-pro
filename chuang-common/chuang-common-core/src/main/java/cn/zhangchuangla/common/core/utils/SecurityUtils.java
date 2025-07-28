@@ -35,6 +35,12 @@ public class SecurityUtils {
     private static final String HEADER = "Authorization";
 
     /**
+     * 令牌前缀
+     */
+    @Value("${security.session.token-prefix}")
+    private static final String TOKEN_PREFIX = "Bearer";
+
+    /**
      * 获取用户
      *
      * @return LoginUser
@@ -142,7 +148,11 @@ public class SecurityUtils {
      */
     public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        return request.getHeader(HEADER);
+        String header = request.getHeader(HEADER);
+        if (header != null && header.startsWith(TOKEN_PREFIX)) {
+            header = header.substring(TOKEN_PREFIX.length()).trim();
+        }
+        return header;
     }
 
     /**

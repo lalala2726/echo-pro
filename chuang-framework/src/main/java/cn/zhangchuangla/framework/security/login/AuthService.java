@@ -1,5 +1,6 @@
 package cn.zhangchuangla.framework.security.login;
 
+import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
@@ -56,6 +57,7 @@ public class AuthService {
     private final RedisTokenStore redisTokenStore;
     private final PasswordRetryLimiter passwordRetryLimiter;
     private final LoginFrequencyLimiter loginFrequencyLimiter;
+    private final SecurityProperties securityProperties;
 
     /**
      * 实现登录逻辑
@@ -133,7 +135,9 @@ public class AuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncLogService.recordLoginLog(username, ipAddr, userAgent, true);
 
-        return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
+        AuthTokenVo authTokenVo = BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
+        setAuthTokenInfo(authTokenVo);
+        return authTokenVo;
     }
 
     /**
@@ -156,5 +160,22 @@ public class AuthService {
         user.setCreateTime(new Date());
         sysUserService.save(user);
         return user.getUserId();
+    }
+
+
+    /**
+     * 设置认证令牌信息
+     *
+     * @param authTokenVo 认证令牌信息
+     */
+    public void setAuthTokenInfo(AuthTokenVo authTokenVo) {
+        long refreshTokenExpireTime = securityProperties.getSession().getRefreshTokenExpireTime();
+        long accessTokenExpireTime = securityProperties.getSession().getAccessTokenExpireTime();
+        authTokenVo.setAccessTokenExpires(refreshTokenExpireTime);
+        authTokenVo.setRefreshTokenExpires(accessTokenExpireTime);
+        String tokenPrefix = securityProperties.getSession().getTokenPrefix();
+        if (!tokenPrefix.isBlank()) {
+            authTokenVo.setAccessToken(tokenPrefix + " " + authTokenVo.getAccessToken());
+        }
     }
 }

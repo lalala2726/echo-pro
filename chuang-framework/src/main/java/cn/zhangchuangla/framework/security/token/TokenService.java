@@ -59,7 +59,6 @@ public class TokenService {
      * @return 包含JWT访问令牌和JWT刷新令牌的AuthenticationToken对象。
      */
 
-    // todo 这边内部不负责获取设备信息IP等信息,统一让上层统一传入!
     public LoginSessionDTO createToken(Authentication authentication) {
         // 获取当前用户的信息
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
@@ -192,7 +191,6 @@ public class TokenService {
         return AuthTokenVo.builder()
                 .accessToken(accessToken)
                 .refreshToken(jwtRefreshToken)
-                .expires(securityProperties.getSession().getAccessTokenExpireTime())
                 .build();
     }
 

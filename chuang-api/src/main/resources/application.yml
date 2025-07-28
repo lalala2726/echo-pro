@@ -66,3 +66,4 @@ security:
       unknown: 10
       mobile: -1
     multi-device: false
+    token-prefix: Bearer

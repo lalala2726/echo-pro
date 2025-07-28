@@ -48,6 +48,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = securityProperties.getHeader();
         String token = request.getHeader(header);
+        String tokenPrefix = securityProperties.getSession().getTokenPrefix();
         try {
             if (StringUtils.isNotBlank(token)) {
 
@@ -57,7 +58,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
                     return;
                 }
-
+                if (!tokenPrefix.isBlank()) {
+                    token = token.replace(tokenPrefix, "").trim();
+                }
                 // 将令牌解析为 Spring Security 上下文认证对象
                 Authentication authentication = tokenService.parseAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
