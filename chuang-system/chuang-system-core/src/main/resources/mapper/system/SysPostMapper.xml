@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.mapper.SysPostMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysPost">
-        <id property="postId" column="post_id"/>
+        <id property="id" column="id"/>
         <result property="postCode" column="post_code"/>
         <result property="postName" column="post_name"/>
         <result property="sort" column="sort"/>
@@ -15,11 +15,9 @@
         <result property="createBy" column="create_by"/>
         <result property="updateBy" column="update_by"/>
         <result property="remark" column="remark"/>
-        <result property="isDeleted" column="is_deleted"/>
     </resultMap>
     <select id="listPost" resultMap="BaseResultMap">
-        select post_id, post_code, post_name, sort, status, create_time, update_time, create_by, update_by, remark,
-        is_deleted
+        select id, post_code, post_name, sort, status, create_time, update_time, create_by, update_by, remark
         from sys_post
         <where>
             <if test="request.postCode != null and request.postCode != ''">
@@ -33,7 +31,6 @@
             </if>
         </where>
         order by sort desc
-
     </select>
 
 </mapper>

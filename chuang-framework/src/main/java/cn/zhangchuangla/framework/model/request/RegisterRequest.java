@@ -22,7 +22,6 @@ public class RegisterRequest {
      * 用户名
      */
     @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED)
-
     private String username;
 
     /**

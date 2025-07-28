@@ -1,13 +1,9 @@
 package cn.zhangchuangla.storage.service;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
-import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
-import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.request.config.*;
+import cn.zhangchuangla.storage.model.vo.config.StorageConfigUnifiedVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -29,78 +25,6 @@ public interface StorageConfigService extends IService<StorageConfig> {
      */
     Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request);
 
-
-    /**
-     * 根据id查询文件配置
-     *
-     * @param id 文件配置id
-     * @return 文件配置对象
-     */
-    StorageConfig getSysFileConfigById(Integer id);
-
-
-    /**
-     * 根据id删除文件配置
-     *
-     * @param id 文件配置id
-     * @return 操作结果
-     */
-    boolean deleteSysFileConfigById(Integer id);
-
-
-    /**
-     * 新增文件配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(StorageConfigAddRequest request);
-
-
-    /**
-     * 新增腾讯云COS配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(TencentCOSConfigRequest request);
-
-
-    /**
-     * 新增阿里云OSS配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(AliyunOSSConfigRequest request);
-
-
-    /**
-     * 新增亚马逊S3配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(AmazonS3ConfigRequest request);
-
-
-    /**
-     * 新增Minio配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean addStorageConfig(MinioConfigRequest request);
-
-
-    /**
-     * 修改文件配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    boolean updateFileConfigById(StorageConfigUpdateRequest request);
-
     /**
      * 判断存储key是否存在
      *
@@ -116,7 +40,7 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @param id 文件配置id
      * @return true 是主配置，false不是主配置
      */
-    boolean isMaster(Integer id);
+    boolean isPrimary(Integer id);
 
     /**
      * 读取主配置
@@ -150,4 +74,75 @@ public interface StorageConfigService extends IService<StorageConfig> {
      */
     boolean deleteFileConfig(List<Long> ids);
 
+    /**
+     * 添加Minio存储配置
+     *
+     * @param request 添加Minio存储配置参数
+     * @return 操作结果
+     */
+    boolean addMinioConfig(MinioConfigSaveRequest request);
+
+    /**
+     * 添加阿里云OSS存储配置
+     *
+     * @param request 添加阿里云OSS存储配置参数
+     * @return 操作结果
+     */
+    boolean addAliyunOssConfig(AliyunOssConfigSaveRequest request);
+
+    /**
+     * 添加腾讯云COS存储配置
+     *
+     * @param request 添加腾讯云COS存储配置参数
+     * @return 操作结果
+     */
+    boolean addTencentCosConfig(TencentCosConfigSaveRequest request);
+
+    /**
+     * 添加AmazonS3存储配置
+     *
+     * @param request 添加AmazonS3存储配置参数
+     * @return 操作结果
+     */
+    boolean addAmazonS3Config(AmazonS3ConfigSaveRequest request);
+
+    /**
+     * 获取文件存储配置
+     *
+     * @param id 文件存储配置ID
+     * @return 文件存储配置
+     */
+    StorageConfigUnifiedVo getStorageConfigById(Long id);
+
+    /**
+     * 修改存储配置
+     *
+     * @param request 修改存储配置参数
+     * @return 修改结果
+     */
+    boolean updateStorageConConfig(StorageConfigUpdateRequest request);
+
+    /**
+     * 检查存储配置键值是否已存在
+     *
+     * @param id         存储配置ID
+     * @param storageKey 存储配置键值
+     * @return 是否已存在
+     */
+    boolean isStorageKeyExists(Long id, String storageKey);
+
+    /**
+     * 获取存储配置列表
+     *
+     * @param request 存储配置查询参数
+     * @return 存储配置列表
+     */
+    List<StorageConfigUnifiedVo> listStorageConfig(StorageConfigQueryRequest request);
+
+    /**
+     * 获取存储配置键值选项
+     *
+     * @return 存储配置键值选项
+     */
+    List<Option<String>> getStorageConfigKeyOption();
 }

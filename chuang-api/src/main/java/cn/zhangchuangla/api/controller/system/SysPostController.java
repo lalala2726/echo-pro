@@ -1,9 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysPost;
 import cn.zhangchuangla.system.model.request.post.SysPostAddRequest;
@@ -79,12 +80,13 @@ public class SysPostController extends BaseController {
      * @param ids 岗位ID集合，支持批量删除
      * @return 操作结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @PreAuthorize("@ss.hasPermission('system:post:remove')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除") @PathVariable("ids") List<Long> ids) {
-        checkParam(ids == null, "id不能为空");
+        Assert.notEmpty(ids, "岗位ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "岗位ID必须大于0！");
         boolean result = sysPostService.deletePost(ids);
         return toAjax(result);
     }
@@ -110,11 +112,11 @@ public class SysPostController extends BaseController {
      * @param id 岗位ID
      * @return 操作结果
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID") @PathVariable("id") Long id) {
-        checkParam(id == null, "id不能为空");
+        Assert.isTrue(id > 0, "岗位ID必须大于0！");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = new SysPostVo();
         BeanUtils.copyProperties(post, sysPostVo);

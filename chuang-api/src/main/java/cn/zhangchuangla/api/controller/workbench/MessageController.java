@@ -1,8 +1,9 @@
 package cn.zhangchuangla.api.controller.workbench;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.message.model.request.UserMessageListQueryRequest;
@@ -60,11 +61,11 @@ public class MessageController extends BaseController {
      * @param id 消息ID
      * @return 消息详情
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据消息ID获取消息详情，当成功请求此接口后系统将自动将消息标记已读，无须单独调用已读消息的接口")
     public AjaxResult<UserMessageVo> getMessageById(
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
-        checkParam(id == null || id <= 0, "消息ID不能小于等于0");
+        Assert.isTrue(id > 0, "消息ID必须大于0！");
         UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
         if (userMessageVo == null) {
             return error("消息不存在");
@@ -93,12 +94,12 @@ public class MessageController extends BaseController {
      * @param ids 消息ID列表
      * @return 操作结果
      */
-    @PutMapping("/read/{ids}")
+    @PutMapping("/read/{ids:[\\d,]+}")
     @Operation(summary = "标记消息为已读")
     public AjaxResult<Void> markMessageAsRead(
             @Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-
+        Assert.notEmpty(ids, "消息ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         // 批量标记已读，不记录阅读时间
         Long userId = getUserId();
         boolean result = userMessageReadService
@@ -113,12 +114,12 @@ public class MessageController extends BaseController {
      * @param ids 消息ID列表
      * @return 操作结果
      */
-    @PutMapping("/unread/{ids}")
+    @PutMapping("/unread/{ids:[\\d,]+}")
     @Operation(summary = "标记消息为未读")
     public AjaxResult<Void> markMessageAsUnRead(
             @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
-        ids.forEach(id -> checkParam(id == null || id <= 0, "消息ID不能小于等于0"));
-
+        Assert.notEmpty(ids, "部门ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "部门ID必须大于0！");
         // 标记未读，保留阅读时间记录
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
@@ -132,10 +133,10 @@ public class MessageController extends BaseController {
      * @param ids 消息ID集合
      * @return 操作结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除消息")
     public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
-        checkParam(ids == null || ids.isEmpty(), "消息ID不能为空!");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         boolean result = sysMessageService.deleteMessages(ids);
         return toAjax(result);
     }

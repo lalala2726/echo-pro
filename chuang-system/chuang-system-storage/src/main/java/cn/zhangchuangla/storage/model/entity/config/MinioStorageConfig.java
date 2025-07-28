@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.model.entity.config;
 
-import cn.zhangchuangla.common.core.annotation.DataMasking;
+import com.alibaba.fastjson2.JSON;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,7 +34,6 @@ public class MinioStorageConfig implements Serializable {
     /**
      * 密钥
      */
-    @DataMasking(prefixKeep = 3, suffixKeep = 3)
     private String secretKey;
 
     /**
@@ -56,6 +55,15 @@ public class MinioStorageConfig implements Serializable {
      * 是否真实删除
      */
     private boolean realDelete;
+
+    /**
+     * 转换成JSON字符串
+     *
+     * @return JSON字符串
+     */
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 
 
 }

@@ -22,11 +22,11 @@
         dict_type,
         dict_name,
         status,
+        remark,
         create_time,
         update_time,
         create_by,
-        update_by,
-        remark
+        update_by
         FROM sys_dict_type
         <where>
             <if test="request != null">
@@ -37,7 +37,13 @@
                     AND dict_name LIKE CONCAT('%', #{request.dictName}, '%')
                 </if>
                 <if test="request.status != null">
-                    AND `status` = #{request.status}
+                    AND status = #{request.status}
+                </if>
+                <if test="request.startTime != null">
+                    AND date(create_time) >= #{request.startTime}
+                </if>
+                <if test="request.endTime != null">
+                    AND date(create_time) &lt;= #{request.endTime}
                 </if>
             </if>
         </where>

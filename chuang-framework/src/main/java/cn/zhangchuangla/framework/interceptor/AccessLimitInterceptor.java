@@ -2,7 +2,7 @@ package cn.zhangchuangla.framework.interceptor;
 
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.AccessType;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.TooManyRequestException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -104,13 +104,13 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 
             // 如果执行结果为0，表示超过访问限制
             if (result == 0) {
-                String ip = IPUtils.getIpAddr(request);
+                String ip = IPUtils.getIpAddress(request);
                 String uri = request.getRequestURI();
                 log.warn("接口访问频率超限 - IP: {}, URI: {}, 限制: {}次/{}秒, 限流类型: {}",
                         ip, uri, maxCount, limitPeriod, limitType.getDescription());
 
                 // 直接抛出异常，由全局异常处理器处理
-                throw new TooManyRequestException(ResponseCode.TOO_MANY_REQUESTS, message);
+                throw new TooManyRequestException(ResultCode.TOO_MANY_REQUESTS, message);
             }
         } catch (TooManyRequestException e) {
             // 直接将TooManyRequestException向上抛出
@@ -142,7 +142,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
         switch (limitType) {
             // IP限流模式
             case IP -> {
-                String ipAddress = IPUtils.getIpAddr(request);
+                String ipAddress = IPUtils.getIpAddress(request);
                 keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
             // 用户ID限流模式
@@ -154,7 +154,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
                             .append(":").append(sysUserDetails.getUserId());
                 } catch (Exception e) {
                     // 未登录用户，默认降级为IP限流
-                    String ipAddress = IPUtils.getIpAddr(request);
+                    String ipAddress = IPUtils.getIpAddress(request);
                     keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
                     log.debug("用户未登录，降级为IP限流: {}", ipAddress);
                 }
@@ -166,7 +166,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             }
             default -> {
                 // 默认采用IP限流
-                String ipAddress = IPUtils.getIpAddr(request);
+                String ipAddress = IPUtils.getIpAddress(request);
                 keyBuilder.append(RedisConstants.ACCESS_LIMIT_IP).append(baseKey).append(":").append(ipAddress);
             }
         }

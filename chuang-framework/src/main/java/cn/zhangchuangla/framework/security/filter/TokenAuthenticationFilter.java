@@ -2,9 +2,9 @@ package cn.zhangchuangla.framework.security.filter;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.utils.ResponseUtils;
-import cn.zhangchuangla.framework.security.token.TokenManager;
+import cn.zhangchuangla.framework.security.token.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +29,12 @@ import java.util.Arrays;
 @Slf4j
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private TokenManager tokenManager;
+
     @Autowired
     private SecurityProperties securityProperties;
 
+    @Autowired
+    private TokenService tokenService;
 
     /**
      * 校验Token，包括验签和是否过期
@@ -47,24 +48,27 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = securityProperties.getHeader();
         String token = request.getHeader(header);
+        String tokenPrefix = securityProperties.getSession().getTokenPrefix();
         try {
             if (StringUtils.isNotBlank(token)) {
 
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
-                boolean isValidToken = tokenManager.validateAccessToken(token);
+                boolean isValidToken = tokenService.validateAccessToken(token);
                 if (!isValidToken) {
-                    ResponseUtils.writeErrMsg(response, ResponseCode.ACCESS_TOKEN_INVALID);
+                    ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
                     return;
                 }
-
+                if (!tokenPrefix.isBlank()) {
+                    token = token.replace(tokenPrefix, "").trim();
+                }
                 // 将令牌解析为 Spring Security 上下文认证对象
-                Authentication authentication = tokenManager.parseToken(token);
+                Authentication authentication = tokenService.parseAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
             // 安全上下文清除保障（防止上下文残留）
             SecurityContextHolder.clearContext();
-            ResponseUtils.writeErrMsg(response, ResponseCode.ACCESS_TOKEN_INVALID);
+            ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
             return;
         }
 

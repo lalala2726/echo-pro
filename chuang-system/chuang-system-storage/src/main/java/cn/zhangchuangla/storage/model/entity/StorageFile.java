@@ -1,0 +1,125 @@
+package cn.zhangchuangla.storage.model.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
+/**
+ * 文件上传记录表
+ *
+ * @author Chuang
+ */
+@TableName(value = "storage_file")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StorageFile {
+
+    /**
+     * 主键ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * 原始文件名
+     */
+    private String originalName;
+
+    /**
+     * 当前文件名
+     */
+    private String fileName;
+
+    /**
+     * 文件类型，如 image/jpeg, application/pdf 等
+     */
+    private String contentType;
+
+    /**
+     * 文件大小，单位字节
+     */
+    private Long fileSize;
+
+    /**
+     * 原始文件URL，直接访问地址
+     */
+    private String originalFileUrl;
+
+    /**
+     * 原始文件相对路径，存储在服务器上的路径
+     */
+    private String originalRelativePath;
+
+    /**
+     * 预览图
+     */
+    private String previewImageUrl;
+
+    /**
+     * 压缩文件相对路径，存储在服务器上的路径
+     */
+    private String previewRelativePath;
+
+    /**
+     * 文件扩展名
+     */
+    private String fileExtension;
+
+    /**
+     * 存储类型 (LOCAL/MINIO/ALIYUN_OSS)
+     */
+    private String storageType;
+
+    /**
+     * 存储桶名称
+     */
+    private String bucketName;
+
+    /**
+     * 上传者ID
+     */
+    private Long uploaderId;
+
+    /**
+     * 上传者名称
+     */
+    private String uploaderName;
+
+    /**
+     * 上传时间
+     */
+    private Date uploadTime;
+
+    /**
+     * 是否删除 (0-未删除, 1-已删除)
+     */
+    private Integer isDeleted;
+
+    /**
+     * 源文件回收站路径
+     */
+    private String originalTrashPath;
+
+    /**
+     * 预览图文件回收站路径
+     */
+    private String previewTrashPath;
+
+    /**
+     * 是否回收站 (0-否, 1-是)
+     */
+    private Integer isTrash = 0;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+}

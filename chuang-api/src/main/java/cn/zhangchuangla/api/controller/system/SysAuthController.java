@@ -1,12 +1,15 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
-import cn.zhangchuangla.common.core.entity.security.AuthenticationToken;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.RefreshTokenRequest;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
-import cn.zhangchuangla.framework.web.service.SysAuthService;
+import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.security.UserSecurityManager;
+import cn.zhangchuangla.framework.security.login.AuthService;
+import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.model.vo.user.UserInfoVo;
 import cn.zhangchuangla.system.service.SysRoleService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -35,9 +38,29 @@ import java.util.Set;
 @RequestMapping("/auth")
 public class SysAuthController extends BaseController {
 
-    private final SysAuthService sysAuthService;
+    private final AuthService authService;
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
+    private final TokenService tokenService;
+    private final UserSecurityManager userSecurityManager;
+
+
+    /**
+     * 注册
+     *
+     * @param request 注册请求参数
+     * @return 返回注册结果，成功返回用户ID
+     */
+    @PostMapping("/register")
+    @Operation(summary = "注册")
+    public AjaxResult<Long> register(@Parameter(description = "注册参数", required = true)
+                                     @Validated @RequestBody RegisterRequest request) {
+        request.setUsername(request.getUsername().trim());
+        request.setPassword(request.getPassword().trim());
+        Long userId = authService.register(request);
+        log.info("用户注册成功，用户ID：{}", userId);
+        return success(userId);
+    }
 
     /**
      * 登录
@@ -47,16 +70,11 @@ public class SysAuthController extends BaseController {
      */
     @PostMapping("/login")
     @Operation(summary = "登录")
-    public AjaxResult<AuthenticationToken> login(
+    public AjaxResult<AuthTokenVo> login(
             @Parameter(name = "登录参数", required = true) @Validated @RequestBody LoginRequest loginRequest,
             @Parameter(name = "请求对象", required = true) HttpServletRequest request) {
-        // 1. 校验验证码
-//        String code = redisCache.getCacheObject(RedisConstants.CAPTCHA_CODE + loginRequest.getCaptchaKey());
-//        if (!loginRequest.getCaptchaCode().equals(code)) {
-//            return error("验证码错误");
-//        }
-        AuthenticationToken authenticationToken = sysAuthService.login(loginRequest, request);
-        return success(authenticationToken);
+        AuthTokenVo authTokenVo = authService.login(loginRequest, request);
+        return success(authTokenVo);
     }
 
     /**
@@ -65,11 +83,11 @@ public class SysAuthController extends BaseController {
      * @param request 刷新令牌
      * @return 新的token
      */
-    @PostMapping("/refreshToken")
+    @PostMapping("/refresh")
     @Operation(summary = "刷新token")
-    public AjaxResult<AuthenticationToken> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
-        AuthenticationToken newAuthenticationToken = sysAuthService.refreshToken(request);
-        return success(newAuthenticationToken);
+    public AjaxResult<AuthTokenVo> refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
+        AuthTokenVo newAuthTokenVo = tokenService.refreshToken(request.getRefreshToken());
+        return success(newAuthTokenVo);
     }
 
 
@@ -101,8 +119,9 @@ public class SysAuthController extends BaseController {
     @DeleteMapping("/logout")
     @Operation(summary = "退出登录")
     public AjaxResult<Void> logout() {
-        sysAuthService.logout();
-        return success();
+        String token = getToken();
+        boolean result = userSecurityManager.logoutByToken(token);
+        return toAjax(result);
     }
 
 }

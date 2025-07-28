@@ -34,17 +34,10 @@ public class LoginRequest {
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "Abc123456!")
     private String password;
 
-    /**
-     * 验证码KEY
-     */
-//    @NotBlank(message = "验证码KEY不能为空!")
-    @Schema(description = "验证码KEY", requiredMode = Schema.RequiredMode.REQUIRED, example = "captchaKey")
-    private String captchaKey;
 
     /**
-     * 验证码
+     * 设备类型
      */
-//    @NotBlank(message = "验证码不能为空!")
-    @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "captchaCode")
-    private String captchaCode;
+    @Schema(description = "设备信息", requiredMode = Schema.RequiredMode.REQUIRED)
+    private DeviceInfoRequest deviceInfo;
 }

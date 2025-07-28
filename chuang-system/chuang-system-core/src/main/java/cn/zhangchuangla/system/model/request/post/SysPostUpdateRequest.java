@@ -1,9 +1,6 @@
 package cn.zhangchuangla.system.model.request.post;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -20,8 +17,7 @@ public class SysPostUpdateRequest {
      * 岗位ID
      */
     @Schema(description = "岗位ID", example = "1", type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1, message = "岗位ID必须大于等于1")
-    private Integer postId;
+    private Long id;
 
     /**
      * 岗位编码
@@ -47,7 +43,6 @@ public class SysPostUpdateRequest {
      */
     @Schema(description = "状态(0-正常,1-停用)", example = "0", type = "integer")
     @Range(min = 0, max = 1, message = "状态只能为0或1")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
 }

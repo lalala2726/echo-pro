@@ -5,6 +5,7 @@ import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -120,4 +121,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 角色信息
      */
     SysRole getRoleInfoById(Long id);
+
+    /**
+     * 更新角色权限信息
+     *
+     * @param request 更新角色权限信息请求
+     * @return 是否更新成功
+     */
+    boolean updateRolePermission(SysUpdateRolePermissionRequest request);
 }

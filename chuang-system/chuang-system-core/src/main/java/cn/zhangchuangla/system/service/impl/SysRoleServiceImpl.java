@@ -2,17 +2,21 @@ package cn.zhangchuangla.system.service.impl;
 
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysRoleMapper;
+import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.model.request.role.SysRoleUpdateRequest;
+import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest;
+import cn.zhangchuangla.system.service.SysMenuService;
 import cn.zhangchuangla.system.service.SysRoleMenuService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -42,6 +46,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleMenuService sysRoleMenuService;
     private final RedisCache redisCache;
+    private final SysMenuService sysMenuService;
 
     /**
      * 角色列表
@@ -75,7 +80,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByUserId(Long userId) {
         if (userId <= 0) {
-            throw new ParamException(ResponseCode.INVALID_ROLE_ID, "用户ID无效");
+            throw new ParamException("用户ID无效");
         }
 
         String cacheKey = RedisConstants.Auth.ROLE_KEY + userId;
@@ -146,12 +151,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public boolean updateRoleInfo(SysRoleUpdateRequest request) {
         SysRole role = getById(request.getId());
         if (role == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "角色不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "角色不存在");
         }
         // 检查是否包含超级管理员角色
         boolean contains = SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey());
         if (contains) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许修改");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(request, sysRole);
@@ -183,7 +188,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<Long> getUserRoleIdByUserId(Long userId) {
         if (userId <= 0) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于0");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能小于等于0");
         }
         List<SysRole> roleList = getRoleListByUserId(userId);
         if (roleList == null) {
@@ -204,20 +209,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteRoleInfo(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
-            throw new ServiceException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
+            throw new ServiceException(ResultCode.PARAM_ERROR, "角色ID不能为空");
         }
 
         // 检查是否包含超级管理员角色
         List<SysRole> roles = listByIds(ids);
         if (roles.stream().anyMatch(role -> SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "超级管理员角色不允许删除");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许删除");
         }
 
         // 检查角色是否已分配菜单
         LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
         List<SysRoleMenu> list = sysRoleMenuService.list(eq);
         if (list != null && !list.isEmpty()) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "角色已分配用户，不能删除");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "角色已分配用户，不能删除");
         }
 
         return removeByIds(ids);
@@ -232,7 +237,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByRoleId(List<Long> roleId) {
         if (roleId == null || roleId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID集合不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "角色ID集合不能为空");
         }
         LambdaQueryWrapper<SysRole> sysRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         sysRoleLambdaQueryWrapper.in(SysRole::getId, roleId);
@@ -268,9 +273,51 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public SysRole getRoleInfoById(Long id) {
         SysRole sysRole = getById(id);
         if (sysRole == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, String.format("ID:【%s】的角色不存在", id));
         }
         return sysRole;
+    }
+
+    /**
+     * 更新角色权限信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
+        SysRole role = getById(request.getRoleId());
+        Assert.isTrue(role != null, String.format("ID:【%s】的角色不存在", request.getRoleId()));
+        Assert.isTrue(!SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()), "超级管理员角色不允许修改权限");
+
+        // 获取所有菜单ID，过滤非法ID
+        Set<Long> validMenuIds = sysMenuService.list()
+                .stream()
+                .map(SysMenu::getId)
+                .collect(Collectors.toSet());
+
+        List<Long> allocatedMenuId = request.getAllocatedMenuId()
+                .stream()
+                .filter(validMenuIds::contains)
+                .distinct()
+                .toList();
+
+        // 删除旧权限（即使是空，也视为成功）
+        sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>()
+                .eq(SysRoleMenu::getRoleId, role.getId()));
+
+        // 如果有新权限则插入
+        if (!allocatedMenuId.isEmpty()) {
+            List<SysRoleMenu> roleMenusToInsert = allocatedMenuId.stream()
+                    .map(id -> {
+                        SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                        sysRoleMenu.setRoleId(request.getRoleId());
+                        sysRoleMenu.setMenuId(id);
+                        return sysRoleMenu;
+                    }).toList();
+            return sysRoleMenuService.saveBatch(roleMenusToInsert);
+        }
+
+        // 没有分配新权限，视为操作成功
+        return true;
     }
 
 }

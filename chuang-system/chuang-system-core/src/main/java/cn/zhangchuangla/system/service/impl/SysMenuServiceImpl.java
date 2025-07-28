@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.service.impl;
 import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -76,10 +76,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public boolean addMenu(SysMenuAddRequest request) {
         if (isMenuNameExists(null, request.getName())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
         }
         if (isMenuPathExists(null, request.getPath())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
@@ -104,10 +104,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public boolean updateMenu(SysMenuUpdateRequest request) {
         if (isMenuNameExists(request.getId(), request.getName())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
         }
         if (isMenuPathExists(request.getId(), request.getPath())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
@@ -131,11 +131,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     public boolean deleteMenu(Long menuId) {
         //判断当前是否包含子菜单
         if (hasChildren(menuId)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单包含子菜单，请先删除子菜单");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前菜单包含子菜单，请先删除子菜单");
         }
         //判断当前菜单是否已分配
         if (sysRoleMenuService.isMenuAssignedToRoles(menuId)) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "当前菜单已分配，请先解除分配");
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前菜单已分配，请先解除分配");
         }
         return removeById(menuId);
     }
@@ -177,7 +177,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         int statusEnable = 0;
         return menuList.stream()
                 .filter(menu -> parentId.equals(menu.getParentId()))
+                //菜单状态为启用
                 .filter(menu -> menu.getStatus() == statusEnable)
+                //按钮类型不进行生成
+                .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getType()))
+                //排序
                 .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
                     RouterVo routerVo = new RouterVo();
@@ -204,20 +208,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 路由元信息
      */
     private MetaVo setMateVo(SysMenu sysMenu) {
-        MetaVo metaVo = new MetaVo();
-        metaVo.setTitle(sysMenu.getTitle());
-        metaVo.setOrder(sysMenu.getSort());
-        metaVo.setIcon(sysMenu.getIcon());
-        metaVo.setActivePath(sysMenu.getActivePath());
-        metaVo.setActiveIcon(sysMenu.getActiveIcon());
-        metaVo.setBadge(sysMenu.getBadge());
-        metaVo.setBadgeType(sysMenu.getBadgeType());
-        metaVo.setBadgeVariants(sysMenu.getBadgeVariants());
-        metaVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
-        metaVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
-        metaVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
-        metaVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
-
+        MetaVo metaVo = BeanCotyUtils.copyProperties(sysMenu, MetaVo.class);
 
         // 处理链接
         if (Constants.MenuConstants.TYPE_EXTERNAL.equals(sysMenu.getType())) {
@@ -266,6 +257,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     @Override
     public boolean isMenuPathExists(Long id, String path) {
+        if (path.isBlank()) {
+            return false;
+        }
         LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<SysMenu>()
                 .eq(SysMenu::getPath, path);
         if (id != null) {

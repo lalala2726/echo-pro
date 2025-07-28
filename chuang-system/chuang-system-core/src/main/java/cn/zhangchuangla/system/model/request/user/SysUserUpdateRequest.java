@@ -2,8 +2,6 @@ package cn.zhangchuangla.system.model.request.user;
 
 import cn.zhangchuangla.common.core.annotation.ValidRegex;
 import cn.zhangchuangla.common.core.constant.RegularConstants;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -66,8 +64,8 @@ public class SysUserUpdateRequest {
      * 密码
      */
     @Schema(description = "登录密码", example = "Abc123456!")
-    @ValidRegex(regexp = RegularConstants.User.PASSWORD, message = "密码格式不正确")
     private String password;
+
 
     /**
      * 昵称
@@ -86,8 +84,6 @@ public class SysUserUpdateRequest {
      * 状态
      */
     @Schema(description = "账号状态 0-禁用 1-启用", example = "1")
-    @Range(min = 0, max = 1, message = "用户状态不正确")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**

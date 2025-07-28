@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 操作日志服务实现类
  *
@@ -58,6 +60,17 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
     @Override
     public SysOperationLog getOperationLogById(Long id) {
         return getById(id);
+    }
+
+    /**
+     * 导出操作日志
+     *
+     * @param request 请求对象
+     * @return 操作日志列表
+     */
+    @Override
+    public List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request) {
+        return sysOperationLogMapper.listOperationLog(request);
     }
 }
 

@@ -3,12 +3,12 @@ package cn.zhangchuangla.system.model.request.user;
 import cn.zhangchuangla.common.core.annotation.ValidRegex;
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDate;
 
 
 /**
@@ -33,7 +33,6 @@ public class SysUserQueryRequest extends BasePageRequest {
      * 部门ID
      */
     @Schema(description = "部门ID", example = "1")
-    @Min(value = 1, message = "部门ID不能小于1")
     private Long deptId;
 
     /**
@@ -66,7 +65,6 @@ public class SysUserQueryRequest extends BasePageRequest {
      * 状态
      */
     @Schema(description = "状态", example = "1")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
@@ -86,5 +84,21 @@ public class SysUserQueryRequest extends BasePageRequest {
      */
     @Schema(description = "修改人", example = "admin")
     private String updateBy;
+
+
+    /**
+     * 开始时间
+     */
+    @Schema(description = "开始时间", example = "2023-01-01", type = "string", format = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate startTime;
+
+    /**
+     * 结束时间
+     */
+    @Schema(description = "结束时间", example = "2023-01-01", type = "string", format = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate endTime;
+
 
 }

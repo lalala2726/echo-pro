@@ -117,19 +117,9 @@ public class StorageConstants {
      */
     public interface dataVerifyConstants {
         /**
-         * 不是文件上传主配置
+         * 文件上传主配置
          */
-        Integer IS_NOT_FILE_UPLOAD_MASTER = 0;
-
-        /**
-         * 是文件上传主配置
-         */
-        Integer IS_FILE_UPLOAD_MASTER = 1;
-
-        /**
-         * 文件已删除
-         */
-        Integer FILE_DELETED = 1;
+        boolean PRIMARY = true;
 
         /**
          * 在回收站

@@ -48,7 +48,7 @@ public class SysRoleListVo {
      * 状态
      */
     @Schema(description = "状态")
-    @Excel(name = "状态", dictType = "system_common_status", sort = 5, width = 10)
+    @Excel(name = "状态", dictKey = "system_common_status", sort = 5, width = 10)
     private Integer status;
 
     /**

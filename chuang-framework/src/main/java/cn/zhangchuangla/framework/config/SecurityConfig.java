@@ -1,14 +1,9 @@
 package cn.zhangchuangla.framework.config;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.utils.ServletUtils;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
-import cn.zhangchuangla.framework.security.token.TokenManager;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -87,8 +81,7 @@ public class SecurityConfig {
                 //.requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // 统一异常处理：未认证和访问拒绝
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler()))
+                        .authenticationEntryPoint(authenticationEntryPoint))
                 // 无状态会话
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 安全头增强：HSTS、CSP、XSS 保护
@@ -147,28 +140,13 @@ public class SecurityConfig {
      * 将 TokenAuthenticationFilter 声明为 Bean
      * 这样可以由 Spring 管理其生命周期，并允许注入其他依赖
      *
-     * @param tokenManager Token管理器
      * @return TokenAuthenticationFilter 实例
      */
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter(TokenManager tokenManager) {
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter();
     }
 
-    /**
-     * 自定义 AccessDeniedHandler Bean
-     * 统一返回 403 JSON 响应
-     *
-     * @return AccessDeniedHandler 实例
-     */
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            String format = String.format("请求访问:%s 权限不足，无法访问系统资源", request.getRequestURI());
-            ServletUtils.renderString(response, JSON.toJSONString(
-                    AjaxResult.error(ResponseCode.FORBIDDEN, format)));
-        };
-    }
 
     /**
      * CORS (跨域资源共享) 配置

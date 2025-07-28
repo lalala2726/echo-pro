@@ -5,6 +5,8 @@ import cn.zhangchuangla.system.model.request.log.SysOperationLogQueryRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * 系统操作日志接口
  *
@@ -34,4 +36,12 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
      * @return 操作日志详情
      */
     SysOperationLog getOperationLogById(Long id);
+
+    /**
+     * 导出操作日志
+     *
+     * @param request 请求对象
+     * @return 操作日志列表
+     */
+    List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request);
 }

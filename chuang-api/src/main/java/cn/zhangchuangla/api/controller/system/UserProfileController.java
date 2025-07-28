@@ -1,8 +1,14 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.result.AjaxResult;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.framework.model.entity.SessionDevice;
+import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
+import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
@@ -10,10 +16,7 @@ import cn.zhangchuangla.system.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Chuang
@@ -22,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @RequestMapping("/system/user/profile")
 @RequiredArgsConstructor
+@RestController
 public class UserProfileController extends BaseController {
 
     private final SysUserService sysUserService;
+    private final DeviceService deviceService;
 
     /**
      * 获取用户信息
@@ -37,6 +42,32 @@ public class UserProfileController extends BaseController {
     public AjaxResult<UserProfileVo> userProfile() {
         UserProfileVo profileVo = sysUserService.getUserProfile();
         return success(profileVo);
+    }
+
+    /**
+     * 获取用户设备列表
+     *
+     * @return 设备列表
+     */
+    @Operation(summary = "获取用户设备列表")
+    @GetMapping("/devices")
+    public AjaxResult<TableDataResult> getUserDeviceList(SessionDeviceQueryRequest request) {
+        String username = getUsername();
+        PageResult<SessionDevice> deviceListByUsername = deviceService.getDeviceListByUsername(username, request);
+        return getTableData(deviceListByUsername);
+    }
+
+    /**
+     * 删除用户设备
+     *
+     * @param refreshTokenId 刷新令牌ID
+     * @return 删除结果
+     */
+    @DeleteMapping("/device/{refreshTokenId}")
+    @Operation(summary = "删除用户设备")
+    public AjaxResult<Void> deleteDevice(@PathVariable("refreshTokenId") String refreshTokenId) {
+        String username = SecurityUtils.getUsername();
+        return deviceService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
     }
 
 

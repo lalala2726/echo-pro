@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
@@ -9,7 +9,7 @@ import cn.zhangchuangla.storage.core.service.OperationService;
 import cn.zhangchuangla.storage.core.service.StorageConfigRetrievalService;
 import cn.zhangchuangla.storage.model.dto.FileOperationDto;
 import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import cn.zhangchuangla.storage.utils.AliyunOssOperationUtils;
 import cn.zhangchuangla.storage.utils.StorageUtils;
 import com.alibaba.fastjson2.JSON;
@@ -43,7 +43,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
     // 内部管理的OSS客户端，支持动态创建和缓存
     private volatile OSS ossClient;
-    private volatile AliyunOSSStorageConfig aliyunOssStorageConfig;
+    private volatile AliyunOssStorageConfig aliyunOssStorageConfig;
 
     /**
      * 获取当前存储配置
@@ -51,9 +51,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      *
      * @return 阿里云OSS存储配置
      */
-    public AliyunOSSStorageConfig getConfig() {
+    public AliyunOssStorageConfig getConfig() {
         String json = getStorageConfigJson();
-        AliyunOSSStorageConfig newConfig = JSON.parseObject(json, AliyunOSSStorageConfig.class);
+        AliyunOssStorageConfig newConfig = JSON.parseObject(json, AliyunOssStorageConfig.class);
 
         // 检查配置是否发生变化，如果变化则重置客户端
         if (configChanged(newConfig)) {
@@ -96,7 +96,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      * @param newConfig 新配置
      * @return 是否发生变化
      */
-    private boolean configChanged(AliyunOSSStorageConfig newConfig) {
+    private boolean configChanged(AliyunOssStorageConfig newConfig) {
         if (aliyunOssStorageConfig == null) {
             return true;
         }
@@ -148,23 +148,23 @@ public class AliyunOssOperationServiceImpl implements OperationService {
             String newFileName = StorageUtils.generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
 
             // 构建OSS对象路径：日期目录/file/文件名
-            String objectPath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName).toString().replace("\\", "/");
+            String path = StorageUtils.joinUrl(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.FILE, newFileName);
 
             // 获取OSS客户端并确保存储桶存在
             OSS client = getOssClient();
             aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
 
             // 上传文件到阿里云OSS - 核心上传逻辑
-            aliyunOssOperationUtils.uploadFile(client, bucketName, objectPath, file.getInputStream(), file.getSize(), file.getContentType());
+            aliyunOssOperationUtils.uploadFile(client, bucketName, path, file.getInputStream(), file.getSize(), file.getContentType());
 
-            log.info("文件上传成功到阿里云OSS: {}/{}", bucketName, objectPath);
+            log.info("文件上传成功到阿里云OSS: {}/{}", bucketName, path);
 
             // 构建文件信息返回给调用方
-            return buildFileInfo(file, objectPath, newFileName);
+            return buildFileInfo(file, path, newFileName);
 
         } catch (Exception e) {
             log.error("阿里云OSS文件上传失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
         }
     }
 
@@ -191,10 +191,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
             // 构建阿里云OSS中的原图和预览图路径
             String originalImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.ORIGINAL, newFileName).toString().replace("\\", "/");
+                    StorageConstants.dirName.ORIGINAL, newFileName).toString();
             String previewImagePath = Paths.get(StorageConstants.dirName.RESOURCE, dateDir, StorageConstants.dirName.IMAGE,
-                    StorageConstants.dirName.PREVIEW, newFileName).toString().replace("\\", "/");
-
+                    StorageConstants.dirName.PREVIEW, newFileName).toString();
             // 获取OSS客户端并确保存储桶存在
             OSS client = getOssClient();
             aliyunOssOperationUtils.ensureBucketExists(client, bucketName);
@@ -223,7 +222,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("阿里云OSS图片上传失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "图片上传失败：" + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "图片上传失败：" + e.getMessage());
         }
     }
 
@@ -242,10 +241,10 @@ public class AliyunOssOperationServiceImpl implements OperationService {
     public FileOperationDto delete(FileOperationDto fileOperationDto, boolean forceDelete) {
         // 1. 参数校验
         if (ObjectUtils.isEmpty(fileOperationDto)) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "参数不能为空");
+            throw new ParamException(ResultCode.PARAM_NOT_NULL, "参数不能为空");
         }
         if (StringUtils.isEmpty(fileOperationDto.getOriginalRelativePath())) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "原始文件路径不能为空");
+            throw new ParamException(ResultCode.PARAM_NOT_NULL, "原始文件路径不能为空");
         }
 
         // 2. 获取配置和初始化
@@ -290,7 +289,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("阿里云OSS物理删除失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件物理删除失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件物理删除失败: " + e.getMessage());
         }
     }
 
@@ -343,7 +342,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("阿里云OSS移入回收站失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件移入回收站失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件移入回收站失败: " + e.getMessage());
         }
     }
 
@@ -361,7 +360,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
     public boolean restore(FileOperationDto fileOperationDto) {
         // 1. 参数校验
         if (fileOperationDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
 
         // 2. 获取配置和初始化
@@ -377,7 +376,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         // 4. 校验必要路径
         if (StringUtils.isBlank(originalTrashPath) || StringUtils.isBlank(originalRelativePath)) {
             log.error("文件恢复失败：回收站路径或原始路径为空，文件ID: {}", fileOperationDto.getFileId());
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在阿里云OSS中已经被删除!");
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在阿里云OSS中已经被删除!");
         }
 
         try {
@@ -392,7 +391,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("文件恢复失败，文件ID: {}, 错误信息: {}", fileOperationDto.getFileId(), e.getMessage(), e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
         }
     }
 
@@ -405,7 +404,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
             if (!aliyunOssOperationUtils.objectExists(client, bucketName, originalTrashPath)) {
                 log.error("回收站中的文件不存在：{}", originalTrashPath);
-                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
+                throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
             }
 
             // 移动文件从回收站到原位置
@@ -414,7 +413,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("恢复原始文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复原始文件失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "恢复原始文件失败: " + e.getMessage());
         }
     }
 
@@ -440,7 +439,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("恢复预览文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复预览文件失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "恢复预览文件失败: " + e.getMessage());
         }
     }
 
@@ -453,10 +452,10 @@ public class AliyunOssOperationServiceImpl implements OperationService {
     public void deleteTrashFile(FileOperationDto fileOperationDto) {
         getConfig();
         if (fileOperationDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
         if (StringUtils.isBlank(fileOperationDto.getOriginalTrashPath())) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
         }
 
         // 如果不是真实删除，则直接返回成功
@@ -488,7 +487,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("删除回收站文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
         }
     }
 
@@ -501,6 +500,8 @@ public class AliyunOssOperationServiceImpl implements OperationService {
      * @return 文件信息
      */
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
+        String fileUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), objectPath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(src.getOriginalFilename());
@@ -510,7 +511,7 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -529,6 +530,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String fileUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(aliyunOssStorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -538,9 +542,9 @@ public class AliyunOssOperationServiceImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(aliyunOssStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(aliyunOssStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

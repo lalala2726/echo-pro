@@ -21,7 +21,7 @@ public class SysPost extends BaseEntity {
      * 岗位ID
      */
     @TableId(type = IdType.AUTO)
-    private Integer postId;
+    private Long id;
 
     /**
      * 岗位编码
@@ -43,8 +43,4 @@ public class SysPost extends BaseEntity {
      */
     private Integer status;
 
-    /**
-     * 是否删除(0-未删除,1-已删除)
-     */
-    private Integer isDeleted;
 }

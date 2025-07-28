@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author Chuang
  */
@@ -47,6 +49,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return 返回用户信息
      */
     SysUser getUserInfoByUsername(@Param("username") String username);
+
+    /**
+     * 导出用户信息
+     *
+     * @param request 查询参数
+     * @return 返回用户信息
+     */
+    List<SysUser> exportListUser(@Param("request") SysUserQueryRequest request);
 }
 
 

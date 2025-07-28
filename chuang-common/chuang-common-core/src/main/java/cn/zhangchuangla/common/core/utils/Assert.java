@@ -1,15 +1,16 @@
 package cn.zhangchuangla.common.core.utils;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Chuang
  * <p>
  * created on 2025/7/10 07:53
  */
-public class Assert {
+public class Assert extends org.springframework.util.Assert {
 
 
     private Assert() {
@@ -26,7 +27,7 @@ public class Assert {
      */
     public static void isTrue(boolean condition, String errorMessage) {
         if (!condition) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, errorMessage);
+            throw new ServiceException(ResultCode.OPERATION_ERROR, errorMessage);
         }
     }
 
@@ -39,7 +40,7 @@ public class Assert {
      */
     public static void isParamTrue(boolean condition, String errorMessage) {
         if (!condition) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, errorMessage);
+            throw new ParamException(ResultCode.PARAM_ERROR, errorMessage);
         }
     }
 
@@ -92,7 +93,7 @@ public class Assert {
      * @param array        要断言不为空的数组。
      * @param errorMessage 数组为空时抛出的错误消息。
      */
-    public static void notEmpty(Object[] array, String errorMessage) {
+    public static void notEmpty(Object[] array, @NotNull String errorMessage) {
         isParamTrue(array != null && array.length > 0, errorMessage);
     }
 

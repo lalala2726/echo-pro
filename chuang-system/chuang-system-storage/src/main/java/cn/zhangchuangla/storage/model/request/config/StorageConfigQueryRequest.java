@@ -16,33 +16,21 @@ import lombok.EqualsAndHashCode;
 public class StorageConfigQueryRequest extends BasePageRequest {
 
     /**
-     * 参数名称
+     * 存储名称
      */
-    @Schema(description = "参数名称")
+    @Schema(description = "存储名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "minio")
     private String storageName;
 
     /**
-     * 参数键名
+     * 存储键名
      */
-    @Schema(description = "参数键名")
+    @Schema(description = "存储键名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "minio")
     private String storageKey;
 
     /**
      * 存储类型
      */
-    @Schema(description = "存储类型")
+    @Schema(description = "存储类型", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "minio")
     private String storageType;
-
-    /**
-     * 存储值
-     */
-    @Schema(description = "存储值")
-    private String storageValue;
-
-    /**
-     * 备注
-     */
-    @Schema(description = "备注")
-    private String remark;
 
 }

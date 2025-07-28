@@ -1,6 +1,6 @@
 package cn.zhangchuangla.message.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.message.constant.MessageConstants;
@@ -96,7 +96,7 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         // 获取消息详情
         SysMessage sysMessage = sysMessageService.getCurrentUserMessage(userId, messageId);
         if (sysMessage == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "消息不存在");
         }
 
         // 异步标记为已读（优化：避免在查询方法中执行写操作）

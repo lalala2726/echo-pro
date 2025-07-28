@@ -1,26 +1,26 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.Option;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
-import cn.zhangchuangla.system.model.entity.SysDictItem;
+import cn.zhangchuangla.system.model.entity.SysDictData;
 import cn.zhangchuangla.system.model.entity.SysDictType;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeAddRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeQueryRequest;
 import cn.zhangchuangla.system.model.request.dict.SysDictTypeUpdateRequest;
-import cn.zhangchuangla.system.service.SysDictItemService;
+import cn.zhangchuangla.system.service.SysDictDataService;
 import cn.zhangchuangla.system.service.SysDictTypeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 字典类型 Service 实现类
+ *
  * @author Chuang
  */
 @Service
@@ -37,27 +39,27 @@ import java.util.List;
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictType>
         implements SysDictTypeService {
 
-    private final SysDictTypeMapper dictTypeMapper;
-    private final SysDictItemService sysDictItemService;
+    private final SysDictTypeMapper sysDictTypeMapper;
+    private final SysDictDataService sysDictDataService;
     private final RedisCache redisCache;
 
     /**
-     * 获取字典类型列表
+     * 分页查询字典类型列表
      *
-     * @param page    分页
-     * @param request 请求
-     * @return 分页结果
+     * @param request 查询条件
+     * @return 字典类型分页列表
      */
     @Override
-    public Page<SysDictType> listDictType(Page<SysDictType> page, SysDictTypeQueryRequest request) {
-        return dictTypeMapper.listDictType(page, request);
+    public Page<SysDictType> listDictType(SysDictTypeQueryRequest request) {
+        Page<SysDictType> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return sysDictTypeMapper.listDictType(page, request);
     }
 
     /**
-     * 根据id获取字典类型
+     * 根据ID获取字典类型
      *
-     * @param id id
-     * @return 字典类型
+     * @param id 字典类型ID
+     * @return 字典类型信息
      */
     @Override
     public SysDictType getDictTypeById(Long id) {
@@ -67,16 +69,17 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     /**
      * 添加字典类型
      *
-     * @param request 请求
+     * @param request 添加请求
      * @return 是否添加成功
      */
     @Override
     public boolean addDictType(SysDictTypeAddRequest request) {
         if (isDictTypeExist(request.getDictType())) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
         }
         SysDictType sysDictType = new SysDictType();
         BeanUtils.copyProperties(request, sysDictType);
+        sysDictType.setCreateBy(SecurityUtils.getUsername());
         sysDictType.setCreateBy(SecurityUtils.getUsername());
         return save(sysDictType);
     }
@@ -84,20 +87,27 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     /**
      * 更新字典类型
      *
-     * @param request 请求
+     * @param request 更新请求
      * @return 是否更新成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateDictType(SysDictTypeUpdateRequest request) {
-        LambdaQueryWrapper<SysDictType> ne = new LambdaQueryWrapper<SysDictType>()
+        // 检查字典类型是否重复（排除自身）
+        LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<SysDictType>()
                 .eq(SysDictType::getDictType, request.getDictType())
                 .ne(SysDictType::getId, request.getId());
-        if (count(ne) > 0) {
-            throw new ServiceException(ResponseCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
+        if (count(queryWrapper) > 0) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型已存在: " + request.getDictType());
+        }
+
+        SysDictType dictType = getById(request.getId());
+        if (dictType == null) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "字典类型不存在");
         }
         SysDictType sysDictType = new SysDictType();
         BeanUtils.copyProperties(request, sysDictType);
+        sysDictType.setUpdateBy(SecurityUtils.getUsername());
         sysDictType.setUpdateBy(SecurityUtils.getUsername());
         return updateById(sysDictType);
     }
@@ -105,7 +115,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     /**
      * 删除字典类型
      *
-     * @param ids id列表
+     * @param ids 字典类型ID列表
      * @return 是否删除成功
      */
     @Override
@@ -115,42 +125,70 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             return false;
         }
 
+        // 获取要删除的字典类型信息
         List<SysDictType> sysDictTypes = listByIds(ids);
         if (sysDictTypes.isEmpty()) {
             return false;
         }
 
+        // 提取字典类型
         List<String> dictTypes = sysDictTypes.stream()
                 .map(SysDictType::getDictType)
                 .distinct()
                 .toList();
 
+        // 删除相关的字典数据
         if (!dictTypes.isEmpty()) {
-            sysDictItemService.deleteDictItemByDictType(dictTypes);
+            sysDictDataService.deleteDictDataByDictType(dictTypes);
         }
 
-        return removeByIds(ids);
+        // 删除字典类型
+        boolean result = removeByIds(ids);
+
+        // 清除相关缓存
+        if (result) {
+            dictTypes.forEach(this::clearDictCache);
+        }
+
+        return result;
     }
 
     /**
-     * 判断字典类型是否存在
+     * 检查字典类型是否存在
      *
      * @param dictType 字典类型
-     * @return true存在，false不存在
+     * @return 是否存在
      */
     @Override
     public boolean isDictTypeExist(String dictType) {
-        if (StrUtils.isBlank(dictType)) {
+        if (StringUtil.isBlank(dictType)) {
             return false;
         }
-        LambdaQueryWrapper<SysDictType> eq = new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType);
-        return count(eq) > 0;
+        LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<SysDictType>()
+                .eq(SysDictType::getDictType, dictType);
+        return count(queryWrapper) > 0;
+    }
+
+    /**
+     * 获取所有字典类型选项
+     *
+     * @return 字典类型选项列表
+     */
+    @Override
+    public List<Option<String>> getAllDictType() {
+        LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<SysDictType>()
+                .eq(SysDictType::getStatus, 0)
+                .orderByDesc(SysDictType::getCreateTime);
+        List<SysDictType> list = list(queryWrapper);
+        return list.stream()
+                .map(item -> new Option<>(item.getDictType(), item.getDictName()))
+                .toList();
     }
 
     /**
      * 刷新字典缓存
      *
-     * @return 操作结果
+     * @return 是否刷新成功
      */
     @Override
     public boolean refreshCache() {
@@ -158,7 +196,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             log.info("开始刷新字典缓存...");
 
             // 1. 清除现有的字典缓存
-            Collection<String> existingKeys = redisCache.keys(RedisConstants.DICT_CACHE + "*");
+            Collection<String> existingKeys = redisCache.keys(RedisConstants.Dict.DICT_CACHE_PREFIX + "*");
             if (!existingKeys.isEmpty()) {
                 long deletedCount = redisCache.deleteObject(existingKeys);
                 log.info("清除了 {} 个现有字典缓存", deletedCount);
@@ -177,28 +215,27 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             int successCount = 0;
             int failCount = 0;
 
-            // 3. 为每个字典类型加载字典项到缓存
+            // 3. 为每个字典类型加载字典数据到缓存
             for (SysDictType dictType : dictTypes) {
                 try {
-                    // 查询该字典类型下所有启用的字典项
-                    LambdaQueryWrapper<SysDictItem> dictItemWrapper = new LambdaQueryWrapper<SysDictItem>()
-                            .eq(SysDictItem::getDictType, dictType.getDictType())
-                            .eq(SysDictItem::getStatus, 0)
-                            .orderByAsc(SysDictItem::getSort);
+                    // 查询该字典类型下所有启用的字典数据
+                    LambdaQueryWrapper<SysDictData> dictDataWrapper = new LambdaQueryWrapper<SysDictData>()
+                            .eq(SysDictData::getDictType, dictType.getDictType())
+                            .eq(SysDictData::getStatus, 1)
+                            .orderByAsc(SysDictData::getSort);
 
-                    List<SysDictItem> dictItems = sysDictItemService.list(dictItemWrapper);
+                    List<SysDictData> dictDataList = sysDictDataService.list(dictDataWrapper);
 
                     // 转换为Option格式
-                    List<Option<String>> options = dictItems.stream()
-                            .map(item -> new Option<>(item.getItemValue(), item.getItemLabel(), item.getTag()))
+                    List<Option<String>> options = dictDataList.stream()
+                            .map(item -> new Option<>(item.getDictValue(), item.getDictLabel()))
                             .toList();
 
                     // 将数据放入缓存
-                    String cacheKey = String.format(RedisConstants.DICT_ITEMS_KEY, dictType.getDictType());
-                    redisCache.setCacheObject(cacheKey, options, RedisConstants.DICT_CACHE_EXPIRE_TIME);
+                    String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType.getDictType());
+                    redisCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
 
                     successCount++;
-                    log.debug("字典类型 [{}] 缓存刷新成功，共 {} 个字典项", dictType.getDictType(), dictItems.size());
 
                 } catch (Exception e) {
                     failCount++;
@@ -217,22 +254,17 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     }
 
     /**
-     * 获取所有字典类型
-     *
-     * @return 字典类型列表
+     * 清除指定字典类型的缓存
      */
-    @Override
-    public List<Option<String>> getAllDictType() {
-        LambdaQueryWrapper<SysDictType> eq = new LambdaQueryWrapper<SysDictType>()
-                .eq(SysDictType::getStatus, Constants.DictConstants.ENABLE_STATUS);
-        List<SysDictType> list = list(eq);
-        return list.stream()
-                .map(item -> new Option<>(item.getDictType(), item.getDictName()))
-                .toList();
+    private void clearDictCache(String dictType) {
+        if (!StringUtils.isBlank(dictType)) {
+            String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
+            try {
+                redisCache.deleteObject(cacheKey);
+                log.debug("已清除字典缓存: {}", dictType);
+            } catch (Exception e) {
+                log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());
+            }
+        }
     }
-
 }
-
-
-
-

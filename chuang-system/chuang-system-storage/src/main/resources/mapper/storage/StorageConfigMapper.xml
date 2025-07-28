@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.storage.mapper.StorageConfigMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.storage.model.entity.StorageConfig">
+        <id property="id" column="id"/>
+        <result property="storageName" column="storage_name"/>
+        <result property="storageKey" column="storage_key"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="isPrimary" column="is_primary"/>
+        <result property="enableTrash" column="enable_trash"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="listStorageConfig" resultMap="BaseResultMap">
+        select id,
+        storage_name,
+        storage_key,
+        storage_value,
+        storage_type,
+        is_primary,
+        enable_trash,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark
+        from storage_config
+        <where>
+            <if test="request.storageName != null and request.storageName != ''">
+                and storage_name like concat('%', #{request.storageName}, '%')
+            </if>
+            <if test="request.storageKey != null and request.storageKey != ''">
+                and storage_key = #{request.storageKey}
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

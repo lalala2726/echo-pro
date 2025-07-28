@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.system.mapper.SysUserRoleMapper;
 import cn.zhangchuangla.system.model.entity.SysUserRole;
@@ -46,7 +46,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
     @Override
     public void deleteUserRoleAssociation(Long userId) {
         if (userId == null || userId <= 0) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能小于等于零");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能小于等于零");
         }
         sysUserRoleMapper.deleteUserRoleByUserId(userId);
     }
@@ -59,6 +59,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void addUserRoleAssociation(List<Long> roleId, Long userId) {
+        if (roleId == null || roleId.isEmpty()) {
+            return;
+        }
         roleId.forEach(role -> {
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(role);

@@ -111,11 +111,31 @@ public @interface Excel {
     String numFormat() default "";
 
     /**
-     * 字典类型编码，用于字典值映射
-     * 当设置此属性时，会从Redis中获取对应的字典项进行值转换
-     * 例如：dictType = "sys_user_sex" 会将 0,1,2 转换为 男,女,未知
+     * 字典类型，用于字典值映射
+     * 当设置此属性时，会从Redis中获取对应的字典数据进行值转换
+     * 例如：dictKey = "user_sex" 会将 0,1,2 转换为 男,女,未知
      */
-    String dictType() default "";
+    String dictKey() default "";
+
+    /**
+     * 是否展开对象字段
+     * 当设置为true时，如果字段是一个对象，会将该对象内部标记了@Excel注解的字段按顺序展开为多列
+     * 例如：User对象有name、age字段都标记了@Excel，则会展开为两列显示
+     */
+    boolean expandObject() default false;
+
+    /**
+     * 对象展开时的列名前缀
+     * 当expandObject为true时，可以为展开的列名添加前缀
+     * 例如：prefix="用户-" 会将展开的列名变为 "用户-姓名"、"用户-年龄"
+     */
+    String expandPrefix() default "";
+
+
+    /**
+     * 当expandObject为true时，如果字段为null，是否导出该列
+     */
+    boolean expandIsNullExport() default false;
 
     /**
      * 单元格格式枚举

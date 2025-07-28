@@ -1,7 +1,7 @@
 package cn.zhangchuangla.message.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -73,7 +73,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     public SysMessageVo getSysMessageById(Long id) {
         SysMessage sysMessage = getById(id);
         if (sysMessage == null) {
-            throw new ServiceException(ResponseCode.RESULT_IS_NULL, "消息不存在");
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "消息不存在");
         }
         SysMessageVo sysMessageVo = new SysMessageVo();
         // 如果消息发送目标类型不是"全部用户"，则需要处理目标ID的关联查询，否则不需要传入目标ID
@@ -166,10 +166,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     public boolean sendMessageByUserId(List<Long> userId, SysMessage message) {
         if (userId == null || userId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能为空");
         }
         if (userId.stream().anyMatch(id -> id == null || id <= 0)) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID必须大于零");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID必须大于零");
         }
 
         // 先保存消息
@@ -212,7 +212,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private boolean sendMessageToUserId(SysSendMessageRequest request, Long senderId, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "用户ID不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能为空");
         }
         MessageRequest message = request.getMessage();
         SysMessage sysMessage = new SysMessage();
@@ -231,7 +231,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private boolean sendMessageToRoleId(SysSendMessageRequest request, Long senderId, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "角色ID不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "角色ID不能为空");
         }
 
         // 查询所有有效的角色ID
@@ -296,7 +296,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private boolean sendMessageToDeptId(SysSendMessageRequest request, Long senderId, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
-            throw new ParamException(ResponseCode.PARAM_ERROR, "部门ID不能为空");
+            throw new ParamException(ResultCode.PARAM_ERROR, "部门ID不能为空");
         }
 
         // 查询所有有效的部门ID

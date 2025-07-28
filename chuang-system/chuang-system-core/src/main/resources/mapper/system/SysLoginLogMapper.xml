@@ -20,18 +20,45 @@
         truncate table sys_login_log
     </update>
 
-    <select id="listLoginLog" resultMap="BaseResultMap">
-        select id,
-               username,
-               status,
-               ip,
-               region,
-               browser,
-               os,
-               login_time,
-               create_by
-        from sys_login_log
-        order by login_time desc
+    <select id="listLoginLog" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        id,
+        username,
+        status,
+        ip,
+        region,
+        browser,
+        os,
+        login_time,
+        create_by
+        FROM sys_login_log
+        <where>
+            <if test="request.username != null and request.username != ''">
+                AND username LIKE CONCAT('%', #{request.username}, '%')
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.address != null and request.address != ''">
+                AND ip LIKE CONCAT('%', #{request.address}, '%')
+            </if>
+            <if test="request.region != null and request.region != ''">
+                AND region LIKE CONCAT('%', #{request.region}, '%')
+            </if>
+            <if test="request.browser != null and request.browser != ''">
+                AND browser LIKE CONCAT('%', #{request.browser}, '%')
+            </if>
+            <if test="request.os != null and request.os != ''">
+                AND os LIKE CONCAT('%', #{request.os}, '%')
+            </if>
+            <if test="request.startTime != null">
+                and date(login_time) >= #{request.startTime}
+            </if>
+            <if test="request.endTime != null">
+                and date(login_time) &lt;= #{request.endTime}
+            </if>
+        </where>
+        ORDER BY login_time DESC
     </select>
 
 </mapper>

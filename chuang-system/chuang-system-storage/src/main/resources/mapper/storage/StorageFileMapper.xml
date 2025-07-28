@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.storage.mapper.StorageFileMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.storage.model.entity.StorageFile">
+        <id property="id" column="id"/>
+        <result property="originalName" column="original_name"/>
+        <result property="fileName" column="file_name"/>
+        <result property="contentType" column="content_type"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="originalFileUrl" column="original_file_url"/>
+        <result property="originalRelativePath" column="original_relative_path"/>
+        <result property="previewRelativePath" column="preview_relative_path"/>
+        <result property="previewImageUrl" column="preview_image_url"/>
+        <result property="fileExtension" column="file_extension"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="bucketName" column="bucket_name"/>
+        <result property="uploaderId" column="uploader_id"/>
+        <result property="uploaderName" column="uploader_name"/>
+        <result property="uploadTime" column="upload_time"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="isTrash" column="is_trash"/>
+        <result property="originalTrashPath" column="original_trash_path"/>
+        <result property="previewTrashPath" column="preview_trash_path"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="listFileManage" resultMap="BaseResultMap">
+        select id, file_name, original_name, content_type, file_size, original_file_url, original_relative_path,
+        preview_image_url, preview_relative_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name,
+        upload_time, original_trash_path, preview_trash_path, update_time, is_trash, is_deleted
+        from storage_file
+        <where>
+            <if test="request.originalName != null and request.originalName != ''">
+                and original_name like concat('%', #{request.originalName}, '%')
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+            <if test="request.contentType != null and request.contentType != ''">
+                and content_type = #{request.contentType}
+            </if>
+            is_deleted = 0
+        </where>
+        order by upload_time desc
+    </select>
+
+    <select id="listFileTrashManage" resultMap="BaseResultMap">
+        select id, original_name, content_type, file_size, original_file_url, original_relative_path, preview_image_url,
+        preview_relative_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name, upload_time,
+        is_trash, original_trash_path, preview_trash_path, is_deleted, update_time, file_name
+        from storage_file
+        <where>
+            <if test="request.originalName != null and request.originalName != ''">
+                and original_name like concat('%', #{request.originalName}, '%')
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+            <if test="request.contentType != null and request.contentType != ''">
+                and content_type = #{request.contentType}
+            </if>
+            is_deleted = 0 and is_trash = 1
+        </where>
+        order by upload_time desc
+    </select>
+</mapper>

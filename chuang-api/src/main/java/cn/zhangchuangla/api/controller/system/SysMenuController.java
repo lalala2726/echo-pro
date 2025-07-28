@@ -1,10 +1,9 @@
 package cn.zhangchuangla.api.controller.system;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysMenu;
@@ -79,12 +78,6 @@ public class SysMenuController extends BaseController {
     public AjaxResult<SysMenuVo> getMenuById(@PathVariable("menuId") Long menuId) {
         SysMenu sysMenu = sysMenuService.getMenuById(menuId);
         SysMenuVo sysMenuVo = BeanCotyUtils.copyProperties(sysMenu, SysMenuVo.class);
-        sysMenuVo.setHideInMenu(sysMenu.getHideInMenu() == Constants.TRUE);
-        sysMenuVo.setHideChildrenInMenu(sysMenu.getHideChildrenInMenu() == Constants.TRUE);
-        sysMenuVo.setAffixTab(sysMenu.getAffixTab() == Constants.TRUE);
-        sysMenuVo.setHideInTab(sysMenu.getHideInTab() == Constants.TRUE);
-        sysMenuVo.setHideInBreadcrumb(sysMenu.getHideInBreadcrumb() == Constants.TRUE);
-
         return AjaxResult.success(sysMenuVo);
     }
 
@@ -183,6 +176,7 @@ public class SysMenuController extends BaseController {
      * @return 存在返回true，不存在返回false
      */
     @GetMapping("/path-exists")
+    @Operation(summary = "检查菜单路径是否已经存在")
     public AjaxResult<Boolean> isMenuPathExists(@RequestParam(value = "id", required = false) Long id,
                                                 @RequestParam("path") String path) {
         boolean exists = sysMenuService.isMenuPathExists(id, path);

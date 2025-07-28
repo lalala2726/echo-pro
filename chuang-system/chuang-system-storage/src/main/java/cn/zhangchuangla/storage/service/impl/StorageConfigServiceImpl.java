@@ -1,31 +1,34 @@
 package cn.zhangchuangla.storage.service.impl;
 
+import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
+import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.storage.constant.StorageConstants;
-import cn.zhangchuangla.storage.mapper.SysFileConfigMapper;
+import cn.zhangchuangla.storage.mapper.StorageConfigMapper;
 import cn.zhangchuangla.storage.model.entity.StorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.AliyunOSSStorageConfig;
+import cn.zhangchuangla.storage.model.entity.config.AliyunOssStorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.AmazonS3StorageConfig;
 import cn.zhangchuangla.storage.model.entity.config.MinioStorageConfig;
-import cn.zhangchuangla.storage.model.entity.config.TencentCOSStorageConfig;
-import cn.zhangchuangla.storage.model.request.AliyunOSSConfigRequest;
-import cn.zhangchuangla.storage.model.request.AmazonS3ConfigRequest;
-import cn.zhangchuangla.storage.model.request.MinioConfigRequest;
-import cn.zhangchuangla.storage.model.request.TencentCOSConfigRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigAddRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigQueryRequest;
-import cn.zhangchuangla.storage.model.request.config.StorageConfigUpdateRequest;
+import cn.zhangchuangla.storage.model.entity.config.TencentCosStorageConfig;
+import cn.zhangchuangla.storage.model.request.config.*;
+import cn.zhangchuangla.storage.model.vo.config.*;
 import cn.zhangchuangla.storage.service.StorageConfigService;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 文件配置服务实现类
@@ -35,10 +38,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, StorageConfig>
+public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, StorageConfig>
         implements StorageConfigService {
 
-    private final SysFileConfigMapper sysFileConfigMapper;
+    private final StorageConfigMapper storageConfigMapper;
 
     /**
      * 查询文件配置列表
@@ -49,146 +52,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public Page<StorageConfig> listSysFileConfig(StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = new Page<>(request.getPageNum(), request.getPageSize());
-        return sysFileConfigMapper.listSysFileConfig(sysFileConfigPage, request);
-    }
-
-    /**
-     * 根据id获取文件配置信息
-     *
-     * @param id 文件配置id
-     * @return 文件配置信息
-     */
-    @Override
-    public StorageConfig getSysFileConfigById(Integer id) {
-        return getById(id);
-    }
-
-    /**
-     * 根据id删除文件配置信息
-     *
-     * @param id 文件配置id
-     * @return 操作结果
-     */
-    @Override
-    public boolean deleteSysFileConfigById(Integer id) {
-        if (isMaster(id)) {
-            throw new ServiceException("主配置不允许删除");
-        }
-        return removeById(id);
-    }
-
-    /**
-     * 添加文件配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(StorageConfigAddRequest request) {
-        if (isStorageKeyExist(request.getStorageKey())) {
-            throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
-        }
-        StorageConfig storageConfig = new StorageConfig();
-        BeanUtils.copyProperties(request, storageConfig);
-        return save(storageConfig);
-    }
-
-    /**
-     * 添加腾讯云COS配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(TencentCOSConfigRequest request) {
-        TencentCOSStorageConfig tencent = new TencentCOSStorageConfig();
-        BeanUtils.copyProperties(request, tencent);
-        String value = JSON.toJSONString(tencent);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS, value);
-    }
-
-
-    /**
-     * 添加阿里云OSS配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(AliyunOSSConfigRequest request) {
-        AliyunOSSStorageConfig aliyun = new AliyunOSSStorageConfig();
-        BeanUtils.copyProperties(request, aliyun);
-        String value = JSON.toJSONString(aliyun);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS, value);
-    }
-
-    /**
-     * 添加亚马逊S3存储配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(AmazonS3ConfigRequest request) {
-        AmazonS3StorageConfig amazonS3StorageConfig = new AmazonS3StorageConfig();
-        BeanUtils.copyProperties(request, amazonS3StorageConfig);
-        String value = JSON.toJSONString(amazonS3StorageConfig);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.AMAZON_S3, value);
-    }
-
-    /**
-     * 添加Minio配置文件
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean addStorageConfig(MinioConfigRequest request) {
-        MinioStorageConfig minioStorageConfig = new MinioStorageConfig();
-        String value = JSON.toJSONString(minioStorageConfig);
-        return addStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO, value);
-    }
-
-
-    /**
-     * 保存文件配置
-     *
-     * @param storageName 存储名字
-     * @param storageKey  存储key
-     * @param storageType 存储类型
-     * @param value       文件配置文件（JSON）
-     * @return 保存结果
-     */
-    private boolean addStorageConfig(String storageName, String storageKey, String storageType, String value) {
-        if (isStorageKeyExist(storageKey)) {
-            throw new ServiceException(String.format("存储key【%s】已存在", storageName));
-        }
-        if (isNameExist(storageName)) {
-            throw new ServiceException(String.format("存储名称【%s】已存在", storageKey));
-        }
-        StorageConfig storageConfig = StorageConfig.builder()
-                .storageName(storageName)
-                .storageKey(storageKey)
-                .storageValue(value)
-                .storageType(storageType)
-                .build();
-        return save(storageConfig);
-    }
-
-    /**
-     * 更新文件配置
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean updateFileConfigById(StorageConfigUpdateRequest request) {
-        if (isStorageKeyExist(request.getStorageKey())) {
-            throw new ServiceException(String.format("存储key【%s】已存在", request.getStorageKey()));
-        }
-        StorageConfig storageConfig = new StorageConfig();
-        BeanUtils.copyProperties(request, storageConfig);
-        return updateById(storageConfig);
+        return storageConfigMapper.listStorageConfig(sysFileConfigPage, request);
     }
 
 
@@ -212,10 +76,10 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      * @return true是主配置，false不是主配置
      */
     @Override
-    public boolean isMaster(Integer id) {
+    public boolean isPrimary(Integer id) {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
                 .eq(StorageConfig::getId, id)
-                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsPrimary, StorageConstants.dataVerifyConstants.PRIMARY);
         return count(eq) > 0;
     }
 
@@ -227,7 +91,7 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
     @Override
     public StorageConfig getPrimaryConfig() {
         LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
-                .eq(StorageConfig::getIsMaster, StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
+                .eq(StorageConfig::getIsPrimary, StorageConstants.dataVerifyConstants.PRIMARY);
         return getOne(eq);
     }
 
@@ -245,27 +109,22 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
         return count > 0;
     }
 
-    /**
-     * 设置主配置
-     *
-     * @param id 文件配置id
-     * @return 操作结果
-     */
     @Override
+    @Transactional
     public boolean updatePrimaryConfig(Long id) {
         // 取消当前主配置
-        StorageConfig currentMasterConfig = getPrimaryConfig();
-        if (currentMasterConfig != null) {
-            currentMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_NOT_FILE_UPLOAD_MASTER);
-            updateById(currentMasterConfig);
-        }
+        UpdateWrapper<StorageConfig> wrapper = new UpdateWrapper<>();
+        wrapper.lambda()
+                .eq(StorageConfig::getIsPrimary, StorageConstants.dataVerifyConstants.PRIMARY)
+                .set(StorageConfig::getIsPrimary, !StorageConstants.dataVerifyConstants.PRIMARY);
+        this.update(null, wrapper);
+
         // 设置新的主配置
-        StorageConfig newMasterConfig = getById(id);
-        if (newMasterConfig == null) {
-            throw new ServiceException("文件配置不存在");
-        }
-        newMasterConfig.setIsMaster(StorageConstants.dataVerifyConstants.IS_FILE_UPLOAD_MASTER);
-        return updateById(newMasterConfig);
+        StorageConfig storageConfig = StorageConfig.builder()
+                .id(id)
+                .isPrimary(StorageConstants.dataVerifyConstants.PRIMARY)
+                .build();
+        return updateById(storageConfig);
     }
 
     /**
@@ -276,7 +135,241 @@ public class StorageConfigServiceImpl extends ServiceImpl<SysFileConfigMapper, S
      */
     @Override
     public boolean deleteFileConfig(List<Long> ids) {
+        StorageConfig primaryConfig = getPrimaryConfig();
+        ids.forEach(id -> {
+            if (Objects.equals(primaryConfig.getId(), id)) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "主文件配置不能删除");
+            }
+        });
         return removeByIds(ids);
+    }
+
+    /**
+     * 添加Minio存储配置
+     *
+     * @param request 添加Minio存储配置参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean addMinioConfig(MinioConfigSaveRequest request) {
+        MinioStorageConfig minioStorageConfig = BeanCotyUtils.copyProperties(request, MinioStorageConfig.class);
+        return saveStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.MINIO,
+                minioStorageConfig.toJson());
+    }
+
+    /**
+     * 添加阿里云OSS配置
+     *
+     * @param request 阿里云OSS配置参数
+     * @return 是否添加成功
+     */
+    @Override
+    public boolean addAliyunOssConfig(AliyunOssConfigSaveRequest request) {
+        AliyunOssStorageConfig aliyunOssStorageConfig = BeanCotyUtils.copyProperties(request, AliyunOssStorageConfig.class);
+        return saveStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.ALIYUN_OSS,
+                aliyunOssStorageConfig.toJson());
+    }
+
+    /**
+     * 添加腾讯云COS配置
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean addTencentCosConfig(TencentCosConfigSaveRequest request) {
+        TencentCosStorageConfig tencentCosStorageConfig = BeanCotyUtils.copyProperties(request, TencentCosStorageConfig.class);
+        return saveStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.TENCENT_COS,
+                tencentCosStorageConfig.toJson());
+    }
+
+    /**
+     * 添加腾讯云COS存储配置
+     *
+     * @param request 添加AmazonS3存储配置参数
+     * @return 添加结果
+     */
+    @Override
+    public boolean addAmazonS3Config(AmazonS3ConfigSaveRequest request) {
+        AmazonS3StorageConfig amazonS3StorageConfig = BeanCotyUtils.copyProperties(request, AmazonS3StorageConfig.class);
+        return saveStorageConfig(request.getStorageName(), request.getStorageKey(), StorageConstants.StorageType.AMAZON_S3,
+                amazonS3StorageConfig.toJson());
+    }
+
+    /**
+     * 根据ID获取文件存储配置
+     *
+     * @param id 文件存储配置ID
+     * @return 文件存储配置
+     */
+    @Override
+    public StorageConfigUnifiedVo getStorageConfigById(Long id) {
+        Assert.isTrue(id > 0, "文件存储配置ID不能小于0");
+        StorageConfig storageConfig = getById(id);
+        if (storageConfig == null) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
+        }
+        return toUnifiedVo(storageConfig);
+    }
+
+    /**
+     * 修改存储配置
+     *
+     * @param request 修改存储配置参数
+     * @return 修改结果
+     */
+    @Override
+    public boolean updateStorageConConfig(StorageConfigUpdateRequest request) {
+        StorageConfig storageConfig = getById(request.getId());
+        if (storageConfig == null) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "文件存储配置不存在");
+        }
+        toStorageConfig(request, storageConfig);
+        return updateById(storageConfig);
+    }
+
+    /**
+     * 检查存储配置键值是否已存在
+     *
+     * @param id         存储配置ID
+     * @param storageKey 存储配置键值
+     * @return 存储配置键值是否已存在
+     */
+    @Override
+    public boolean isStorageKeyExists(Long id, String storageKey) {
+        LambdaQueryWrapper<StorageConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StorageConfig::getStorageKey, storageKey);
+        if (id != null) {
+            queryWrapper.ne(StorageConfig::getId, id);
+        }
+        return count(queryWrapper) > 0;
+    }
+
+    /**
+     * 查询存储配置,无分页
+     *
+     * @param request 存储配置查询参数
+     * @return 存储配置列表
+     */
+    @Override
+    public List<StorageConfigUnifiedVo> listStorageConfig(StorageConfigQueryRequest request) {
+        List<StorageConfig> storageConfigs = storageConfigMapper.listStorageConfig(request);
+        ArrayList<StorageConfigUnifiedVo> storageConfigUnifiedVos = new ArrayList<>();
+        storageConfigs.forEach(storageConfig -> {
+                    StorageConfigUnifiedVo unifiedVo = toUnifiedVo(storageConfig);
+                    storageConfigUnifiedVos.add(unifiedVo);
+                }
+        );
+        return storageConfigUnifiedVos;
+    }
+
+
+    /**
+     * 获取存储配置键值选项
+     *
+     * @return 存储配置键值选项
+     */
+    @Override
+    public List<Option<String>> getStorageConfigKeyOption() {
+        return list()
+                .stream()
+                .map(storageConfig -> new Option<>(storageConfig.getStorageKey(), storageConfig.getStorageName())).toList();
+    }
+
+    /**
+     * 转换请求参数为存储配置实体对象
+     *
+     * @param request       请求参数
+     * @param storageConfig 存储配置实体类
+     */
+    private void toStorageConfig(StorageConfigUpdateRequest request, StorageConfig storageConfig) {
+        BeanUtils.copyProperties(request, storageConfig);
+        switch (storageConfig.getStorageType()) {
+            case StorageConstants.StorageType.ALIYUN_OSS:
+                AliyunOssConfigSaveRequest aliyunOss = request.getAliyunOss();
+                AliyunOssStorageConfig aliyunOssStorageConfig = BeanCotyUtils.copyProperties(aliyunOss, AliyunOssStorageConfig.class);
+                storageConfig.setStorageValue(aliyunOssStorageConfig.toJson());
+                break;
+            case StorageConstants.StorageType.MINIO:
+                MinioConfigSaveRequest minio = request.getMinio();
+                MinioStorageConfig minioStorageConfig = BeanCotyUtils.copyProperties(minio, MinioStorageConfig.class);
+                storageConfig.setStorageValue(minioStorageConfig.toJson());
+                break;
+            case StorageConstants.StorageType.AMAZON_S3:
+                AmazonS3ConfigSaveRequest amazonS3 = request.getAmazonS3();
+                AmazonS3StorageConfig amazonS3StorageConfig = BeanCotyUtils.copyProperties(amazonS3, AmazonS3StorageConfig.class);
+                storageConfig.setStorageValue(amazonS3StorageConfig.toJson());
+                storageConfig.setStorageType(StorageConstants.StorageType.AMAZON_S3);
+                break;
+            case StorageConstants.StorageType.TENCENT_COS:
+                TencentCosConfigSaveRequest tencentCos = request.getTencentCos();
+                TencentCosStorageConfig tencentCosStorageConfig = BeanCotyUtils.copyProperties(tencentCos, TencentCosStorageConfig.class);
+                storageConfig.setStorageValue(tencentCosStorageConfig.toJson());
+                break;
+            default:
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
+        }
+    }
+
+    /**
+     * 将文件存储配置转换为文件存储配置统一视图对象
+     *
+     * @param storageConfig 文件存储配置
+     * @return 文件存储配置统一视图对象
+     */
+    private StorageConfigUnifiedVo toUnifiedVo(StorageConfig storageConfig) {
+        StorageConfigUnifiedVo storageConfigUnifiedVo = BeanCotyUtils.copyProperties(storageConfig, StorageConfigUnifiedVo.class);
+        switch (storageConfig.getStorageType()) {
+            case StorageConstants.StorageType.ALIYUN_OSS:
+                AliyunOssStorageConfig aliyunOssStorageConfig = JSON.parseObject(storageConfig.getStorageValue(), AliyunOssStorageConfig.class);
+                AliyunOssStorageConfigVo aliyunOssStorageConfigVo = BeanCotyUtils.copyProperties(aliyunOssStorageConfig, AliyunOssStorageConfigVo.class);
+                storageConfigUnifiedVo.setAliyunOssStorageConfigVo(aliyunOssStorageConfigVo);
+                break;
+            case StorageConstants.StorageType.MINIO:
+                MinioStorageConfig minioStorageConfig = JSON.parseObject(storageConfig.getStorageValue(), MinioStorageConfig.class);
+                MinioStorageConfigVo minioStorageConfigVo = BeanCotyUtils.copyProperties(minioStorageConfig, MinioStorageConfigVo.class);
+                storageConfigUnifiedVo.setMinioStorageConfigVo(minioStorageConfigVo);
+                break;
+            case StorageConstants.StorageType.AMAZON_S3:
+                AmazonS3StorageConfig amazonS3StorageConfig = JSON.parseObject(storageConfig.getStorageValue(), AmazonS3StorageConfig.class);
+                AmazonS3StorageConfigVo amazonS3StorageConfigVo = BeanCotyUtils.copyProperties(amazonS3StorageConfig, AmazonS3StorageConfigVo.class);
+                storageConfigUnifiedVo.setAmazonS3StorageConfigVo(amazonS3StorageConfigVo);
+                break;
+            case StorageConstants.StorageType.TENCENT_COS:
+                TencentCosStorageConfig tencentCosStorageConfig = JSON.parseObject(storageConfig.getStorageValue(), TencentCosStorageConfig.class);
+                TencentCosStorageConfigVo tencentCosStorageConfigVo = BeanCotyUtils.copyProperties(tencentCosStorageConfig, TencentCosStorageConfigVo.class);
+                storageConfigUnifiedVo.setTencentCosStorageConfigVo(tencentCosStorageConfigVo);
+                break;
+            default:
+                throw new ServiceException(ResultCode.SERVER_CANNOT_SUPPORT);
+        }
+        return storageConfigUnifiedVo;
+    }
+
+
+    /**
+     * 保存文件配置
+     *
+     * @param storageName 存储名字
+     * @param storageKey  存储key
+     * @param storageType 存储类型
+     * @param value       文件配置文件（JSON）
+     * @return 保存结果
+     */
+    private boolean saveStorageConfig(String storageName, String storageKey, String storageType, String value) {
+        if (isStorageKeyExist(storageKey)) {
+            throw new ServiceException(String.format("存储key【%s】已存在", storageName));
+        }
+        if (isNameExist(storageName)) {
+            throw new ServiceException(String.format("存储名称【%s】已存在", storageKey));
+        }
+        StorageConfig storageConfig = StorageConfig.builder()
+                .storageName(storageName)
+                .storageKey(storageKey)
+                .storageValue(value)
+                .storageType(storageType)
+                .build();
+        return save(storageConfig);
     }
 
 }

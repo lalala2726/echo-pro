@@ -1,6 +1,6 @@
 package cn.zhangchuangla.common.core.exception;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
 
 /**
@@ -15,12 +15,12 @@ public class ParamException extends RuntimeException {
 
     public ParamException(String message) {
         super(message);
-        this.code = ResponseCode.PARAM_ERROR.getCode();
+        this.code = ResultCode.PARAM_ERROR.getCode();
     }
 
-    public ParamException(ResponseCode responseCode) {
-        super(responseCode.getMessage());
-        this.code = responseCode.getCode();
+    public ParamException(ResultCode resultCode) {
+        super(resultCode.getMessage());
+        this.code = resultCode.getCode();
     }
 
     public ParamException(Integer code, String message) {
@@ -28,9 +28,9 @@ public class ParamException extends RuntimeException {
         this.code = code;
     }
 
-    public ParamException(ResponseCode responseCode, String message) {
+    public ParamException(ResultCode resultCode, String message) {
         super(message);
-        this.code = responseCode.getCode();
+        this.code = resultCode.getCode();
     }
 
 

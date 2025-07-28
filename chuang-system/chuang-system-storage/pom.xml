@@ -56,6 +56,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-common-excel</artifactId>
+        </dependency>
+
         <!-- 阿里云OSS -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>

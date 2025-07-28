@@ -3,13 +3,13 @@ package cn.zhangchuangla.common.core.utils;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
+import org.apache.commons.lang3.Strings;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +31,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityUtils {
 
+    @Value("${security.header}")
+    private static final String HEADER = "Authorization";
+
+    /**
+     * 令牌前缀
+     */
+    @Value("${security.session.token-prefix}")
+    private static final String TOKEN_PREFIX = "Bearer";
+
     /**
      * 获取用户
      *
@@ -39,7 +48,7 @@ public class SecurityUtils {
     public static SysUserDetails getLoginUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof SysUserDetails)) {
-            throw new ServiceException(ResponseCode.UNAUTHORIZED, "用户未登录");
+            throw new ServiceException(ResultCode.UNAUTHORIZED, "用户未登录");
         }
         return (SysUserDetails) authentication.getPrincipal();
     }
@@ -130,16 +139,20 @@ public class SecurityUtils {
                 .map(GrantedAuthority::getAuthority)
                 // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
                 .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
-                .map(authority -> StringUtils.removeStart(authority, SecurityConstants.ROLE_PREFIX))
+                .map(authority -> Strings.CS.removeStart(authority, SecurityConstants.ROLE_PREFIX))
                 .collect(Collectors.toSet());
     }
 
     /**
      * 获取当前请求的 Token
      */
-    public static String getTokenFromRequest() {
+    public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        return request.getHeader(HttpHeaders.AUTHORIZATION);
+        String header = request.getHeader(HEADER);
+        if (header != null && header.startsWith(TOKEN_PREFIX)) {
+            header = header.substring(TOKEN_PREFIX.length()).trim();
+        }
+        return header;
     }
 
     /**

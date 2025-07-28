@@ -1,6 +1,6 @@
 package cn.zhangchuangla.storage.core.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResponseCode;
+import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.FileException;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.storage.async.StorageAsyncService;
@@ -165,7 +165,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("MinIO文件上传失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件上传失败：" + e.getMessage());
         }
     }
 
@@ -224,7 +224,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("MinIO图片上传失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "图片上传失败：" + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "图片上传失败：" + e.getMessage());
         }
     }
 
@@ -243,10 +243,10 @@ public class MinioOperationServiceImpl implements OperationService {
     public FileOperationDto delete(FileOperationDto fileOperationDto, boolean forceDelete) {
         // 1. 参数校验
         if (ObjectUtils.isEmpty(fileOperationDto)) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "参数不能为空");
+            throw new ParamException(ResultCode.PARAM_NOT_NULL, "参数不能为空");
         }
         if (StringUtils.isEmpty(fileOperationDto.getOriginalRelativePath())) {
-            throw new ParamException(ResponseCode.PARAM_NOT_NULL, "原始文件路径不能为空");
+            throw new ParamException(ResultCode.PARAM_NOT_NULL, "原始文件路径不能为空");
         }
 
         // 2. 获取配置和初始化
@@ -291,7 +291,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("MinIO物理删除失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件物理删除失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件物理删除失败: " + e.getMessage());
         }
     }
 
@@ -344,7 +344,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("MinIO移入回收站失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件移入回收站失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件移入回收站失败: " + e.getMessage());
         }
     }
 
@@ -362,7 +362,7 @@ public class MinioOperationServiceImpl implements OperationService {
     public boolean restore(FileOperationDto fileOperationDto) {
         // 1. 参数校验
         if (fileOperationDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
 
         // 2. 获取配置和初始化
@@ -378,7 +378,7 @@ public class MinioOperationServiceImpl implements OperationService {
         // 4. 校验必要路径
         if (StringUtils.isBlank(originalTrashPath) || StringUtils.isBlank(originalRelativePath)) {
             log.error("文件恢复失败：回收站路径或原始路径为空，文件ID: {}", fileOperationDto.getFileId());
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在MinIO中已经被删除!");
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "此文件无法恢复!可能文件在MinIO中已经被删除!");
         }
 
         try {
@@ -393,7 +393,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("文件恢复失败，文件ID: {}, 错误信息: {}", fileOperationDto.getFileId(), e.getMessage(), e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件恢复失败: " + e.getMessage());
         }
     }
 
@@ -406,7 +406,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
             if (!minioOperationUtils.objectExists(client, bucketName, originalTrashPath)) {
                 log.error("回收站中的文件不存在：{}", originalTrashPath);
-                throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
+                throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件在回收站中不存在，无法恢复");
             }
 
             // 移动文件从回收站到原位置
@@ -415,7 +415,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("恢复原始文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复原始文件失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "恢复原始文件失败: " + e.getMessage());
         }
     }
 
@@ -441,7 +441,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("恢复预览文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "恢复预览文件失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "恢复预览文件失败: " + e.getMessage());
         }
     }
 
@@ -454,10 +454,10 @@ public class MinioOperationServiceImpl implements OperationService {
     public void deleteTrashFile(FileOperationDto fileOperationDto) {
         getConfig();
         if (fileOperationDto == null) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录为空");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录为空");
         }
         if (StringUtils.isBlank(fileOperationDto.getOriginalTrashPath())) {
-            throw new FileException(ResponseCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
+            throw new FileException(ResultCode.FILE_OPERATION_ERROR, "文件记录不能为空!");
         }
 
         // 如果不是真实删除，则直接返回成功
@@ -489,7 +489,7 @@ public class MinioOperationServiceImpl implements OperationService {
 
         } catch (Exception e) {
             log.error("删除回收站文件失败", e);
-            throw new FileException(ResponseCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
+            throw new FileException(ResultCode.FILE_OPERATION_FAILED, "文件删除失败: " + e.getMessage());
         }
     }
 
@@ -504,6 +504,9 @@ public class MinioOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildFileInfo(MultipartFile src, String objectPath, String newFileName) {
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
+
+        String fileUrl = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), objectPath);
+
         info.setBucketName(bucketName);
         info.setFileOriginalName(src.getOriginalFilename());
         info.setFileName(newFileName);
@@ -511,7 +514,7 @@ public class MinioOperationServiceImpl implements OperationService {
         info.setFileSize(src.getSize());
         info.setFileType(src.getContentType());
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(minioStorageConfig.getFileDomain(), objectPath).toString().replace("\\", "/"));
+        info.setFileUrl(fileUrl);
         info.setFileRelativePath(objectPath);
         return info;
     }
@@ -530,6 +533,9 @@ public class MinioOperationServiceImpl implements OperationService {
     private UploadedFileInfo buildImageFileInfo(String originalFileName, String originalImagePath,
                                                 String previewImagePath, String newFileName,
                                                 String fileType, long fileSize) {
+        String filePath = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), originalImagePath);
+        String imageUrl = StorageUtils.joinUrl(minioStorageConfig.getFileDomain(), previewImagePath);
+
         String bucketName = getConfig().getBucketName();
         UploadedFileInfo info = new UploadedFileInfo();
         info.setFileOriginalName(originalFileName);
@@ -539,9 +545,9 @@ public class MinioOperationServiceImpl implements OperationService {
         info.setFileSize(fileSize);
         info.setFileType(fileType);
         info.setExtension(StorageUtils.getFileExtension(newFileName));
-        info.setFileUrl(Paths.get(minioStorageConfig.getFileDomain(), originalImagePath).toString().replace("\\", "/"));
+        info.setFileUrl(filePath);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(Paths.get(minioStorageConfig.getFileDomain(), previewImagePath).toString().replace("\\", "/"));
+        info.setPreviewImage(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

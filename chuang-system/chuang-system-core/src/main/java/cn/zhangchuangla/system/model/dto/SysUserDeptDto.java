@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -80,7 +78,6 @@ public class SysUserDeptDto extends BaseEntity {
      * 状态
      */
     @Schema(description = "状态")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer status;
 
     /**
@@ -96,6 +93,5 @@ public class SysUserDeptDto extends BaseEntity {
      */
     @Schema(description = "部门对象")
     private SysDept sysDept;
-
 
 }

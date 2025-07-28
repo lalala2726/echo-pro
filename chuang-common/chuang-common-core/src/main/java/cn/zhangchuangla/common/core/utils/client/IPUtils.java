@@ -49,7 +49,7 @@ public class IPUtils {
      * @param request HttpServletRequest对象
      * @return 客户端IP地址
      */
-    public static String getIpAddr(HttpServletRequest request) {
+    public static String getIpAddress(HttpServletRequest request) {
         String ip;
         try {
             if (request == null) {
@@ -69,17 +69,12 @@ public class IPUtils {
             if (!isValidIp(ip)) {
                 ip = request.getHeader("HTTP_X_FORWARDED_FOR");
             }
-            // 如果以上都无效，获取直接连接的 IP
             if (!isValidIp(ip)) {
                 ip = request.getRemoteAddr();
-                if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-                    // 根据网卡取本机配置的IP
-                    ip = getLocalAddr();
-                }
             }
         } catch (Exception e) {
             // 记录完整异常
-            log.error("IPUtils getIpAddr ERROR", e);
+            log.error("IPUtils getIpAddress ERROR", e);
             // 出错时返回空字符串
             return "";
         }
@@ -103,11 +98,110 @@ public class IPUtils {
     }
 
     /**
-     * 检查 IP 是否有效（非空、非 "unknown"）
+     * 检查 IP 是否有效
+     * 过滤掉无效的IP地址，包括："unknown"、"localhost"、"127.0.0.1"等本地地址
+     *
+     * @param ip IP地址字符串
+     * @return true表示有效的公网或私网IP，false表示无效
      */
     private static boolean isValidIp(String ip) {
-        String unknown = "unknown";
-        return StringUtils.isNotBlank(ip) && !unknown.equalsIgnoreCase(ip);
+        if (StringUtils.isBlank(ip)) {
+            return false;
+        }
+
+        // 去掉前后空格并转换为小写
+        ip = ip.trim().toLowerCase();
+
+        // 过滤掉常见的无效值
+        String[] invalidValues = {
+                "unknown",
+                "null",
+                "undefined",
+                "localhost",
+                "0:0:0:0:0:0:0:1",
+                "::"
+        };
+
+        for (String invalid : invalidValues) {
+            if (invalid.equals(ip)) {
+                return false;
+            }
+        }
+
+        // 基本的IPv4格式验证
+        if (isValidIPv4(ip)) {
+            // 排除一些特殊的本地地址
+            return !"0.0.0.0".equals(ip) && !"127.0.0.1".equals(ip);
+        }
+
+        // 基本的IPv6格式验证
+        if (isValidIPv6(ip)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 验证IPv4地址格式
+     *
+     * @param ip IP地址字符串
+     * @return true表示有效的IPv4格式
+     */
+    private static boolean isValidIPv4(String ip) {
+        if (StringUtils.isBlank(ip)) {
+            return false;
+        }
+
+        String[] octets = ip.split("\\.");
+        if (octets.length != 4) {
+            return false;
+        }
+
+        try {
+            for (String octet : octets) {
+                int value = Integer.parseInt(octet);
+                if (value < 0 || value > 255) {
+                    return false;
+                }
+                // 不允许前导零（除了单独的"0"）
+                if (octet.length() > 1 && octet.startsWith("0")) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 验证IPv6地址格式（简单验证）
+     *
+     * @param ip IP地址字符串
+     * @return true表示可能的IPv6格式
+     */
+    private static boolean isValidIPv6(String ip) {
+        if (StringUtils.isBlank(ip)) {
+            return false;
+        }
+
+        // 简单的IPv6格式检查
+        return ip.contains(":") &&
+                ip.length() >= 2 &&
+                ip.length() <= 39 &&
+                !"::".equals(ip) &&
+                !"0:0:0:0:0:0:0:1".equals(ip);
+    }
+
+    /**
+     * 判断IP地址是否为IPv6格式
+     *
+     * @param ip IP地址字符串
+     * @return true表示IPv6格式
+     */
+    public static boolean isIPv6(String ip) {
+        return StringUtils.isNotBlank(ip) && ip.contains(":") && !ip.contains(".");
     }
 
 
@@ -207,11 +301,18 @@ public class IPUtils {
 
     /**
      * 根据IP返回地理位置信息，例如: 国家 省份 城市 ISP
+     * 注意：仅支持IPv4地址查询，IPv6地址将返回"IPv6不支持查询"
      *
-     * @param ip IP地址（目前仅支持IPV4）
+     * @param ip IP地址（仅支持IPv4）
      * @return 地理位置信息字符串，格式为 "国家 省份 城市 ISP"
      */
     public static String getRegion(String ip) {
+        // 检查是否为IPv6地址
+        if (isIPv6(ip)) {
+            log.debug("检测到IPv6地址: {}, 不支持地理位置查询", ip);
+            return "IPv6不支持查询";
+        }
+
         IPEntity regionEntity = getRegionEntity(ip);
         StringBuilder region = new StringBuilder();
 
@@ -245,10 +346,10 @@ public class IPUtils {
 
     /**
      * 根据IP地址获取结构化的地理位置信息 (IPEntity)
-     * (优化版：增加了私网和CGN判断)
+     * 注意：仅支持IPv4地址查询，IPv6地址将返回特殊标识
      *
-     * @param ip IP地址
-     * @return IPEntity对象，包含国家、省/州、城市和ISP信息。私网或CGN地址会返回特定标识。
+     * @param ip IP地址（仅支持IPv4）
+     * @return IPEntity对象，包含国家、省/州、城市和ISP信息。IPv6地址、私网或CGN地址会返回特定标识。
      */
     public static IPEntity getRegionEntity(String ip) {
         IPEntity ipEntity = new IPEntity();
@@ -263,7 +364,17 @@ public class IPUtils {
             return ipEntity;
         }
 
-        // 2. 判断是否为私网、回环地址或 CGN 地址
+        // 2. 检查是否为IPv6地址
+        if (isIPv6(ip)) {
+            log.debug("检测到IPv6地址: {}, 不支持地理位置查询", ip);
+            ipEntity.setCountry("IPv6不支持查询");
+            ipEntity.setArea("IPv6不支持查询");
+            ipEntity.setRegion("IPv6不支持查询");
+            ipEntity.setISP("IPv6不支持查询");
+            return ipEntity;
+        }
+
+        // 3. 判断是否为私网、回环地址或 CGN 地址（仅适用于IPv4）
         if (isPrivateOrCgnIp(ip)) {
             String info;
             if (ip.startsWith("127.")) {
@@ -279,7 +390,7 @@ public class IPUtils {
             return ipEntity;
         }
 
-        // 3. 调用 ip2region 查询公网 IP
+        // 4. 调用 ip2region 查询公网 IPv4 地址
         String regionResult = getRegionString(ip);
 
         if (regionResult != null) {

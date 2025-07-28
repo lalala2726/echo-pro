@@ -2,12 +2,12 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
@@ -17,6 +17,7 @@ import cn.zhangchuangla.system.model.request.role.SysUpdateRolePermissionRequest
 import cn.zhangchuangla.system.model.vo.role.SysRoleListVo;
 import cn.zhangchuangla.system.model.vo.role.SysRolePermissionVo;
 import cn.zhangchuangla.system.model.vo.role.SysRoleVo;
+import cn.zhangchuangla.system.service.SysPermissionService;
 import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,8 @@ import java.util.List;
 public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
+    private final SysPermissionService sysPermissionService;
 
 
     /**
@@ -88,22 +90,23 @@ public class SysRoleController extends BaseController {
             SysRoleListVo sysRoleListVo = BeanCotyUtils.copyProperties(user, SysRoleListVo.class);
             sysRoleListVos.add(sysRoleListVo);
         });
-        excelUtils.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
+        excelExportService.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
 
     }
 
 
     /**
-     * 根据角色ID获取角色权限
+     * 获取角色权限分配信息
      *
      * @param roleId 角色ID
-     * @return 角色权限
+     * @return 角色权限分配信息
      */
-    @GetMapping("/permission/{roleId}")
-    @Operation(summary = "根据角色ID获取角色权限")
-    public AjaxResult<SysRolePermissionVo> getRolePermission(@Parameter(description = "角色ID")
-                                                                 @PathVariable("roleId") Long roleId) {
-        return success();
+    @GetMapping("/permission/{roleId:\\d+}")
+    @Operation(summary = "获取角色权限分配信息")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    public AjaxResult<SysRolePermissionVo> getPermissionByRoleId(@PathVariable("roleId") Long roleId) {
+        SysRolePermissionVo permission = sysPermissionService.getPermissionByRoleId(roleId);
+        return success(permission);
     }
 
     /**
@@ -117,7 +120,8 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:permission')")
     @OperationLog(title = "角色权限管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateRolePermission(@RequestBody SysUpdateRolePermissionRequest request) {
-        return success();
+        boolean result = sysRoleService.updateRolePermission(request);
+        return toAjax(result);
     }
 
     /**
@@ -140,7 +144,7 @@ public class SysRoleController extends BaseController {
      * @param id 角色ID
      * @return 角色信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据id获取角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:info')")
     public AjaxResult<SysRoleVo> getRoleInfoById(@Parameter(description = "角色ID") @PathVariable("id") Long id) {
@@ -156,7 +160,7 @@ public class SysRoleController extends BaseController {
      * @param ids 角色ID
      * @return 删除结果
      */
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
