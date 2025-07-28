@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
-import cn.zhangchuangla.framework.security.session.SessionService;
+import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.system.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.model.vo.user.profile.UserProfileVo;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserProfileController extends BaseController {
 
     private final SysUserService sysUserService;
-    private final SessionService sessionService;
+    private final DeviceService deviceService;
 
     /**
      * 获取用户信息
@@ -53,7 +53,7 @@ public class UserProfileController extends BaseController {
     @GetMapping("/devices")
     public AjaxResult<TableDataResult> getUserDeviceList(SessionDeviceQueryRequest request) {
         String username = getUsername();
-        PageResult<SessionDevice> deviceListByUsername = sessionService.getDeviceListByUsername(username, request);
+        PageResult<SessionDevice> deviceListByUsername = deviceService.getDeviceListByUsername(username, request);
         return getTableData(deviceListByUsername);
     }
 
@@ -67,7 +67,7 @@ public class UserProfileController extends BaseController {
     @Operation(summary = "删除用户设备")
     public AjaxResult<Void> deleteDevice(@PathVariable("refreshTokenId") String refreshTokenId) {
         String username = SecurityUtils.getUsername();
-        return sessionService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
+        return deviceService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
     }
 
 

@@ -15,7 +15,7 @@ import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
-import cn.zhangchuangla.framework.security.session.SessionLimiter;
+import cn.zhangchuangla.framework.security.device.DeviceLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.service.SysUserService;
@@ -49,7 +49,7 @@ public class AuthService {
     private final AsyncService asyncService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SysUserService sysUserService;
-    private final SessionLimiter sessionLimiter;
+    private final DeviceLimiter deviceLimiter;
     private final RedisTokenStore redisTokenStore;
 
     /**
@@ -94,7 +94,7 @@ public class AuthService {
         // 表示在检查设备数量限制时跳过加锁。适用于单机部署且用户并发不高的场景。
         // 注意：跳过加锁可能会导致会话数量限制不准确，需根据实际业务场景权衡。
         try {
-            sessionLimiter.checkLimitAndAddSession(deviceInfo);
+            deviceLimiter.checkLimitAndAddSession(deviceInfo);
         } catch (AuthorizationException e) {
             // 如果设备限制检查失败，需要清理已生成的token
             log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",

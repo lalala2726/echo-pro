@@ -30,7 +30,7 @@ public class RedisTokenStore {
      * @param accessTokenSession 访问令牌会话ID
      * @param onlineLoginUser    在线用户信息
      */
-    public void setAccessToken(String accessTokenSession, OnlineLoginUser onlineLoginUser) {
+    protected void setAccessToken(String accessTokenSession, OnlineLoginUser onlineLoginUser) {
         String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
         redisKeyCache.setCacheObject(accessTokenKey, onlineLoginUser,
                 securityProperties.getSession().getAccessTokenExpireTime());
@@ -42,7 +42,7 @@ public class RedisTokenStore {
      * @param refreshTokenSession 刷新令牌会话ID
      * @param accessTokenSession  访问令牌会话ID
      */
-    public void setRefreshToken(String refreshTokenSession, String accessTokenSession) {
+    protected void setRefreshToken(String refreshTokenSession, String accessTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
         //保存刷新令牌
         redisKeyCache.setCacheObject(refreshTokenKey, accessTokenSession,
@@ -74,7 +74,7 @@ public class RedisTokenStore {
      *
      * @param accessTokenSession 访问令牌会话ID
      */
-    public void deleteAccessToken(String accessTokenSession) {
+    protected void deleteAccessToken(String accessTokenSession) {
         String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
         redisKeyCache.deleteObject(accessTokenKey);
     }
@@ -84,7 +84,7 @@ public class RedisTokenStore {
      *
      * @param refreshTokenSession 刷新令牌会话ID
      */
-    public void deleteRefreshToken(String refreshTokenSession) {
+    protected void deleteRefreshToken(String refreshTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
         redisKeyCache.deleteObject(refreshTokenKey);
     }
