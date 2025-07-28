@@ -38,6 +38,11 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-system-core</artifactId>
         </dependency>
+        <!-- 监控模块 -->
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-system-monitor</artifactId>
+        </dependency>
         <!-- 常用工具模块 -->
         <dependency>
             <groupId>cn.zhangchuangla</groupId>

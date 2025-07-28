@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.zhangchuangla.system.monitor.config.MonitorAutoConfiguration

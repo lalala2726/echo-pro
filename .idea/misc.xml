@@ -20,12 +20,15 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/chuang-system-service/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-core/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-system/chuang-common-monitor/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-system/chuang-system-monitor/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/accounting/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-common/chuang-common-core/chuang-common-security/pom.xml" />
+        <option value="$PROJECT_DIR$/chuang-common/chuang-common-monitor/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-generator/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-quartz/pom.xml" />
         <option value="$PROJECT_DIR$/chuang-service/chuang-message-service/pom.xml" />
