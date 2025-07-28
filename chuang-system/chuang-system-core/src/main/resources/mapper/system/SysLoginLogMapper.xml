@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysLoginLogMapper">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysLoginLogMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysLoginLog">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysLoginLog">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="status" column="status"/>

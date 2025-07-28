@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.message.mapper.UserMessageExtMapper">
+<mapper namespace="cn.zhangchuangla.system.message.mapper.UserMessageExtMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.message.model.entity.SysUserMessageExt">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.message.model.entity.SysUserMessageExt">
         <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="messageId" column="message_id"/>

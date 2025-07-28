@@ -2,10 +2,10 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysMenuMapper">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysMenuMapper">
 
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysMenu">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysMenu">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="title" column="title"/>

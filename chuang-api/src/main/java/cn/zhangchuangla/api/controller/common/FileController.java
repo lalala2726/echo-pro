@@ -2,11 +2,11 @@ package cn.zhangchuangla.api.controller.common;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
-import cn.zhangchuangla.storage.model.dto.UploadedFileInfo;
-import cn.zhangchuangla.storage.model.vo.ImageVo;
-import cn.zhangchuangla.storage.model.vo.SimpleFileVO;
-import cn.zhangchuangla.storage.service.StorageFileService;
-import cn.zhangchuangla.storage.utils.StorageUtils;
+import cn.zhangchuangla.system.storage.model.dto.UploadedFileInfo;
+import cn.zhangchuangla.system.storage.model.vo.ImageVo;
+import cn.zhangchuangla.system.storage.model.vo.SimpleFileVO;
+import cn.zhangchuangla.system.storage.service.StorageFileService;
+import cn.zhangchuangla.system.storage.utils.StorageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

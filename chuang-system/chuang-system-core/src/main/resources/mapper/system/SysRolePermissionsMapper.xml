@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysRolePermissionsMapper">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysRolePermissionsMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysRolePermissions">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysRolePermissions">
         <id property="rolePermissionId" column="role_permission_id"/>
         <id property="roleId" column="role_id"/>
         <id property="permissionId" column="permission_id"/>

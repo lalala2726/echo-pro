@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.async.AsyncLogService;
-import cn.zhangchuangla.system.model.entity.SysOperationLog;
+import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

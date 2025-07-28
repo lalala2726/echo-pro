@@ -1,0 +1,46 @@
+package cn.zhangchuangla.system.core.model.entity;
+
+import cn.zhangchuangla.common.core.entity.base.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 岗位表
+ *
+ * @author Chuang
+ */
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "sys_post")
+@Data
+public class SysPost extends BaseEntity {
+
+    /**
+     * 岗位ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * 岗位编码
+     */
+    private String postCode;
+
+    /**
+     * 岗位名称
+     */
+    private String postName;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
+
+    /**
+     * 状态(0-正常,1-停用)
+     */
+    private Integer status;
+
+}

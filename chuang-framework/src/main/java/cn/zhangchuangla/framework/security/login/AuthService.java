@@ -22,7 +22,7 @@ import cn.zhangchuangla.framework.security.login.limiter.LoginFrequencyLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.service.SysUserService;
+import cn.zhangchuangla.system.core.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

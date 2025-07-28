@@ -9,7 +9,7 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.security.session.SessionService;
-import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
+import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

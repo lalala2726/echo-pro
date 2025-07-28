@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
+import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
