@@ -100,13 +100,13 @@ public class RedisTokenStore {
      */
     public void deleteRefreshTokenAndAccessToken(String refreshTokenSession) {
         String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        redisCache.deleteObject(refreshTokenKey);
         // 删除关联的访问令牌
         String accessToken = redisCache.getCacheObject(refreshTokenKey);
         if (accessToken != null) {
             String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessToken;
             redisCache.deleteObject(accessTokenKey);
         }
+        redisCache.deleteObject(refreshTokenKey);
     }
 
     /**
