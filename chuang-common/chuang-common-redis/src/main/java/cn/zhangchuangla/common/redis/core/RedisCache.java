@@ -210,7 +210,7 @@ public final class RedisCache {
     /**
      * 判断给定键是否存在于Redis中
      *
-     * @param key 键
+     * @param key ��
      * @return true=存在；false=不存在
      */
     public boolean exists(String key) {
@@ -225,6 +225,27 @@ public final class RedisCache {
      */
     public Long getKeyExpire(String key) {
         return redisTemplate.getExpire(key);
+    }
+
+    /**
+     * 获取指定key的过期时间
+     *
+     * @param key      key
+     * @param timeUnit 时间单位
+     * @return 过期时间，返回-1���示永不过期，返回-2表示键不存在
+     */
+    public Long getExpire(String key, TimeUnit timeUnit) {
+        return redisTemplate.getExpire(key, timeUnit);
+    }
+
+    /**
+     * 获取指定key的过期时间（默认秒）
+     *
+     * @param key key
+     * @return 过期时间（秒），返回-1表示永不过期，返回-2表示键不存在
+     */
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
 

@@ -92,6 +92,31 @@ public interface RedisConstants {
          */
         String PASSWORD_LOCK_KEY = "auth:password:lock:%s";
 
+        /**
+         * 登录频率限制前缀
+         */
+        String LOGIN_FREQUENCY_PREFIX = "auth:login:frequency:";
+
+        /**
+         * 每日登录失败次数Key格式: auth:login:frequency:fail:day:{username}
+         */
+        String LOGIN_FAIL_DAY_KEY = LOGIN_FREQUENCY_PREFIX + "fail:day:%s";
+
+        /**
+         * 每小时登录失败次数Key格式: auth:login:frequency:fail:hour:{username}
+         */
+        String LOGIN_FAIL_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "fail:hour:%s";
+
+        /**
+         * 每日登录成功次数Key格式: auth:login:frequency:success:day:{username}
+         */
+        String LOGIN_SUCCESS_DAY_KEY = LOGIN_FREQUENCY_PREFIX + "success:day:%s";
+
+        /**
+         * 每小时登录成功次数Key格式: auth:login:frequency:success:hour:{username}
+         */
+        String LOGIN_SUCCESS_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "success:hour:%s";
+
 
     }
 

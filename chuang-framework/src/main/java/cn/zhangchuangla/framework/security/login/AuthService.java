@@ -17,6 +17,7 @@ import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
 import cn.zhangchuangla.framework.security.device.DeviceLimiter;
+import cn.zhangchuangla.framework.security.login.limiter.LoginFrequencyLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
@@ -54,6 +55,7 @@ public class AuthService {
     private final DeviceLimiter deviceLimiter;
     private final RedisTokenStore redisTokenStore;
     private final PasswordRetryLimiter passwordRetryLimiter;
+    private final LoginFrequencyLimiter loginFrequencyLimiter;
 
     /**
      * 实现登录逻辑
@@ -67,19 +69,23 @@ public class AuthService {
         // 1. 检查用户是否被锁定（密码重试限制）
         passwordRetryLimiter.allowLogin(username);
 
-        // 2. 创建用于密码认证的令牌（未认证）
+        // 2. 检查登录频率限制（基于成功登录次数）
+        loginFrequencyLimiter.checkFrequencyLimit(username);
+
+        // 3. 创建用于密码认证的令牌（未认证）
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 username, request.getPassword().trim());
 
-        // 3. 执行认证（认证中）
+        // 4. 执行认证（认证中）
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
             log.error("用户名:{},登录失败！", username, e);
 
-            // 记录登录失败，增加重试次数
+            // 记录密码重试失败次数
             passwordRetryLimiter.recordFailure(username);
+            // 注意：这里不记录登录频率失败，因为登录频率限制只统计成功登录
 
             // 使用异步服务记录登录失败日志
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
@@ -88,14 +94,15 @@ public class AuthService {
             throw new LoginException("账号或密码错误!");
         }
 
-        // 4. 认证成功后，清除重试记录
+        // 5. 认证成功后，清除密码重试记录并记录成功登录频率
         passwordRetryLimiter.clearRecord(username);
+        loginFrequencyLimiter.recordLoginSuccess(username);
 
-        // 5. 生成 JWT 令牌（但还未添加到会话管理中）
+        // 6. 生成 JWT 令牌（但还未添加到会话管理中）
         LoginSessionDTO authSessionInfo = tokenService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 6. 构建登录设备信息
+        // 7. 构建登录设备信息
         LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
                 .deviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue())
                 .deviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device")
