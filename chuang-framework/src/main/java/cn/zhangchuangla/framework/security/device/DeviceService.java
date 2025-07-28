@@ -82,7 +82,11 @@ public class DeviceService {
      */
     public OnlineLoginUser getOnlineLoginUser(String refreshTokenId) {
         Assert.isTrue(tokenService.validateRefreshToken(refreshTokenId), "刷新令牌无效!");
-        return redisTokenStore.readAccessToken(refreshTokenId);
+        String accessTokenId = redisTokenStore.getRefreshToken(refreshTokenId);
+        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
+        boolean exists = redisCache.exists(accessTokenRedisKey);
+        Assert.isTrue(exists, "访问令牌不存在!");
+        return redisTokenStore.getAccessToken(accessTokenRedisKey);
     }
 
 
