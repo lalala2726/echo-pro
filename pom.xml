@@ -109,6 +109,11 @@
                 <artifactId>chuang-common-excel</artifactId>
                 <version>${app.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-system-monitor</artifactId>
+                <version>${app.version}</version>
+            </dependency>
             <!-- 框架模块 -->
             <dependency>
                 <groupId>cn.zhangchuangla</groupId>

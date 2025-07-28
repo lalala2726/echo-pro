@@ -15,6 +15,8 @@
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-file/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-log/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-log/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-monitor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-monitor/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-mq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-mq/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-common/chuang-common-mybatis/src/main/resources" charset="UTF-8" />
@@ -38,6 +40,8 @@
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-message/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-message/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-monitor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-monitor/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-siteMessage/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-siteMessage/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chuang-system/chuang-system-storage/src/main/java" charset="UTF-8" />
@@ -56,5 +60,7 @@
     <file url="file://$PROJECT_DIR$/model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file:///src/main/java" charset="UTF-8" />
+    <file url="file:///src/main/resources" charset="UTF-8" />
   </component>
 </project>

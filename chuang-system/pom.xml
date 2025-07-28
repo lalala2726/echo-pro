@@ -24,6 +24,7 @@
         <module>chuang-system-core</module>
         <module>chuang-system-storage</module>
         <module>chuang-system-message</module>
+        <module>chuang-system-monitor</module>
     </modules>
 
     <dependencies>
