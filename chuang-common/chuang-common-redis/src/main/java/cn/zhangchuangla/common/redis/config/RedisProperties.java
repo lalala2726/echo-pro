@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "security")
+@ConfigurationProperties(prefix = "redis")
 public class RedisProperties {
 
     /**

@@ -55,7 +55,7 @@ public class SecurityProperties {
         /**
          * 锁定时间
          */
-        @Min(60)
+        @Min(1)
         private Integer lockTime = 120;
     }
 
