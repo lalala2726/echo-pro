@@ -29,11 +29,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SessionService {
 
-    private RedisCache redisCache;
     private final TokenService tokenService;
     private final RedisTokenStore redisTokenStore;
     private final DeviceService deviceService;
-
+    private RedisCache redisCache;
 
     /**
      * 获取在线用户列表

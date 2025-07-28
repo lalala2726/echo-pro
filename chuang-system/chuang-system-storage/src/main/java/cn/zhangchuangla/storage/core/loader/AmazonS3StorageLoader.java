@@ -37,7 +37,7 @@ public class AmazonS3StorageLoader implements StorageLoader {
      * 这样设计的好处是支持运行时动态切换存储配置。
      * </p>
      *
-     * @param json          亚马逊S3存储配置的JSON字符串
+     * @param json       亚马逊S3存储配置的JSON字符串
      * @param redisCache Redis缓存实例
      */
     @Override

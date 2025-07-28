@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.core.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -130,14 +130,14 @@ public class SecurityUtils {
                 .map(GrantedAuthority::getAuthority)
                 // 筛选角色,authorities 中的角色都是以 ROLE_ 开头
                 .filter(authority -> authority.startsWith(SecurityConstants.ROLE_PREFIX))
-                .map(authority -> StringUtils.removeStart(authority, SecurityConstants.ROLE_PREFIX))
+                .map(authority -> Strings.CS.removeStart(authority, SecurityConstants.ROLE_PREFIX))
                 .collect(Collectors.toSet());
     }
 
     /**
      * 获取当前请求的 Token
      */
-    public static String getTokenFromRequest() {
+    public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         return request.getHeader(HttpHeaders.AUTHORIZATION);
     }

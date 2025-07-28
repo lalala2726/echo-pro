@@ -43,7 +43,7 @@ public class JwtTokenProvider {
     /**
      * 创建JWT。不再包含tokenType。
      *
-     * @param tokenId       令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
+     * @param tokenId  令牌的唯一ID (对于访问令牌是accessTokenId，对于刷新令牌是refreshTokenId)
      * @param username 用户名
      * @return JWT字符串
      */
