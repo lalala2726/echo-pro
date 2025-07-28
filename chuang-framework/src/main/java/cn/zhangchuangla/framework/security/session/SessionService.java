@@ -2,8 +2,12 @@ package cn.zhangchuangla.framework.security.session;
 
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.framework.security.device.DeviceService;
+import cn.zhangchuangla.framework.security.token.RedisTokenStore;
+import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,9 @@ import java.util.stream.Collectors;
 public class SessionService {
 
     private RedisCache redisCache;
+    private final TokenService tokenService;
+    private final RedisTokenStore redisTokenStore;
+    private final DeviceService deviceService;
 
 
     /**
@@ -140,4 +147,25 @@ public class SessionService {
                 .build();
     }
 
+    /**
+     * 获取会话详情
+     *
+     * @param accessTokenId 访问令牌ID
+     * @return 会话详情
+     */
+    public OnlineLoginUser sessionDetail(String accessTokenId) {
+        Assert.isTrue(tokenService.validateAccessToken(accessTokenId), "会话ID不存在!");
+        return redisTokenStore.getAccessToken(accessTokenId);
+    }
+
+    public boolean deleteSession(String accessTokenId) {
+        Assert.isTrue(redisTokenStore.isValidAccessToken(accessTokenId), "会话ID不存在!");
+        String refreshTokenId = redisTokenStore.getRefreshTokenIdByAccessTokenId(accessTokenId);
+        //删除设备信息
+        deviceService.deleteDevice(refreshTokenId);
+        //删除会话信息
+        redisTokenStore.deleteAccessToken(accessTokenId);
+        redisTokenStore.deleteRefreshToken(refreshTokenId);
+        return true;
+    }
 }

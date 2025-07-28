@@ -25,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class TokenService {
-
 
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -109,7 +109,7 @@ public class TokenService {
             return null;
         }
 
-        OnlineLoginUser onlineUser = redisTokenStore.readAccessToken(accessTokenSessionId);
+        OnlineLoginUser onlineUser = redisTokenStore.getAccessToken(accessTokenSessionId);
         if (onlineUser == null) {
             return null;
         }
@@ -245,6 +245,7 @@ public class TokenService {
                 .roles(roleSetByRoleId);
         return builder.build();
     }
+
 
     /**
      * 设置在线用户的客户端信息。
