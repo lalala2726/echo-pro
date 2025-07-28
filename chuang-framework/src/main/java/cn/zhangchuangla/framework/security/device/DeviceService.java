@@ -26,11 +26,13 @@ import java.util.*;
 
 
 /**
- * 登录设备管理（查询、删除、踢下线）
+ * 登录设备管理服务类，提供设备会话的查询、删除和强制下线功能。
+ * <p>
+ * 该服务确保在删除设备信息时，自动清理相关的访问令牌和刷新令牌，以维护系统数据一致性。
+ * </p>
  *
  * @author Chuang
- * <p>
- * created on 2025/7/24 22:06
+ * @since 2025/7/24 22:06
  */
 @Service
 @RequiredArgsConstructor
@@ -358,4 +360,71 @@ public class DeviceService {
     }
 
 
+    /**
+     * 通过用户名删除全部设备信息,注意!删除设备信息后,用户将无法登录系统
+     *
+     * @param username 用户名
+     * @return 操作结果
+     */
+    public boolean deleteDeviceByUsername(String username) {
+        Assert.isTrue(!username.isBlank(), "用户名不能为空!");
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<String> refreshTokenIds = new HashSet<>();
+        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
+        allWithScore.forEach(tuple -> {
+            refreshTokenIds.add(tuple.getValue());
+        });
+        // 删除设备信息和访问令牌和刷新令牌信息
+        refreshTokenIds.forEach(refreshTokenId -> {
+            String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+            redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+            redisCache.deleteObject(deviceInfoRedisKey);
+        });
+        //删除设备索引
+        redisCache.deleteObject(deviceIndexRedisKey);
+        return true;
+    }
+
+    /**
+     * 通过用户名和设备类型删除设备,删除设备之后也会删除会话
+     *
+     * @param username   用户名
+     * @param deviceType 设备信息
+     * @return 操作结果
+     */
+    public boolean deleteDeviceByUsername(String username, DeviceType deviceType) {
+        Assert.isTrue(!username.isBlank(), "用户名不能为空!");
+        Assert.notNull(deviceType, "设备类型不能为空!");
+
+        String deviceIndexRedisKey = RedisConstants.Auth.SESSIONS_INDEX_KEY + username;
+        Set<String> refreshTokenIds = new HashSet<>();
+        Set<ZSetOperations.TypedTuple<String>> allWithScore = redisZSetCache.getAllWithScore(deviceIndexRedisKey);
+
+        // 筛选出指定设备类型的会话
+        allWithScore.forEach(tuple -> {
+            String refreshTokenId = tuple.getValue();
+            String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+            Map<String, String> deviceInfo = redisHashCache.hGetAll(deviceInfoRedisKey);
+
+            if (!deviceInfo.isEmpty()) {
+                String loginDeviceType = deviceInfo.get(SecurityConstants.DEVICE_TYPE);
+                if (deviceType.getValue().equals(loginDeviceType)) {
+                    refreshTokenIds.add(refreshTokenId);
+                }
+            }
+        });
+
+        // 删除指定设备类型的设备信息和令牌
+        refreshTokenIds.forEach(refreshTokenId -> {
+            String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
+            // 删除刷新令牌和访问令牌
+            redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+            // 删除设备信息
+            redisCache.deleteObject(deviceInfoRedisKey);
+            // 从索引中移除该设备
+            redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
+        });
+
+        return !refreshTokenIds.isEmpty();
+    }
 }

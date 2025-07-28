@@ -46,6 +46,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      */
     @Override
     public Set<String> getPermissionByRole(Set<String> roleSet) {
+        //todo 根据需求加入Redis缓存
         return sysMenuMapper.getPermissionByRole(roleSet);
     }
 

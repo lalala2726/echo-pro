@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -25,9 +26,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static cn.zhangchuangla.common.core.constant.SecurityConstants.CLAIM_KEY_SESSION_ID;
 
 
 /**
@@ -103,9 +105,9 @@ public class TokenService {
             return null;
         }
 
-        String accessTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
+        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(accessTokenSessionId)) {
-            log.warn("访问令牌JWT中未找到sessionId ({}): {}", SecurityConstants.CLAIM_KEY_SESSION_ID, accessToken);
+            log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, accessToken);
             return null;
         }
 
@@ -138,7 +140,7 @@ public class TokenService {
             return false;
         }
 
-        String refreshTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
+        String refreshTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(refreshTokenSessionId)) {
             return false;
         }
@@ -160,7 +162,7 @@ public class TokenService {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
 
-        String refreshTokenSessionId = refreshClaims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
+        String refreshTokenSessionId = refreshClaims.get(CLAIM_KEY_SESSION_ID, String.class);
         if (!redisTokenStore.isValidRefreshToken(refreshTokenSessionId)) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
         }
@@ -209,7 +211,7 @@ public class TokenService {
         if (claims == null) {
             return false;
         }
-        String accessTokenSessionId = claims.get(SecurityConstants.CLAIM_KEY_SESSION_ID, String.class);
+        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
         if (StringUtils.isBlank(accessTokenSessionId)) {
             return false;
         }
@@ -285,5 +287,18 @@ public class TokenService {
         userDetails.setDeptId(onlineUser.getDeptId());
         userDetails.setAuthorities(authorities);
         return userDetails;
+    }
+
+
+    /**
+     * 从token中解析sessionId
+     *
+     * @param token 令牌
+     * @return sessionId
+     */
+    public String getSessionId(String token) {
+        Assert.notEmpty(token, "令牌不能为空");
+        Claims claims = jwtTokenProvider.getClaimsFromToken(token);
+        return claims.get(CLAIM_KEY_SESSION_ID, String.class);
     }
 }
