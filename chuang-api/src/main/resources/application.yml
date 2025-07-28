@@ -59,4 +59,11 @@ security:
   session:
     access-token-expire-time: 7200000
     refresh-token-expire-time: 2592000
-    single-login: false
+    max-sessions-per-client:
+      pc: 10
+      mini-program: -1
+      web: -1
+      unknown: 10
+      mobile: -1
+    multi-device: false
+    token-prefix: null

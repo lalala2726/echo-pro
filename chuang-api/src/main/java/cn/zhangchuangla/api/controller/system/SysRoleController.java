@@ -2,12 +2,12 @@ package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.Option;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysRole;
 import cn.zhangchuangla.system.model.request.role.SysRoleAddRequest;
@@ -50,7 +50,7 @@ import java.util.List;
 public class SysRoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
     private final SysPermissionService sysPermissionService;
 
 
@@ -90,7 +90,7 @@ public class SysRoleController extends BaseController {
             SysRoleListVo sysRoleListVo = BeanCotyUtils.copyProperties(user, SysRoleListVo.class);
             sysRoleListVos.add(sysRoleListVo);
         });
-        excelUtils.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
+        excelExportService.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
 
     }
 

@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.web.service.AsyncService;
+import cn.zhangchuangla.framework.async.AsyncLogService;
 import cn.zhangchuangla.system.model.entity.SysOperationLog;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +48,10 @@ public class OperationLogAspect {
      * 标记当前线程是否是清空日志的操作，用于防止递归调用
      */
     private static final ThreadLocal<Boolean> IS_CLEANING_LOG = new NamedThreadLocal<>("Is Cleaning Log");
-    private final AsyncService asyncService;
+    private final AsyncLogService asyncLogService;
 
-    public OperationLogAspect(AsyncService asyncService) {
-        this.asyncService = asyncService;
+    public OperationLogAspect(AsyncLogService asyncLogService) {
+        this.asyncLogService = asyncLogService;
     }
 
     /**
@@ -111,34 +111,6 @@ public class OperationLogAspect {
      */
     private void handleLog(final JoinPoint joinPoint, OperationLog controllerOperationLog, final Exception exception, Object jsonResult) {
         try {
-            // 检查当前是否是清空日志的操作，如果是则特殊处理
-            Boolean isCleaningLog = IS_CLEANING_LOG.get();
-            if (isCleaningLog != null && isCleaningLog) {
-                log.info("当前是清空日志操作，跳过日志记录以防止递归调用");
-
-                // 对于清空日志操作，我们可以选择不记录日志，或者使用其他方式记录，如直接输出到控制台
-                String methodName = joinPoint.getSignature().getName();
-                SysUserDetails user = SecurityUtils.getLoginUser();
-                String username = user != null ? user.getUsername() : "未知用户";
-
-                log.info("======= 清空日志操作 =======");
-                log.info("操作人: {}", username);
-                log.info("操作方法: {}", methodName);
-                log.info("操作时间: {}", new Date());
-                log.info("操作状态: {}", exception == null ? "成功" : "失败");
-                if (exception != null) {
-                    log.info("错误信息: {}", exception.getMessage());
-                }
-                log.info("===========================");
-
-                // 使用异步服务执行清空操作，但不记录日志
-                if (methodName.contains("cleanOperationLog")) {
-                    asyncService.cleanOperationLog();
-                }
-
-                return; // 跳过后续的日志记录逻辑
-            }
-
             // 获取当前登录用户
             SysUserDetails sysUserDetails = SecurityUtils.getLoginUser();
 
@@ -190,7 +162,7 @@ public class OperationLogAspect {
             sysOperationLog.setCreateTime(new Date());
 
             // 使用Spring异步服务记录日志
-            asyncService.recordOperationLog(sysOperationLog);
+            asyncLogService.recordOperationLog(sysOperationLog);
             log.debug("操作日志已提交异步处理: {}", sysOperationLog.getModule());
 
         } catch (Exception e) {

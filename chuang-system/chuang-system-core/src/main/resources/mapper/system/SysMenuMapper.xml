@@ -49,7 +49,7 @@
         SELECT DISTINCT sm.permission
         FROM sys_menu sm
         INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id
-        INNER JOIN sys_role sr ON srm.role_id = sr.role_id
+        INNER JOIN sys_role sr ON srm.role_id = sr.id
         WHERE sr.role_key IN
         <foreach collection="roleSet" item="role" open="(" separator="," close=")">
             #{role}

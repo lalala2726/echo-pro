@@ -1,10 +1,10 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
-import cn.zhangchuangla.common.excel.utils.ExcelUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.model.request.log.SysLoginLogQueryRequest;
@@ -39,7 +39,7 @@ import java.util.List;
 public class SysLoginLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
-    private final ExcelUtils excelUtils;
+    private final ExcelExportService excelExportService;
 
     /**
      * 获取登录日志列表
@@ -71,7 +71,7 @@ public class SysLoginLogController extends BaseController {
     public void exportStorageConfig(@ParameterObject SysLoginLogQueryRequest request, HttpServletResponse response) {
         List<SysLoginLog> loginLogs = sysLoginLogService.exportLoginLog(request);
         List<SysLoginLogVo> storageConfigListVos = copyListProperties(loginLogs, SysLoginLogVo.class);
-        excelUtils.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
+        excelExportService.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
     }
 
     /**

@@ -7,18 +7,6 @@ package cn.zhangchuangla.common.redis.constant;
  * @since 2024-7-29 11:46:08
  */
 public interface RedisConstants {
-
-    /**
-     * 用户登录密码错误次数前缀
-     */
-    String PASSWORD_ERROR_COUNT = "password_error_count:";
-
-
-    /**
-     * 系统配置
-     */
-    String SYSTEM_CONFIG = "system_config:";
-
     /**
      * 验证码前缀
      */
@@ -64,69 +52,72 @@ public interface RedisConstants {
         int DICT_CACHE_EXPIRE_TIME = 24 * 60 * 60;
     }
 
-    /**
-     * access-token-expire-time: 7200
-     * refresh-token-expire-time: 2592000
-     * single-login: false
-     */
-    //todo 将配置项放入Redis中可以动态修改
-    interface SystemConfig {
-        interface SessionConfig {
-            // 是否单点登录
-            boolean SINGLE_LOGIN = false;
-            // 访问令牌过期时间(单位秒)
-            int ACCESS_TOKEN_EXPIRE_TIME = 7200;
-            // 刷新令牌过期时间(单位秒)
-            int REFRESH_TOKEN_EXPIRE_TIME = 2592000;
-        }
-    }
-
 
     interface StorageConfig {
         String ACTIVE_TYPE = "storage:active_type";
         String CURRENT_STORAGE_CONFIG = "storage:current_storage_config";
         String CONFIGURATION_FILE_TYPE = "storage:configuration_file_type";
-
         String CONFIG_TYPE_DATABASE = "database";
-        String CONFIG_TYPE_LOCAL = "local";
     }
 
-    /**
-     * 代码生成
-     */
-    interface Generator {
-        String CONFIG_INFO = "generator:config:info";
-    }
 
     /**
      * 认证模块
      */
     interface Auth {
 
-        // 存储访问令牌对应的用户信息（accessToken -> OnlineUser）
-        String ACCESS_TOKEN_USER = "auth:token:access:";
 
-        // 存储刷新令牌对应的用户信息（refreshToken -> OnlineUser）
-        String REFRESH_TOKEN_USER = "auth:token:refresh:";
+        String USER_ACCESS_TOKEN = "auth:token:access:";
 
-        // 用户与访问令牌的映射（userId -> accessToken）
-        String USER_ACCESS_TOKEN = "auth:user:access:";
+        String USER_REFRESH_TOKEN = "auth:token:refresh:";
 
-        // 用户与刷新令牌的映射（userId -> refreshToken
-        String USER_REFRESH_TOKEN = "auth:user:refresh:";
-
-        // 刷新令牌ID与访问令牌ID的映射 (refreshTokenId -> accessTokenId)
-        String REFRESH_TOKEN_MAPPING = "auth:token:refresh_mapping:";
-
-        // 黑名单 Token（用于退出登录或注销）
-        String BLACKLIST_TOKEN = "auth:token:blacklist:";
-
-        // 权限前缀
-        String PERMISSIONS_PREFIX = "auth:permissions:";
-
-        // 角色权限缓存前缀
-        String ROLE_PERMISSIONS_PREFIX = "auth:role_permissions:{}";
         String ROLE_KEY = "auth:role:";
+
+        String SESSIONS_INDEX_KEY = "auth:session:index:";
+
+        String SESSIONS_DEVICE_KEY = "auth:session:device:";
+
+        /**
+         * 密码重试限制前缀
+         */
+        String PASSWORD_RETRY_PREFIX = "auth:password:retry:";
+
+        /**
+         * 密码重试次数缓存Key格式: auth:password:retry:{username}
+         */
+        String PASSWORD_RETRY_COUNT_KEY = PASSWORD_RETRY_PREFIX + "%s";
+
+        /**
+         * 密码锁定状态缓存Key格式: auth:password:lock:{username}
+         */
+        String PASSWORD_LOCK_KEY = "auth:password:lock:%s";
+
+        /**
+         * 登录频率限制前缀
+         */
+        String LOGIN_FREQUENCY_PREFIX = "auth:login:frequency:";
+
+        /**
+         * 每日登录失败次数Key格式: auth:login:frequency:fail:day:{username}
+         */
+        String LOGIN_FAIL_DAY_KEY = LOGIN_FREQUENCY_PREFIX + "fail:day:%s";
+
+        /**
+         * 每小时登录失败次数Key格式: auth:login:frequency:fail:hour:{username}
+         */
+        String LOGIN_FAIL_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "fail:hour:%s";
+
+        /**
+         * 每日登录成功次数Key格式: auth:login:frequency:success:day:{username}
+         */
+        String LOGIN_SUCCESS_DAY_KEY = LOGIN_FREQUENCY_PREFIX + "success:day:%s";
+
+        /**
+         * 每小时登录成功次数Key格式: auth:login:frequency:success:hour:{username}
+         */
+        String LOGIN_SUCCESS_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "success:hour:%s";
+
+
     }
 
 }

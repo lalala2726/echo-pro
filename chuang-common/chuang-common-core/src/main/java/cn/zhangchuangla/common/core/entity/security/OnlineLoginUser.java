@@ -56,7 +56,7 @@ public class OnlineLoginUser {
      * 登录IP地址
      */
     @Schema(description = "登录IP地址")
-    private String IP;
+    private String ip;
 
     /**
      * 登录地点

@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.system.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.model.entity.SysMenu;
 import cn.zhangchuangla.system.model.entity.SysRole;
@@ -19,7 +18,6 @@ import cn.zhangchuangla.system.service.SysRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,7 +31,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = RedisConstants.Auth.PERMISSIONS_PREFIX)
 public class SysPermissionServiceImpl implements SysPermissionService {
 
     private final SysMenuMapper sysMenuMapper;
@@ -49,6 +46,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      */
     @Override
     public Set<String> getPermissionByRole(Set<String> roleSet) {
+        //todo 根据需求加入Redis缓存
         return sysMenuMapper.getPermissionByRole(roleSet);
     }
 

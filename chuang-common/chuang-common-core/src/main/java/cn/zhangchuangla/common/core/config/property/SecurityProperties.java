@@ -36,11 +36,6 @@ public class SecurityProperties {
      */
     private String secret;
 
-    /**
-     * 过期时间
-     */
-    private Integer expire;
-
 
     @Data
     public static class PasswordConfig {
@@ -54,7 +49,7 @@ public class SecurityProperties {
         /**
          * 锁定时间
          */
-        @Min(60)
+        @Min(1)
         private Integer lockTime = 120;
     }
 
@@ -62,25 +57,84 @@ public class SecurityProperties {
     public static class SessionConfig {
 
         /**
-         * 访问令牌有效期（单位：秒）
-         * 默认值：7200秒（2小时）
+         * 每个客户端允许的最大会话数
          */
-        @Min(-1)
-        private Integer accessTokenExpireTime = 7200;
+        public MaxSessionsPerClient maxSessionsPerClient;
 
         /**
-         * 刷新令牌有效期（单位：秒）
-         * 默认值：2592000秒（30天）
+         * 访问令牌有效期（单位：秒），-1 表示永不过期
+         * 默认值：1800 秒（30分钟）
          */
         @Min(-1)
-        private Integer refreshTokenExpireTime = 2592000;
+        private long accessTokenExpireTime = 1800;
+
+        /**
+         * 刷新令牌有效期（单位：秒），-1 表示永不过期
+         * 默认值：2592000 秒（30天）
+         */
+        @Min(-1)
+        private long refreshTokenExpireTime = 2592000;
 
         /**
          * 是否允许多设备同时登录
-         * <p>true - 允许同一账户多设备登录（默认）</p>
-         * <p>false - 新登录会使旧令牌失效</p>
+         * true  - 多设备（默认）
+         * false - 单设备登录（新登录挤掉旧会话）
          */
-        private Boolean singleLogin = true;
+        private boolean multiDevice = true;
+
+        /**
+         * 令牌前缀 系统默认会给前缀和token之间拼接一个空格如: Bearer xxxxxxxx
+         */
+        private String tokenPrefix = "Bearer";
+
+        /**
+         * 登录频次限制：每用户每小时最多尝试登录次数，-1 表示不限制
+         */
+        @Min(-1)
+        private int maxLoginPerHour = 10;
+
+        /**
+         * 登录频次限制：每用户每天最多尝试登录次数，-1 表示不限制
+         */
+        @Min(-1)
+        private int maxLoginPerDay = 50;
+
+        /**
+         * 每个客户端允许的最大会话数
+         */
+        @Data
+        public static class MaxSessionsPerClient {
+
+            /**
+             * 网页端最大会话数 -1 表示不限制，默认值：-1
+             */
+            @Min(-1)
+            private long web = -1;
+
+            /**
+             * PC 端最大会话数 -1 表示不限制，默认值：-1
+             */
+            @Min(-1)
+            private long pc = -1;
+
+            /**
+             * 移动端最大会话数 -1 表示不限制，默认值：-1
+             */
+            @Min(-1)
+            private long mobile = -1;
+
+            /**
+             * 小程序最大会话数 -1 表示不限制，默认值：-1
+             */
+            @Min(-1)
+            private long miniProgram = -1;
+
+            /**
+             * 未知端最大会话数 -1 表示不限制，默认值：-1
+             */
+            @Min(-1)
+            private long unknown = -1;
+        }
 
     }
 

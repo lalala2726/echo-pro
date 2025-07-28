@@ -1,11 +1,9 @@
 package cn.zhangchuangla.system.service.impl;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictDataMapper;
@@ -20,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +70,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public List<Option<String>> getDictDataOption(String dictType) {
-        if (StrUtils.isBlank(dictType)) {
+        final int normal = 0;
+        if (StringUtils.isBlank(dictType)) {
             return List.of();
         }
 
@@ -89,7 +89,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<SysDictData>()
                 .eq(SysDictData::getDictType, dictType)
                 // 只查询启用的字典数据
-                .eq(SysDictData::getStatus, Constants.SystemStatus.NORMAL)
+                .eq(SysDictData::getStatus, normal)
                 // 按排序字段升序
                 .orderByAsc(SysDictData::getSort);
 
@@ -226,7 +226,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public boolean isDictDataExistByValue(String dictType, String dictValue, Long dataId) {
-        if (StrUtils.isBlank(dictType, dictValue)) {
+        if (StringUtils.isAllBlank(dictType, dictValue)) {
             return false;
         }
         LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<SysDictData>()
@@ -243,7 +243,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * 清除指定字典类型的缓存
      */
     private void clearDictCache(String dictType) {
-        if (!StrUtils.isBlank(dictType)) {
+        if (!StringUtils.isBlank(dictType)) {
             String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
                 redisCache.deleteObject(cacheKey);

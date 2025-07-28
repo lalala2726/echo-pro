@@ -1,11 +1,10 @@
 package cn.zhangchuangla.common.core.utils;
 
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -30,6 +29,7 @@ public class ResponseUtils {
      */
     public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode) {
 
+        response.setStatus(resultCode.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
@@ -49,12 +49,9 @@ public class ResponseUtils {
      * @param resultCode 响应结果码
      */
     public static void writeErrMsg(HttpServletResponse response, ResultCode resultCode, String message) {
-        int status = getHttpStatus(resultCode);
-
-        response.setStatus(status);
+        response.setStatus(resultCode.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
         try (PrintWriter writer = response.getWriter()) {
             String jsonResponse = JSON.toJSONString(AjaxResult.error(resultCode, message));
             writer.print(jsonResponse);
@@ -64,18 +61,5 @@ public class ResponseUtils {
         }
     }
 
-
-    /**
-     * 根据结果码获取HTTP状态码
-     *
-     * @param resultCode 结果码
-     * @return HTTP状态码
-     */
-    private static int getHttpStatus(ResultCode resultCode) {
-        return switch (resultCode) {
-            case ACCESS_UNAUTHORIZED, ACCESS_TOKEN_INVALID, REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED.value();
-            default -> HttpStatus.BAD_REQUEST.value();
-        };
-    }
 
 }

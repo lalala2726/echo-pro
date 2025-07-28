@@ -1,9 +1,10 @@
 package cn.zhangchuangla.common.core.controller;
 
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -88,6 +89,16 @@ public class BaseController {
      */
     protected AjaxResult<TableDataResult> getTableData(Page<?> page, List<?> rows, Map<String, Object> extra) {
         return TableDataResult.build(page, rows, extra);
+    }
+
+    /**
+     * 使用自定义分页封装分页结果
+     *
+     * @param page 自定义分页
+     * @return 封装后的分页数据
+     */
+    protected AjaxResult<TableDataResult> getTableData(PageResult<?> page) {
+        return TableDataResult.build(page);
     }
 
 
@@ -230,6 +241,16 @@ public class BaseController {
      */
     protected boolean matchesPassword(String rawPassword, String encodedPassword) {
         return SecurityUtils.matchesPassword(rawPassword, encodedPassword);
+    }
+
+
+    /**
+     * 获取当前登录用户的访问令牌
+     *
+     * @return 访问令牌
+     */
+    protected String getToken() {
+        return SecurityUtils.getToken();
     }
 
 

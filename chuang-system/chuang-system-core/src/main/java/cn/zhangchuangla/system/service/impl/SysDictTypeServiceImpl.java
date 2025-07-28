@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
-import cn.zhangchuangla.common.core.utils.StrUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.mapper.SysDictTypeMapper;
@@ -20,6 +19,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,7 +161,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      */
     @Override
     public boolean isDictTypeExist(String dictType) {
-        if (StrUtils.isBlank(dictType)) {
+        if (StringUtil.isBlank(dictType)) {
             return false;
         }
         LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<SysDictType>()
@@ -256,7 +257,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * 清除指定字典类型的缓存
      */
     private void clearDictCache(String dictType) {
-        if (!StrUtils.isBlank(dictType)) {
+        if (!StringUtils.isBlank(dictType)) {
             String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
                 redisCache.deleteObject(cacheKey);

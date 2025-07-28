@@ -1,9 +1,9 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.core.result.AjaxResult;
-import cn.zhangchuangla.common.core.result.TableDataResult;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.storage.model.entity.StorageFile;
 import cn.zhangchuangla.storage.model.request.file.StorageFileQueryRequest;
@@ -67,7 +67,7 @@ public class SysStorageFileController extends BaseController {
     @Operation(summary = "文件资源详情")
     @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
     public AjaxResult<StorageFileVo> getFileById(@Parameter(description = "文件ID")
-                                                @PathVariable("id") Long id) {
+                                                     @PathVariable("id") Long id) {
         StorageFile storageFile = storageFileService.getFileById(id);
         StorageFileVo storageFileVo = new StorageFileVo();
         BeanUtils.copyProperties(storageFile, storageFileVo);

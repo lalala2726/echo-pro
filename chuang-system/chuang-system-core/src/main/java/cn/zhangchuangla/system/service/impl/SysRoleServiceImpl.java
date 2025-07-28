@@ -80,7 +80,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public Set<String> getRoleSetByUserId(Long userId) {
         if (userId <= 0) {
-            throw new ParamException(ResultCode.INVALID_ROLE_ID, "用户ID无效");
+            throw new ParamException("用户ID无效");
         }
 
         String cacheKey = RedisConstants.Auth.ROLE_KEY + userId;
