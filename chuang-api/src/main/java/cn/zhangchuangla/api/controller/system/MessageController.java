@@ -38,7 +38,7 @@ import java.util.List;
 @RequestMapping("/system/message")
 @RequiredArgsConstructor
 @Tag(name = "站内信管理", description = "提供系统消息的列表、发送、用户消息操作、标记已读未读、详情、导出等相关接口")
-public class SysMessageController extends BaseController {
+public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
     private final ExcelExportService excelExportService;

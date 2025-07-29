@@ -47,7 +47,7 @@ import java.util.List;
 @RequestMapping("/system/role")
 @Tag(name = "角色管理", description = "提供角色的新增、删除、修改、查询、权限分配、角色选项等管理接口")
 @RequiredArgsConstructor
-public class SysRoleController extends BaseController {
+public class RoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
     private final ExcelExportService excelExportService;

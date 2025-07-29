@@ -36,7 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "操作日志", description = "提供系统操作日志")
 @Slf4j
-public class SysOperationLogController extends BaseController {
+public class OperationLogController extends BaseController {
 
     private final SysOperationLogService sysOperationLogService;
     private final ExcelExportService excelExportService;

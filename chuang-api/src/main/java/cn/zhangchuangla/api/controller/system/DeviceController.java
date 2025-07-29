@@ -1,10 +1,9 @@
-package cn.zhangchuangla.api.controller.monitor;
+package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
-import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.excel.utils.ExcelExportService;
 import cn.zhangchuangla.framework.annotation.OperationLog;
@@ -26,7 +25,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/monitor/device")
+@RequestMapping("/system/device")
 @Tag(name = "设备管理", description = "设备的相关管理")
 @RequiredArgsConstructor
 public class DeviceController extends BaseController {
@@ -51,20 +50,6 @@ public class DeviceController extends BaseController {
 
 
     /**
-     * 获取当前设备关联会话详情
-     *
-     * @param refreshTokenId 刷新令牌ID
-     * @return 是否成功删除
-     */
-    @Operation(summary = "获取当前设备关联会话详情", description = "获取当前设备关联会话详情,只能获取当前在线的用户")
-    @GetMapping("/detail")
-    @PreAuthorize("hasAuthority('system:session:query')")
-    public AjaxResult<OnlineLoginUser> getOnlineLoginUser(@RequestParam("refreshTokenId") String refreshTokenId) {
-        OnlineLoginUser onlineLoginUser = deviceService.getOnlineLoginUser(refreshTokenId);
-        return success(onlineLoginUser);
-    }
-
-    /**
      * 删除会话
      *
      * @param refreshTokenId 刷新令牌ID
@@ -80,6 +65,12 @@ public class DeviceController extends BaseController {
     }
 
 
+    /**
+     * 导出在线设备列表
+     *
+     * @param request  请求参数
+     * @param response 响应
+     */
     @PostMapping("/export")
     @OperationLog(title = "会话管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("hasAuthority('system:session:export')")

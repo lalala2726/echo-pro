@@ -37,7 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "字典类型管理", description = "提供字典类型的增删改查、缓存刷新等相关接口")
-public class SysDictTypeController extends BaseController {
+public class DictTypeController extends BaseController {
 
     private final SysDictTypeService sysDictTypeService;
 

@@ -38,7 +38,7 @@ import java.util.List;
 @RequestMapping("/system/post")
 @Tag(name = "岗位管理", description = "提供岗位的新增、删除、修改、查询、批量操作、导出等管理相关接口")
 @RequiredArgsConstructor
-public class SysPostController extends BaseController {
+public class PostController extends BaseController {
 
     private final SysPostService sysPostService;
 

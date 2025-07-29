@@ -36,7 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "登录日志", description = "提供系统登录日志")
 @Slf4j
-public class SysLoginLogController extends BaseController {
+public class LoginLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
     private final ExcelExportService excelExportService;

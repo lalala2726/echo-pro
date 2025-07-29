@@ -46,7 +46,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/system/user")
 @RequiredArgsConstructor
-public class SysUserController extends BaseController {
+public class UserController extends BaseController {
 
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;

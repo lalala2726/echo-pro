@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/system/user/profile")
 @RequiredArgsConstructor
 @RestController
-public class UserProfileController extends BaseController {
+public class ProfileController extends BaseController {
 
     private final SysUserService sysUserService;
     private final DeviceService deviceService;

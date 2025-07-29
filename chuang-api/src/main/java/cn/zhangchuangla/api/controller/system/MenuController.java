@@ -32,7 +32,7 @@ import java.util.List;
 @RequestMapping("/system/menu")
 @RestController
 @RequiredArgsConstructor
-public class SysMenuController extends BaseController {
+public class MenuController extends BaseController {
 
     private final SysMenuService sysMenuService;
 

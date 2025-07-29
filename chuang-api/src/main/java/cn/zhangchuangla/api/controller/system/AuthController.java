@@ -36,7 +36,7 @@ import java.util.Set;
 @Tag(name = "用户认证", description = "提供用户登录、刷新令牌、退出登录等认证相关操作接口")
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class SysAuthController extends BaseController {
+public class AuthController extends BaseController {
 
     private final AuthService authService;
     private final SysUserService sysUserService;

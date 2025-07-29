@@ -35,7 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/dept")
 @RequiredArgsConstructor
-public class SysDeptController extends BaseController {
+public class DeptController extends BaseController {
 
     private final SysDeptService sysDeptService;
 

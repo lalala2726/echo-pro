@@ -41,7 +41,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "字典数据管理", description = "提供字典数据的增删改查等相关接口")
-public class SysDictDataController extends BaseController {
+public class DictDataController extends BaseController {
 
     private final SysDictDataService sysDictDataService;
     private final SysDictTypeService sysDictTypeService;
