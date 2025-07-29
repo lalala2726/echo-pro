@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * created on 2025/7/28 14:41
  */
 @RestController
-@RequestMapping("/monitor/session")
+@RequestMapping("/system/session")
 @Slf4j
 @RequiredArgsConstructor
 public class SessionController extends BaseController {

@@ -14,6 +14,7 @@
         <module>chuang-system</module>
         <module>chuang-framework</module>
         <module>chuang-api</module>
+        <module>chuang-quartz</module>
     </modules>
 
 
@@ -142,6 +143,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>chuang-system</artifactId>
+                <version>${app.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.zhangchuangla</groupId>
+                <artifactId>chuang-quartz</artifactId>
                 <version>${app.version}</version>
             </dependency>
 

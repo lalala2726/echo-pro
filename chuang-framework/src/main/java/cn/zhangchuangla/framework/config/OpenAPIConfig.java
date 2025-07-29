@@ -58,16 +58,6 @@ public class OpenAPIConfig {
                 .build();
     }
 
-    /**
-     * 工作台
-     */
-    @Bean
-    public GroupedOpenApi workbenchApi() {
-        return GroupedOpenApi.builder()
-                .group("工作台")
-                .packagesToScan("cn.zhangchuangla.api.controller.workbench")
-                .build();
-    }
 
     /**
      * 通用接口组
