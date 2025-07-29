@@ -1,7 +1,6 @@
 package cn.zhangchuangla.framework.model.dto;
 
 import cn.zhangchuangla.common.core.enums.DeviceType;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,19 +20,16 @@ public class LoginDeviceDTO {
     /**
      * 用户ID
      */
-    @NotNull(message = "用户ID不能为空")
     private Long userId;
 
     /**
      * 用户名
      */
-    @NotNull(message = "用户名不能为空")
     private String username;
 
     /**
      * 刷新令牌会话ID
      */
-    @NotNull(message = "刷新令牌会话ID不能为空")
     private String refreshSessionId;
 
     /**
@@ -45,6 +41,8 @@ public class LoginDeviceDTO {
      * 设备名称
      */
     private String deviceName;
+
+    private String userAgent;
 
     /**
      * IP地址

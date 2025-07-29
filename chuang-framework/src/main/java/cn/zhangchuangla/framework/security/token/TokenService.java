@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.security.token;
 
-import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
@@ -9,15 +8,12 @@ import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
-import cn.zhangchuangla.common.core.utils.client.IPUtils;
-import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
+import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +43,6 @@ public class TokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SysRoleService sysRoleService;
-    private final SecurityProperties securityProperties;
     private final SysUserService userService;
     private final RedisTokenStore redisTokenStore;
 
@@ -59,7 +54,7 @@ public class TokenService {
      * @return 包含JWT访问令牌和JWT刷新令牌的AuthenticationToken对象。
      */
 
-    public LoginSessionDTO createToken(Authentication authentication) {
+    public LoginSessionDTO createToken(Authentication authentication, LoginDeviceDTO loginDeviceDTO) {
         // 获取当前用户的信息
         SysUserDetails userDetails = (SysUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
@@ -70,8 +65,7 @@ public class TokenService {
         String refreshTokenSessionId = UUIDUtils.simple();
 
         // 构造在线用户信息
-        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId);
-        setClientInfo(onlineLoginUser);
+        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId, loginDeviceDTO);
 
         redisTokenStore.setRefreshToken(refreshTokenSessionId, accessTokenSessionId);
         redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
@@ -104,16 +98,20 @@ public class TokenService {
             return null;
         }
 
-        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(accessTokenSessionId)) {
+        String accessTokenId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+        if (StringUtils.isBlank(accessTokenId)) {
             log.warn("访问令牌JWT中未找到sessionId ({}): {}", CLAIM_KEY_SESSION_ID, accessToken);
             return null;
         }
 
-        OnlineLoginUser onlineUser = redisTokenStore.getAccessToken(accessTokenSessionId);
+        OnlineLoginUser onlineUser = redisTokenStore.getAccessToken(accessTokenId);
+
+        //更新访问时间
         if (onlineUser == null) {
             return null;
         }
+        redisTokenStore.updateAccessTime(accessTokenId);
+
         Set<SimpleGrantedAuthority> authorities = onlineUser.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
                 .collect(Collectors.toSet());
@@ -180,9 +178,6 @@ public class TokenService {
                 .username(user.getUsername())
                 .build();
 
-
-        // 设置客户端信息
-        setClientInfo(onlineLoginUser);
         // 保存刷新令牌
         redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
         //重新设置新的访问令牌和刷新令牌的映射关系
@@ -226,50 +221,25 @@ public class TokenService {
      * @param accessTokenId 访问令牌ID
      * @return OnlineLoginUser 对象
      */
-    private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId) {
+    private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId, LoginDeviceDTO loginDeviceDTO) {
 
         Set<String> roleSetByRoleId = sysRoleService.getRoleSetByRoleId(user.getUserId());
 
-        HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
-        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
-        String region = IPUtils.getRegion(ipAddr);
+        String ip = loginDeviceDTO.getIp();
+        String location = loginDeviceDTO.getLocation();
 
         OnlineLoginUser.OnlineLoginUserBuilder builder = OnlineLoginUser.builder()
                 .username(user.getUsername())
-                // 这是访问令牌ID
-                .sessionId(accessTokenId)
-                .ip(ipAddr)
-                .region(region)
+                .accessTokenId(accessTokenId)
+                .ip(ip)
+                .accessTime(System.currentTimeMillis())
+                .location(location)
                 .deptId(user.getDeptId())
                 .userId(user.getUserId())
                 .roles(roleSetByRoleId);
         return builder.build();
     }
 
-
-    /**
-     * 设置在线用户的客户端信息。
-     * 包括IP地址、地区、操作系统、浏览器、设备制造商等信息。
-     *
-     * @param onlineUser 在线用户信息
-     */
-    private void setClientInfo(OnlineLoginUser onlineUser) {
-        // 应检查是否为null
-        HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
-        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
-        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
-        String osName = UserAgentUtils.getOsName(userAgent);
-        String browserName = UserAgentUtils.getBrowserName(userAgent);
-        String deviceManufacturer = UserAgentUtils.getDeviceManufacturer(userAgent);
-
-        onlineUser.setIp(ipAddr);
-        onlineUser.setRegion(IPUtils.getRegion(ipAddr));
-        onlineUser.setOs(osName);
-        onlineUser.setBrowser(browserName);
-        onlineUser.setDevice(deviceManufacturer);
-        onlineUser.setLoginTime(System.currentTimeMillis());
-        onlineUser.setUserAgent(userAgent);
-    }
 
     /**
      * 构建用户详情对象。
