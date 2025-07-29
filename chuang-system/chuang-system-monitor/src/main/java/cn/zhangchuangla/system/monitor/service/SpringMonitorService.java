@@ -1,9 +1,7 @@
 package cn.zhangchuangla.system.monitor.service;
 
 import cn.zhangchuangla.system.monitor.dto.SpringMetricsDTO;
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
@@ -54,22 +52,14 @@ public class SpringMonitorService {
     public SpringMetricsDTO getSpringMetrics() {
         SpringMetricsDTO metrics = new SpringMetricsDTO();
         metrics.setTimestamp(LocalDateTime.now());
-
-        try {
-            // 获取应用信息
-            metrics.setApplication(getApplicationInfo());
-            // 获取HTTP指标
-            metrics.setHttp(getHttpMetrics());
-            // 获取数据源指标
-            metrics.setDataSource(getDataSourceMetrics());
-            // 获取线程池指标
-            metrics.setThreadPools(getThreadPoolMetrics());
-            // 获取缓存指标
-            metrics.setCaches(getCacheMetrics());
-        } catch (Exception e) {
-            log.error("获取Spring监控指标失败", e);
-        }
-
+        // 获取应用信息
+        metrics.setApplication(getApplicationInfo());
+        // 获取数据源指标
+        metrics.setDataSource(getDataSourceMetrics());
+        // 获取线程池指标
+        metrics.setThreadPools(getThreadPoolMetrics());
+        // 获取缓存指标
+        metrics.setCaches(getCacheMetrics());
         return metrics;
     }
 
@@ -103,89 +93,7 @@ public class SpringMonitorService {
         return appInfo;
     }
 
-    /**
-     * 获取HTTP指标
-     */
-    private SpringMetricsDTO.HttpMetrics getHttpMetrics() {
-        SpringMetricsDTO.HttpMetrics httpMetrics = new SpringMetricsDTO.HttpMetrics();
 
-        try {
-            // 从Micrometer获取HTTP指标
-            Counter totalRequests = meterRegistry.find("http.server.requests").counter();
-            if (totalRequests != null) {
-                httpMetrics.setTotalRequests((long) totalRequests.count());
-            }
-
-            // 获取各状态码统计
-            Map<String, Long> statusCodeStats = new HashMap<>();
-            meterRegistry.find("http.server.requests")
-                    .counters()
-                    .forEach(counter -> {
-                        String status = counter.getId().getTag("status");
-                        if (status != null) {
-                            statusCodeStats.put(status, (long) counter.count());
-                        }
-                    });
-            httpMetrics.setStatusCodeStats(statusCodeStats);
-
-            // 计算成功、客户端错误、服务器错误请求数
-            long successRequests = statusCodeStats.entrySet().stream()
-                    .filter(entry -> entry.getKey().startsWith("2"))
-                    .mapToLong(Map.Entry::getValue)
-                    .sum();
-            httpMetrics.setSuccessRequests(successRequests);
-
-            long clientErrorRequests = statusCodeStats.entrySet().stream()
-                    .filter(entry -> entry.getKey().startsWith("4"))
-                    .mapToLong(Map.Entry::getValue)
-                    .sum();
-            httpMetrics.setClientErrorRequests(clientErrorRequests);
-
-            long serverErrorRequests = statusCodeStats.entrySet().stream()
-                    .filter(entry -> entry.getKey().startsWith("5"))
-                    .mapToLong(Map.Entry::getValue)
-                    .sum();
-            httpMetrics.setServerErrorRequests(serverErrorRequests);
-
-            // 获取响应时间指标
-            Timer responseTimer = meterRegistry.find("http.server.requests").timer();
-            if (responseTimer != null) {
-                httpMetrics.setAverageResponseTime(responseTimer.mean(java.util.concurrent.TimeUnit.MILLISECONDS));
-                httpMetrics.setMaxResponseTime(responseTimer.max(java.util.concurrent.TimeUnit.MILLISECONDS));
-            }
-
-            // 计算每秒请求数（基于运行时间）
-            long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-            if (uptime > 0) {
-                double requestsPerSecond = (double) httpMetrics.getTotalRequests() / (uptime / 1000.0);
-                httpMetrics.setRequestsPerSecond(Math.round(requestsPerSecond * 100.0) / 100.0);
-            }
-
-            // 获取各端点统计
-            Map<String, SpringMetricsDTO.HttpMetrics.EndpointStats> endpointStats = new HashMap<>();
-            meterRegistry.find("http.server.requests")
-                    .timers()
-                    .forEach(timer -> {
-                        String uri = timer.getId().getTag("uri");
-                        String method = timer.getId().getTag("method");
-                        if (uri != null && method != null) {
-                            String endpoint = method + " " + uri;
-                            SpringMetricsDTO.HttpMetrics.EndpointStats stats =
-                                    new SpringMetricsDTO.HttpMetrics.EndpointStats();
-                            stats.setCount((long) timer.count());
-                            stats.setAverageTime(timer.mean(java.util.concurrent.TimeUnit.MILLISECONDS));
-                            stats.setMaxTime(timer.max(java.util.concurrent.TimeUnit.MILLISECONDS));
-                            endpointStats.put(endpoint, stats);
-                        }
-                    });
-            httpMetrics.setEndpointStats(endpointStats);
-
-        } catch (Exception e) {
-            log.debug("获取HTTP指标失败", e);
-        }
-
-        return httpMetrics;
-    }
 
     /**
      * 获取数据源指标

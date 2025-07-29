@@ -2,12 +2,15 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
-import cn.zhangchuangla.common.core.entity.base.PageResult;
-import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
-import cn.zhangchuangla.system.monitor.dto.*;
-import cn.zhangchuangla.system.monitor.request.EndpointStatsQueryRequest;
-import cn.zhangchuangla.system.monitor.service.*;
+import cn.zhangchuangla.system.monitor.dto.JvmMetricsDTO;
+import cn.zhangchuangla.system.monitor.dto.RedisMetricsDTO;
+import cn.zhangchuangla.system.monitor.dto.SpringMetricsDTO;
+import cn.zhangchuangla.system.monitor.dto.SystemMetricsDTO;
+import cn.zhangchuangla.system.monitor.service.JvmMonitorService;
+import cn.zhangchuangla.system.monitor.service.RedisMonitorService;
+import cn.zhangchuangla.system.monitor.service.SpringMonitorService;
+import cn.zhangchuangla.system.monitor.service.SystemMonitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,6 @@ public class MonitorController extends BaseController {
     private final JvmMonitorService jvmMonitorService;
     private final RedisMonitorService redisMonitorService;
     private final SpringMonitorService springMonitorService;
-    private final EndpointStatsService endpointStatsService;
 
     /**
      * 获取系统监控指标
@@ -108,32 +110,6 @@ public class MonitorController extends BaseController {
     }
 
     /**
-     * 获取端点统计列表
-     *
-     * @param request 查询请求
-     * @return 端点统计分页结果
-     */
-    @GetMapping("/endpoints")
-    @Operation(summary = "获取端点统计列表", description = "获取HTTP端点的详细统计信息，支持分页和过滤")
-    public AjaxResult<TableDataResult> getEndpointStats(EndpointStatsQueryRequest request) {
-        PageResult<EndpointStatsDTO> result = endpointStatsService.getEndpointStats(request);
-        return getTableData(result);
-    }
-
-    /**
-     * 获取端点统计概览
-     *
-     * @return 端点统计概览
-     */
-    @GetMapping("/endpoints/overview")
-    @Operation(summary = "获取端点统计概览", description = "获取端点统计的汇总信息")
-    public AjaxResult<Map<String, Object>> getEndpointStatsOverview() {
-        Map<String, Object> overview = endpointStatsService.getEndpointStatsOverview();
-        return success(overview);
-    }
-
-
-    /**
      * 获取所有监控指标概览
      *
      * @return 所有监控指标概览
@@ -177,8 +153,6 @@ public class MonitorController extends BaseController {
             // Spring指标概览
             SpringMetricsDTO springMetrics = springMonitorService.getSpringMetrics();
             Map<String, Object> springOverview = new HashMap<>();
-            springOverview.put("totalRequests", springMetrics.getHttp().getTotalRequests());
-            springOverview.put("averageResponseTime", springMetrics.getHttp().getAverageResponseTime());
             springOverview.put("dataSourceUsage", springMetrics.getDataSource().getUsage());
             springOverview.put("uptime", springMetrics.getApplication().getUptime());
             springOverview.put("timestamp", springMetrics.getTimestamp());
