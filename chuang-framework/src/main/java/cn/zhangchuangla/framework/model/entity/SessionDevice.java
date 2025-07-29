@@ -22,7 +22,6 @@ import java.util.Date;
 @Builder
 public class SessionDevice {
 
-
     /**
      * 用户ID
      */

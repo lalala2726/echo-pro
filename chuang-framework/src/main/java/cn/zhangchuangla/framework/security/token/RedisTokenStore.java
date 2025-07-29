@@ -10,8 +10,6 @@ import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * Redis中读取令牌操作
  *
@@ -30,11 +28,11 @@ public class RedisTokenStore {
     /**
      * 保存访问令牌到Redis中
      *
-     * @param accessTokenSession 访问令牌会话ID
-     * @param onlineLoginUser    在线用户信息
+     * @param accessTokenId   访问令牌会话ID
+     * @param onlineLoginUser 在线用户信息
      */
-    protected void setAccessToken(String accessTokenSession, OnlineLoginUser onlineLoginUser) {
-        String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
+    protected void setAccessToken(String accessTokenId, OnlineLoginUser onlineLoginUser) {
+        String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
         redisCache.setCacheObject(accessTokenKey, onlineLoginUser,
                 securityProperties.getSession().getAccessTokenExpireTime());
     }
@@ -42,71 +40,71 @@ public class RedisTokenStore {
     /**
      * 保存刷新令牌到Redis中
      *
-     * @param refreshTokenSession 刷新令牌会话ID
-     * @param accessTokenSession  访问令牌会话ID
+     * @param refreshTokenId 刷新令牌会话ID
+     * @param accessTokenId  访问令牌会话ID
      */
-    protected void setRefreshToken(String refreshTokenSession, String accessTokenSession) {
-        String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
+    protected void setRefreshToken(String refreshTokenId, String accessTokenId) {
+        String refreshTokenRedisKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenId;
         //保存刷新令牌
-        redisCache.setCacheObject(refreshTokenKey, accessTokenSession,
+        redisCache.setCacheObject(refreshTokenRedisKey, accessTokenId,
                 securityProperties.getSession().getRefreshTokenExpireTime());
     }
 
     /**
      * 读取访问令牌
      *
-     * @param accessTokenSession 访问令牌会话ID
+     * @param accessTokenId 访问令牌会话ID
      */
-    public OnlineLoginUser getAccessToken(String accessTokenSession) {
-        String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
-        return redisCache.getCacheObject(accessTokenKey);
+    public OnlineLoginUser getAccessToken(String accessTokenId) {
+        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
+        return redisCache.getCacheObject(accessTokenRedisKey);
     }
 
     /**
      * 读取刷新令牌
      *
-     * @param refreshTokenSession 刷新令牌会话ID
+     * @param refreshTokenId 刷新令牌会话ID
      * @return 访问令牌ID
      */
-    public String getRefreshToken(String refreshTokenSession) {
-        String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        return redisCache.getCacheObject(refreshTokenKey);
+    public String getRefreshToken(String refreshTokenId) {
+        String refreshTokenRedisKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenId;
+        return redisCache.getCacheObject(refreshTokenRedisKey);
     }
 
     /**
      * 删除访问令牌
      *
-     * @param accessTokenSession 访问令牌会话ID
+     * @param accessTokenId 访问令牌会话ID
      */
-    public void deleteAccessToken(String accessTokenSession) {
-        String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenSession;
-        redisCache.deleteObject(accessTokenKey);
+    public void deleteAccessToken(String accessTokenId) {
+        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
+        redisCache.deleteObject(accessTokenRedisKey);
     }
 
     /**
      * 删除刷新令牌
      *
-     * @param refreshTokenSession 刷新令牌会话ID
+     * @param refreshTokenId 刷新令牌会话ID
      */
-    public void deleteRefreshToken(String refreshTokenSession) {
-        String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
-        redisCache.deleteObject(refreshTokenKey);
+    public void deleteRefreshToken(String refreshTokenId) {
+        String refreshTokenRedisKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenId;
+        redisCache.deleteObject(refreshTokenRedisKey);
     }
 
     /**
      * 删除刷新令牌和关联的访问令牌
      *
-     * @param refreshTokenSession 刷新令牌会话ID
+     * @param refreshTokenId 刷新令牌会话ID
      */
-    public void deleteRefreshTokenAndAccessToken(String refreshTokenSession) {
-        String refreshTokenKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
+    public void deleteRefreshTokenAndAccessToken(String refreshTokenId) {
+        String refreshTokenRedisKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenId;
         // 删除关联的访问令牌
-        String accessToken = redisCache.getCacheObject(refreshTokenKey);
+        String accessToken = redisCache.getCacheObject(refreshTokenRedisKey);
         if (accessToken != null) {
             String accessTokenKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessToken;
             redisCache.deleteObject(accessTokenKey);
         }
-        redisCache.deleteObject(refreshTokenKey);
+        redisCache.deleteObject(refreshTokenRedisKey);
     }
 
     /**
@@ -136,26 +134,19 @@ public class RedisTokenStore {
      */
     public String getRefreshTokenIdByAccessTokenId(String accessTokenId) {
         Assert.hasText(accessTokenId, "访问令牌ID不能为空!");
-        String refreshTokenRedisKey = RedisConstants.Auth.USER_REFRESH_TOKEN + "*";
-        Map<String, Object> stringObjectMap = redisCache.scanKeysWithValues(refreshTokenRedisKey);
-
-        for (Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
-            if (entry.getValue() instanceof String value && accessTokenId.equals(value)) {
-                String key = entry.getKey();
-                return key.replace(RedisConstants.Auth.USER_REFRESH_TOKEN, "");
-            }
-        }
-        return null;
+        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
+        OnlineLoginUser onlineLoginUser = redisCache.getCacheObject(accessTokenRedisKey);
+        return onlineLoginUser.getRefreshTokenId();
     }
 
 
     /**
      * 映射刷新令牌到访问令牌
      *
-     * @param refreshTokenSession 刷新令牌会话ID
+     * @param refreshTokenId 刷新令牌会话ID
      */
-    public void mapRefreshTokenToAccessToken(String refreshTokenSession, String newAccessToken) {
-        String refreshKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenSession;
+    public void mapRefreshTokenToAccessToken(String refreshTokenId, String newAccessToken) {
+        String refreshKey = RedisConstants.Auth.USER_REFRESH_TOKEN + refreshTokenId;
         // 1. 验证 refreshKey 存在
         if (!redisCache.exists(refreshKey)) {
             throw new AuthorizationException(ResultCode.REFRESH_TOKEN_INVALID);
@@ -183,4 +174,16 @@ public class RedisTokenStore {
     }
 
 
+    /**
+     * 更新访问令牌时间
+     *
+     * @param accessTokenId 访问令牌ID
+     */
+    public void updateAccessTime(String accessTokenId) {
+        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
+        OnlineLoginUser onlineLoginUser = redisCache.getCacheObject(accessTokenRedisKey);
+        Long expire = redisCache.getExpire(accessTokenRedisKey);
+        onlineLoginUser.setAccessTime(System.currentTimeMillis());
+        redisCache.setCacheObject(accessTokenRedisKey, onlineLoginUser, expire);
+    }
 }

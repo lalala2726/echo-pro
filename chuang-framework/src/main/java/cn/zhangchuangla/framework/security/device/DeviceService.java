@@ -17,7 +17,7 @@ import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.service.SysUserService;
+import cn.zhangchuangla.system.core.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;

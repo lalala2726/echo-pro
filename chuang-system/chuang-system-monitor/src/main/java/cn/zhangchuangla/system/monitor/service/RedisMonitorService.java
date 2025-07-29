@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class RedisMonitorService {
 
-    private final RedisTemplate<Object, Object> redisTemplate;
     private final RedisConnectionFactory redisConnectionFactory;
 
     /**
@@ -40,25 +38,27 @@ public class RedisMonitorService {
 
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
             // 获取Redis信息
-            Properties info = connection.info();
+            Properties info = connection.serverCommands().info();
 
-            // 获取Redis基本信息
-            metrics.setInfo(getRedisInfo(info));
+            if (info != null) {
+                // 获取Redis基本信息
+                metrics.setInfo(getRedisInfo(info));
 
-            // 获取内存指标
-            metrics.setMemory(getMemoryMetrics(info));
+                // 获取内存指标
+                metrics.setMemory(getMemoryMetrics(info));
 
-            // 获取连接指标
-            metrics.setConnections(getConnectionMetrics(info));
+                // 获取连接指标
+                metrics.setConnections(getConnectionMetrics(info));
 
-            // 获取命令统计
-            metrics.setCommandStats(getCommandStats(info));
+                // 获取命令统计
+                metrics.setCommandStats(getCommandStats(info));
 
-            // 获取键空间统计
-            metrics.setKeyspace(getKeyspaceStats(info));
+                // 获取键空间统计
+                metrics.setKeyspace(getKeyspaceStats(info));
 
-            // 获取性能指标
-            metrics.setPerformance(getPerformanceMetrics(info));
+                // 获取性能指标
+                metrics.setPerformance(getPerformanceMetrics(info));
+            }
 
         } catch (Exception e) {
             log.error("获取Redis监控指标失败", e);

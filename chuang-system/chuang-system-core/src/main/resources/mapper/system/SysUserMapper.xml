@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="cn.zhangchuangla.system.mapper.SysUserMapper">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysUserMapper">
 
     <!-- 用户 + 部门组合 DTO 映射 -->
-    <resultMap id="UserDeptMap" type="cn.zhangchuangla.system.model.dto.SysUserDeptDto">
+    <resultMap id="UserDeptMap" type="cn.zhangchuangla.system.core.model.dto.SysUserDeptDto">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.zhangchuangla.system.mapper.SysUserRoleMapper">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysUserRoleMapper">
 
-    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.model.entity.SysUserRole">
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysUserRole">
         <id property="userRoleId" column="user_role_id"/>
         <id property="userId" column="user_id"/>
         <id property="roleId" column="role_id"/>

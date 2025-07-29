@@ -23,10 +23,16 @@ public class OnlineLoginUser {
 
 
     /**
-     * 会话ID
+     * 访问令牌ID
      */
     @Schema(description = "会话ID")
-    private String sessionId;
+    private String accessTokenId;
+
+    /**
+     * 刷新令牌ID
+     */
+    @Schema(description = "刷新令牌ID")
+    private String refreshTokenId;
 
     /**
      * 用户ID
@@ -62,37 +68,19 @@ public class OnlineLoginUser {
      * 登录地点
      */
     @Schema(description = "登录地点")
-    private String region;
+    private String location;
 
     /**
-     * 登录时间
+     * 访问时间
      */
-    @Schema(description = "登录时间")
-    private Long loginTime;
+    @Schema(description = "最近访问时间")
+    private Long accessTime;
 
     /**
      * userAgent
      */
     @Schema(description = "userAgent")
     private String userAgent;
-
-    /**
-     * 设备信息
-     */
-    @Schema(description = "设备信息")
-    private String device;
-
-    /**
-     * 设备
-     */
-    @Schema(description = "设备")
-    private String os;
-
-    /**
-     * 浏览器信息
-     */
-    @Schema(description = "浏览器信息")
-    private String browser;
 
 
 }

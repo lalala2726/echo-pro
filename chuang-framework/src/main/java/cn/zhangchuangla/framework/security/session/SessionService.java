@@ -8,7 +8,7 @@ import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.model.request.monitor.OnlineUserQueryRequest;
+import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public class SessionService {
                     if (sessionIdKeyword == null || sessionIdKeyword.isBlank()) {
                         return true;
                     }
-                    String sessionId = user.getSessionId();
+                    String sessionId = user.getAccessTokenId();
                     return sessionId != null && !sessionId.isBlank() && sessionId.toLowerCase().contains(sessionIdKeyword.toLowerCase());
                 })
                 // 用户名模糊查询
@@ -111,12 +111,12 @@ public class SessionService {
                     if (regionKeyword == null || regionKeyword.isBlank()) {
                         return true;
                     }
-                    String region = user.getRegion();
+                    String region = user.getLocation();
                     return region != null && !region.isBlank() && region.toLowerCase().contains(regionKeyword.toLowerCase());
                 })
                 // 排序：按 loginTime 倒序（时间晚的排前面）
                 .sorted(Comparator.comparing(
-                        OnlineLoginUser::getLoginTime,
+                        OnlineLoginUser::getAccessTime,
                         Comparator.nullsLast(Comparator.reverseOrder())
                 ))
                 .collect(Collectors.toList());

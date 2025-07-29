@@ -28,11 +28,6 @@ public class SpringMetricsDTO {
     @Schema(description = "应用信息")
     private ApplicationInfo application;
 
-    /**
-     * HTTP指标
-     */
-    @Schema(description = "HTTP指标")
-    private HttpMetrics http;
 
     /**
      * 数据源指标
@@ -101,94 +96,6 @@ public class SpringMetricsDTO {
         private String[] activeProfiles;
     }
 
-    /**
-     * HTTP指标
-     */
-    @Data
-    @Schema(description = "HTTP指标")
-    public static class HttpMetrics {
-        /**
-         * 总请求数
-         */
-        @Schema(description = "总请求数")
-        private long totalRequests;
-
-        /**
-         * 成功请求数（2xx）
-         */
-        @Schema(description = "成功请求数（2xx）")
-        private long successRequests;
-
-        /**
-         * 客户端错误请求数（4xx）
-         */
-        @Schema(description = "客户端错误请求数（4xx）")
-        private long clientErrorRequests;
-
-        /**
-         * 服务器错误请求数（5xx）
-         */
-        @Schema(description = "服务器错误请求数（5xx）")
-        private long serverErrorRequests;
-
-        /**
-         * 平均响应时间（毫秒）
-         */
-        @Schema(description = "平均响应时间（毫秒）")
-        private double averageResponseTime;
-
-        /**
-         * 最大响应时间（毫秒）
-         */
-        @Schema(description = "最大响应时间（毫秒）")
-        private double maxResponseTime;
-
-        /**
-         * 每秒请求数
-         */
-        @Schema(description = "每秒请求数")
-        private double requestsPerSecond;
-
-        /**
-         * 当前活跃请求数
-         */
-        @Schema(description = "当前活跃请求数")
-        private int activeRequests;
-
-        /**
-         * 各状态码统计
-         */
-        @Schema(description = "各状态码统计")
-        private Map<String, Long> statusCodeStats;
-
-        /**
-         * 各端点统计
-         */
-        @Schema(description = "各端点统计")
-        private Map<String, EndpointStats> endpointStats;
-
-        @Data
-        @Schema(description = "端点统计")
-        public static class EndpointStats {
-            /**
-             * 请求数
-             */
-            @Schema(description = "请求数")
-            private long count;
-
-            /**
-             * 平均响应时间（毫秒）
-             */
-            @Schema(description = "平均响应时间（毫秒）")
-            private double averageTime;
-
-            /**
-             * 最大响应时间（毫秒）
-             */
-            @Schema(description = "最大响应时间（毫秒）")
-            private double maxTime;
-        }
-    }
 
     /**
      * 数据源指标

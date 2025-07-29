@@ -22,7 +22,7 @@ import cn.zhangchuangla.framework.security.login.limiter.LoginFrequencyLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.service.SysUserService;
+import cn.zhangchuangla.system.core.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,26 +100,27 @@ public class AuthService {
         passwordRetryLimiter.clearRecord(username);
         loginFrequencyLimiter.recordLoginSuccess(username);
 
+        LoginDeviceDTO loginDeviceDTO = new LoginDeviceDTO();
+        loginDeviceDTO.setDeviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device");
+        loginDeviceDTO.setDeviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue());
+        loginDeviceDTO.setIp(IPUtils.getIpAddress(httpServletRequest));
+        loginDeviceDTO.setLocation(IPUtils.getRegion(IPUtils.getIpAddress(httpServletRequest)));
+        loginDeviceDTO.setUserAgent(UserAgentUtils.getUserAgent(httpServletRequest));
+
         // 6. 生成 JWT 令牌（但还未添加到会话管理中）
-        LoginSessionDTO authSessionInfo = tokenService.createToken(authentication);
+        LoginSessionDTO authSessionInfo = tokenService.createToken(authentication, loginDeviceDTO);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 7. 构建登录设备信息
-        LoginDeviceDTO deviceInfo = LoginDeviceDTO.builder()
-                .deviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue())
-                .deviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device")
-                .userId(authSessionInfo.getUserId())
-                .refreshSessionId(authSessionInfo.getRefreshTokenSessionId())
-                .username(authSessionInfo.getUsername())
-                .ip(IPUtils.getIpAddress(httpServletRequest))
-                .location(IPUtils.getRegion(IPUtils.getIpAddress(httpServletRequest)))
-                .build();
+        loginDeviceDTO.setRefreshSessionId(authSessionInfo.getRefreshTokenSessionId());
+        loginDeviceDTO.setUsername(username);
+        loginDeviceDTO.setUserId(authSessionInfo.getUserId());
+
 
         // 如果为了性能考虑，可以在 checkLimitAndAddSession 的第二个参数传入 false，
         // 表示在检查设备数量限制时跳过加锁。适用于单机部署且用户并发不高的场景。
         // 注意：跳过加锁可能会导致会话数量限制不准确，需根据实际业务场景权衡。
         try {
-            deviceLimiter.checkLimitAndAddSession(deviceInfo);
+            deviceLimiter.checkLimitAndAddSession(loginDeviceDTO);
         } catch (AuthorizationException e) {
             // 如果设备限制检查失败，需要清理已生成的token
             log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
