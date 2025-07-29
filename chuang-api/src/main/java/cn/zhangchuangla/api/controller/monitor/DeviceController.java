@@ -51,13 +51,13 @@ public class DeviceController extends BaseController {
 
 
     /**
-     * 删除设备
+     * 获取当前设备关联会话详情
      *
      * @param refreshTokenId 刷新令牌ID
      * @return 是否成功删除
      */
     @Operation(summary = "获取当前设备关联会话详情", description = "获取当前设备关联会话详情,只能获取当前在线的用户")
-    @GetMapping("/detail/refreshTokenId")
+    @GetMapping("/detail")
     @PreAuthorize("hasAuthority('system:session:query')")
     public AjaxResult<OnlineLoginUser> getOnlineLoginUser(@RequestParam("refreshTokenId") String refreshTokenId) {
         OnlineLoginUser onlineLoginUser = deviceService.getOnlineLoginUser(refreshTokenId);
@@ -71,7 +71,7 @@ public class DeviceController extends BaseController {
      * @return 是否成功删除会话
      */
     @Operation(summary = "删除设备", description = "删除设备会删除关联的会话")
-    @DeleteMapping("/delete/refreshTokenId")
+    @DeleteMapping
     @OperationLog(title = "会话管理", businessType = BusinessType.DELETE)
     @PreAuthorize("hasAuthority('system:session:delete')")
     public AjaxResult<Void> deleteSession(@RequestParam("refreshTokenId") String refreshTokenId) {

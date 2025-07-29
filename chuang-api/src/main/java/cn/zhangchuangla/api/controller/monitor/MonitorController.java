@@ -2,19 +2,16 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
-import cn.zhangchuangla.system.monitor.dto.JvmMetricsDTO;
-import cn.zhangchuangla.system.monitor.dto.RedisMetricsDTO;
-import cn.zhangchuangla.system.monitor.dto.SpringMetricsDTO;
-import cn.zhangchuangla.system.monitor.dto.SystemMetricsDTO;
-import cn.zhangchuangla.system.monitor.service.JvmMonitorService;
-import cn.zhangchuangla.system.monitor.service.RedisMonitorService;
-import cn.zhangchuangla.system.monitor.service.SpringMonitorService;
-import cn.zhangchuangla.system.monitor.service.SystemMonitorService;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
+import cn.zhangchuangla.common.core.entity.base.TableDataResult;
+import cn.zhangchuangla.framework.annotation.Anonymous;
+import cn.zhangchuangla.system.monitor.dto.*;
+import cn.zhangchuangla.system.monitor.request.EndpointStatsQueryRequest;
+import cn.zhangchuangla.system.monitor.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,12 +30,14 @@ import java.util.Map;
 @RequestMapping("/monitor/metrics")
 @Tag(name = "系统监控", description = "系统监控相关接口")
 @RequiredArgsConstructor
+@Anonymous
 public class MonitorController extends BaseController {
 
     private final SystemMonitorService systemMonitorService;
     private final JvmMonitorService jvmMonitorService;
     private final RedisMonitorService redisMonitorService;
     private final SpringMonitorService springMonitorService;
+    private final EndpointStatsService endpointStatsService;
 
     /**
      * 获取系统监控指标
@@ -47,7 +46,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/system")
     @Operation(summary = "获取系统监控指标", description = "获取CPU、内存、磁盘等系统监控指标")
-    @PreAuthorize("@ss.hasPermission('monitor:system:list')")
     public AjaxResult<SystemMetricsDTO> getSystemMetrics() {
         try {
             SystemMetricsDTO metrics = systemMonitorService.getSystemMetrics();
@@ -65,7 +63,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/jvm")
     @Operation(summary = "获取JVM监控指标", description = "获取JVM内存、垃圾回收、线程等监控指标")
-    @PreAuthorize("@ss.hasPermission('monitor:jvm:list')")
     public AjaxResult<JvmMetricsDTO> getJvmMetrics() {
         try {
             JvmMetricsDTO metrics = jvmMonitorService.getJvmMetrics();
@@ -83,7 +80,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/redis")
     @Operation(summary = "获取Redis监控指标", description = "获取Redis内存、连接、命令统计等监控指标")
-    @PreAuthorize("@ss.hasPermission('monitor:redis:list')")
     public AjaxResult<RedisMetricsDTO> getRedisMetrics() {
         try {
             RedisMetricsDTO metrics = redisMonitorService.getRedisMetrics();
@@ -101,7 +97,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/spring")
     @Operation(summary = "获取Spring监控指标", description = "获取Spring应用、HTTP、数据源、线程池等监控指标")
-    @PreAuthorize("@ss.hasPermission('monitor:spring:list')")
     public AjaxResult<SpringMetricsDTO> getSpringMetrics() {
         try {
             SpringMetricsDTO metrics = springMonitorService.getSpringMetrics();
@@ -113,13 +108,38 @@ public class MonitorController extends BaseController {
     }
 
     /**
+     * 获取端点统计列表
+     *
+     * @param request 查询请求
+     * @return 端点统计分页结果
+     */
+    @GetMapping("/endpoints")
+    @Operation(summary = "获取端点统计列表", description = "获取HTTP端点的详细统计信息，支持分页和过滤")
+    public AjaxResult<TableDataResult> getEndpointStats(EndpointStatsQueryRequest request) {
+        PageResult<EndpointStatsDTO> result = endpointStatsService.getEndpointStats(request);
+        return getTableData(result);
+    }
+
+    /**
+     * 获取端点统计概览
+     *
+     * @return 端点统计概览
+     */
+    @GetMapping("/endpoints/overview")
+    @Operation(summary = "获取端点统计概览", description = "获取端点统计的汇总信息")
+    public AjaxResult<Map<String, Object>> getEndpointStatsOverview() {
+        Map<String, Object> overview = endpointStatsService.getEndpointStatsOverview();
+        return success(overview);
+    }
+
+
+    /**
      * 获取所有监控指标概览
      *
      * @return 所有监控指标概览
      */
     @GetMapping("/overview")
     @Operation(summary = "获取监控概览", description = "获取所有监控指标的概览信息")
-    @PreAuthorize("@ss.hasPermission('monitor:overview:list')")
     public AjaxResult<Map<String, Object>> getMonitorOverview() {
         try {
             Map<String, Object> overview = new HashMap<>();
@@ -178,7 +198,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/health")
     @Operation(summary = "获取系统健康状态", description = "获取系统各组件的健康状态")
-    @PreAuthorize("@ss.hasPermission('monitor:health:list')")
     public AjaxResult<Map<String, Object>> getHealthStatus() {
         try {
             Map<String, Object> health = new HashMap<>();
@@ -247,7 +266,6 @@ public class MonitorController extends BaseController {
      */
     @GetMapping("/config")
     @Operation(summary = "获取监控配置", description = "获取当前监控系统的配置信息")
-    @PreAuthorize("@ss.hasPermission('monitor:config:list')")
     public AjaxResult<Map<String, Object>> getMonitorConfig() {
         try {
             Map<String, Object> config = new HashMap<>();

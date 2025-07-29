@@ -58,19 +58,14 @@ public class SpringMonitorService {
         try {
             // 获取应用信息
             metrics.setApplication(getApplicationInfo());
-
             // 获取HTTP指标
             metrics.setHttp(getHttpMetrics());
-
             // 获取数据源指标
             metrics.setDataSource(getDataSourceMetrics());
-
             // 获取线程池指标
             metrics.setThreadPools(getThreadPoolMetrics());
-
             // 获取缓存指标
             metrics.setCaches(getCacheMetrics());
-
         } catch (Exception e) {
             log.error("获取Spring监控指标失败", e);
         }
