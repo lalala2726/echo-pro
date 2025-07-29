@@ -169,7 +169,7 @@ public class EndpointStatsService {
                         });
 
                         // 累加请求数
-                        long count = (long) timer.count();
+                        long count = timer.count();
                         stats.setRequestCount(stats.getRequestCount() + count);
 
                         // 更新响应时间统计
@@ -204,7 +204,7 @@ public class EndpointStatsService {
 
         // 计算衍生指标
         return statsMap.values().stream()
-                .map(stats -> {
+                .peek(stats -> {
                     // 计算成功率
                     if (stats.getRequestCount() > 0) {
                         double successRate = (double) stats.getSuccessCount() / stats.getRequestCount() * 100;
@@ -229,7 +229,6 @@ public class EndpointStatsService {
                         stats.setMaxResponseTime(0.0);
                     }
 
-                    return stats;
                 })
                 .collect(Collectors.toList());
     }

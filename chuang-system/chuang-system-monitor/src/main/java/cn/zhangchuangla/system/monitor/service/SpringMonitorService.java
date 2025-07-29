@@ -4,12 +4,10 @@ import cn.zhangchuangla.system.monitor.dto.SpringMetricsDTO;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import java.lang.management.ManagementFactory;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,20 +26,14 @@ public class SpringMonitorService {
 
     private final Environment environment;
     private final MeterRegistry meterRegistry;
-    private final MetricsEndpoint metricsEndpoint;
-    private final DataSource dataSource;
 
     @Autowired(required = false)
     private BuildProperties buildProperties;
 
     public SpringMonitorService(Environment environment,
-                                MeterRegistry meterRegistry,
-                                MetricsEndpoint metricsEndpoint,
-                                DataSource dataSource) {
+                                MeterRegistry meterRegistry) {
         this.environment = environment;
         this.meterRegistry = meterRegistry;
-        this.metricsEndpoint = metricsEndpoint;
-        this.dataSource = dataSource;
     }
 
     /**
@@ -92,7 +84,6 @@ public class SpringMonitorService {
 
         return appInfo;
     }
-
 
 
     /**

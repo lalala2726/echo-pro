@@ -19,7 +19,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.sql.DataSource;
 
 /**
  * 监控自动配置类
@@ -60,10 +59,9 @@ public class MonitorAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnClass({RedisTemplate.class, RedisConnectionFactory.class})
-    public RedisMonitorService redisMonitorService(RedisTemplate<Object, Object> redisTemplate,
-                                                   RedisConnectionFactory redisConnectionFactory) {
+    public RedisMonitorService redisMonitorService(RedisConnectionFactory redisConnectionFactory) {
         log.info("初始化Redis监控服务");
-        return new RedisMonitorService(redisTemplate, redisConnectionFactory);
+        return new RedisMonitorService(redisConnectionFactory);
     }
 
     /**
@@ -73,11 +71,9 @@ public class MonitorAutoConfiguration {
     @ConditionalOnMissingBean
     @ConditionalOnClass({MeterRegistry.class, MetricsEndpoint.class})
     public SpringMonitorService springMonitorService(Environment environment,
-                                                     MeterRegistry meterRegistry,
-                                                     MetricsEndpoint metricsEndpoint,
-                                                     DataSource dataSource) {
+                                                     MeterRegistry meterRegistry) {
         log.info("初始化Spring监控服务");
-        return new SpringMonitorService(environment, meterRegistry, metricsEndpoint, dataSource);
+        return new SpringMonitorService(environment, meterRegistry);
     }
 
     /**

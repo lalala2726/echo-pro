@@ -183,13 +183,7 @@ public class JvmMonitorService {
      * 获取已使用的直接内存（近似值）
      */
     private long getUsedDirectMemory() {
-        try {
-            Class<?> bitsClass = Class.forName("java.nio.Bits");
-            Object reservedMemory = bitsClass.getDeclaredField("reservedMemory").get(null);
-            return (Long) reservedMemory;
-        } catch (Exception e) {
-            return 0;
-        }
+        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
 
     /**
