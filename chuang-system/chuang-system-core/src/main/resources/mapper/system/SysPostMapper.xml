@@ -33,4 +33,21 @@
         order by sort desc
     </select>
 
+    <select id="exportPostList" resultMap="BaseResultMap">
+        select id, post_code, post_name, sort, status, create_time, update_time, create_by, update_by, remark
+        from sys_post
+        <where>
+            <if test="request.postCode != null and request.postCode != ''">
+                and post_code like concat('%', #{request.postCode}, '%')
+            </if>
+            <if test="request.postName != null and request.postName != ''">
+                and post_name like concat('%', #{request.postName}, '%')
+            </if>
+            <if test="request.status != null">
+                and status = #{request.status}
+            </if>
+        </where>
+        order by sort desc
+    </select>
+
 </mapper>

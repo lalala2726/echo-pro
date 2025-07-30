@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysPost;
 import cn.zhangchuangla.system.core.model.request.post.SysPostAddRequest;
@@ -41,6 +42,7 @@ import java.util.List;
 public class PostController extends BaseController {
 
     private final SysPostService sysPostService;
+    private final ExcelExporter excelExporter;
 
     /**
      * 岗位列表
@@ -123,10 +125,19 @@ public class PostController extends BaseController {
         return AjaxResult.success(sysPostVo);
     }
 
+    /**
+     * 导出岗位数据
+     *
+     * @param request  查询参数
+     * @param response 响应
+     */
     @PostMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @Operation(summary = "导出岗位")
-    public AjaxResult<Void> exportPost(HttpServletResponse response) {
-        return success();
+    @OperationLog(title = "岗位管理", businessType = BusinessType.EXPORT)
+    public void exportPost(@RequestBody SysPostQueryRequest request, HttpServletResponse response) {
+        List<SysPost> sysPosts = sysPostService.exportPostList(request);
+        List<SysPostListVo> sysPostListVos = copyListProperties(sysPosts, SysPostListVo.class);
+        excelExporter.exportExcel(response, sysPostListVos, SysPostListVo.class, "岗位列表");
     }
 }

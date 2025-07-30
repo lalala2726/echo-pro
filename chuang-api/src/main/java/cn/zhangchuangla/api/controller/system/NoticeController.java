@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysNotice;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeAddRequest;
@@ -18,6 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -40,6 +42,7 @@ import java.util.List;
 public class NoticeController extends BaseController {
 
     private final SysNoticeService sysNoticeService;
+    private final ExcelExporter excelExporter;
 
     /**
      * 公告列表
@@ -118,6 +121,23 @@ public class NoticeController extends BaseController {
         Assert.notEmpty(ids, "公告ID不能为空");
         boolean result = sysNoticeService.deleteNotice(ids);
         return result ? success("删除成功") : error("删除失败");
+    }
+
+
+    /**
+     * 导出公告
+     *
+     * @param request  查询参数
+     * @param response 响应
+     */
+    @PostMapping("/export")
+    @Operation(summary = "导出公告", description = "导出公告")
+    @PreAuthorize("@ss.hasPermission('system:notice:export')")
+    @OperationLog(title = "公告管理", businessType = BusinessType.EXPORT)
+    public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody SysNoticeQueryRequest request, HttpServletResponse response) {
+        List<SysNotice> list = sysNoticeService.exportNoticeList(request);
+        List<SysNoticeListVo> sysNoticeListVos = copyListProperties(list, SysNoticeListVo.class);
+        excelExporter.exportExcel(response, sysNoticeListVos, SysNoticeListVo.class, "公告列表");
     }
 
 

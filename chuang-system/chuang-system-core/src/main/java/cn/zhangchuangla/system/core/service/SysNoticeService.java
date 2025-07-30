@@ -64,4 +64,12 @@ public interface SysNoticeService extends IService<SysNotice> {
      * @return 是否存在
      */
     boolean isNoticeTitleExist(String noticeTitle, Long id);
+
+    /**
+     * 导出公告列表
+     *
+     * @param request 查询参数
+     * @return 导出结果
+     */
+    List<SysNotice> exportNoticeList(SysNoticeQueryRequest request);
 }

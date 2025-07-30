@@ -95,4 +95,16 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         }
         return count(queryWrapper) > 0;
     }
+
+    /**
+     * 导出公告列表
+     *
+     * @param request 查询参数
+     * @return 查询参数
+     */
+    @Override
+    public List<SysNotice> exportNoticeList(SysNoticeQueryRequest request) {
+        //todo 这边公告是富文本参数,这边需要将这边转换一下
+        return sysNoticeMapper.exportNoticeList(request);
+    }
 }
