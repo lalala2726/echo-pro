@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author Chuang
  */
@@ -30,6 +32,13 @@ public interface StorageFileMapper extends BaseMapper<StorageFile> {
      */
     Page<StorageFile> listFileTrashManage(Page<StorageFile> page, @Param("request") StorageFileQueryRequest request);
 
+    /**
+     * 导出文件列表
+     *
+     * @param request 请求参数
+     * @return 结果
+     */
+    List<StorageFile> exportListFile(StorageFileQueryRequest request);
 }
 
 

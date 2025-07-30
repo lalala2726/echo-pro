@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.excel.utils.ExcelExportService;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.core.model.request.log.SysLoginLogQueryRequest;
@@ -39,7 +39,7 @@ import java.util.List;
 public class LoginLogController extends BaseController {
 
     private final SysLoginLogService sysLoginLogService;
-    private final ExcelExportService excelExportService;
+    private final ExcelExporter excelExporter;
 
     /**
      * 获取登录日志列表
@@ -71,7 +71,7 @@ public class LoginLogController extends BaseController {
     public void exportStorageConfig(@ParameterObject SysLoginLogQueryRequest request, HttpServletResponse response) {
         List<SysLoginLog> loginLogs = sysLoginLogService.exportLoginLog(request);
         List<SysLoginLogVo> storageConfigListVos = copyListProperties(loginLogs, SysLoginLogVo.class);
-        excelExportService.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
+        excelExporter.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
     }
 
     /**

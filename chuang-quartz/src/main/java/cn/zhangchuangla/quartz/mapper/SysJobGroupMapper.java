@@ -58,4 +58,12 @@ public interface SysJobGroupMapper extends BaseMapper<SysJobGroup> {
      * @return 任务数量
      */
     int countJobsByGroupId(@Param("groupId") Long groupId);
+
+    /**
+     * 导出任务组列表
+     *
+     * @param request 查询参数
+     * @return 返回任务组列表
+     */
+    List<SysJobGroup> exportJobGroupList(SysJobGroupQueryRequest request);
 }

@@ -384,6 +384,17 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         return getById(id);
     }
 
+    /**
+     * 导出文件列表
+     *
+     * @param request 查询参数
+     * @return 文件列表
+     */
+    @Override
+    public List<StorageFile> exportListFile(StorageFileQueryRequest request) {
+        return storageFileMapper.exportListFile(request);
+    }
+
 
     /**
      * 根据存储类型获取对应的存储服务

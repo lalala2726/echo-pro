@@ -135,6 +135,17 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
     }
 
     /**
+     * 导出任务日志
+     *
+     * @param request 查询条件
+     * @return 返回任务日志列表
+     */
+    @Override
+    public List<SysJobLog> exportJobLogList(SysJobLogQueryRequest request) {
+        return sysJobLogMapper.exportJobLogList(request);
+    }
+
+    /**
      * 设置日志描述信息
      */
     private void setLogDescriptions(SysJobLogVo logVo) {

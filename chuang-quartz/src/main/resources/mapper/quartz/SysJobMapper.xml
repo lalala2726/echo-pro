@@ -125,4 +125,28 @@
         ORDER BY job_id ASC
     </select>
 
+    <select id="exportJobList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        <where>
+            <if test="request.jobName != null and request.jobName != ''">
+                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
+            </if>
+            <if test="request.jobGroup != null and request.jobGroup != ''">
+                AND job_group = #{request.jobGroup}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.invokeTarget != null and request.invokeTarget != ''">
+                AND invoke_target LIKE CONCAT('%', #{request.invokeTarget}, '%')
+            </if>
+            <if test="request.scheduleType != null">
+                AND schedule_type = #{request.scheduleType}
+            </if>
+        </where>
+        ORDER BY job_id DESC
+    </select>
+
 </mapper>

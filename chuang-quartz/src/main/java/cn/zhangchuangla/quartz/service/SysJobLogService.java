@@ -108,4 +108,12 @@ public interface SysJobLogService extends IService<SysJobLog> {
      * @param exceptionInfo 异常信息
      */
     void recordJobEnd(Long jobLogId, Integer status, String message, String exceptionInfo);
+
+    /**
+     * 导出任务日志列表
+     *
+     * @param request 查询条件
+     * @return 日志列表
+     */
+    List<SysJobLog> exportJobLogList(SysJobLogQueryRequest request);
 }

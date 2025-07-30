@@ -30,12 +30,26 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
 
     private final SysJobGroupMapper sysJobGroupMapper;
 
+
+    /**
+     * 查询定时任务组列表
+     *
+     * @param request 查询参数
+     * @return 定时任务组列表
+     */
     @Override
     public Page<SysJobGroup> selectJobGroupList(SysJobGroupQueryRequest request) {
         Page<SysJobGroup> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysJobGroupMapper.selectJobGroupList(page, request);
     }
 
+
+    /**
+     * 根据ID获取任务组
+     *
+     * @param id 任务组ID
+     * @return 任务组
+     */
     @Override
     public SysJobGroupVo selectJobGroupById(Long id) {
         SysJobGroup jobGroup = getById(id);
@@ -56,6 +70,12 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
         return vo;
     }
 
+    /**
+     * 新增任务组
+     *
+     * @param request 新增任务组请求
+     * @return 是否添加成功
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addJobGroup(SysJobGroupAddRequest request) {
@@ -83,6 +103,12 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
         return save(jobGroup);
     }
 
+    /**
+     * 更新任务组
+     *
+     * @param request 修改请求
+     * @return 修改结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateJobGroup(SysJobGroupUpdateRequest request) {
@@ -108,6 +134,12 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
         return updateById(jobGroup);
     }
 
+    /**
+     * 删除任务组
+     *
+     * @param ids 任务组ID列表
+     * @return 删除结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteJobGroups(List<Long> ids) {
@@ -124,26 +156,60 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
         return removeByIds(ids);
     }
 
+
+    /**
+     * 查询所有启用的任务组
+     */
     @Override
     public List<SysJobGroup> selectEnabledGroups() {
         return sysJobGroupMapper.selectEnabledGroups();
     }
 
+    /**
+     * 校验任务组名称是否唯一
+     *
+     * @param groupName 任务组名称
+     * @param id        排除的任务组ID
+     * @return true: 存在 false: 不存在
+     */
     @Override
     public boolean checkGroupNameExists(String groupName, Long id) {
         return sysJobGroupMapper.checkGroupNameExists(groupName, id) > 0;
     }
 
+
+    /**
+     * 检查任务组编码是否存在
+     *
+     * @param groupCode 任务组编码
+     * @param id        排除的任务组ID
+     * @return 是否存在
+     */
     @Override
     public boolean checkGroupCodeExists(String groupCode, Long id) {
         return sysJobGroupMapper.checkGroupCodeExists(groupCode, id) > 0;
     }
 
+
+    /**
+     * 获取任务组下的任务数量
+     *
+     * @param groupId 任务组ID
+     * @return 任务数量
+     */
     @Override
     public int countJobsByGroupId(Long groupId) {
         return sysJobGroupMapper.countJobsByGroupId(groupId);
     }
 
+
+    /**
+     * 批量修改任务组状态
+     *
+     * @param ids    任务组ID列表
+     * @param status 状态
+     * @return 修改结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateJobGroupStatus(List<Long> ids, Integer status) {
@@ -154,5 +220,16 @@ public class SysJobGroupServiceImpl extends ServiceImpl<SysJobGroupMapper, SysJo
             updateById(jobGroup);
         }
         return true;
+    }
+
+    /**
+     * 导出任务组列表
+     *
+     * @param request 查询条件
+     * @return 任务组列表
+     */
+    @Override
+    public List<SysJobGroup> exportJobGroupList(SysJobGroupQueryRequest request) {
+        return sysJobGroupMapper.exportJobGroupList(request);
     }
 }

@@ -71,4 +71,22 @@
         WHERE job_group_id = #{groupId}
     </select>
 
+    <select id="exportJobGroupList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_group
+        <where>
+            <if test="request.groupName != null and request.groupName != ''">
+                AND group_name LIKE CONCAT('%', #{request.groupName}, '%')
+            </if>
+            <if test="request.groupCode != null and request.groupCode != ''">
+                AND group_code LIKE CONCAT('%', #{request.groupCode}, '%')
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+        </where>
+        ORDER BY sort ASC, id ASC
+    </select>
+
 </mapper>

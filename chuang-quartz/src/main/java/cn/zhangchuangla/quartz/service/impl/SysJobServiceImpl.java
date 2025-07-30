@@ -311,6 +311,14 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     }
 
     /**
+     * 导出任务列表
+     */
+    @Override
+    public List<SysJob> exportJobList(SysJobQueryRequest request) {
+        return sysJobMapper.exportJobList(request);
+    }
+
+    /**
      * 验证任务请求参数
      */
     private void validateJobRequest(Object request) {

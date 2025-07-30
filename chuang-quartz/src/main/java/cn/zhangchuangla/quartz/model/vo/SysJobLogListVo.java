@@ -17,6 +17,13 @@ import java.util.Date;
 @Schema(description = "定时任务日志视图对象")
 public class SysJobLogListVo extends BaseVo {
 
+
+    /**
+     * 任务日志ID
+     */
+    @Schema(description = "任务日志ID")
+    private Long jobLogId;
+
     /**
      * 任务ID
      */

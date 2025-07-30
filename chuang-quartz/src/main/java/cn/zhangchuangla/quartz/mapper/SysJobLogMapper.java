@@ -71,4 +71,12 @@ public interface SysJobLogMapper extends BaseMapper<SysJobLog> {
      * @return 日志列表
      */
     List<SysJobLog> selectRecentLogs(@Param("jobId") Long jobId, @Param("limit") Integer limit);
+
+    /**
+     * 导出定时任务日志列表
+     *
+     * @param request 查询条件
+     * @return 定时任务日志列表
+     */
+    List<SysJobLog> exportJobLogList(@Param("request") SysJobLogQueryRequest request);
 }

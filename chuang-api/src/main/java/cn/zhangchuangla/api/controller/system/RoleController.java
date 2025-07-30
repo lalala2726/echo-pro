@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.excel.utils.ExcelExportService;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysRole;
 import cn.zhangchuangla.system.core.model.request.role.SysRoleAddRequest;
@@ -50,7 +50,7 @@ import java.util.List;
 public class RoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final ExcelExportService excelExportService;
+    private final ExcelExporter excelExporter;
     private final SysPermissionService sysPermissionService;
 
 
@@ -90,7 +90,7 @@ public class RoleController extends BaseController {
             SysRoleListVo sysRoleListVo = BeanCotyUtils.copyProperties(user, SysRoleListVo.class);
             sysRoleListVos.add(sysRoleListVo);
         });
-        excelExportService.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
+        excelExporter.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
 
     }
 

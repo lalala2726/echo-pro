@@ -98,4 +98,12 @@ public interface SysJobGroupService extends IService<SysJobGroup> {
      * @return 是否成功
      */
     boolean updateJobGroupStatus(List<Long> ids, Integer status);
+
+    /**
+     * 导出任务组列表
+     *
+     * @param request 查询条件
+     * @return 任务组列表
+     */
+    List<SysJobGroup> exportJobGroupList(SysJobGroupQueryRequest request);
 }

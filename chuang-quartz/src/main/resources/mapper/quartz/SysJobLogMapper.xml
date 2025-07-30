@@ -103,5 +103,31 @@
         ORDER BY job_log_id DESC
         LIMIT #{limit}
     </select>
+    <select id="exportJobLogList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_log
+        <where>
+            <if test="request.jobId != null">
+                AND job_id = #{request.jobId}
+            </if>
+            <if test="request.jobName != null and request.jobName != ''">
+                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
+            </if>
+            <if test="request.jobGroup != null and request.jobGroup != ''">
+                AND job_group = #{request.jobGroup}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.startTimeBegin != null">
+                AND start_time >= #{request.startTimeBegin}
+            </if>
+            <if test="request.startTimeEnd != null">
+                AND start_time &lt;= #{request.startTimeEnd}
+            </if>
+        </where>
+        ORDER BY job_log_id DESC
+    </select>
 
 </mapper>

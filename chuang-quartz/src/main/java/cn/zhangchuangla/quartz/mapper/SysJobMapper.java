@@ -74,4 +74,12 @@ public interface SysJobMapper extends BaseMapper<SysJob> {
      * @return 依赖的任务列表
      */
     List<SysJob> selectDependentJobs(@Param("jobId") Long jobId);
+
+    /**
+     * 导出定时任务列表
+     *
+     * @param request 查询参数
+     * @return 导出定时任务列表
+     */
+    List<SysJob> exportJobList(SysJobQueryRequest request);
 }

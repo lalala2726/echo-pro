@@ -141,4 +141,12 @@ public interface SysJobService extends IService<SysJob> {
      * @param jobId 任务ID
      */
     void refreshJobStatus(Long jobId);
+
+    /**
+     * 导出定时任务列表
+     *
+     * @param request 查询参数
+     * @return 定时任务列表
+     */
+    List<SysJob> exportJobList(SysJobQueryRequest request);
 }
