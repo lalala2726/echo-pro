@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysNoticeMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysNotice">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="noticeTitle" column="notice_title" jdbcType="VARCHAR"/>
+        <result property="noticeContent" column="notice_content" jdbcType="LONGVARCHAR"/>
+        <result property="noticeType" column="notice_type" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, notice_title, notice_content, notice_type, status,
+        create_time, update_time, create_by, update_by, remark
+    </sql>
+
+    <select id="listNotice" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_notice
+        <where>
+            <if test="request.noticeTitle != null and request.noticeTitle != ''">
+                AND notice_title LIKE CONCAT('%', #{request.noticeTitle}, '%')
+            </if>
+            <if test="request.noticeType != null and request.noticeType != ''">
+                AND notice_type = #{request.noticeType}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.createBy != null and request.createBy != ''">
+                AND create_by LIKE CONCAT('%', #{request.createBy}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+</mapper>
