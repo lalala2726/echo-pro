@@ -1,5 +1,7 @@
 package cn.zhangchuangla.common.core.utils;
 
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -13,17 +15,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringUtils implements ApplicationContextAware {
 
+    /**
+     * -- GETTER --
+     *  获取applicationContext
+     */
+    @Getter
     private static ApplicationContext applicationContext;
 
-    /**
-     * 获取applicationContext
-     */
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         SpringUtils.applicationContext = applicationContext;
     }
 

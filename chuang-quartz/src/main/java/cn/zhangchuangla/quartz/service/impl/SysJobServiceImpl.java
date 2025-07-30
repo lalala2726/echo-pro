@@ -101,6 +101,9 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
             try {
                 // 创建定时任务
                 ScheduleUtils.createScheduleJob(scheduler, job);
+
+                // 创建成功后，立即更新下次执行时间
+                updateJobNextFireTime(job.getJobId());
             } catch (SchedulerException e) {
                 log.error("创建定时任务失败", e);
                 throw new ServiceException("创建定时任务失败: " + e.getMessage());
@@ -141,6 +144,9 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
             try {
                 // 更新定时任务
                 updateSchedulerJob(job, existingJob.getJobGroup());
+
+                // 更新成功后，立即更新下次执行时间
+                updateJobNextFireTime(job.getJobId());
             } catch (SchedulerException e) {
                 log.error("更新定时任务失败", e);
                 throw new ServiceException("更新定时任务失败: " + e.getMessage());
@@ -181,6 +187,9 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
             // 更新数据库状态
             job.setStatus(QuartzConstants.JobStatusConstants.NORMAL);
             updateById(job);
+
+            // 启动任务后，更新下次执行时间
+            updateJobNextFireTime(jobId);
 
             return true;
         } catch (SchedulerException e) {
@@ -285,6 +294,23 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
                 ScheduleUtils.createScheduleJob(scheduler, job);
             }
             log.info("初始化定时任务完成，共加载 {} 个任务", jobList.size());
+
+            // 初始化完成后，批量更新所有任务的执行时间
+            // 使用异步方式避免阻塞启动过程
+            new Thread(() -> {
+                try {
+                    // 等待调度器完全启动
+                    Thread.sleep(2000);
+                    int updateCount = batchUpdateJobExecutionTimes();
+                    log.info("批量更新任务执行时间完成，更新了 {} 个任务", updateCount);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("批量更新任务执行时间被中断", e);
+                } catch (Exception e) {
+                    log.error("批量更新任务执行时间失败", e);
+                }
+            }, "job-time-updater").start();
+
         } catch (SchedulerException e) {
             log.error("初始化定时任务失败", e);
         }
@@ -422,5 +448,122 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
 
         // 重新创建
         ScheduleUtils.createScheduleJob(scheduler, job);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateJobExecutionTime(Long jobId, java.util.Date previousFireTime, java.util.Date nextFireTime) {
+        if (jobId == null) {
+            log.warn("任务ID不能为空，无法更新执行时间");
+            return false;
+        }
+
+        try {
+            // 使用专门的 Mapper 方法更新执行时间，避免更新其他字段
+            int updated = sysJobMapper.updateJobExecutionTime(jobId, previousFireTime, nextFireTime);
+
+            if (updated > 0) {
+                log.debug("任务执行时间更新成功: jobId={}, previousFireTime={}, nextFireTime={}",
+                        jobId, previousFireTime, nextFireTime);
+                return true;
+            } else {
+                log.warn("任务执行时间更新失败，可能任务不存在: jobId={}", jobId);
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("更新任务执行时间异常: jobId={}", jobId, e);
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateJobNextFireTime(Long jobId) {
+        if (jobId == null) {
+            log.warn("任务ID不能为空，无法更新下次执行时间");
+            return false;
+        }
+
+        try {
+            SysJob job = getById(jobId);
+            if (job == null) {
+                log.warn("任务不存在，无法更新下次执行时间: jobId={}", jobId);
+                return false;
+            }
+
+            // 从 Quartz 调度器获取下次执行时间
+            JobKey jobKey = ScheduleUtils.getJobKey(jobId, job.getJobGroup());
+            if (scheduler.checkExists(jobKey)) {
+                List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
+                if (!triggers.isEmpty()) {
+                    Trigger trigger = triggers.get(0);
+                    java.util.Date nextFireTime = trigger.getNextFireTime();
+
+                    // 更新数据库中的下次执行时间
+                    SysJob updateJob = new SysJob();
+                    updateJob.setJobId(jobId);
+                    updateJob.setNextFireTime(nextFireTime);
+
+                    boolean updated = updateById(updateJob);
+                    if (updated) {
+                        log.debug("任务下次执行时间更新成功: jobId={}, nextFireTime={}", jobId, nextFireTime);
+                    }
+
+                    return updated;
+                }
+            }
+
+            log.warn("任务在调度器中不存在，无法获取下次执行时间: jobId={}", jobId);
+            return false;
+        } catch (Exception e) {
+            log.error("更新任务下次执行时间异常: jobId={}", jobId, e);
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int batchUpdateJobExecutionTimes() {
+        log.info("开始批量更新任务执行时间");
+        int updateCount = 0;
+
+        try {
+            // 获取所有启用的任务
+            List<SysJob> enabledJobs = selectEnabledJobs();
+
+            for (SysJob job : enabledJobs) {
+                try {
+                    JobKey jobKey = ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup());
+                    if (scheduler.checkExists(jobKey)) {
+                        List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
+                        if (!triggers.isEmpty()) {
+                            Trigger trigger = triggers.get(0);
+                            java.util.Date nextFireTime = trigger.getNextFireTime();
+                            java.util.Date previousFireTime = trigger.getPreviousFireTime();
+
+                            // 更新数据库中的执行时间
+                            SysJob updateJob = new SysJob();
+                            updateJob.setJobId(job.getJobId());
+                            updateJob.setNextFireTime(nextFireTime);
+                            updateJob.setPreviousFireTime(previousFireTime);
+
+                            if (updateById(updateJob)) {
+                                updateCount++;
+                                log.debug("任务执行时间批量更新成功: jobId={}, nextFireTime={}, previousFireTime={}",
+                                        job.getJobId(), nextFireTime, previousFireTime);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("批量更新任务执行时间失败: jobId={}", job.getJobId(), e);
+                }
+            }
+
+            log.info("批量更新任务执行时间完成，成功更新 {} 个任务", updateCount);
+        } catch (Exception e) {
+            log.error("批量更新任务执行时间异常", e);
+        }
+
+        return updateCount;
     }
 }

@@ -5,8 +5,10 @@ import cn.zhangchuangla.quartz.constants.QuartzConstants;
 import cn.zhangchuangla.quartz.entity.SysJob;
 import cn.zhangchuangla.quartz.entity.SysJobLog;
 import cn.zhangchuangla.quartz.service.SysJobLogService;
+import cn.zhangchuangla.quartz.service.SysJobService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,23 +44,55 @@ public abstract class AbstractQuartzJob implements Job {
 
     /**
      * 执行前
+     * <p>
+     * 在任务执行前进行准备工作：
+     * 1. 记录任务开始执行时间
+     * 2. 更新数据库中的上次执行时间和下次执行时间
+     * </p>
      *
      * @param context 工作执行上下文对象
      * @param sysJob  系统计划任务
      */
     protected void before(JobExecutionContext context, SysJob sysJob) {
-        THREAD_LOCAL.set(new Date());
+        Date startTime = new Date();
+        THREAD_LOCAL.set(startTime);
+
+        try {
+            // 获取触发器信息
+            Trigger trigger = context.getTrigger();
+            Date previousFireTime = trigger.getPreviousFireTime();
+            Date nextFireTime = trigger.getNextFireTime();
+
+            // 更新数据库中的执行时间
+            // 注意：这里的 previousFireTime 实际上是当前执行时间，因为触发器已经触发
+            // 我们使用当前时间作为上次执行时间
+            SysJobService jobService = SpringUtils.getBean(SysJobService.class);
+            jobService.updateJobExecutionTime(sysJob.getJobId(), startTime, nextFireTime);
+
+            logger.debug("任务执行前时间更新完成: jobId={}, previousFireTime={}, nextFireTime={}",
+                    sysJob.getJobId(), startTime, nextFireTime);
+        } catch (Exception e) {
+            logger.warn("更新任务执行时间失败: jobId={}", sysJob.getJobId(), e);
+        }
     }
 
     /**
      * 执行后
+     * <p>
+     * 在任务执行完成后进行收尾工作：
+     * 1. 记录任务执行日志
+     * 2. 更新下次执行时间（确保时间同步）
+     * 3. 清理线程本地变量
+     * </p>
      *
      * @param context 工作执行上下文对象
      * @param sysJob  系统计划任务
+     * @param e       执行异常（如果有）
      */
     protected void after(JobExecutionContext context, SysJob sysJob, Exception e) {
         Date startTime = THREAD_LOCAL.get();
         THREAD_LOCAL.remove();
+        Date endTime = new Date();
 
         final SysJobLog sysJobLog = new SysJobLog();
         sysJobLog.setJobId(sysJob.getJobId());
@@ -67,7 +101,7 @@ public abstract class AbstractQuartzJob implements Job {
         sysJobLog.setInvokeTarget(sysJob.getInvokeTarget());
         sysJobLog.setJobData(sysJob.getJobData());
         sysJobLog.setStartTime(startTime);
-        sysJobLog.setEndTime(new Date());
+        sysJobLog.setEndTime(endTime);
         long runMs = sysJobLog.getEndTime().getTime() - sysJobLog.getStartTime().getTime();
         sysJobLog.setExecuteTime(runMs);
 
@@ -93,8 +127,28 @@ public abstract class AbstractQuartzJob implements Job {
             sysJobLog.setJobMessage("执行成功");
         }
 
-        // 写入数据库当中
+        // 写入执行日志到数据库
         SpringUtils.getBean(SysJobLogService.class).addJobLog(sysJobLog);
+
+        // 任务执行完成后，更新下次执行时间
+        // 这确保了即使在高并发情况下，数据库中的时间信息也是准确的
+        try {
+            Trigger trigger = context.getTrigger();
+            Date nextFireTime = trigger.getNextFireTime();
+
+            // 只有当下次执行时间存在时才更新（避免一次性任务的空指针）
+            if (nextFireTime != null) {
+                SysJobService jobService = SpringUtils.getBean(SysJobService.class);
+                jobService.updateJobExecutionTime(sysJob.getJobId(), startTime, nextFireTime);
+
+                logger.debug("任务执行后时间更新完成: jobId={}, nextFireTime={}",
+                        sysJob.getJobId(), nextFireTime);
+            } else {
+                logger.debug("任务无下次执行时间，可能是一次性任务: jobId={}", sysJob.getJobId());
+            }
+        } catch (Exception ex) {
+            logger.warn("任务执行后更新下次执行时间失败: jobId={}", sysJob.getJobId(), ex);
+        }
     }
 
     /**

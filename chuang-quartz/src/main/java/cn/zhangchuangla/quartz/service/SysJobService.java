@@ -149,4 +149,41 @@ public interface SysJobService extends IService<SysJob> {
      * @return 定时任务列表
      */
     List<SysJob> exportJobList(SysJobQueryRequest request);
+
+    /**
+     * 更新任务执行时间
+     * <p>
+     * 在任务执行前后更新上次执行时间和下次执行时间
+     * 这个方法会在任务执行的关键节点被调用，确保时间字段的准确性
+     * </p>
+     *
+     * @param jobId            任务ID
+     * @param previousFireTime 上次执行时间
+     * @param nextFireTime     下次执行时间
+     * @return 是否更新成功
+     */
+    boolean updateJobExecutionTime(Long jobId, java.util.Date previousFireTime, java.util.Date nextFireTime);
+
+    /**
+     * 更新任务的下次执行时间
+     * <p>
+     * 当任务被创建、修改或重新调度时，需要更新下次执行时间
+     * 这个方法会根据任务的调度策略计算下次执行时间
+     * </p>
+     *
+     * @param jobId 任务ID
+     * @return 是否更新成功
+     */
+    boolean updateJobNextFireTime(Long jobId);
+
+    /**
+     * 批量更新任务执行时间
+     * <p>
+     * 系统启动时或定时刷新时，批量更新所有任务的执行时间信息
+     * 确保数据库中的时间信息与 Quartz 调度器保持同步
+     * </p>
+     *
+     * @return 更新的任务数量
+     */
+    int batchUpdateJobExecutionTimes();
 }

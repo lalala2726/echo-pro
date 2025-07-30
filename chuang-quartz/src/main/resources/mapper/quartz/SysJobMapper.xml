@@ -149,4 +149,24 @@
         ORDER BY job_id DESC
     </select>
 
+    <!-- 批量更新任务执行时间 -->
+    <update id="batchUpdateExecutionTimes">
+        <foreach collection="jobs" item="job" separator=";">
+            UPDATE sys_job
+            SET previous_fire_time = #{job.previousFireTime},
+            next_fire_time = #{job.nextFireTime},
+            update_time = NOW()
+            WHERE job_id = #{job.jobId}
+        </foreach>
+    </update>
+
+    <!-- 更新单个任务的执行时间 -->
+    <update id="updateJobExecutionTime">
+        UPDATE sys_job
+        SET previous_fire_time = #{previousFireTime},
+            next_fire_time     = #{nextFireTime},
+            update_time        = NOW()
+        WHERE job_id = #{jobId}
+    </update>
+
 </mapper>
