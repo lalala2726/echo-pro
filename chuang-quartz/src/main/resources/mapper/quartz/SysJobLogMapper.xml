@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.quartz.mapper.SysJobLogMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.quartz.entity.SysJobLog">
+        <id column="job_log_id" property="jobLogId" jdbcType="BIGINT"/>
+        <result column="job_id" property="jobId" jdbcType="BIGINT"/>
+        <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
+        <result column="job_group" property="jobGroup" jdbcType="VARCHAR"/>
+        <result column="invoke_target" property="invokeTarget" jdbcType="VARCHAR"/>
+        <result column="job_data" property="jobData" jdbcType="LONGVARCHAR"/>
+        <result column="job_message" property="jobMessage" jdbcType="LONGVARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="exception_info" property="exceptionInfo" jdbcType="LONGVARCHAR"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_time" property="executeTime" jdbcType="BIGINT"/>
+        <result column="server_ip" property="serverIp" jdbcType="VARCHAR"/>
+        <result column="server_name" property="serverName" jdbcType="VARCHAR"/>
+        <result column="retry_count" property="retryCount" jdbcType="INTEGER"/>
+        <result column="trigger_type" property="triggerType" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        job_log_id, job_id, job_name, job_group, invoke_target, job_data, job_message,
+        status, exception_info, start_time, end_time, execute_time, server_ip, server_name,
+        retry_count, trigger_type, create_time, update_time, create_by, update_by, remark
+    </sql>
+
+    <select id="selectJobLogList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_log
+        <where>
+            <if test="request.jobId != null">
+                AND job_id = #{request.jobId}
+            </if>
+            <if test="request.jobName != null and request.jobName != ''">
+                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
+            </if>
+            <if test="request.jobGroup != null and request.jobGroup != ''">
+                AND job_group = #{request.jobGroup}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.startTimeBegin != null">
+                AND start_time >= #{request.startTimeBegin}
+            </if>
+            <if test="request.startTimeEnd != null">
+                AND start_time &lt;= #{request.startTimeEnd}
+            </if>
+        </where>
+        ORDER BY job_log_id DESC
+    </select>
+
+    <select id="selectLogsByJobId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_log
+        WHERE job_id = #{jobId}
+        ORDER BY job_log_id DESC
+    </select>
+
+    <delete id="cleanLogsBefore">
+        DELETE
+        FROM sys_job_log
+        WHERE create_time &lt; #{beforeDate}
+    </delete>
+
+    <delete id="batchDeleteLogs">
+        DELETE FROM sys_job_log
+        WHERE job_log_id IN
+        <foreach collection="logIds" item="logId" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+    </delete>
+
+    <select id="selectJobStatistics" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_log
+        WHERE job_id = #{jobId}
+        <if test="startDate != null">
+            AND start_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND start_time &lt;= #{endDate}
+        </if>
+        ORDER BY start_time DESC
+    </select>
+
+    <select id="selectRecentLogs" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job_log
+        WHERE job_id = #{jobId}
+        ORDER BY job_log_id DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

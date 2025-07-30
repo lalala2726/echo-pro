@@ -2,7 +2,6 @@ package cn.zhangchuangla.framework.security.device;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
-import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -74,21 +73,6 @@ public class DeviceService {
 
         List<SessionDevice> sessionDevices = new ArrayList<>(deviceSet);
         return querySessionDevice(sessionDevices, request);
-    }
-
-    /**
-     * 查看在线用户详细信息
-     *
-     * @param refreshTokenId 刷新令牌ID
-     * @return 在线用户详细信息
-     */
-    public OnlineLoginUser getOnlineLoginUser(String refreshTokenId) {
-        Assert.isTrue(tokenService.validateRefreshToken(refreshTokenId), "刷新令牌无效!");
-        String accessTokenId = redisTokenStore.getRefreshToken(refreshTokenId);
-        String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
-        boolean exists = redisCache.exists(accessTokenRedisKey);
-        Assert.isTrue(exists, "访问令牌不存在!");
-        return redisTokenStore.getAccessToken(accessTokenRedisKey);
     }
 
 

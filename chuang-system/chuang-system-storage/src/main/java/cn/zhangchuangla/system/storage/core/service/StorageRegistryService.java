@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * created on 2025/6/27 07:21
  */
 @Slf4j
-@Service
+@Service("storageRegistryService")
 public class StorageRegistryService {
 
     private final StorageConfigService storageConfigService;

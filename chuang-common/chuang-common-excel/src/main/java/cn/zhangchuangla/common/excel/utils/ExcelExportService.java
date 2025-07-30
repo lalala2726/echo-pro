@@ -1,9 +1,9 @@
 package cn.zhangchuangla.common.excel.utils;
 
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import cn.zhangchuangla.common.excel.core.DictDataHandler;
 import cn.zhangchuangla.common.excel.core.ExcelField;
-import cn.zhangchuangla.common.excel.exception.ExcelException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -65,7 +65,7 @@ public class ExcelExportService {
             exportExcel(response.getOutputStream(), data, clazz, fileName);
         } catch (IOException e) {
             log.error("导出Excel失败", e);
-            throw new ExcelException("导出Excel失败");
+            throw new ServiceException("导出Excel失败");
         }
     }
 
@@ -103,7 +103,7 @@ public class ExcelExportService {
 
         } catch (IOException e) {
             log.error("导出Excel失败", e);
-            throw new ExcelException("导出Excel失败");
+            throw new ServiceException("导出Excel失败");
         }
     }
 

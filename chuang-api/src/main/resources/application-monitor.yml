@@ -1,0 +1,52 @@
+#监控配置
+monitoring:
+  enabled: true
+  data-collection:
+    enable-historical-data: true
+    retention-days: 7
+    batch-size: 100
+  server:
+    enabled: true
+    collection-interval: 30
+    cpu:
+      enabled: true
+      alert-threshold: 80.0
+    memory:
+      enabled: true
+      alert-threshold: 85.0
+    disk:
+      enabled: true
+      alert-threshold: 90.0
+  jvm:
+    enabled: true
+    collection-interval: 30
+    heap-memory-alert-threshold: 85.0
+    non-heap-memory-alert-threshold: 85.0
+    gc-time-alert-threshold: 1000
+  redis:
+    enabled: true
+    collection-interval: 30
+    memory-alert-threshold: 80.0
+    connection-alert-threshold: 1000
+    command-time-alert-threshold: 100
+  spring:
+    enabled: true
+    collection-interval: 30
+    http-response-time-alert-threshold: 2000
+    thread-pool-alert-threshold: 80.0
+
+# Spring Boot Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      access: READ_ONLY
+  prometheus:
+    metrics:
+      export:
+        enabled: true

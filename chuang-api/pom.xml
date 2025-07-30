@@ -48,6 +48,11 @@
             <groupId>cn.zhangchuangla</groupId>
             <artifactId>chuang-common-excel</artifactId>
         </dependency>
+        <!-- 定时任务 -->
+        <dependency>
+            <groupId>cn.zhangchuangla</groupId>
+            <artifactId>chuang-quartz</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
