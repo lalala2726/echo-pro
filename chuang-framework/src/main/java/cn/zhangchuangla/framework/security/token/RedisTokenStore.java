@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RedisTokenStore {
 
     private final RedisCache redisCache;
@@ -178,12 +180,26 @@ public class RedisTokenStore {
      * 更新访问令牌时间
      *
      * @param accessTokenId 访问令牌ID
+     * @return 是否更新成功
      */
-    public void updateAccessTime(String accessTokenId) {
+    public boolean updateAccessTime(String accessTokenId) {
         String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
         OnlineLoginUser onlineLoginUser = redisCache.getCacheObject(accessTokenRedisKey);
+
+        // 检查令牌是否存在
+        if (onlineLoginUser == null) {
+            log.warn("尝试更新访问时间时，令牌不存在: {}", accessTokenId);
+            return false;
+        }
+
         Long expire = redisCache.getExpire(accessTokenRedisKey);
+        if (expire <= 0) {
+            log.warn("尝试更新访问时间时，令牌已过期: {}", accessTokenId);
+            return false;
+        }
+
         onlineLoginUser.setAccessTime(System.currentTimeMillis());
         redisCache.setCacheObject(accessTokenRedisKey, onlineLoginUser, expire);
+        return true;
     }
 }

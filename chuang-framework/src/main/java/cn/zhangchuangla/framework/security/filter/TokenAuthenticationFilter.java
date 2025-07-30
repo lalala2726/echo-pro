@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
@@ -55,12 +56,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // 执行令牌有效性检查（包含密码学验签和过期时间验证）
                 boolean isValidToken = tokenService.validateAccessToken(token);
                 if (!isValidToken) {
-                    ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
+                    ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID, HttpStatus.UNAUTHORIZED);
                     return;
                 }
-                if (!tokenPrefix.isBlank()) {
-                    token = token.replace(tokenPrefix, "").trim();
-                }
+
                 // 将令牌解析为 Spring Security 上下文认证对象
                 Authentication authentication = tokenService.parseAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -68,7 +67,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             // 安全上下文清除保障（防止上下文残留）
             SecurityContextHolder.clearContext();
-            ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID);
+            ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID, HttpStatus.UNAUTHORIZED);
             return;
         }
 

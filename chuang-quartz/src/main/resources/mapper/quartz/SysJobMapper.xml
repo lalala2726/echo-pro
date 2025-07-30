@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.quartz.mapper.SysJobMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.quartz.entity.SysJob">
+        <id column="job_id" property="jobId" jdbcType="BIGINT"/>
+        <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
+        <result column="job_group_id" property="jobGroupId" jdbcType="BIGINT"/>
+        <result column="job_group" property="jobGroup" jdbcType="VARCHAR"/>
+        <result column="invoke_target" property="invokeTarget" jdbcType="VARCHAR"/>
+        <result column="schedule_type" property="scheduleType" jdbcType="INTEGER"/>
+        <result column="cron_expression" property="cronExpression" jdbcType="VARCHAR"/>
+        <result column="fixed_rate" property="fixedRate" jdbcType="BIGINT"/>
+        <result column="fixed_delay" property="fixedDelay" jdbcType="BIGINT"/>
+        <result column="initial_delay" property="initialDelay" jdbcType="BIGINT"/>
+        <result column="misfire_policy" property="misfirePolicy" jdbcType="INTEGER"/>
+        <result column="concurrent" property="concurrent" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="priority" property="priority" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="job_data" property="jobData" jdbcType="LONGVARCHAR"/>
+        <result column="dependent_job_ids" property="dependentJobIds" jdbcType="VARCHAR"/>
+        <result column="max_retry_count" property="maxRetryCount" jdbcType="INTEGER"/>
+        <result column="retry_interval" property="retryInterval" jdbcType="BIGINT"/>
+        <result column="timeout" property="timeout" jdbcType="BIGINT"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="next_fire_time" property="nextFireTime" jdbcType="TIMESTAMP"/>
+        <result column="previous_fire_time" property="previousFireTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        job_id, job_name, job_group_id, job_group, invoke_target, schedule_type, cron_expression,
+        fixed_rate, fixed_delay, initial_delay, misfire_policy, concurrent, status, priority,
+        description, job_data, dependent_job_ids, max_retry_count, retry_interval, timeout,
+        start_time, end_time, next_fire_time, previous_fire_time, create_time, update_time,
+        create_by, update_by, remark
+    </sql>
+
+    <select id="selectJobList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        <where>
+            <if test="request.jobName != null and request.jobName != ''">
+                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
+            </if>
+            <if test="request.jobGroup != null and request.jobGroup != ''">
+                AND job_group = #{request.jobGroup}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.invokeTarget != null and request.invokeTarget != ''">
+                AND invoke_target LIKE CONCAT('%', #{request.invokeTarget}, '%')
+            </if>
+            <if test="request.scheduleType != null">
+                AND schedule_type = #{request.scheduleType}
+            </if>
+        </where>
+        ORDER BY job_id DESC
+    </select>
+
+    <select id="selectEnabledJobs" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        WHERE status = 0
+        ORDER BY priority DESC, job_id ASC
+    </select>
+
+    <select id="selectJobsByGroup" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        WHERE job_group = #{jobGroup}
+        ORDER BY job_id ASC
+    </select>
+
+    <select id="selectJobsByDependentId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        WHERE FIND_IN_SET(#{dependentJobId}, dependent_job_ids) > 0
+        ORDER BY job_id ASC
+    </select>
+
+    <update id="batchUpdateStatus">
+        UPDATE sys_job
+        SET status = #{status}, update_time = NOW()
+        WHERE job_id IN
+        <foreach collection="jobIds" item="jobId" open="(" separator="," close=")">
+            #{jobId}
+        </foreach>
+    </update>
+
+    <select id="checkJobNameExists" resultType="int">
+        SELECT COUNT(1)
+        FROM sys_job
+        WHERE job_name = #{jobName}
+        <if test="jobId != null">
+            AND job_id != #{jobId}
+        </if>
+    </select>
+
+    <select id="selectDependentJobs" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_job
+        WHERE job_id IN (
+        SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(dependent_job_ids, ',', numbers.n), ',', -1)) AS job_id
+        FROM (
+        SELECT 1 n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+        UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+        ) numbers
+        INNER JOIN sys_job ON CHAR_LENGTH(dependent_job_ids) - CHAR_LENGTH(REPLACE(dependent_job_ids, ',', '')) >=
+        numbers.n - 1
+        WHERE FIND_IN_SET(#{jobId}, dependent_job_ids) > 0
+        )
+        ORDER BY job_id ASC
+    </select>
+
+</mapper>

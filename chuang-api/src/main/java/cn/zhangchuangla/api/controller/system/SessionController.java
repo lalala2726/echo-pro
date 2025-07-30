@@ -39,7 +39,7 @@ public class SessionController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "会话列表")
-    @PreAuthorize("@ss.hasPermission('monitor:session:list')")
+    @PreAuthorize("@ss.hasPermission('system:session:list')")
     public AjaxResult<TableDataResult> sessionList(OnlineUserQueryRequest request) {
         PageResult<OnlineLoginUser> onlineUserPageResult = sessionService.sessionList(request);
         return getTableData(onlineUserPageResult);
@@ -53,8 +53,8 @@ public class SessionController extends BaseController {
      */
     @GetMapping("/detail")
     @Operation(summary = "会话详情")
-    @PreAuthorize("@ss.hasPermission('monitor:session:detail')")
-    public AjaxResult<OnlineLoginUser> sessionDetail(@RequestParam("sessionId") String accessTokenId) {
+    @PreAuthorize("@ss.hasPermission('system:session:detail')")
+    public AjaxResult<OnlineLoginUser> sessionDetail(@RequestParam("accessTokenId") String accessTokenId) {
         OnlineLoginUser onlineLoginUser = sessionService.sessionDetail(accessTokenId);
         return AjaxResult.success(onlineLoginUser);
     }
@@ -68,8 +68,8 @@ public class SessionController extends BaseController {
     @DeleteMapping
     @Operation(summary = "删除会话")
     @OperationLog(title = "会话管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("hasAuthority('system:session:delete')")
-    public AjaxResult<Void> deleteSession(@RequestParam("sessionId") String accessTokenId) {
+    @PreAuthorize("@ss.hasPermission('system:session:delete')")
+    public AjaxResult<Void> deleteSession(@RequestParam("accessTokenId") String accessTokenId) {
         boolean result = sessionService.deleteSession(accessTokenId);
         return toAjax(result);
     }

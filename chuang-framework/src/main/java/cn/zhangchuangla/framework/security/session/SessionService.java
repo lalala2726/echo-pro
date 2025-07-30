@@ -7,7 +7,6 @@ import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
-import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SessionService {
 
-    private final TokenService tokenService;
     private final RedisTokenStore redisTokenStore;
     private final DeviceService deviceService;
     private RedisCache redisCache;
@@ -153,7 +151,7 @@ public class SessionService {
      * @return 会话详情
      */
     public OnlineLoginUser sessionDetail(String accessTokenId) {
-        Assert.isTrue(tokenService.validateAccessToken(accessTokenId), "会话ID不存在!");
+        Assert.isTrue(!accessTokenId.isBlank(), "会话ID不存在!");
         return redisTokenStore.getAccessToken(accessTokenId);
     }
 

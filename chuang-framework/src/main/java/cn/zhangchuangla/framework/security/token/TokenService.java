@@ -107,10 +107,11 @@ public class TokenService {
         OnlineLoginUser onlineUser = redisTokenStore.getAccessToken(accessTokenId);
 
         //更新访问时间
-        if (onlineUser == null) {
+        boolean updateSuccess = redisTokenStore.updateAccessTime(accessTokenId);
+        if (!updateSuccess) {
+            log.warn("更新访问时间失败，令牌可能已被删除: {}", accessTokenId);
             return null;
         }
-        redisTokenStore.updateAccessTime(accessTokenId);
 
         Set<SimpleGrantedAuthority> authorities = onlineUser.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(SecurityConstants.ROLE_PREFIX + role))
@@ -197,19 +198,29 @@ public class TokenService {
      * @return 如果有效返回true，否则返回false。
      */
     public boolean validateAccessToken(String jwtAccessToken) {
-        Claims claims;
-        // 如果解析失败或过期，getClaimsFromToken会抛出异常
-        claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
-        // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
-        if (claims == null) {
-            return false;
-        }
-        String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-        if (StringUtils.isBlank(accessTokenSessionId)) {
-            return false;
-        }
+        try {
+            Claims claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
+            // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
+            if (claims == null) {
+                log.warn("JWT解析返回空Claims: {}", jwtAccessToken.substring(0, Math.min(jwtAccessToken.length(), 20)) + "...");
+                return false;
+            }
 
-        return redisTokenStore.isValidAccessToken(accessTokenSessionId);
+            String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
+            if (StringUtils.isBlank(accessTokenSessionId)) {
+                log.warn("JWT中缺少sessionId: {}", jwtAccessToken.substring(0, Math.min(jwtAccessToken.length(), 20)) + "...");
+                return false;
+            }
+
+            boolean isValid = redisTokenStore.isValidAccessToken(accessTokenSessionId);
+            if (!isValid) {
+                log.warn("Redis中不存在对应的访问令牌: {}", accessTokenSessionId);
+            }
+            return isValid;
+        } catch (Exception e) {
+            log.warn("访问令牌验证失败: {}", e.getMessage());
+            return false;
+        }
     }
 
 
