@@ -31,18 +31,6 @@ public class SysJobUpdateRequest {
     private String jobName;
 
     /**
-     * 任务组ID
-     */
-    @Schema(description = "任务组ID")
-    private Long jobGroupId;
-
-    /**
-     * 任务组名
-     */
-    @Schema(description = "任务组名")
-    private String jobGroup;
-
-    /**
      * 调用目标字符串
      */
     @NotBlank(message = "调用目标不能为空")

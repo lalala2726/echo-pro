@@ -115,14 +115,6 @@ public interface SysJobService extends IService<SysJob> {
     List<SysJob> selectEnabledJobs();
 
     /**
-     * 根据任务组查询任务列表
-     *
-     * @param jobGroup 任务组名
-     * @return 任务列表
-     */
-    List<SysJob> selectJobsByGroup(String jobGroup);
-
-    /**
      * 检查任务依赖关系
      *
      * @param jobId 任务ID

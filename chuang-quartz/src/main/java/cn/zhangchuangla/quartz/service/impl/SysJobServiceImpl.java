@@ -143,7 +143,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         if (updated) {
             try {
                 // 更新定时任务
-                updateSchedulerJob(job, existingJob.getJobGroup());
+                updateSchedulerJob(job);
 
                 // 更新成功后，立即更新下次执行时间
                 updateJobNextFireTime(job.getJobId());
@@ -163,7 +163,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
             SysJob job = getById(jobId);
             if (job != null) {
                 try {
-                    scheduler.deleteJob(ScheduleUtils.getJobKey(jobId, job.getJobGroup()));
+                    scheduler.deleteJob(ScheduleUtils.getJobKey(jobId));
                 } catch (SchedulerException e) {
                     log.error("删除定时任务失败: {}", jobId, e);
                     throw new ServiceException("删除定时任务失败: " + e.getMessage());
@@ -182,7 +182,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         }
 
         try {
-            scheduler.resumeJob(ScheduleUtils.getJobKey(jobId, job.getJobGroup()));
+            scheduler.resumeJob(ScheduleUtils.getJobKey(jobId));
 
             // 更新数据库状态
             job.setStatus(QuartzConstants.JobStatusConstants.NORMAL);
@@ -206,7 +206,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         }
 
         try {
-            scheduler.pauseJob(ScheduleUtils.getJobKey(jobId, job.getJobGroup()));
+            scheduler.pauseJob(ScheduleUtils.getJobKey(jobId));
 
             // 更新数据库状态
             job.setStatus(QuartzConstants.JobStatusConstants.PAUSE);
@@ -232,7 +232,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         }
 
         try {
-            scheduler.triggerJob(ScheduleUtils.getJobKey(jobId, job.getJobGroup()));
+            scheduler.triggerJob(ScheduleUtils.getJobKey(jobId));
             return true;
         } catch (SchedulerException e) {
             log.error("执行任务失败: {}", jobId, e);
@@ -273,11 +273,6 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     @Override
     public List<SysJob> selectEnabledJobs() {
         return sysJobMapper.selectEnabledJobs();
-    }
-
-    @Override
-    public List<SysJob> selectJobsByGroup(String jobGroup) {
-        return sysJobMapper.selectJobsByGroup(jobGroup);
     }
 
     @Override
@@ -325,7 +320,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
 
         try {
             // 更新下次执行时间
-            Trigger trigger = scheduler.getTrigger(ScheduleUtils.getTriggerKey(jobId, job.getJobGroup()));
+            Trigger trigger = scheduler.getTrigger(ScheduleUtils.getTriggerKey(jobId));
             if (trigger != null) {
                 job.setNextFireTime(trigger.getNextFireTime());
                 job.setPreviousFireTime(trigger.getPreviousFireTime());
@@ -404,9 +399,6 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         if (job.getPriority() == null) {
             job.setPriority(5);
         }
-        if (StringUtils.isEmpty(job.getJobGroup())) {
-            job.setJobGroup(QuartzConstants.DEFAULT_GROUP);
-        }
     }
 
     /**
@@ -436,9 +428,9 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     /**
      * 更新调度器中的任务
      */
-    private void updateSchedulerJob(SysJob job, String oldJobGroup) throws SchedulerException {
+    private void updateSchedulerJob(SysJob job) throws SchedulerException {
         Long jobId = job.getJobId();
-        JobKey jobKey = ScheduleUtils.getJobKey(jobId, oldJobGroup);
+        JobKey jobKey = ScheduleUtils.getJobKey(jobId);
 
         // 判断是否存在
         if (scheduler.checkExists(jobKey)) {
@@ -492,7 +484,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
             }
 
             // 从 Quartz 调度器获取下次执行时间
-            JobKey jobKey = ScheduleUtils.getJobKey(jobId, job.getJobGroup());
+            JobKey jobKey = ScheduleUtils.getJobKey(jobId);
             if (scheduler.checkExists(jobKey)) {
                 List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
                 if (!triggers.isEmpty()) {
@@ -533,7 +525,7 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
 
             for (SysJob job : enabledJobs) {
                 try {
-                    JobKey jobKey = ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup());
+                    JobKey jobKey = ScheduleUtils.getJobKey(job.getJobId());
                     if (scheduler.checkExists(jobKey)) {
                         List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
                         if (!triggers.isEmpty()) {

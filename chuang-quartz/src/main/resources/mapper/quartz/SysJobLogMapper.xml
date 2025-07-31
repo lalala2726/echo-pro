@@ -6,7 +6,6 @@
         <id column="job_log_id" property="jobLogId" jdbcType="BIGINT"/>
         <result column="job_id" property="jobId" jdbcType="BIGINT"/>
         <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
-        <result column="job_group" property="jobGroup" jdbcType="VARCHAR"/>
         <result column="invoke_target" property="invokeTarget" jdbcType="VARCHAR"/>
         <result column="job_data" property="jobData" jdbcType="LONGVARCHAR"/>
         <result column="job_message" property="jobMessage" jdbcType="LONGVARCHAR"/>
@@ -27,7 +26,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        job_log_id, job_id, job_name, job_group, invoke_target, job_data, job_message,
+        job_log_id, job_id, job_name, invoke_target, job_data, job_message,
         status, exception_info, start_time, end_time, execute_time, server_ip, server_name,
         retry_count, trigger_type, create_time, update_time, create_by, update_by, remark
     </sql>
@@ -42,9 +41,6 @@
             </if>
             <if test="request.jobName != null and request.jobName != ''">
                 AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
-            </if>
-            <if test="request.jobGroup != null and request.jobGroup != ''">
-                AND job_group = #{request.jobGroup}
             </if>
             <if test="request.status != null">
                 AND status = #{request.status}

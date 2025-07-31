@@ -37,12 +37,6 @@ public class SysJobLogListVo extends BaseVo {
     private String jobName;
 
     /**
-     * 任务组名
-     */
-    @Schema(description = "任务组名")
-    private String jobGroup;
-
-    /**
      * 调用目标字符串
      */
     @Schema(description = "调用目标字符串")

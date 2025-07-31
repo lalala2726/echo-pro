@@ -5,8 +5,6 @@
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.quartz.entity.SysJob">
         <id column="job_id" property="jobId" jdbcType="BIGINT"/>
         <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
-        <result column="job_group_id" property="jobGroupId" jdbcType="BIGINT"/>
-        <result column="job_group" property="jobGroup" jdbcType="VARCHAR"/>
         <result column="invoke_target" property="invokeTarget" jdbcType="VARCHAR"/>
         <result column="schedule_type" property="scheduleType" jdbcType="INTEGER"/>
         <result column="cron_expression" property="cronExpression" jdbcType="VARCHAR"/>
@@ -35,7 +33,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        job_id, job_name, job_group_id, job_group, invoke_target, schedule_type, cron_expression,
+        job_id, job_name, invoke_target, schedule_type, cron_expression,
         fixed_rate, fixed_delay, initial_delay, misfire_policy, concurrent, status, priority,
         description, job_data, dependent_job_ids, max_retry_count, retry_interval, timeout,
         start_time, end_time, next_fire_time, previous_fire_time, create_time, update_time,
@@ -49,9 +47,6 @@
         <where>
             <if test="request.jobName != null and request.jobName != ''">
                 AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
-            </if>
-            <if test="request.jobGroup != null and request.jobGroup != ''">
-                AND job_group = #{request.jobGroup}
             </if>
             <if test="request.status != null">
                 AND status = #{request.status}
@@ -72,14 +67,6 @@
         FROM sys_job
         WHERE status = 0
         ORDER BY priority DESC, job_id ASC
-    </select>
-
-    <select id="selectJobsByGroup" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM sys_job
-        WHERE job_group = #{jobGroup}
-        ORDER BY job_id ASC
     </select>
 
     <select id="selectJobsByDependentId" resultMap="BaseResultMap">

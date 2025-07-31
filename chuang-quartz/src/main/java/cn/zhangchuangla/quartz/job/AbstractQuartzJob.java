@@ -97,7 +97,6 @@ public abstract class AbstractQuartzJob implements Job {
         final SysJobLog sysJobLog = new SysJobLog();
         sysJobLog.setJobId(sysJob.getJobId());
         sysJobLog.setJobName(sysJob.getJobName());
-        sysJobLog.setJobGroup(sysJob.getJobGroup());
         sysJobLog.setInvokeTarget(sysJob.getInvokeTarget());
         sysJobLog.setJobData(sysJob.getJobData());
         sysJobLog.setStartTime(startTime);

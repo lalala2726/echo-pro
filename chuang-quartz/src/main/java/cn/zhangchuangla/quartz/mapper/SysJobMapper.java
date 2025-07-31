@@ -34,14 +34,6 @@ public interface SysJobMapper extends BaseMapper<SysJob> {
     List<SysJob> selectEnabledJobs();
 
     /**
-     * 根据任务组查询任务列表
-     *
-     * @param jobGroup 任务组名
-     * @return 任务列表
-     */
-    List<SysJob> selectJobsByGroup(@Param("jobGroup") String jobGroup);
-
-    /**
      * 根据依赖任务ID查询任务列表
      *
      * @param dependentJobId 依赖任务ID
