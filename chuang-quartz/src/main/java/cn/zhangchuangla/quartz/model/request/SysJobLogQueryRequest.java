@@ -30,12 +30,6 @@ public class SysJobLogQueryRequest extends BasePageRequest {
     private String jobName;
 
     /**
-     * 任务组名
-     */
-    @Schema(description = "任务组名")
-    private String jobGroup;
-
-    /**
      * 执行状态（0正常 1失败）
      */
     @Schema(description = "执行状态（0正常 1失败）")

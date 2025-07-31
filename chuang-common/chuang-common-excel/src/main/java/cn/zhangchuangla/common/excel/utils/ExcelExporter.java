@@ -39,12 +39,12 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class ExcelExportService {
+public class ExcelExporter {
 
 
     private final DictDataHandler dictDataHandler;
 
-    public ExcelExportService(DictDataHandler dictDataHandler) {
+    public ExcelExporter(DictDataHandler dictDataHandler) {
         this.dictDataHandler = dictDataHandler;
     }
 

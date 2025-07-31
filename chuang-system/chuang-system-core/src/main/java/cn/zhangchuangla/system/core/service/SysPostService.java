@@ -72,4 +72,12 @@ public interface SysPostService extends IService<SysPost> {
      * @return true存在，false不存在
      */
     boolean isPostNameExist(@NotBlank(message = "岗位名称不能为空") String postName);
+
+    /**
+     * 导出岗位列表
+     *
+     * @param request 查询参数
+     * @return 岗位列表
+     */
+    List<SysPost> exportPostList(SysPostQueryRequest request);
 }

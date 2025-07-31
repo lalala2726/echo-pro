@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.storage.model.entity.StorageFile;
 import cn.zhangchuangla.system.storage.model.request.file.StorageFileQueryRequest;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +39,7 @@ import java.util.List;
 public class StorageFileController extends BaseController {
 
     private final StorageFileService storageFileService;
+    private final ExcelExporter excelExporter;
 
 
     /**
@@ -138,5 +141,22 @@ public class StorageFileController extends BaseController {
                                        @RequestParam(value = "forceDelete", required = false, defaultValue = "false") boolean forceDelete) {
         boolean result = storageFileService.deleteFileById(ids, forceDelete);
         return toAjax(result);
+    }
+
+    /**
+     * 导出文件资源列表
+     *
+     * @param request  查询参数
+     * @param response 响应
+     */
+    @PostMapping("/export")
+    @Operation(summary = "导出文件")
+    @PreAuthorize("@ss.hasPermission('system:storage-file:export')")
+    @OperationLog(title = "文件资源", businessType = BusinessType.EXPORT)
+    public void export(@Parameter(description = "查询条件用于筛选文件")
+                       @RequestBody StorageFileQueryRequest request, HttpServletResponse response) {
+        List<StorageFile> fileList = storageFileService.exportListFile(request);
+        List<StorageFileListVo> storageFileListVos = copyListProperties(fileList, StorageFileListVo.class);
+        excelExporter.exportExcel(response, storageFileListVos, StorageFileListVo.class, "文件列表");
     }
 }

@@ -65,4 +65,24 @@
         </where>
         order by upload_time desc
     </select>
+
+    <select id="exportListFile" resultMap="BaseResultMap">
+        select id, file_name, original_name, content_type, file_size, original_file_url, original_relative_path,
+        preview_image_url, preview_relative_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name,
+        upload_time, original_trash_path, preview_trash_path, update_time, is_trash, is_deleted
+        from storage_file
+        <where>
+            <if test="request.originalName != null and request.originalName != ''">
+                and original_name like concat('%', #{request.originalName}, '%')
+            </if>
+            <if test="request.storageType != null and request.storageType != ''">
+                and storage_type = #{request.storageType}
+            </if>
+            <if test="request.contentType != null and request.contentType != ''">
+                and content_type = #{request.contentType}
+            </if>
+            is_deleted = 0
+        </where>
+        order by upload_time desc
+    </select>
 </mapper>

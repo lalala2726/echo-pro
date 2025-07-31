@@ -4,10 +4,10 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
-import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.enums.BusinessType;
-import cn.zhangchuangla.common.excel.utils.ExcelExportService;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
 import cn.zhangchuangla.framework.security.session.SessionService;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class SessionController extends BaseController {
 
     private final SessionService sessionService;
-    private final ExcelExportService excelExportService;
+    private final ExcelExporter excelExporter;
 
     /**
      * 会话列表
@@ -88,7 +88,7 @@ public class SessionController extends BaseController {
         request.setPageNum(-1);
         request.setPageSize(-1);
         PageResult<OnlineLoginUser> onlineLoginUserPageResult = sessionService.sessionList(request);
-        excelExportService.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUser.class, "登录用户列表");
+        excelExporter.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUser.class, "登录用户列表");
     }
 
 }

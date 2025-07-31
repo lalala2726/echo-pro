@@ -6,7 +6,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.excel.utils.ExcelExportService;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.storage.core.service.StorageRegistryService;
 import cn.zhangchuangla.system.storage.model.entity.StorageConfig;
@@ -39,7 +39,7 @@ public class StorageConfigController extends BaseController {
 
     private final StorageConfigService storageConfigService;
     private final StorageRegistryService storageRegistryService;
-    private final ExcelExportService excelExportService;
+    private final ExcelExporter excelExporter;
 
 
     /**
@@ -70,7 +70,7 @@ public class StorageConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:storage-config:export')")
     public void exportStorageConfig(@ParameterObject StorageConfigQueryRequest request, HttpServletResponse response) {
         List<StorageConfigUnifiedVo> storageConfigUnifiedVos = storageConfigService.listStorageConfig(request);
-        excelExportService.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
+        excelExporter.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
     }
 
 

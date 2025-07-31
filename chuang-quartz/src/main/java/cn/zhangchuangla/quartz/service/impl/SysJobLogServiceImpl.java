@@ -1,5 +1,7 @@
 package cn.zhangchuangla.quartz.service.impl;
 
+import cn.zhangchuangla.common.core.enums.ResultCode;
+import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.quartz.entity.SysJobLog;
 import cn.zhangchuangla.quartz.mapper.SysJobLogMapper;
@@ -10,7 +12,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,17 +37,13 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
     }
 
     @Override
-    public SysJobLogVo selectJobLogById(Long jobLogId) {
+    public SysJobLog selectJobLogById(Long jobLogId) {
         SysJobLog jobLog = getById(jobLogId);
         if (jobLog == null) {
-            return null;
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "任务日志不存在");
         }
+        return jobLog;
 
-        SysJobLogVo logVo = new SysJobLogVo();
-        BeanUtils.copyProperties(jobLog, logVo);
-        setLogDescriptions(logVo);
-
-        return logVo;
     }
 
     @Override
@@ -132,6 +129,17 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
 
             updateById(jobLog);
         }
+    }
+
+    /**
+     * 导出任务日志
+     *
+     * @param request 查询条件
+     * @return 返回任务日志列表
+     */
+    @Override
+    public List<SysJobLog> exportJobLogList(SysJobLogQueryRequest request) {
+        return sysJobLogMapper.exportJobLogList(request);
     }
 
     /**

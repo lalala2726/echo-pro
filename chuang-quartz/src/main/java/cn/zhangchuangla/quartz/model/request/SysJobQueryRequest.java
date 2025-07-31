@@ -22,12 +22,6 @@ public class SysJobQueryRequest extends BasePageRequest {
     private String jobName;
 
     /**
-     * 任务组名
-     */
-    @Schema(description = "任务组名")
-    private String jobGroup;
-
-    /**
      * 任务状态
      */
     @Schema(description = "任务状态")

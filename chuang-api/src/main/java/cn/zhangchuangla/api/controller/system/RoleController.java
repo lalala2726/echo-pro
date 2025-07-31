@@ -6,8 +6,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.excel.utils.ExcelExportService;
+import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysRole;
 import cn.zhangchuangla.system.core.model.request.role.SysRoleAddRequest;
@@ -32,7 +31,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,7 +48,7 @@ import java.util.List;
 public class RoleController extends BaseController {
 
     private final SysRoleService sysRoleService;
-    private final ExcelExportService excelExportService;
+    private final ExcelExporter excelExporter;
     private final SysPermissionService sysPermissionService;
 
 
@@ -85,12 +83,8 @@ public class RoleController extends BaseController {
                             @RequestBody SysRoleQueryRequest request) {
         log.info("导出用户列表:{}", request);
         Page<SysRole> page = sysRoleService.roleList(request);
-        ArrayList<SysRoleListVo> sysRoleListVos = new ArrayList<>();
-        page.getRecords().forEach(user -> {
-            SysRoleListVo sysRoleListVo = BeanCotyUtils.copyProperties(user, SysRoleListVo.class);
-            sysRoleListVos.add(sysRoleListVo);
-        });
-        excelExportService.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
+        List<SysRoleListVo> sysRoleListVos = copyListProperties(page, SysRoleListVo.class);
+        excelExporter.exportExcel(response, sysRoleListVos, SysRoleListVo.class, "角色列表");
 
     }
 

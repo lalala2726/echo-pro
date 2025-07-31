@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 公告 Mapper 接口
  *
@@ -23,6 +25,14 @@ public interface SysNoticeMapper extends BaseMapper<SysNotice> {
      * @return 公告分页列表
      */
     Page<SysNotice> listNotice(Page<SysNotice> page, @Param("request") SysNoticeQueryRequest request);
+
+    /**
+     * 导出公告列表
+     *
+     * @param request 查询参数
+     * @return 公告列表
+     */
+    List<SysNotice> exportNoticeList(SysNoticeQueryRequest request);
 }
 
 

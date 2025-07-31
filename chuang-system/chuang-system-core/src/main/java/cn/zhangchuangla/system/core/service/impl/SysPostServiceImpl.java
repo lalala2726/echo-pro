@@ -117,6 +117,17 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
         LambdaQueryWrapper<SysPost> eq = new LambdaQueryWrapper<SysPost>().eq(SysPost::getPostName, postName);
         return count(eq) > 0;
     }
+
+    /**
+     * 导出岗位列表
+     *
+     * @param request 查询参数
+     * @return 岗位列表
+     */
+    @Override
+    public List<SysPost> exportPostList(SysPostQueryRequest request) {
+        return sysPostMapper.exportPostList(request);
+    }
 }
 
 

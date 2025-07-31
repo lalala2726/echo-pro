@@ -34,14 +34,6 @@ public interface SysJobMapper extends BaseMapper<SysJob> {
     List<SysJob> selectEnabledJobs();
 
     /**
-     * 根据任务组查询任务列表
-     *
-     * @param jobGroup 任务组名
-     * @return 任务列表
-     */
-    List<SysJob> selectJobsByGroup(@Param("jobGroup") String jobGroup);
-
-    /**
      * 根据依赖任务ID查询任务列表
      *
      * @param dependentJobId 依赖任务ID
@@ -74,4 +66,40 @@ public interface SysJobMapper extends BaseMapper<SysJob> {
      * @return 依赖的任务列表
      */
     List<SysJob> selectDependentJobs(@Param("jobId") Long jobId);
+
+    /**
+     * 导出定时任务列表
+     *
+     * @param request 查询参数
+     * @return 导出定时任务列表
+     */
+    List<SysJob> exportJobList(SysJobQueryRequest request);
+
+    /**
+     * 批量更新任务执行时间
+     * <p>
+     * 用于批量更新多个任务的上次执行时间和下次执行时间
+     * 提高批量更新的性能，避免逐个更新的开销
+     * </p>
+     *
+     * @param jobs 需要更新的任务列表，包含 jobId、previousFireTime、nextFireTime
+     * @return 更新的记录数
+     */
+    int batchUpdateExecutionTimes(@Param("jobs") List<SysJob> jobs);
+
+    /**
+     * 更新单个任务的执行时间
+     * <p>
+     * 专门用于更新任务的执行时间字段，避免更新其他不相关的字段
+     * 提供更精确的更新控制
+     * </p>
+     *
+     * @param jobId            任务ID
+     * @param previousFireTime 上次执行时间
+     * @param nextFireTime     下次执行时间
+     * @return 更新的记录数
+     */
+    int updateJobExecutionTime(@Param("jobId") Long jobId,
+                               @Param("previousFireTime") java.util.Date previousFireTime,
+                               @Param("nextFireTime") java.util.Date nextFireTime);
 }

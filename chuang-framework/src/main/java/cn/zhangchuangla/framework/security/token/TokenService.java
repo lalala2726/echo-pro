@@ -1,8 +1,6 @@
 package cn.zhangchuangla.framework.security.token;
 
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
-import cn.zhangchuangla.common.core.entity.security.OnlineLoginUser;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -11,6 +9,8 @@ import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
 import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
+import cn.zhangchuangla.framework.model.vo.AuthTokenVo;
+import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import io.jsonwebtoken.Claims;

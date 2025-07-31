@@ -42,4 +42,23 @@
         </where>
         ORDER BY create_time DESC
     </select>
+
+    <select id="exportNoticeList" resultMap="BaseResultMap">
+        FROM sys_notice
+        <where>
+            <if test="request.noticeTitle != null and request.noticeTitle != ''">
+                AND notice_title LIKE CONCAT('%', #{request.noticeTitle}, '%')
+            </if>
+            <if test="request.noticeType != null and request.noticeType != ''">
+                AND notice_type = #{request.noticeType}
+            </if>
+            <if test="request.status != null">
+                AND status = #{request.status}
+            </if>
+            <if test="request.createBy != null and request.createBy != ''">
+                AND create_by LIKE CONCAT('%', #{request.createBy}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
 </mapper>

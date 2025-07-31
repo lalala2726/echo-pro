@@ -1,7 +1,6 @@
 package cn.zhangchuangla.framework.security.login;
 
 import cn.zhangchuangla.common.core.config.property.SecurityProperties;
-import cn.zhangchuangla.common.core.entity.security.AuthTokenVo;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -17,6 +16,7 @@ import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.request.LoginRequest;
 import cn.zhangchuangla.framework.model.request.RegisterRequest;
+import cn.zhangchuangla.framework.model.vo.AuthTokenVo;
 import cn.zhangchuangla.framework.security.device.DeviceLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.LoginFrequencyLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;

@@ -1,6 +1,9 @@
 package cn.zhangchuangla.quartz.model.vo;
 
 import cn.zhangchuangla.common.core.entity.base.BaseVo;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,6 +23,7 @@ public class SysJobLogVo extends BaseVo {
     /**
      * 任务日志ID
      */
+    @TableId(type = IdType.AUTO)
     @Schema(description = "任务日志ID")
     private Long jobLogId;
 
@@ -34,12 +38,6 @@ public class SysJobLogVo extends BaseVo {
      */
     @Schema(description = "任务名称")
     private String jobName;
-
-    /**
-     * 任务组名
-     */
-    @Schema(description = "任务组名")
-    private String jobGroup;
 
     /**
      * 调用目标字符串
@@ -81,12 +79,14 @@ public class SysJobLogVo extends BaseVo {
      * 开始时间
      */
     @Schema(description = "开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * 结束时间
      */
     @Schema(description = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**

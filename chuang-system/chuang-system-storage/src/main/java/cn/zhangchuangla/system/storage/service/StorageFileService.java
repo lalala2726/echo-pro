@@ -100,4 +100,12 @@ public interface StorageFileService extends IService<StorageFile> {
      * @return 文件信息
      */
     StorageFile getFileById(Long id);
+
+    /**
+     * 导出文件列表
+     *
+     * @param request 查询参数
+     * @return 文件列表
+     */
+    List<StorageFile> exportListFile(StorageFileQueryRequest request);
 }

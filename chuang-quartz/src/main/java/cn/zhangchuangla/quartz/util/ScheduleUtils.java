@@ -35,7 +35,7 @@ public class ScheduleUtils {
      */
     public static TriggerBuilder<Trigger> getTriggerBuilder(SysJob job) {
         TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
-                .withIdentity(getTriggerKey(job.getJobId(), job.getJobGroup()))
+                .withIdentity(getTriggerKey(job.getJobId()))
                 .withDescription(job.getDescription());
 
         // 设置开始时间
@@ -157,8 +157,7 @@ public class ScheduleUtils {
         Class<? extends Job> jobClass = getQuartzJobClass(job);
         // 构建job信息
         Long jobId = job.getJobId();
-        String jobGroup = job.getJobGroup();
-        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(getJobKey(jobId, jobGroup)).build();
+        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(getJobKey(jobId)).build();
 
         // 放入参数，运行时的方法可以获取
         jobDetail.getJobDataMap().put(QuartzConstants.TASK_PROPERTIES, job);
@@ -167,9 +166,9 @@ public class ScheduleUtils {
         Trigger trigger = getTrigger(job);
 
         // 判断是否存在
-        if (scheduler.checkExists(getJobKey(jobId, jobGroup))) {
+        if (scheduler.checkExists(getJobKey(jobId))) {
             // 防止创建时存在数据问题 先移除，然后在执行创建操作
-            scheduler.deleteJob(getJobKey(jobId, jobGroup));
+            scheduler.deleteJob(getJobKey(jobId));
         }
 
         // 判断任务是否过期
@@ -182,7 +181,7 @@ public class ScheduleUtils {
 
         // 暂停任务
         if (job.getStatus().equals(QuartzConstants.JobStatusConstants.PAUSE)) {
-            scheduler.pauseJob(getJobKey(jobId, jobGroup));
+            scheduler.pauseJob(getJobKey(jobId));
         }
     }
 
@@ -194,23 +193,10 @@ public class ScheduleUtils {
     }
 
     /**
-     * 构造任务键对象
-     */
-    public static JobKey getJobKey(Long jobId, String jobGroup) {
-        return JobKey.jobKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId, jobGroup);
-    }
-
-    /**
      * 构造任务触发器键对象
      */
     public static TriggerKey getTriggerKey(Long jobId) {
         return TriggerKey.triggerKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId);
     }
 
-    /**
-     * 构造任务触发器键对象
-     */
-    public static TriggerKey getTriggerKey(Long jobId, String jobGroup) {
-        return TriggerKey.triggerKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId, jobGroup);
-    }
 }
