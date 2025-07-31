@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.quartz.entity.SysJobLog;
@@ -61,8 +62,9 @@ public class JobLogController extends BaseController {
     @PreAuthorize("@ss.hasPermission('tool:job-log:query')")
     public AjaxResult<SysJobLogVo> getInfo(@Parameter(description = "日志ID") @PathVariable("jobLogId") Long jobLogId) {
         Assert.notNull(jobLogId, "日志ID不能为空");
-        SysJobLogVo logVo = sysJobLogService.selectJobLogById(jobLogId);
-        return success(logVo);
+        SysJobLog sysJobLog = sysJobLogService.selectJobLogById(jobLogId);
+        SysJobLogVo sysJobLogVo = BeanCotyUtils.copyProperties(sysJobLog, SysJobLogVo.class);
+        return success(sysJobLogVo);
     }
 
     /**
