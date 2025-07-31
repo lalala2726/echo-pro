@@ -73,7 +73,7 @@ public interface SysJobMapper extends BaseMapper<SysJob> {
      * @param request 查询参数
      * @return 导出定时任务列表
      */
-    List<SysJob> exportJobList(SysJobQueryRequest request);
+    List<SysJob> exportJobList(@Param("request") SysJobQueryRequest request);
 
     /**
      * 批量更新任务执行时间
