@@ -193,23 +193,10 @@ public class ScheduleUtils {
     }
 
     /**
-     * 构造任务键对象
-     */
-    public static JobKey getJobKey(Long jobId, String jobGroup) {
-        return JobKey.jobKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId, jobGroup);
-    }
-
-    /**
      * 构造任务触发器键对象
      */
     public static TriggerKey getTriggerKey(Long jobId) {
         return TriggerKey.triggerKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId);
     }
 
-    /**
-     * 构造任务触发器键对象
-     */
-    public static TriggerKey getTriggerKey(Long jobId, String jobGroup) {
-        return TriggerKey.triggerKey(QuartzConstants.TASK_PROPERTIES + "_" + jobId, jobGroup);
-    }
 }

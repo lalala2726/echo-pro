@@ -94,6 +94,12 @@ public abstract class AbstractQuartzJob implements Job {
         THREAD_LOCAL.remove();
         Date endTime = new Date();
 
+        // 如果开始时间为空，使用当前时间
+        if (startTime == null) {
+            startTime = endTime;
+            logger.warn("任务开始时间为空，使用结束时间作为开始时间: jobId={}", sysJob.getJobId());
+        }
+
         final SysJobLog sysJobLog = new SysJobLog();
         sysJobLog.setJobId(sysJob.getJobId());
         sysJobLog.setJobName(sysJob.getJobName());

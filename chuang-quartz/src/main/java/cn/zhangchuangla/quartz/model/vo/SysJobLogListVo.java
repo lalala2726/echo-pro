@@ -1,6 +1,7 @@
 package cn.zhangchuangla.quartz.model.vo;
 
 import cn.zhangchuangla.common.core.entity.base.BaseVo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -76,11 +77,13 @@ public class SysJobLogListVo extends BaseVo {
      * 上次执行时间
      */
     @Schema(description = "上次执行时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date previousFireTime;
 
     /**
      * 下次执行时间
      */
     @Schema(description = "下次执行时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date nextFireTime;
 }

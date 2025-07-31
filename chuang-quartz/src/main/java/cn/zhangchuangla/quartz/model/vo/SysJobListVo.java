@@ -1,5 +1,6 @@
 package cn.zhangchuangla.quartz.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -60,11 +61,13 @@ public class SysJobListVo {
      * 任务参数
      */
     @Schema(description = "下次执行时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date nextFireTime;
 
     /**
      * 上次执行时间
      */
     @Schema(description = "上次执行时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date previousFireTime;
 }

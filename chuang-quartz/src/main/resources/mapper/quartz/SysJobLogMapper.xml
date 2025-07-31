@@ -107,12 +107,6 @@
             <if test="request.jobId != null">
                 AND job_id = #{request.jobId}
             </if>
-            <if test="request.jobName != null and request.jobName != ''">
-                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
-            </if>
-            <if test="request.jobGroup != null and request.jobGroup != ''">
-                AND job_group = #{request.jobGroup}
-            </if>
             <if test="request.status != null">
                 AND status = #{request.status}
             </if>

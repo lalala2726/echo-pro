@@ -117,12 +117,6 @@
         <include refid="Base_Column_List"/>
         FROM sys_job
         <where>
-            <if test="request.jobName != null and request.jobName != ''">
-                AND job_name LIKE CONCAT('%', #{request.jobName}, '%')
-            </if>
-            <if test="request.jobGroup != null and request.jobGroup != ''">
-                AND job_group = #{request.jobGroup}
-            </if>
             <if test="request.status != null">
                 AND status = #{request.status}
             </if>
