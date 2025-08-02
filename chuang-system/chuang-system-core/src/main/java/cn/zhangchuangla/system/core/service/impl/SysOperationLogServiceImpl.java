@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -74,20 +73,6 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
         return sysOperationLogMapper.listOperationLog(request);
     }
 
-    /**
-     * 获取用户安全日志
-     *
-     * @param userId 用户ID
-     * @return 用户安全日志
-     */
-    @Override
-    public List<SysOperationLog> getUserSecurityLog(Long userId) {
-        return lambdaQuery()
-                .eq(SysOperationLog::getUserId, userId)
-                .ge(SysOperationLog::getCreateTime, LocalDateTime.now().minusDays(30))
-                .list();
-
-    }
 }
 
 

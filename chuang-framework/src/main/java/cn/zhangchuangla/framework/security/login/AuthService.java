@@ -179,9 +179,20 @@ public class AuthService {
      */
     private void recordLoginSecurityLog(String username, String ipAddr, boolean isSuccess) {
         try {
+            // 获取用户ID
+            Long userId = null;
+            try {
+                SysUser user = sysUserService.getUserByUsername(username);
+                if (user != null) {
+                    userId = user.getUserId();
+                }
+            } catch (Exception e) {
+                log.warn("获取用户ID失败，用户名: {}, 异常: {}", username, e.getMessage());
+            }
+
             // 构建安全日志对象
             SysSecurityLog securityLog = new SysSecurityLog();
-            securityLog.setUsername(username);
+            securityLog.setUserId(userId);
             securityLog.setTitle(isSuccess ? "用户登录成功" : "用户登录失败");
             securityLog.setOperationType(BusinessType.LOGIN.name());
             securityLog.setOperationIp(ipAddr);
@@ -191,7 +202,8 @@ public class AuthService {
             // 使用异步服务记录安全日志
             asyncLogService.recordSecurityLog(securityLog);
 
-            log.info("用户安全日志记录完成 - 用户: {}, 操作: {}, IP: {}, 地区: {}",
+            log.info("用户安全日志记录完成 - 用户ID: {}, 用户名: {}, 操作: {}, IP: {}, 地区: {}",
+                    userId,
                     username,
                     securityLog.getTitle(),
                     ipAddr,

@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.aspect;
 
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -113,7 +112,7 @@ public class SecurityLogAspect {
             SysSecurityLog sysSecurityLog = new SysSecurityLog();
             sysSecurityLog.setTitle(securityLog.title());
             sysSecurityLog.setOperationType(securityLog.businessType().name());
-            sysSecurityLog.setUsername(sysUserDetails != null ? sysUserDetails.getUsername() : SysRolesConstant.ANONYMOUS);
+            sysSecurityLog.setUserId(sysUserDetails != null ? sysUserDetails.getUserId() : null);
 
             // 获取 HTTP 请求对象
             HttpServletRequest request = SecurityUtils.getHttpServletRequest();
@@ -126,9 +125,9 @@ public class SecurityLogAspect {
 
             // 记录异常信息（仅用于日志输出，不存储到数据库）
             if (exception != null) {
-                log.warn("安全操作执行异常，模块: {}, 用户: {}, 异常: {}",
+                log.warn("安全操作执行异常，模块: {}, 用户ID: {}, 异常: {}",
                         securityLog.title(),
-                        sysUserDetails != null ? sysUserDetails.getUsername() : "匿名用户",
+                        sysUserDetails != null ? sysUserDetails.getUserId() : "匿名用户",
                         exception.getMessage());
             }
 

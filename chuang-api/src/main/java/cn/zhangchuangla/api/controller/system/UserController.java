@@ -19,9 +19,9 @@ import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
-import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysPost;
 import cn.zhangchuangla.system.core.model.entity.SysRole;
+import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
 import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
@@ -65,7 +65,7 @@ public class UserController extends BaseController {
     private final DeviceService deviceService;
     private final SysDeptService sysDeptService;
     private final SysPostService sysPostService;
-    private final SysOperationLogService sysOperationLogService;
+    private final SysSecurityLogService sysSecurityLogService;
 
 
     /**
@@ -311,7 +311,7 @@ public class UserController extends BaseController {
     @GetMapping("/security/log")
     public AjaxResult<List<UserSecurityLog>> securityLog() {
         Long userId = SecurityUtils.getUserId();
-        List<SysOperationLog> userSecurityLog = sysOperationLogService.getUserSecurityLog(userId);
+        List<SysSecurityLog> userSecurityLog = sysSecurityLogService.getUserSecurityLog(userId);
         List<UserSecurityLog> userSecurityLogs = copyListProperties(userSecurityLog, UserSecurityLog.class);
         return success(userSecurityLogs);
     }

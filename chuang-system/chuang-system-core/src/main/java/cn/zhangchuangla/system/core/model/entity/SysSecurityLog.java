@@ -15,6 +15,7 @@ import java.util.Date;
 @TableName(value = "sys_security_log")
 @Data
 public class SysSecurityLog {
+
     /**
      * 日志ID
      */
@@ -22,9 +23,9 @@ public class SysSecurityLog {
     private Long id;
 
     /**
-     * 用户名
+     * 用户ID
      */
-    private String username;
+    private Long userId;
 
     /**
      * 日志标题

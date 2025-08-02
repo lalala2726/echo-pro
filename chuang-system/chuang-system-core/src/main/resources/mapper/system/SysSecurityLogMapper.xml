@@ -6,7 +6,7 @@
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysSecurityLog">
         <id property="id" column="id"/>
-        <result property="username" column="username"/>
+        <result property="userId" column="user_id"/>
         <result property="title" column="title"/>
         <result property="operationType" column="operation_type"/>
         <result property="operationRegion" column="operation_region"/>
@@ -15,7 +15,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,username,title,operation_type,operation_region,operation_ip,
+        id,user_id,title,operation_type,operation_region,operation_ip,
         operation_time
     </sql>
 </mapper>
