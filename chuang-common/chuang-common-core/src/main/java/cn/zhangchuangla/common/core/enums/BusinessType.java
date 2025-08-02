@@ -100,9 +100,4 @@ public enum BusinessType {
      * 执行SQL
      */
     EXECUTE,
-
-    /**
-     * 安全
-     */
-    SECURITY,
 }

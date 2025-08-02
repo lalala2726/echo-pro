@@ -13,6 +13,7 @@ import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.framework.annotation.SecurityLog;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.device.DeviceService;
@@ -324,7 +325,7 @@ public class UserController extends BaseController {
      */
     @DeleteMapping("/security/device/{refreshTokenId}")
     @Operation(summary = "删除用户设备")
-    @OperationLog(title = "删除设备", businessType = BusinessType.SECURITY)
+    @SecurityLog(title = "退出设备", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> deleteDevice(@PathVariable("refreshTokenId") String refreshTokenId) {
         String username = SecurityUtils.getUsername();
         return deviceService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
@@ -339,7 +340,7 @@ public class UserController extends BaseController {
      * @return 修改结果
      */
     @Operation(summary = "修改用户密码")
-    @OperationLog(title = "修改密码", businessType = BusinessType.SECURITY)
+    @SecurityLog(title = "修改密码", businessType = BusinessType.UPDATE)
     @PutMapping("/security/password")
     public AjaxResult<Void> updatePassword(@RequestBody @Validated UpdatePasswordRequest request) {
         String oldPassword = request.getOldPassword();

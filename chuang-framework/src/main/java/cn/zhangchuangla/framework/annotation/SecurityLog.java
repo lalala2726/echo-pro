@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * 安全日志记录注解，用于标记需要记录安全敏感操作的方法
  * <p>
  * 该注解主要用于记录用户的敏感操作，如权限变更、密码修改、重要数据操作等。
- * 与普通操作日志不同，安全日志更关注安全相关的操作记录，便于安全审计和问题追踪。
+ * 与普通操作日志不同，安全日志主要是标记用户的相关操作
  * </p>
  *
  * <p>使用示例：</p>
@@ -47,5 +47,5 @@ public @interface SecurityLog {
      *
      * @return 业务类型枚举
      */
-    BusinessType businessType() default BusinessType.SECURITY;
+    BusinessType businessType() default BusinessType.OTHER;
 }
