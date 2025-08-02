@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.core.model.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class SysRoleMenu {
     /**
      * 角色ID
      */
+    @TableField(value = "role_id")
     private Long roleId;
 
     /**
