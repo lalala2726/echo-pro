@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangchuangla.system.core.mapper.SysSecurityLogMapper">
+
+    <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysSecurityLog">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="title" column="title"/>
+        <result property="operationType" column="operation_type"/>
+        <result property="operationRegion" column="operation_region"/>
+        <result property="operationIp" column="operation_ip"/>
+        <result property="operationTime" column="operation_time"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,username,title,operation_type,operation_region,operation_ip,
+        operation_time
+    </sql>
+</mapper>

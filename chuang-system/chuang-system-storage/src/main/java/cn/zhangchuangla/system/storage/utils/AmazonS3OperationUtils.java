@@ -39,7 +39,6 @@ import java.net.URI;
  * </ul>
  *
  * @author Chuang
- * @since 2025/7/4
  */
 @Slf4j
 @Component

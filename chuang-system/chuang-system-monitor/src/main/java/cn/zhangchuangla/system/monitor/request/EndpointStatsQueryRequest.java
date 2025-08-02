@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
  * 端点统计查询请求
  *
  * @author Chuang
- * @since 2025/1/15
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

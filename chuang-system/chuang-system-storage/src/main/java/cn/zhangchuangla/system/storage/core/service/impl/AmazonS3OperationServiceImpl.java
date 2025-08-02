@@ -31,7 +31,6 @@ import java.util.Objects;
  * 兼容标准S3协议和其他S3兼容存储服务
  *
  * @author Chuang
- * @since 2025/7/4
  */
 @Slf4j
 @Service(StorageConstants.springBeanName.AMAZON_S3_STORAGE_SERVICE)

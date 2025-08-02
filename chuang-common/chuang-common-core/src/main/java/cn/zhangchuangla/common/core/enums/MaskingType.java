@@ -6,7 +6,6 @@ import lombok.Getter;
  * 数据脱敏类型枚举
  *
  * @author Chuang
- * @since 2025/4/23
  */
 @Getter
 public enum MaskingType {

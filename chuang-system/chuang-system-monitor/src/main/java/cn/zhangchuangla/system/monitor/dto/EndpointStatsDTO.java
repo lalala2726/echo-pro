@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
  * 端点统计DTO
  *
  * @author Chuang
- * @since 2025/1/15
  */
 @Data
 @Builder

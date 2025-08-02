@@ -25,7 +25,6 @@ import java.io.OutputStream;
  * </ul>
  *
  * @author Chuang
- * @since 2025/06/30
  */
 @Slf4j
 public final class ImageStreamUtils {

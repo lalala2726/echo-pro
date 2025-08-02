@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Chuang
  * @version 2.0
- * @since 2025/03/19
  */
 public class UserAgentUtils {
 

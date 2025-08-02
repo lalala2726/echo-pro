@@ -1,6 +1,7 @@
 package cn.zhangchuangla.framework.security.login;
 
 import cn.zhangchuangla.common.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
@@ -21,6 +22,7 @@ import cn.zhangchuangla.framework.security.login.limiter.LoginFrequencyLimiter;
 import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
+import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +91,10 @@ public class AuthService {
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
             asyncLogService.recordLoginLog(username, ipAddr, userAgent, false);
+
+            // 手动记录安全日志 - 用户登录失败事件
+            recordLoginSecurityLog(username, ipAddr, false);
+
             throw new LoginException(e.getMessage());
         }
 
@@ -132,6 +138,9 @@ public class AuthService {
         String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
         asyncLogService.recordLoginLog(username, ipAddr, userAgent, true);
 
+        // 手动记录安全日志 - 用户登录成功事件
+        recordLoginSecurityLog(username, ipAddr, true);
+
         return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
     }
 
@@ -155,6 +164,42 @@ public class AuthService {
         user.setCreateTime(new Date());
         sysUserService.save(user);
         return user.getUserId();
+    }
+
+    /**
+     * 手动记录登录安全日志
+     * <p>
+     * 用于记录用户登录成功的安全日志，这是一个重要的安全事件，
+     * 需要单独记录以便进行安全审计和异常行为分析。
+     * </p>
+     *
+     * @param username  用户名
+     * @param ipAddr    登录IP地址
+     * @param isSuccess 是否登录成功
+     */
+    private void recordLoginSecurityLog(String username, String ipAddr, boolean isSuccess) {
+        try {
+            // 构建安全日志对象
+            SysSecurityLog securityLog = new SysSecurityLog();
+            securityLog.setUsername(username);
+            securityLog.setTitle(isSuccess ? "用户登录成功" : "用户登录失败");
+            securityLog.setOperationType(BusinessType.LOGIN.name());
+            securityLog.setOperationIp(ipAddr);
+            securityLog.setOperationRegion(IPUtils.getRegion(ipAddr));
+            securityLog.setOperationTime(new Date());
+
+            // 使用异步服务记录安全日志
+            asyncLogService.recordSecurityLog(securityLog);
+
+            log.info("用户安全日志记录完成 - 用户: {}, 操作: {}, IP: {}, 地区: {}",
+                    username,
+                    securityLog.getTitle(),
+                    ipAddr,
+                    securityLog.getOperationRegion());
+
+        } catch (Exception e) {
+            log.error("记录登录安全日志时发生异常，用户: {}, IP: {}, 异常: {}", username, ipAddr, e.getMessage(), e);
+        }
     }
 
 }

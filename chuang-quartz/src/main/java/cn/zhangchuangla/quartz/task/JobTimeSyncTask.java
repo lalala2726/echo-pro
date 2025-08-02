@@ -20,8 +20,6 @@ import org.springframework.stereotype.Component;
  * 3. 异常情况下不影响正常的任务调度
  * </p>
  *
- * @author Chuang
- * @since 1.0.0
  */
 @Slf4j
 @Component
@@ -101,7 +99,7 @@ public class JobTimeSyncTask {
     public void dailySyncJobExecutionTimes() {
         try {
             log.info("开始执行每日全量任务时间同步");
-            
+
             long startTime = System.currentTimeMillis();
             int updateCount = sysJobService.batchUpdateJobExecutionTimes();
             long endTime = System.currentTimeMillis();

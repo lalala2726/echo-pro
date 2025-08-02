@@ -5,8 +5,10 @@ import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.system.core.model.entity.SysLoginLog;
 import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
+import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
 import cn.zhangchuangla.system.core.service.SysLoginLogService;
 import cn.zhangchuangla.system.core.service.SysOperationLogService;
+import cn.zhangchuangla.system.core.service.SysSecurityLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -27,6 +29,7 @@ public class AsyncLogService {
 
     private final SysOperationLogService sysOperationLogService;
     private final SysLoginLogService sysLoginLogService;
+    private final SysSecurityLogService sysSecurityLogService;
 
     /**
      * 异步记录操作日志
@@ -51,6 +54,32 @@ public class AsyncLogService {
             }
         } catch (Exception e) {
             log.error("异步保存操作日志失败: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 异步记录安全日志
+     *
+     * @param securityLog 安全日志信息
+     */
+    @Async("logProcessExecutor")
+    public void recordSecurityLog(SysSecurityLog securityLog) {
+        try {
+            // 如果IP地址为空或者地区为空，尝试根据IP获取地区信息
+            if (securityLog.getOperationIp() != null && securityLog.getOperationRegion() == null) {
+                String region = IPUtils.getRegion(securityLog.getOperationIp());
+                securityLog.setOperationRegion(region);
+            }
+
+            // 保存安全日志
+            boolean result = sysSecurityLogService.save(securityLog);
+            if (result) {
+                log.debug("异步保存安全日志成功，ID: {}, 操作: {}", securityLog.getId(), securityLog.getTitle());
+            } else {
+                log.warn("异步保存安全日志失败，操作: {}", securityLog.getTitle());
+            }
+        } catch (Exception e) {
+            log.error("异步保存安全日志失败: {}", e.getMessage(), e);
         }
     }
 
