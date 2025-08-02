@@ -53,7 +53,7 @@ public class UploadedFileInfo {
     /**
      * 预览图片(图片资源特有)
      */
-    private String previewImage;
+    private String previewImageUrl;
 
     /**
      * 预览图片相对路径(图片资源特有)

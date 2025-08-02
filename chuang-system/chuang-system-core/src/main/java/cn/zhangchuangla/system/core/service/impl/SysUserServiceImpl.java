@@ -5,16 +5,18 @@ import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.core.mapper.SysUserMapper;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
+import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
-import cn.zhangchuangla.system.core.model.vo.user.profile.UserProfileVo;
+import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.core.service.SysDeptService;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
@@ -380,4 +382,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public List<SysUser> exportListUser(SysUserQueryRequest request) {
         return sysUserMapper.exportListUser(request);
     }
+
+    /**
+     * 修改用户信息
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateUserProfile(ProfileUpdateRequest request) {
+        SysUser sysUser = BeanCotyUtils.copyProperties(request, SysUser.class);
+        sysUser.setUserId(SecurityUtils.getUserId());
+        return updateById(sysUser);
+    }
+
 }

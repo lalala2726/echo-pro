@@ -64,7 +64,13 @@ public class FileController extends BaseController {
     @Operation(summary = "上传图片")
     public AjaxResult<ImageVo> uploadImage(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageFileService.uploadImage(file);
-        ImageVo imageVo = new ImageVo(upload.getFileUrl(), upload.getPreviewImage());
+        ImageVo imageVo = ImageVo.builder()
+                .fileName(upload.getFileOriginalName())
+                .fileUrl(upload.getFileUrl())
+                .previewUrl(upload.getPreviewImageUrl())
+                .fileSize(StorageUtils.formatFileSize(upload.getFileSize()))
+                .fileType(upload.getFileType())
+                .build();
         return success(imageVo);
     }
 

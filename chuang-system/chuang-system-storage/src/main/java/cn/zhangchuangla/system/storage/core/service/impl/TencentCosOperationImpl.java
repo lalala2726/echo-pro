@@ -569,7 +569,7 @@ public class TencentCosOperationImpl implements OperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(imageUrl);
+        info.setPreviewImageUrl(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

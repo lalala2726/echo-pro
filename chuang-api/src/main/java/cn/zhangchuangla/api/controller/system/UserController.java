@@ -3,21 +3,31 @@ package cn.zhangchuangla.api.controller.system;
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
+import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
+import cn.zhangchuangla.framework.model.entity.SessionDevice;
+import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
+import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
+import cn.zhangchuangla.system.core.model.entity.SysDept;
+import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
+import cn.zhangchuangla.system.core.model.entity.SysPost;
+import cn.zhangchuangla.system.core.model.entity.SysRole;
+import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
-import cn.zhangchuangla.system.core.model.vo.user.UserInfoVo;
-import cn.zhangchuangla.system.core.model.vo.user.UserListVo;
-import cn.zhangchuangla.system.core.service.SysRoleService;
-import cn.zhangchuangla.system.core.service.SysUserService;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.vo.user.*;
+import cn.zhangchuangla.system.core.service.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,6 +61,10 @@ public class UserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final ExcelExporter excelExporter;
+    private final DeviceService deviceService;
+    private final SysDeptService sysDeptService;
+    private final SysPostService sysPostService;
+    private final SysOperationLogService sysOperationLogService;
 
 
     /**
@@ -218,5 +232,126 @@ public class UserController extends BaseController {
         userInfoVo.setRoleIds(roleId);
         return success(userInfoVo);
     }
+
+
+    /**
+     * 获取用户信息
+     * 获取当前登录用户的详细信息，包括个人资料
+     *
+     * @return 用户个人资料信息
+     */
+    @GetMapping("/profile")
+    @Operation(summary = "获取用户信息")
+    public AjaxResult<UserProfileVo> userProfile() {
+        UserProfileVo profileVo = sysUserService.getUserProfile();
+        return success(profileVo);
+    }
+
+    /**
+     * 获取用户概述信息
+     *
+     * @return 用户概述信息
+     */
+    @GetMapping("/profile/overview")
+    @Operation(summary = "获取用户概览信息")
+    public AjaxResult<ProfileOverviewInfoVo> overviewInfo() {
+        Long userId = SecurityUtils.getUserId();
+        SysUser userInfo = sysUserService.getUserInfoByUserId(userId);
+        ProfileOverviewInfoVo profileOverviewInfoVo = BeanCotyUtils.copyProperties(userInfo, ProfileOverviewInfoVo.class);
+        if (userInfo.getDeptId() != null && userInfo.getDeptId() > 0) {
+            SysDept dept = sysDeptService.getDeptById(userInfo.getDeptId());
+            profileOverviewInfoVo.setDeptName(dept.getDeptName());
+        }
+        List<SysRole> roleListByUserId = sysRoleService.getRoleListByUserId(userId);
+        if (roleListByUserId != null) {
+            List<String> list = roleListByUserId.stream().map(SysRole::getRoleName).toList();
+            profileOverviewInfoVo.setRoles(list);
+        }
+        SysPost postById = sysPostService.getPostById(userInfo.getPostId());
+        if (postById != null) {
+            profileOverviewInfoVo.setPost(postById.getPostName());
+        }
+        return success(profileOverviewInfoVo);
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param request 修改用户信息请求参数
+     * @return 操作结果
+     */
+    @PutMapping("/profile")
+    @Operation(summary = "更新用户信息")
+    public AjaxResult<Void> updateProFile(@RequestBody ProfileUpdateRequest request) {
+        boolean result = sysUserService.updateUserProfile(request);
+        return toAjax(result);
+    }
+
+
+    /**
+     * 获取用户设备列表
+     *
+     * @return 设备列表
+     */
+    @Operation(summary = "获取用户设备列表")
+    @GetMapping("/security/device")
+    public AjaxResult<TableDataResult> getUserDeviceList(SessionDeviceQueryRequest request) {
+        String username = getUsername();
+        PageResult<SessionDevice> deviceListByUsername = deviceService.getDeviceListByUsername(username, request);
+        return getTableData(deviceListByUsername);
+    }
+
+    /**
+     * 获取用户安全日志
+     *
+     * @return 安全日志列表
+     */
+    @Operation(summary = "获取用户安全日志")
+    @GetMapping("/security/log")
+    public AjaxResult<List<UserSecurityLog>> securityLog() {
+        Long userId = SecurityUtils.getUserId();
+        List<SysOperationLog> userSecurityLog = sysOperationLogService.getUserSecurityLog(userId);
+        List<UserSecurityLog> userSecurityLogs = copyListProperties(userSecurityLog, UserSecurityLog.class);
+        return success(userSecurityLogs);
+    }
+
+
+    /**
+     * 删除用户设备
+     *
+     * @param refreshTokenId 刷新令牌ID
+     * @return 删除结果
+     */
+    @DeleteMapping("/security/device/{refreshTokenId}")
+    @Operation(summary = "删除用户设备")
+    @OperationLog(title = "删除设备", businessType = BusinessType.SECURITY)
+    public AjaxResult<Void> deleteDevice(@PathVariable("refreshTokenId") String refreshTokenId) {
+        String username = SecurityUtils.getUsername();
+        return deviceService.deleteDeviceAsUser(refreshTokenId, username) ? success() : error();
+    }
+
+
+    /**
+     * 修改用户密码
+     * 修改当前登录用户的密码
+     *
+     * @param request 修改密码请求参数
+     * @return 修改结果
+     */
+    @Operation(summary = "修改用户密码")
+    @OperationLog(title = "修改密码", businessType = BusinessType.SECURITY)
+    @PutMapping("/security/password")
+    public AjaxResult<Void> updatePassword(@RequestBody @Validated UpdatePasswordRequest request) {
+        String oldPassword = request.getOldPassword();
+        String userPassword = encryptPassword(oldPassword);
+        SysUserDetails loginUser = getLoginUser();
+        String password = loginUser.getPassword();
+        if (!userPassword.equals(password)) {
+            return error("旧密码错误");
+        }
+        boolean result = sysUserService.updatePassword(request);
+        return toAjax(result);
+    }
+
 
 }

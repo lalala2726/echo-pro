@@ -143,7 +143,7 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
         StorageFile storageFile = StorageFile.builder()
                 .originalName(file.getOriginalFilename())
                 .fileName(uploadedFileInfo.getFileName())
-                .previewImageUrl(uploadedFileInfo.getPreviewImage())
+                .previewImageUrl(uploadedFileInfo.getPreviewImageUrl())
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
                 .bucketName(uploadedFileInfo.getBucketName())

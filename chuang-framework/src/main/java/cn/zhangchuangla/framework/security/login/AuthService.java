@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.security.login;
 
-import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -57,7 +56,6 @@ public class AuthService {
     private final RedisTokenStore redisTokenStore;
     private final PasswordRetryLimiter passwordRetryLimiter;
     private final LoginFrequencyLimiter loginFrequencyLimiter;
-    private final SecurityProperties securityProperties;
 
     /**
      * 实现登录逻辑
@@ -87,13 +85,11 @@ public class AuthService {
 
             // 记录密码重试失败次数
             passwordRetryLimiter.recordFailure(username);
-            // 注意：这里不记录登录频率失败，因为登录频率限制只统计成功登录
-
             // 使用异步服务记录登录失败日志
             String ipAddr = IPUtils.getIpAddress(httpServletRequest);
             String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
             asyncLogService.recordLoginLog(username, ipAddr, userAgent, false);
-            throw new LoginException("账号或密码错误!");
+            throw new LoginException(e.getMessage());
         }
 
         // 5. 认证成功后，清除密码重试记录并记录成功登录频率

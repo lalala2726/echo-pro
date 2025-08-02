@@ -2,12 +2,13 @@ package cn.zhangchuangla.system.core.service;
 
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
+import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
-import cn.zhangchuangla.system.core.model.vo.user.profile.UserProfileVo;
+import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.constraints.NotBlank;
@@ -166,4 +167,14 @@ public interface SysUserService extends IService<SysUser> {
      * @return 用户列表
      */
     List<SysUser> exportListUser(SysUserQueryRequest request);
+
+    /**
+     * 修改用户个人资料
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    boolean updateUserProfile(ProfileUpdateRequest request);
+
+
 }

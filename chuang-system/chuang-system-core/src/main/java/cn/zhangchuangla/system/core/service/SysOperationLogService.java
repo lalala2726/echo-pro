@@ -44,4 +44,12 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
      * @return 操作日志列表
      */
     List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request);
+
+    /**
+     * 获取用户安全日志
+     *
+     * @param userId 用户ID
+     * @return 用户安全日志
+     */
+    List<SysOperationLog> getUserSecurityLog(Long userId);
 }

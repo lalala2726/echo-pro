@@ -31,6 +31,9 @@
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
+        <result property="region" column="region"/>
+        <result property="signature" column="signature"/>
+        <result property="postId" column="post_id"/>
         <result property="nickname" column="nickname"/>
         <result property="avatar" column="avatar"/>
         <result property="gender" column="gender"/>
@@ -65,12 +68,15 @@
         select user.user_id     as user_id,
                user.username    as username,
                user.password    as password,
+               user.region    as region,
+               user.signature as signature,
                user.nickname    as nickname,
                user.avatar      as avatar,
                user.gender      as gender,
                user.phone       as phone,
                user.email       as email,
                user.dept_id     as dept_id,
+               user.post_id   as post_id,
                user.status      as status,
                user.create_time as create_time,
                user.update_time as update_time,
