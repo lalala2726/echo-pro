@@ -371,18 +371,6 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 发送当前邮箱的验证码
-     *
-     * @return 发送结果
-     */
-    @PostMapping("/email/code")
-    @Operation(summary = "发送当前邮箱的验证码")
-    public AjaxResult<String> sendCurrentEmailCode() {
-        String result = sysUserService.sendCurrentEmailCode();
-        return success(result);
-    }
-
-    /**
      * 修改用户邮箱
      *
      * @param request 修改邮箱请求参数
@@ -396,44 +384,6 @@ public class UserController extends BaseController {
         return toAjax(result);
     }
 
-    /**
-     * 发送当前手机的验证码
-     *
-     * @return 验证码
-     */
-    @PostMapping("/phone/code")
-    @Operation(summary = "发送当前手机的验证码")
-    public AjaxResult<String> sendCurrentPhoneCode() {
-        String result = sysUserService.sendCurrentPhoneCode();
-        return success(result);
-    }
-
-
-    /**
-     * 获取当前用户的手机号
-     *
-     * @return 手机号
-     */
-    @GetMapping("/phone")
-    @Operation(summary = "获取当前手机")
-    public AjaxResult<String> getCurrentPhone() {
-        Long userId = getUserId();
-        SysUser userInfoByUserId = sysUserService.getUserInfoByUserId(userId);
-        return success(userInfoByUserId.getPhone());
-    }
-
-    /**
-     * 获取当前用户的邮箱
-     *
-     * @return 邮箱
-     */
-    @GetMapping("/email")
-    @Operation(summary = "获取当前邮箱")
-    public AjaxResult<String> getCurrentEmail() {
-        Long userId = getUserId();
-        SysUser userInfoByUserId = sysUserService.getUserInfoByUserId(userId);
-        return success(userInfoByUserId.getEmail());
-    }
 
     /**
      * 修改用户手机

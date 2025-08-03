@@ -1,30 +1,18 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
-import cn.zhangchuangla.common.redis.constant.RedisConstants;
-import cn.zhangchuangla.common.redis.core.RedisCache;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.framework.annotation.AccessLimit;
-import cn.zhangchuangla.framework.config.kaptcha.KaptchaTextCreator;
+import cn.zhangchuangla.system.core.model.request.CaptchaRequest;
+import cn.zhangchuangla.system.core.service.CaptchaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.util.FastByteArrayOutputStream;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码相关接口
@@ -39,82 +27,83 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CaptchaController extends BaseController {
 
-    private final RedisCache redisCache;
-    private final SecureRandom random = new SecureRandom();
-    @Resource(name = "captchaTextCreator")
-    private KaptchaTextCreator captchaTextCreator;
+    private final CaptchaService captchaService;
+
 
     /**
-     * 获取验证码
+     * 发送邮件验证码
      *
-     * @return 返回验证码对应的UUID和Base64图片
+     * @param request 验证码请求参数
+     * @return 验证码发送结果
      */
-    @GetMapping
-    @Operation(summary = "获取验证码")
-    @AccessLimit(maxCount = 20)
-    public AjaxResult<HashMap<String, String>> getCaptcha() {
-        // 保存验证码信息
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        HashMap<String, String> ajax = new HashMap<>(2);
+    @PostMapping("/email")
+    @Operation(summary = "发送验证码")
+    public AjaxResult<Void> sendEmail(@RequestBody CaptchaRequest request) {
+        Assert.isNull(request.getEmail(), "邮箱不能为空");
+        captchaService.sendEmail(request);
+        return success();
+    }
 
-        // 生成数学公式验证码
-        String mathText = captchaTextCreator.getText();
-        String formula = mathText.substring(0, mathText.lastIndexOf("@"));
-        String code = mathText.substring(mathText.lastIndexOf("@") + 1);
 
-        // 生成简单的验证码图片
-        BufferedImage image = createCaptchaImage(formula);
-
-        // 将验证码存储到redis中，有效期2分钟
-        String verifyKey = RedisConstants.CAPTCHA_CODE + uuid;
-        redisCache.setCacheObject(verifyKey, code, 2, TimeUnit.MINUTES);
-        // 转换流信息写出
-        FastByteArrayOutputStream os = new FastByteArrayOutputStream();
-        try {
-            ImageIO.write(image, "jpg", os);
-        } catch (IOException e) {
-            return AjaxResult.error(e.getMessage());
-        }
-
-        ajax.put("captchaKey", uuid);
-        ajax.put("captchaBase64", Constants.BASE64_CODE + Base64.encodeBase64String(os.toByteArray()));
-        return success(ajax);
+    /**
+     * 发送手机验证码
+     *
+     * @param request 发送手机号验证码请求参数
+     * @return 验证唯一标识
+     */
+    @PostMapping("/phone")
+    @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
+    @Operation(summary = "发送手机验证码")
+    public AjaxResult<Void> sendPhone(@RequestBody CaptchaRequest request) {
+        Assert.isNull(request.getPhone(), "手机号不能为空");
+        captchaService.sendPhone(request);
+        return success();
     }
 
     /**
-     * 创建简单的验证码图片
+     * 验证手机号验证码
      *
-     * @param text 验证码文本
-     * @return 验证码图片
+     * @param request 验证码请求参数
+     * @return 验证结果
      */
-    private BufferedImage createCaptchaImage(String text) {
-        int width = 160;
-        int height = 60;
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.getGraphics();
-
-        // 设置背景色
-        g.setColor(new Color(random.nextInt(80) + 170, random.nextInt(80) + 170, random.nextInt(80) + 170));
-        g.fillRect(0, 0, width, height);
-
-        // 设置字体
-        g.setFont(new Font("Arial", Font.BOLD, 30));
-        g.setColor(new Color(random.nextInt(150), random.nextInt(150), random.nextInt(150)));
-
-        // 绘制验证码文本
-        g.drawString(text, 30, 40);
-
-        // 添加干扰线
-        for (int i = 0; i < 10; i++) {
-            g.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-            int x1 = random.nextInt(width);
-            int y1 = random.nextInt(height);
-            int x2 = random.nextInt(width);
-            int y2 = random.nextInt(height);
-            g.drawLine(x1, y1, x2, y2);
-        }
-
-        g.dispose();
-        return image;
+    @PostMapping("/verify/phone")
+    @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
+    @Operation(summary = "验证手机号验证码")
+    public AjaxResult<Void> verifyPhone(@RequestBody CaptchaRequest request) {
+        Assert.isNull(request.getCode(), "验证码不能为空");
+        Assert.isNull(request.getPhone(), "手机号不能为空");
+        boolean verify = captchaService.verifyPhone(request.getPhone(), request.getCode());
+        return toAjax(verify);
     }
+
+    /**
+     * 验证邮箱验证码
+     *
+     * @param request 验证码请求参数
+     * @return 验证结果
+     */
+    @PostMapping("/verify/email")
+    @Operation(summary = "验证邮箱验证码")
+    public AjaxResult<Void> verifyEmail(@RequestBody CaptchaRequest request) {
+        Assert.isNull(request.getCode(), "验证码不能为空");
+        Assert.isNull(request.getEmail(), "邮箱不能为空");
+        boolean verify = captchaService.verifyEmail(request.getEmail(), request.getCode());
+        return toAjax(verify);
+    }
+
+    /**
+     * 验证验证码
+     *
+     * @param request 验证码请求参数
+     * @return 验证结果
+     */
+    @PostMapping("/verify")
+    @Operation(summary = "验证验证码")
+    public AjaxResult<Void> verify(@RequestBody CaptchaRequest request) {
+        Assert.isNull(request.getCode(), "验证码不能为空");
+        Assert.isNull(request.getUid(), "验证码唯一标识不能为空");
+        boolean verify = captchaService.verify(request);
+        return toAjax(verify);
+    }
+
 }

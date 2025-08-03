@@ -17,7 +17,7 @@ public class UpdateEmailRequest {
      * 邮箱
      */
     @NotBlank(message = "邮箱不能为空")
-    @Schema(description = "邮箱", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "admin@emai.com")
+    @Schema(description = "新邮箱", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "admin@emai.com")
     private String email;
 
     /**
@@ -25,12 +25,5 @@ public class UpdateEmailRequest {
      */
     @Schema(description = "验证码", type = "string", requiredMode = Schema.RequiredMode.AUTO, example = "123456")
     private String code;
-
-    /**
-     * 验证码的uuid
-     */
-    @NotBlank(message = "uuid不能为空")
-    @Schema(description = "uuid", type = "string", requiredMode = Schema.RequiredMode.AUTO, example = "123456")
-    private String uuid;
 
 }

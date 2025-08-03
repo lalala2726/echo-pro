@@ -4,8 +4,9 @@ import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.utils.*;
-import cn.zhangchuangla.common.redis.RedisCodeManager;
+import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.core.mapper.SysUserMapper;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
@@ -16,12 +17,8 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
-import cn.zhangchuangla.system.core.service.SysDeptService;
-import cn.zhangchuangla.system.core.service.SysRoleService;
-import cn.zhangchuangla.system.core.service.SysUserRoleService;
-import cn.zhangchuangla.system.core.service.SysUserService;
+import cn.zhangchuangla.system.core.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -50,7 +47,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final SysRoleService sysRoleService;
-    private final RedisCodeManager redisCodeManager;
+    private final CaptchaService captchaService;
 
     /**
      * 进行条件查询
@@ -360,19 +357,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return update(sysUser, eq);
     }
 
-    /**
-     * 修改用户个人信息
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean updateUserProfile(UserProfileUpdateRequest request) {
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
-        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
-        return update(sysUser, eq);
-    }
 
     /**
      * 导出用户列表
@@ -398,21 +382,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return updateById(sysUser);
     }
 
-    /**
-     * 发送当前邮箱验证码
-     *
-     * @return UUID
-     */
-    @Override
-    public String sendCurrentEmailCode() {
-        // 这边打印邮箱验证码，实际开发中需要发送邮件验证码
-        String uuid = UUIDUtils.simple();
-        String code = CaptchaUtils.randomNumeric();
-        redisCodeManager.setCode(uuid, code);
-        log.info("邮箱验证码:{}", code);
-        //将验证码保存到redis中,方便后续验证
-        return uuid;
-    }
 
     /**
      * 修改邮箱
@@ -424,22 +393,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public boolean updateEmail(UpdateEmailRequest request) {
         Long userId = SecurityUtils.getUserId();
         SysUser user = getById(userId);
-        // 当前邮箱存在的话必须提供UUID和code
+        // 如果邮箱不为空，则需要之前的邮箱的验证码
         if (!user.getEmail().isBlank()) {
             if (request.getCode().isBlank() || request.getCode().isBlank()) {
                 throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
             }
+            boolean result = captchaService.verifyEmail(user.getEmail(), request.getCode());
+            Assert.isTrue(result, "验证码错误");
         }
         if (!user.getEmail().isBlank() && !Objects.equals(user.getEmail(), request.getEmail())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "当前邮箱已绑定！");
         }
-        String code = redisCodeManager.getCode(request.getCode());
-        if (code.isBlank()) {
-            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码已过期！");
-        }
-        if (!Objects.equals(code, request.getCode())) {
-            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码错误！");
-        }
+        boolean result = captchaService.verifyEmail(request.getEmail(), request.getCode());
+        Assert.isTrue(result, "验证码错误");
         SysUser sysUser = SysUser.builder()
                 .userId(userId)
                 .email(request.getEmail())
@@ -447,17 +413,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return updateById(sysUser);
     }
 
-    /**
-     * 发送当前手机验证码
-     */
-    @Override
-    public String sendCurrentPhoneCode() {
-        String uuid = UUIDUtils.simple();
-        String code = CaptchaUtils.randomNumeric();
-        redisCodeManager.setCode(uuid, code);
-        log.info("手机验证码:{}", code);
-        return uuid;
-    }
 
     /**
      * 修改手机号
@@ -473,17 +428,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             if (request.getCode().isBlank() || request.getCode().isBlank()) {
                 throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
             }
+            boolean result = captchaService.verifyPhone(user.getPhone(), request.getCode());
+            Assert.isTrue(result, "验证码错误");
         }
         if (!user.getPhone().isBlank() && !Objects.equals(user.getPhone(), request.getPhone())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "当前手机号已绑定！");
         }
-        String code = redisCodeManager.getCode(request.getCode());
-        if (code.isBlank()) {
-            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码已过期！");
-        }
-        if (!Objects.equals(code, request.getCode())) {
-            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码错误！");
-        }
+        boolean result = captchaService.verifyPhone(request.getPhone(), request.getCode());
+        Assert.isTrue(result, "验证码错误");
         SysUser sysUser = SysUser.builder()
                 .userId(userId)
                 .phone(request.getPhone())
