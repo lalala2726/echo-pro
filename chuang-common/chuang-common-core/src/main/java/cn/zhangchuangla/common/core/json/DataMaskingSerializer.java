@@ -14,7 +14,6 @@ import java.io.IOException;
  * 数据脱敏 JSON 序列化器
  *
  * @author Chuang
- * @since 2025/4/23
  */
 public class DataMaskingSerializer extends JsonSerializer<String> implements ContextualSerializer {
 

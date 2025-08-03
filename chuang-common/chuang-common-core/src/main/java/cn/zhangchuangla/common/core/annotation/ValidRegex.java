@@ -15,7 +15,6 @@ import java.lang.annotation.*;
  * 因此我们自定义了该注解以满足实际需求。
  *
  * @author Chuang
- * @since 2025/4/20 15:14
  */
 @Documented
 @Constraint(validatedBy = RegexValidator.class)

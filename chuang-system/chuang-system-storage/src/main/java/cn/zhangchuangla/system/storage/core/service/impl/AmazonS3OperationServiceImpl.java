@@ -31,7 +31,6 @@ import java.util.Objects;
  * 兼容标准S3协议和其他S3兼容存储服务
  *
  * @author Chuang
- * @since 2025/7/4
  */
 @Slf4j
 @Service(StorageConstants.springBeanName.AMAZON_S3_STORAGE_SERVICE)
@@ -547,7 +546,7 @@ public class AmazonS3OperationServiceImpl implements OperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(imageUrl);
+        info.setPreviewImageUrl(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

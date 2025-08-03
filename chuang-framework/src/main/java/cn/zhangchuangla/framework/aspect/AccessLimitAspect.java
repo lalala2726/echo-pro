@@ -191,15 +191,4 @@ public class AccessLimitAspect {
         return keyBuilder.toString();
     }
 
-    /**
-     * 判断当前方法是否为Controller层方法
-     *
-     * @param joinPoint 切点
-     * @return 是否为Controller层方法
-     */
-    private boolean isControllerMethod(ProceedingJoinPoint joinPoint) {
-        String className = joinPoint.getTarget().getClass().getName();
-        return className.contains(".controller.") ||
-                className.endsWith("Controller");
-    }
 }

@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
  * 菜单实体
  *
  * @author Chuang
- * @since 2025/5/14 13:11
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

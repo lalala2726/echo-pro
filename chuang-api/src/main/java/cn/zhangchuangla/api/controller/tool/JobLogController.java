@@ -102,7 +102,7 @@ public class JobLogController extends BaseController {
     public void exportJobLog(@Parameter(description = "定时任务日志查询参数") @RequestBody SysJobLogQueryRequest request,
                              HttpServletResponse response) {
         List<SysJobLog> sysJobLogPage = sysJobLogService.exportJobLogList(request);
-        List<SysJobLogListVo> sysJobLogListVos = copyListProperties(sysJobLogPage, SysJobLogListVo.class);
-        excelExporter.exportExcel(response, sysJobLogListVos, SysJobLogListVo.class, "定时任务日志列表");
+        List<SysJobLogVo> sysJobLogVos = copyListProperties(sysJobLogPage, SysJobLogVo.class);
+        excelExporter.exportExcel(response, sysJobLogVos, SysJobLogVo.class, "定时任务日志列表");
     }
 }

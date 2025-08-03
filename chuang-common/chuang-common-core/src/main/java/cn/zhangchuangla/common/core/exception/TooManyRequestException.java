@@ -2,6 +2,7 @@ package cn.zhangchuangla.common.core.exception;
 
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author Chuang
@@ -19,17 +20,17 @@ public final class TooManyRequestException extends RuntimeException {
 
     public TooManyRequestException(ResultCode resultCode, String message) {
         super(message);
-        this.code = resultCode.getCode();
+        this.code = HttpStatus.TOO_MANY_REQUESTS.value();
     }
 
     public TooManyRequestException(ResultCode resultCode) {
         super(resultCode.getMessage());
-        this.code = resultCode.getCode();
+        this.code = HttpStatus.TOO_MANY_REQUESTS.value();
     }
 
     public TooManyRequestException(String message) {
         super(message);
-        this.code = ResultCode.FORBIDDEN.getCode();
+        this.code = HttpStatus.TOO_MANY_REQUESTS.value();
     }
 
 }

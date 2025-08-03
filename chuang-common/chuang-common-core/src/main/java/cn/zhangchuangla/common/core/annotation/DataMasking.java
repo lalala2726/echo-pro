@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
  * </p>
  *
  * @author Chuang
- * @since 2025/4/23
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

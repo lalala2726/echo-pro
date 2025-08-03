@@ -547,7 +547,7 @@ public class MinioOperationServiceImpl implements OperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(filePath);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(imageUrl);
+        info.setPreviewImageUrl(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

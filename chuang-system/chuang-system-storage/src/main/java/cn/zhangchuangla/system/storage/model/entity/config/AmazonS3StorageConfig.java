@@ -19,7 +19,6 @@ import java.io.Serializable;
  * </ul>
  *
  * @author Chuang
- * @since 2025/7/4
  */
 @Data
 @Schema(description = "亚马逊S3存储配置实体类")

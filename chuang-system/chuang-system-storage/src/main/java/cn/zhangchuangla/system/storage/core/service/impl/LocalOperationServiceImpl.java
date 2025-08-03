@@ -439,7 +439,7 @@ public class LocalOperationServiceImpl implements OperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(fileUrl);
         info.setFileRelativePath(Paths.get(filePath, newFileName).toString());
-        info.setPreviewImage(imageUrl);
+        info.setPreviewImageUrl(imageUrl);
         info.setPreviewImageRelativePath(Paths.get(previewPath, newFileName).toString());
         return info;
     }

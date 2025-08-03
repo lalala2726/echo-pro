@@ -72,6 +72,7 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
     public List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request) {
         return sysOperationLogMapper.listOperationLog(request);
     }
+
 }
 
 

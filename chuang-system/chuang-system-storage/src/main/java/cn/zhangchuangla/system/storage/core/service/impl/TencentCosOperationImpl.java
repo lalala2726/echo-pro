@@ -54,7 +54,6 @@ import java.util.Objects;
  * </pre>
  *
  * @author Chuang
- * @since 2025/7/3
  */
 @Slf4j
 @Service(StorageConstants.springBeanName.TENCENT_COS_STORAGE_SERVICE)
@@ -569,7 +568,7 @@ public class TencentCosOperationImpl implements OperationService {
         info.setExtension(StorageUtils.getFileExtension(newFileName));
         info.setFileUrl(fileUrl);
         info.setFileRelativePath(originalImagePath);
-        info.setPreviewImage(imageUrl);
+        info.setPreviewImageUrl(imageUrl);
         info.setPreviewImageRelativePath(previewImagePath);
         return info;
     }

@@ -40,6 +40,12 @@ public class SysUser extends BaseEntity {
     private Long deptId;
 
     /**
+     * 职位ID
+     */
+    @Schema(description = "职位ID")
+    private Long postId;
+
+    /**
      * 密码
      */
     @Schema(description = "密码")
@@ -56,6 +62,18 @@ public class SysUser extends BaseEntity {
      */
     @Schema(description = "头像")
     private String avatar;
+
+    /**
+     * 地区
+     */
+    @Schema(description = "地区")
+    private String region;
+
+    /**
+     * 个性签名
+     */
+    @Schema(description = "个性签名")
+    private String signature;
 
     /**
      * 性别

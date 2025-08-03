@@ -65,7 +65,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public AjaxResult<Void> httpMessageNotReadableExceptionHandel(HttpMessageNotReadableException exception) {
         log.error("请求参数非法: ", exception);
-        return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
+        return AjaxResult.error(ResultCode.PARAM_ERROR, exception.getMessage());
     }
 
     /**
@@ -99,7 +99,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(IllegalArgumentException.class)
     public AjaxResult<Void> illegalArgumentExceptionHandel(IllegalArgumentException exception) {
         log.error("请求参数非法: ", exception);
-        return AjaxResult.error(ResultCode.PARAM_ERROR, "请求参数非法!");
+        return AjaxResult.error(ResultCode.PARAM_ERROR, exception.getMessage());
     }
 
 

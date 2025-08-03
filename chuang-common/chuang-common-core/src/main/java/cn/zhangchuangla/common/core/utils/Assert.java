@@ -73,7 +73,7 @@ public class Assert extends org.springframework.util.Assert {
      * @param text         要断言有文本内容的字符串。
      * @param errorMessage 字符串无文本内容时抛出的错误消息。
      */
-    public static void hasText(String text, String errorMessage) {
+    public static void hasText(String text, @NotNull String errorMessage) {
         isParamTrue(text != null && !text.trim().isEmpty(), errorMessage);
     }
 
@@ -83,7 +83,7 @@ public class Assert extends org.springframework.util.Assert {
      * @param collection   要断言不为空的集合。
      * @param errorMessage 集合为空时抛出的错误消息。
      */
-    public static void notEmpty(java.util.Collection<?> collection, String errorMessage) {
+    public static void notEmpty(java.util.Collection<?> collection, @NotNull String errorMessage) {
         isParamTrue(collection != null && !collection.isEmpty(), errorMessage);
     }
 

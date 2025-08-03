@@ -191,7 +191,7 @@ public class JobController extends BaseController {
     public void exportJob(@Parameter(description = "定时任务导出查询参数") @RequestBody SysJobQueryRequest request,
                           HttpServletResponse response) {
         List<SysJob> sysJobPage = sysJobService.exportJobList(request);
-        List<SysJobListVo> sysJobListVos = copyListProperties(sysJobPage, SysJobListVo.class);
-        excelExporter.exportExcel(response, sysJobListVos, SysJobListVo.class, "定时任务列表");
+        List<SysJobVo> sysJobVos = copyListProperties(sysJobPage, SysJobVo.class);
+        excelExporter.exportExcel(response, sysJobVos, SysJobVo.class, "定时任务列表");
     }
 }

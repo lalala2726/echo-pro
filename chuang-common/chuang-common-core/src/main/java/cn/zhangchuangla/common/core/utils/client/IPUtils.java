@@ -25,7 +25,6 @@ import java.nio.file.StandardCopyOption;
  * </p>
  *
  * @author Ray (Original), Chuang (Refined)
- * @since 2.10.0
  */
 @Slf4j
 @Component

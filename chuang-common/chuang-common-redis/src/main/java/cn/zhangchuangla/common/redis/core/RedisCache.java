@@ -48,7 +48,7 @@ public final class RedisCache {
      * @param timeout  时间
      * @param timeUnit 时间颗粒度
      */
-    public <T> void setCacheObject(final String key, final T value, final int timeout, final TimeUnit timeUnit) {
+    public <T> void setCacheObject(final String key, final T value, final long timeout, final TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
 

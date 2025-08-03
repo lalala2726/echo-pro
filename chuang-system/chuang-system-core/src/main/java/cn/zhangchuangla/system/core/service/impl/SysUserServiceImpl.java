@@ -5,20 +5,20 @@ import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.core.mapper.SysUserMapper;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
+import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
-import cn.zhangchuangla.system.core.model.vo.user.profile.UserProfileVo;
-import cn.zhangchuangla.system.core.service.SysDeptService;
-import cn.zhangchuangla.system.core.service.SysRoleService;
-import cn.zhangchuangla.system.core.service.SysUserRoleService;
-import cn.zhangchuangla.system.core.service.SysUserService;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
+import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.core.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,6 +47,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final SysRoleService sysRoleService;
+    private final CaptchaService captchaService;
 
     /**
      * 进行条件查询
@@ -356,19 +357,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return update(sysUser, eq);
     }
 
-    /**
-     * 修改用户个人信息
-     *
-     * @param request 请求参数
-     * @return 操作结果
-     */
-    @Override
-    public boolean updateUserProfile(UserProfileUpdateRequest request) {
-        SysUser sysUser = new SysUser();
-        BeanUtils.copyProperties(request, sysUser);
-        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
-        return update(sysUser, eq);
-    }
 
     /**
      * 导出用户列表
@@ -380,4 +368,64 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public List<SysUser> exportListUser(SysUserQueryRequest request) {
         return sysUserMapper.exportListUser(request);
     }
+
+    /**
+     * 修改用户信息
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateUserProfile(ProfileUpdateRequest request) {
+        SysUser sysUser = BeanCotyUtils.copyProperties(request, SysUser.class);
+        sysUser.setUserId(SecurityUtils.getUserId());
+        return updateById(sysUser);
+    }
+
+
+    /**
+     * 修改邮箱
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateEmail(UpdateEmailRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = getById(userId);
+        if (!user.getEmail().isBlank() && Objects.equals(user.getEmail(), request.getEmail())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前邮箱已绑定！");
+        }
+        boolean result = captchaService.verifyEmail(request.getEmail(), request.getCode());
+        Assert.isTrue(result, "验证码错误");
+        SysUser sysUser = SysUser.builder()
+                .userId(userId)
+                .email(request.getEmail())
+                .build();
+        return updateById(sysUser);
+    }
+
+
+    /**
+     * 修改手机号
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updatePhone(UpdatePhoneRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = getById(userId);
+        if (!user.getPhone().isBlank() && Objects.equals(user.getPhone(), request.getPhone())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前手机号已绑定！");
+        }
+        boolean result = captchaService.verifyPhone(request.getPhone(), request.getCode());
+        Assert.isTrue(result, "验证码错误");
+        SysUser sysUser = SysUser.builder()
+                .userId(userId)
+                .phone(request.getPhone())
+                .build();
+        return updateById(sysUser);
+    }
+
 }

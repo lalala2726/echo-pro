@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author Chuang
- * @since 2025/7/28 18:30
  */
 @Component
 @RequiredArgsConstructor

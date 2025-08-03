@@ -3,8 +3,7 @@ package cn.zhangchuangla.common.redis.constant;
 /**
  * Redis 常量
  *
- * @author Theo
- * @since 2024-7-29 11:46:08
+ * @author Chuang
  */
 public interface RedisConstants {
     /**
@@ -117,7 +116,7 @@ public interface RedisConstants {
          */
         String LOGIN_SUCCESS_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "success:hour:%s";
 
-
     }
+
 
 }

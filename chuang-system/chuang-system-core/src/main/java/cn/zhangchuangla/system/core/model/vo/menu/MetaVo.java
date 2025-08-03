@@ -13,7 +13,6 @@ import java.util.Set;
  * 菜单元数据对象
  *
  * @author Chuang
- * @since 2024/04/12
  */
 @Schema(name = "菜单元数据视图对象", description = "菜单元数据视图对象")
 @Data
