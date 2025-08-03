@@ -35,8 +35,8 @@ public class CaptchaRequest {
     private String code;
 
     /**
-     * 用户唯一标识
+     * 普通验证码唯一标识
      */
-    @Schema(description = "用户唯一标识", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1001")
+    @Schema(description = "普通验证码唯一标识", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1001")
     private String uid;
 }

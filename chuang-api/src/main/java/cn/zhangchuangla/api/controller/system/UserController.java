@@ -46,6 +46,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -371,13 +372,43 @@ public class UserController extends BaseController {
     }
 
     /**
+     * 获取用户手机
+     *
+     * @return 用户手机
+     */
+    @GetMapping("/phone")
+    @Operation(summary = "获取用户手机")
+    public AjaxResult<HashMap<String, String>> getCurrentPhone() {
+        HashMap<String, String> data = new HashMap<>();
+        Long userId = SecurityUtils.getUserId();
+        String phone = sysUserService.getUserInfoByUserId(userId).getPhone();
+        data.put("phone", phone);
+        return success(data);
+    }
+
+    /**
+     * 获取用户邮箱
+     *
+     * @return 用户邮箱
+     */
+    @GetMapping("/email")
+    @Operation(summary = "获取用户邮箱")
+    public AjaxResult<HashMap<String, String>> getCurrentEmail() {
+        HashMap<String, String> data = new HashMap<>();
+        Long userId = SecurityUtils.getUserId();
+        String email = sysUserService.getUserInfoByUserId(userId).getEmail();
+        data.put("email", email);
+        return success(data);
+    }
+
+    /**
      * 修改用户邮箱
      *
      * @param request 修改邮箱请求参数
      * @return 修改结果
      */
     @Operation(summary = "修改用户邮箱")
-    @PostMapping("/email/update")
+    @PutMapping("/email")
     @SecurityLog(title = "修改邮箱", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateEmail(@RequestBody @Validated UpdateEmailRequest request) {
         boolean result = sysUserService.updateEmail(request);
@@ -392,7 +423,7 @@ public class UserController extends BaseController {
      * @return 修改结果
      */
     @Operation(summary = "修改用户手机")
-    @PostMapping("/phone/update")
+    @PutMapping("/phone")
     @SecurityLog(title = "修改手机", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updatePhone(@RequestBody @Validated UpdatePhoneRequest request) {
         boolean result = sysUserService.updatePhone(request);

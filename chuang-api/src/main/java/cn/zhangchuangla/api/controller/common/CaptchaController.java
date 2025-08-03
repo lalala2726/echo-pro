@@ -9,6 +9,7 @@ import cn.zhangchuangla.system.core.service.CaptchaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,7 @@ public class CaptchaController extends BaseController {
      */
     @PostMapping("/email")
     @Operation(summary = "发送验证码")
-    public AjaxResult<Void> sendEmail(@RequestBody CaptchaRequest request) {
+    public AjaxResult<Void> sendEmail(@Validated @RequestBody CaptchaRequest request) {
         Assert.isNull(request.getEmail(), "邮箱不能为空");
         captchaService.sendEmail(request);
         return success();
@@ -54,8 +55,8 @@ public class CaptchaController extends BaseController {
     @PostMapping("/phone")
     @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
     @Operation(summary = "发送手机验证码")
-    public AjaxResult<Void> sendPhone(@RequestBody CaptchaRequest request) {
-        Assert.isNull(request.getPhone(), "手机号不能为空");
+    public AjaxResult<Void> sendPhone(@Validated @RequestBody CaptchaRequest request) {
+        Assert.hasText(request.getPhone(), "手机号不能为空");
         captchaService.sendPhone(request);
         return success();
     }
@@ -69,11 +70,11 @@ public class CaptchaController extends BaseController {
     @PostMapping("/verify/phone")
     @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
     @Operation(summary = "验证手机号验证码")
-    public AjaxResult<Void> verifyPhone(@RequestBody CaptchaRequest request) {
-        Assert.isNull(request.getCode(), "验证码不能为空");
-        Assert.isNull(request.getPhone(), "手机号不能为空");
+    public AjaxResult<Boolean> verifyPhone(@Validated @RequestBody CaptchaRequest request) {
+        Assert.hasText(request.getCode(), "验证码不能为空");
+        Assert.hasText(request.getPhone(), "手机号不能为空");
         boolean verify = captchaService.verifyPhone(request.getPhone(), request.getCode());
-        return toAjax(verify);
+        return success(verify);
     }
 
     /**
@@ -84,11 +85,11 @@ public class CaptchaController extends BaseController {
      */
     @PostMapping("/verify/email")
     @Operation(summary = "验证邮箱验证码")
-    public AjaxResult<Void> verifyEmail(@RequestBody CaptchaRequest request) {
-        Assert.isNull(request.getCode(), "验证码不能为空");
-        Assert.isNull(request.getEmail(), "邮箱不能为空");
+    public AjaxResult<Boolean> verifyEmail(@Validated @RequestBody CaptchaRequest request) {
+        Assert.hasText(request.getCode(), "验证码不能为空");
+        Assert.hasText(request.getEmail(), "邮箱不能为空");
         boolean verify = captchaService.verifyEmail(request.getEmail(), request.getCode());
-        return toAjax(verify);
+        return success(verify);
     }
 
     /**
@@ -99,11 +100,11 @@ public class CaptchaController extends BaseController {
      */
     @PostMapping("/verify")
     @Operation(summary = "验证验证码")
-    public AjaxResult<Void> verify(@RequestBody CaptchaRequest request) {
-        Assert.isNull(request.getCode(), "验证码不能为空");
-        Assert.isNull(request.getUid(), "验证码唯一标识不能为空");
+    public AjaxResult<Boolean> verify(@Validated @RequestBody CaptchaRequest request) {
+        Assert.hasText(request.getCode(), "验证码不能为空");
+        Assert.hasText(request.getUid(), "验证码唯一标识不能为空");
         boolean verify = captchaService.verify(request);
-        return toAjax(verify);
+        return success(verify);
     }
 
 }

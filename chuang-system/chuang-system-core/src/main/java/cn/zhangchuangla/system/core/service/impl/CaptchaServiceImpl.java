@@ -6,7 +6,10 @@ import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.core.model.request.CaptchaRequest;
 import cn.zhangchuangla.system.core.service.CaptchaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Chuang
@@ -15,23 +18,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CaptchaServiceImpl implements CaptchaService {
 
     private final static String CAPTCHA_CODE_KEY = "captcha:code:";
-    private final RedisCodeManager redisCodeManager;
     private final RedisCache redisCache;
     private final long timeout = 5;
 
     @Override
     public void sendEmail(CaptchaRequest request) {
         String code = CaptchaUtils.randomNumeric();
-        redisCache.setCacheObject(CAPTCHA_CODE_KEY + request.getEmail(), code, timeout);
+        log.info("邮箱验证码:{}", code);
+        redisCache.setCacheObject(CAPTCHA_CODE_KEY + request.getEmail(), code, timeout, TimeUnit.MINUTES);
     }
 
     @Override
     public void sendPhone(CaptchaRequest request) {
         String code = CaptchaUtils.randomNumeric();
-        redisCache.setCacheObject(CAPTCHA_CODE_KEY + request.getPhone(), code, timeout);
+        log.info("手机验证码:{}", code);
+        redisCache.setCacheObject(CAPTCHA_CODE_KEY + request.getPhone(), code, timeout, TimeUnit.MINUTES);
     }
 
     /**

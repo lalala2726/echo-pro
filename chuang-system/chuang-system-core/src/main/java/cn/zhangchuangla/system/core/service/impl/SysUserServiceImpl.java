@@ -393,15 +393,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public boolean updateEmail(UpdateEmailRequest request) {
         Long userId = SecurityUtils.getUserId();
         SysUser user = getById(userId);
-        // 如果邮箱不为空，则需要之前的邮箱的验证码
-        if (!user.getEmail().isBlank()) {
-            if (request.getCode().isBlank() || request.getCode().isBlank()) {
-                throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
-            }
-            boolean result = captchaService.verifyEmail(user.getEmail(), request.getCode());
-            Assert.isTrue(result, "验证码错误");
-        }
-        if (!user.getEmail().isBlank() && !Objects.equals(user.getEmail(), request.getEmail())) {
+        if (!user.getEmail().isBlank() && Objects.equals(user.getEmail(), request.getEmail())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "当前邮箱已绑定！");
         }
         boolean result = captchaService.verifyEmail(request.getEmail(), request.getCode());
@@ -424,14 +416,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public boolean updatePhone(UpdatePhoneRequest request) {
         Long userId = SecurityUtils.getUserId();
         SysUser user = getById(userId);
-        if (!user.getPhone().isBlank()) {
-            if (request.getCode().isBlank() || request.getCode().isBlank()) {
-                throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
-            }
-            boolean result = captchaService.verifyPhone(user.getPhone(), request.getCode());
-            Assert.isTrue(result, "验证码错误");
-        }
-        if (!user.getPhone().isBlank() && !Objects.equals(user.getPhone(), request.getPhone())) {
+        if (!user.getPhone().isBlank() && Objects.equals(user.getPhone(), request.getPhone())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "当前手机号已绑定！");
         }
         boolean result = captchaService.verifyPhone(request.getPhone(), request.getCode());
