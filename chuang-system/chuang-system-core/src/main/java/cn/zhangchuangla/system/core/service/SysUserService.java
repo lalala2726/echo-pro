@@ -8,6 +8,7 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -192,4 +193,19 @@ public interface SysUserService extends IService<SysUser> {
      * @return 操作结果
      */
     boolean updateEmail(UpdateEmailRequest request);
+
+    /**
+     * 发送当前手机验证码
+     *
+     * @return 验证码唯一标识符
+     */
+    String sendCurrentPhoneCode();
+
+    /**
+     * 修改用户手机号
+     *
+     * @param request 手机号修改请求参数
+     * @return 操作结果
+     */
+    boolean updatePhone(UpdatePhoneRequest request);
 }

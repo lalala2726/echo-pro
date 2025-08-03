@@ -29,6 +29,7 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.vo.user.*;
 import cn.zhangchuangla.system.core.service.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -376,7 +377,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/email/code")
     @Operation(summary = "发送当前邮箱的验证码")
-    public AjaxResult<Void> sendCurrentEmailCode() {
+    public AjaxResult<String> sendCurrentEmailCode() {
         String result = sysUserService.sendCurrentEmailCode();
         return success(result);
     }
@@ -389,10 +390,35 @@ public class UserController extends BaseController {
      */
     @Operation(summary = "修改用户邮箱")
     @PostMapping("/email/update")
+    @SecurityLog(title = "修改邮箱", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateEmail(@RequestBody @Validated UpdateEmailRequest request) {
         boolean result = sysUserService.updateEmail(request);
         return toAjax(result);
     }
 
+    /**
+     * 发送当前手机的验证码
+     *
+     * @return 验证码
+     */
+    @PostMapping("/phone/code")
+    @Operation(summary = "发送当前手机的验证码")
+    public AjaxResult<String> sendCurrentPhoneCode() {
+        String result = sysUserService.sendCurrentPhoneCode();
+        return success(result);
+    }
 
+    /**
+     * 修改用户手机
+     *
+     * @param request 修改手机请求参数
+     * @return 修改结果
+     */
+    @Operation(summary = "修改用户手机")
+    @PostMapping("/phone/update")
+    @SecurityLog(title = "修改手机", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> updatePhone(@RequestBody @Validated UpdatePhoneRequest request) {
+        boolean result = sysUserService.updatePhone(request);
+        return toAjax(result);
+    }
 }

@@ -10,15 +10,15 @@ import lombok.Data;
  * created on 2025/8/3 23:52
  */
 @Data
-@Schema(name = "修改邮箱请求类", description = "用于修改邮箱时")
-public class UpdateEmailRequest {
+@Schema(name = "修改手机号请求类", description = "用于修改手机号时")
+public class UpdatePhoneRequest {
 
     /**
-     * 邮箱
+     * 手机号
      */
-    @NotBlank(message = "邮箱不能为空")
-    @Schema(description = "邮箱", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "admin@emai.com")
-    private String email;
+    @NotBlank(message = "手机号不能为空")
+    @Schema(description = "手机号", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "18888888888")
+    private String phone;
 
     /**
      * 验证码

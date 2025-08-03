@@ -15,6 +15,7 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
 import cn.zhangchuangla.system.core.service.SysDeptService;
@@ -405,12 +406,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     @Override
     public String sendCurrentEmailCode() {
         // 这边打印邮箱验证码，实际开发中需要发送邮件验证码
-        String simple = UUIDUtils.simple();
+        String uuid = UUIDUtils.simple();
         String code = CaptchaUtils.randomNumeric();
-        redisCodeManager.setCode(simple, code);
+        redisCodeManager.setCode(uuid, code);
         log.info("邮箱验证码:{}", code);
         //将验证码保存到redis中,方便后续验证
-        return simple;
+        return uuid;
     }
 
     /**
@@ -423,6 +424,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public boolean updateEmail(UpdateEmailRequest request) {
         Long userId = SecurityUtils.getUserId();
         SysUser user = getById(userId);
+        // 当前邮箱存在的话必须提供UUID和code
+        if (!user.getEmail().isBlank()) {
+            if (request.getCode().isBlank() || request.getCode().isBlank()) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
+            }
+        }
         if (!user.getEmail().isBlank() && !Objects.equals(user.getEmail(), request.getEmail())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "当前邮箱已绑定！");
         }
@@ -436,6 +443,50 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         SysUser sysUser = SysUser.builder()
                 .userId(userId)
                 .email(request.getEmail())
+                .build();
+        return updateById(sysUser);
+    }
+
+    /**
+     * 发送当前手机验证码
+     */
+    @Override
+    public String sendCurrentPhoneCode() {
+        String uuid = UUIDUtils.simple();
+        String code = CaptchaUtils.randomNumeric();
+        redisCodeManager.setCode(uuid, code);
+        log.info("手机验证码:{}", code);
+        return uuid;
+    }
+
+    /**
+     * 修改手机号
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updatePhone(UpdatePhoneRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = getById(userId);
+        if (!user.getPhone().isBlank()) {
+            if (request.getCode().isBlank() || request.getCode().isBlank()) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "请输入验证码");
+            }
+        }
+        if (!user.getPhone().isBlank() && !Objects.equals(user.getPhone(), request.getPhone())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前手机号已绑定！");
+        }
+        String code = redisCodeManager.getCode(request.getCode());
+        if (code.isBlank()) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码已过期！");
+        }
+        if (!Objects.equals(code, request.getCode())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码错误！");
+        }
+        SysUser sysUser = SysUser.builder()
+                .userId(userId)
+                .phone(request.getPhone())
                 .build();
         return updateById(sysUser);
     }
