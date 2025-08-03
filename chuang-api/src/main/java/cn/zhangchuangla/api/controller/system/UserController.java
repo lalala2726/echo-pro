@@ -16,6 +16,7 @@ import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.annotation.SecurityLog;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
+import cn.zhangchuangla.framework.security.UserSecurityManager;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
@@ -26,6 +27,7 @@ import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.vo.user.*;
 import cn.zhangchuangla.system.core.service.*;
@@ -66,7 +68,7 @@ public class UserController extends BaseController {
     private final SysDeptService sysDeptService;
     private final SysPostService sysPostService;
     private final SysSecurityLogService sysSecurityLogService;
-
+    private final UserSecurityManager userSecurityManager;
 
     /**
      * 获取用户列表
@@ -303,6 +305,19 @@ public class UserController extends BaseController {
     }
 
     /**
+     * 注销全部会话
+     *
+     * @return 注销结果
+     */
+    @DeleteMapping("/security/logoutAll")
+    @Operation(summary = "注销全部会话")
+    public AjaxResult<Void> logoutAll() {
+        String username = getUsername();
+        boolean logout = userSecurityManager.logout(username);
+        return toAjax(logout);
+    }
+
+    /**
      * 获取用户安全日志
      *
      * @return 安全日志列表
@@ -351,6 +366,31 @@ public class UserController extends BaseController {
             return error("旧密码错误");
         }
         boolean result = sysUserService.updatePassword(request);
+        return toAjax(result);
+    }
+
+    /**
+     * 发送当前邮箱的验证码
+     *
+     * @return 发送结果
+     */
+    @PostMapping("/email/code")
+    @Operation(summary = "发送当前邮箱的验证码")
+    public AjaxResult<Void> sendCurrentEmailCode() {
+        String result = sysUserService.sendCurrentEmailCode();
+        return success(result);
+    }
+
+    /**
+     * 修改用户邮箱
+     *
+     * @param request 修改邮箱请求参数
+     * @return 修改结果
+     */
+    @Operation(summary = "修改用户邮箱")
+    @PostMapping("/email/update")
+    public AjaxResult<Void> updateEmail(@RequestBody @Validated UpdateEmailRequest request) {
+        boolean result = sysUserService.updateEmail(request);
         return toAjax(result);
     }
 

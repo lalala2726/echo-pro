@@ -4,9 +4,8 @@ import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
-import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
-import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.*;
+import cn.zhangchuangla.common.redis.RedisCodeManager;
 import cn.zhangchuangla.system.core.mapper.SysUserMapper;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
@@ -14,6 +13,7 @@ import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
@@ -49,6 +49,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     private final SysUserRoleService sysUserRoleService;
     private final SysDeptService sysDeptService;
     private final SysRoleService sysRoleService;
+    private final RedisCodeManager redisCodeManager;
 
     /**
      * 进行条件查询
@@ -393,6 +394,49 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public boolean updateUserProfile(ProfileUpdateRequest request) {
         SysUser sysUser = BeanCotyUtils.copyProperties(request, SysUser.class);
         sysUser.setUserId(SecurityUtils.getUserId());
+        return updateById(sysUser);
+    }
+
+    /**
+     * 发送当前邮箱验证码
+     *
+     * @return UUID
+     */
+    @Override
+    public String sendCurrentEmailCode() {
+        // 这边打印邮箱验证码，实际开发中需要发送邮件验证码
+        String simple = UUIDUtils.simple();
+        String code = CaptchaUtils.randomNumeric();
+        redisCodeManager.setCode(simple, code);
+        log.info("邮箱验证码:{}", code);
+        //将验证码保存到redis中,方便后续验证
+        return simple;
+    }
+
+    /**
+     * 修改邮箱
+     *
+     * @param request 请求参数
+     * @return 操作结果
+     */
+    @Override
+    public boolean updateEmail(UpdateEmailRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = getById(userId);
+        if (!user.getEmail().isBlank() && !Objects.equals(user.getEmail(), request.getEmail())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "当前邮箱已绑定！");
+        }
+        String code = redisCodeManager.getCode(request.getCode());
+        if (code.isBlank()) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码已过期！");
+        }
+        if (!Objects.equals(code, request.getCode())) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "验证码错误！");
+        }
+        SysUser sysUser = SysUser.builder()
+                .userId(userId)
+                .email(request.getEmail())
+                .build();
         return updateById(sysUser);
     }
 

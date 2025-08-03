@@ -116,7 +116,7 @@ public interface RedisConstants {
          */
         String LOGIN_SUCCESS_HOUR_KEY = LOGIN_FREQUENCY_PREFIX + "success:hour:%s";
 
-
     }
+
 
 }

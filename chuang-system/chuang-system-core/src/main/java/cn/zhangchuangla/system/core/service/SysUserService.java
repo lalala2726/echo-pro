@@ -6,6 +6,7 @@ import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
+import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UserProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
@@ -177,4 +178,18 @@ public interface SysUserService extends IService<SysUser> {
     boolean updateUserProfile(ProfileUpdateRequest request);
 
 
+    /**
+     * 发送当前邮箱验证码
+     *
+     * @return 验证码唯一标识符
+     */
+    String sendCurrentEmailCode();
+
+    /**
+     * 修改用户邮箱
+     *
+     * @param request 邮箱修改请求参数
+     * @return 操作结果
+     */
+    boolean updateEmail(UpdateEmailRequest request);
 }
