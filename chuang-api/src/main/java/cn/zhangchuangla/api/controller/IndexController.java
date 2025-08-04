@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.common;
+package cn.zhangchuangla.api.controller;
 
 import cn.zhangchuangla.common.core.config.property.AppProperty;
 import cn.zhangchuangla.common.core.controller.BaseController;

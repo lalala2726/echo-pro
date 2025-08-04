@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * created on 2025/4/2 14:39
  */
 @RestController
-@RequestMapping("/captcha")
+@RequestMapping("/common/captcha")
 @Tag(name = "验证码接口", description = "提供获取验证码的功能")
 @RequiredArgsConstructor
 public class CaptchaController extends BaseController {
