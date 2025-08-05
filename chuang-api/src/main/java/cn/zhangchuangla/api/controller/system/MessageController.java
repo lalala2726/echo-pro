@@ -18,10 +18,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Chuang
@@ -43,13 +44,15 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户消息列表")
-    @PreAuthorize("@ss.hasPermission('system:message:list')")
     public AjaxResult<TableDataResult> listUserMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
                                                            @ParameterObject UserMessageListQueryRequest request) {
         Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
-
+        UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("read", userMessageReadCountDto.getRead());
+        extra.put("unread", userMessageReadCountDto.getUnRead());
         List<UserMessageListVo> userMessageListVos = copyListProperties(sysMessagePage, UserMessageListVo.class);
-        return getTableData(sysMessagePage, userMessageListVos);
+        return getTableData(sysMessagePage, userMessageListVos, extra);
     }
 
 
@@ -61,7 +64,6 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据消息ID获取消息详情，当成功请求此接口后系统将自动将消息标记已读，无须单独调用已读消息的接口")
-    @PreAuthorize("@ss.hasPermission('system:message:query')")
     public AjaxResult<UserMessageVo> getMessageDetailById(
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "消息ID必须大于0！");
@@ -82,7 +84,6 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/count")
     @Operation(summary = "获取用户消息数量")
-    @PreAuthorize("@ss.hasPermission('system:message:count')")
     public AjaxResult<UserMessageReadCountDto> getUnreadCount() {
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         return success(userMessageReadCountDto);
@@ -96,7 +97,6 @@ public class MessageController extends BaseController {
      */
     @PutMapping("/read/{ids:[\\d,]+}")
     @Operation(summary = "标记消息为已读")
-    @PreAuthorize("@ss.hasPermission('system:message:read')")
     public AjaxResult<Void> markMessageAsRead(
             @Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "消息ID不能为空！");
@@ -117,7 +117,6 @@ public class MessageController extends BaseController {
      */
     @PutMapping("/unread/{ids:[\\d,]+}")
     @Operation(summary = "标记消息为未读")
-    @PreAuthorize("@ss.hasPermission('system:message:unread')")
     public AjaxResult<Void> markMessageAsUnRead(
             @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "部门ID不能为空！");
@@ -136,7 +135,6 @@ public class MessageController extends BaseController {
      */
     @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除消息")
-    @PreAuthorize("@ss.hasPermission('system:message:delete')")
     public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         boolean result = sysMessageService.deleteMessages(ids);

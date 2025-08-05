@@ -101,6 +101,18 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     Page<SysMessage> pageUserMessage(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request);
 
+
+    /**
+     * 分页查询用户已读消息
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @param messageIds     已读消息ID列表
+     * @return 分页结果
+     */
+    Page<SysMessage> pageUserMessageIsRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds);
+
     /**
      * 根据用户ID和消息ID获取当前用户消息
      *
@@ -114,11 +126,11 @@ public interface SysMessageService extends IService<SysMessage> {
     /**
      * 根据用户ID和消息ID列表获取消息列表
      *
-     * @param userId    用户ID
-     * @param messageId 消息ID列表
+     * @param userId     用户ID
+     * @param messageIds 消息ID列表
      * @return 消息列表
      */
-    List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId);
+    List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageIds);
 
     /**
      * 批量删除消息
@@ -127,4 +139,15 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 删除结果
      */
     boolean deleteMessages(List<Long> ids);
+
+    /**
+     * 分页查询用户未读消息
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @param messageIds     已读消息ID列表（用于排除）
+     * @return 分页结果
+     */
+    Page<SysMessage> pageUserMessageIsUnRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds);
 }

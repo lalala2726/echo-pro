@@ -394,6 +394,20 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
+     * 分页查询用户已读消息
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @param messageIds     已读消息ID列表
+     * @return 用户已读消息列表
+     */
+    @Override
+    public Page<SysMessage> pageUserMessageIsRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds) {
+        return sysMessageMapper.pageUserMessageIsRead(sysMessagePage, userId, request, messageIds);
+    }
+
+    /**
      * 根据消息角色ID和消息ID获取用户消息详情
      *
      * @param userId    用户ID
@@ -408,13 +422,13 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     /**
      * 根据用户ID和消息ID批量获取消息详情
      *
-     * @param userId    用户ID
-     * @param messageId 消息ID
+     * @param userId     用户ID
+     * @param messageIds 消息ID列表
      * @return 消息详情
      */
     @Override
-    public List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageId) {
-        return List.of();
+    public List<SysMessage> listMessageWithUserIdAndMessageId(Long userId, List<Long> messageIds) {
+        return sysMessageMapper.listMessageWithUserIdAndMessageId(userId, messageIds);
     }
 
     /**
@@ -427,5 +441,19 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteMessages(List<Long> ids) {
         return removeBatchByIds(ids);
+    }
+
+    /**
+     * 获取用户未读消息列表
+     *
+     * @param sysMessagePage 分页参数
+     * @param userId         用户ID
+     * @param request        查询参数
+     * @param messageIds     已读消息ID列表（用于排除）
+     * @return 用户未读消息列表
+     */
+    @Override
+    public Page<SysMessage> pageUserMessageIsUnRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds) {
+        return sysMessageMapper.pageUserMessageIsUnRead(sysMessagePage, userId, request, messageIds);
     }
 }
