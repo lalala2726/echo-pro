@@ -18,40 +18,33 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     /**
      * 消息标题
      */
-    @Schema(description = "消息标题")
+    @Schema(description = "消息标题", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统消息")
     private String title;
 
     /**
      * 消息类型：1-系统消息 2-通知消息 3-公告消息
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
+    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     private Integer type;
 
-    /**
-     * 是否查询我发送的消息
-     * true：仅查询我自己发送的消息
-     * false 或 null：查询我接收到的消息
-     */
-    @Schema(description = "是否查询我发送的消息（true：我发送的；false：接收的）")
-    private Boolean sentByMyself;
 
     /**
      * 消息级别：1-普通 2-重要 3-紧急
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
+    @Schema(description = "消息级别：1-普通 2-重要 3-紧急", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     private Integer level;
 
     /**
      * 是否已读
      */
-    @Schema(description = "是否已读")
+    @Schema(description = "是否已读", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "true")
     private Boolean isRead;
 
 
     /**
      * 发送者姓名
      */
-    @Schema(description = "发送者姓名")
+    @Schema(description = "发送者姓名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "张三")
     private String senderName;
 
 

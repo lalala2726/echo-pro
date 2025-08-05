@@ -21,9 +21,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Chuang
@@ -49,13 +47,11 @@ public class MessageController extends BaseController {
     public AjaxResult<TableDataResult> listUserMessageList(@Parameter(description = "消息列表查询，包含分页和筛选条件")
                                                            @ParameterObject UserMessageListQueryRequest request) {
         Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
-        UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("read", userMessageReadCountDto.getRead());
-        extra.put("unread", userMessageReadCountDto.getUnRead());
+
         List<UserMessageListVo> userMessageListVos = copyListProperties(sysMessagePage, UserMessageListVo.class);
-        return getTableData(sysMessagePage, userMessageListVos, extra);
+        return getTableData(sysMessagePage, userMessageListVos);
     }
+
 
     /**
      * 根据消息ID获取消息详情
@@ -66,7 +62,7 @@ public class MessageController extends BaseController {
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据消息ID获取消息详情，当成功请求此接口后系统将自动将消息标记已读，无须单独调用已读消息的接口")
     @PreAuthorize("@ss.hasPermission('system:message:query')")
-    public AjaxResult<UserMessageVo> getMessageById(
+    public AjaxResult<UserMessageVo> getMessageDetailById(
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "消息ID必须大于0！");
         UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
@@ -87,7 +83,7 @@ public class MessageController extends BaseController {
     @GetMapping("/count")
     @Operation(summary = "获取用户消息数量")
     @PreAuthorize("@ss.hasPermission('system:message:count')")
-    public AjaxResult<UserMessageReadCountDto> getUserMessageReadCount() {
+    public AjaxResult<UserMessageReadCountDto> getUnreadCount() {
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         return success(userMessageReadCountDto);
     }
@@ -129,7 +125,6 @@ public class MessageController extends BaseController {
         // 标记未读，保留阅读时间记录
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
-
         return toAjax(result);
     }
 

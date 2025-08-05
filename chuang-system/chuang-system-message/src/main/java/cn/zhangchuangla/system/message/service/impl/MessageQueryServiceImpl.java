@@ -117,12 +117,12 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         Long userId = SecurityUtils.getUserId();
         long userMessageCount = sysMessageService.getUserMessageCount(userId);
         if (userMessageCount == 0L) {
-            return new UserMessageReadCountDto(userId, 0L, 0L, 0L);
+            return new UserMessageReadCountDto(userId, 0L, 0L);
         }
         LambdaQueryWrapper<SysUserMessageExt> eq = new LambdaQueryWrapper<SysUserMessageExt>().eq(SysUserMessageExt::getUserId, userId);
         long read = userMessageExtService.count(eq);
         long unRead = userMessageCount - read;
-        return new UserMessageReadCountDto(userId, userMessageCount, read, unRead);
+        return new UserMessageReadCountDto(userMessageCount, read, unRead);
     }
 
 }

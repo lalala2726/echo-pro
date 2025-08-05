@@ -16,12 +16,6 @@ import lombok.Data;
 public class UserMessageReadCountDto {
 
     /**
-     * 用户ID
-     */
-    @Schema(description = "用户ID")
-    private Long userId;
-
-    /**
      * 总数量
      */
     @Schema(description = "总数量")
