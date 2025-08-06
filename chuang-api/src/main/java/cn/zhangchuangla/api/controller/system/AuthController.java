@@ -147,6 +147,9 @@ public class AuthController extends BaseController {
     @Operation(summary = "退出登录")
     public AjaxResult<Void> logout() {
         String token = getToken();
+        if (token == null) {
+            return error("未登录");
+        }
         boolean result = userSecurityManager.logoutByToken(token);
         return toAjax(result);
     }

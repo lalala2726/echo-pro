@@ -111,7 +111,7 @@ public class PasswordRetryLimiter {
 
         // 删除重试次数记录
         boolean retryDeleted = redisCache.deleteObject(retryKey);
-        // 删除锁��状态
+        // 删除锁状态
         boolean lockDeleted = redisCache.deleteObject(lockKey);
 
         if (retryDeleted || lockDeleted) {
