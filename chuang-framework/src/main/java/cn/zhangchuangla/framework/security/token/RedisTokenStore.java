@@ -138,6 +138,7 @@ public class RedisTokenStore {
         Assert.hasText(accessTokenId, "访问令牌ID不能为空!");
         String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + accessTokenId;
         OnlineLoginUser onlineLoginUser = redisCache.getCacheObject(accessTokenRedisKey);
+        Assert.notNull(onlineLoginUser, "访问令牌不存在!");
         return onlineLoginUser.getRefreshTokenId();
     }
 

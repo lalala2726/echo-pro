@@ -66,16 +66,6 @@ public class Assert extends org.springframework.util.Assert {
         isParamTrue(text != null && !text.isEmpty(), errorMessage);
     }
 
-    /**
-     * 断言给定字符串不为 null、不为空字符串（""）且不只包含空白字符，如果为空则抛出带指定错误消息的 ParamException。
-     * （类似 Spring 的 hasText 方法）
-     *
-     * @param text         要断言有文本内容的字符串。
-     * @param errorMessage 字符串无文本内容时抛出的错误消息。
-     */
-    public static void hasText(String text, @NotNull String errorMessage) {
-        isParamTrue(text != null && !text.trim().isEmpty(), errorMessage);
-    }
 
     /**
      * 断言给定集合不为 null 且不为空，如果为空则抛出带指定错误消息的 ParamException。

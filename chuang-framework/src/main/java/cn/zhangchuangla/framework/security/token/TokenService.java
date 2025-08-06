@@ -65,7 +65,7 @@ public class TokenService {
         String refreshTokenSessionId = UUIDUtils.simple();
 
         // 构造在线用户信息
-        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId, loginDeviceDTO);
+        OnlineLoginUser onlineLoginUser = buildOnlineUser(userDetails, accessTokenSessionId, refreshTokenSessionId, loginDeviceDTO);
 
         redisTokenStore.setRefreshToken(refreshTokenSessionId, accessTokenSessionId);
         redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
@@ -232,7 +232,7 @@ public class TokenService {
      * @param accessTokenId 访问令牌ID
      * @return OnlineLoginUser 对象
      */
-    private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId, LoginDeviceDTO loginDeviceDTO) {
+    private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId, String refreshTokenId, LoginDeviceDTO loginDeviceDTO) {
 
         Set<String> roleSetByRoleId = sysRoleService.getRoleSetByRoleId(user.getUserId());
 
@@ -243,6 +243,7 @@ public class TokenService {
                 .username(user.getUsername())
                 .accessTokenId(accessTokenId)
                 .ip(ip)
+                .refreshTokenId(refreshTokenId)
                 .accessTime(System.currentTimeMillis())
                 .location(location)
                 .deptId(user.getDeptId())

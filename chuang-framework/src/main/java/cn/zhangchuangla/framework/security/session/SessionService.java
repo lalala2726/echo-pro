@@ -155,6 +155,12 @@ public class SessionService {
         return redisTokenStore.getAccessToken(accessTokenId);
     }
 
+    /**
+     * 删除会话
+     *
+     * @param accessTokenId 访问令牌ID
+     * @return 是否删除成功
+     */
     public boolean deleteSession(String accessTokenId) {
         Assert.isTrue(redisTokenStore.isValidAccessToken(accessTokenId), "会话ID不存在!");
         String refreshTokenId = redisTokenStore.getRefreshTokenIdByAccessTokenId(accessTokenId);
