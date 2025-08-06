@@ -1,7 +1,6 @@
 package cn.zhangchuangla.framework.config;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,6 @@ import java.util.List;
  */
 @Configuration
 @ConfigurationProperties(prefix = "app.cors")
-@Slf4j
 @Data
 public class CorsConfig {
 
@@ -98,25 +96,21 @@ public class CorsConfig {
      */
     @Bean
     public CorsFilter corsFilter() {
-        log.info("配置增强的CORS过滤器");
 
         CorsConfiguration config = new CorsConfiguration();
 
         // 设置允许的源地址
         if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
             config.setAllowedOrigins(allowedOrigins);
-            log.info("CORS允许的源地址: {}", allowedOrigins);
         }
 
         // 设置允许的源地址模式
         if (allowedOriginPatterns != null && !allowedOriginPatterns.isEmpty()) {
             config.setAllowedOriginPatterns(allowedOriginPatterns);
-            log.info("CORS允许的源地址模式: {}", allowedOriginPatterns);
         }
 
         // 设置允许的HTTP方法
         config.setAllowedMethods(allowedMethods);
-        log.info("CORS允许的HTTP方法: {}", allowedMethods);
 
         // 设置允许的请求头
         config.setAllowedHeaders(allowedHeaders);
@@ -132,8 +126,6 @@ public class CorsConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
-        log.info("增强的CORS过滤器配置完成");
         return new CorsFilter(source);
     }
 
@@ -142,8 +134,6 @@ public class CorsConfig {
      */
     @Bean("securityCorsConfigurationSource")
     public CorsConfigurationSource securityCorsConfigurationSource() {
-        log.info("配置Spring Security的CORS配置源");
-
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 设置允许的源地址模式
