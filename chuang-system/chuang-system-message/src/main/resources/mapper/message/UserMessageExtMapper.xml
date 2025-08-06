@@ -14,4 +14,44 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
+
+    <!-- 获取用户已读消息数量 -->
+    <select id="getReadMessageCount" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM user_message_ext ume
+                 INNER JOIN sys_message sm ON ume.message_id = sm.id
+        WHERE ume.user_id = #{userId}
+          AND ume.is_read = 1
+          AND sm.is_deleted = 0
+    </select>
+
+    <!-- 批量获取消息已读状态 -->
+    <select id="getMessageReadStatus" resultType="cn.zhangchuangla.system.message.model.bo.MessageReadStatusBo">
+        SELECT ume.message_id AS messageId,
+        ume.is_read AS isRead
+        FROM user_message_ext ume
+        WHERE ume.user_id = #{userId}
+        <if test="messageIds != null and messageIds.size() > 0">
+            AND ume.message_id IN
+            <foreach collection="messageIds" item="messageId" open="(" separator="," close=")">
+                #{messageId}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 获取用户已读的消息ID列表 -->
+    <select id="getReadMessageIds" resultType="java.lang.Long">
+        SELECT ume.message_id
+        FROM user_message_ext ume
+        INNER JOIN sys_message sm ON ume.message_id = sm.id
+        WHERE ume.user_id = #{userId}
+        AND ume.is_read = 1
+        AND sm.is_deleted = 0
+        <if test="messageIds != null and messageIds.size() > 0">
+            AND ume.message_id IN
+            <foreach collection="messageIds" item="messageId" open="(" separator="," close=")">
+                #{messageId}
+            </foreach>
+        </if>
+    </select>
 </mapper>

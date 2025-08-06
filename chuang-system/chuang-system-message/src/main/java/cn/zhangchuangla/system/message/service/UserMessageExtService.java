@@ -76,4 +76,12 @@ public interface UserMessageExtService extends IService<SysUserMessageExt> {
      * @return 已读消息ID列表
      */
     List<MessageReadStatusBo> getMessageReadStatus(Long userId, List<Long> messageIds);
+
+    /**
+     * 获取用户已读消息数量
+     *
+     * @param userId 用户ID
+     * @return 已读消息数量
+     */
+    long getReadMessageCount(Long userId);
 }

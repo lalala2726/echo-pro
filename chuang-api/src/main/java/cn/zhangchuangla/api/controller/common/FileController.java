@@ -41,7 +41,7 @@ public class FileController extends BaseController {
      * @return 文件信息
      */
     @Operation(summary = "普通文件上传")
-    @PostMapping
+    @PostMapping("/upload")
     public AjaxResult<SimpleFileVO> upload(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageFileService.upload(file);
         SimpleFileVO simpleFileVO = SimpleFileVO.builder()
@@ -60,7 +60,7 @@ public class FileController extends BaseController {
      * @return 上传结果
      */
 
-    @PostMapping("/image")
+    @PostMapping("/upload/image")
     @Operation(summary = "上传图片")
     public AjaxResult<ImageVo> uploadImage(@RequestParam("file") MultipartFile file) {
         UploadedFileInfo upload = storageFileService.uploadImage(file);

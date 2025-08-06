@@ -33,16 +33,33 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @param userId 用户ID
      * @return 列表
      */
-    Page<SysMessage> pageUserMessage(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
+    Page<SysMessage> pageUserMessage(Page<SysMessage> page,
+                                     @Param("userId") Long userId,
+                                     @Param("request") UserMessageListQueryRequest request);
+
+    /**
+     * 根据用户ID分页查询系统消息表信息（已读消息）
+     *
+     * @param page       分页对象
+     * @param userId     用户ID
+     * @param request    查询参数
+     * @param messageIds 已读消息ID列表
+     * @return 列表
+     */
+    Page<SysMessage> pageUserMessageIsRead(Page<SysMessage> page,
+                                           @Param("userId") Long userId,
+                                           @Param("request") UserMessageListQueryRequest request,
+                                           @Param("messageIds") List<Long> messageIds);
 
     /**
      * 根据用户ID和消息ID查询系统消息表信息
      *
-     * @param userId    用户ID
-     * @param messageId 消息ID
+     * @param userId     用户ID
+     * @param messageIds 消息ID列表
      * @return 列表
      */
-    List<SysMessage> listMessageWithUserIdAndMessageId(@Param("userId") Long userId, @Param("messageIds") List<Long> messageId);
+    List<SysMessage> listMessageWithUserIdAndMessageId(@Param("userId") Long userId,
+                                                       @Param("messageIds") List<Long> messageIds);
 
     /**
      * 根据用户ID查询系统消息表信息
@@ -69,5 +86,22 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      * @param request 查询参数
      * @return 返回分页对象
      */
-    Page<SysMessage> pageUserSentMessage(Page<SysMessage> page, @Param("userId") Long userId, @Param("request") UserMessageListQueryRequest request);
+    Page<SysMessage> pageUserSentMessage(Page<SysMessage> page,
+                                         @Param("userId") Long userId,
+                                         @Param("request") UserMessageListQueryRequest request);
+
+
+    /**
+     * 根据用户ID分页查询未读的系统消息表信息
+     *
+     * @param page       分页对象
+     * @param userId     用户ID
+     * @param request    查询参数
+     * @param messageIds 已读消息ID列表（用于排除）
+     * @return 列表
+     */
+    Page<SysMessage> pageUserMessageIsUnRead(Page<SysMessage> page,
+                                             @Param("userId") Long userId,
+                                             @Param("request") UserMessageListQueryRequest request,
+                                             @Param("messageIds") List<Long> messageIds);
 }

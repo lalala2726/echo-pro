@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.system;
+package cn.zhangchuangla.api.controller.dashboard;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
@@ -30,9 +30,9 @@ import java.util.Map;
  * created on 2025/5/26 19:17
  */
 @RestController
-@Tag(name = "站内信", description = "站内信的阅读和发送等操作")
+@Tag(name = "我的消息", description = "我的消息的阅读和发送等操作")
 @RequiredArgsConstructor
-@RequestMapping("/system/message")
+@RequestMapping("/dashboard/message")
 public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
@@ -55,6 +55,7 @@ public class MessageController extends BaseController {
         return getTableData(sysMessagePage, userMessageListVos, extra);
     }
 
+
     /**
      * 根据消息ID获取消息详情
      *
@@ -63,7 +64,7 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据消息ID获取消息详情，当成功请求此接口后系统将自动将消息标记已读，无须单独调用已读消息的接口")
-    public AjaxResult<UserMessageVo> getMessageById(
+    public AjaxResult<UserMessageVo> getMessageDetailById(
             @Parameter(description = "消息ID，用于查询消息详情") @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "消息ID必须大于0！");
         UserMessageVo userMessageVo = messageQueryService.getUserMessageDetail(id);
@@ -83,7 +84,7 @@ public class MessageController extends BaseController {
      */
     @GetMapping("/count")
     @Operation(summary = "获取用户消息数量")
-    public AjaxResult<UserMessageReadCountDto> getUserMessageReadCount() {
+    public AjaxResult<UserMessageReadCountDto> getUnreadCount() {
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
         return success(userMessageReadCountDto);
     }
@@ -123,7 +124,6 @@ public class MessageController extends BaseController {
         // 标记未读，保留阅读时间记录
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
-
         return toAjax(result);
     }
 
