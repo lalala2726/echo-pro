@@ -78,7 +78,7 @@ public class UserSecurityManager {
      * @return 删除成功与否
      */
     public boolean logoutByToken(String accessToken) {
-        Assert.notEmpty(accessToken, "accessToken不能为空");
+        Assert.hasText(accessToken, "accessToken不能为空");
         String accessTokenId = tokenService.getSessionId(accessToken);
         //删除设备信息
         String refreshTokenId = redisTokenStore.getRefreshTokenIdByAccessTokenId(accessTokenId);

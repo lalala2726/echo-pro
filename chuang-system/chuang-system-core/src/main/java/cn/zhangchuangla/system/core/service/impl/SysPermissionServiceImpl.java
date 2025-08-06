@@ -46,7 +46,10 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      */
     @Override
     public Set<String> getPermissionByRole(Set<String> roleSet) {
-        //todo 根据需求加入Redis缓存
+        // 如果是超级管理员将返回全部权限信息
+        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+            return Set.of("*:*:*");
+        }
         return sysMenuMapper.getPermissionByRole(roleSet);
     }
 

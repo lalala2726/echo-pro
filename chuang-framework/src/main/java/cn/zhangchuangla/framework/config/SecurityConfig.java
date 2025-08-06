@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,15 +21,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +37,6 @@ import java.util.Set;
  * @author Chuang
  * created on 2024/04/23 16:48
  */
-@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -50,12 +45,16 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final CorsConfigurationSource securityCorsConfigurationSource;
 
-    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint,
-                          @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          AuthenticationEntryPointImpl authenticationEntryPoint,
+                          @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping,
+                          @Qualifier("securityCorsConfigurationSource") CorsConfigurationSource securityCorsConfigurationSource) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.securityCorsConfigurationSource = securityCorsConfigurationSource;
     }
 
     /**
@@ -72,11 +71,10 @@ public class SecurityConfig {
         // 获取所有标记了@Anonymous注解的接口
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         Set<String> anonymousUrls = findAnonymousUrls(handlerMethods);
-        log.info("Discovered anonymous URLs: {}", anonymousUrls);
 
         return http
-                // CORS 配置
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CORS 配置 - 使用专门的CORS配置源
+                .cors(cors -> cors.configurationSource(securityCorsConfigurationSource))
                 // 强制 HTTPS
                 //.requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // 统一异常处理：未认证和访问拒绝
@@ -84,14 +82,13 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint))
                 // 无状态会话
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 安全头增强：HSTS、CSP、XSS 保护
+                // 安全头增强：HSTS、XSS 保护、CSP策略
                 .headers(headers -> headers
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                         .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
-                        //如果您的应用需要从 CDN 加载脚本、样式、字体或图片，或者需要连接到其他域的 WebSocket，您需要相应地调整 policyDirectives。
-                        // 例如，添加 script-src 'self' https://cdn.example.com;。
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';")))
+                        // 配置CSP策略，支持iframe嵌入和Druid监控
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(buildContentSecurityPolicy())))
                 // 关闭 CSRF、表单登录、Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -149,26 +146,6 @@ public class SecurityConfig {
 
 
     /**
-     * CORS (跨域资源共享) 配置
-     *
-     * @return CorsConfigurationSource
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(false);
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 设置允许跨域的路径
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    /**
      * 身份验证管理器 Bean
      */
     @Bean
@@ -185,5 +162,42 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(10);
+    }
+
+    /**
+     * 构建Content Security Policy策略
+     * <p>
+     * 为Druid监控界面和前端iframe嵌入提供适当的CSP权限，同时保持安全性
+     * </p>
+     *
+     * @return CSP策略字符串
+     */
+    private String buildContentSecurityPolicy() {
+        return String.join(" ",
+                // 默认源：只允许同源
+                "default-src 'self';",
+                // 脚本源：允许同源和内联脚本（Druid需要）
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+                // 样式源：允许同源和内联样式（Druid需要）
+                "style-src 'self' 'unsafe-inline';",
+                // 图片源：允许同源和data URI（用于图标和图表）
+                "img-src 'self' data: blob:;",
+                // 字体源：允许同源
+                "font-src 'self';",
+                // 连接源：允许同源（用于AJAX请求）
+                "connect-src 'self';",
+                // 媒体源：允许同源
+                "media-src 'self';",
+                // 对象源：禁止（安全考虑）
+                "object-src 'none';",
+                // 基础URI：限制为同源
+                "base-uri 'self';",
+                // 表单提交：允许同源
+                "form-action 'self';",
+                // 框架祖先：允许前端应用嵌入（支持localhost和内网地址）
+                "frame-ancestors 'self' http://localhost:* http://127.0.0.1:* https://localhost:* https://127.0.0.1:* http://192.168.*:* https://192.168.*:* http://10.*:* https://10.*:* http://172.16.*:* https://172.16.*:*;",
+                // 框架源：允许同源
+                "frame-src 'self';"
+        );
     }
 }

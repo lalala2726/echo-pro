@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * 登录频率限制器
  * <p>
  * 该组件用于控制用户登录频率，防止频繁登录攻击。
- * 只统计成功登录次���，支持按小时和按天限制登录次数。
+ * 只统计成功登录次，支持按小时和按天限制登录次数。
  * </p>
  *
  * @author Chuang
@@ -35,7 +35,7 @@ public class LoginFrequencyLimiter {
      * 检查用户登录频率限制（基于成功登录次数）
      *
      * @param username 用户名
-     * @throws AuthorizationException 如果超过频率限制则抛���异常
+     * @throws AuthorizationException 如果超过频率限制则抛异常
      */
     public void checkFrequencyLimit(String username) {
         Assert.hasText(username, "用户名不能为空");
@@ -102,7 +102,7 @@ public class LoginFrequencyLimiter {
      * 检查每日限制（只基于成功登录次数）
      *
      * @param username       用户名
-     * @param maxLoginPerDay 每日最大登录���数
+     * @param maxLoginPerDay 每日最大登录数
      */
     private void checkDailyLimit(String username, int maxLoginPerDay) {
         String successKey = String.format(RedisConstants.Auth.LOGIN_SUCCESS_DAY_KEY, username);

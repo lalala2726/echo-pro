@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Chuang
@@ -119,6 +120,16 @@ public class BaseController {
      */
     protected String getUsername() {
         return SecurityUtils.getUsername();
+    }
+
+
+    /**
+     * 获取当前用户角色
+     *
+     * @return 角色集合
+     */
+    protected Set<String> getRoles() {
+        return SecurityUtils.getRoles();
     }
 
     /**
