@@ -89,9 +89,8 @@ public class SecurityConfig {
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                         .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
-                        //如果您的应用需要从 CDN 加载脚本、样式、字体或图片，或者需要连接到其他域的 WebSocket，您需要相应地调整 policyDirectives。
-                        // 例如，添加 script-src 'self' https://cdn.example.com;。
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';")))
+                        // 配置CSP策略，为Druid监控界面提供必要的权限
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(buildContentSecurityPolicy())))
                 // 关闭 CSRF、表单登录、Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -156,14 +155,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 设置允许跨域的路径
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
@@ -185,5 +182,46 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(10);
+    }
+
+
+    /**
+     * 构建Content Security Policy策略
+     * <p>
+     * 为Druid监控界面和其他组件提供适当的CSP权限，同时保持安全性
+     * </p>
+     *
+     * @return CSP策略字符串
+     */
+    private String buildContentSecurityPolicy() {
+        log.info("构建CSP策略 - 为Druid监控界面配置安全策略");
+        String cspPolicy = String.join(" ",
+                // 默认源：只允许同源
+                "default-src 'self';",
+                // 脚本源：允许同源和内联脚本（Druid需要）
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+                // 样式源：允许同源和内联样式（Druid需要）
+                "style-src 'self' 'unsafe-inline';",
+                // 图片源：允许同源和data URI（用于图标和图表）
+                "img-src 'self' data: blob:;",
+                // 字体源：允许同源
+                "font-src 'self';",
+                // 连接源：允许同源（用于AJAX请求）
+                "connect-src 'self';",
+                // 媒体源：允许同源
+                "media-src 'self';",
+                // 对象源：禁止（安全考虑）
+                "object-src 'none';",
+                // 基础URI：限制为同源
+                "base-uri 'self';",
+                // 表单提交：允许同源
+                "form-action 'self';",
+                // 框架祖先：允许同源（Druid可能需要iframe）
+                "frame-ancestors 'self';",
+                // 框架源：允许同源
+                "frame-src 'self';"
+        );
+        log.info("CSP策略构建完成: {}", cspPolicy);
+        return cspPolicy;
     }
 }

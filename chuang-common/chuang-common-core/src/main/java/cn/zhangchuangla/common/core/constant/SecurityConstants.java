@@ -27,8 +27,8 @@ public class SecurityConstants {
             "/captcha",
             "/register",
             "/auth/refresh",
+            "/druid/**"
     };
-
     /**
      * 静态资源白名单
      */
