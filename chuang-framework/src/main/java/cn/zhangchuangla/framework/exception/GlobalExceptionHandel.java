@@ -138,8 +138,7 @@ public class GlobalExceptionHandel {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public AjaxResult<Void> authorizationDeniedExceptionHandel(HttpServletRequest request, AuthorizationDeniedException exception) {
         log.error("授权失败", exception);
-        String message = String.format("请求访问:%s 认证失败，您没有权限访问此资源!", request.getRequestURI());
-        return AjaxResult.error(ResultCode.FORBIDDEN.getCode(), message);
+        return AjaxResult.error(ResultCode.FORBIDDEN.getCode(), "您没有权限访问此资源!");
     }
 
     /**
