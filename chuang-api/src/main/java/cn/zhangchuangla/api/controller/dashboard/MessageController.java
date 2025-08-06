@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.system;
+package cn.zhangchuangla.api.controller.dashboard;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
@@ -30,9 +30,9 @@ import java.util.Map;
  * created on 2025/5/26 19:17
  */
 @RestController
-@Tag(name = "站内信", description = "站内信的阅读和发送等操作")
+@Tag(name = "我的消息", description = "我的消息的阅读和发送等操作")
 @RequiredArgsConstructor
-@RequestMapping("/system/message")
+@RequestMapping("/dashboard/message")
 public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
