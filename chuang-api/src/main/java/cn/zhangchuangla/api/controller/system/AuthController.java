@@ -11,6 +11,7 @@ import cn.zhangchuangla.framework.security.UserSecurityManager;
 import cn.zhangchuangla.framework.security.login.AuthService;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.core.model.vo.user.UserInfoVo;
+import cn.zhangchuangla.system.core.service.SysPermissionService;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +44,7 @@ public class AuthController extends BaseController {
     private final SysRoleService sysRoleService;
     private final TokenService tokenService;
     private final UserSecurityManager userSecurityManager;
+    private final SysPermissionService sysPermissionService;
 
 
     /**
@@ -109,6 +111,31 @@ public class AuthController extends BaseController {
         ajax.put("user", userInfoVo);
         ajax.put("roles", roles);
         return success(ajax);
+    }
+
+    /**
+     * 获取当前用户权限信息
+     *
+     * @return 权限信息
+     */
+    @GetMapping("/permission")
+    @Operation(summary = "获取用户权限")
+    public AjaxResult<Set<String>> getPermission() {
+        Set<String> roles = getRoles();
+        Set<String> permissionByRole = sysPermissionService.getPermissionByRole(roles);
+        return success(permissionByRole);
+    }
+
+
+    /**
+     * 获取当前用户角色信息
+     *
+     * @return 角色信息
+     */
+    @GetMapping("/roles")
+    @Operation(summary = "获取用户角色")
+    public AjaxResult<Set<String>> getUserRoles() {
+        return success(getRoles());
     }
 
     /**

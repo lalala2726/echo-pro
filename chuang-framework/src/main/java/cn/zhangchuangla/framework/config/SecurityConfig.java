@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.framework.security.filter.TokenAuthenticationFilter;
 import cn.zhangchuangla.framework.security.handel.AuthenticationEntryPointImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +37,6 @@ import java.util.Set;
  * @author Chuang
  * created on 2024/04/23 16:48
  */
-@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -57,7 +55,6 @@ public class SecurityConfig {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.securityCorsConfigurationSource = securityCorsConfigurationSource;
-        log.info("🔧 SecurityConfig 初始化完成 - 准备配置CSP策略");
     }
 
     /**
@@ -74,7 +71,6 @@ public class SecurityConfig {
         // 获取所有标记了@Anonymous注解的接口
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         Set<String> anonymousUrls = findAnonymousUrls(handlerMethods);
-        log.info("Discovered anonymous URLs: {}", anonymousUrls);
 
         return http
                 // CORS 配置 - 使用专门的CORS配置源
@@ -177,8 +173,7 @@ public class SecurityConfig {
      * @return CSP策略字符串
      */
     private String buildContentSecurityPolicy() {
-        log.info("🔧 开始构建CSP策略 - 支持Druid监控和iframe嵌入");
-        String cspPolicy = String.join(" ",
+        return String.join(" ",
                 // 默认源：只允许同源
                 "default-src 'self';",
                 // 脚本源：允许同源和内联脚本（Druid需要）
@@ -204,6 +199,5 @@ public class SecurityConfig {
                 // 框架源：允许同源
                 "frame-src 'self';"
         );
-        return cspPolicy;
     }
 }
