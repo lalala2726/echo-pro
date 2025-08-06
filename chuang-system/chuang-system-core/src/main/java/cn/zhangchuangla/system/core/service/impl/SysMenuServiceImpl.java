@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
+import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -23,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -69,30 +71,46 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     /**
      * 新增菜单
+     * <p>
+     * 根据不同的菜单类型进行字段验证和过滤，确保数据的完整性和一致性
+     * </p>
      *
      * @param request 菜单信息
      * @return 是否成功
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean addMenu(SysMenuAddRequest request) {
+        log.info("🔧 开始添加菜单: 名称={}, 类型={}", request.getName(), request.getType());
+
+        // 1. 基础验证
+        validateMenuRequest(request);
+
+        // 2. 检查菜单名称和路径是否已存在
         if (isMenuNameExists(null, request.getName())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
         }
         if (isMenuPathExists(null, request.getPath())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
+
+        // 3. 创建菜单对象并设置基础信息
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setCreateBy(username);
 
+        // 4. 根据菜单类型进行字段过滤和验证
+        SysMenu processedMenu = switch (request.getType()) {
+            case Constants.MenuConstants.TYPE_DIR -> saveCatalog(sysMenu);
+            case Constants.MenuConstants.TYPE_MENU -> saveMenu(sysMenu);
+            case Constants.MenuConstants.TYPE_BUTTON -> saveButton(sysMenu);
+            case Constants.MenuConstants.TYPE_INTERNAL -> saveEmbedded(sysMenu);
+            case Constants.MenuConstants.TYPE_EXTERNAL -> saveLink(sysMenu);
+            default -> throw new ParamException(ResultCode.PARAM_ERROR, "不支持的菜单类型: " + request.getType());
+        };
 
-        // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
-        if (request.getLink() != null && !request.getLink().isBlank()
-                && (Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
-                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType()))) {
-            sysMenu.setLink(request.getLink());
-        }
-        return save(sysMenu);
+        // 5. 保存菜单
+        return save(processedMenu);
     }
 
     /**
@@ -340,4 +358,233 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 })
                 .toList();
     }
+
+
+    /**
+     * 验证菜单请求参数
+     * <p>
+     * 根据菜单类型验证必填字段
+     * </p>
+     *
+     * @param request 菜单请求
+     */
+    private void validateMenuRequest(SysMenuAddRequest request) {
+        String type = request.getType();
+
+        // 通用必填字段验证
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "菜单名称不能为空");
+        }
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "菜单标题不能为空");
+        }
+
+        // 根据菜单类型进行特定验证
+        switch (type) {
+            case Constants.MenuConstants.TYPE_DIR -> validateDirectoryMenu(request);
+            case Constants.MenuConstants.TYPE_MENU -> validatePageMenu(request);
+            case Constants.MenuConstants.TYPE_BUTTON -> validateButtonMenu(request);
+            case Constants.MenuConstants.TYPE_INTERNAL -> validateEmbeddedMenu(request);
+            case Constants.MenuConstants.TYPE_EXTERNAL -> validateExternalMenu(request);
+            default -> throw new ParamException(ResultCode.PARAM_ERROR, "不支持的菜单类型: " + type);
+        }
+    }
+
+    /**
+     * 验证目录类型菜单
+     */
+    private void validateDirectoryMenu(SysMenuAddRequest request) {
+        if (request.getPath() == null || request.getPath().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "目录类型菜单的路由地址不能为空");
+        }
+    }
+
+    /**
+     * 验证页面类型菜单
+     */
+    private void validatePageMenu(SysMenuAddRequest request) {
+        if (request.getPath() == null || request.getPath().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "页面类型菜单的路由地址不能为空");
+        }
+        if (request.getComponent() == null || request.getComponent().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "页面类型菜单的页面组件不能为空");
+        }
+    }
+
+    /**
+     * 验证按钮类型菜单
+     */
+    private void validateButtonMenu(SysMenuAddRequest request) {
+        if (request.getPermission() == null || request.getPermission().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "按钮类型菜单的权限标识不能为空");
+        }
+        if (request.getSort() == null) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "按钮类型菜单的排序不能为空");
+        }
+    }
+
+    /**
+     * 验证内嵌类型菜单
+     */
+    private void validateEmbeddedMenu(SysMenuAddRequest request) {
+        if (request.getPath() == null || request.getPath().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "内嵌类型菜单的路由地址不能为空");
+        }
+        if (request.getLink() == null || request.getLink().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "内嵌类型菜单的链接地址不能为空");
+        }
+    }
+
+    /**
+     * 验证外链类型菜单
+     */
+    private void validateExternalMenu(SysMenuAddRequest request) {
+        if (request.getPath() == null || request.getPath().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "外链类型菜单的路由地址不能为空");
+        }
+        if (request.getLink() == null || request.getLink().trim().isEmpty()) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "外链类型菜单的链接地址不能为空");
+        }
+    }
+
+    /**
+     * 保存目录类型菜单
+     * <p>
+     * 目录类型菜单字段规则：
+     * - 必填字段：菜单名称、标题、路由地址
+     * - 可选字段：上级菜单、图标、激活路径、激活图标、权限标识、状态、徽章相关、排序、其他设置
+     * - 需要清空的字段：页面组件、链接地址、缓存标签页
+     * </p>
+     *
+     * @param sysMenu 菜单信息
+     * @return 处理后的菜单信息
+     */
+    private SysMenu saveCatalog(SysMenu sysMenu) {
+        // 目录不需要组件
+        sysMenu.setComponent(null);
+        // 目录不需要链接地址
+        sysMenu.setLink(null);
+        // 目录不需要缓存设置
+        sysMenu.setKeepAlive(null);
+        return sysMenu;
+    }
+
+    /**
+     * 保存页面类型菜单
+     * <p>
+     * 页面类型菜单字段规则：
+     * - 必填字段：菜单名称、标题、路由地址、页面组件
+     * - 可选字段：上级菜单、图标、激活路径、激活图标、权限标识、状态、徽章相关、排序、其他设置（包括缓存标签页）
+     * - 需要清空的字段：链接地址
+     * </p>
+     *
+     * @param sysMenu 菜单信息
+     * @return 处理后的菜单信息
+     */
+    private SysMenu saveMenu(SysMenu sysMenu) {
+        // 页面菜单不需要链接地址
+        sysMenu.setLink(null);
+        return sysMenu;
+    }
+
+    /**
+     * 保存按钮类型菜单
+     * <p>
+     * 按钮类型菜单字段规则：
+     * - 必填字段：菜单名称、标题、权限标识、排序
+     * - 可选字段：上级菜单、状态
+     * - 需要清空的字段：路由地址、页面组件、链接地址、图标、激活路径、激活图标、徽章相关、所有其他设置
+     * </p>
+     *
+     * @param sysMenu 菜单信息
+     * @return 处理后的菜单信息
+     */
+    private SysMenu saveButton(SysMenu sysMenu) {
+        // 清空不需要的字段
+        // 按钮不需要路由地址
+        sysMenu.setPath(null);
+        // 按钮不需要组件
+        sysMenu.setComponent(null);
+        // 按钮不需要链接地址
+        sysMenu.setLink(null);
+        // 按钮不需要图标
+        sysMenu.setIcon(null);
+        // 按钮不需要激活路径
+        sysMenu.setActivePath(null);
+        // 按钮不需要激活图标
+        sysMenu.setActiveIcon(null);
+        // 按钮不需要徽章
+        sysMenu.setBadgeType(null);
+        sysMenu.setBadge(null);
+        sysMenu.setBadgeVariants(null);
+        // 按钮不需要缓存设置
+        sysMenu.setKeepAlive(null);
+
+        // 清空所有其他设置
+        sysMenu.setAffixTab(null);
+        sysMenu.setHideInMenu(null);
+        sysMenu.setHideChildrenInMenu(null);
+        sysMenu.setHideInBreadcrumb(null);
+        sysMenu.setHideInTab(null);
+
+        return sysMenu;
+    }
+
+    /**
+     * 保存内嵌类型菜单
+     * <p>
+     * 内嵌类型菜单字段规则：
+     * - 必填字段：菜单名称、标题、路由地址、链接地址
+     * - 可选字段：上级菜单、图标、激活路径、激活图标、权限标识、状态、徽章相关、排序、其他设置
+     * - 需要清空的字段：页面组件、缓存标签页
+     * </p>
+     *
+     * @param sysMenu 菜单信息
+     * @return 处理后的菜单信息
+     */
+    private SysMenu saveEmbedded(SysMenu sysMenu) {
+        // 内嵌页面不需要组件
+        sysMenu.setComponent(null);
+        // 内嵌页面不需要缓存设置
+        sysMenu.setKeepAlive(null);
+        return sysMenu;
+    }
+
+    /**
+     * 保存外链类型菜单
+     * <p>
+     * 外链类型菜单字段规则：
+     * - 必填字段：菜单名称、标题、路由地址、链接地址
+     * - 可选字段：上级菜单、图标、状态、徽章相关、其他设置（隐藏菜单）
+     * - 需要清空的字段：页面组件、激活路径、激活图标、权限标识、其他不相关的设置
+     * </p>
+     *
+     * @param sysMenu 菜单信息
+     * @return 处理后的菜单信息
+     */
+    private SysMenu saveLink(SysMenu sysMenu) {
+        // 外链不需要组件
+        sysMenu.setComponent(null);
+        // 外链不需要激活路径
+        sysMenu.setActivePath(null);
+        // 外链不需要激活图标
+        sysMenu.setActiveIcon(null);
+        // 外链通常不需要权限标识
+        sysMenu.setPermission(null);
+        // 外链不需要缓存设置
+        sysMenu.setKeepAlive(null);
+
+        // 清空大部分其他设置（外链只保留隐藏菜单设置）
+        sysMenu.setAffixTab(null);
+        sysMenu.setHideChildrenInMenu(null);
+        sysMenu.setHideInBreadcrumb(null);
+        sysMenu.setHideInTab(null);
+        // 外链默认隐藏在菜单中显示为false（即显示）
+        if (sysMenu.getHideInMenu() == null) {
+            sysMenu.setHideInMenu(false);
+        }
+        return sysMenu;
+    }
+
+
 }
