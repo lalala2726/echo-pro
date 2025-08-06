@@ -22,15 +22,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,12 +47,17 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final CorsConfigurationSource securityCorsConfigurationSource;
 
-    public SecurityConfig(UserDetailsService userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint,
-                          @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          AuthenticationEntryPointImpl authenticationEntryPoint,
+                          @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping requestMappingHandlerMapping,
+                          @Qualifier("securityCorsConfigurationSource") CorsConfigurationSource securityCorsConfigurationSource) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.securityCorsConfigurationSource = securityCorsConfigurationSource;
+        log.info("🔧 SecurityConfig 初始化完成 - 准备配置CSP策略");
     }
 
     /**
@@ -75,8 +77,8 @@ public class SecurityConfig {
         log.info("Discovered anonymous URLs: {}", anonymousUrls);
 
         return http
-                // CORS 配置
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CORS 配置 - 使用专门的CORS配置源
+                .cors(cors -> cors.configurationSource(securityCorsConfigurationSource))
                 // 强制 HTTPS
                 //.requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // 统一异常处理：未认证和访问拒绝
@@ -84,12 +86,12 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint))
                 // 无状态会话
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 安全头增强：HSTS、CSP、XSS 保护
+                // 安全头增强：HSTS、XSS 保护、CSP策略
                 .headers(headers -> headers
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                         .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
-                        // 配置CSP策略，为Druid监控界面提供必要的权限
+                        // 配置CSP策略，支持iframe嵌入和Druid监控
                         .contentSecurityPolicy(csp -> csp.policyDirectives(buildContentSecurityPolicy())))
                 // 关闭 CSRF、表单登录、Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
@@ -148,24 +150,6 @@ public class SecurityConfig {
 
 
     /**
-     * CORS (跨域资源共享) 配置
-     *
-     * @return CorsConfigurationSource
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    /**
      * 身份验证管理器 Bean
      */
     @Bean
@@ -184,17 +168,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(10);
     }
 
-
     /**
      * 构建Content Security Policy策略
      * <p>
-     * 为Druid监控界面和其他组件提供适当的CSP权限，同时保持安全性
+     * 为Druid监控界面和前端iframe嵌入提供适当的CSP权限，同时保持安全性
      * </p>
      *
      * @return CSP策略字符串
      */
     private String buildContentSecurityPolicy() {
-        log.info("构建CSP策略 - 为Druid监控界面配置安全策略");
+        log.info("🔧 开始构建CSP策略 - 支持Druid监控和iframe嵌入");
         String cspPolicy = String.join(" ",
                 // 默认源：只允许同源
                 "default-src 'self';",
@@ -216,12 +199,11 @@ public class SecurityConfig {
                 "base-uri 'self';",
                 // 表单提交：允许同源
                 "form-action 'self';",
-                // 框架祖先：允许同源（Druid可能需要iframe）
-                "frame-ancestors 'self';",
+                // 框架祖先：允许前端应用嵌入（支持localhost和内网地址）
+                "frame-ancestors 'self' http://localhost:* http://127.0.0.1:* https://localhost:* https://127.0.0.1:* http://192.168.*:* https://192.168.*:* http://10.*:* https://10.*:* http://172.16.*:* https://172.16.*:*;",
                 // 框架源：允许同源
                 "frame-src 'self';"
         );
-        log.info("CSP策略构建完成: {}", cspPolicy);
         return cspPolicy;
     }
 }

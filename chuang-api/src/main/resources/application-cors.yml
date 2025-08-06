@@ -1,0 +1,61 @@
+# CORS跨域配置
+app:
+  cors:
+    # 允许的源地址列表（精确匹配）
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:8080
+      - http://localhost:8081
+      - http://127.0.0.1:3000
+      - http://127.0.0.1:8080
+      - http://127.0.0.1:8081
+    
+    # 允许的源地址模式列表（支持通配符）
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - https://localhost:*
+      - https://127.0.0.1:*
+      - http://192.168.*.*:*
+      - https://192.168.*.*:*
+      - http://10.*.*.*:*
+      - https://10.*.*.*:*
+      - http://172.16.*.*:*
+      - https://172.16.*.*:*
+      # 生产环境域名（根据实际情况修改）
+      # - https://*.yourdomain.com
+      # - https://yourdomain.com
+    
+    # 允许的HTTP方法
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+      - HEAD
+    
+    # 允许的请求头（* 表示允许所有）
+    allowed-headers:
+      - "*"
+    
+    # 暴露的响应头
+    exposed-headers:
+      - Authorization
+      - Content-Type
+      - X-Total-Count
+      - X-Request-ID
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Credentials
+    
+    # 是否允许携带认证信息（Cookie、Authorization头等）
+    allow-credentials: true
+    
+    # 预检请求的缓存时间（秒）
+    max-age: 3600
+
+# Spring Boot配置
+spring:
+  profiles:
+    include: cors

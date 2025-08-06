@@ -210,11 +210,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private MetaVo setMateVo(SysMenu sysMenu) {
         MetaVo metaVo = BeanCotyUtils.copyProperties(sysMenu, MetaVo.class);
 
-        // 处理链接
-        if (Constants.MenuConstants.TYPE_EXTERNAL.equals(sysMenu.getType())) {
-            metaVo.setLink(sysMenu.getLink());
-        } else if (Constants.MenuConstants.TYPE_INTERNAL.equals(sysMenu.getType())) {
+        if (Constants.MenuConstants.TYPE_INTERNAL.equals(sysMenu.getType())) {
             metaVo.setIframeSrc(sysMenu.getLink());
+            metaVo.setLink(null);
         }
         return metaVo;
     }
