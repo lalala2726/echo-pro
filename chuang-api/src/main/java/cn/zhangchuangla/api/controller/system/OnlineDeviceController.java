@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/system/device")
 @Tag(name = "设备管理", description = "设备的相关管理")
 @RequiredArgsConstructor
-public class DeviceController extends BaseController {
+public class OnlineDeviceController extends BaseController {
 
     private final DeviceService deviceService;
     private final ExcelExporter excelExporter;
@@ -42,7 +42,7 @@ public class DeviceController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "设备列表")
-    @PreAuthorize("@ss.hasPermission('system:device:list')")
+    @PreAuthorize("@ss.hasPermission('system:online:device:list')")
     public AjaxResult<TableDataResult> listDevice(SessionDeviceQueryRequest request) {
         PageResult<SessionDevice> sessionDevicePageResult = deviceService.listDevice(request);
         return getTableData(sessionDevicePageResult);
@@ -58,7 +58,7 @@ public class DeviceController extends BaseController {
     @Operation(summary = "删除设备", description = "删除设备会删除关联的会话")
     @DeleteMapping
     @OperationLog(title = "会话管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@ss.hasPermission('system:session:delete')")
+    @PreAuthorize("@ss.hasPermission('system:online-device:delete')")
     public AjaxResult<Void> deleteSession(@RequestParam("refreshTokenId") String refreshTokenId) {
         boolean result = deviceService.deleteDevice(refreshTokenId);
         return result ? success() : error();
@@ -73,7 +73,7 @@ public class DeviceController extends BaseController {
      */
     @PostMapping("/export")
     @OperationLog(title = "会话管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermission('system:session:export')")
+    @PreAuthorize("@ss.hasPermission('system:online-device:export')")
     public void exportSession(@RequestBody SessionDeviceQueryRequest request, HttpServletResponse response) {
         request.setPageNum(-1);
         request.setPageNum(-1);

@@ -52,13 +52,11 @@ public class StorageFileController extends BaseController {
     @Operation(summary = "文件资源列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileManage(@Parameter(description = "文件资源列表查询参数")
-                                                          @Validated @ParameterObject StorageFileQueryRequest request) {
+                                                      @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileManage(request);
         List<StorageFileListVo> fileRecordListVos = copyListProperties(page, StorageFileListVo.class);
         return getTableData(page, fileRecordListVos);
     }
-
-    //todo 导出文件资源列表
 
     /**
      * 文件资源详情
@@ -70,7 +68,7 @@ public class StorageFileController extends BaseController {
     @Operation(summary = "文件资源详情")
     @PreAuthorize("@ss.hasPermission('system:storage-file:query')")
     public AjaxResult<StorageFileVo> getFileById(@Parameter(description = "文件ID")
-                                                     @PathVariable("id") Long id) {
+                                                 @PathVariable("id") Long id) {
         StorageFile storageFile = storageFileService.getFileById(id);
         StorageFileVo storageFileVo = new StorageFileVo();
         BeanUtils.copyProperties(storageFile, storageFileVo);
@@ -87,7 +85,7 @@ public class StorageFileController extends BaseController {
     @Operation(summary = "文件资源回收站列表")
     @PreAuthorize("@ss.hasPermission('system:storage-file:list')")
     public AjaxResult<TableDataResult> listFileTrash(@Parameter(description = "文件资源回收站查询参数")
-                                                         @Validated @ParameterObject StorageFileQueryRequest request) {
+                                                     @Validated @ParameterObject StorageFileQueryRequest request) {
         Page<StorageFile> page = storageFileService.listFileTrashManage(request);
         List<StorageFileListVo> fileRecordListVos = copyListProperties(page, StorageFileListVo.class);
         return getTableData(page, fileRecordListVos);
@@ -116,7 +114,7 @@ public class StorageFileController extends BaseController {
      * @param ids 文件ID
      * @return 恢复结果
      */
-    @PreAuthorize("@ss.hasPermission('system:storage-file:recover')")
+    @PreAuthorize("@ss.hasPermission('system:storage-file:restore')")
     @Operation(summary = "恢复文件")
     @PutMapping("/recover/{ids:[\\d,]+}")
     @OperationLog(title = "文件资源", businessType = BusinessType.RECOVER)
@@ -133,7 +131,7 @@ public class StorageFileController extends BaseController {
      * @return 删除结果
      */
     @DeleteMapping("/{ids:[\\d,]+}")
-    @PreAuthorize("@ss.hasPermission('ststem:file:list')")
+    @PreAuthorize("@ss.hasPermission('ststem:storage-file:delete')")
     @Operation(summary = "删除文件")
     @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,

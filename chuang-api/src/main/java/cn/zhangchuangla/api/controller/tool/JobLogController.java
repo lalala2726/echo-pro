@@ -72,7 +72,7 @@ public class JobLogController extends BaseController {
      */
     @DeleteMapping("/{logIds:\\d+}")
     @Operation(summary = "删除定时任务日志")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:remove')")
+    @PreAuthorize("@ss.hasPermission('tool:job-log:delete')")
     @OperationLog(title = "定时任务日志", businessType = BusinessType.DELETE)
     public AjaxResult<Void> remove(@Parameter(description = "日志ID列表，多个用逗号分隔") @PathVariable List<Long> logIds) {
         Assert.notEmpty(logIds, "日志ID不能为空");
@@ -85,7 +85,7 @@ public class JobLogController extends BaseController {
      */
     @DeleteMapping("/clean/all")
     @Operation(summary = "清理所有日志")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:remove')")
+    @PreAuthorize("@ss.hasPermission('tool:job-log:delete')")
     @OperationLog(title = "定时任务调度日志", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanAll() {
         int count = sysJobLogService.cleanAllLogs();

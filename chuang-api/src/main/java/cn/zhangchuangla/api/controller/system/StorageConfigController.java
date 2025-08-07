@@ -141,6 +141,7 @@ public class StorageConfigController extends BaseController {
     @PostMapping("/tencent")
     @Operation(summary = "添加腾讯云COS存储配置")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     public AjaxResult<Void> addTencentCosConfig(@Validated @RequestBody TencentCosConfigSaveRequest request) {
         boolean result = storageConfigService.addTencentCosConfig(request);
         return toAjax(result);
@@ -155,6 +156,7 @@ public class StorageConfigController extends BaseController {
     @PostMapping("/amaze")
     @Operation(summary = "添加亚马逊S3存储配置", description = "兼容S3协议可以使用此接口")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     public AjaxResult<Void> addAmazonS3Config(@Validated @RequestBody AmazonS3ConfigSaveRequest request) {
         boolean result = storageConfigService.addAmazonS3Config(request);
         return toAjax(result);
@@ -218,7 +220,7 @@ public class StorageConfigController extends BaseController {
      * @return 刷新结果
      */
     @PutMapping("/refreshCache")
-    @PreAuthorize("@ss.hasPermission('system:storage-config:refreshCache')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:refresh')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> refreshCache() {
