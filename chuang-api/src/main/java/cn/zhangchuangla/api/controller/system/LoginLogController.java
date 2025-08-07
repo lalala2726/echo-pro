@@ -99,7 +99,7 @@ public class LoginLogController extends BaseController {
      */
     @DeleteMapping("/clean")
     @Operation(summary = "清空登录日志")
-    @PreAuthorize("@ss.hasPermission('system:log-login:delete')")
+    @PreAuthorize("@ss.hasPermission('system:log-login:clean')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanLoginLog() {
         boolean result = sysLoginLogService.cleanLoginLog();

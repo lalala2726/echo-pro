@@ -95,7 +95,7 @@ public class OperationLogController extends BaseController {
      */
     @DeleteMapping("/clean")
     @Operation(summary = "清空操作日志")
-    @PreAuthorize("@ss.hasPermission('system:log-operation:delete')")
+    @PreAuthorize("@ss.hasPermission('system:log-operation:clean')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanOperationLog() {
         boolean result = sysOperationLogService.cleanOperationLog();
