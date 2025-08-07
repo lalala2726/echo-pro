@@ -84,7 +84,7 @@ public class JobController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改定时任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:edit')")
+    @PreAuthorize("@ss.hasPermission('tool:job:update')")
     @OperationLog(title = "定时任务管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> edit(@Parameter(description = "定时任务信息") @Validated @RequestBody SysJobUpdateRequest request) {
         boolean result = sysJobService.updateJob(request);
@@ -96,7 +96,7 @@ public class JobController extends BaseController {
      */
     @DeleteMapping("/{jobIds:\\d+}")
     @Operation(summary = "删除定时任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:remove')")
+    @PreAuthorize("@ss.hasPermission('tool:job:delete')")
     @OperationLog(title = "定时任务", businessType = BusinessType.DELETE)
     public AjaxResult<Void> remove(@Parameter(description = "任务ID列表，多个用逗号分隔") @PathVariable("jobIds") List<Long> jobIds) {
         Assert.notEmpty(jobIds, "任务ID不能为空");
@@ -109,7 +109,7 @@ public class JobController extends BaseController {
      */
     @PostMapping("/start/{jobId:\\d+}")
     @Operation(summary = "启动任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:changeStatus')")
+    @PreAuthorize("@ss.hasPermission('tool:job:exec')")
     @OperationLog(title = "定时任务", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> start(@Parameter(description = "任务ID") @PathVariable("jobId") Long jobId) {
         Assert.notNull(jobId, "任务ID不能为空");
@@ -122,7 +122,7 @@ public class JobController extends BaseController {
      */
     @PostMapping("/pause/{jobId:\\d+}")
     @Operation(summary = "暂停任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:changeStatus')")
+    @PreAuthorize("@ss.hasPermission('tool:job:pause')")
     @OperationLog(title = "定时任务", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> pause(@Parameter(description = "任务ID") @PathVariable("jobId") Long jobId) {
         Assert.notNull(jobId, "任务ID不能为空");
@@ -136,7 +136,7 @@ public class JobController extends BaseController {
     @PostMapping("/resume/{jobId:\\d+}")
     @Operation(summary = "恢复任务")
     @OperationLog(title = "定时任务管理", businessType = BusinessType.UPDATE)
-    @PreAuthorize("@ss.hasPermission('tool:job:changeStatus')")
+    @PreAuthorize("@ss.hasPermission('tool:job:resume')")
     public AjaxResult<Void> resume(@Parameter(description = "任务ID") @PathVariable("jobId") Long jobId) {
         Assert.notNull(jobId, "任务ID不能为空");
         boolean result = sysJobService.resumeJob(jobId);
@@ -148,7 +148,7 @@ public class JobController extends BaseController {
      */
     @PostMapping("/run/{jobId:\\d+}")
     @Operation(summary = "立即执行任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:changeStatus')")
+    @PreAuthorize("@ss.hasPermission('tool:job:run')")
     @OperationLog(title = "定时任务", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> run(@Parameter(description = "任务ID") @PathVariable("jobId") Long jobId) {
         Assert.notNull(jobId, "任务ID不能为空");
@@ -161,7 +161,7 @@ public class JobController extends BaseController {
      */
     @PostMapping("/batch")
     @Operation(summary = "批量操作任务")
-    @PreAuthorize("@ss.hasPermission('tool:job:changeStatus')")
+    @PreAuthorize("@ss.hasPermission('tool:job:batch')")
     @OperationLog(title = "定时任务", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> batchOperate(@Parameter(description = "批量操作参数") @Validated @RequestBody SysJobBatchRequest request) {
         boolean result = sysJobService.batchOperateJobs(request);
@@ -173,7 +173,7 @@ public class JobController extends BaseController {
      */
     @PostMapping("/refresh/{jobId:\\d+}")
     @Operation(summary = "刷新任务状态")
-    @PreAuthorize("@ss.hasPermission('tool:job:query')")
+    @PreAuthorize("@ss.hasPermission('tool:job:refresh')")
     @OperationLog(title = "定时任务管理", businessType = BusinessType.REFRESH)
     public AjaxResult<Void> refresh(@Parameter(description = "任务ID") @PathVariable Long jobId) {
         Assert.notNull(jobId, "任务ID不能为空");
