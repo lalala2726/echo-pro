@@ -55,7 +55,7 @@ public class DictDataController extends BaseController {
      */
     @GetMapping("/{dictType}/list")
     @Operation(summary = "字典数据列表")
-    @PreAuthorize("@ss.hasPermission('system:dict:list')")
+    @PreAuthorize("@ss.hasPermission('system:dict:data:list')")
     public AjaxResult<TableDataResult> listDictData(@PathVariable("dictType") String dictType,
                                                     @Parameter(description = "字典数据列表查询参数")
                                                     @Validated @ParameterObject SysDictDataQueryRequest request) {
@@ -91,7 +91,7 @@ public class DictDataController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "字典数据详情")
-    @PreAuthorize("@ss.hasPermission('system:dict:query')")
+    @PreAuthorize("@ss.hasPermission('system:dict:data:query')")
     public AjaxResult<SysDictDataVo> getDictData(@Parameter(description = "字典数据ID") @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "字典数据ID必须大于0！");
         SysDictData sysDictData = sysDictDataService.getDictDataById(id);
@@ -110,7 +110,7 @@ public class DictDataController extends BaseController {
      */
     @PostMapping
     @Operation(summary = "添加字典数据")
-    @PreAuthorize("@ss.hasPermission('system:dict:add')")
+    @PreAuthorize("@ss.hasPermission('system:dict:data:add')")
     @OperationLog(title = "字典数据", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addDictData(@Parameter(description = "字典数据添加请求参数")
                                         @Validated @RequestBody SysDictDataAddRequest request) {
@@ -130,7 +130,7 @@ public class DictDataController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改字典数据")
-    @PreAuthorize("@ss.hasPermission('system:dict:edit')")
+    @PreAuthorize("@ss.hasPermission('system:dict:data:update')")
     @OperationLog(title = "字典数据", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateDictData(@Parameter(description = "字典数据修改请求参数")
                                            @Validated @RequestBody SysDictDataUpdateRequest request) {
@@ -146,7 +146,7 @@ public class DictDataController extends BaseController {
      */
     @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除字典数据")
-    @PreAuthorize("@ss.hasPermission('system:dict:remove')")
+    @PreAuthorize("@ss.hasPermission('system:dict:data:delete')")
     @OperationLog(title = "字典数据", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteDictData(@Parameter(description = "字典数据ID列表") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "字典数据ID不能为空！");

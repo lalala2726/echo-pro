@@ -46,7 +46,7 @@ public class JobLogController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取定时任务日志列表")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:list')")
+    @PreAuthorize("@ss.hasPermission('tool:job:log:list')")
     public AjaxResult<TableDataResult> list(@Parameter(description = "定时任务日志查询参数")
                                             @Validated @ParameterObject SysJobLogQueryRequest request) {
         Page<SysJobLog> page = sysJobLogService.selectJobLogList(request);
@@ -59,7 +59,7 @@ public class JobLogController extends BaseController {
      */
     @GetMapping("/{jobLogId:\\d+}")
     @Operation(summary = "获取定时任务日志详情")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:query')")
+    @PreAuthorize("@ss.hasPermission('tool:job:log:query')")
     public AjaxResult<SysJobLogVo> getInfo(@Parameter(description = "日志ID") @PathVariable("jobLogId") Long jobLogId) {
         Assert.notNull(jobLogId, "日志ID不能为空");
         SysJobLog sysJobLog = sysJobLogService.selectJobLogById(jobLogId);
@@ -72,7 +72,7 @@ public class JobLogController extends BaseController {
      */
     @DeleteMapping("/{logIds:\\d+}")
     @Operation(summary = "删除定时任务日志")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:remove')")
+    @PreAuthorize("@ss.hasPermission('tool:job:log:delete')")
     @OperationLog(title = "定时任务日志", businessType = BusinessType.DELETE)
     public AjaxResult<Void> remove(@Parameter(description = "日志ID列表，多个用逗号分隔") @PathVariable List<Long> logIds) {
         Assert.notEmpty(logIds, "日志ID不能为空");
@@ -85,7 +85,7 @@ public class JobLogController extends BaseController {
      */
     @DeleteMapping("/clean/all")
     @Operation(summary = "清理所有日志")
-    @PreAuthorize("@ss.hasPermission('tool:job-log:remove')")
+    @PreAuthorize("@ss.hasPermission('tool:job:log:delete')")
     @OperationLog(title = "定时任务调度日志", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanAll() {
         int count = sysJobLogService.cleanAllLogs();
