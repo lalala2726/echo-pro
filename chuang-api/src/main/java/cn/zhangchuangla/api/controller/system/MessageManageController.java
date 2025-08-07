@@ -113,7 +113,7 @@ public class MessageManageController extends BaseController {
      * 修改系统消息表
      */
     @Operation(summary = "修改系统消息表")
-    @PreAuthorize("@ss.hasPermission('system.message:edit')")
+    @PreAuthorize("@ss.hasPermission('system.message:update')")
     @PutMapping
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateSysMessage(@Parameter(description = "修改系统消息表请求参数")
@@ -126,7 +126,7 @@ public class MessageManageController extends BaseController {
      * 删除系统消息表
      */
     @Operation(summary = "删除系统消息表")
-    @PreAuthorize("@ss.hasPermission('system.message:remove')")
+    @PreAuthorize("@ss.hasPermission('system.message:delete')")
     @DeleteMapping("/{ids:[\\d,]+}")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteSysMessageByIds(@Parameter(description = "系统消息表ID集合，支持批量删除")

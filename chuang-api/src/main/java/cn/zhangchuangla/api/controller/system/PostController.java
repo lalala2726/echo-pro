@@ -83,7 +83,7 @@ public class PostController extends BaseController {
      * @return 操作结果
      */
     @DeleteMapping("/{ids:[\\d,]+}")
-    @PreAuthorize("@ss.hasPermission('system:post:remove')")
+    @PreAuthorize("@ss.hasPermission('system:post:delete')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除岗位")
     public AjaxResult<Void> deletePost(@Parameter(description = "岗位ID集合，支持批量删除") @PathVariable("ids") List<Long> ids) {

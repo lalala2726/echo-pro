@@ -117,7 +117,7 @@ public class DictTypeController extends BaseController {
      */
     @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除字典类型")
-    @PreAuthorize("@ss.hasPermission('system:dict-type:remove')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:delete')")
     @OperationLog(title = "字典类型", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteDictType(@Parameter(description = "字典类型ID列表") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "字典类型ID不能为空！");

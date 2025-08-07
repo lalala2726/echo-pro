@@ -100,7 +100,7 @@ public class NoticeController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改公告", description = "修改公告信息")
-    @PreAuthorize("@ss.hasPermission('system:notice:edit')")
+    @PreAuthorize("@ss.hasPermission('system:notice:update')")
     @OperationLog(title = "公告管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> edit(@Parameter(description = "公告信息") @Validated @RequestBody SysNoticeUpdateRequest request) {
         boolean result = sysNoticeService.updateNotice(request);
@@ -115,7 +115,7 @@ public class NoticeController extends BaseController {
      */
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除公告", description = "批量删除公告")
-    @PreAuthorize("@ss.hasPermission('system:notice:remove')")
+    @PreAuthorize("@ss.hasPermission('system:notice:delete')")
     @OperationLog(title = "公告管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> remove(@Parameter(description = "公告ID列表，多个用逗号分隔") @PathVariable List<Long> ids) {
         Assert.notEmpty(ids, "公告ID不能为空");
