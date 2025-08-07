@@ -215,6 +215,20 @@ public class StorageConfigController extends BaseController {
     }
 
     /**
+     * 取消文件主配置
+     *
+     * @return 操作结果
+     */
+    @PutMapping("/cancelPrimary")
+    @Operation(summary = "取消文件主配置")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> resetPrimary() {
+        boolean result = storageConfigService.cancelPrimary();
+        return toAjax(result);
+    }
+
+    /**
      * 刷新文件配置缓存
      *
      * @return 刷新结果

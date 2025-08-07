@@ -277,6 +277,19 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
     }
 
     /**
+     * 取消文件主配置
+     *
+     * @return 是否取消成功
+     */
+    @Override
+    public boolean cancelPrimary() {
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>().eq(StorageConfig::getIsPrimary, true);
+        StorageConfig storageConfig = new StorageConfig();
+        storageConfig.setIsPrimary(false);
+        return update(storageConfig, eq);
+    }
+
+    /**
      * 转换请求参数为存储配置实体对象
      *
      * @param request       请求参数

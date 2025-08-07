@@ -145,4 +145,11 @@ public interface StorageConfigService extends IService<StorageConfig> {
      * @return 存储配置键值选项
      */
     List<Option<String>> getStorageConfigKeyOption();
+
+    /**
+     * 取消文件主配置
+     *
+     * @return 是否取消成功
+     */
+    boolean cancelPrimary();
 }
