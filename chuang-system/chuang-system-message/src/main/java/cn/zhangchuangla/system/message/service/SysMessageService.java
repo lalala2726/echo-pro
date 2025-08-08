@@ -1,7 +1,10 @@
 package cn.zhangchuangla.system.message.service;
 
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
-import cn.zhangchuangla.system.message.model.request.*;
+import cn.zhangchuangla.system.message.model.request.SysMessageQueryRequest;
+import cn.zhangchuangla.system.message.model.request.SysMessageUpdateRequest;
+import cn.zhangchuangla.system.message.model.request.SysSendMessageRequest;
+import cn.zhangchuangla.system.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -33,13 +36,6 @@ public interface SysMessageService extends IService<SysMessage> {
      */
     SysMessageVo getSysMessageById(Long id);
 
-    /**
-     * 新增系统消息表
-     *
-     * @param request 新增请求参数
-     * @return 结果
-     */
-    boolean addSysMessage(SysMessageAddRequest request);
 
     /**
      * 修改系统消息表

@@ -86,18 +86,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         return sysMessageVo;
     }
 
-    /**
-     * 新增系统消息表
-     *
-     * @param request 新增请求参数
-     * @return 结果
-     */
-    @Override
-    public boolean addSysMessage(SysMessageAddRequest request) {
-        SysMessage sysMessage = new SysMessage();
-        BeanUtils.copyProperties(request, sysMessage);
-        return save(sysMessage);
-    }
 
     /**
      * 修改系统消息表

@@ -3,7 +3,6 @@ package cn.zhangchuangla.system.message.model.vo.system;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +51,6 @@ public class SysMessageVo {
      */
     private List<Long> targetIds;
 
-
     /**
      * 发送者姓名
      */
@@ -65,23 +63,11 @@ public class SysMessageVo {
     @Schema(description = "目标类型：1-指定用户 2-全部用户 3-角色用户")
     private Integer targetType;
 
-
-    /**
-     * 是否已发布：0-未发布 1-已发布
-     */
-    @Schema(description = "是否已发布：0-未发布 1-已发布")
-    private Integer isPublished;
-
     /**
      * 发布时间
      */
     @Schema(description = "发布时间")
     private Date publishTime;
 
-    /**
-     * 过期时间，NULL表示不过期
-     */
-    @Schema(description = "过期时间，NULL表示不过期")
-    private LocalDateTime expireTime;
 
 }
