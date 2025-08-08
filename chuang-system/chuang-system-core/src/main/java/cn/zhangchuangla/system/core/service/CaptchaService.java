@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.core.service;
 
 import cn.zhangchuangla.system.core.model.request.CaptchaRequest;
+import cn.zhangchuangla.system.core.model.vo.captcha.CaptchaImageVo;
 
 /**
  * @author Chuang
@@ -31,6 +32,12 @@ public interface CaptchaService {
      * @return 验证结果
      */
     boolean verify(CaptchaRequest request);
+
+    /**
+     * 生成图形验证码（按类型 numeric/alpha/alphanumeric）
+     * 返回 uuid 与 Base64 图片
+     */
+    CaptchaImageVo generateImageCaptcha();
 
     /**
      * 验证邮箱验证码是否有效

@@ -2,13 +2,17 @@ package cn.zhangchuangla.system.core.service.impl;
 
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.CaptchaUtils;
+import cn.zhangchuangla.common.core.utils.ImageCaptchaUtils;
+import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.core.model.request.CaptchaRequest;
+import cn.zhangchuangla.system.core.model.vo.captcha.CaptchaImageVo;
 import cn.zhangchuangla.system.core.service.CaptchaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CaptchaServiceImpl implements CaptchaService {
 
-    private final static String CAPTCHA_CODE_KEY = "captcha:code:";
+    private final static String CAPTCHA_CODE_KEY = RedisConstants.CAPTCHA_CODE;
     private final RedisCache redisCache;
     private final long timeout = 5;
 
@@ -47,6 +51,15 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     @Override
     public boolean verify(CaptchaRequest request) {
+        Assert.notEmpty(request.getUid(), "验证码唯一标识不能为空");
+        Assert.notEmpty(request.getCode(), "验证码不能为空");
+        String redisKey = CAPTCHA_CODE_KEY + request.getUid();
+        String redisCode = redisCache.getCacheObject(redisKey);
+        Assert.hasText(redisCode, "验证码已过期");
+        if (redisCode.equalsIgnoreCase(request.getCode())) {
+            redisCache.deleteObject(redisKey);
+            return true;
+        }
         return false;
     }
 
@@ -58,8 +71,8 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     @Override
     public boolean verifyEmail(String email, String code) {
-        Assert.hasText(code, "验证码不能为空");
-        Assert.hasText(email, "邮箱不能为空");
+        Assert.notEmpty(code, "验证码不能为空");
+        Assert.notEmpty(email, "邮箱不能为空");
         String redisKey = CAPTCHA_CODE_KEY + email;
         String redisCode = redisCache.getCacheObject(redisKey);
         Assert.hasText(redisCode, "验证码已过期");
@@ -79,8 +92,8 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     @Override
     public boolean verifyPhone(String phone, String code) {
-        Assert.hasText(phone, "手机不能为空");
-        Assert.hasText(code, "验证码不能为空");
+        Assert.notEmpty(phone, "手机不能为空");
+        Assert.notEmpty(code, "验证码不能为空");
         String redisKey = CAPTCHA_CODE_KEY + phone;
         String redisCode = redisCache.getCacheObject(redisKey);
         Assert.hasText(redisCode, "验证码已过期");
@@ -89,6 +102,21 @@ public class CaptchaServiceImpl implements CaptchaService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public CaptchaImageVo generateImageCaptcha() {
+        String code = CaptchaUtils.randomAlphanumeric(4, true);
+
+        String uuid = UUID.randomUUID().toString();
+        String base64 = ImageCaptchaUtils.generateBase64Png(code, 160, 50);
+        // 存储到Redis，大小写不敏感校验采用统一大写
+        redisCache.setCacheObject(CAPTCHA_CODE_KEY + uuid, code.toUpperCase(), timeout, TimeUnit.MINUTES);
+
+        CaptchaImageVo vo = new CaptchaImageVo();
+        vo.setUuid(uuid);
+        vo.setImgBase64(base64);
+        return vo;
     }
 
 
