@@ -53,11 +53,6 @@ public class SysMessage {
     private Integer level;
 
     /**
-     * 发送者ID，NULL表示系统发送
-     */
-    private Long senderId;
-
-    /**
      * 发送者姓名
      */
     private String senderName;
@@ -67,31 +62,10 @@ public class SysMessage {
      */
     private Integer targetType;
 
-
-    /**
-     * 推送方式：1-仅站内信 2-仅WebSocket 3-站内信+WebSocket
-     */
-    private Integer pushType;
-
-    /**
-     * 是否已发布：0-未发布 1-已发布
-     */
-    private Integer isPublished;
-
     /**
      * 发布时间
      */
     private Date publishTime;
-
-    /**
-     * 定时发送时间，NULL表示立即发送
-     */
-    private Date scheduledTime;
-
-    /**
-     * 过期时间，NULL表示不过期
-     */
-    private Date expireTime;
 
     /**
      * 是否删除：0-未删除 1-已删除

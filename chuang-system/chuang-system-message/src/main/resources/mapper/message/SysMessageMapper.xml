@@ -10,14 +10,9 @@
         <result property="content" column="content"/>
         <result property="type" column="type"/>
         <result property="level" column="level"/>
-        <result property="senderId" column="sender_id"/>
         <result property="senderName" column="sender_name"/>
         <result property="targetType" column="target_type"/>
-        <result property="pushType" column="push_type"/>
-        <result property="isPublished" column="is_published"/>
         <result property="publishTime" column="publish_time"/>
-        <result property="scheduledTime" column="scheduled_time"/>
-        <result property="expireTime" column="expire_time"/>
         <result property="isDeleted" column="is_deleted"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
@@ -31,14 +26,9 @@
                content,
                type,
                level,
-               sender_id,
                sender_name,
                target_type,
-               push_type,
-               is_published,
                publish_time,
-               scheduled_time,
-               expire_time,
                is_deleted,
                create_time,
                update_time,
@@ -59,14 +49,9 @@
         IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
         sm.type AS type,
         sm.level AS level,
-        sm.sender_id AS sender_id,
         sm.sender_name AS sender_name,
         sm.target_type AS target_type,
-        sm.push_type AS push_type,
-        sm.is_published AS is_published,
         sm.publish_time AS publish_time,
-        sm.scheduled_time AS scheduled_time,
-        sm.expire_time AS expire_time,
         sm.is_deleted AS is_deleted,
         sm.create_time AS create_time,
         sm.update_time AS update_time,
@@ -111,14 +96,9 @@
                         sm.content        AS content,
                         sm.type           AS type,
                         sm.level          AS level,
-                        sm.sender_id      AS sender_id,
                         sm.sender_name    AS sender_name,
                         sm.target_type    AS target_type,
-                        sm.push_type      AS push_type,
-                        sm.is_published   AS is_published,
                         sm.publish_time   AS publish_time,
-                        sm.scheduled_time AS scheduled_time,
-                        sm.expire_time    AS expire_time,
                         sm.is_deleted     AS is_deleted,
                         sm.create_time    AS create_time,
                         sm.update_time    AS update_time,
@@ -160,14 +140,9 @@
         sm.content AS content,
         sm.type AS type,
         sm.level AS level,
-        sm.sender_id AS sender_id,
         sm.sender_name AS sender_name,
         sm.target_type AS target_type,
-        sm.push_type AS push_type,
-        sm.is_published AS is_published,
         sm.publish_time AS publish_time,
-        sm.scheduled_time AS scheduled_time,
-        sm.expire_time AS expire_time,
         sm.is_deleted AS is_deleted,
         sm.create_time AS create_time,
         sm.update_time AS update_time,
@@ -189,36 +164,7 @@
         </foreach>
         AND sm.is_deleted = 0
     </select>
-    <select id="pageUserSentMessage" resultType="cn.zhangchuangla.system.message.model.entity.SysMessage">
-        select id,
-        title,
-        content,
-        type,
-        level,
-        sender_id,
-        sender_name,
-        target_type,
-        push_type,
-        is_published,
-        publish_time,
-        scheduled_time,
-        expire_time,
-        is_deleted,
-        create_time,
-        update_time,
-        create_by,
-        update_by
-        from sys_message
-        <where>
-            <if test="request != null">
-                <if test="request.title != null and request.title != '' or request.content != null and request.content !=''">
-                    AND (title LIKE CONCAT('%', #{request.title}, '%') or (content like CONCAT('%', #{request.content},
-                    '%')))
-                </if>
-            </if>
-            and sender_id = #{userId}
-        </where>
-    </select>
+    <!-- 删除 pageUserSentMessage 语句（依赖 sender_id 字段） -->
     <!-- 分页查询用户已读消息 -->
     <select id="pageUserMessageIsRead" resultMap="BaseResultMap">
         SELECT DISTINCT sm.id AS id,
@@ -226,14 +172,9 @@
         IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
         sm.type AS type,
         sm.level AS level,
-        sm.sender_id AS sender_id,
         sm.sender_name AS sender_name,
         sm.target_type AS target_type,
-        sm.push_type AS push_type,
-        sm.is_published AS is_published,
         sm.publish_time AS publish_time,
-        sm.scheduled_time AS scheduled_time,
-        sm.expire_time AS expire_time,
         sm.is_deleted AS is_deleted,
         sm.create_time AS create_time,
         sm.update_time AS update_time,
@@ -289,14 +230,9 @@
         IF(CHAR_LENGTH(sm.content) > 50, CONCAT(LEFT(sm.content, 50), '......'), sm.content) AS content,
         sm.type AS type,
         sm.level AS level,
-        sm.sender_id AS sender_id,
         sm.sender_name AS sender_name,
         sm.target_type AS target_type,
-        sm.push_type AS push_type,
-        sm.is_published AS is_published,
         sm.publish_time AS publish_time,
-        sm.scheduled_time AS scheduled_time,
-        sm.expire_time AS expire_time,
         sm.is_deleted AS is_deleted,
         sm.create_time AS create_time,
         sm.update_time AS update_time,
