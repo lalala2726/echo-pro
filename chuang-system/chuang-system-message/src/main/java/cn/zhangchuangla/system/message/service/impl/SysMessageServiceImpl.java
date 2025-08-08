@@ -209,9 +209,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         // XSS 清洗
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = new SysMessage();
-        BeanUtils.copyProperties(message, sysMessage);
-        sysMessage.setSenderName(senderName);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_USER);
         return sendMessageByUserId(receiveId, sysMessage);
     }
 
@@ -245,16 +243,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_ROLE)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
-        // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_ROLE);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -313,16 +305,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_DEPT)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
-        // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_DEPT);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -357,18 +343,23 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 结果
      */
     private boolean sendMessageToAll(SysSendMessageRequest request, String senderName) {
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
         // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_ALL);
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
+    }
+
+    private SysMessage buildBaseSysMessage(MessageRequest message, String senderName, int targetType) {
+        SysMessage sysMessage = SysMessage.builder()
+                .targetType(targetType)
+                .senderName(senderName)
+                .createTime(new Date())
+                .build();
+        BeanUtils.copyProperties(message, sysMessage);
+        return sysMessage;
     }
 
     /**
