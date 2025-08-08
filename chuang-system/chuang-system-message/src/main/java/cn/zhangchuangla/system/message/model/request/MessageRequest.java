@@ -3,8 +3,6 @@ package cn.zhangchuangla.system.message.model.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * @author Chuang
  * <p>
@@ -37,29 +35,5 @@ public class MessageRequest {
      */
     @Schema(description = "消息级别：1-普通 2-重要 3-紧急", type = "integer", example = "1")
     private Integer level;
-
-    /**
-     * 推送方式：1-仅站内信 2-仅WebSocket 3-站内信+WebSocket
-     */
-    @Schema(description = "推送方式：1-仅站内信 2-仅WebSocket 3-站内信+WebSocket", type = "integer", example = "1")
-    private Integer pushType;
-
-    /**
-     * 是否已发布：0-未发布 1-已发布
-     */
-    @Schema(description = "是否已发布：0-未发布 1-已发布", type = "integer", example = "0")
-    private Integer isPublished;
-
-    /**
-     * 定时发送时间，NULL表示立即发送
-     */
-    @Schema(description = "定时发送时间，NULL表示立即发送", type = "LocalDateTime")
-    private LocalDateTime scheduledTime;
-
-    /**
-     * 过期时间，NULL表示不过期
-     */
-    @Schema(description = "过期时间，NULL表示不过期", type = "LocalDateTime")
-    private LocalDateTime expireTime;
 
 }

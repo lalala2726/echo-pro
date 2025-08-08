@@ -58,7 +58,7 @@ public class OnlineDeviceController extends BaseController {
     @Operation(summary = "删除设备", description = "删除设备会删除关联的会话")
     @DeleteMapping
     @OperationLog(title = "会话管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@ss.hasPermission('system:session:delete')")
+    @PreAuthorize("@ss.hasPermission('system:online-device:delete')")
     public AjaxResult<Void> deleteSession(@RequestParam("refreshTokenId") String refreshTokenId) {
         boolean result = deviceService.deleteDevice(refreshTokenId);
         return result ? success() : error();
@@ -73,7 +73,7 @@ public class OnlineDeviceController extends BaseController {
      */
     @PostMapping("/export")
     @OperationLog(title = "会话管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermission('system:session:export')")
+    @PreAuthorize("@ss.hasPermission('system:online-device:export')")
     public void exportSession(@RequestBody SessionDeviceQueryRequest request, HttpServletResponse response) {
         request.setPageNum(-1);
         request.setPageNum(-1);

@@ -50,7 +50,7 @@ public class OperationLogController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取操作日志列表")
-    @PreAuthorize("@ss.hasPermission('system:log:list')")
+    @PreAuthorize("@ss.hasPermission('system:log-operation:list')")
     public AjaxResult<TableDataResult> listOperationLog(@Parameter(description = "操作日志列表查询参数")
                                                         @Validated @ParameterObject SysOperationLogQueryRequest request) {
         Page<SysOperationLog> sysOperationLogPage = sysOperationLogService.listOperationLog(request);
@@ -79,7 +79,7 @@ public class OperationLogController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "获取操作日志详情")
-    @PreAuthorize("@ss.hasPermission('system:log:query')")
+    @PreAuthorize("@ss.hasPermission('system:log-operation:query')")
     public AjaxResult<SysOperationLogVo> getOperationLogById(@Parameter(description = "操作日志ID")
                                                              @PathVariable("id") Long id) {
         SysOperationLog sysOperationLog = sysOperationLogService.getOperationLogById(id);
@@ -95,7 +95,7 @@ public class OperationLogController extends BaseController {
      */
     @DeleteMapping("/clean")
     @Operation(summary = "清空操作日志")
-    @PreAuthorize("@ss.hasPermission('system:log:delete')")
+    @PreAuthorize("@ss.hasPermission('system:log-operation:clean')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanOperationLog() {
         boolean result = sysOperationLogService.cleanOperationLog();

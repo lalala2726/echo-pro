@@ -49,7 +49,7 @@ public class LoginLogController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "获取登录日志列表")
-    @PreAuthorize("@ss.hasPermission('system:log:list')")
+    @PreAuthorize("@ss.hasPermission('system:log-login:list')")
     public AjaxResult<TableDataResult> listLoginLog(@Parameter(description = "登录日志列表查询参数")
                                                     @Validated @ParameterObject SysLoginLogQueryRequest request) {
         Page<SysLoginLog> sysLoginLogPage = sysLoginLogService.listLoginLog(request);
@@ -82,7 +82,7 @@ public class LoginLogController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "获取登录日志详情")
-    @PreAuthorize("@ss.hasPermission('system:log:query')")
+    @PreAuthorize("@ss.hasPermission('system:log-login:query')")
     public AjaxResult<SysLoginLogVo> getLoginLogById(@Parameter(description = "登录日志ID")
                                                      @PathVariable("id") Long id) {
         SysLoginLog sysLoginLog = sysLoginLogService.getLoginLogById(id);
@@ -99,7 +99,7 @@ public class LoginLogController extends BaseController {
      */
     @DeleteMapping("/clean")
     @Operation(summary = "清空登录日志")
-    @PreAuthorize("@ss.hasPermission('system:log:delete')")
+    @PreAuthorize("@ss.hasPermission('system:log-login:clean')")
     @OperationLog(title = "日志管理", businessType = BusinessType.CLEAN)
     public AjaxResult<Void> cleanLoginLog() {
         boolean result = sysLoginLogService.cleanLoginLog();

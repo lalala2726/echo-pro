@@ -8,7 +8,6 @@ import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
-import cn.zhangchuangla.system.message.model.request.SysMessageAddRequest;
 import cn.zhangchuangla.system.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.system.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.system.message.model.request.SysSendMessageRequest;
@@ -78,6 +77,7 @@ public class MessageManageController extends BaseController {
     @GetMapping("/export")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
     public void export(HttpServletResponse response) {
+        //todo 只导出消息的基本信息,不会导出详细的发送详细信息
         List<SysMessage> list = sysMessageService.list();
         List<SysMessageListVo> voList = copyListProperties(list, SysMessageListVo.class);
         excelExporter.exportExcel(response, voList, SysMessageListVo.class, "系统消息表列表");
@@ -97,23 +97,10 @@ public class MessageManageController extends BaseController {
     }
 
     /**
-     * 新增系统消息表
-     */
-    @Operation(summary = "新增系统消息表")
-    @PreAuthorize("@ss.hasPermission('system.message:add')")
-    @PostMapping
-    @OperationLog(title = "系统消息表管理", businessType = BusinessType.INSERT)
-    public AjaxResult<Void> addSysMessage(@Parameter(description = "新增系统消息表请求参数")
-                                          @Validated @RequestBody SysMessageAddRequest request) {
-        boolean result = sysMessageService.addSysMessage(request);
-        return toAjax(result);
-    }
-
-    /**
      * 修改系统消息表
      */
     @Operation(summary = "修改系统消息表")
-    @PreAuthorize("@ss.hasPermission('system.message:edit')")
+    @PreAuthorize("@ss.hasPermission('system.message:update')")
     @PutMapping
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateSysMessage(@Parameter(description = "修改系统消息表请求参数")
@@ -126,7 +113,7 @@ public class MessageManageController extends BaseController {
      * 删除系统消息表
      */
     @Operation(summary = "删除系统消息表")
-    @PreAuthorize("@ss.hasPermission('system.message:remove')")
+    @PreAuthorize("@ss.hasPermission('system.message:delete')")
     @DeleteMapping("/{ids:[\\d,]+}")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteSysMessageByIds(@Parameter(description = "系统消息表ID集合，支持批量删除")

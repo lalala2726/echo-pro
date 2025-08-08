@@ -39,7 +39,7 @@ public class OnlineSessionController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "会话列表")
-    @PreAuthorize("@ss.hasPermission('system:online:session:list')")
+    @PreAuthorize("@ss.hasPermission('system:online-session:list')")
     public AjaxResult<TableDataResult> sessionList(OnlineUserQueryRequest request) {
         PageResult<OnlineLoginUser> onlineUserPageResult = sessionService.sessionList(request);
         return getTableData(onlineUserPageResult);
@@ -53,7 +53,7 @@ public class OnlineSessionController extends BaseController {
      */
     @GetMapping("/detail")
     @Operation(summary = "会话详情")
-    @PreAuthorize("@ss.hasPermission('system:online:session:query')")
+    @PreAuthorize("@ss.hasPermission('system:online-session:query')")
     public AjaxResult<OnlineLoginUser> sessionDetail(@RequestParam("accessTokenId") String accessTokenId) {
         OnlineLoginUser onlineLoginUser = sessionService.sessionDetail(accessTokenId);
         return AjaxResult.success(onlineLoginUser);
@@ -68,7 +68,7 @@ public class OnlineSessionController extends BaseController {
     @DeleteMapping
     @Operation(summary = "删除会话")
     @OperationLog(title = "会话管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@ss.hasPermission('system:online:session:delete')")
+    @PreAuthorize("@ss.hasPermission('system:online-session:delete')")
     public AjaxResult<Void> deleteSession(@RequestParam("accessTokenId") String accessTokenId) {
         boolean result = sessionService.deleteSession(accessTokenId);
         return toAjax(result);

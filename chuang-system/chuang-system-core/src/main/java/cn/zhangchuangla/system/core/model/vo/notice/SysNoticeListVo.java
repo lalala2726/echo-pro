@@ -37,27 +37,6 @@ public class SysNoticeListVo {
     private String noticeType;
 
     /**
-     * 公告类型描述
-     */
-    @Schema(description = "公告类型描述")
-    @Excel(name = "公告类型描述")
-    private String noticeTypeDesc;
-
-    /**
-     * 公告状态（0正常 1关闭）
-     */
-    @Schema(description = "公告状态（0正常 1关闭）")
-    @Excel(name = "公告状态（0正常 1关闭）")
-    private Integer status;
-
-    /**
-     * 公告状态描述
-     */
-    @Schema(description = "公告状态描述")
-    @Excel(name = "公告状态描述")
-    private String statusDesc;
-
-    /**
      * 创建时间
      */
     @Schema(description = "创建时间")

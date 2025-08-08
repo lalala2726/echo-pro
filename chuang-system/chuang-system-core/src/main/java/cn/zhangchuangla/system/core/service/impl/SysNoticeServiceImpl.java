@@ -2,6 +2,7 @@ package cn.zhangchuangla.system.core.service.impl;
 
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.XssUtils;
 import cn.zhangchuangla.system.core.mapper.SysNoticeMapper;
 import cn.zhangchuangla.system.core.model.entity.SysNotice;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeAddRequest;
@@ -27,7 +28,8 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice> implements SysNoticeService {
+public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice>
+        implements SysNoticeService {
 
     private final SysNoticeMapper sysNoticeMapper;
 
@@ -49,6 +51,9 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         if (isNoticeTitleExist(request.getNoticeTitle(), null)) {
             throw new ServiceException("公告标题已存在");
         }
+        // XSS 清洗公告标题与内容
+        request.setNoticeTitle(XssUtils.sanitizeHtml(request.getNoticeTitle()));
+        request.setNoticeContent(XssUtils.sanitizeHtml(request.getNoticeContent()));
 
         SysNotice sysNotice = new SysNotice();
         BeanUtils.copyProperties(request, sysNotice);
@@ -65,6 +70,10 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         if (existingNotice == null) {
             throw new ServiceException("公告不存在");
         }
+
+        // XSS 清洗公告标题与内容
+        request.setNoticeTitle(XssUtils.sanitizeHtml(request.getNoticeTitle()));
+        request.setNoticeContent(XssUtils.sanitizeHtml(request.getNoticeContent()));
 
         // 检查标题是否存在
         if (isNoticeTitleExist(request.getNoticeTitle(), request.getId())) {
@@ -104,7 +113,13 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
      */
     @Override
     public List<SysNotice> exportNoticeList(SysNoticeQueryRequest request) {
-        //todo 这边公告是富文本参数,这边需要将这边转换一下
-        return sysNoticeMapper.exportNoticeList(request);
+        List<SysNotice> list = sysNoticeMapper.exportNoticeList(request);
+        // 导出时仅保留纯文字，避免富文本中的潜在XSS
+        list.forEach(n -> {
+            if (n.getNoticeContent() != null) {
+                n.setNoticeContent(XssUtils.extractPlainText(n.getNoticeContent()));
+            }
+        });
+        return list;
     }
 }

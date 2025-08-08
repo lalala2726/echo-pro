@@ -125,7 +125,7 @@ public class DeptController extends BaseController {
     @DeleteMapping("/{ids:[\\d,]+}")
     @OperationLog(title = "部门管理", businessType = BusinessType.DELETE)
     @Operation(summary = "删除部门")
-    @PreAuthorize("@ss.hasPermission('system:dept:remove')")
+    @PreAuthorize("@ss.hasPermission('system:dept:delete')")
     public AjaxResult<Void> deleteDept(
             @Parameter(description = "部门ID集合，支持批量删除，批量删除时其中一个删除失败全部将会失败")
             @PathVariable List<Long> ids) {

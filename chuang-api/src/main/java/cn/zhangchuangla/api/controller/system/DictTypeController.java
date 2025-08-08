@@ -49,7 +49,7 @@ public class DictTypeController extends BaseController {
      */
     @GetMapping("/list")
     @Operation(summary = "字典类型列表")
-    @PreAuthorize("@ss.hasPermission('system:dict:type:list')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:list')")
     public AjaxResult<TableDataResult> listDictType(@Parameter(description = "字典类型列表查询参数")
                                                     @Validated @ParameterObject SysDictTypeQueryRequest request) {
         Page<SysDictType> sysDictTypePage = sysDictTypeService.listDictType(request);
@@ -65,7 +65,7 @@ public class DictTypeController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "字典类型详情")
-    @PreAuthorize("@ss.hasPermission('system:dict:type:query')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:query')")
     public AjaxResult<SysDictTypeVo> getDictType(@Parameter(description = "字典类型ID") @PathVariable("id") Long id) {
         Assert.notNull(id, "字典类型ID不能为空！");
         Assert.isTrue(id > 0, "字典类型ID必须大于0！");
@@ -85,7 +85,7 @@ public class DictTypeController extends BaseController {
      */
     @PostMapping
     @Operation(summary = "添加字典类型")
-    @PreAuthorize("@ss.hasPermission('system:dict:type:add')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:add')")
     @OperationLog(title = "字典类型", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addDictType(@Parameter(description = "字典类型添加请求参数")
                                         @Validated @RequestBody SysDictTypeAddRequest request) {
@@ -101,7 +101,7 @@ public class DictTypeController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "修改字典类型")
-    @PreAuthorize("@ss.hasPermission('system:dict:type:update')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:update')")
     @OperationLog(title = "字典类型", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateDictType(@Parameter(description = "字典类型修改请求参数")
                                            @Validated @RequestBody SysDictTypeUpdateRequest request) {
@@ -117,7 +117,7 @@ public class DictTypeController extends BaseController {
      */
     @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除字典类型")
-    @PreAuthorize("@ss.hasPermission('system:dict:type:remove')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:delete')")
     @OperationLog(title = "字典类型", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteDictType(@Parameter(description = "字典类型ID列表") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "字典类型ID不能为空！");
@@ -131,7 +131,7 @@ public class DictTypeController extends BaseController {
      *
      * @return 所有字典类型选项
      */
-    @PreAuthorize("@ss.hasPermission('system:dict:type:list')")
+    @PreAuthorize("@ss.hasPermission('system:dict-type:list')")
     @Operation(summary = "获取所有字典类型选项")
     @GetMapping("/options")
     public AjaxResult<List<Option<String>>> getAllDictType() {

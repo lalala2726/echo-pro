@@ -50,7 +50,7 @@ public class StorageConfigController extends BaseController {
      */
     @Operation(summary = "文件配置列表", description = "文件配置列表")
     @GetMapping("/list")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:list')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:list')")
     public AjaxResult<TableDataResult> listSysFileConfig(@Parameter(description = "文件配置列表查询参数")
                                                              @ParameterObject StorageConfigQueryRequest request) {
         Page<StorageConfig> sysFileConfigPage = storageConfigService.listSysFileConfig(request);
@@ -67,7 +67,7 @@ public class StorageConfigController extends BaseController {
      */
     @Operation(summary = "导出存储配置")
     @PostMapping("/export")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:export')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:export')")
     public void exportStorageConfig(@ParameterObject StorageConfigQueryRequest request, HttpServletResponse response) {
         List<StorageConfigUnifiedVo> storageConfigUnifiedVos = storageConfigService.listStorageConfig(request);
         excelExporter.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
@@ -109,7 +109,7 @@ public class StorageConfigController extends BaseController {
      */
     @PostMapping("/minio")
     @Operation(summary = "添加Minio存储配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addMinioConfig(@Validated @RequestBody MinioConfigSaveRequest request) {
         boolean result = storageConfigService.addMinioConfig(request);
@@ -124,7 +124,7 @@ public class StorageConfigController extends BaseController {
      */
     @PostMapping("/aliyun")
     @Operation(summary = "添加阿里云OSS存储配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
     public AjaxResult<Void> addAliyunOssConfig(@Validated @RequestBody AliyunOssConfigSaveRequest request) {
         boolean result = storageConfigService.addAliyunOssConfig(request);
@@ -141,7 +141,7 @@ public class StorageConfigController extends BaseController {
     @PostMapping("/tencent")
     @Operation(summary = "添加腾讯云COS存储配置")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
-    @PreAuthorize("@ss.hasPermission('system:storage:config:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     public AjaxResult<Void> addTencentCosConfig(@Validated @RequestBody TencentCosConfigSaveRequest request) {
         boolean result = storageConfigService.addTencentCosConfig(request);
         return toAjax(result);
@@ -156,7 +156,7 @@ public class StorageConfigController extends BaseController {
     @PostMapping("/amaze")
     @Operation(summary = "添加亚马逊S3存储配置", description = "兼容S3协议可以使用此接口")
     @OperationLog(title = "存储配置", businessType = BusinessType.INSERT)
-    @PreAuthorize("@ss.hasPermission('system:storage:config:add')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:add')")
     public AjaxResult<Void> addAmazonS3Config(@Validated @RequestBody AmazonS3ConfigSaveRequest request) {
         boolean result = storageConfigService.addAmazonS3Config(request);
         return toAjax(result);
@@ -171,7 +171,7 @@ public class StorageConfigController extends BaseController {
      */
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "获取存储配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:query')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:query')")
     public AjaxResult<StorageConfigUnifiedVo> getStorageConfigById(@PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "存储配置ID必须大于0！");
         StorageConfigUnifiedVo storageConfig = storageConfigService.getStorageConfigById(id);
@@ -185,7 +185,7 @@ public class StorageConfigController extends BaseController {
      * @return 修改结果
      */
     @Operation(summary = "修改存储配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:update')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
     @OperationLog(title = "存储配置", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> updateStorageConConfig(@Validated @RequestBody StorageConfigUpdateRequest request) {
@@ -201,7 +201,7 @@ public class StorageConfigController extends BaseController {
      */
     @PutMapping("/primary/{id:\\d+}")
     @Operation(summary = "设置主配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:update')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> updatePrimaryConfig(@Parameter(description = "文件配置ID")
                                                 @PathVariable("id") Long id) {
@@ -215,12 +215,26 @@ public class StorageConfigController extends BaseController {
     }
 
     /**
+     * 取消文件主配置
+     *
+     * @return 操作结果
+     */
+    @PutMapping("/cancelPrimary")
+    @Operation(summary = "取消文件主配置")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:update')")
+    @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE)
+    public AjaxResult<Void> resetPrimary() {
+        boolean result = storageConfigService.cancelPrimary();
+        return toAjax(result);
+    }
+
+    /**
      * 刷新文件配置缓存
      *
      * @return 刷新结果
      */
     @PutMapping("/refreshCache")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:refresh')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:refresh')")
     @Operation(summary = "刷新文件配置缓存", description = "通常情况下当修改文件配置后会自动刷新缓存,但如果需要手动刷新可以使用此接口")
     @OperationLog(title = "文件配置", businessType = BusinessType.UPDATE, saveRequestData = false)
     public AjaxResult<Void> refreshCache() {
@@ -236,7 +250,7 @@ public class StorageConfigController extends BaseController {
      */
     @DeleteMapping("/{ids:[\\d,]+}")
     @Operation(summary = "删除文件配置")
-    @PreAuthorize("@ss.hasPermission('system:storage:config:delete')")
+    @PreAuthorize("@ss.hasPermission('system:storage-config:delete')")
     @OperationLog(title = "文件配置", businessType = BusinessType.DELETE, saveRequestData = false)
     public AjaxResult<Void> deleteFileConfig(@Parameter(description = "文件配置ID集合，支持批量删除")
                                              @PathVariable("ids") List<Long> ids) {
