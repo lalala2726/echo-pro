@@ -54,9 +54,9 @@ public class SysMessageQueryRequest extends BasePageRequest {
     private Integer targetType;
 
     /**
-     * 时间范围
+     * 发布时间范围
      */
     @Schema(description = "时间范围")
-    private TimeRange timeRange;
+    private TimeRange publishTimeRange;
 
 }
