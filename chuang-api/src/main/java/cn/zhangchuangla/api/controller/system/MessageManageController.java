@@ -13,7 +13,9 @@ import cn.zhangchuangla.system.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.system.message.model.request.SysSendMessageRequest;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageListVo;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
+import cn.zhangchuangla.system.message.model.vo.system.UserMessageStatusVo;
 import cn.zhangchuangla.system.message.service.SysMessageService;
+import cn.zhangchuangla.system.message.service.UserMessageReadService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +42,7 @@ import java.util.List;
 public class MessageManageController extends BaseController {
 
     private final SysMessageService sysMessageService;
+    private final UserMessageReadService userMessageReadService;
     private final ExcelExporter excelExporter;
 
     /**
@@ -120,5 +123,28 @@ public class MessageManageController extends BaseController {
                                                   @PathVariable("ids") List<Long> ids) {
         boolean result = sysMessageService.deleteSysMessageByIds(ids);
         return toAjax(result);
+    }
+
+    /**
+     * 查询指定用户对指定消息的阅读状态（是否已读、首次/最后阅读时间）
+     */
+    @Operation(summary = "查询用户消息阅读状态")
+    @PreAuthorize("@ss.hasPermission('system.message:query')")
+    @GetMapping("/user-status")
+    public AjaxResult<UserMessageStatusVo> getUserMessageStatus(
+            @Parameter(description = "用户ID") @RequestParam("userId") Long userId,
+            @Parameter(description = "消息ID") @RequestParam("messageId") Long messageId) {
+        Assert.isTrue(userId != null && userId > 0, "用户ID必须大于0！");
+        Assert.isTrue(messageId != null && messageId > 0, "消息ID必须大于0！");
+
+        boolean isRead = userMessageReadService.isMessageRead(userId, messageId);
+        UserMessageStatusVo vo = new UserMessageStatusVo();
+        vo.setUserId(userId);
+        vo.setMessageId(messageId);
+        vo.setIsRead(isRead ? 1 : 0);
+        vo.setFirstReadTime(userMessageReadService.getFirstReadTime(userId, messageId));
+        vo.setLastReadTime(userMessageReadService.getLastReadTime(userId, messageId));
+
+        return success(vo);
     }
 }
