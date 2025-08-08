@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.common.core.utils.XssUtils;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.common.mq.production.MessageProducer;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
@@ -95,6 +96,9 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     @Override
     public boolean updateSysMessage(SysMessageUpdateRequest request) {
+        // XSS 清洗
+        request.setTitle(XssUtils.sanitizeHtml(request.getTitle()));
+        request.setContent(XssUtils.sanitizeHtml(request.getContent()));
         SysMessage sysMessage = new SysMessage();
         BeanUtils.copyProperties(request, sysMessage);
         return updateById(sysMessage);
@@ -172,8 +176,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         try {
             MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(message.getId())
-                    .title(message.getTitle())
-                    .content(message.getContent())
+                    .title(XssUtils.extractPlainText(message.getTitle()))
+                    .content(XssUtils.extractPlainText(message.getContent()))
                     .messageType(message.getType())
                     .sendMethod(Constants.MessageConstants.SEND_METHOD_USER)
                     .userIds(userId)
@@ -203,6 +207,9 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能为空");
         }
         MessageRequest message = request.getMessage();
+        // XSS 清洗
+        message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
+        message.setContent(XssUtils.sanitizeHtml(message.getContent()));
         SysMessage sysMessage = new SysMessage();
         BeanUtils.copyProperties(message, sysMessage);
         sysMessage.setSenderId(senderId);
@@ -246,7 +253,11 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .senderName(senderName)
                 .createTime(new Date())
                 .build();
-        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        // XSS 清洗
+        MessageRequest message = request.getMessage();
+        message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
+        message.setContent(XssUtils.sanitizeHtml(message.getContent()));
+        BeanUtils.copyProperties(message, sysMessage);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -256,8 +267,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         try {
             MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(sysMessage.getId())
-                    .title(sysMessage.getTitle())
-                    .content(sysMessage.getContent())
+                    .title(XssUtils.extractPlainText(sysMessage.getTitle()))
+                    .content(XssUtils.extractPlainText(sysMessage.getContent()))
                     .messageType(sysMessage.getType())
                     .sendMethod(Constants.MessageConstants.SEND_METHOD_ROLE)
                     .roleIds(receiveId)
@@ -311,7 +322,11 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .senderName(senderName)
                 .createTime(new Date())
                 .build();
-        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        // XSS 清洗
+        MessageRequest message = request.getMessage();
+        message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
+        message.setContent(XssUtils.sanitizeHtml(message.getContent()));
+        BeanUtils.copyProperties(message, sysMessage);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -321,8 +336,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         try {
             MessageSendDTO messageSendDTO = MessageSendDTO.builder()
                     .messageId(sysMessage.getId())
-                    .title(sysMessage.getTitle())
-                    .content(sysMessage.getContent())
+                    .title(XssUtils.extractPlainText(sysMessage.getTitle()))
+                    .content(XssUtils.extractPlainText(sysMessage.getContent()))
                     .messageType(sysMessage.getType())
                     .sendMethod(Constants.MessageConstants.SEND_METHOD_DEPT)
                     .deptIds(receiveId)
@@ -352,7 +367,11 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .senderName(senderName)
                 .createTime(new Date())
                 .build();
-        BeanUtils.copyProperties(request.getMessage(), sysMessage);
+        // XSS 清洗
+        MessageRequest message = request.getMessage();
+        message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
+        message.setContent(XssUtils.sanitizeHtml(message.getContent()));
+        BeanUtils.copyProperties(message, sysMessage);
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
     }
