@@ -14,6 +14,7 @@ import cn.zhangchuangla.system.message.model.vo.user.UserMessageVo;
 import cn.zhangchuangla.system.message.service.MessageQueryService;
 import cn.zhangchuangla.system.message.service.SysMessageService;
 import cn.zhangchuangla.system.message.service.UserMessageExtService;
+import cn.zhangchuangla.system.message.service.UserMessageReadService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class MessageQueryServiceImpl implements MessageQueryService {
 
     private final SysMessageService sysMessageService;
     private final UserMessageExtService userMessageExtService;
+    private final UserMessageReadService userMessageReadService;
 
     /**
      * 分页查询用户消息列表
@@ -285,12 +287,11 @@ public class MessageQueryServiceImpl implements MessageQueryService {
             throw new ServiceException(ResultCode.RESULT_IS_NULL, "消息不存在或您无权限访问");
         }
 
-        // 标记消息为已读（使用真实阅读，记录阅读时间）
+        // 标记消息为已读（使用真实阅读，记录首次与最后阅读时间）
         try {
-            userMessageExtService.read(currentUserId, messageId);
+            userMessageReadService.realRead(currentUserId, messageId);
         } catch (Exception e) {
             log.error("标记消息已读失败，用户ID: {}, 消息ID: {}", currentUserId, messageId, e);
-            // 标记已读失败不影响消息详情的返回，只记录日志
         }
 
         // 转换为视图对象

@@ -116,7 +116,9 @@ public class MessageProducer {
             log.info("发送部门消息到队列，消息ID: {}, 部门数量: {}",
                     messageSendDTO.getMessageId(), deptIds.size());
         } catch (Exception e) {
-            log.error("发送部门消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            if (messageSendDTO != null) {
+                log.error("发送部门消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            }
             throw new RuntimeException("发送部门消息到队列失败", e);
         }
     }

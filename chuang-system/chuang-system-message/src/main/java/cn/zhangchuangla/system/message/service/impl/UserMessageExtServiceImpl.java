@@ -5,7 +5,6 @@ import cn.zhangchuangla.system.message.mapper.UserMessageExtMapper;
 import cn.zhangchuangla.system.message.model.bo.MessageReadStatusBo;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessageExt;
 import cn.zhangchuangla.system.message.service.UserMessageExtService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -167,9 +166,13 @@ public class UserMessageExtServiceImpl extends ServiceImpl<UserMessageExtMapper,
             return false;
         }
 
-        return update(new LambdaQueryWrapper<SysUserMessageExt>()
+        // 置为未读，但保留 firstReadTime/lastReadTime 以便数据分析
+        return lambdaUpdate()
                 .eq(SysUserMessageExt::getUserId, userId)
-                .in(SysUserMessageExt::getMessageId, messageIds));
+                .in(SysUserMessageExt::getMessageId, messageIds)
+                .set(SysUserMessageExt::getIsRead, MessageConstants.StatusConstants.MESSAGE_UN_READ)
+                .set(SysUserMessageExt::getUpdateTime, new Date())
+                .update();
     }
 
 
