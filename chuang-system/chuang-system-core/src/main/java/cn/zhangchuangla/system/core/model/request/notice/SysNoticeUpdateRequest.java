@@ -45,12 +45,6 @@ public class SysNoticeUpdateRequest {
     private String noticeType;
 
     /**
-     * 公告状态（0正常 1关闭）
-     */
-    @Schema(description = "公告状态（0正常 1关闭）", example = "0", type = "integer")
-    private Integer status;
-
-    /**
      * 备注
      */
     @Size(max = 500, message = "备注不能超过500个字符")

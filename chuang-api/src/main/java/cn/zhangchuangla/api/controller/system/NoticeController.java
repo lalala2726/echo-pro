@@ -70,7 +70,7 @@ public class NoticeController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "获取公告详情", description = "根据ID获取公告详细信息")
     @PreAuthorize("@ss.hasPermission('system:notice:query')")
-    public AjaxResult<SysNoticeVo> getInfo(@Parameter(description = "公告ID") @PathVariable Long id) {
+    public AjaxResult<SysNoticeVo> getInfo(@Parameter(description = "公告ID") @PathVariable("id") Long id) {
         Assert.notNull(id, "公告ID不能为空");
         SysNotice sysNotice = sysNoticeService.getNoticeById(id);
         SysNoticeVo sysNoticeVo = BeanCotyUtils.copyProperties(sysNotice, SysNoticeVo.class);

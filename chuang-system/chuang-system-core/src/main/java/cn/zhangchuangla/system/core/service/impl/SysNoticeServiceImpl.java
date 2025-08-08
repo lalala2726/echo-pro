@@ -27,7 +27,8 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice> implements SysNoticeService {
+public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice>
+        implements SysNoticeService {
 
     private final SysNoticeMapper sysNoticeMapper;
 
@@ -49,6 +50,7 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         if (isNoticeTitleExist(request.getNoticeTitle(), null)) {
             throw new ServiceException("公告标题已存在");
         }
+        //todo 添加内容验证防止XSS
 
         SysNotice sysNotice = new SysNotice();
         BeanUtils.copyProperties(request, sysNotice);
@@ -65,6 +67,8 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         if (existingNotice == null) {
             throw new ServiceException("公告不存在");
         }
+
+        //todo 添加内容验证防止XSS
 
         // 检查标题是否存在
         if (isNoticeTitleExist(request.getNoticeTitle(), request.getId())) {

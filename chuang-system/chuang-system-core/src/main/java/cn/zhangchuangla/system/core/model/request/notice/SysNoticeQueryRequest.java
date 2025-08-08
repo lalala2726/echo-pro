@@ -28,12 +28,6 @@ public class SysNoticeQueryRequest extends BasePageRequest {
     private String noticeType;
 
     /**
-     * 公告状态（0正常 1关闭）
-     */
-    @Schema(description = "公告状态（0正常 1关闭）", example = "0", type = "integer")
-    private Integer status;
-
-    /**
      * 创建者
      */
     @Schema(description = "创建者", example = "admin", type = "string")
