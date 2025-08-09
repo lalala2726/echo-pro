@@ -78,17 +78,7 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      */
     long getUserMessageCount(@Param("userId") Long userId);
 
-    /**
-     * 根据用户ID分页查询已发送的系统消息表信息
-     *
-     * @param page    分页对象
-     * @param userId  用户ID
-     * @param request 查询参数
-     * @return 返回分页对象
-     */
-    Page<SysMessage> pageUserSentMessage(Page<SysMessage> page,
-                                         @Param("userId") Long userId,
-                                         @Param("request") UserMessageListQueryRequest request);
+    // 删除: 根据用户ID分页查询已发送的系统消息（依赖 senderId），随字段移除一并删除接口
 
 
     /**

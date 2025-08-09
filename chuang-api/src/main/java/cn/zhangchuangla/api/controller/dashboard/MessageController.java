@@ -71,9 +71,6 @@ public class MessageController extends BaseController {
         if (userMessageVo == null) {
             return error("消息不存在");
         }
-        // 真实阅读，记录首次和最后阅读时间
-        Long userId = getUserId();
-        userMessageReadService.realRead(userId, id);
         return success(userMessageVo);
     }
 
@@ -119,8 +116,8 @@ public class MessageController extends BaseController {
     @Operation(summary = "标记消息为未读")
     public AjaxResult<Void> markMessageAsUnRead(
             @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
-        Assert.notEmpty(ids, "部门ID不能为空！");
-        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "部门ID必须大于0！");
+        Assert.notEmpty(ids, "消息ID不能为空！");
+        Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         // 标记未读，保留阅读时间记录
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);

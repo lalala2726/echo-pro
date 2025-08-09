@@ -124,26 +124,25 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean sysSendMessage(SysSendMessageRequest request) {
-        Long senderId = SecurityUtils.getUserId();
         String senderName = SecurityUtils.getUsername();
-        return sendMessage(request, senderId, senderName);
+        return sendMessage(request, senderName);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean systemSendMessage(SysSendMessageRequest request) {
-        return sendMessage(request, 0L, "系统");
+        return sendMessage(request, "系统");
     }
 
     /**
      * 根据发送方式分发消息
      */
-    private boolean sendMessage(SysSendMessageRequest request, Long senderId, String senderName) {
+    private boolean sendMessage(SysSendMessageRequest request, String senderName) {
         return switch (request.getSendMethod()) {
-            case Constants.MessageConstants.SEND_METHOD_USER -> sendMessageToUserId(request, senderId, senderName);
-            case Constants.MessageConstants.SEND_METHOD_ROLE -> sendMessageToRoleId(request, senderId, senderName);
-            case Constants.MessageConstants.SEND_METHOD_DEPT -> sendMessageToDeptId(request, senderId, senderName);
-            case Constants.MessageConstants.SEND_METHOD_ALL -> sendMessageToAll(request, senderId, senderName);
+            case Constants.MessageConstants.SEND_METHOD_USER -> sendMessageToUserId(request, senderName);
+            case Constants.MessageConstants.SEND_METHOD_ROLE -> sendMessageToRoleId(request, senderName);
+            case Constants.MessageConstants.SEND_METHOD_DEPT -> sendMessageToDeptId(request, senderName);
+            case Constants.MessageConstants.SEND_METHOD_ALL -> sendMessageToAll(request, senderName);
             default -> false;
         };
     }
@@ -201,7 +200,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToUserId(SysSendMessageRequest request, Long senderId, String senderName) {
+    private boolean sendMessageToUserId(SysSendMessageRequest request, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能为空");
@@ -210,10 +209,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         // XSS 清洗
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = new SysMessage();
-        BeanUtils.copyProperties(message, sysMessage);
-        sysMessage.setSenderId(senderId);
-        sysMessage.setSenderName(senderName);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_USER);
         return sendMessageByUserId(receiveId, sysMessage);
     }
 
@@ -223,7 +219,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToRoleId(SysSendMessageRequest request, Long senderId, String senderName) {
+    private boolean sendMessageToRoleId(SysSendMessageRequest request, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResultCode.PARAM_ERROR, "角色ID不能为空");
@@ -247,17 +243,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_ROLE)
-                .senderId(senderId)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
-        // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_ROLE);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -292,7 +281,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToDeptId(SysSendMessageRequest request, Long senderId, String senderName) {
+    private boolean sendMessageToDeptId(SysSendMessageRequest request, String senderName) {
         List<Long> receiveId = request.getReceiveId();
         if (receiveId == null || receiveId.isEmpty()) {
             throw new ParamException(ResultCode.PARAM_ERROR, "部门ID不能为空");
@@ -316,17 +305,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_DEPT)
-                .senderId(senderId)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
-        // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_DEPT);
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -360,20 +342,24 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @param request 发送消息请求参数
      * @return 结果
      */
-    private boolean sendMessageToAll(SysSendMessageRequest request, Long senderId, String senderName) {
-        SysMessage sysMessage = SysMessage.builder()
-                .targetType(Constants.MessageConstants.SEND_METHOD_ALL)
-                .senderId(senderId)
-                .senderName(senderName)
-                .createTime(new Date())
-                .build();
+    private boolean sendMessageToAll(SysSendMessageRequest request, String senderName) {
         // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        BeanUtils.copyProperties(message, sysMessage);
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, Constants.MessageConstants.SEND_METHOD_ALL);
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
+    }
+
+    private SysMessage buildBaseSysMessage(MessageRequest message, String senderName, int targetType) {
+        SysMessage sysMessage = SysMessage.builder()
+                .targetType(targetType)
+                .senderName(senderName)
+                .createTime(new Date())
+                .build();
+        BeanUtils.copyProperties(message, sysMessage);
+        return sysMessage;
     }
 
     /**

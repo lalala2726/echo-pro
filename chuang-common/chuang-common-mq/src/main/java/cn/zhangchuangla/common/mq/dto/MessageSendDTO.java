@@ -67,5 +67,6 @@ public class MessageSendDTO implements Serializable {
     /**
      * 批次大小（用于分批处理）
      */
+    @Builder.Default
     private Integer batchSize = 500;
 }

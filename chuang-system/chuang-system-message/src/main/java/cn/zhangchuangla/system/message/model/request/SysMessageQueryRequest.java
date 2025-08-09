@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-
 /**
  * 系统消息表查询请求参数
  *
@@ -56,15 +54,9 @@ public class SysMessageQueryRequest extends BasePageRequest {
     private Integer targetType;
 
     /**
-     * 过期时间，NULL表示不过期
-     */
-    @Schema(description = "过期时间，NULL表示不过期")
-    private LocalDateTime expireTime;
-
-    /**
-     * 时间范围
+     * 发布时间范围
      */
     @Schema(description = "时间范围")
-    private TimeRange timeRange;
+    private TimeRange publishTimeRange;
 
 }

@@ -30,6 +30,10 @@ public class MessageProducer {
      */
     public void sendUserMessage(MessageSendDTO messageSendDTO) {
         try {
+            if (messageSendDTO == null) {
+                log.warn("sendUserMessage 入参为空，跳过发送");
+                return;
+            }
             // 分批处理用户列表
             List<Long> userIds = messageSendDTO.getUserIds();
             if (userIds == null || userIds.isEmpty()) {
@@ -37,34 +41,24 @@ public class MessageProducer {
                 return;
             }
 
-            int batchSize = messageSendDTO.getBatchSize();
+            int batchSize = normalizeBatchSize(messageSendDTO.getBatchSize());
             for (int i = 0; i < userIds.size(); i += batchSize) {
                 int endIndex = Math.min(i + batchSize, userIds.size());
                 List<Long> batchUserIds = userIds.subList(i, endIndex);
 
                 // 创建批次消息
-                MessageSendDTO batchMessage = MessageSendDTO.builder()
-                        .messageId(messageSendDTO.getMessageId())
-                        .title(messageSendDTO.getTitle())
-                        .content(messageSendDTO.getContent())
-                        .messageType(messageSendDTO.getMessageType())
-                        .sendMethod(messageSendDTO.getSendMethod())
-                        .userIds(batchUserIds)
-                        .batchSize(batchSize)
-                        .build();
+                MessageSendDTO batchMessage = copyForUserBatch(messageSendDTO, batchUserIds, batchSize);
 
                 // 发送到队列
-                rabbitTemplate.convertAndSend(
-                        RabbitMQConfig.MESSAGE_EXCHANGE,
-                        RabbitMQConfig.USER_MESSAGE_ROUTING_KEY,
-                        JSON.toJSONString(batchMessage)
-                );
+                convertAndSendJson(batchMessage);
 
                 log.info("发送用户消息批次到队列，消息ID: {}, 用户数量: {}",
                         messageSendDTO.getMessageId(), batchUserIds.size());
             }
         } catch (Exception e) {
-            log.error("发送用户消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            if (messageSendDTO != null) {
+                log.error("发送用户消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            }
             throw new RuntimeException("发送用户消息到队列失败", e);
         }
     }
@@ -76,6 +70,10 @@ public class MessageProducer {
      */
     public void sendRoleMessage(MessageSendDTO messageSendDTO) {
         try {
+            if (messageSendDTO == null) {
+                log.warn("sendRoleMessage 入参为空，跳过发送");
+                return;
+            }
             List<Long> roleIds = messageSendDTO.getRoleIds();
             if (roleIds == null || roleIds.isEmpty()) {
                 log.warn("角色ID列表为空，跳过发送");
@@ -83,16 +81,14 @@ public class MessageProducer {
             }
 
             // 发送到队列
-            rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.MESSAGE_EXCHANGE,
-                    RabbitMQConfig.USER_MESSAGE_ROUTING_KEY,
-                    JSON.toJSONString(messageSendDTO)
-            );
+            convertAndSendJson(messageSendDTO);
 
             log.info("发送角色消息到队列，消息ID: {}, 角色数量: {}",
                     messageSendDTO.getMessageId(), roleIds.size());
         } catch (Exception e) {
-            log.error("发送角色消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            if (messageSendDTO != null) {
+                log.error("发送角色消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            }
             throw new RuntimeException("发送角色消息到队列失败", e);
         }
     }
@@ -104,6 +100,10 @@ public class MessageProducer {
      */
     public void sendDeptMessage(MessageSendDTO messageSendDTO) {
         try {
+            if (messageSendDTO == null) {
+                log.warn("sendDeptMessage 入参为空，跳过发送");
+                return;
+            }
             List<Long> deptIds = messageSendDTO.getDeptIds();
             if (deptIds == null || deptIds.isEmpty()) {
                 log.warn("部门ID列表为空，跳过发送");
@@ -111,17 +111,39 @@ public class MessageProducer {
             }
 
             // 发送到队列
-            rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.MESSAGE_EXCHANGE,
-                    RabbitMQConfig.USER_MESSAGE_ROUTING_KEY,
-                    JSON.toJSONString(messageSendDTO)
-            );
+            convertAndSendJson(messageSendDTO);
 
             log.info("发送部门消息到队列，消息ID: {}, 部门数量: {}",
                     messageSendDTO.getMessageId(), deptIds.size());
         } catch (Exception e) {
-            log.error("发送部门消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            if (messageSendDTO != null) {
+                log.error("发送部门消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
+            }
             throw new RuntimeException("发送部门消息到队列失败", e);
         }
+    }
+
+    private int normalizeBatchSize(Integer batchSize) {
+        if (batchSize == null || batchSize <= 0) {
+            return 500;
+        }
+        // 上限保护
+        return Math.min(batchSize, 5000);
+    }
+
+    private MessageSendDTO copyForUserBatch(MessageSendDTO src, List<Long> batchUserIds, int batchSize) {
+        return MessageSendDTO.builder()
+                .messageId(src.getMessageId())
+                .title(src.getTitle())
+                .content(src.getContent())
+                .messageType(src.getMessageType())
+                .sendMethod(src.getSendMethod())
+                .userIds(batchUserIds)
+                .batchSize(batchSize)
+                .build();
+    }
+
+    private void convertAndSendJson(Object payload) {
+        rabbitTemplate.convertAndSend(RabbitMQConfig.MESSAGE_EXCHANGE, RabbitMQConfig.USER_MESSAGE_ROUTING_KEY, JSON.toJSONString(payload));
     }
 }
