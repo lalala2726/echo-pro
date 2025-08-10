@@ -1,8 +1,8 @@
 package cn.zhangchuangla.system.message.consumer;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
+import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.system.message.service.SysUserMessageService;
 import com.alibaba.fastjson.JSON;
@@ -41,11 +41,20 @@ public class MessageBusinessConsumer {
             MessageSendDTO messageSendDTO = JSON.parseObject(message, MessageSendDTO.class);
 
             // 根据发送方式处理不同类型的消息
-            switch (messageSendDTO.getSendMethod()) {
-                case Constants.MessageConstants.SEND_METHOD_USER -> handleUserMessage(messageSendDTO, startTime);
-                case Constants.MessageConstants.SEND_METHOD_ROLE -> handleRoleMessage(messageSendDTO, startTime);
-                case Constants.MessageConstants.SEND_METHOD_DEPT -> handleDeptMessage(messageSendDTO, startTime);
-                default -> log.warn("未知的发送方式: {}", messageSendDTO.getSendMethod());
+            String method = messageSendDTO.getSendMethod();
+            MessageSendMethodEnum sendMethod = MessageSendMethodEnum.getByValue(method);
+            if (sendMethod == null) {
+                log.warn("未知的发送方式: {}", method);
+                return;
+            }
+            switch (sendMethod) {
+                case USER -> handleUserMessage(messageSendDTO, startTime);
+                case ROLE -> handleRoleMessage(messageSendDTO, startTime);
+                case DEPT -> handleDeptMessage(messageSendDTO, startTime);
+                case ALL -> {
+                    // ALL 场景无需用户/角色/部门明细入库
+                    log.info("收到 ALL 消息，消息ID:{}，无需细分入库", messageSendDTO.getMessageId());
+                }
             }
 
         } catch (Exception e) {

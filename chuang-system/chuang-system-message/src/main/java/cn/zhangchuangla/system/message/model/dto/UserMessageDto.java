@@ -49,11 +49,6 @@ public class UserMessageDto {
     private Integer level;
 
     /**
-     * 发送者ID，NULL表示系统发送
-     */
-    // 删除 senderId 冗余字段
-
-    /**
      * 发送者姓名
      */
     private String senderName;
@@ -63,31 +58,11 @@ public class UserMessageDto {
      */
     private Integer targetType;
 
-
-    /**
-     * 推送方式：1-仅站内信 2-仅WebSocket 3-站内信+WebSocket
-     */
-    // 删除 pushType 冗余字段
-
-    /**
-     * 是否已发布：0-未发布 1-已发布
-     */
-    // 删除 isPublished 冗余字段
-
     /**
      * 发布时间
      */
     private Date publishTime;
 
-    /**
-     * 定时发送时间，NULL表示立即发送
-     */
-    // 删除 scheduledTime 冗余字段
-
-    /**
-     * 过期时间，NULL表示不过期
-     */
-    // 删除 expireTime 冗余字段
 
     /**
      * 是否删除：0-未删除 1-已删除

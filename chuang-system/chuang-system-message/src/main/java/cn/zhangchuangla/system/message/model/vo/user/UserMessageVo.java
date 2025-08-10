@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.message.model.vo.user;
 
+import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
+import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,16 +36,16 @@ public class UserMessageVo {
     private String content;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
-    private Integer type;
+    @Schema(description = "消息类型")
+    private MessageTypeEnum type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
-    private Integer level;
+    @Schema(description = "消息级别")
+    private MessageLevelEnum level;
 
     /**
      * 发送者姓名

@@ -48,21 +48,6 @@ public class Constants {
         Integer NOT_DELETED = 0;
     }
 
-
-    // todo 提取到MessageConstants中
-    public interface MessageConstants {
-        //根据用户ID发送
-        int SEND_METHOD_USER = 0;
-        //根据角色ID发送
-        int SEND_METHOD_ROLE = 1;
-        //根据部门ID发送
-        int SEND_METHOD_DEPT = 2;
-        //全部发送
-        int SEND_METHOD_ALL = 3;
-
-    }
-
-
     /**
      * 菜单常量
      */

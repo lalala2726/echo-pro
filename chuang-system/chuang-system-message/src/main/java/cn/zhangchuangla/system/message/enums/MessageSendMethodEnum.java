@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.message.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -30,11 +32,35 @@ public enum MessageSendMethodEnum {
      */
     ALL("all");
 
+    @JsonValue
     private final String value;
 
 
     MessageSendMethodEnum(String value) {
         this.value = value;
+    }
+
+    public static MessageSendMethodEnum getByValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        for (MessageSendMethodEnum e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static MessageSendMethodEnum fromJson(String raw) {
+        if (raw == null) return null;
+        for (MessageSendMethodEnum e : values()) {
+            if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported send method: " + raw);
     }
 
 }

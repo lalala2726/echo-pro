@@ -2,6 +2,9 @@ package cn.zhangchuangla.system.message.model.request;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.entity.base.TimeRange;
+import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
+import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,16 +33,16 @@ public class SysMessageQueryRequest extends BasePageRequest {
     private String content;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
-    private Integer type;
+    @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"})
+    private MessageTypeEnum type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
-    private Integer level;
+    @Schema(description = "消息级别", allowableValues = {"normal", "important", "urgent"})
+    private MessageLevelEnum level;
 
     /**
      * 发送者姓名
@@ -48,10 +51,10 @@ public class SysMessageQueryRequest extends BasePageRequest {
     private String senderName;
 
     /**
-     * 目标类型：1-指定用户 2-全部用户 3-角色用户
+     * 目标类型
      */
-    @Schema(description = "目标类型：1-指定用户 2-全部用户 3-角色用户")
-    private Integer targetType;
+    @Schema(description = "目标类型", allowableValues = {"user", "role", "dept", "all"})
+    private MessageSendMethodEnum targetType;
 
     /**
      * 发布时间范围

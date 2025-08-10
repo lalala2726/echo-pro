@@ -40,14 +40,14 @@ public class MessageSendDTO implements Serializable {
     private String content;
 
     /**
-     * 消息类型
+     * 消息类型：system/notice/announcement
      */
-    private Integer messageType;
+    private String messageType;
 
     /**
-     * 发送方式：0-指定用户 1-角色用户 2-部门用户 3-全部用户
+     * 发送方式：user/role/dept/all
      */
-    private Integer sendMethod;
+    private String sendMethod;
 
     /**
      * 接收用户ID列表（sendMethod=0时使用）

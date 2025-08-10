@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.message.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -25,6 +27,7 @@ public enum MessageTypeEnum {
      */
     ANNOUNCEMENT("announcement");
 
+    @JsonValue
     private final String value;
 
     MessageTypeEnum(String value) {
@@ -32,11 +35,23 @@ public enum MessageTypeEnum {
     }
 
     public static MessageTypeEnum getByValue(String value) {
+        if (value == null) return null;
         for (MessageTypeEnum type : MessageTypeEnum.values()) {
-            if (type.value.equals(value)) {
+            if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
         }
         return null;
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static MessageTypeEnum fromJson(String raw) {
+        if (raw == null) return null;
+        for (MessageTypeEnum e : values()) {
+            if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported message type: " + raw);
     }
 }

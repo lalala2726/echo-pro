@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.message.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -23,6 +25,7 @@ public enum MessageLevelEnum {
      */
     URGENT("urgent");
 
+    @JsonValue
     private final String value;
 
     MessageLevelEnum(String value) {
@@ -36,12 +39,24 @@ public enum MessageLevelEnum {
      * @return 枚举
      */
     public static MessageLevelEnum getByValue(String value) {
+        if (value == null) return null;
         for (MessageLevelEnum level : values()) {
-            if (level.value.equals(value)) {
+            if (level.value.equalsIgnoreCase(value)) {
                 return level;
             }
         }
         return null;
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static MessageLevelEnum fromJson(String raw) {
+        if (raw == null) return null;
+        for (MessageLevelEnum e : values()) {
+            if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported message level: " + raw);
     }
 
 }
