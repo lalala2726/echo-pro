@@ -7,13 +7,17 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.XssUtils;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.common.mq.production.MessageProducer;
+import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
+import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
 import cn.zhangchuangla.system.core.model.entity.SysDept;
 import cn.zhangchuangla.system.core.model.entity.SysUserRole;
 import cn.zhangchuangla.system.core.service.SysDeptService;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
 import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.mapper.SysMessageMapper;
+import cn.zhangchuangla.system.message.model.dto.NewMessageNoticeDTO;
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
+import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.system.message.model.request.*;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.system.message.service.SysMessageService;
@@ -51,6 +55,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysDeptService sysDeptService;
     private final MessageProducer messageProducer;
     private final SysUserMessageService sysUserMessageService;
+    private final WebSocketPublisher webSocketPublisher;
 
     /**
      * 分页查询系统消息表
@@ -188,6 +193,9 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
 
             messageProducer.sendUserMessage(messageSendDTO);
             log.info("用户消息发送到队列成功，消息ID: {}, 用户数量: {}", message.getId(), userId.size());
+            // WebSocket 推送用户新消息通知
+            NewMessageNoticeDTO notice = buildNotice(message);
+            webSocketPublisher.sendToUsers(userId, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
             return true;
         } catch (Exception e) {
             log.error("用户消息发送到队列失败，消息ID: {}", message.getId(), e);
@@ -255,25 +263,22 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             return false;
         }
 
-        // 使用消息队列异步处理角色消息记录
-        try {
-            MessageSendDTO messageSendDTO = MessageSendDTO.builder()
-                    .messageId(sysMessage.getId())
-                    .title(XssUtils.extractPlainText(sysMessage.getTitle()))
-                    .content(XssUtils.extractPlainText(sysMessage.getContent()))
-                    .messageType(sysMessage.getType())
-                    .sendMethod("role")
-                    .roleIds(receiveId)
-                    .batchSize(BEACH_SEND_MESSAGE_QUANTITY)
-                    .build();
-
-            messageProducer.sendRoleMessage(messageSendDTO);
-            return true;
-        } catch (Exception e) {
-            // 如果队列发送失败，回滚消息记录
+        // 同步创建角色消息映射并广播
+        List<SysUserMessage> roleMessages = receiveId.stream()
+                .map(roleId -> SysUserMessage.builder()
+                        .messageId(sysMessage.getId())
+                        .roleId(roleId)
+                        .createTime(new Date())
+                        .build())
+                .toList();
+        boolean linkSaved = sysUserMessageService.saveBatch(roleMessages);
+        if (!linkSaved) {
             removeById(sysMessage.getId());
-            throw new ServiceException("角色消息发送失败");
+            throw new ServiceException("角色消息关联保存失败");
         }
+        NewMessageNoticeDTO notice = buildNotice(sysMessage);
+        receiveId.forEach(roleId -> webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_ROLE + roleId, notice));
+        return true;
     }
 
     /**
@@ -315,26 +320,23 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             return false;
         }
 
-        // 使用消息队列异步处理部门消息记录
-        try {
-            MessageSendDTO messageSendDTO = MessageSendDTO.builder()
-                    .messageId(sysMessage.getId())
-                    .title(XssUtils.extractPlainText(sysMessage.getTitle()))
-                    .content(XssUtils.extractPlainText(sysMessage.getContent()))
-                    .messageType(sysMessage.getType())
-                    .sendMethod("dept")
-                    .deptIds(receiveId)
-                    .build();
-
-            messageProducer.sendDeptMessage(messageSendDTO);
-            log.info("部门消息发送到队列成功，消息ID: {}, 部门数量: {}", sysMessage.getId(), receiveId.size());
-            return true;
-        } catch (Exception e) {
-            log.error("部门消息发送到队列失败，消息ID: {}", sysMessage.getId(), e);
-            // 如果队列发送失败，回滚消息记录
+        // 同步创建部门消息映射并广播
+        List<SysUserMessage> deptMessages = receiveId.stream()
+                .map(deptId -> SysUserMessage.builder()
+                        .messageId(sysMessage.getId())
+                        .deptId(deptId)
+                        .createTime(new Date())
+                        .build())
+                .toList();
+        boolean linkSaved = sysUserMessageService.saveBatch(deptMessages);
+        if (!linkSaved) {
             removeById(sysMessage.getId());
-            throw new ServiceException("部门消息发送失败");
+            throw new ServiceException("部门消息关联保存失败");
         }
+        NewMessageNoticeDTO notice = buildNotice(sysMessage);
+        receiveId.forEach(deptId -> webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_DEPT + deptId, notice));
+        log.info("部门消息发送成功并已广播，消息ID: {}, 部门数量: {}", sysMessage.getId(), receiveId.size());
+        return true;
     }
 
     /**
@@ -344,13 +346,17 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * @return 结果
      */
     private boolean sendMessageToAll(SysSendMessageRequest request, String senderName) {
-        // XSS 清洗
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
         SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageReceiveTypeEnum.ALL.getValue());
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
-        return save(sysMessage);
+        boolean ok = save(sysMessage);
+        if (ok) {
+            NewMessageNoticeDTO notice = buildNotice(sysMessage);
+            webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_MESSAGE_NEW, notice);
+        }
+        return ok;
     }
 
     private SysMessage buildBaseSysMessage(MessageRequest message, String senderName, String targetType) {
@@ -368,6 +374,21 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .build();
     }
 
+    /**
+     * 构建用于前端提示的新消息通知 DTO。
+     *
+     * @param sysMessage 系统消息实体
+     * @return 新消息通知
+     */
+    private NewMessageNoticeDTO buildNotice(SysMessage sysMessage) {
+        NewMessageNoticeDTO notice = new NewMessageNoticeDTO();
+        notice.setMessageId(sysMessage.getId());
+        notice.setTitle(XssUtils.extractPlainText(sysMessage.getTitle()));
+        notice.setType(sysMessage.getType());
+        notice.setLevel(sysMessage.getLevel());
+        notice.setPublishTime(sysMessage.getCreateTime());
+        return notice;
+    }
 
     /**
      * 获取用户消息数量

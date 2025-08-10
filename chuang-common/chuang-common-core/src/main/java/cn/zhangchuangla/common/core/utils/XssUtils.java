@@ -11,7 +11,7 @@ import org.jsoup.safety.Safelist;
  * 2. extractPlainText: 从富文本中仅提取纯文字（不包含图片、表格等）
  * 3. extractTextTableImage: 提取文字与图片、表格（仅结构化文本 + 图片链接），丢弃其他不必要内容
  *
- * @author zhangchuang
+ * @author Chuang
  */
 public final class XssUtils {
 

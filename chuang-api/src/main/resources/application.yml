@@ -66,3 +66,7 @@ security:
       mobile: -1
     multi-device: true
     token-prefix: null
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
