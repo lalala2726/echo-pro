@@ -11,7 +11,7 @@ import cn.zhangchuangla.system.core.model.entity.SysDept;
 import cn.zhangchuangla.system.core.model.entity.SysUserRole;
 import cn.zhangchuangla.system.core.service.SysDeptService;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
 import cn.zhangchuangla.system.message.model.request.*;
@@ -78,7 +78,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
         SysMessageVo sysMessageVo = new SysMessageVo();
         // 如果消息发送目标类型不是"全部用户"，则需要处理目标ID的关联查询，否则不需要传入目标ID
-        if (sysMessage.getTargetType() != null && !sysMessage.getTargetType().equals(MessageSendMethodEnum.ALL.getValue())) {
+        if (sysMessage.getTargetType() != null && !sysMessage.getTargetType().equals(MessageReceiveTypeEnum.ALL.getValue())) {
             List<Long> targetIds = sysUserMessageService.getRecipientIdsByMessageId(id);
             sysMessageVo.setTargetIds(targetIds);
         }
@@ -138,7 +138,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * 根据发送方式分发消息
      */
     private boolean sendMessage(SysSendMessageRequest request, String senderName) {
-        MessageSendMethodEnum method = request.getReceiveType();
+        MessageReceiveTypeEnum method = request.getReceiveType();
         if (method == null) {
             throw new ParamException(ResultCode.PARAM_ERROR, "消息发送方式不能为空");
         }
@@ -167,7 +167,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         }
 
         // 先保存消息
-        message.setTargetType(MessageSendMethodEnum.USER.getValue());
+        message.setTargetType(MessageReceiveTypeEnum.USER.getValue());
         message.setCreateTime(new Date());
         boolean save = save(message);
         if (!save) {
@@ -212,7 +212,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         // XSS 清洗
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageSendMethodEnum.USER.getValue());
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageReceiveTypeEnum.USER.getValue());
         return sendMessageByUserId(receiveId, sysMessage);
     }
 
@@ -249,7 +249,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageSendMethodEnum.ROLE.getValue());
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageReceiveTypeEnum.ROLE.getValue());
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -309,7 +309,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageSendMethodEnum.DEPT.getValue());
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageReceiveTypeEnum.DEPT.getValue());
         boolean save = save(sysMessage);
         if (!save) {
             return false;
@@ -348,7 +348,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         MessageRequest message = request.getMessage();
         message.setTitle(XssUtils.sanitizeHtml(message.getTitle()));
         message.setContent(XssUtils.sanitizeHtml(message.getContent()));
-        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageSendMethodEnum.ALL.getValue());
+        SysMessage sysMessage = buildBaseSysMessage(message, senderName, MessageReceiveTypeEnum.ALL.getValue());
         // 发送给全部用户无需设置用户消息对应表，直接保存消息即可
         return save(sysMessage);
     }

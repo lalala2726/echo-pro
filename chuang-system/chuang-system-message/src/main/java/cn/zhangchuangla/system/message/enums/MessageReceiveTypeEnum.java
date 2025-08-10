@@ -10,7 +10,7 @@ import lombok.Getter;
  * created on 2025/8/10 11:06
  */
 @Getter
-public enum MessageSendMethodEnum {
+public enum MessageReceiveTypeEnum {
 
     /**
      * 给指定用户发送消息
@@ -36,15 +36,15 @@ public enum MessageSendMethodEnum {
     private final String value;
 
 
-    MessageSendMethodEnum(String value) {
+    MessageReceiveTypeEnum(String value) {
         this.value = value;
     }
 
-    public static MessageSendMethodEnum getByValue(String value) {
+    public static MessageReceiveTypeEnum getByValue(String value) {
         if (value == null) {
             return null;
         }
-        for (MessageSendMethodEnum e : values()) {
+        for (MessageReceiveTypeEnum e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;
             }
@@ -53,9 +53,9 @@ public enum MessageSendMethodEnum {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static MessageSendMethodEnum fromJson(String raw) {
+    public static MessageReceiveTypeEnum fromJson(String raw) {
         if (raw == null) return null;
-        for (MessageSendMethodEnum e : values()) {
+        for (MessageReceiveTypeEnum e : values()) {
             if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
                 return e;
             }

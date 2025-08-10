@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.message.model.vo.system;
 
 import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -64,7 +64,7 @@ public class SysMessageVo {
      * 目标类型
      */
     @Schema(description = "目标类型")
-    private MessageSendMethodEnum targetType;
+    private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间

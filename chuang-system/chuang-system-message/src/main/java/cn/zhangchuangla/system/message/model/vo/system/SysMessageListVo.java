@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.message.model.vo.system;
 
 import cn.zhangchuangla.common.excel.annotation.Excel;
 import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -66,7 +66,7 @@ public class SysMessageListVo {
      */
     @Schema(description = "目标类型")
     @Excel(name = "目标类型", sort = 7)
-    private MessageSendMethodEnum targetType;
+    private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间

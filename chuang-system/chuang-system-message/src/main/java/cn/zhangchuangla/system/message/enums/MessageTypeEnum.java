@@ -35,7 +35,9 @@ public enum MessageTypeEnum {
     }
 
     public static MessageTypeEnum getByValue(String value) {
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
         for (MessageTypeEnum type : MessageTypeEnum.values()) {
             if (type.value.equalsIgnoreCase(value)) {
                 return type;
@@ -46,7 +48,9 @@ public enum MessageTypeEnum {
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MessageTypeEnum fromJson(String raw) {
-        if (raw == null) return null;
+        if (raw == null) {
+            return null;
+        }
         for (MessageTypeEnum e : values()) {
             if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
                 return e;

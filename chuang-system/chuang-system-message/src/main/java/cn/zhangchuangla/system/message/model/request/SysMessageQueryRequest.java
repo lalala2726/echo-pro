@@ -3,7 +3,7 @@ package cn.zhangchuangla.system.message.model.request;
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.entity.base.TimeRange;
 import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -54,7 +54,7 @@ public class SysMessageQueryRequest extends BasePageRequest {
      * 目标类型
      */
     @Schema(description = "目标类型", allowableValues = {"user", "role", "dept", "all"})
-    private MessageSendMethodEnum targetType;
+    private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间范围

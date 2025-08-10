@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.message.model.request;
 
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class SysSendMessageRequest {
      */
     @Schema(description = "消息发送方式", allowableValues = {"user", "role", "dept", "all"}, example = "user")
     @NotNull(message = "消息发送方式不能为空")
-    private MessageSendMethodEnum receiveType;
+    private MessageReceiveTypeEnum receiveType;
 
     /**
      * 接收者ID列表，根据发送方式指定不同类型的ID：

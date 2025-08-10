@@ -2,7 +2,7 @@ package cn.zhangchuangla.system.message.consumer;
 
 import cn.zhangchuangla.common.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
-import cn.zhangchuangla.system.message.enums.MessageSendMethodEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.system.message.service.SysUserMessageService;
 import com.alibaba.fastjson.JSON;
@@ -42,7 +42,7 @@ public class MessageBusinessConsumer {
 
             // 根据发送方式处理不同类型的消息
             String method = messageSendDTO.getSendMethod();
-            MessageSendMethodEnum sendMethod = MessageSendMethodEnum.getByValue(method);
+            MessageReceiveTypeEnum sendMethod = MessageReceiveTypeEnum.getByValue(method);
             if (sendMethod == null) {
                 log.warn("未知的发送方式: {}", method);
                 return;
