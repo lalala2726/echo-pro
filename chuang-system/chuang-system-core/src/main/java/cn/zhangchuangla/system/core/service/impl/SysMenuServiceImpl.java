@@ -81,8 +81,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addMenu(SysMenuAddRequest request) {
-        log.info("🔧 开始添加菜单: 名称={}, 类型={}", request.getName(), request.getType());
-
         // 1. 基础验证
         validateMenuRequest(request);
 
@@ -543,8 +541,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 处理后的菜单信息
      */
     private SysMenu saveEmbedded(SysMenu sysMenu) {
-        // 内嵌页面不需要组件
-        sysMenu.setComponent(null);
+        sysMenu.setComponent("IFrameView");
         // 内嵌页面不需要缓存设置
         sysMenu.setKeepAlive(null);
         return sysMenu;
@@ -564,7 +561,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     private SysMenu saveLink(SysMenu sysMenu) {
         // 外链不需要组件
-        sysMenu.setComponent(null);
+        sysMenu.setComponent("IFrameView");
         // 外链不需要激活路径
         sysMenu.setActivePath(null);
         // 外链不需要激活图标
@@ -573,7 +570,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         sysMenu.setPermission(null);
         // 外链不需要缓存设置
         sysMenu.setKeepAlive(null);
-
         // 清空大部分其他设置（外链只保留隐藏菜单设置）
         sysMenu.setAffixTab(null);
         sysMenu.setHideChildrenInMenu(null);
