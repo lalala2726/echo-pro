@@ -31,13 +31,11 @@ public class MessageProducer {
     public void sendUserMessage(MessageSendDTO messageSendDTO) {
         try {
             if (messageSendDTO == null) {
-                log.warn("sendUserMessage 入参为空，跳过发送");
                 return;
             }
             // 分批处理用户列表
             List<Long> userIds = messageSendDTO.getUserIds();
             if (userIds == null || userIds.isEmpty()) {
-                log.warn("用户ID列表为空，跳过发送");
                 return;
             }
 
@@ -51,14 +49,9 @@ public class MessageProducer {
 
                 // 发送到队列
                 convertAndSendJson(batchMessage);
-
-                log.info("发送用户消息批次到队列，消息ID: {}, 用户数量: {}",
-                        messageSendDTO.getMessageId(), batchUserIds.size());
             }
         } catch (Exception e) {
-            if (messageSendDTO != null) {
-                log.error("发送用户消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
-            }
+            log.error("发送用户消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
             throw new RuntimeException("发送用户消息到队列失败", e);
         }
     }
@@ -71,7 +64,6 @@ public class MessageProducer {
     public void sendRoleMessage(MessageSendDTO messageSendDTO) {
         try {
             if (messageSendDTO == null) {
-                log.warn("sendRoleMessage 入参为空，跳过发送");
                 return;
             }
             List<Long> roleIds = messageSendDTO.getRoleIds();
@@ -86,9 +78,7 @@ public class MessageProducer {
             log.info("发送角色消息到队列，消息ID: {}, 角色数量: {}",
                     messageSendDTO.getMessageId(), roleIds.size());
         } catch (Exception e) {
-            if (messageSendDTO != null) {
-                log.error("发送角色消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
-            }
+            log.error("发送角色消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
             throw new RuntimeException("发送角色消息到队列失败", e);
         }
     }
@@ -101,12 +91,10 @@ public class MessageProducer {
     public void sendDeptMessage(MessageSendDTO messageSendDTO) {
         try {
             if (messageSendDTO == null) {
-                log.warn("sendDeptMessage 入参为空，跳过发送");
                 return;
             }
             List<Long> deptIds = messageSendDTO.getDeptIds();
             if (deptIds == null || deptIds.isEmpty()) {
-                log.warn("部门ID列表为空，跳过发送");
                 return;
             }
 
@@ -116,9 +104,6 @@ public class MessageProducer {
             log.info("发送部门消息到队列，消息ID: {}, 部门数量: {}",
                     messageSendDTO.getMessageId(), deptIds.size());
         } catch (Exception e) {
-            if (messageSendDTO != null) {
-                log.error("发送部门消息到队列失败，消息ID: {}", messageSendDTO.getMessageId(), e);
-            }
             throw new RuntimeException("发送部门消息到队列失败", e);
         }
     }

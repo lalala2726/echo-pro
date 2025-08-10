@@ -20,13 +20,10 @@ public class SysSendMessageRequest {
      */
     @Schema(description = "消息发送方式", allowableValues = {"user", "role", "dept", "all"}, example = "user")
     @NotNull(message = "消息发送方式不能为空")
-    private MessageSendMethodEnum sendMethod;
+    private MessageSendMethodEnum receiveType;
 
     /**
      * 接收者ID列表，根据发送方式指定不同类型的ID：
-     * 发送方式为0时是用户ID列表
-     * 发送方式为1时是角色ID列表
-     * 发送方式为2时是部门ID列表
      */
     @Schema(description = "接收者ID列表（根据发送方式对应：用户ID、角色ID或部门ID）", type = "List<Long>")
     private List<Long> receiveId;

@@ -138,7 +138,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      * 根据发送方式分发消息
      */
     private boolean sendMessage(SysSendMessageRequest request, String senderName) {
-        MessageSendMethodEnum method = request.getSendMethod();
+        MessageSendMethodEnum method = request.getReceiveType();
         if (method == null) {
             throw new ParamException(ResultCode.PARAM_ERROR, "消息发送方式不能为空");
         }
@@ -268,10 +268,8 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                     .build();
 
             messageProducer.sendRoleMessage(messageSendDTO);
-            log.info("角色消息发送到队列成功，消息ID: {}, 角色数量: {}", sysMessage.getId(), receiveId.size());
             return true;
         } catch (Exception e) {
-            log.error("角色消息发送到队列失败，消息ID: {}", sysMessage.getId(), e);
             // 如果队列发送失败，回滚消息记录
             removeById(sysMessage.getId());
             throw new ServiceException("角色消息发送失败");
