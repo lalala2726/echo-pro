@@ -1,5 +1,8 @@
 package cn.zhangchuangla.system.message.model.vo.system;
 
+import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
+import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -35,16 +38,16 @@ public class SysMessageVo {
     private String content;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
-    private Integer type;
+    @Schema(description = "消息类型")
+    private MessageTypeEnum type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
-    private Integer level;
+    @Schema(description = "消息级别")
+    private MessageLevelEnum level;
 
     /**
      * 目标接受者ID列表
@@ -58,10 +61,10 @@ public class SysMessageVo {
     private String senderName;
 
     /**
-     * 目标类型：1-指定用户 2-全部用户 3-角色用户
+     * 目标类型
      */
-    @Schema(description = "目标类型：1-指定用户 2-全部用户 3-角色用户")
-    private Integer targetType;
+    @Schema(description = "目标类型")
+    private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间

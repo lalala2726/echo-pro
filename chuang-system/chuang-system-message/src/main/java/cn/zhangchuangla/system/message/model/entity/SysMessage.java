@@ -3,7 +3,6 @@ package cn.zhangchuangla.system.message.model.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,24 +32,22 @@ public class SysMessage {
     /**
      * 消息标题
      */
-    @NotNull(message = "消息标题不能为空")
     private String title;
 
     /**
      * 消息内容
      */
-    @NotNull(message = "消息内容不能为空")
     private String content;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    private Integer type;
+    private String type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    private Integer level;
+    private String level;
 
     /**
      * 发送者姓名
@@ -58,9 +55,9 @@ public class SysMessage {
     private String senderName;
 
     /**
-     * 目标类型：0-指定用户 1-角色用户 2-部门用户 3-全部用户
+     * 目标类型
      */
-    private Integer targetType;
+    private String targetType;
 
     /**
      * 发布时间
@@ -68,7 +65,7 @@ public class SysMessage {
     private Date publishTime;
 
     /**
-     * 是否删除：0-未删除 1-已删除
+     * 是否删除
      */
     private Integer isDeleted;
 

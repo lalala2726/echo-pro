@@ -49,7 +49,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = securityProperties.getHeader();
         String token = request.getHeader(header);
-        String tokenPrefix = securityProperties.getSession().getTokenPrefix();
         try {
             if (StringUtils.isNotBlank(token)) {
 

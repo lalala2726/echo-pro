@@ -42,16 +42,8 @@ public class CorsConfig {
      * 允许的源地址模式列表
      */
     private List<String> allowedOriginPatterns = Arrays.asList(
-            "http://localhost:*",
-            "http://127.0.0.1:*",
-            "https://localhost:*",
-            "https://127.0.0.1:*",
-            "http://192.168.*.*:*",
-            "https://192.168.*.*:*",
-            "http://10.*.*.*:*",
-            "https://10.*.*.*:*",
-            "http://172.16.*.*:*",
-            "https://172.16.*.*:*"
+            "http://*:*",
+            "https://*:*"
     );
 
     /**

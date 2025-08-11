@@ -4,6 +4,9 @@ import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
+import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
+import cn.zhangchuangla.system.message.model.dto.NoticeBadgeDTO;
 import cn.zhangchuangla.system.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.system.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.system.message.model.request.UserMessageListQueryRequest;
@@ -25,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 我的消息控制器。
+ *
  * @author Chuang
- * <p>
- * created on 2025/5/26 19:17
  */
 @RestController
 @Tag(name = "我的消息", description = "我的消息的阅读和发送等操作")
@@ -38,9 +41,15 @@ public class MessageController extends BaseController {
     private final SysMessageService sysMessageService;
     private final MessageQueryService messageQueryService;
     private final UserMessageReadService userMessageReadService;
+    private final WebSocketPublisher webSocketPublisher;
 
     /**
-     * 获取用户消息列表
+     * 获取用户消息列表。
+     *
+     * <p>支持分页与标题、类型、等级、发送人筛选。</p>
+     *
+     * @param request 查询与分页参数
+     * @return 表格数据，包含列表与扩展的已读/未读统计
      */
     @GetMapping("/list")
     @Operation(summary = "获取用户消息列表")
@@ -57,7 +66,9 @@ public class MessageController extends BaseController {
 
 
     /**
-     * 根据消息ID获取消息详情
+     * 根据消息ID获取消息详情。
+     *
+     * <p>成功请求后系统会自动将该消息标记为已读，并推送徽标数量变更。</p>
      *
      * @param id 消息ID
      * @return 消息详情
@@ -71,13 +82,14 @@ public class MessageController extends BaseController {
         if (userMessageVo == null) {
             return error("消息不存在");
         }
+        notifyUserBadgeChange(getUserId());
         return success(userMessageVo);
     }
 
     /**
-     * 获取用户消息数量
+     * 获取当前用户消息数量统计。
      *
-     * @return 用户消息数量
+     * @return 已读与未读数量
      */
     @GetMapping("/count")
     @Operation(summary = "获取用户消息数量")
@@ -87,7 +99,9 @@ public class MessageController extends BaseController {
     }
 
     /**
-     * 标记消息为已读
+     * 批量标记消息为已读。
+     *
+     * <p>仅修改阅读状态，不记录阅读时间。</p>
      *
      * @param ids 消息ID列表
      * @return 操作结果
@@ -98,16 +112,18 @@ public class MessageController extends BaseController {
             @Parameter(description = "消息ID，用于标记消息为已读,通常情况下此接口只是在用户选中多个消息标记已读") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "消息ID不能为空！");
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
-        // 批量标记已读，不记录阅读时间
         Long userId = getUserId();
-        boolean result = userMessageReadService
-                .batchMarkAsRead(userId, ids);
-
+        boolean result = userMessageReadService.batchMarkAsRead(userId, ids);
+        if (result) {
+            notifyUserBadgeChange(userId);
+        }
         return toAjax(result);
     }
 
     /**
-     * 标记消息为未读
+     * 批量标记消息为未读。
+     *
+     * <p>保留历史阅读时间记录。</p>
      *
      * @param ids 消息ID列表
      * @return 操作结果
@@ -118,14 +134,16 @@ public class MessageController extends BaseController {
             @Parameter(description = "消息ID，用于标记消息为未读") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "消息ID不能为空！");
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
-        // 标记未读，保留阅读时间记录
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
+        if (result) {
+            notifyUserBadgeChange(userId);
+        }
         return toAjax(result);
     }
 
     /**
-     * 删除消息
+     * 批量删除消息。
      *
      * @param ids 消息ID集合
      * @return 操作结果
@@ -135,7 +153,22 @@ public class MessageController extends BaseController {
     public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         boolean result = sysMessageService.deleteMessages(ids);
+        if (result) {
+            notifyUserBadgeChange(getUserId());
+        }
         return toAjax(result);
     }
 
+    /**
+     * 推送用户徽标数量变更通知。
+     *
+     * <p>该方法会查询当前用户的已读与未读消息数量，并通过 WebSocket 点对点推送给该用户。</p>
+     *
+     * @param userId 用户ID
+     */
+    private void notifyUserBadgeChange(Long userId) {
+        UserMessageReadCountDto count = messageQueryService.getUserMessageReadCount();
+        NoticeBadgeDTO badge = new NoticeBadgeDTO(count.getUnRead(), count.getRead());
+        webSocketPublisher.sendToUser(userId, WebSocketDestinations.USER_QUEUE_MESSAGE_BADGE, badge);
+    }
 }

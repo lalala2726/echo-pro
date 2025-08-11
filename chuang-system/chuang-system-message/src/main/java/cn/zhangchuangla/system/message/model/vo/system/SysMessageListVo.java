@@ -1,6 +1,9 @@
 package cn.zhangchuangla.system.message.model.vo.system;
 
 import cn.zhangchuangla.common.excel.annotation.Excel;
+import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
+import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
+import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -38,18 +41,18 @@ public class SysMessageListVo {
     private String content;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息")
-    @Excel(name = "消息类型：1-系统消息 2-通知消息 3-公告消息", sort = 3)
-    private Integer type;
+    @Schema(description = "消息类型")
+    @Excel(name = "消息类型", sort = 3)
+    private MessageTypeEnum type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急")
-    @Excel(name = "消息级别：1-普通 2-重要 3-紧急", sort = 4)
-    private Integer level;
+    @Schema(description = "消息级别")
+    @Excel(name = "消息级别", sort = 4)
+    private MessageLevelEnum level;
 
     /**
      * 发送者姓名
@@ -59,11 +62,11 @@ public class SysMessageListVo {
     private String senderName;
 
     /**
-     * 目标类型：1-指定用户 2-全部用户 3-角色用户
+     * 目标类型
      */
-    @Schema(description = "目标类型：1-指定用户 2-全部用户 3-角色用户")
-    @Excel(name = "目标类型：1-指定用户 2-全部用户 3-角色用户", sort = 7)
-    private Integer targetType;
+    @Schema(description = "目标类型")
+    @Excel(name = "目标类型", sort = 7)
+    private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间

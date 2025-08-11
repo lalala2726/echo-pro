@@ -18,13 +18,4 @@ public class MessageConstants {
         //消息未读
         Integer MESSAGE_UN_READ = 0;
     }
-
-    public interface MessageTypeConstants {
-        Integer SYSTEM_MESSAGE = 1;
-        Integer NOTICE_MESSAGE = 2;
-        Integer GENERAL_MESSAGE = 3;
-        Integer ANNOUNCEMENT_MESSAGE = 4;
-        Integer USER_MESSAGE = 5;
-    }
-
 }

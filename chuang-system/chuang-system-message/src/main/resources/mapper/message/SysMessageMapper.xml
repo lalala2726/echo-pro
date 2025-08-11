@@ -63,13 +63,14 @@
         <where>
             (
             -- 查询条件1:消息是专门给当前用户 --
-            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            (sum_link.user_id = #{userId} OR sm.target_type = 'all')
             OR
             -- 查询条件2:消息是部门内消息--
-            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
             -- 查询条件3:消息是角色内消息--
-            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            (sm.target_type = 'role' AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id =
+            #{userId}))
             )
             AND sm.is_deleted = 0
             <if test="request != null">
@@ -77,10 +78,10 @@
                     AND sm.title LIKE CONCAT('%', #{request.title}, '%')
                 </if>
                 <if test="request.type != null">
-                    AND sm.type = #{request.type}
+                    AND sm.type = #{request.type.value}
                 </if>
                 <if test="request.level != null">
-                    AND sm.level = #{request.level}
+                    AND sm.level = #{request.level.value}
                 </if>
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
@@ -108,11 +109,12 @@
                  LEFT JOIN
              sys_user_message sum_link ON sm.id = sum_link.message_id
         where (
-            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            (sum_link.user_id = #{userId} OR sm.target_type = 'all')
                 OR
-            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
                 OR
-            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            (sm.target_type = 'role' AND
+             sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
           AND sm.id = #{messageId}
           AND sm.is_deleted = 0
@@ -124,11 +126,12 @@
                  LEFT JOIN
              sys_user_message sum_link ON sm.id = sum_link.message_id
         where (
-            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            (sum_link.user_id = #{userId} OR sm.target_type = 'all')
                 OR
-            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
                 OR
-            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            (sm.target_type = 'role' AND
+             sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
             )
           AND sm.is_deleted = 0
     </select>
@@ -186,13 +189,14 @@
             <!-- 基础权限过滤条件 -->
             (
             <!-- 查询条件1: 消息是专门给当前用户的 -->
-            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            (sum_link.user_id = #{userId} OR sm.target_type = 'all')
             OR
             <!-- 查询条件2: 消息是部门内消息 -->
-            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
             <!-- 查询条件3: 消息是角色内消息 -->
-            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            (sm.target_type = 'role' AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id =
+            #{userId}))
             )
 
             <!-- 已读消息ID筛选条件 -->
@@ -211,10 +215,10 @@
                     AND sm.title LIKE CONCAT('%', #{request.title}, '%')
                 </if>
                 <if test="request.type != null">
-                    AND sm.type = #{request.type}
+                    AND sm.type = #{request.type.value}
                 </if>
                 <if test="request.level != null">
-                    AND sm.level = #{request.level}
+                    AND sm.level = #{request.level.value}
                 </if>
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')
@@ -244,13 +248,14 @@
             <!-- 基础权限过滤条件 -->
             (
             <!-- 查询条件1: 消息是专门给当前用户的 -->
-            (sum_link.user_id = #{userId} OR sm.target_type = 3)
+            (sum_link.user_id = #{userId} OR sm.target_type = 'all')
             OR
             <!-- 查询条件2: 消息是部门内消息 -->
-            (sm.target_type = 2 AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+            (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
             <!-- 查询条件3: 消息是角色内消息 -->
-            (sm.target_type = 1 AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+            (sm.target_type = 'role' AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id =
+            #{userId}))
             )
 
             <!-- 未读消息ID筛选条件：排除已读消息 -->
@@ -269,10 +274,10 @@
                     AND sm.title LIKE CONCAT('%', #{request.title}, '%')
                 </if>
                 <if test="request.type != null">
-                    AND sm.type = #{request.type}
+                    AND sm.type = #{request.type.value}
                 </if>
                 <if test="request.level != null">
-                    AND sm.level = #{request.level}
+                    AND sm.level = #{request.level.value}
                 </if>
                 <if test="request.senderName != null and request.senderName != ''">
                     AND sm.sender_name LIKE CONCAT('%', #{request.senderName}, '%')

@@ -1,6 +1,8 @@
 package cn.zhangchuangla.system.message.model.request;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
+import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
+import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,17 +24,17 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     private String title;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    @Schema(description = "消息类型：1-系统消息 2-通知消息 3-公告消息", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
-    private Integer type;
+    @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"}, requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "system")
+    private MessageTypeEnum type;
 
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
-    @Schema(description = "消息级别：1-普通 2-重要 3-紧急", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
-    private Integer level;
+    @Schema(description = "消息级别", allowableValues = {"normal", "important", "urgent"}, requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "normal")
+    private MessageLevelEnum level;
 
     /**
      * 是否已读
