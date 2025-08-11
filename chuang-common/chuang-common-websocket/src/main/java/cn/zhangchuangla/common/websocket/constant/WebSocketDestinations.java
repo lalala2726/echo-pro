@@ -16,16 +16,6 @@ public interface WebSocketDestinations {
      * 点对点：用户的消息徽标数量变更通知。
      */
     String USER_QUEUE_MESSAGE_BADGE = "/queue/message/badge";
-
-    /**
-     * 广播：角色级别的消息通知前缀。
-     */
-    String TOPIC_ROLE = "/topic/role/";
-
-    /**
-     * 广播：部门级别的消息通知前缀。
-     */
-    String TOPIC_DEPT = "/topic/dept/";
 }
 
 

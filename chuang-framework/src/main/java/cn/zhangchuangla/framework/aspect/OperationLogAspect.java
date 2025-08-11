@@ -1,6 +1,6 @@
 package cn.zhangchuangla.framework.aspect;
 
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
@@ -119,7 +119,7 @@ public class OperationLogAspect {
             sysOperationLog.setModule(controllerOperationLog.title());
             sysOperationLog.setOperationType(controllerOperationLog.businessType().name());
             sysOperationLog.setUserId(sysUserDetails != null ? sysUserDetails.getUserId() : null);
-            sysOperationLog.setUserName(sysUserDetails != null ? sysUserDetails.getUsername() : SysRolesConstant.ANONYMOUS);
+            sysOperationLog.setUserName(sysUserDetails != null ? sysUserDetails.getUsername() : RolesConstant.ANONYMOUS);
 
             // 获取 HTTP 请求对象
             HttpServletRequest request = SecurityUtils.getHttpServletRequest();

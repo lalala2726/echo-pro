@@ -45,6 +45,7 @@ public class SecurityHandshakeInterceptor implements HandshakeInterceptor {
         var authentication = tokenService.parseAccessToken(token);
         if (authentication == null || authentication.getPrincipal() == null) {
             // token 无效也允许握手，后续操作再鉴权
+            log.warn("[WS 握手] token 无效，保持匿名，uri={}", request.getURI());
             return true;
         }
         var principal = (cn.zhangchuangla.common.core.entity.security.SysUserDetails) authentication.getPrincipal();

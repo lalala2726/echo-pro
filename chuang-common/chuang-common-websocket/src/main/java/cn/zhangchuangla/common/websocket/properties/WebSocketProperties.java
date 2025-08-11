@@ -28,7 +28,6 @@ public class WebSocketProperties {
     /**
      * 允许的跨域来源模式。
      */
-    //todo 接入安全常量
     private List<String> allowedOrigins = new ArrayList<>(List.of("*"));
 
     /**

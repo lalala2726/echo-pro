@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.message.service.impl;
 
+import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -9,10 +10,9 @@ import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.common.mq.production.MessageProducer;
 import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
 import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
-import cn.zhangchuangla.system.core.model.entity.SysDept;
 import cn.zhangchuangla.system.core.model.entity.SysUserRole;
-import cn.zhangchuangla.system.core.service.SysDeptService;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
+import cn.zhangchuangla.system.core.service.SysUserService;
 import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.system.message.model.dto.NewMessageNoticeDTO;
@@ -52,7 +52,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private static final int BEACH_SEND_MESSAGE_QUANTITY = 500;
     private final SysMessageMapper sysMessageMapper;
     private final SysUserRoleService sysUserRoleService;
-    private final SysDeptService sysDeptService;
+    private final SysUserService sysUserService;
     private final MessageProducer messageProducer;
     private final SysUserMessageService sysUserMessageService;
     private final WebSocketPublisher webSocketPublisher;
@@ -225,7 +225,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     /**
-     * 根据角色ID发送消息
+     * 根据角色ID发送消息（点对点方式）
      *
      * @param request 发送消息请求参数
      * @return 结果
@@ -236,21 +236,17 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             throw new ParamException(ResultCode.PARAM_ERROR, "角色ID不能为空");
         }
 
-        // 查询所有有效的角色ID
+        // 查询拥有这些角色的所有用户ID
         LambdaQueryWrapper<SysUserRole> roleQueryWrapper = new LambdaQueryWrapper<SysUserRole>()
                 .in(SysUserRole::getRoleId, receiveId);
-        List<Long> validRoleIds = sysUserRoleService.list(roleQueryWrapper)
+        List<Long> targetUserIds = sysUserRoleService.list(roleQueryWrapper)
                 .stream()
-                .map(SysUserRole::getRoleId)
+                .map(SysUserRole::getUserId)
                 .distinct()
                 .toList();
 
-        // 判断是否有无效的角色ID
-        if (validRoleIds.size() != receiveId.size()) {
-            List<Long> invalidRoleIds = receiveId.stream()
-                    .filter(id -> !validRoleIds.contains(id))
-                    .toList();
-            throw new ServiceException(String.format("无效的角色ID：%s，请刷新网页重新请求！", invalidRoleIds));
+        if (targetUserIds.isEmpty()) {
+            throw new ServiceException("没有找到拥有指定角色的用户");
         }
 
         // 先保存消息
@@ -263,7 +259,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             return false;
         }
 
-        // 同步创建角色消息映射并广播
+        // 创建角色消息映射记录
         List<SysUserMessage> roleMessages = receiveId.stream()
                 .map(roleId -> SysUserMessage.builder()
                         .messageId(sysMessage.getId())
@@ -276,13 +272,17 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             removeById(sysMessage.getId());
             throw new ServiceException("角色消息关联保存失败");
         }
+
+        // 点对点发送给拥有指定角色的用户
         NewMessageNoticeDTO notice = buildNotice(sysMessage);
-        receiveId.forEach(roleId -> webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_ROLE + roleId, notice));
+        webSocketPublisher.sendToUsers(targetUserIds, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+        log.info("角色消息发送成功并已推送，消息ID: {}, 角色数量: {}, 目标用户数量: {}",
+                sysMessage.getId(), receiveId.size(), targetUserIds.size());
         return true;
     }
 
     /**
-     * 根据部门ID发送消息
+     * 根据部门ID发送消息（点对点方式）
      *
      * @param request 发送消息请求参数
      * @return 结果
@@ -293,21 +293,16 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             throw new ParamException(ResultCode.PARAM_ERROR, "部门ID不能为空");
         }
 
-        // 查询所有有效的部门ID
-        LambdaQueryWrapper<SysDept> deptQueryWrapper = new LambdaQueryWrapper<SysDept>()
-                .in(SysDept::getDeptId, receiveId);
-
-        List<Long> validDeptIds = sysDeptService.list(deptQueryWrapper)
+        // 查询属于这些部门的所有用户ID
+        List<Long> targetUserIds = sysUserService.list(new LambdaQueryWrapper<SysUser>()
+                        .in(SysUser::getDeptId, receiveId))
                 .stream()
-                .map(SysDept::getDeptId)
+                .map(SysUser::getUserId)
                 .distinct()
                 .toList();
 
-        if (validDeptIds.size() != receiveId.size()) {
-            List<Long> invalidDeptIds = receiveId.stream()
-                    .filter(id -> !validDeptIds.contains(id))
-                    .toList();
-            throw new ServiceException(String.format("无效的部门ID：%s，请刷新网页重新请求！", invalidDeptIds));
+        if (targetUserIds.isEmpty()) {
+            throw new ServiceException("没有找到属于指定部门的用户");
         }
 
         // 先保存消息
@@ -320,7 +315,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             return false;
         }
 
-        // 同步创建部门消息映射并广播
+        // 创建部门消息映射记录
         List<SysUserMessage> deptMessages = receiveId.stream()
                 .map(deptId -> SysUserMessage.builder()
                         .messageId(sysMessage.getId())
@@ -333,9 +328,12 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             removeById(sysMessage.getId());
             throw new ServiceException("部门消息关联保存失败");
         }
+
+        // 点对点发送给属于指定部门的用户
         NewMessageNoticeDTO notice = buildNotice(sysMessage);
-        receiveId.forEach(deptId -> webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_DEPT + deptId, notice));
-        log.info("部门消息发送成功并已广播，消息ID: {}, 部门数量: {}", sysMessage.getId(), receiveId.size());
+        webSocketPublisher.sendToUsers(targetUserIds, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+        log.info("部门消息发送成功并已推送，消息ID: {}, 部门数量: {}, 目标用户数量: {}",
+                sysMessage.getId(), receiveId.size(), targetUserIds.size());
         return true;
     }
 

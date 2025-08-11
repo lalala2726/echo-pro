@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.security.component;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.core.service.SysPermissionService;
@@ -39,7 +39,7 @@ public class PermissionAuth {
     public boolean hasPermission(String permission) {
         Set<String> roles = SecurityUtils.getRoles();
         // 如果是超级管理员，直接返回 true
-        if (roles.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roles.contains(RolesConstant.SUPER_ADMIN)) {
             return true;
         }
         Set<String> permissionByRole = sysPermissionService.getPermissionByRole(roles);
@@ -87,7 +87,7 @@ public class PermissionAuth {
      */
     private boolean isAdmin() {
         Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.ADMIN);
+        return roles.contains(RolesConstant.ADMIN);
     }
 
     /**
@@ -97,7 +97,7 @@ public class PermissionAuth {
      */
     private boolean isSuperAdmin() {
         Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.SUPER_ADMIN);
+        return roles.contains(RolesConstant.SUPER_ADMIN);
     }
 
     /**

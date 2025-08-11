@@ -1,7 +1,7 @@
 package cn.zhangchuangla.system.core.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
@@ -165,7 +165,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public List<SysMenu> listSysMenuByRoleName(Set<String> roleName) {
         //超级管理员拥有所有权限
-        if (roleName.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleName.contains(RolesConstant.SUPER_ADMIN)) {
             return list();
         }
         return sysMenuMapper.listSysMenuByRoleName(roleName);

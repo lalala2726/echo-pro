@@ -6,7 +6,7 @@ package cn.zhangchuangla.common.core.constant;
  * <p>
  * created on 2025/2/26 19:22
  */
-public class SysRolesConstant {
+public class RolesConstant {
 
     /**
      * 超级管理员

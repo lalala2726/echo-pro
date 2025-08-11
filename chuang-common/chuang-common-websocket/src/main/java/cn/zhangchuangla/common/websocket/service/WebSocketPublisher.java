@@ -1,5 +1,6 @@
 package cn.zhangchuangla.common.websocket.service;
 
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -82,12 +83,24 @@ public class WebSocketPublisher {
      * @return 认证用户ID列表
      */
     public List<Long> getAuthenticatedUserIds() {
-        return simpUserRegistry.getUsers().stream()
+        List<Long> userIds = simpUserRegistry.getUsers().stream()
                 .map(SimpUser::getPrincipal)
-                .filter(principal -> principal != null && !"anonymous".equals(principal.getName()))
+                .filter(principal -> principal != null && !RolesConstant.ANONYMOUS.equals(principal.getName()))
                 .map(Principal::getName)
+                .filter(name -> {
+                    try {
+                        Long.valueOf(name);
+                        return true;
+                    } catch (NumberFormatException e) {
+                        log.warn("Principal名称无法转换为用户ID: {}", name);
+                        return false;
+                    }
+                })
                 .map(Long::valueOf)
                 .toList();
+
+        log.debug("获取到 {} 个已认证用户: {}", userIds.size(), userIds);
+        return userIds;
     }
 
     /**
@@ -101,24 +114,12 @@ public class WebSocketPublisher {
     public void broadcastToAuthenticatedUsers(@NonNull String destination, Object payload) {
         List<Long> authenticatedUserIds = getAuthenticatedUserIds();
         if (authenticatedUserIds.isEmpty()) {
-            log.debug("没有认证用户在线，跳过广播消息到目的地: {}", destination);
+            log.warn("没有认证用户在线，跳过广播消息到目的地: {}", destination);
             return;
         }
 
-        log.debug("广播消息给 {} 个认证用户，目的地: {}", authenticatedUserIds.size(), destination);
+        log.info("广播消息给 {} 个认证用户，目的地: {}", authenticatedUserIds.size(), destination);
         sendToUsers(authenticatedUserIds, destination, payload);
-    }
-
-    /**
-     * 广播消息到指定目的地（所有订阅者，包括未认证用户）。
-     *
-     * <p>适用于公开信息的广播，不区分认证状态。</p>
-     *
-     * @param destination 广播目的地（例如：/topic/message/new）
-     * @param payload     消息体
-     */
-    public void broadcast(@NonNull String destination, Object payload) {
-        messagingTemplate.convertAndSend(destination, payload);
     }
 }
 
