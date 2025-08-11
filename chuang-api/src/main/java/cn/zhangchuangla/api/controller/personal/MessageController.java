@@ -55,6 +55,7 @@ public class MessageController extends BaseController {
                                                            @ParameterObject UserMessageListQueryRequest request) {
         Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
+
         Map<String, Object> extra = new HashMap<>();
         extra.put("read", userMessageReadCountDto.getRead());
         extra.put("unread", userMessageReadCountDto.getUnRead());

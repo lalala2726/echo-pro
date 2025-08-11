@@ -4,7 +4,9 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.system.message.constant.MessageConstants;
+import cn.zhangchuangla.system.message.mapper.SysMessageMapper;
 import cn.zhangchuangla.system.message.model.bo.MessageReadStatusBo;
+import cn.zhangchuangla.system.message.model.dto.AroundMessageIdDto;
 import cn.zhangchuangla.system.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.system.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
@@ -50,6 +52,7 @@ import java.util.stream.Collectors;
 public class MessageQueryServiceImpl implements MessageQueryService {
 
     private final SysMessageService sysMessageService;
+    private final SysMessageMapper sysMessageMapper;
     private final UserMessageExtService userMessageExtService;
     private final UserMessageReadService userMessageReadService;
 
@@ -89,9 +92,8 @@ public class MessageQueryServiceImpl implements MessageQueryService {
                 messagePage.getRecords(), currentUserId);
 
         // 构建最终结果
-        Page<UserMessageDto> resultPage = buildResultPage(messagePage, messageWithReadStatus);
 
-        return resultPage;
+        return buildResultPage(messagePage, messageWithReadStatus);
     }
 
     /**
@@ -297,6 +299,19 @@ public class MessageQueryServiceImpl implements MessageQueryService {
         // 转换为视图对象
         UserMessageVo messageVo = new UserMessageVo();
         BeanUtils.copyProperties(message, messageVo);
+
+        // 发送时间兼容：前端展示使用 sentTime，这里以 publishTime 优先，回落到 createTime
+        messageVo.setSentTime(message.getPublishTime() != null ? message.getPublishTime() : message.getCreateTime());
+
+        // 通过 Mapper 查询上一条/下一条（按 publish_time DESC, id DESC）
+        try {
+            AroundMessageIdDto prevNext = sysMessageMapper.getPrevAndNextMessageId(currentUserId, messageId);
+            if (prevNext != null) {
+                messageVo.setPreviousId(prevNext.getPrevId());
+                messageVo.setNextId(prevNext.getNextId());
+            }
+        } catch (Exception ignore) {
+        }
 
         return messageVo;
     }
