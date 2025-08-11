@@ -8,8 +8,6 @@ import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.XssUtils;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.common.mq.production.MessageProducer;
-import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
-import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
 import cn.zhangchuangla.system.core.model.entity.SysUserRole;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
@@ -20,6 +18,7 @@ import cn.zhangchuangla.system.message.model.entity.SysMessage;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
 import cn.zhangchuangla.system.message.model.request.*;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
+import cn.zhangchuangla.system.message.push.MessagePushService;
 import cn.zhangchuangla.system.message.service.SysMessageService;
 import cn.zhangchuangla.system.message.service.SysUserMessageService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -55,7 +54,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     private final SysUserService sysUserService;
     private final MessageProducer messageProducer;
     private final SysUserMessageService sysUserMessageService;
-    private final WebSocketPublisher webSocketPublisher;
+    private final MessagePushService messagePushService;
 
     /**
      * 分页查询系统消息表
@@ -195,7 +194,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             log.info("用户消息发送到队列成功，消息ID: {}, 用户数量: {}", message.getId(), userId.size());
             // WebSocket 推送用户新消息通知
             NewMessageNoticeDTO notice = buildNotice(message);
-            webSocketPublisher.sendToUsers(userId, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+            messagePushService.pushMessageNotifyToUser(userId, notice);
             return true;
         } catch (Exception e) {
             log.error("用户消息发送到队列失败，消息ID: {}", message.getId(), e);
@@ -275,7 +274,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
 
         // 点对点发送给拥有指定角色的用户
         NewMessageNoticeDTO notice = buildNotice(sysMessage);
-        webSocketPublisher.sendToUsers(targetUserIds, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+        messagePushService.pushMessageNotifyToUser(targetUserIds, notice);
         log.info("角色消息发送成功并已推送，消息ID: {}, 角色数量: {}, 目标用户数量: {}",
                 sysMessage.getId(), receiveId.size(), targetUserIds.size());
         return true;
@@ -331,7 +330,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
 
         // 点对点发送给属于指定部门的用户
         NewMessageNoticeDTO notice = buildNotice(sysMessage);
-        webSocketPublisher.sendToUsers(targetUserIds, WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+        messagePushService.pushMessageNotifyToUser(targetUserIds, notice);
         log.info("部门消息发送成功并已推送，消息ID: {}, 部门数量: {}, 目标用户数量: {}",
                 sysMessage.getId(), receiveId.size(), targetUserIds.size());
         return true;
@@ -353,7 +352,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         if (ok) {
             NewMessageNoticeDTO notice = buildNotice(sysMessage);
             // 只给已认证的用户发送全员消息
-            webSocketPublisher.broadcastToAuthenticatedUsers(WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+            messagePushService.pushMessageNotifyToAllUser(notice);
             log.info("全员消息发送成功并已推送给所有认证用户，消息ID: {}", sysMessage.getId());
         }
         return ok;

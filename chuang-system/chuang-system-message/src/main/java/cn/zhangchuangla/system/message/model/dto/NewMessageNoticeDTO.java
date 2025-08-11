@@ -1,7 +1,10 @@
 package cn.zhangchuangla.system.message.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -12,7 +15,10 @@ import java.util.Date;
  *
  * @author Chuang
  */
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
+@Builder
 @Schema(description = "新消息通知")
 public class NewMessageNoticeDTO {
 
