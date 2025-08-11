@@ -26,7 +26,7 @@ public class NewMessageNoticeDTO {
      * 消息ID
      */
     @Schema(description = "消息ID")
-    private Long messageId;
+    private Long id;
 
     /**
      * 标题摘要

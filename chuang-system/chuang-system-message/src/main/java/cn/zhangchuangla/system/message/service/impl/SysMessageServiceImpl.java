@@ -381,7 +381,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
      */
     private NewMessageNoticeDTO buildNotice(SysMessage sysMessage) {
         NewMessageNoticeDTO notice = new NewMessageNoticeDTO();
-        notice.setMessageId(sysMessage.getId());
+        notice.setId(sysMessage.getId());
         notice.setTitle(XssUtils.extractPlainText(sysMessage.getTitle()));
         notice.setType(sysMessage.getType());
         notice.setLevel(sysMessage.getLevel());
