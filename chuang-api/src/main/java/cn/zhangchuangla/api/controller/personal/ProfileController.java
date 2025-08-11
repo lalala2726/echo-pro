@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.system;
+package cn.zhangchuangla.api.controller.personal;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
@@ -41,7 +41,7 @@ import java.util.List;
  * created on 2025/8/9 04:30
  */
 @RestController
-@RequestMapping("/system/user/profile")
+@RequestMapping("/personal/profile")
 @RequiredArgsConstructor
 @Tag(name = "用户个人资料", description = "用户个人资料接口")
 public class ProfileController extends BaseController {

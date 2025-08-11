@@ -1,4 +1,4 @@
-package cn.zhangchuangla.api.controller.dashboard;
+package cn.zhangchuangla.api.controller.personal;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
@@ -33,7 +33,7 @@ import java.util.Map;
 @RestController
 @Tag(name = "我的消息", description = "我的消息的阅读和发送等操作")
 @RequiredArgsConstructor
-@RequestMapping("/dashboard/message")
+@RequestMapping("/personal/message")
 public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
