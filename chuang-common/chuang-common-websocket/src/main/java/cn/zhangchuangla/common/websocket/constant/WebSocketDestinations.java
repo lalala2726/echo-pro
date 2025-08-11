@@ -8,11 +8,6 @@ package cn.zhangchuangla.common.websocket.constant;
 public interface WebSocketDestinations {
 
     /**
-     * 广播：有新系统消息产生。
-     */
-    String TOPIC_MESSAGE_NEW = "/topic/message/new";
-
-    /**
      * 点对点：用户的新消息通知。
      */
     String USER_QUEUE_MESSAGE = "/queue/message";

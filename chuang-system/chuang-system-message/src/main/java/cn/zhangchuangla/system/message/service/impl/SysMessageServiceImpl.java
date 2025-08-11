@@ -354,7 +354,9 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
         boolean ok = save(sysMessage);
         if (ok) {
             NewMessageNoticeDTO notice = buildNotice(sysMessage);
-            webSocketPublisher.broadcast(WebSocketDestinations.TOPIC_MESSAGE_NEW, notice);
+            // 只给已认证的用户发送全员消息
+            webSocketPublisher.broadcastToAuthenticatedUsers(WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+            log.info("全员消息发送成功并已推送给所有认证用户，消息ID: {}", sysMessage.getId());
         }
         return ok;
     }

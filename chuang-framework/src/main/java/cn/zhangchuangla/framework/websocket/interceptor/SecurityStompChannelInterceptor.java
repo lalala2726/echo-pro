@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.websocket.interceptor;
 
-import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,35 +41,22 @@ public class SecurityStompChannelInterceptor implements ChannelInterceptor {
         }
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String token = resolveFromHeaders(accessor);
-            var authentication = tokenService.parseAccessToken(token);
-            if (authentication == null || authentication.getPrincipal() == null) {
-                throw new AuthorizationException("Invalid token");
+            // 允许无 token 的连接；若带 token 则尝试解析并注入用户上下文
+            String token = accessor.getFirstNativeHeader("token");
+            if (StringUtils.hasText(token)) {
+                var authentication = tokenService.parseAccessToken(token);
+                if (authentication != null && authentication.getPrincipal() != null) {
+                    var principal = (cn.zhangchuangla.common.core.entity.security.SysUserDetails) authentication.getPrincipal();
+                    Principal user = new UsernamePasswordAuthenticationToken(String.valueOf(principal.getUserId()), null, authentication.getAuthorities());
+                    accessor.setUser(user);
+                }
             }
-            var principal = (cn.zhangchuangla.common.core.entity.security.SysUserDetails) authentication.getPrincipal();
-            Principal user = new UsernamePasswordAuthenticationToken(String.valueOf(principal.getUserId()), null, authentication.getAuthorities());
-            accessor.setUser(user);
         }
 
         return message;
     }
 
-    /**
-     * 从请求头中解析令牌
-     *
-     * @param accessor 请求头访问器
-     * @return 令牌
-     */
-    private String resolveFromHeaders(StompHeaderAccessor accessor) {
-        String auth = accessor.getFirstNativeHeader("Authorization");
-        if (!StringUtils.hasText(auth)) {
-            auth = accessor.getFirstNativeHeader("token");
-        }
-        if (!StringUtils.hasText(auth)) {
-            throw new AuthorizationException("Missing token");
-        }
-        return auth;
-    }
+
 }
 
 

@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,15 +39,17 @@ public class SecurityHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(@NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response, @NotNull WebSocketHandler wsHandler, Map<String, Object> attributes) {
         String token = resolveToken(request);
         if (!StringUtils.hasText(token)) {
-            throw new IllegalArgumentException("Missing token");
+            // 允许无认证建立连接（扫码、引导页等场景）
+            return true;
         }
         var authentication = tokenService.parseAccessToken(token);
         if (authentication == null || authentication.getPrincipal() == null) {
-            // 解析失败时也允许握手，防止 400；CONNECT 会被拒绝
+            // token 无效也允许握手，后续操作再鉴权
             return true;
         }
         var principal = (cn.zhangchuangla.common.core.entity.security.SysUserDetails) authentication.getPrincipal();
         attributes.put("wsUserId", String.valueOf(principal.getUserId()));
+        attributes.put("wsDeptId", principal.getDeptId());
         return true;
     }
 
@@ -72,21 +73,17 @@ public class SecurityHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     /**
-     * 解析请求中的 token。
+     * 解析请求参数中的 token（仅支持参数传递）。
      *
      * @param request 请求
      * @return token
      */
     private String resolveToken(ServerHttpRequest request) {
-        List<String> headers = request.getHeaders().get("Authorization");
-        String candidate = (headers != null && !headers.isEmpty()) ? headers.get(0) : null;
-        if (!StringUtils.hasText(candidate) && request instanceof ServletServerHttpRequest servletReq) {
-            candidate = servletReq.getServletRequest().getParameter("token");
+        if (request instanceof ServletServerHttpRequest servletReq) {
+            String token = servletReq.getServletRequest().getParameter("token");
+            return StringUtils.hasText(token) ? token : null;
         }
-        if (!StringUtils.hasText(candidate)) {
-            return null;
-        }
-        return candidate.startsWith("Bearer ") ? candidate.substring(7) : candidate;
+        return null;
     }
 }
 

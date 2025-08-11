@@ -28,12 +28,19 @@ public class WebSocketProperties {
     /**
      * 允许的跨域来源模式。
      */
+    //todo 接入安全常量
     private List<String> allowedOrigins = new ArrayList<>(List.of("*"));
 
     /**
      * 是否启用 SockJS 回退。
      */
     private Boolean sockJsEnabled = Boolean.TRUE;
+
+    /**
+     * 未认证连接的最大存活时长（秒）。
+     * 超过该时长仍未完成认证的连接将被服务端主动断开以节省资源。
+     */
+    private Integer unauthenticatedMaxAgeSeconds = 300;
 
 }
 
