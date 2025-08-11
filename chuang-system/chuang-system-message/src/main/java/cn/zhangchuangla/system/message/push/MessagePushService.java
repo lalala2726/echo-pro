@@ -3,10 +3,10 @@ package cn.zhangchuangla.system.message.push;
 import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
 import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
 import cn.zhangchuangla.system.message.model.dto.NewMessageNoticeDTO;
+import cn.zhangchuangla.system.message.model.dto.UserMessageReadCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,16 +43,9 @@ public class MessagePushService {
 
     /**
      * 推送消息已读未读数量给用户
-     *
-     * @param userId 用户ID
-     * @param read   已读数量
-     * @param unread 未读数量
      */
-    public void pushMessageReadCount(Long userId, Long read, Long unread) {
-        HashMap<String, Long> response = new HashMap<>();
-        response.put("read", read);
-        response.put("unread", unread);
-        webSocketPublisher.sendToUser(userId, WebSocketDestinations.USER_QUEUE_MESSAGE_BADGE, response);
+    public void pushMessageReadCount(Long userId, UserMessageReadCountDto unread) {
+        webSocketPublisher.sendToUser(userId, WebSocketDestinations.USER_QUEUE_MESSAGE_BADGE, unread);
     }
 
 

@@ -339,4 +339,5 @@ public class UserMessageReadServiceImpl extends ServiceImpl<UserMessageExtMapper
 
         return record != null ? record.getLastReadTime() : null;
     }
+
 }
