@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.message.mapper;
 
+import cn.zhangchuangla.system.message.model.dto.AroundMessageIdDto;
 import cn.zhangchuangla.system.message.model.entity.SysMessage;
 import cn.zhangchuangla.system.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.system.message.model.request.UserMessageListQueryRequest;
@@ -94,4 +95,14 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
                                              @Param("userId") Long userId,
                                              @Param("request") UserMessageListQueryRequest request,
                                              @Param("messageIds") List<Long> messageIds);
+
+    /**
+     * 获取当前消息的上一条和下一条消息ID（基于 publish_time DESC, id DESC 排序），范围限定为当前用户可见的消息集合。
+     *
+     * @param userId    当前用户ID
+     * @param currentId 当前消息ID
+     * @return 包含键 prev_id/next_id 的 Map
+     */
+    AroundMessageIdDto getPrevAndNextMessageId(@Param("userId") Long userId,
+                                               @Param("currentId") Long currentId);
 }

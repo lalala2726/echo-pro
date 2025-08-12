@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
+import cn.zhangchuangla.system.message.push.MessagePushService;
 import cn.zhangchuangla.system.message.service.SysUserMessageService;
 import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 public class MessageBusinessConsumer {
 
     private final SysUserMessageService sysUserMessageService;
-    // WebSocket 推送已迁移至 Service 层，消费者仅负责入库
+    private final MessagePushService messagePushService;
 
     /**
      * 消费用户消息队列中的消息，批量插入用户消息记录
@@ -93,21 +94,21 @@ public class MessageBusinessConsumer {
 
         // 批量插入
         boolean success = sysUserMessageService.saveBatch(userMessages);
-        logResult(success, messageSendDTO, userIds.size(), startTime, "用户");
+        logResult(success, messageSendDTO, userIds.size(), startTime);
     }
 
     /**
      * 记录处理结果
      */
-    private void logResult(boolean success, MessageSendDTO messageSendDTO, int count, long startTime, String type) {
+    private void logResult(boolean success, MessageSendDTO messageSendDTO, int count, long startTime) {
         long endTime = System.currentTimeMillis();
         if (success) {
             log.info("{}消息批次处理成功，消息ID: {}, {}数量: {}, 耗时: {}ms",
-                    type, messageSendDTO.getMessageId(), type, count, endTime - startTime);
+                    "用户", messageSendDTO.getMessageId(), "用户", count, endTime - startTime);
         } else {
             log.error("{}消息批次处理失败，消息ID: {}, {}数量: {}",
-                    type, messageSendDTO.getMessageId(), type, count);
-            throw new RuntimeException("批量插入" + type + "消息记录失败");
+                    "用户", messageSendDTO.getMessageId(), "用户", count);
+            throw new RuntimeException("批量插入" + "用户" + "消息记录失败");
         }
     }
 

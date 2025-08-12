@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -47,7 +47,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Override
     public Set<String> getPermissionByRole(Set<String> roleSet) {
         // 如果是超级管理员将返回全部权限信息
-        if (roleSet.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleSet.contains(RolesConstant.SUPER_ADMIN)) {
             return Set.of("*:*:*");
         }
         return sysMenuMapper.getPermissionByRole(roleSet);
@@ -95,7 +95,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         if (sysRole == null) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "角色不存在");
         }
-        if (SysRolesConstant.SUPER_ADMIN.equals(sysRole.getRoleKey())) {
+        if (RolesConstant.SUPER_ADMIN.equals(sysRole.getRoleKey())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
@@ -125,7 +125,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             return Collections.emptyList();
         }
         Set<String> roleKeys = sysRoleService.getRoleSetByRoleId(roleId);
-        if (roleKeys.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleKeys.contains(RolesConstant.SUPER_ADMIN)) {
             return sysMenuService.list().stream().map(SysMenu::getId).distinct().collect(Collectors.toList());
         }
         return sysRoleMenuService.selectMenuListByRoleId(roleId);

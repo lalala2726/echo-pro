@@ -32,9 +32,9 @@ public interface DataLoader {
     }
 
     /**
-     * 加载失败时是否允许继续启动项目,true将阻止项目启动
+     * 失败是否阻止启动；true=阻止启动，false=不中断启动。
      */
-    default boolean allowStartupOnFailure() {
+    default boolean blockStartupOnFailure() {
         return false;
     }
 }

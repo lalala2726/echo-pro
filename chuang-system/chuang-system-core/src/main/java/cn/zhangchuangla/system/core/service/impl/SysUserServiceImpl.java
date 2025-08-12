@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -292,7 +292,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             throw new ServiceException(ResultCode.OPERATION_ERROR, "不允许修改自己的信息！");
         }
         Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleSetByUserId.contains(RolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "不允许修改超级管理员的信息！");
         }
 
@@ -331,7 +331,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
         //不允许用户重置管理员密码
         Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(userId);
-        if (roleSetByUserId.contains(SysRolesConstant.SUPER_ADMIN)) {
+        if (roleSetByUserId.contains(RolesConstant.SUPER_ADMIN)) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "不允许重置超级管理员密码");
         }
         SysUser sysUser = SysUser.builder()

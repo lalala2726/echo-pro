@@ -48,7 +48,6 @@ public class SysUserDetails implements UserDetails, Serializable {
      */
     private Long deptId;
 
-
     /**
      * 用户角色权限集合
      */

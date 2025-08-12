@@ -204,9 +204,14 @@ public class DeviceLimiter {
             if (score != null && score <= needDeleteValue) {
                 String refreshTokenId = tuple.getValue();
                 String deviceRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-                //删除设备数
+                // 同步删除对应的令牌，避免残留无索引的会话
+                try {
+                    redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+                } catch (Exception ignore) {
+                    // 容错：令牌可能已被删除
+                }
+                // 删除设备数据与索引
                 redisCache.deleteObject(deviceRedisKey);
-                //删除索引
                 redisZSetCache.zRemove(deviceIndexRedisKey, refreshTokenId);
             }
         });

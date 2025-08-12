@@ -116,7 +116,8 @@ public class LoaderCoordinator implements CommandLineRunner {
                     String errorMsg = "加载器返回false，表示加载失败";
                     status.markFailure(errorMsg);
                     logger.error("同步加载器执行失败: {} - {}", loaderName, errorMsg);
-                    if (loader.allowStartupOnFailure()) {
+                    boolean blockStartup = loader.blockStartupOnFailure();
+                    if (blockStartup) {
                         throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
                     }
                 }
@@ -126,12 +127,15 @@ public class LoaderCoordinator implements CommandLineRunner {
                 String errorMsg = e.getMessage();
                 status.markFailure(errorMsg);
                 logger.error("同步加载器执行失败: {} - {}", loaderName, errorMsg, e);
-                if (loader.allowStartupOnFailure()) {
+                boolean blockStartup = loader.blockStartupOnFailure();
+                if (blockStartup) {
                     throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
                 }
 
                 if (failFast) {
                     logger.error("系统配置为快速失败模式，中止后续加载器执行");
+                    // 标记后续未执行的同步加载器为跳过
+                    markRemainingSyncLoadersSkipped(syncLoaders, loaderName);
                     break;
                 }
             }
@@ -176,7 +180,8 @@ public class LoaderCoordinator implements CommandLineRunner {
                                 String errorMsg = "加载器返回false，表示加载失败";
                                 status.markFailure(errorMsg);
                                 logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg);
-                                if (loader.allowStartupOnFailure()) {
+                                boolean blockStartup = loader.blockStartupOnFailure();
+                                if (blockStartup) {
                                     throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
                                 }
                             }
@@ -185,24 +190,33 @@ public class LoaderCoordinator implements CommandLineRunner {
                             String errorMsg = e.getMessage();
                             status.markFailure(errorMsg);
                             logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg, e);
-                            if (loader.allowStartupOnFailure()) {
+                            boolean blockStartup = loader.blockStartupOnFailure();
+                            if (blockStartup) {
                                 throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
                             }
                         }
-                    }, executorService))
+                            }, executorService)
+                            // 每个任务设置单独超时，避免长尾拖慢整体
+                            .orTimeout(loaderTimeoutSeconds, TimeUnit.SECONDS))
                     .toList();
 
             // 设置超时等待所有异步加载完成
             try {
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .get(loaderTimeoutSeconds, TimeUnit.SECONDS);
+                CompletableFuture<Void> all = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+                all.get(loaderTimeoutSeconds, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.error("异步加载器执行被中断", e);
             } catch (ExecutionException e) {
                 logger.error("异步加载器执行发生错误", e);
+                if (failFast) {
+                    futures.forEach(f -> f.cancel(true));
+                    executorService.shutdownNow();
+                }
             } catch (TimeoutException e) {
                 logger.error("异步加载器执行超时 ({}秒)", loaderTimeoutSeconds, e);
+                futures.forEach(f -> f.cancel(true));
+                executorService.shutdownNow();
             }
         } finally {
             executorService.shutdown();
@@ -215,6 +229,26 @@ public class LoaderCoordinator implements CommandLineRunner {
                 Thread.currentThread().interrupt();
                 logger.error("等待线程池关闭时被中断", e);
                 executorService.shutdownNow();
+            }
+        }
+    }
+
+    /**
+     * 标记同步阶段未执行的加载器为跳过
+     */
+    private void markRemainingSyncLoadersSkipped(List<DataLoader> syncLoaders, String failedLoaderName) {
+        boolean afterFailed = false;
+        for (DataLoader loader : syncLoaders) {
+            String name = loader.getName();
+            if (name.equals(failedLoaderName)) {
+                afterFailed = true;
+                continue;
+            }
+            if (afterFailed) {
+                LoaderStatus status = loaderStatusMap.get(name);
+                if (status != null) {
+                    status.markSkipped();
+                }
             }
         }
     }
@@ -258,6 +292,7 @@ public class LoaderCoordinator implements CommandLineRunner {
         private long endTime;
         private boolean success;
         private String errorMessage;
+        private boolean skipped;
 
         public LoaderStatus(String name) {
             this.name = name;
@@ -278,15 +313,22 @@ public class LoaderCoordinator implements CommandLineRunner {
             this.errorMessage = errorMessage;
         }
 
+        public void markSkipped() {
+            this.endTime = System.currentTimeMillis();
+            this.success = false;
+            this.skipped = true;
+        }
+
         public long getDuration() {
             return endTime - startTime;
         }
 
         @Override
         public String toString() {
+            String state = skipped ? "跳过" : (success ? "成功" : "失败");
             return String.format("%s [%s] %dms %s",
                     name,
-                    success ? "成功" : "失败",
+                    state,
                     getDuration(),
                     errorMessage != null ? "- " + errorMessage : "");
         }

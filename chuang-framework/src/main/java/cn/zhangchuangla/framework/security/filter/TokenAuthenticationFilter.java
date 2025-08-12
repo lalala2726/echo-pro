@@ -49,18 +49,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = securityProperties.getHeader();
         String token = request.getHeader(header);
+        // 兼容标准 Authorization: Bearer <token>
+        if (StringUtils.isBlank(token)) {
+            String authHeader = request.getHeader("Authorization");
+            if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7).trim();
+            }
+        }
         try {
             if (StringUtils.isNotBlank(token)) {
-
-                // 执行令牌有效性检查（包含密码学验签和过期时间验证）
-                boolean isValidToken = tokenService.validateAccessToken(token);
-                if (!isValidToken) {
+                // 直接解析令牌（内部会做验签与有效性检查），避免重复解析
+                Authentication authentication = tokenService.parseAccessToken(token);
+                if (authentication == null) {
                     ResponseUtils.writeErrMsg(response, ResultCode.ACCESS_TOKEN_INVALID, HttpStatus.UNAUTHORIZED);
                     return;
                 }
-
-                // 将令牌解析为 Spring Security 上下文认证对象
-                Authentication authentication = tokenService.parseAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {

@@ -491,17 +491,13 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
                     Trigger trigger = triggers.get(0);
                     java.util.Date nextFireTime = trigger.getNextFireTime();
 
-                    // 更新数据库中的下次执行时间
-                    SysJob updateJob = new SysJob();
-                    updateJob.setJobId(jobId);
-                    updateJob.setNextFireTime(nextFireTime);
-
-                    boolean updated = updateById(updateJob);
-                    if (updated) {
+                    // 使用专用Mapper方法，避免其他字段被误置空
+                    int updated = sysJobMapper.updateJobExecutionTime(jobId, job.getPreviousFireTime(), nextFireTime);
+                    if (updated > 0) {
                         log.debug("任务下次执行时间更新成功: jobId={}, nextFireTime={}", jobId, nextFireTime);
+                        return true;
                     }
-
-                    return updated;
+                    return false;
                 }
             }
 
@@ -520,8 +516,9 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         int updateCount = 0;
 
         try {
-            // 获取所有启用的任务
+            // 获取所有启用的任务并批量构造更新集
             List<SysJob> enabledJobs = selectEnabledJobs();
+            java.util.List<SysJob> needUpdate = new java.util.ArrayList<>();
 
             for (SysJob job : enabledJobs) {
                 try {
@@ -533,22 +530,20 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
                             java.util.Date nextFireTime = trigger.getNextFireTime();
                             java.util.Date previousFireTime = trigger.getPreviousFireTime();
 
-                            // 更新数据库中的执行时间
                             SysJob updateJob = new SysJob();
                             updateJob.setJobId(job.getJobId());
                             updateJob.setNextFireTime(nextFireTime);
                             updateJob.setPreviousFireTime(previousFireTime);
-
-                            if (updateById(updateJob)) {
-                                updateCount++;
-                                log.debug("任务执行时间批量更新成功: jobId={}, nextFireTime={}, previousFireTime={}",
-                                        job.getJobId(), nextFireTime, previousFireTime);
-                            }
+                            needUpdate.add(updateJob);
                         }
                     }
                 } catch (Exception e) {
                     log.error("批量更新任务执行时间失败: jobId={}", job.getJobId(), e);
                 }
+            }
+
+            if (!needUpdate.isEmpty()) {
+                updateCount = sysJobMapper.batchUpdateExecutionTimes(needUpdate);
             }
 
             log.info("批量更新任务执行时间完成，成功更新 {} 个任务", updateCount);

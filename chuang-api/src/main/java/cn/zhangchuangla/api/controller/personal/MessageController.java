@@ -1,17 +1,15 @@
-package cn.zhangchuangla.api.controller.dashboard;
+package cn.zhangchuangla.api.controller.personal;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.utils.Assert;
-import cn.zhangchuangla.common.websocket.constant.WebSocketDestinations;
-import cn.zhangchuangla.common.websocket.service.WebSocketPublisher;
-import cn.zhangchuangla.system.message.model.dto.NoticeBadgeDTO;
 import cn.zhangchuangla.system.message.model.dto.UserMessageDto;
 import cn.zhangchuangla.system.message.model.dto.UserMessageReadCountDto;
 import cn.zhangchuangla.system.message.model.request.UserMessageListQueryRequest;
 import cn.zhangchuangla.system.message.model.vo.user.UserMessageListVo;
 import cn.zhangchuangla.system.message.model.vo.user.UserMessageVo;
+import cn.zhangchuangla.system.message.push.MessagePushService;
 import cn.zhangchuangla.system.message.service.MessageQueryService;
 import cn.zhangchuangla.system.message.service.SysMessageService;
 import cn.zhangchuangla.system.message.service.UserMessageReadService;
@@ -35,13 +33,13 @@ import java.util.Map;
 @RestController
 @Tag(name = "我的消息", description = "我的消息的阅读和发送等操作")
 @RequiredArgsConstructor
-@RequestMapping("/dashboard/message")
+@RequestMapping("/personal/message")
 public class MessageController extends BaseController {
 
     private final SysMessageService sysMessageService;
     private final MessageQueryService messageQueryService;
     private final UserMessageReadService userMessageReadService;
-    private final WebSocketPublisher webSocketPublisher;
+    private final MessagePushService messagePushService;
 
     /**
      * 获取用户消息列表。
@@ -57,6 +55,7 @@ public class MessageController extends BaseController {
                                                            @ParameterObject UserMessageListQueryRequest request) {
         Page<UserMessageDto> sysMessagePage = messageQueryService.listUserMessageList(request);
         UserMessageReadCountDto userMessageReadCountDto = messageQueryService.getUserMessageReadCount();
+
         Map<String, Object> extra = new HashMap<>();
         extra.put("read", userMessageReadCountDto.getRead());
         extra.put("unread", userMessageReadCountDto.getUnRead());
@@ -82,7 +81,7 @@ public class MessageController extends BaseController {
         if (userMessageVo == null) {
             return error("消息不存在");
         }
-        notifyUserBadgeChange(getUserId());
+        pushMessageCount(getUserId());
         return success(userMessageVo);
     }
 
@@ -114,9 +113,7 @@ public class MessageController extends BaseController {
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         Long userId = getUserId();
         boolean result = userMessageReadService.batchMarkAsRead(userId, ids);
-        if (result) {
-            notifyUserBadgeChange(userId);
-        }
+        pushMessageCount(getUserId());
         return toAjax(result);
     }
 
@@ -136,9 +133,7 @@ public class MessageController extends BaseController {
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         Long userId = getUserId();
         boolean result = userMessageReadService.unread(userId, ids);
-        if (result) {
-            notifyUserBadgeChange(userId);
-        }
+        pushMessageCount(userId);
         return toAjax(result);
     }
 
@@ -153,22 +148,18 @@ public class MessageController extends BaseController {
     public AjaxResult<Void> deleteMessages(@PathVariable("ids") List<Long> ids) {
         Assert.isTrue(ids.stream().allMatch(id -> id > 0), "消息ID必须大于0！");
         boolean result = sysMessageService.deleteMessages(ids);
-        if (result) {
-            notifyUserBadgeChange(getUserId());
-        }
+        pushMessageCount(getUserId());
         return toAjax(result);
     }
 
     /**
-     * 推送用户徽标数量变更通知。
-     *
-     * <p>该方法会查询当前用户的已读与未读消息数量，并通过 WebSocket 点对点推送给该用户。</p>
+     * 推送消息数量
      *
      * @param userId 用户ID
      */
-    private void notifyUserBadgeChange(Long userId) {
-        UserMessageReadCountDto count = messageQueryService.getUserMessageReadCount();
-        NoticeBadgeDTO badge = new NoticeBadgeDTO(count.getUnRead(), count.getRead());
-        webSocketPublisher.sendToUser(userId, WebSocketDestinations.USER_QUEUE_MESSAGE_BADGE, badge);
+    private void pushMessageCount(Long userId) {
+        UserMessageReadCountDto userMessageReadCount = messageQueryService.getUserMessageReadCount();
+        messagePushService.pushMessageReadCount(userId, userMessageReadCount);
     }
+
 }

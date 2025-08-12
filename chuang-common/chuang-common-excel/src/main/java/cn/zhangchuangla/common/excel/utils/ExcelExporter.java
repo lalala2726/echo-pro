@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -42,6 +41,11 @@ public class ExcelExporter {
 
 
     private final DictDataHandler dictDataHandler;
+
+    /**
+     * 默认每个Sheet的最大数据行数（不含表头/提示行）
+     */
+    private static final int DEFAULT_MAX_ROWS_PER_SHEET = 50000;
 
     public ExcelExporter(DictDataHandler dictDataHandler) {
         this.dictDataHandler = dictDataHandler;
@@ -79,8 +83,6 @@ public class ExcelExporter {
      */
     public <T> void exportExcel(OutputStream outputStream, List<T> data, Class<T> clazz, String sheetName) {
         try (Workbook workbook = new Workbook(outputStream, "ExcelApp", "1.0")) {
-            Worksheet worksheet = workbook.newWorksheet(sheetName);
-
             // 获取Excel字段信息，传入数据用于判断对象展开
             List<ExcelField> excelFields = getExcelFields(clazz, data);
             if (CollectionUtils.isEmpty(excelFields)) {
@@ -91,14 +93,41 @@ public class ExcelExporter {
             // 预加载字典数据
             preloadDictData(excelFields);
 
-            // 写入表头
-            writeHeader(worksheet, excelFields);
+            // 计算是否需要提示行
+            boolean hasHints = excelFields.stream().anyMatch(f -> {
+                if (f.getExcel() == null) return false;
+                return StringUtils.isNotBlank(f.getExcel().prompt()) || (f.getExcel().combo() != null && f.getExcel().combo().length > 0);
+            });
 
-            // 写入数据
-            writeData(worksheet, data, excelFields);
+            int total = data == null ? 0 : data.size();
+            int sheetCount = Math.max(1, (int) Math.ceil(total / (double) DEFAULT_MAX_ROWS_PER_SHEET));
 
-            // 设置列宽
-            setColumnWidth(worksheet, excelFields);
+            for (int s = 0; s < sheetCount; s++) {
+                String curSheetName = sheetName + (sheetCount > 1 ? ("_" + (s + 1)) : "");
+                Worksheet worksheet = workbook.newWorksheet(curSheetName);
+
+                int fromIndex = s * DEFAULT_MAX_ROWS_PER_SHEET;
+                int toIndex = Math.min(fromIndex + DEFAULT_MAX_ROWS_PER_SHEET, total);
+                List<T> pageData = data == null ? java.util.Collections.emptyList() : data.subList(fromIndex, toIndex);
+
+                // 行索引计算
+                int headerRowIndex = 0;
+                int hintRowIndex = hasHints ? 1 : -1;
+                int dataStartRow = hasHints ? 2 : 1;
+
+                // 写入表头
+                writeHeader(worksheet, excelFields, headerRowIndex);
+                // 写入提示
+                if (hasHints) {
+                    writeHintsRow(worksheet, excelFields, hintRowIndex);
+                }
+                // 写入数据
+                int lastRowIndex = writeData(worksheet, pageData, excelFields, dataStartRow);
+                // 写入统计行
+                writeStatisticsRow(worksheet, pageData, excelFields, lastRowIndex + 1);
+                // 设置列宽
+                setColumnWidth(worksheet, excelFields);
+            }
 
         } catch (IOException e) {
             log.error("导出Excel失败", e);
@@ -121,7 +150,7 @@ public class ExcelExporter {
             return outputStream.toByteArray();
         } catch (IOException e) {
             log.error("导出Excel到字节数组失败", e);
-            throw new RuntimeException("导出Excel到字节数组失败", e);
+            throw new ServiceException("导出Excel失败");
         }
     }
 
@@ -149,6 +178,11 @@ public class ExcelExporter {
 
         Field[] fields = FieldUtils.getAllFieldsList(clazz).toArray(new Field[0]);
         for (Field field : fields) {
+            // 过滤 static/transient 字段
+            int mod = field.getModifiers();
+            if (java.lang.reflect.Modifier.isStatic(mod) || java.lang.reflect.Modifier.isTransient(mod)) {
+                continue;
+            }
             Excel excel = field.getAnnotation(Excel.class);
             if (excel != null && excel.isExport()) {
                 field.setAccessible(true);
@@ -229,8 +263,10 @@ public class ExcelExporter {
                 // 设置字段路径，用于后续获取值时使用 - 格式为 "parentField.childField"
                 expandedField.setTargetAttr(parentField.getName() + "." + field.getName());
 
-                // 设置排序值，基于父字段的排序值加上子字段的相对位置
-                int expandedSort = parentSort == Integer.MAX_VALUE ? excel.sort() : parentSort + i;
+                // 设置排序值：父排序权重大，子字段次之，减少冲突
+                int base = (parentSort == Integer.MAX_VALUE ? 0 : parentSort) * 1000;
+                int childSort = excel.sort() == Integer.MAX_VALUE ? i : excel.sort();
+                int expandedSort = base + childSort;
                 expandedField.setSort(expandedSort);
 
                 expandedFields.add(expandedField);
@@ -266,23 +302,41 @@ public class ExcelExporter {
      * @param worksheet   工作表
      * @param excelFields Excel字段列表
      */
-    private void writeHeader(Worksheet worksheet, List<ExcelField> excelFields) {
+    private void writeHeader(Worksheet worksheet, List<ExcelField> excelFields, int rowIndex) {
         for (int i = 0; i < excelFields.size(); i++) {
             ExcelField excelField = excelFields.get(i);
             String title = StringUtils.isNotBlank(excelField.getTitle()) ? excelField.getTitle() : excelField.getFieldName();
 
             // 写入表头
-            worksheet.value(0, i, title);
+            worksheet.value(rowIndex, i, title);
 
             // 设置表头样式
             if (excelField.isBold()) {
-                worksheet.style(0, i).bold().set();
+                worksheet.style(rowIndex, i).bold().set();
             }
+        }
+    }
 
-            // 这里可以根据需要设置字体颜色
-            StringUtils.isNotBlank(excelField.getColor());
-            // 这里可以根据需要设置背景颜色
-            StringUtils.isNotBlank(excelField.getBackgroundColor());
+    /**
+     * 写入提示/下拉枚举行（仅文本提示，不做数据有效性约束）
+     */
+    private void writeHintsRow(Worksheet worksheet, List<ExcelField> excelFields, int rowIndex) {
+        for (int i = 0; i < excelFields.size(); i++) {
+            ExcelField field = excelFields.get(i);
+            if (field.getExcel() == null) continue;
+            String prompt = field.getExcel().prompt();
+            String[] combo = field.getExcel().combo();
+            String hint = null;
+            if (StringUtils.isNotBlank(prompt)) {
+                hint = prompt;
+            }
+            if (combo != null && combo.length > 0) {
+                String options = String.join(",", combo);
+                hint = (hint == null ? "可选:" : hint + " 可选:") + options;
+            }
+            if (StringUtils.isNotBlank(hint)) {
+                worksheet.value(rowIndex, i, hint);
+            }
         }
     }
 
@@ -294,35 +348,69 @@ public class ExcelExporter {
      * @param excelFields Excel字段列表
      * @param <T>         数据类型
      */
-    private <T> void writeData(Worksheet worksheet, List<T> data, List<ExcelField> excelFields) {
+    private <T> int writeData(Worksheet worksheet, List<T> data, List<ExcelField> excelFields, int startRow) {
         if (CollectionUtils.isEmpty(data)) {
-            return;
+            return startRow - 1;
         }
 
         for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
             T item = data.get(rowIndex);
             // Excel行索引从1开始（0是表头）
-            int excelRowIndex = rowIndex + 1;
+            int excelRowIndex = startRow + rowIndex;
 
             for (int colIndex = 0; colIndex < excelFields.size(); colIndex++) {
                 ExcelField excelField = excelFields.get(colIndex);
                 Object value = getFieldValue(item, excelField);
 
-                // 处理字典映射
+                // 处理字典映射与显示值
                 String cellValue = processCellValue(value, excelField);
 
-                // 写入单元格
-                if (cellValue != null) {
-                    // 根据数据类型写入不同格式的值
-                    if (excelField.getColumnType() == Excel.ColumnType.NUMERIC && isNumeric(cellValue)) {
-                        try {
-                            worksheet.value(excelRowIndex, colIndex, Double.parseDouble(cellValue));
-                        } catch (NumberFormatException e) {
-                            worksheet.value(excelRowIndex, colIndex, cellValue);
-                        }
+                // 优先按原始类型写入数值，避免精度丢失；字符串兜底
+                if (excelField.getColumnType() == Excel.ColumnType.IMAGE) {
+                    // 图片类型：当前简化为写入占位/URL 文本（FastExcel不直接支持图片绘制）
+                    if (value instanceof String) {
+                        worksheet.value(excelRowIndex, colIndex, (String) value);
                     } else {
-                        worksheet.value(excelRowIndex, colIndex, cellValue);
+                        worksheet.value(excelRowIndex, colIndex, "[image]");
                     }
+                } else if (value instanceof Number && excelField.getColumnType() == Excel.ColumnType.NUMERIC) {
+                    worksheet.value(excelRowIndex, colIndex, ((Number) value).doubleValue());
+                } else if (cellValue != null) {
+                    worksheet.value(excelRowIndex, colIndex, cellValue);
+                }
+            }
+        }
+        return startRow + data.size() - 1;
+    }
+
+    /**
+     * 写入统计行（对开启 isStatistics 的列求和）
+     */
+    private <T> void writeStatisticsRow(Worksheet worksheet, List<T> data, List<ExcelField> excelFields, int rowIndex) {
+        if (CollectionUtils.isEmpty(data)) {
+            return;
+        }
+        boolean hasStats = excelFields.stream().anyMatch(f -> f.getExcel() != null && f.getExcel().isStatistics());
+        if (!hasStats) {
+            return;
+        }
+        boolean titleWritten = false;
+        for (int colIndex = 0; colIndex < excelFields.size(); colIndex++) {
+            ExcelField field = excelFields.get(colIndex);
+            if (field.getExcel() != null && field.getExcel().isStatistics()) {
+                java.math.BigDecimal sum = java.math.BigDecimal.ZERO;
+                for (T item : data) {
+                    Object v = getFieldValue(item, field);
+                    if (v instanceof Number) {
+                        sum = sum.add(new java.math.BigDecimal(((Number) v).toString()));
+                    } else if (v instanceof String && isNumeric((String) v)) {
+                        sum = sum.add(new java.math.BigDecimal((String) v));
+                    }
+                }
+                worksheet.value(rowIndex, colIndex, sum.doubleValue());
+                if (!titleWritten) {
+                    worksheet.value(rowIndex, 0, "合计");
+                    titleWritten = true;
                 }
             }
         }
@@ -437,9 +525,14 @@ public class ExcelExporter {
             return ((LocalDate) value).format(DateTimeFormatter.ofPattern(dateFormat));
         }
 
-        // 数字格式化
-        if (value instanceof BigDecimal && StringUtils.isNotBlank(excelField.getNumFormat())) {
-            return String.format(excelField.getNumFormat(), value);
+        // 数字格式化（优先使用 DecimalFormat 模式，如 0.00）
+        if (StringUtils.isNotBlank(excelField.getNumFormat()) && value instanceof Number) {
+            try {
+                java.text.DecimalFormat df = new java.text.DecimalFormat(excelField.getNumFormat());
+                return df.format(((Number) value).doubleValue());
+            } catch (IllegalArgumentException ignore) {
+                // 回退到默认 toString
+            }
         }
 
         return String.valueOf(value);
@@ -471,8 +564,11 @@ public class ExcelExporter {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("UTF-8");
 
-            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-            response.setHeader("Content-Disposition", "attachment; filename=" + encodedFileName + ".xlsx");
+            String base = fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName;
+            String encoded = URLEncoder.encode(base, StandardCharsets.UTF_8);
+            // 兼容 RFC 5987
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + encoded + ".xlsx; filename*=UTF-8''" + encoded + ".xlsx");
         } catch (Exception e) {
             log.error("设置响应头失败", e);
         }

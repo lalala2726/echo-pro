@@ -258,4 +258,35 @@ public final class RedisZSetCache {
     }
 
 
+    /**
+     * 使用 ZSCAN 扫描单个 ZSet 的成员（带分值）
+     * 注意：这是惰性、增量式扫描；本方法会将结果聚合到内存中返回。
+     * 如需极致大集合的流式处理，建议提供回调式消费。
+     *
+     * @param key ZSet 键
+     * @return 成员（带分值）集合
+     */
+    public Set<ZSetOperations.TypedTuple<Object>> zScanWithScores(final String key) {
+        if (!StringUtils.hasText(key)) {
+            return Collections.emptySet();
+        }
+
+        Set<ZSetOperations.TypedTuple<Object>> result = new LinkedHashSet<>();
+        try {
+            ScanOptions options = ScanOptions.scanOptions()
+                    .count(redisProperties.scanCount)
+                    .build();
+            try (Cursor<ZSetOperations.TypedTuple<Object>> cursor = redisTemplate.opsForZSet().scan(key, options)) {
+                while (cursor.hasNext()) {
+                    result.add(cursor.next());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Redis ZSet scan members failed, key: {}, error: {}", key, e.getMessage(), e);
+            return Collections.emptySet();
+        }
+        return result;
+    }
+
+
 }

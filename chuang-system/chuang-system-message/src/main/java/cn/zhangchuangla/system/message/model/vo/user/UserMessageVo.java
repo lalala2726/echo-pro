@@ -59,4 +59,16 @@ public class UserMessageVo {
     @Schema(description = "发送时间")
     private Date sentTime;
 
+    /**
+     * 上一条消息ID
+     */
+    @Schema(description = "上一条消息ID")
+    private Long previousId;
+
+    /**
+     * 下一条消息ID
+     */
+    @Schema(description = "下一条消息ID")
+    private Long nextId;
+
 }

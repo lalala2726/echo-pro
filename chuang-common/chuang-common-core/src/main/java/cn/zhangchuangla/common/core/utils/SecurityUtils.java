@@ -1,7 +1,7 @@
 package cn.zhangchuangla.common.core.utils;
 
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ServiceException;
@@ -122,7 +122,7 @@ public class SecurityUtils {
      */
     public static boolean isSuperAdmin() {
         Set<String> roles = getRoles();
-        return roles.contains(SysRolesConstant.SUPER_ADMIN);
+        return roles.contains(RolesConstant.SUPER_ADMIN);
     }
 
     /**

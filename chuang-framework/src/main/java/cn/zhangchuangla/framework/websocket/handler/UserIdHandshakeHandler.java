@@ -1,5 +1,6 @@
 package cn.zhangchuangla.framework.websocket.handler;
 
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +31,7 @@ public class UserIdHandshakeHandler extends DefaultHandshakeHandler {
     protected Principal determineUser(@NotNull ServerHttpRequest request, @NotNull WebSocketHandler wsHandler, Map<String, Object> attributes) {
         Object val = attributes.get("wsUserId");
         if (val == null) {
-            return new UsernamePasswordAuthenticationToken("anonymous", null);
+            return new UsernamePasswordAuthenticationToken(RolesConstant.ANONYMOUS, null);
         }
         return new UsernamePasswordAuthenticationToken(String.valueOf(val), null);
     }

@@ -234,7 +234,8 @@ public class TokenService {
      */
     private OnlineLoginUser buildOnlineUser(SysUserDetails user, String accessTokenId, String refreshTokenId, LoginDeviceDTO loginDeviceDTO) {
 
-        Set<String> roleSetByRoleId = sysRoleService.getRoleSetByRoleId(user.getUserId());
+        // 修复：应根据用户ID获取角色集合
+        Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(user.getUserId());
 
         String ip = loginDeviceDTO.getIp();
         String location = loginDeviceDTO.getLocation();
@@ -248,7 +249,7 @@ public class TokenService {
                 .location(location)
                 .deptId(user.getDeptId())
                 .userId(user.getUserId())
-                .roles(roleSetByRoleId);
+                .roles(roleSetByUserId);
         return builder.build();
     }
 

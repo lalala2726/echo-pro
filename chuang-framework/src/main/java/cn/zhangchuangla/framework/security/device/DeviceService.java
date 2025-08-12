@@ -15,7 +15,6 @@ import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.entity.SessionDevice;
 import cn.zhangchuangla.framework.model.request.SessionDeviceQueryRequest;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
-import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -41,7 +40,6 @@ public class DeviceService {
     private final SysUserService sysUserService;
     private final RedisTokenStore redisTokenStore;
     private final RedisCache redisCache;
-    private final TokenService tokenService;
 
     /**
      * 查询指定用户的登录设备列表
@@ -154,27 +152,26 @@ public class DeviceService {
      * @return 设备列表
      */
     public PageResult<SessionDevice> listDevice(SessionDeviceQueryRequest request) {
-        // 1. 构造 Key 模式，匹配所有用户的 session 索引 ZSet
+        // 采用增量扫描：先 scan 匹配所有用户的 session 索引 ZSet key，再对每个 ZSet 用 zscan 扫描成员
         String keyPattern = RedisConstants.Auth.SESSIONS_INDEX_KEY + "*";
+        List<String> indexKeys = redisZSetCache.scanKeys(keyPattern);
 
-        // 2. 批量扫描出所有符合模式的 ZSet Key 以及它们的成员和分数
-        Map<String, Set<ZSetOperations.TypedTuple<Object>>> allDeviceIndex =
-                redisZSetCache.scanKeysWithValues(keyPattern);
-        // 3. 结果集合，用于去重
         Set<SessionDevice> deviceSet = new LinkedHashSet<>();
-        // 4. 遍历每个 ZSet Key
-        allDeviceIndex.forEach((zsetKey, tuples) -> {
-            // 5. 遍历该用户 ZSet 中的每个成员
+        for (String indexKey : indexKeys) {
+            Set<ZSetOperations.TypedTuple<Object>> tuples = redisZSetCache.zScanWithScores(indexKey);
+            if (tuples == null || tuples.isEmpty()) {
+                continue;
+            }
             for (ZSetOperations.TypedTuple<Object> tuple : tuples) {
                 String member = String.valueOf(tuple.getValue());
                 Double score = tuple.getScore();
-                // 6. 转换成 SessionDevice
                 SessionDevice device = convertToSessionDevice(member, score);
                 if (device != null) {
                     deviceSet.add(device);
                 }
             }
-        });
+        }
+
         List<SessionDevice> sessionDevices = new ArrayList<>(deviceSet);
         return querySessionDevice(sessionDevices, request);
     }

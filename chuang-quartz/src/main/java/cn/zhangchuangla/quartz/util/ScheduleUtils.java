@@ -26,8 +26,9 @@ public class ScheduleUtils {
      * @return 具体执行任务类
      */
     private static Class<? extends Job> getQuartzJobClass(SysJob sysJob) {
-        boolean isConcurrent = QuartzConstants.JobStatusConstants.NORMAL.equals(sysJob.getConcurrent());
-        return isConcurrent ? QuartzJobExecution.class : QuartzDisallowConcurrentExecution.class;
+        // 并发标志：0=允许，1=禁止
+        boolean allowConcurrent = Integer.valueOf(0).equals(sysJob.getConcurrent());
+        return allowConcurrent ? QuartzJobExecution.class : QuartzDisallowConcurrentExecution.class;
     }
 
     /**
@@ -107,7 +108,7 @@ public class ScheduleUtils {
      * 构建一次性触发器
      */
     private static SimpleTrigger buildOnceTrigger(TriggerBuilder<Trigger> triggerBuilder, SysJob job) {
-        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
+        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0);
         if (job.getInitialDelay() != null && job.getInitialDelay() > 0) {
             triggerBuilder.startAt(new java.util.Date(System.currentTimeMillis() + job.getInitialDelay()));
         }

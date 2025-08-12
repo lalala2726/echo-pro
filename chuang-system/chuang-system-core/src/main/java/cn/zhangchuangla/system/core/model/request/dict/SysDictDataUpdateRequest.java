@@ -47,11 +47,12 @@ public class SysDictDataUpdateRequest {
     @Schema(description = "字典值", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictValue;
 
+
     /**
-     * 是否默认：1是，0否
+     * 颜色
      */
-    @Schema(description = "是否默认：1是，0否", example = "0", type = "integer")
-    private Integer isDefault = 0;
+    @Schema(description = "颜色", example = "#000000", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String color;
 
     /**
      * 排序

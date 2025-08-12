@@ -34,14 +34,14 @@ public class SysDictData extends BaseEntity {
     private String dictLabel;
 
     /**
+     * 颜色
+     */
+    private String color;
+
+    /**
      * 字典值（业务使用的值）
      */
     private String dictValue;
-
-    /**
-     * 是否默认（1=是，0=否）
-     */
-    private Integer isDefault;
 
     /**
      * 排序（越小越前）

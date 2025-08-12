@@ -1,6 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
-import cn.zhangchuangla.common.core.constant.SysRolesConstant;
+import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
@@ -154,7 +154,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             throw new ServiceException(ResultCode.RESULT_IS_NULL, "角色不存在");
         }
         // 检查是否包含超级管理员角色
-        boolean contains = SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey());
+        boolean contains = RolesConstant.SUPER_ADMIN.equals(role.getRoleKey());
         if (contains) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
@@ -214,7 +214,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
         // 检查是否包含超级管理员角色
         List<SysRole> roles = listByIds(ids);
-        if (roles.stream().anyMatch(role -> SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
+        if (roles.stream().anyMatch(role -> RolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许删除");
         }
 
@@ -286,7 +286,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
         SysRole role = getById(request.getRoleId());
         Assert.isTrue(role != null, String.format("ID:【%s】的角色不存在", request.getRoleId()));
-        Assert.isTrue(!SysRolesConstant.SUPER_ADMIN.equals(role.getRoleKey()), "超级管理员角色不允许修改权限");
+        Assert.isTrue(!RolesConstant.SUPER_ADMIN.equals(role.getRoleKey()), "超级管理员角色不允许修改权限");
 
         // 获取所有菜单ID，过滤非法ID
         Set<Long> validMenuIds = sysMenuService.list()

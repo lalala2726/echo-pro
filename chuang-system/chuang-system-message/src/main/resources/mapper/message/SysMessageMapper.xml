@@ -286,4 +286,26 @@
         </where>
         ORDER BY sm.create_time DESC
     </select>
+
+    <!-- 基于 publish_time DESC, id DESC 的上一条/下一条消息ID查询，限定在当前用户可见范围内 -->
+    <select id="getPrevAndNextMessageId" resultType="cn.zhangchuangla.system.message.model.dto.AroundMessageIdDto">
+        SELECT IF(t.prev_id IS NULL, -1, t.prev_id) AS prevId,
+               IF(t.next_id IS NULL, -1, t.next_id) AS nextId
+        FROM (SELECT sm.id,
+                     LAG(sm.id) OVER (ORDER BY IFNULL(sm.publish_time, sm.create_time) DESC, sm.id DESC)  AS prev_id,
+                     LEAD(sm.id) OVER (ORDER BY IFNULL(sm.publish_time, sm.create_time) DESC, sm.id DESC) AS next_id
+              FROM sys_message sm
+                       LEFT JOIN sys_user_message sum_link ON sm.id = sum_link.message_id
+              WHERE (
+                  (sum_link.user_id = #{userId} OR sm.target_type = 'all')
+                      OR
+                  (sm.target_type = 'dept' AND
+                   sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
+                      OR
+                  (sm.target_type = 'role' AND
+                   sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId}))
+                  )
+                AND sm.is_deleted = 0) AS t
+        WHERE t.id = #{currentId}
+    </select>
 </mapper>

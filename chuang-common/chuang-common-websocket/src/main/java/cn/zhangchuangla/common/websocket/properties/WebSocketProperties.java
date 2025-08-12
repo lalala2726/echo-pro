@@ -35,6 +35,12 @@ public class WebSocketProperties {
      */
     private Boolean sockJsEnabled = Boolean.TRUE;
 
+    /**
+     * 未认证连接的最大存活时长（秒）。
+     * 超过该时长仍未完成认证的连接将被服务端主动断开以节省资源。
+     */
+    private Integer unauthenticatedMaxAgeSeconds = 300;
+
 }
 
 

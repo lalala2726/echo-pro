@@ -17,6 +17,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -47,16 +50,17 @@ public class AccessLimitAspect {
             local key = KEYS[1]
             local maxCount = tonumber(ARGV[1])
             local expireTime = tonumber(ARGV[2])
+            local permits = tonumber(ARGV[3])
             
             local current = tonumber(redis.call('get', key) or "0")
-            if current >= maxCount then
+            if current + permits > maxCount then
                 return 0
             end
-            
+
             if current == 0 then
-                redis.call('setex', key, expireTime, 1)
+                redis.call('setex', key, expireTime, permits)
             else
-                redis.call('incr', key)
+                redis.call('incrby', key, permits)
             end
             return 1
             """;
@@ -68,6 +72,7 @@ public class AccessLimitAspect {
      * Redis操作模板
      */
     private final StringRedisTemplate stringRedisTemplate;
+    private final ExpressionParser spelParser = new SpelExpressionParser();
 
     /**
      * 环绕通知处理访问限制
@@ -79,17 +84,30 @@ public class AccessLimitAspect {
      */
     @Around("@annotation(accessLimit)")
     public Object around(ProceedingJoinPoint joinPoint, AccessLimit accessLimit) throws Throwable {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        AccessLimit classLevel = method.getDeclaringClass().getAnnotation(AccessLimit.class);
+        AccessLimit effective = accessLimit != null ? accessLimit : classLevel;
+        if (effective == null) {
+            return joinPoint.proceed();
+        }
+
+        if (!effective.enable()) {
+            return joinPoint.proceed();
+        }
+
         // 获取注解中的限流参数
-        int maxCount = accessLimit.maxCount();
-        int limitPeriod = accessLimit.second();
-        AccessType limitType = accessLimit.limitType();
-        String message = accessLimit.message();
+        int maxCount = effective.maxCount();
+        int limitPeriod = effective.second();
+        AccessType limitType = effective.limitType();
+        String message = effective.message();
+        int permits = Math.max(1, effective.permits());
 
         // 获取请求信息
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
         // 构建Redis键
-        String redisKey = buildLimitKey(attributes, joinPoint, limitType);
+        String redisKey = buildLimitKey(attributes, joinPoint, limitType, effective.key());
 
         try {
             // 执行Lua脚本进行限流判断
@@ -97,13 +115,12 @@ public class AccessLimitAspect {
                     LIMIT_SCRIPT,
                     Collections.singletonList(redisKey),
                     String.valueOf(maxCount),
-                    String.valueOf(limitPeriod));
+                    String.valueOf(limitPeriod),
+                    String.valueOf(permits));
 
             // 如果执行结果为0，表示超过访问限制
             if (result == 0) {
                 // 获取类名和方法名，用于日志记录
-                MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-                Method method = signature.getMethod();
                 String className = method.getDeclaringClass().getName();
                 String methodName = method.getName();
 
@@ -142,7 +159,7 @@ public class AccessLimitAspect {
      * @return Redis键
      */
     private String buildLimitKey(ServletRequestAttributes attributes, ProceedingJoinPoint joinPoint,
-                                 AccessType limitType) {
+                                 AccessType limitType, String customKeyExpr) {
         StringBuilder keyBuilder = new StringBuilder(64);
 
         // 获取方法签名
@@ -179,8 +196,26 @@ public class AccessLimitAspect {
             }
             // 自定义参数限流模式
             case CUSTOM -> {
-                String uri = (request != null) ? request.getRequestURI() : "non-web";
-                keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(uri);
+                String evaluated = null;
+                if (customKeyExpr != null && !customKeyExpr.isBlank()) {
+                    try {
+                        StandardEvaluationContext context = new StandardEvaluationContext();
+                        context.setVariable("args", joinPoint.getArgs());
+                        context.setVariable("request", request);
+                        try {
+                            SysUserDetails user = SecurityUtils.getLoginUser();
+                            context.setVariable("user", user);
+                        } catch (Exception ignore) {
+                        }
+                        evaluated = String.valueOf(spelParser.parseExpression(customKeyExpr).getValue(context));
+                    } catch (Exception e) {
+                        log.warn("自定义限流Key SpEL解析失败，降级为URI: {}", e.getMessage());
+                    }
+                }
+                if (evaluated == null || evaluated.isBlank()) {
+                    evaluated = (request != null) ? request.getRequestURI() : "non-web";
+                }
+                keyBuilder.append(RedisConstants.ACCESS_LIMIT_CUSTOM).append(baseKey).append(":").append(evaluated);
             }
             default -> {
                 String ipAddress = (request != null) ? IPUtils.getIpAddress(request) : "non-web";
