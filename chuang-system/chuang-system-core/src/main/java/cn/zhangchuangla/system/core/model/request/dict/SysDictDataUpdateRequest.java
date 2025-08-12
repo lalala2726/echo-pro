@@ -48,12 +48,6 @@ public class SysDictDataUpdateRequest {
     private String dictValue;
 
     /**
-     * 是否默认：1是，0否
-     */
-    @Schema(description = "是否默认：1是，0否", example = "0", type = "integer")
-    private Integer isDefault = 0;
-
-    /**
      * 排序
      */
     @Schema(description = "排序", example = "1", type = "integer")

@@ -39,11 +39,6 @@ public class SysDictData extends BaseEntity {
     private String dictValue;
 
     /**
-     * 是否默认（1=是，0=否）
-     */
-    private Integer isDefault;
-
-    /**
      * 排序（越小越前）
      */
     private Integer sort;
