@@ -25,7 +25,7 @@ public class SysSendMessageRequest {
     /**
      * 接收者ID列表，根据发送方式指定不同类型的ID：
      */
-    @Schema(description = "接收者ID列表（根据发送方式对应：用户ID、角色ID或部门ID）", type = "List<Long>")
+    @Schema(description = "接收者ID列表（根据发送方式对应：用户ID、角色ID或部门ID）", type = "List<Long>", example = "[1, 2, 3]")
     private List<Long> receiveId;
 
 

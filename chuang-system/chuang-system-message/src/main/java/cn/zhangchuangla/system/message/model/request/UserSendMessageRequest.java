@@ -36,4 +36,10 @@ public class UserSendMessageRequest {
     @NotNull(message = "接收者ID列表不能为空")
     private List<Long> receiveId;
 
+    /**
+     * 错误信息
+     */
+    @Schema(description = "错误信息", type = "string", example = "用户名或密码错误")
+    private String errorMessage;
+
 }
