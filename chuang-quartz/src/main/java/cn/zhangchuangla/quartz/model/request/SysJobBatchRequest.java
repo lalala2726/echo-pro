@@ -19,12 +19,12 @@ public class SysJobBatchRequest {
      * 任务ID列表
      */
     @NotEmpty(message = "任务ID列表不能为空")
-    @Schema(description = "任务ID列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "任务ID列表", requiredMode = Schema.RequiredMode.REQUIRED, type = "array", example = "[1, 2, 3]")
     private List<Long> jobIds;
 
     /**
      * 操作类型（start=启动, pause=暂停, resume=恢复, delete=删除）
      */
-    @Schema(description = "操作类型")
+    @Schema(description = "操作类型（start=启动, pause=暂停, resume=恢复, delete=删除）", type = "string", example = "start")
     private String operation;
 }
