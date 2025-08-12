@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/monitor")
+@RequestMapping("/monitor/endpoints")
 @Tag(name = "系统监控", description = "系统监控相关接口")
 @RequiredArgsConstructor
 @Anonymous
@@ -39,7 +39,7 @@ public class EndpointStatsController extends BaseController {
      * @param request 查询请求
      * @return 端点统计分页结果
      */
-    @GetMapping("/endpoints")
+    @GetMapping("/list")
     @Operation(summary = "获取端点统计列表", description = "获取HTTP端点的详细统计信息，支持分页和过滤")
     public AjaxResult<TableDataResult> getEndpointStats(EndpointStatsQueryRequest request) {
         PageResult<EndpointStatsDTO> result = endpointStatsService.getEndpointStats(request);
@@ -51,7 +51,7 @@ public class EndpointStatsController extends BaseController {
      *
      * @return 端点统计概览
      */
-    @GetMapping("/endpoints/overview")
+    @GetMapping("/overview")
     @Operation(summary = "获取端点统计概览", description = "获取端点统计的汇总信息")
     public AjaxResult<Map<String, Object>> getEndpointStatsOverview() {
         Map<String, Object> overview = endpointStatsService.getEndpointStatsOverview();

@@ -57,12 +57,6 @@ public class EndpointStatsDTO {
     private Double maxResponseTime;
 
     /**
-     * 最小响应时间（毫秒）
-     */
-    @Schema(description = "最小响应时间（毫秒）")
-    private Double minResponseTime;
-
-    /**
      * 成功请求数（2xx状态码）
      */
     @Schema(description = "成功请求数")
@@ -93,20 +87,8 @@ public class EndpointStatsDTO {
     private Double qps;
 
     /**
-     * 最后访问时间
-     */
-    @Schema(description = "最后访问时间")
-    private LocalDateTime lastAccessTime;
-
-    /**
      * 统计时间
      */
     @Schema(description = "统计时间")
     private LocalDateTime timestamp;
-
-    /**
-     * 错误信息
-     */
-    @Schema(description = "错误信息", type = "string", example = "用户名或密码错误")
-    private String errorMessage;
 }
