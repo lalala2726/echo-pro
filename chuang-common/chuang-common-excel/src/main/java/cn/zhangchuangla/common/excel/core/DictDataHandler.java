@@ -31,7 +31,21 @@ public class DictDataHandler {
     private final Map<String, Map<String, String>> localCache = new ConcurrentHashMap<>();
 
 
-    //fixme 审查这边的代码
+    /**
+     * 清除本地缓存（全量）
+     */
+    public void clearAllLocalCache() {
+        localCache.clear();
+    }
+
+    /**
+     * 清除指定字典键的本地缓存
+     */
+    public void clearLocalCache(String dictKey) {
+        if (StringUtils.isNotBlank(dictKey)) {
+            localCache.remove(dictKey);
+        }
+    }
 
     /**
      * 根据字典类型和字典值获取字典标签
