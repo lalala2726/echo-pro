@@ -8,14 +8,10 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * OpenAPI(Swagger3)配置类
@@ -32,9 +28,6 @@ public class OpenAPIConfig {
 
     @Value("${app.version:1.0.0}")
     private String appVersion;
-
-    @Value("${server.port:8080}")
-    private String serverPort;
 
     /**
      * 系统接口组
@@ -93,6 +86,19 @@ public class OpenAPIConfig {
                 .build();
     }
 
+
+    /**
+     * 所有接口
+     */
+    @Bean
+    public GroupedOpenApi personal() {
+        return GroupedOpenApi.builder()
+                .group("个人中心")
+                .packagesToScan("cn.zhangchuangla.api.controller.personal")
+                .build();
+    }
+
+
     /**
      * OpenAPI 主配置
      */
@@ -113,33 +119,8 @@ public class OpenAPIConfig {
                 .externalDocs(new ExternalDocumentation()
                         .description("系统使用说明文档")
                         .url("https://docs.zhangchuangla.cn"))
-                .servers(serverList())
                 .components(securitySchemes())
                 .addSecurityItem(new SecurityRequirement().addList("JWT认证"));
-    }
-
-    /**
-     * 配置服务器信息
-     */
-    private List<Server> serverList() {
-        List<Server> serverList = new ArrayList<>();
-
-        Server localServer = new Server();
-        localServer.setUrl("http://localhost:" + serverPort);
-        localServer.setDescription("本地环境");
-        serverList.add(localServer);
-
-        Server devServer = new Server();
-        devServer.setUrl("https://dev-api.zhangchuangla.cn");
-        devServer.setDescription("开发环境");
-        serverList.add(devServer);
-
-        Server prodServer = new Server();
-        prodServer.setUrl("https://api.zhangchuangla.cn");
-        prodServer.setDescription("生产环境");
-        serverList.add(prodServer);
-
-        return serverList;
     }
 
     /**
@@ -149,7 +130,6 @@ public class OpenAPIConfig {
         return new Components()
                 .addSecuritySchemes("JWT认证", new SecurityScheme()
                         .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
                         .bearerFormat("JWT")
                         .in(SecurityScheme.In.HEADER)
                         .name("Authorization"));

@@ -18,13 +18,13 @@ import cn.zhangchuangla.system.core.model.entity.SysDept;
 import cn.zhangchuangla.system.core.model.entity.SysPost;
 import cn.zhangchuangla.system.core.model.entity.SysRole;
 import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
+import cn.zhangchuangla.system.core.model.request.personal.UpdateEmailRequest;
+import cn.zhangchuangla.system.core.model.request.personal.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.request.personal.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
-import cn.zhangchuangla.system.core.model.vo.user.ProfileOverviewInfoVo;
-import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
-import cn.zhangchuangla.system.core.model.vo.user.UserSecurityLog;
+import cn.zhangchuangla.system.core.model.vo.personal.ProfileOverviewInfoVo;
+import cn.zhangchuangla.system.core.model.vo.personal.UserProfileVo;
+import cn.zhangchuangla.system.core.model.vo.personal.UserSecurityLog;
 import cn.zhangchuangla.system.core.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -90,7 +90,7 @@ public class ProfileController extends BaseController {
         }
         SysPost postById = sysPostService.getPostById(userInfo.getPostId());
         if (postById != null) {
-            profileOverviewInfoVo.setPost(postById.getPostName());
+            profileOverviewInfoVo.setPostName(postById.getPostName());
         }
         return success(profileOverviewInfoVo);
     }

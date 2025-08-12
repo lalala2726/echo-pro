@@ -20,25 +20,25 @@ public class MenuOption {
     /**
      * 菜单ID
      */
-    @Schema(description = "菜单ID")
+    @Schema(description = "菜单ID", type = "number", example = "1")
     private Long id;
 
     /**
      * 菜单名称
      */
-    @Schema(description = "菜单名称")
+    @Schema(description = "菜单名称", type = "string", example = "系统管理")
     private String title;
 
     /**
      * 菜单图标
      */
-    @Schema(description = "图标")
+    @Schema(description = "图标", type = "string", example = "el-icon-setting")
     private String icon;
 
     /**
      * 子菜单
      */
-    @Schema(description = "子菜单")
+    @Schema(description = "子菜单", type = "array")
     private List<MenuOption> children;
 
 }

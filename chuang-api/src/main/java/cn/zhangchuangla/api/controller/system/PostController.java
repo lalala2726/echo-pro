@@ -1,6 +1,7 @@
 package cn.zhangchuangla.api.controller.system;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
@@ -106,6 +107,18 @@ public class PostController extends BaseController {
     public AjaxResult<Void> updatePost(
             @Parameter(description = "修改岗位请求参数") @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.updatePost(request));
+    }
+
+    /**
+     * 获取岗位下拉选项
+     *
+     * @return 岗位下拉选项
+     */
+    @GetMapping("/options")
+    @Operation(summary = "获取岗位下拉选项")
+    public AjaxResult<List<Option<Long>>> getPostOptions() {
+        List<Option<Long>> options = sysPostService.getPostOptions();
+        return success(options);
     }
 
     /**

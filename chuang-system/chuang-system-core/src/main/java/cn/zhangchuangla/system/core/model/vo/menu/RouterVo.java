@@ -25,38 +25,38 @@ public class RouterVo {
     /**
      * 路由名字
      */
-    @Schema(description = "路由名字")
+    @Schema(description = "路由名字", type = "string", example = "dashboard")
     private String name;
 
     /**
      * 路由地址
      */
-    @Schema(description = "路由地址")
+    @Schema(description = "路由地址", type = "string", example = "/dashboard")
     private String path;
 
     /**
      * 组件路径
      */
-    @Schema(description = "组件路径")
+    @Schema(description = "组件路径", type = "string", example = "views/dashboard/index.vue")
     private String component;
 
     /**
      * 菜单类型
      */
-    @Schema(description = "菜单类型")
+    @Schema(description = "菜单类型", type = "string", example = "M")
     private String type;
 
 
     /**
      * 路由元数据
      */
-    @Schema(description = "路由元数据")
+    @Schema(description = "路由元数据", type = "object")
     private MetaVo meta;
 
     /**
      * 子路由
      */
-    @Schema(description = "子路由")
+    @Schema(description = "子路由", type = "array")
     private List<RouterVo> children;
 
 }

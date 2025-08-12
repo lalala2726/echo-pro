@@ -20,35 +20,35 @@ public class SysMessageUpdateRequest {
     /**
      * 消息ID
      */
-    @Schema(description = "消息ID")
+    @Schema(description = "消息ID", type = "long", example = "1")
     @NotNull(message = "消息ID不能为空")
     private Long id;
 
     /**
      * 消息标题
      */
-    @Schema(description = "消息标题")
+    @Schema(description = "消息标题", type = "string", example = "系统维护通知")
     @NotBlank(message = "消息标题不能为空")
     private String title;
 
     /**
      * 消息内容
      */
-    @Schema(description = "消息内容")
+    @Schema(description = "消息内容", type = "string", example = "系统将在今晚进行维护，请提前保存数据。")
     @NotBlank(message = "消息内容不能为空")
     private String content;
 
     /**
      * 消息类型
      */
-    @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"})
+    @Schema(description = "消息类型", type = "string", example = "system", allowableValues = {"system", "notice", "announcement"})
     @NotNull(message = "消息类型不能为空")
     private MessageTypeEnum type;
 
     /**
      * 消息级别
      */
-    @Schema(description = "消息级别", allowableValues = {"normal", "important", "urgent"})
+    @Schema(description = "消息级别", type = "string", example = "important", allowableValues = {"normal", "important", "urgent"})
     @NotNull(message = "消息级别不能为空")
     private MessageLevelEnum level;
 }

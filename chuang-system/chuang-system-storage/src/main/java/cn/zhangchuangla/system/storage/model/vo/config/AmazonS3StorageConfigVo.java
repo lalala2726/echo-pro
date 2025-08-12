@@ -20,27 +20,27 @@ public class AmazonS3StorageConfigVo {
      * <p>
      * 对于兼容S3的服务：具体的服务端点地址
      */
-    @Schema(description = "存储服务地址端点")
+    @Schema(description = "存储服务地址端点", type = "string", example = "https://s3.amazonaws.com")
     @Excel(name = "存储服务地址端点")
     private String endpoint;
 
     /**
      * 访问密钥ID
      */
-    @Schema(description = "访问密钥ID")
+    @Schema(description = "访问密钥ID", type = "string", example = "AKIAIOSFODNN7EXAMPLE")
     @Excel(name = "AccessKey", sort = 2)
     private String accessKey;
 
     /**
      * 访问密钥
      */
-    @Schema(description = "访问密钥")
+    @Schema(description = "访问密钥", type = "string", example = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
     private String secretKey;
 
     /**
      * 存储桶名称
      */
-    @Schema(description = "存储桶名称")
+    @Schema(description = "存储桶名称", type = "string", example = "my-bucket")
     @Excel(name = "存储桶名称", sort = 3)
     private String bucketName;
 
@@ -50,7 +50,7 @@ public class AmazonS3StorageConfigVo {
      * AWS S3区域代码，如：us-east-1、us-west-2、ap-northeast-1等
      * 对于兼容S3的服务，使用相应的区域配置
      */
-    @Schema(description = "存储桶区域")
+    @Schema(description = "存储桶区域", type = "string", example = "us-east-1")
     @Excel(name = "存储桶区域", sort = 4)
     private String region;
 
@@ -59,14 +59,14 @@ public class AmazonS3StorageConfigVo {
      * <p>
      * 用于构建文件的公开访问URL
      */
-    @Schema(description = "文件访问域名")
+    @Schema(description = "文件访问域名", type = "string", example = "https://my-bucket.s3.amazonaws.com")
     @Excel(name = "文件访问域名", sort = 5)
     private String fileDomain;
 
     /**
      * 是否真实删除
      */
-    @Schema(description = "是否真实删除")
+    @Schema(description = "是否真实删除", type = "boolean", example = "true")
     @Excel(name = "是否真实删除", sort = 6)
     private Boolean realDelete;
 

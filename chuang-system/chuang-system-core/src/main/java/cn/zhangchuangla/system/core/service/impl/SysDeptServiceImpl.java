@@ -133,12 +133,20 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
      */
     @Override
     public List<Option<Long>> getDeptOptions() {
-        List<SysDept> list = list();
-        if (list != null && !list.isEmpty()) {
-            return buildDeptTreeRecursive(0L, list);
-        }
-        return List.of();
+        List<SysDept> allDept = list();
+        return allDept.stream().map(dept -> new Option<>(dept.getDeptId(), dept.getDeptName())).toList();
 
+    }
+
+    /**
+     * 获取部门树下拉列表
+     *
+     * @return 部门树下拉列表
+     */
+    @Override
+    public List<Option<Long>> getDeptTreeOptions() {
+        List<SysDept> allDept = list();
+        return buildDeptTreeRecursive(0L, allDept);
     }
 
     /**

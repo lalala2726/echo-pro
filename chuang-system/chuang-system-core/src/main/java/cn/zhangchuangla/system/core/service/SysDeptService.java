@@ -77,5 +77,13 @@ public interface SysDeptService extends IService<SysDept> {
      */
     List<Option<Long>> getDeptOptions();
 
+
+    /**
+     * 获取部门树
+     *
+     * @return 部门树
+     */
+    List<Option<Long>> getDeptTreeOptions();
+
 }
 

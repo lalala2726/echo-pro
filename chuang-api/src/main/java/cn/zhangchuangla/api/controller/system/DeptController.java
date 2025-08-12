@@ -109,12 +109,21 @@ public class DeptController extends BaseController {
      * @return 部门下拉列表
      */
     @GetMapping("/options")
-    @PreAuthorize("@ss.hasPermission('system:dept:tree')")
+    @PreAuthorize("@ss.hasPermission('system:dept:list')")
     @Operation(summary = "部门下拉列表")
-    public AjaxResult<List<Option<Long>>> treeDept() {
+    public AjaxResult<List<Option<Long>>> options() {
         List<Option<Long>> deptOptions = sysDeptService.getDeptOptions();
         return success(deptOptions);
     }
+
+    @GetMapping("/tree")
+    @PreAuthorize("@ss.hasPermission('system:dept:list')")
+    @Operation(summary = "部门树")
+    public AjaxResult<List<Option<Long>>> treeDept() {
+        List<Option<Long>> deptOptions = sysDeptService.getDeptTreeOptions();
+        return success(deptOptions);
+    }
+
 
     /**
      * 删除部门,支持批量删除
