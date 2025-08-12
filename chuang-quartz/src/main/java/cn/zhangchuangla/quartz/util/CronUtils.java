@@ -23,12 +23,7 @@ public class CronUtils {
      * @return 是否有效
      */
     public static boolean isValid(String cronExpression) {
-        try {
-            return CronExpression.isValidExpression(cronExpression);
-        } catch (Exception e) {
-            logger.error("验证Cron表达式失败: {}", cronExpression, e);
-            return true;
-        }
+        return CronExpression.isValidExpression(cronExpression);
     }
 
     /**
@@ -71,7 +66,7 @@ public class CronUtils {
      * @return 描述信息
      */
     public static String getDescription(String cronExpression) {
-        if (isValid(cronExpression)) {
+        if (!isValid(cronExpression)) {
             return "无效的Cron表达式";
         }
 

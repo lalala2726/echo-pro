@@ -62,10 +62,8 @@ public class JobInvokeUtil {
     }
 
     /**
-     * 校验是否为白名单配置
-     *
-     * @param invokeTarget 目标字符串
-     * @return 结果
+     * 是否不在白名单中（为保持向后兼容保留旧方法名的行为）
+     * 返回 true 表示不在白名单（禁止），false 表示在白名单（允许）
      */
     public static boolean whiteList(String invokeTarget) {
         String packageName = getPackageName(invokeTarget);
@@ -129,27 +127,36 @@ public class JobInvokeUtil {
         String[] methodParams = methodStr.split(",(?=([^\"']*[\"'][^\"']*[\"'])*[^\"']*$)");
         List<Object[]> classes = new LinkedList<>();
         for (String methodParam : methodParams) {
-            String str = StringUtils.trimToEmpty(methodParam);
-            // String字符串类型，包含'
-            if (Strings.CS.contains(str, "'")) {
-                classes.add(new Object[]{Strings.CS.replace(str, "'", ""), String.class});
+            String raw = StringUtils.trimToEmpty(methodParam);
+            // String: 单引号包围
+            if (raw.startsWith("'") && raw.endsWith("'")) {
+                classes.add(new Object[]{raw.substring(1, raw.length() - 1), String.class});
+                continue;
             }
-            // boolean布尔类型，等于true或者false
-            else if (Strings.CS.contains(str, "true") || Strings.CS.contains(str, "false")) {
-                classes.add(new Object[]{Boolean.valueOf(str), Boolean.class});
+            // boolean: 严格匹配 true/false（不区分大小写）
+            if ("true".equalsIgnoreCase(raw) || "false".equalsIgnoreCase(raw)) {
+                classes.add(new Object[]{Boolean.valueOf(raw), Boolean.class});
+                continue;
             }
-            // long长整形，包含L
-            else if (Strings.CS.contains(str, "L")) {
-                classes.add(new Object[]{Long.valueOf(Strings.CS.replace(str, "L", "")), Long.class});
+            // long: 以 L 结尾
+            if (raw.endsWith("L") || raw.endsWith("l")) {
+                String num = raw.substring(0, raw.length() - 1);
+                classes.add(new Object[]{Long.valueOf(num), Long.class});
+                continue;
             }
-            // double浮点类型，包含D
-            else if (Strings.CS.contains(str, "D")) {
-                classes.add(new Object[]{Double.valueOf(Strings.CS.replace(str, "D", "")), Double.class});
+            // double: 以 D 结尾
+            if (raw.endsWith("D") || raw.endsWith("d")) {
+                String num = raw.substring(0, raw.length() - 1);
+                classes.add(new Object[]{Double.valueOf(num), Double.class});
+                continue;
             }
-            // 其他类型归类为整形
-            else {
-                classes.add(new Object[]{Integer.valueOf(str), Integer.class});
+            // 小数: 包含小数点
+            if (raw.contains(".")) {
+                classes.add(new Object[]{Double.valueOf(raw), Double.class});
+                continue;
             }
+            // 整数
+            classes.add(new Object[]{Integer.valueOf(raw), Integer.class});
         }
         return classes;
     }
