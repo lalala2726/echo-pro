@@ -20,25 +20,25 @@ public class SimpleFileVO {
     /**
      * 文件名
      */
-    @Schema(description = "文件名")
+    @Schema(description = "文件名", type = "string", example = "example.txt")
     private String fileName;
 
     /**
      * 文件大小
      */
-    @Schema(description = "文件大小")
+    @Schema(description = "文件大小", type = "string", example = "1024KB")
     private String fileSize;
 
     /**
      * 文件路径
      */
-    @Schema(description = "文件URL")
+    @Schema(description = "文件URL", type = "string", example = "http://example.com/file.txt")
     private String fileUrl;
 
 
     /**
      * 文件类型
      */
-    @Schema(description = "文件类型")
+    @Schema(description = "文件类型", type = "string", example = "text/plain")
     private String fileType;
 }

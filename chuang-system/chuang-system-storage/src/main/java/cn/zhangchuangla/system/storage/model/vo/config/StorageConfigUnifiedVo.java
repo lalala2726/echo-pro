@@ -18,35 +18,35 @@ public class StorageConfigUnifiedVo {
     /**
      * 主键
      */
-    @Schema(description = "主键")
+    @Schema(description = "主键", type = "number", example = "1")
     @Excel(name = "主键", sort = 1)
     private Long id;
 
     /**
      * 参数名称
      */
-    @Schema(description = "参数名称")
+    @Schema(description = "参数名称", type = "string", example = "阿里云OSS配置")
     @Excel(name = "参数名称", sort = 2)
     private String storageName;
 
     /**
      * 参数键名
      */
-    @Schema(description = "参数键名")
+    @Schema(description = "参数键名", type = "string", example = "aliyun_oss")
     @Excel(name = "参数键名", sort = 3)
     private String storageKey;
 
     /**
      * 存储类型
      */
-    @Schema(description = "存储类型")
+    @Schema(description = "存储类型", type = "string", example = "ALIYUN_OSS")
     @Excel(name = "存储类型", sort = 4)
     private String storageType;
 
     /**
      * 是否主配置
      */
-    @Schema(description = "是否主配置")
+    @Schema(description = "是否主配置", type = "boolean", example = "true")
     @Excel(name = "是否主配置", sort = 5)
     private Boolean isPrimary;
 
