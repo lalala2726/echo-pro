@@ -34,6 +34,11 @@ public class SysDictData extends BaseEntity {
     private String dictLabel;
 
     /**
+     * 颜色
+     */
+    private String color;
+
+    /**
      * 字典值（业务使用的值）
      */
     private String dictValue;

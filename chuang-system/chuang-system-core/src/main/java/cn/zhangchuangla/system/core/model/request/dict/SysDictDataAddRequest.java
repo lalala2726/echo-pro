@@ -39,9 +39,15 @@ public class SysDictDataAddRequest {
     private String dictValue;
 
     /**
+     * 颜色
+     */
+    @Schema(description = "颜色", example = "#000000", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String color;
+
+    /**
      * 排序
      */
-    @Schema(description = "排序", example = "1", type = "integer")
+    @Schema(description = "排序", example = "1", type = "integer", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer sort = 0;
 
     /**
@@ -54,6 +60,6 @@ public class SysDictDataAddRequest {
      * 备注
      */
     @Size(max = 255, message = "备注长度不能超过255个字符")
-    @Schema(description = "备注", example = "启用状态", type = "string")
+    @Schema(description = "备注", example = "启用状态", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String remark;
 }

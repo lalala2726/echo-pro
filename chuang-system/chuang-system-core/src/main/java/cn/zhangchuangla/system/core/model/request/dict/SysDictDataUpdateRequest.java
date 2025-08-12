@@ -47,6 +47,13 @@ public class SysDictDataUpdateRequest {
     @Schema(description = "字典值", example = "0", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictValue;
 
+
+    /**
+     * 颜色
+     */
+    @Schema(description = "颜色", example = "#000000", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String color;
+
     /**
      * 排序
      */

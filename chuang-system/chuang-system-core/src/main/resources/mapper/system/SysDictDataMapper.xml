@@ -9,6 +9,7 @@
         <result property="dictType" column="dict_type"/>
         <result property="dictLabel" column="dict_label"/>
         <result property="dictValue" column="dict_value"/>
+        <result property="color" column="color"/>
         <result property="sort" column="sort"/>
         <result property="status" column="status"/>
         <result property="remark" column="remark"/>
@@ -25,6 +26,7 @@
         dict_label,
         dict_value,
         sort,
+        color,
         status,
         remark,
         create_time,
