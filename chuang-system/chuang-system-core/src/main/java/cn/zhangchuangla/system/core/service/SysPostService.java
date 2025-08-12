@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.core.service;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.system.core.model.entity.SysPost;
 import cn.zhangchuangla.system.core.model.request.post.SysPostAddRequest;
 import cn.zhangchuangla.system.core.model.request.post.SysPostQueryRequest;
@@ -80,4 +81,11 @@ public interface SysPostService extends IService<SysPost> {
      * @return 岗位列表
      */
     List<SysPost> exportPostList(SysPostQueryRequest request);
+
+    /**
+     * 获取岗位选项
+     *
+     * @return 岗位选项
+     */
+    List<Option<Long>> getPostOptions();
 }

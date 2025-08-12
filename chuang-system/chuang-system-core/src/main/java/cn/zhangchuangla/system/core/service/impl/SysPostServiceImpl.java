@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
+import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.system.core.mapper.SysPostMapper;
 import cn.zhangchuangla.system.core.model.entity.SysPost;
@@ -127,6 +128,22 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost>
     @Override
     public List<SysPost> exportPostList(SysPostQueryRequest request) {
         return sysPostMapper.exportPostList(request);
+    }
+
+    /**
+     * 获取岗位选项
+     *
+     * @return 岗位选项
+     */
+    @Override
+    public List<Option<Long>> getPostOptions() {
+        LambdaQueryWrapper<SysPost> queryWrapper = new LambdaQueryWrapper<SysPost>()
+                .eq(SysPost::getStatus, 0)
+                .orderByDesc(SysPost::getCreateTime);
+        List<SysPost> list = list(queryWrapper);
+        return list.stream()
+                .map(item -> new Option<>(item.getId(), item.getPostName()))
+                .toList();
     }
 }
 

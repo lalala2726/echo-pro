@@ -76,28 +76,28 @@ public class UserController extends BaseController {
         return getTableData(userPage, userListVos);
     }
 
-
     /**
-     * 导出用户列表
-     * 根据查询条件导出系统用户列表
+     * 查询用户信息
+     * 根据用户ID获取用户的详细信息，包括基本资料和角色信息
      *
-     * @param request 包含分页、排序和筛选条件的用户查询参数
+     * @param id 用户ID
+     * @return 用户详细信息
      */
-    @PostMapping("/export")
-    @Operation(summary = "导出用户列表")
-    @PreAuthorize("@ss.hasPermission('system:user:export')")
-    @OperationLog(title = "用户管理", businessType = BusinessType.EXPORT)
-    public void exportExcel(HttpServletResponse response,
-                            @Parameter(description = "用户查询参数，包含分页和筛选条件")
-                            @RequestBody SysUserQueryRequest request) {
-        List<SysUser> userList = sysUserService.exportListUser(request);
-        ArrayList<UserListVo> userListVos = new ArrayList<>();
-        userList.forEach(user -> {
-            UserListVo userListVo = BeanCotyUtils.copyProperties(user, UserListVo.class);
-            userListVos.add(userListVo);
-        });
-        excelExporter.exportExcel(response, userListVos, UserListVo.class, "用户列表");
+    @GetMapping("/{id:\\d+}")
+    @Operation(summary = "根据ID获取用户信息")
+    @PreAuthorize("@ss.hasPermission('system:user:info')")
+    public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
+                                                  @PathVariable("id") Long id) {
+        Assert.isTrue(id > 0, "用户ID必须大于0！");
+        SysUser sysUser = sysUserService.getUserInfoByUserId(id);
+        Long userId = sysUser.getUserId();
+        Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(sysUser, userInfoVo);
+        userInfoVo.setRoleIds(roleId);
+        return success(userInfoVo);
     }
+
 
     /**
      * 添加用户
@@ -106,7 +106,7 @@ public class UserController extends BaseController {
      * @param request 用户添加请求参数，包含用户基本信息
      * @return 添加结果，成功返回用户ID
      */
-    @PostMapping()
+    @PostMapping
     @Operation(summary = "添加用户")
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     @OperationLog(title = "用户管理", businessType = BusinessType.INSERT)
@@ -195,25 +195,26 @@ public class UserController extends BaseController {
         return toAjax(result);
     }
 
+
     /**
-     * 查询用户信息
-     * 根据用户ID获取用户的详细信息，包括基本资料和角色信息
+     * 导出用户列表
+     * 根据查询条件导出系统用户列表
      *
-     * @param id 用户ID
-     * @return 用户详细信息
+     * @param request 包含分页、排序和筛选条件的用户查询参数
      */
-    @GetMapping("/{id:\\d+}")
-    @Operation(summary = "根据ID获取用户信息")
-    @PreAuthorize("@ss.hasPermission('system:user:info')")
-    public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
-                                                  @PathVariable("id") Long id) {
-        Assert.isTrue(id > 0, "用户ID必须大于0！");
-        SysUser sysUser = sysUserService.getUserInfoByUserId(id);
-        Long userId = sysUser.getUserId();
-        Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        userInfoVo.setRoleIds(roleId);
-        return success(userInfoVo);
+    @PostMapping("/export")
+    @Operation(summary = "导出用户列表")
+    @PreAuthorize("@ss.hasPermission('system:user:export')")
+    @OperationLog(title = "用户管理", businessType = BusinessType.EXPORT)
+    public void exportExcel(HttpServletResponse response,
+                            @Parameter(description = "用户查询参数，包含分页和筛选条件")
+                            @RequestBody SysUserQueryRequest request) {
+        List<SysUser> userList = sysUserService.exportListUser(request);
+        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        userList.forEach(user -> {
+            UserListVo userListVo = BeanCotyUtils.copyProperties(user, UserListVo.class);
+            userListVos.add(userListVo);
+        });
+        excelExporter.exportExcel(response, userListVos, UserListVo.class, "用户列表");
     }
 }

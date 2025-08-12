@@ -21,6 +21,13 @@ public class UserListVo {
     @Excel(name = "用户ID", sort = 1, width = 15)
     private Long userId;
 
+
+    /**
+     * 头像
+     */
+    @Schema(description = "头像")
+    private String avatar;
+
     /**
      * 用户名
      */
