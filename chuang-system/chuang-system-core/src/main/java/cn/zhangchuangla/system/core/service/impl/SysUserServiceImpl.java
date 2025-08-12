@@ -17,7 +17,7 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
-import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.core.model.vo.personal.UserProfileVo;
 import cn.zhangchuangla.system.core.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

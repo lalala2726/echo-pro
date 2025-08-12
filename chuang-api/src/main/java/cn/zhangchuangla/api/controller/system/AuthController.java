@@ -10,7 +10,7 @@ import cn.zhangchuangla.framework.model.vo.AuthTokenVo;
 import cn.zhangchuangla.framework.security.UserSecurityManager;
 import cn.zhangchuangla.framework.security.login.AuthService;
 import cn.zhangchuangla.framework.security.token.TokenService;
-import cn.zhangchuangla.system.core.model.vo.user.UserInfoVo;
+import cn.zhangchuangla.system.core.model.vo.user.SysUserInfoVo;
 import cn.zhangchuangla.system.core.service.SysPermissionService;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
@@ -106,9 +106,9 @@ public class AuthController extends BaseController {
         Long userId = getUserId();
         Set<String> roles = sysRoleService.getRoleSetByUserId(userId);
         SysUser sysUser = sysUserService.getUserInfoByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        ajax.put("user", userInfoVo);
+        SysUserInfoVo sysUserInfoVo = new SysUserInfoVo();
+        BeanUtils.copyProperties(sysUser, sysUserInfoVo);
+        ajax.put("user", sysUserInfoVo);
         ajax.put("roles", roles);
         return success(ajax);
     }

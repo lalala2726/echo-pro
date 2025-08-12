@@ -11,7 +11,7 @@ import java.util.Set;
  */
 @Data
 @Schema(name = "用户信息视图对象", description = "用于展示用户的详细信息")
-public class UserInfoVo {
+public class SysUserInfoVo {
 
     /**
      * 头像

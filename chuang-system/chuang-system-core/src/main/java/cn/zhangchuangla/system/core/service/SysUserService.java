@@ -9,7 +9,7 @@ import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
 import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
-import cn.zhangchuangla.system.core.model.vo.user.UserProfileVo;
+import cn.zhangchuangla.system.core.model.vo.personal.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.constraints.NotBlank;

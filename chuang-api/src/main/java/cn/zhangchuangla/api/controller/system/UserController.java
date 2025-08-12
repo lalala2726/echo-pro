@@ -14,8 +14,8 @@ import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
-import cn.zhangchuangla.system.core.model.vo.user.UserInfoVo;
-import cn.zhangchuangla.system.core.model.vo.user.UserListVo;
+import cn.zhangchuangla.system.core.model.vo.user.SysUserInfoVo;
+import cn.zhangchuangla.system.core.model.vo.user.SysUserListVo;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -64,16 +64,16 @@ public class UserController extends BaseController {
     public AjaxResult<TableDataResult> listUser(@Parameter(description = "用户查询参数，包含分页和筛选条件")
                                                 @Validated @ParameterObject SysUserQueryRequest request) {
         Page<SysUserDeptDto> userPage = sysUserService.listUser(request);
-        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        ArrayList<SysUserListVo> sysUserListVos = new ArrayList<>();
         userPage.getRecords().forEach(user -> {
-            UserListVo userInfoVo = new UserListVo();
+            SysUserListVo userInfoVo = new SysUserListVo();
             BeanUtils.copyProperties(user, userInfoVo);
             if (user.getSysDept() != null) {
                 userInfoVo.setDeptName(user.getSysDept().getDeptName());
             }
-            userListVos.add(userInfoVo);
+            sysUserListVos.add(userInfoVo);
         });
-        return getTableData(userPage, userListVos);
+        return getTableData(userPage, sysUserListVos);
     }
 
     /**
@@ -86,16 +86,16 @@ public class UserController extends BaseController {
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
-    public AjaxResult<UserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
+    public AjaxResult<SysUserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
                                                   @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "用户ID必须大于0！");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();
         Set<Long> roleId = sysRoleService.getUserRoleIdByUserId(userId);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(sysUser, userInfoVo);
-        userInfoVo.setRoleIds(roleId);
-        return success(userInfoVo);
+        SysUserInfoVo sysUserInfoVo = new SysUserInfoVo();
+        BeanUtils.copyProperties(sysUser, sysUserInfoVo);
+        sysUserInfoVo.setRoleIds(roleId);
+        return success(sysUserInfoVo);
     }
 
 
@@ -210,11 +210,11 @@ public class UserController extends BaseController {
                             @Parameter(description = "用户查询参数，包含分页和筛选条件")
                             @RequestBody SysUserQueryRequest request) {
         List<SysUser> userList = sysUserService.exportListUser(request);
-        ArrayList<UserListVo> userListVos = new ArrayList<>();
+        ArrayList<SysUserListVo> sysUserListVos = new ArrayList<>();
         userList.forEach(user -> {
-            UserListVo userListVo = BeanCotyUtils.copyProperties(user, UserListVo.class);
-            userListVos.add(userListVo);
+            SysUserListVo sysUserListVo = BeanCotyUtils.copyProperties(user, SysUserListVo.class);
+            sysUserListVos.add(sysUserListVo);
         });
-        excelExporter.exportExcel(response, userListVos, UserListVo.class, "用户列表");
+        excelExporter.exportExcel(response, sysUserListVos, SysUserListVo.class, "用户列表");
     }
 }
