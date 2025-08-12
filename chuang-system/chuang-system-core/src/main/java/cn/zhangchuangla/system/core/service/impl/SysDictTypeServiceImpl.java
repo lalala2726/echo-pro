@@ -25,7 +25,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -195,8 +194,8 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         try {
             log.info("开始刷新字典缓存...");
 
-            // 1. 清除现有的字典缓存
-            Collection<String> existingKeys = redisCache.keys(RedisConstants.Dict.DICT_CACHE_PREFIX + "*");
+            // 1. 清除现有的字典缓存（使用 SCAN 替代 KEYS，避免阻塞）
+            List<String> existingKeys = redisCache.scanKeys(RedisConstants.Dict.DICT_CACHE_PREFIX + "*");
             if (!existingKeys.isEmpty()) {
                 long deletedCount = redisCache.deleteObject(existingKeys);
                 log.info("清除了 {} 个现有字典缓存", deletedCount);

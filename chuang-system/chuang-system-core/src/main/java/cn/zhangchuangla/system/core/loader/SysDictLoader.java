@@ -104,7 +104,7 @@ public class SysDictLoader implements DataLoader {
     }
 
     @Override
-    public boolean allowStartupOnFailure() {
+    public boolean blockStartupOnFailure() {
         // 字典加载失败不应阻止项目启动
         return true;
     }
