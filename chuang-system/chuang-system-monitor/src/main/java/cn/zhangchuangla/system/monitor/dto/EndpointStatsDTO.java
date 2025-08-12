@@ -103,4 +103,10 @@ public class EndpointStatsDTO {
      */
     @Schema(description = "统计时间")
     private LocalDateTime timestamp;
+
+    /**
+     * 错误信息
+     */
+    @Schema(description = "错误信息", type = "string", example = "用户名或密码错误")
+    private String errorMessage;
 }
