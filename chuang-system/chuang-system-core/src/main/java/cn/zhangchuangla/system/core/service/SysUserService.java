@@ -2,13 +2,13 @@ package cn.zhangchuangla.system.core.service;
 
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.system.core.model.dto.SysUserDeptDto;
+import cn.zhangchuangla.system.core.model.request.personal.UpdateEmailRequest;
+import cn.zhangchuangla.system.core.model.request.personal.UpdatePasswordRequest;
+import cn.zhangchuangla.system.core.model.request.personal.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.request.user.ProfileUpdateRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserAddRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserQueryRequest;
 import cn.zhangchuangla.system.core.model.request.user.SysUserUpdateRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdateEmailRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePasswordRequest;
-import cn.zhangchuangla.system.core.model.request.user.profile.UpdatePhoneRequest;
 import cn.zhangchuangla.system.core.model.vo.personal.UserProfileVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;

@@ -1,4 +1,4 @@
-package cn.zhangchuangla.system.core.model.request.user.profile;
+package cn.zhangchuangla.system.core.model.request.personal;
 
 import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
