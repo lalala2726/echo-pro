@@ -149,7 +149,7 @@ public class SecurityUtils {
     public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         String header = request.getHeader(HEADER);
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
+        if (header != null && header.startsWith(TOKEN_PREFIX.trim() + " ")) {
             header = header.substring(TOKEN_PREFIX.length()).trim();
         }
         return header;

@@ -51,8 +51,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = request.getHeader(header);
         // 兼容标准 Authorization: Bearer <token>
         if (StringUtils.isBlank(token)) {
-            String authHeader = request.getHeader("Authorization");
-            if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith("Bearer ")) {
+            String authHeader = request.getHeader(securityProperties.getHeader());
+            if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith(securityProperties.session.getTokenPrefix().trim() + " ")) {
                 token = authHeader.substring(7).trim();
             }
         }
