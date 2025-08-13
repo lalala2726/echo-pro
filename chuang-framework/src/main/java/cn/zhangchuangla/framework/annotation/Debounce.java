@@ -12,7 +12,8 @@ import java.lang.annotation.*;
  * - 可用于方法或类级别（类级别对类内所有方法生效，方法级别可覆盖类级别配置）。
  * - 维度支持 IP/USER/CUSTOM（CUSTOM 支持 SpEL 构建 Key）。
  * <p>
- * created by Chuang
+ *
+ * @author Chuang
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -45,5 +46,6 @@ public @interface Debounce {
      */
     boolean enable() default true;
 }
+
 
 

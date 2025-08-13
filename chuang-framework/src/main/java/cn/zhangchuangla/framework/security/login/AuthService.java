@@ -23,6 +23,7 @@ import cn.zhangchuangla.framework.security.login.limiter.PasswordRetryLimiter;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
+import cn.zhangchuangla.system.core.service.CaptchaService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -58,86 +59,182 @@ public class AuthService {
     private final RedisTokenStore redisTokenStore;
     private final PasswordRetryLimiter passwordRetryLimiter;
     private final LoginFrequencyLimiter loginFrequencyLimiter;
+    private final CaptchaService captchaService;
 
     /**
      * 实现登录逻辑
      *
-     * @param request 请求参数
-     * @return 令牌
+     * <p>流程：
+     * 1) 校验登录约束（密码重试、频率限制）
+     * 2) 认证
+     * 3) 构造设备信息
+     * 4) 生成会话并绑定上下文
+     * 5) 校验设备限制，必要时回滚令牌
+     * 6) 记录登录与安全日志
+     * </p>
+     *
+     * @param request            登录请求参数
+     * @param httpServletRequest 原始 HTTP 请求（用于提取 IP、UA 等）
+     * @return 授权令牌视图
+     * @throws LoginException 认证失败时抛出
      */
     public AuthTokenVo login(LoginRequest request, HttpServletRequest httpServletRequest) {
         String username = request.getUsername().trim();
 
-        // 1. 检查用户是否被锁定（密码重试限制）
+        // 0) 图形验证码校验（大小写不敏感）
+        verifyImageCaptcha(request);
+
+        // 1) 校验登录约束
+        validateLoginConstraints(username);
+
+        // 2) 认证
+        Authentication authentication = doAuthenticate(username, request.getPassword().trim(), httpServletRequest);
+
+        // 3) 构造设备信息
+        LoginDeviceDTO loginDeviceDTO = buildLoginDeviceDTO(request, httpServletRequest);
+
+        // 4) 生成会话并绑定上下文
+        LoginSessionDTO session = createSessionAndBindContext(authentication, loginDeviceDTO);
+        enrichDeviceDTOWithSession(loginDeviceDTO, session, username);
+
+        // 5) 校验设备限制并在失败时回滚令牌
+        enforceDeviceLimitOrRollback(loginDeviceDTO, session);
+
+        // 6) 记录登录与安全日志
+        recordLoginSuccessLogs(username, httpServletRequest);
+
+        return BeanCotyUtils.copyProperties(session, AuthTokenVo.class);
+    }
+
+    /**
+     * 校验登录约束：密码重试限制与登录频率限制。
+     *
+     * @param username 用户名
+     * @throws AuthorizationException 当不满足策略限制时抛出
+     */
+    private void validateLoginConstraints(String username) {
+        // 检查用户是否被锁定（密码重试限制）
         passwordRetryLimiter.allowLogin(username);
-
-        // 2. 检查登录频率限制（基于成功登录次数）
+        // 检查登录频率限制（基于成功登录次数）
         loginFrequencyLimiter.checkFrequencyLimit(username);
+    }
 
-        // 3. 创建用于密码认证的令牌（未认证）
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                username, request.getPassword().trim());
-
-        // 4. 执行认证（认证中）
-        Authentication authentication;
+    /**
+     * 执行认证流程。如果失败，会记录失败次数与失败日志，并抛出 LoginException。
+     *
+     * @param username    用户名
+     * @param rawPassword 原始密码
+     * @param request     HTTP 请求（用于提取 IP、UA）
+     * @return 认证对象
+     * @throws LoginException 认证失败时抛出
+     */
+    private Authentication doAuthenticate(String username, String rawPassword, HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, rawPassword);
         try {
-            authentication = authenticationManager.authenticate(authenticationToken);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            // 成功后清理失败记录并记录成功频率
+            passwordRetryLimiter.clearRecord(username);
+            loginFrequencyLimiter.recordLoginSuccess(username);
+            return authentication;
         } catch (Exception e) {
             log.error("用户名:{},登录失败！", username, e);
-
-            // 记录密码重试失败次数
             passwordRetryLimiter.recordFailure(username);
-            // 使用异步服务记录登录失败日志
-            String ipAddr = IPUtils.getIpAddress(httpServletRequest);
-            String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+            String ipAddr = IPUtils.getIpAddress(request);
+            String userAgent = UserAgentUtils.getUserAgent(request);
             asyncLogService.recordLoginLog(username, ipAddr, userAgent, false);
             throw new LoginException(e.getMessage());
         }
+    }
 
-        // 5. 认证成功后，清除密码重试记录并记录成功登录频率
-        passwordRetryLimiter.clearRecord(username);
-        loginFrequencyLimiter.recordLoginSuccess(username);
-
+    /**
+     * 构造登录设备信息。
+     *
+     * @param loginRequest 登录请求
+     * @param request      HTTP 请求（用于提取 IP、UA、位置信息等）
+     * @return 登录设备信息 DTO
+     */
+    private LoginDeviceDTO buildLoginDeviceDTO(LoginRequest loginRequest, HttpServletRequest request) {
         LoginDeviceDTO loginDeviceDTO = new LoginDeviceDTO();
-        loginDeviceDTO.setDeviceName(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceName() : "Unknown Device");
-        loginDeviceDTO.setDeviceType(request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType().getValue() : DeviceType.UNKNOWN.getValue());
-        loginDeviceDTO.setIp(IPUtils.getIpAddress(httpServletRequest));
-        loginDeviceDTO.setLocation(IPUtils.getRegion(IPUtils.getIpAddress(httpServletRequest)));
-        loginDeviceDTO.setUserAgent(UserAgentUtils.getUserAgent(httpServletRequest));
+        String browserName = UserAgentUtils.getBrowserName(request);
+        loginDeviceDTO.setDeviceName(browserName != null ? browserName : "Unknown Device");
+        loginDeviceDTO.setDeviceType(loginRequest.getDeviceType() != null ? loginRequest.getDeviceType().getValue() : DeviceType.UNKNOWN.getValue());
+        String ip = IPUtils.getIpAddress(request);
+        loginDeviceDTO.setIp(ip);
+        loginDeviceDTO.setLocation(IPUtils.getRegion(ip));
+        loginDeviceDTO.setUserAgent(UserAgentUtils.getUserAgent(request));
+        return loginDeviceDTO;
+    }
 
-        // 6. 生成 JWT 令牌（但还未添加到会话管理中）
-        LoginSessionDTO authSessionInfo = tokenService.createToken(authentication, loginDeviceDTO);
+    /**
+     * 生成会话令牌并绑定到 Spring Security 上下文。
+     *
+     * @param authentication 认证对象
+     * @param loginDeviceDTO 登录设备信息
+     * @return 登录会话信息
+     */
+    private LoginSessionDTO createSessionAndBindContext(Authentication authentication, LoginDeviceDTO loginDeviceDTO) {
+        LoginSessionDTO session = tokenService.createToken(authentication, loginDeviceDTO);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return session;
+    }
 
-        loginDeviceDTO.setRefreshSessionId(authSessionInfo.getRefreshTokenSessionId());
+    /**
+     * 将会话关键字段补充回设备信息对象中，便于后续设备限制检查。
+     *
+     * @param loginDeviceDTO 设备信息
+     * @param session        登录会话信息
+     * @param username       用户名
+     */
+    private void enrichDeviceDTOWithSession(LoginDeviceDTO loginDeviceDTO, LoginSessionDTO session, String username) {
+        loginDeviceDTO.setRefreshSessionId(session.getRefreshTokenSessionId());
         loginDeviceDTO.setUsername(username);
-        loginDeviceDTO.setUserId(authSessionInfo.getUserId());
+        loginDeviceDTO.setUserId(session.getUserId());
+    }
 
-
-        // 如果为了性能考虑，可以在 checkLimitAndAddSession 的第二个参数传入 false，
-        // 表示在检查设备数量限制时跳过加锁。适用于单机部署且用户并发不高的场景。
-        // 注意：跳过加锁可能会导致会话数量限制不准确，需根据实际业务场景权衡。
+    /**
+     * 校验设备限制，若不通过则删除已生成的令牌并向上抛出异常。
+     *
+     * <p>注意：如需在单机、低并发下跳过加锁，可在限流实现中按需调整。</p>
+     *
+     * @param loginDeviceDTO 设备信息
+     * @param session        登录会话信息
+     * @throws AuthorizationException 当设备数量超限时抛出
+     */
+    private void enforceDeviceLimitOrRollback(LoginDeviceDTO loginDeviceDTO, LoginSessionDTO session) {
         try {
             deviceLimiter.checkLimitAndAddSession(loginDeviceDTO);
         } catch (AuthorizationException e) {
-            // 如果设备限制检查失败，需要清理已生成的token
-            log.warn("设备限制检查失败，用户: {}, 设备类型: {}, 错误: {}",
-                    username,
-                    request.getDeviceInfo() != null ? request.getDeviceInfo().getDeviceType() : DeviceType.UNKNOWN,
-                    e.getMessage());
-            redisTokenStore.deleteRefreshTokenAndAccessToken(authSessionInfo.getRefreshTokenSessionId());
+            redisTokenStore.deleteRefreshTokenAndAccessToken(session.getRefreshTokenSessionId());
             throw e;
         }
+    }
 
-        // 使用异步服务记录登录成功日志
-        String ipAddr = IPUtils.getIpAddress(httpServletRequest);
-        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+    /**
+     * 记录登录成功相关日志（登录日志与安全日志）。
+     *
+     * @param username 用户名
+     * @param request  HTTP 请求（用于提取 IP、UA）
+     */
+    private void recordLoginSuccessLogs(String username, HttpServletRequest request) {
+        String ipAddr = IPUtils.getIpAddress(request);
+        String userAgent = UserAgentUtils.getUserAgent(request);
         asyncLogService.recordLoginLog(username, ipAddr, userAgent, true);
-
-        // 手动记录安全日志 - 用户登录成功事件
         recordLoginSecurityLog(username, ipAddr);
+    }
 
-        return BeanCotyUtils.copyProperties(authSessionInfo, AuthTokenVo.class);
+    /**
+     * 校验图形验证码，大小写不敏感。
+     *
+     * @param request 登录请求，需包含 uuid 与 code
+     * @throws ParamException 当验证码无效或校验失败时抛出
+     */
+    private void verifyImageCaptcha(LoginRequest request) {
+        String uuid = request.getUuid();
+        String codeUpper = request.getCode() == null ? null : request.getCode().toUpperCase();
+        boolean ok = captchaService.verifyImageCode(uuid, codeUpper);
+        if (!ok) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "验证码错误");
+        }
     }
 
     /**
