@@ -92,19 +92,19 @@
     </select>
 
     <select id="getCurrentUserMessage" resultMap="BaseResultMap">
-        SELECT DISTINCT sm.id             AS id,
-                        sm.title          AS title,
-                        sm.content        AS content,
-                        sm.type           AS type,
-                        sm.level          AS level,
-                        sm.sender_name    AS sender_name,
-                        sm.target_type    AS target_type,
-                        sm.publish_time   AS publish_time,
-                        sm.is_deleted     AS is_deleted,
-                        sm.create_time    AS create_time,
-                        sm.update_time    AS update_time,
-                        sm.create_by      AS create_by,
-                        sm.update_by      AS update_by
+        SELECT DISTINCT sm.id           AS id,
+                        sm.title        AS title,
+                        sm.content      AS content,
+                        sm.type         AS type,
+                        sm.level        AS level,
+                        sm.sender_name  AS sender_name,
+                        sm.target_type  AS target_type,
+                        sm.publish_time AS publish_time,
+                        sm.is_deleted   AS is_deleted,
+                        sm.create_time  AS create_time,
+                        sm.update_time  AS update_time,
+                        sm.create_by    AS create_by,
+                        sm.update_by    AS update_by
         FROM sys_message sm
                  LEFT JOIN
              sys_user_message sum_link ON sm.id = sum_link.message_id

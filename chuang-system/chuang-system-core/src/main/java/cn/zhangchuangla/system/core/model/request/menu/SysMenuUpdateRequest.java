@@ -46,11 +46,6 @@ public class SysMenuUpdateRequest {
     @NotNull(message = "类型不能为空")
     private MenuTypeEnum type;
 
-    @JsonSetter("type")
-    public void setType(String type) {
-        this.type = MenuTypeEnum.fromValue(type);
-    }
-
     /**
      * 状态
      */
@@ -166,6 +161,11 @@ public class SysMenuUpdateRequest {
      */
     @Schema(description = "排序", type = "integer", example = "1")
     private Integer sort;
+
+    @JsonSetter("type")
+    public void setType(String type) {
+        this.type = MenuTypeEnum.fromValue(type);
+    }
 
 
 }

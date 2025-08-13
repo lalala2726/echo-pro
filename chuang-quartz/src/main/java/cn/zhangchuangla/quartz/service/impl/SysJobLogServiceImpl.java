@@ -46,16 +46,6 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
 
     }
 
-    @Override
-    public List<SysJobLogVo> selectLogsByJobId(Long jobId) {
-        List<SysJobLog> logs = sysJobLogMapper.selectLogsByJobId(jobId);
-        List<SysJobLogVo> logVos = BeanCotyUtils.copyListProperties(logs, SysJobLogVo.class);
-
-        // 设置状态描述
-        logVos.forEach(this::setLogDescriptions);
-
-        return logVos;
-    }
 
     @Override
     public boolean addJobLog(SysJobLog jobLog) {

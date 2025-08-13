@@ -51,6 +51,7 @@ public class UserController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final ExcelExporter excelExporter;
+
     /**
      * 获取用户列表
      * 根据查询条件分页获取系统用户列表
@@ -87,7 +88,7 @@ public class UserController extends BaseController {
     @Operation(summary = "根据ID获取用户信息")
     @PreAuthorize("@ss.hasPermission('system:user:info')")
     public AjaxResult<SysUserInfoVo> getUserInfoById(@Parameter(description = "需要查询的用户ID", required = true)
-                                                  @PathVariable("id") Long id) {
+                                                         @PathVariable("id") Long id) {
         Assert.isTrue(id > 0, "用户ID必须大于0！");
         SysUser sysUser = sysUserService.getUserInfoByUserId(id);
         Long userId = sysUser.getUserId();

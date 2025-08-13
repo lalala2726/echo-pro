@@ -210,7 +210,7 @@ public final class RedisCache {
     /**
      * 判断给定键是否存在于Redis中
      *
-     * @param key 
+     * @param key key
      * @return true=存在；false=不存在
      */
     public boolean exists(String key) {

@@ -4,6 +4,8 @@ import lombok.Getter;
 
 /**
  * 菜单类型
+ *
+ * @author Chuang
  */
 @Getter
 public enum MenuTypeEnum {
@@ -36,7 +38,9 @@ public enum MenuTypeEnum {
     }
 
     public static boolean isValid(String value) {
-        if (value == null) return false;
+        if (value == null) {
+            return false;
+        }
         for (MenuTypeEnum type : values()) {
             if (type.value.equals(value)) {
                 return true;

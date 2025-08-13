@@ -40,12 +40,11 @@ import java.util.stream.Collectors;
 public class ExcelExporter {
 
 
-    private final DictDataHandler dictDataHandler;
-
     /**
      * 默认每个Sheet的最大数据行数（不含表头/提示行）
      */
     private static final int DEFAULT_MAX_ROWS_PER_SHEET = 50000;
+    private final DictDataHandler dictDataHandler;
 
     public ExcelExporter(DictDataHandler dictDataHandler) {
         this.dictDataHandler = dictDataHandler;
@@ -95,7 +94,9 @@ public class ExcelExporter {
 
             // 计算是否需要提示行
             boolean hasHints = excelFields.stream().anyMatch(f -> {
-                if (f.getExcel() == null) return false;
+                if (f.getExcel() == null) {
+                    return false;
+                }
                 return StringUtils.isNotBlank(f.getExcel().prompt()) || (f.getExcel().combo() != null && f.getExcel().combo().length > 0);
             });
 
@@ -323,7 +324,9 @@ public class ExcelExporter {
     private void writeHintsRow(Worksheet worksheet, List<ExcelField> excelFields, int rowIndex) {
         for (int i = 0; i < excelFields.size(); i++) {
             ExcelField field = excelFields.get(i);
-            if (field.getExcel() == null) continue;
+            if (field.getExcel() == null) {
+                continue;
+            }
             String prompt = field.getExcel().prompt();
             String[] combo = field.getExcel().combo();
             String hint = null;
