@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.mq.config.RabbitMQConfig;
 import cn.zhangchuangla.common.mq.dto.MessageSendDTO;
 import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.model.entity.SysUserMessage;
-import cn.zhangchuangla.system.message.push.MessagePushService;
 import cn.zhangchuangla.system.message.service.SysUserMessageService;
 import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,6 @@ import java.util.stream.Collectors;
 public class MessageBusinessConsumer {
 
     private final SysUserMessageService sysUserMessageService;
-    private final MessagePushService messagePushService;
 
     /**
      * 消费用户消息队列中的消息，批量插入用户消息记录

@@ -54,7 +54,9 @@ public enum MessageReceiveTypeEnum {
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MessageReceiveTypeEnum fromJson(String raw) {
-        if (raw == null) return null;
+        if (raw == null) {
+            return null;
+        }
         for (MessageReceiveTypeEnum e : values()) {
             if (e.name().equalsIgnoreCase(raw) || e.value.equalsIgnoreCase(raw)) {
                 return e;

@@ -33,15 +33,6 @@ public interface SysJobLogService extends IService<SysJobLog> {
     SysJobLog selectJobLogById(Long jobLogId);
 
     /**
-     * 根据任务ID查询日志列表
-     *
-     * @param jobId 任务ID
-     * @return 日志列表
-     */
-    @Deprecated
-    List<SysJobLogVo> selectLogsByJobId(Long jobId);
-
-    /**
      * 添加任务日志
      *
      * @param jobLog 任务日志

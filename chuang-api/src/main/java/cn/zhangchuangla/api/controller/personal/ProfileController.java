@@ -2,6 +2,7 @@ package cn.zhangchuangla.api.controller.personal;
 
 import cn.zhangchuangla.common.core.controller.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
@@ -26,6 +27,7 @@ import cn.zhangchuangla.system.core.model.vo.personal.ProfileOverviewInfoVo;
 import cn.zhangchuangla.system.core.model.vo.personal.UserProfileVo;
 import cn.zhangchuangla.system.core.model.vo.personal.UserSecurityLog;
 import cn.zhangchuangla.system.core.service.*;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -142,11 +144,11 @@ public class ProfileController extends BaseController {
      */
     @Operation(summary = "获取用户安全日志")
     @GetMapping("/security/log")
-    public AjaxResult<List<UserSecurityLog>> securityLog() {
+    public AjaxResult<TableDataResult> securityLog(BasePageRequest request) {
         Long userId = SecurityUtils.getUserId();
-        List<SysSecurityLog> userSecurityLog = sysSecurityLogService.getUserSecurityLog(userId);
-        List<UserSecurityLog> userSecurityLogs = copyListProperties(userSecurityLog, UserSecurityLog.class);
-        return success(userSecurityLogs);
+        Page<SysSecurityLog> page = sysSecurityLogService.getUserSecurityLog(userId, request);
+        List<UserSecurityLog> userSecurityLogs = copyListProperties(page, UserSecurityLog.class);
+        return getTableData(page, userSecurityLogs);
     }
 
 

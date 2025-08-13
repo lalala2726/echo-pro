@@ -26,6 +26,7 @@ public enum DeviceType {
      * 移动端
      */
     MOBILE("mobile"),
+
     /**
      * 微信小程序
      */

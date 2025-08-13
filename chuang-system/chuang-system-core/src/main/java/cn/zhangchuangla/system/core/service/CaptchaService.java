@@ -26,12 +26,14 @@ public interface CaptchaService {
 
 
     /**
-     * 验证验证码是否有效
+     * 验证图形验证码是否正确
      *
-     * @param request 请求参数
+     * @param uid  验证码唯一标识
+     * @param code 验证码
      * @return 验证结果
      */
-    boolean verify(CaptchaRequest request);
+    boolean verifyImageCode(String uid, String code);
+
 
     /**
      * 生成图形验证码（按类型 numeric/alpha/alphanumeric）

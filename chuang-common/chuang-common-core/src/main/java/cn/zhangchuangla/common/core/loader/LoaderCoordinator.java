@@ -167,34 +167,34 @@ public class LoaderCoordinator implements CommandLineRunner {
             // 创建异步任务
             List<CompletableFuture<Void>> futures = asyncLoaders.stream()
                     .map(loader -> CompletableFuture.runAsync(() -> {
-                        String loaderName = loader.getName();
-                        LoaderStatus status = loaderStatusMap.get(loaderName);
-                        status.markStart();
+                                String loaderName = loader.getName();
+                                LoaderStatus status = loaderStatusMap.get(loaderName);
+                                status.markStart();
 
-                        logger.info("开始执行异步加载器: {}", loaderName);
-                        try {
-                            boolean load = loader.load();
-                            if (load) {
-                                status.markSuccess();
-                            } else {
-                                String errorMsg = "加载器返回false，表示加载失败";
-                                status.markFailure(errorMsg);
-                                logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg);
-                                boolean blockStartup = loader.blockStartupOnFailure();
-                                if (blockStartup) {
-                                    throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
+                                logger.info("开始执行异步加载器: {}", loaderName);
+                                try {
+                                    boolean load = loader.load();
+                                    if (load) {
+                                        status.markSuccess();
+                                    } else {
+                                        String errorMsg = "加载器返回false，表示加载失败";
+                                        status.markFailure(errorMsg);
+                                        logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg);
+                                        boolean blockStartup = loader.blockStartupOnFailure();
+                                        if (blockStartup) {
+                                            throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动");
+                                        }
+                                    }
+                                    logger.info("异步加载器执行完成: {} (耗时: {}ms)", loaderName, status.getDuration());
+                                } catch (Exception e) {
+                                    String errorMsg = e.getMessage();
+                                    status.markFailure(errorMsg);
+                                    logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg, e);
+                                    boolean blockStartup = loader.blockStartupOnFailure();
+                                    if (blockStartup) {
+                                        throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
+                                    }
                                 }
-                            }
-                            logger.info("异步加载器执行完成: {} (耗时: {}ms)", loaderName, status.getDuration());
-                        } catch (Exception e) {
-                            String errorMsg = e.getMessage();
-                            status.markFailure(errorMsg);
-                            logger.error("异步加载器执行失败: {} - {}", loaderName, errorMsg, e);
-                            boolean blockStartup = loader.blockStartupOnFailure();
-                            if (blockStartup) {
-                                throw new RuntimeException("加载器 " + loaderName + " 加载失败，阻止项目启动", e);
-                            }
-                        }
                             }, executorService)
                             // 每个任务设置单独超时，避免长尾拖慢整体
                             .orTimeout(loaderTimeoutSeconds, TimeUnit.SECONDS))

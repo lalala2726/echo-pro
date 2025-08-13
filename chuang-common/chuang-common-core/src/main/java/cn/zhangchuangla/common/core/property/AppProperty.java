@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.config.property;
+package cn.zhangchuangla.common.core.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

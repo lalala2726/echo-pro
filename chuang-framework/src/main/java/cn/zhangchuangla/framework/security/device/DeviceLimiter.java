@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.security.device;
 
-import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.DeviceType;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -10,6 +9,7 @@ import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.common.redis.core.RedisHashCache;
 import cn.zhangchuangla.common.redis.core.RedisZSetCache;
 import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
+import cn.zhangchuangla.framework.security.property.SecurityProperties;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;

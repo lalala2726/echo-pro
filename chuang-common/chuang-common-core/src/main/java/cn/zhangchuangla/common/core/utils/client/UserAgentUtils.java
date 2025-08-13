@@ -134,6 +134,17 @@ public class UserAgentUtils {
     }
 
     /**
+     * 获取浏览器名称
+     *
+     * @param httpServletRequest HttpServletRequest
+     * @return 浏览器名称
+     */
+    public static String getBrowserName(HttpServletRequest httpServletRequest) {
+        String userAgentStr = getUserAgent(httpServletRequest);
+        return getBrowser(userAgentStr).getName();
+    }
+
+    /**
      * 获取浏览器类型（例如：Web Browser / Mobile Browser）
      *
      * @param userAgentStr User-Agent 字符串

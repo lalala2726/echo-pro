@@ -1,9 +1,9 @@
 package cn.zhangchuangla.system.core.service;
 
+import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.system.core.model.entity.SysSecurityLog;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
 
 /**
  * @author Chuang
@@ -16,5 +16,5 @@ public interface SysSecurityLogService extends IService<SysSecurityLog> {
      * @param userId 用户ID
      * @return 用户安全日志列表
      */
-    List<SysSecurityLog> getUserSecurityLog(Long userId);
+    Page<SysSecurityLog> getUserSecurityLog(Long userId, BasePageRequest request);
 }

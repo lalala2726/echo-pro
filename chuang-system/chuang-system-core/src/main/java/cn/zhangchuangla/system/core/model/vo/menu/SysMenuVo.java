@@ -109,7 +109,7 @@ public class SysMenuVo extends BaseVo {
      * 是否缓存
      */
     @Schema(description = "是否缓存", type = "number", example = "0")
-    private Integer keepAlive;
+    private Boolean keepAlive;
 
     /**
      * 是否固定标签页

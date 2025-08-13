@@ -44,24 +44,26 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 普通字符验证码
+     * 图形验证码验证
      *
-     * @param request 请求参数
+     * @param uid  验证码唯一标识
+     * @param code 验证码
      * @return 验证结果
      */
     @Override
-    public boolean verify(CaptchaRequest request) {
-        Assert.notEmpty(request.getUid(), "验证码唯一标识不能为空");
-        Assert.notEmpty(request.getCode(), "验证码不能为空");
-        String redisKey = CAPTCHA_CODE_KEY + request.getUid();
+    public boolean verifyImageCode(String uid, String code) {
+        Assert.notEmpty(code, "验证码不能为空");
+        Assert.notEmpty(uid, "验证码唯一标识不能为空");
+        String redisKey = CAPTCHA_CODE_KEY + uid;
         String redisCode = redisCache.getCacheObject(redisKey);
         Assert.hasText(redisCode, "验证码已过期");
-        if (redisCode.equalsIgnoreCase(request.getCode())) {
+        if (redisCode.equals(code)) {
             redisCache.deleteObject(redisKey);
             return true;
         }
         return false;
     }
+
 
     /**
      * 邮箱验证码验证
@@ -104,6 +106,11 @@ public class CaptchaServiceImpl implements CaptchaService {
         return false;
     }
 
+    /**
+     * 生成图形验证码
+     *
+     * @return 图形验证码
+     */
     @Override
     public CaptchaImageVo generateImageCaptcha() {
         String code = CaptchaUtils.randomAlphanumeric(4, true);
@@ -112,7 +119,6 @@ public class CaptchaServiceImpl implements CaptchaService {
         String base64 = ImageCaptchaUtils.generateBase64Png(code, 160, 50);
         // 存储到Redis，大小写不敏感校验采用统一大写
         redisCache.setCacheObject(CAPTCHA_CODE_KEY + uuid, code.toUpperCase(), timeout, TimeUnit.MINUTES);
-
         CaptchaImageVo vo = new CaptchaImageVo();
         vo.setUuid(uuid);
         vo.setImgBase64(base64);

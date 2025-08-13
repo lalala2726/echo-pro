@@ -38,6 +38,7 @@ public class CaptchaController extends BaseController {
      * @return 验证码发送结果
      */
     @PostMapping("/email")
+    @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
     @Operation(summary = "发送验证码")
     public AjaxResult<Void> sendEmail(@Validated @RequestBody CaptchaRequest request) {
         Assert.notEmpty(request.getEmail(), "邮箱不能为空");
@@ -61,51 +62,6 @@ public class CaptchaController extends BaseController {
         return success();
     }
 
-    /**
-     * 验证手机号验证码
-     *
-     * @param request 验证码请求参数
-     * @return 验证结果
-     */
-    @PostMapping("/verify/phone")
-    @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
-    @Operation(summary = "验证手机号验证码")
-    public AjaxResult<Boolean> verifyPhone(@Validated @RequestBody CaptchaRequest request) {
-        Assert.notEmpty(request.getCode(), "验证码不能为空");
-        Assert.notEmpty(request.getPhone(), "手机号不能为空");
-        boolean verify = captchaService.verifyPhone(request.getPhone(), request.getCode());
-        return success(verify);
-    }
-
-    /**
-     * 验证邮箱验证码
-     *
-     * @param request 验证码请求参数
-     * @return 验证结果
-     */
-    @PostMapping("/verify/email")
-    @Operation(summary = "验证邮箱验证码")
-    public AjaxResult<Boolean> verifyEmail(@Validated @RequestBody CaptchaRequest request) {
-        Assert.notEmpty(request.getCode(), "验证码不能为空");
-        Assert.notEmpty(request.getEmail(), "邮箱不能为空");
-        boolean verify = captchaService.verifyEmail(request.getEmail(), request.getCode());
-        return success(verify);
-    }
-
-    /**
-     * 验证验证码
-     *
-     * @param request 验证码请求参数
-     * @return 验证结果
-     */
-    @PostMapping("/verify")
-    @Operation(summary = "验证验证码")
-    public AjaxResult<Boolean> verify(@Validated @RequestBody CaptchaRequest request) {
-        Assert.notEmpty(request.getCode(), "验证码不能为空");
-        Assert.notEmpty(request.getUid(), "验证码唯一标识不能为空");
-        boolean verify = captchaService.verify(request);
-        return success(verify);
-    }
 
     /**
      * 获取图形验证码（返回uuid与Base64）

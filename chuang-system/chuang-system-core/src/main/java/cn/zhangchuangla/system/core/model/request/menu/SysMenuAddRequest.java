@@ -1,8 +1,11 @@
 package cn.zhangchuangla.system.core.model.request.menu;
 
+import cn.zhangchuangla.system.core.enums.MenuTypeEnum;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -33,8 +36,8 @@ public class SysMenuAddRequest {
      * 类型
      */
     @Schema(description = "类型", type = "string", example = "catalog")
-    @NotEmpty(message = "类型不能为空")
-    private String type;
+    @NotNull(message = "类型不能为空")
+    private MenuTypeEnum type;
 
     /**
      * 状态
@@ -151,6 +154,11 @@ public class SysMenuAddRequest {
      */
     @Schema(description = "排序", type = "integer", example = "1")
     private Integer sort;
+
+    @JsonSetter("type")
+    public void setType(String type) {
+        this.type = MenuTypeEnum.fromValue(type);
+    }
 
 
 }

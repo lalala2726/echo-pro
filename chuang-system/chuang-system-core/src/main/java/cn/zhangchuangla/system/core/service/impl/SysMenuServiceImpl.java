@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.core.service.impl;
 
-import cn.zhangchuangla.common.core.constant.Constants;
 import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.Option;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -8,6 +7,7 @@ import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
+import cn.zhangchuangla.system.core.enums.MenuTypeEnum;
 import cn.zhangchuangla.system.core.mapper.SysMenuMapper;
 import cn.zhangchuangla.system.core.model.entity.SysMenu;
 import cn.zhangchuangla.system.core.model.request.menu.SysMenuAddRequest;
@@ -84,6 +84,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 1. 基础验证
         validateMenuRequest(request);
 
+        // 1.1 业务校验：名称仅允许英文；路径按类型必须以/开头
+        validateNameAndPath(request.getName(), request.getPath(), request.getType());
+
         // 2. 检查菜单名称和路径是否已存在
         if (isMenuNameExists(null, request.getName())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单名称已存在: " + request.getName());
@@ -97,14 +100,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setCreateBy(username);
 
+        // 4.1 规范化路径：去除结尾/（保留根路径/）
+        sysMenu.setPath(normalizePath(sysMenu.getPath()));
+
+        // 映射枚举到实体存储值
+        sysMenu.setType(request.getType().getValue());
+
         // 4. 根据菜单类型进行字段过滤和验证
         SysMenu processedMenu = switch (request.getType()) {
-            case Constants.MenuConstants.TYPE_DIR -> saveCatalog(sysMenu);
-            case Constants.MenuConstants.TYPE_MENU -> saveMenu(sysMenu);
-            case Constants.MenuConstants.TYPE_BUTTON -> saveButton(sysMenu);
-            case Constants.MenuConstants.TYPE_INTERNAL -> saveEmbedded(sysMenu);
-            case Constants.MenuConstants.TYPE_EXTERNAL -> saveLink(sysMenu);
-            default -> throw new ParamException(ResultCode.PARAM_ERROR, "不支持的菜单类型: " + request.getType());
+            case CATALOG -> saveCatalog(sysMenu);
+            case MENU -> saveMenu(sysMenu);
+            case BUTTON -> saveButton(sysMenu);
+            case EMBEDDED -> saveEmbedded(sysMenu);
+            case LINK -> saveLink(sysMenu);
         };
 
         // 5. 保存菜单
@@ -126,15 +134,61 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
         String username = SecurityUtils.getUsername();
+        // 1.1 业务校验：名称仅允许英文；路径按类型必须以/开头
+        validateNameAndPath(request.getName(), request.getPath(), request.getType());
+
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setUpdateBy(username);
-        // 处理链接,Link字段不能为空并且类型为外部链接或者内部链接
-        if (request.getLink() != null && !request.getLink().isBlank()
-                && (Constants.MenuConstants.TYPE_EXTERNAL.equals(request.getType())
-                || Constants.MenuConstants.TYPE_INTERNAL.equals(request.getType()))) {
-            sysMenu.setLink(request.getLink());
+
+        // 规范化路径：去除结尾/（保留根路径/）
+        sysMenu.setPath(normalizePath(sysMenu.getPath()));
+
+        // 映射枚举到实体存储值
+        sysMenu.setType(request.getType().getValue());
+
+        // 根据菜单类型进行字段过滤和规范化（与新增一致）
+        SysMenu processedMenu = switch (request.getType()) {
+            case CATALOG -> saveCatalog(sysMenu);
+            case MENU -> saveMenu(sysMenu);
+            case BUTTON -> saveButton(sysMenu);
+            case EMBEDDED -> saveEmbedded(sysMenu);
+            case LINK -> saveLink(sysMenu);
+        };
+        return updateById(processedMenu);
+    }
+
+    /**
+     * 校验菜单名称与路径
+     *
+     * <p>
+     * - 名称仅允许英文字符 [A-Za-z]+
+     * - 路径在目录/页面/内嵌/外链等需要路径的类型下，必须以/开头
+     * </p>
+     */
+    private void validateNameAndPath(String name, String path, MenuTypeEnum type) {
+        if (name == null || !name.matches("^[A-Za-z]+$")) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "菜单名称仅允许英文");
         }
-        return updateById(sysMenu);
+        // 仅在需要路径的类型下校验路径
+        if (type != MenuTypeEnum.BUTTON) {
+            if (path == null || !path.startsWith("/")) {
+                throw new ParamException(ResultCode.PARAM_ERROR, "路由地址必须以/开头");
+            }
+        }
+    }
+
+    /**
+     * 规范化路径：去除结尾的/（但保留根路径/）。
+     */
+    private String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        String trimmed = path.trim();
+        if (trimmed.length() > 1 && trimmed.endsWith("/")) {
+            return trimmed.substring(0, trimmed.length() - 1);
+        }
+        return trimmed;
     }
 
     /**
@@ -196,7 +250,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 //菜单状态为启用
                 .filter(menu -> menu.getStatus() == statusEnable)
                 //按钮类型不进行生成
-                .filter(menu -> !Constants.MenuConstants.TYPE_BUTTON.equals(menu.getType()))
+                .filter(menu -> !MenuTypeEnum.BUTTON.getValue().equals(menu.getType()))
                 //排序
                 .sorted(Comparator.comparing(SysMenu::getSort).reversed())
                 .map(menu -> {
@@ -226,7 +280,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     private MetaVo setMateVo(SysMenu sysMenu) {
         MetaVo metaVo = BeanCotyUtils.copyProperties(sysMenu, MetaVo.class);
 
-        if (Constants.MenuConstants.TYPE_INTERNAL.equals(sysMenu.getType())) {
+        if (MenuTypeEnum.EMBEDDED.getValue().equals(sysMenu.getType())) {
             metaVo.setIframeSrc(sysMenu.getLink());
             metaVo.setLink(null);
         }
@@ -367,7 +421,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @param request 菜单请求
      */
     private void validateMenuRequest(SysMenuAddRequest request) {
-        String type = request.getType();
+        MenuTypeEnum type = request.getType();
 
         // 通用必填字段验证
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -376,15 +430,17 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
             throw new ParamException(ResultCode.PARAM_ERROR, "菜单标题不能为空");
         }
+        if (type == null) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "不支持的菜单类型: null");
+        }
 
         // 根据菜单类型进行特定验证
         switch (type) {
-            case Constants.MenuConstants.TYPE_DIR -> validateDirectoryMenu(request);
-            case Constants.MenuConstants.TYPE_MENU -> validatePageMenu(request);
-            case Constants.MenuConstants.TYPE_BUTTON -> validateButtonMenu(request);
-            case Constants.MenuConstants.TYPE_INTERNAL -> validateEmbeddedMenu(request);
-            case Constants.MenuConstants.TYPE_EXTERNAL -> validateExternalMenu(request);
-            default -> throw new ParamException(ResultCode.PARAM_ERROR, "不支持的菜单类型: " + type);
+            case CATALOG -> validateDirectoryMenu(request);
+            case MENU -> validatePageMenu(request);
+            case BUTTON -> validateButtonMenu(request);
+            case EMBEDDED -> validateEmbeddedMenu(request);
+            case LINK -> validateExternalMenu(request);
         }
     }
 
@@ -542,8 +598,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      */
     private SysMenu saveEmbedded(SysMenu sysMenu) {
         sysMenu.setComponent("IFrameView");
-        // 内嵌页面不需要缓存设置
-        sysMenu.setKeepAlive(null);
         return sysMenu;
     }
 
