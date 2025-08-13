@@ -38,6 +38,7 @@ public class CaptchaController extends BaseController {
      * @return 验证码发送结果
      */
     @PostMapping("/email")
+    @AccessLimit(message = "验证码发送此处太多了!请稍后再试!")
     @Operation(summary = "发送验证码")
     public AjaxResult<Void> sendEmail(@Validated @RequestBody CaptchaRequest request) {
         Assert.notEmpty(request.getEmail(), "邮箱不能为空");
