@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Chuang
@@ -45,7 +46,8 @@ public class MenuController extends BaseController {
     @Operation(summary = "获取路由")
     @GetMapping("/route")
     public AjaxResult<List<RouterVo>> getRoute() {
-        List<SysMenu> list = sysMenuService.list();
+        Set<String> roles = getRoles();
+        List<SysMenu> list = sysMenuService.listMenuByRoleName(roles);
         List<RouterVo> routerVos = sysMenuService.buildRouteVo(list);
         return AjaxResult.success(routerVos);
     }

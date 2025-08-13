@@ -20,6 +20,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,10 +36,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@CacheConfig(cacheNames = "dictDataOptions")
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
         implements SysDictDataService {
 
     private final SysDictDataMapper sysDictDataMapper;
+    private final CacheManager cacheManager;
     private final RedisCache redisCache;
 
     /**
@@ -69,44 +75,22 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 字典数据选项列表
      */
     @Override
+    @Cacheable(key = "#dictType", unless = "#result == null || #result.isEmpty()", sync = true)
     public List<Option<String>> getDictDataOption(String dictType) {
         final int normal = 0;
         if (StringUtils.isBlank(dictType)) {
             return List.of();
         }
 
-        // 1. 优先从缓存中获取
-        String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
-        List<Option<String>> cachedOptions = redisCache.getCacheObject(cacheKey);
-
-        if (cachedOptions != null) {
-            log.debug("从缓存中获取字典数据: {}", dictType);
-            return cachedOptions;
-        }
-
-        // 2. 缓存中没有数据，从数据库查询
-        log.debug("缓存中没有字典数据，从数据库查询: {}", dictType);
         LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<SysDictData>()
                 .eq(SysDictData::getDictType, dictType)
-                // 只查询启用的字典数据
                 .eq(SysDictData::getStatus, normal)
-                // 按排序字段升序
                 .orderByAsc(SysDictData::getSort);
 
         List<SysDictData> dictDataList = list(queryWrapper);
-        List<Option<String>> options = dictDataList.stream()
+        return dictDataList.stream()
                 .map(item -> new Option<>(item.getDictValue(), item.getDictLabel()))
                 .toList();
-
-        // 3. 将查询结果缓存起来
-        try {
-            redisCache.setCacheObject(cacheKey, options, RedisConstants.Dict.DICT_CACHE_EXPIRE_TIME);
-            log.debug("字典数据已缓存: {}", dictType);
-        } catch (Exception e) {
-            log.warn("缓存字典数据失败: {}, 错误: {}", dictType, e.getMessage());
-        }
-
-        return options;
     }
 
     /**
@@ -116,6 +100,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 是否添加成功
      */
     @Override
+    @CacheEvict(key = "#request.dictType")
     public boolean addDictData(SysDictDataAddRequest request) {
         // 检查同一字典类型下字典值是否重复
         if (isDictDataExistByValue(request.getDictType(), request.getDictValue(), null)) {
@@ -128,12 +113,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         sysDictData.setCreateBy(SecurityUtils.getUsername());
 
         sysDictData.setCreateBy(SecurityUtils.getUsername());
-        boolean result = save(sysDictData);
-        if (result) {
-            // 清除相关缓存
-            clearDictCache(request.getDictType());
-        }
-        return result;
+        return save(sysDictData);
     }
 
     /**
@@ -162,11 +142,9 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         sysDictData.setUpdateBy(SecurityUtils.getUsername());
         boolean result = updateById(sysDictData);
         if (result) {
-            // 清除相关缓存
-            clearDictCache(request.getDictType());
-            // 如果字典类型发生了变化，也要清除旧的缓存
+            evictDictOptions(request.getDictType());
             if (!request.getDictType().equals(existDictData.getDictType())) {
-                clearDictCache(existDictData.getDictType());
+                evictDictOptions(existDictData.getDictType());
             }
         }
         return result;
@@ -189,11 +167,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
         boolean result = removeByIds(ids);
         if (result) {
-            // 清除相关缓存
             itemsToDelete.stream()
                     .map(SysDictData::getDictType)
                     .distinct()
-                    .forEach(this::clearDictCache);
+                    .forEach(this::evictDictOptions);
         }
         return result;
     }
@@ -212,8 +189,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         queryWrapper.in(SysDictData::getDictType, dictTypes);
         remove(queryWrapper);
 
-        // 清除相关缓存
-        dictTypes.forEach(this::clearDictCache);
+        dictTypes.forEach(this::evictDictOptions);
     }
 
     /**
@@ -240,14 +216,18 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     }
 
     /**
-     * 清除指定字典类型的缓存
+     * 清除指定字典类型的 Spring Cache 缓存
      */
-    private void clearDictCache(String dictType) {
+    private void evictDictOptions(String dictType) {
         if (!StringUtils.isBlank(dictType)) {
-            String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
-                redisCache.deleteObject(cacheKey);
-                log.debug("已清除字典缓存: {}", dictType);
+                var cache = cacheManager.getCache("dictDataOptions");
+                if (cache != null) {
+                    cache.evict(dictType);
+                }
+                // 同步删除旧的手工Redis键，兼容 Excel 等读取逻辑
+                String manualKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
+                redisCache.deleteObject(manualKey);
             } catch (Exception e) {
                 log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());
             }
