@@ -1,5 +1,7 @@
 package cn.zhangchuangla.system.core.model.request.menu;
 
+import cn.zhangchuangla.system.core.enums.MenuTypeEnum;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -41,8 +43,13 @@ public class SysMenuUpdateRequest {
      * 类型
      */
     @Schema(description = "类型", type = "string", example = "catalog")
-    @NotEmpty(message = "类型不能为空")
-    private String type;
+    @NotNull(message = "类型不能为空")
+    private MenuTypeEnum type;
+
+    @JsonSetter("type")
+    public void setType(String type) {
+        this.type = MenuTypeEnum.fromValue(type);
+    }
 
     /**
      * 状态

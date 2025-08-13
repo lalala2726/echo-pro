@@ -51,31 +51,12 @@ public class Constants {
     /**
      * 菜单常量
      */
+    @Deprecated
     public interface MenuConstants {
-
-        /**
-         * 目录
-         */
         String TYPE_DIR = "catalog";
-
-        /**
-         * 菜单
-         */
         String TYPE_MENU = "menu";
-
-        /**
-         * 按钮
-         */
         String TYPE_BUTTON = "button";
-
-        /**
-         * 内嵌
-         */
         String TYPE_INTERNAL = "embedded";
-
-        /**
-         * 外链
-         */
         String TYPE_EXTERNAL = "link";
     }
 }

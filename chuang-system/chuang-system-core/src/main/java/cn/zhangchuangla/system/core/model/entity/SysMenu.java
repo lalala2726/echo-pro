@@ -98,7 +98,7 @@ public class SysMenu extends BaseEntity {
     /**
      * 是否缓存
      */
-    private Integer keepAlive;
+    private Boolean keepAlive;
 
     /**
      * 是否固定标签页
