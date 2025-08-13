@@ -1,8 +1,8 @@
 package cn.zhangchuangla.framework.security.token;
 
-import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
+import cn.zhangchuangla.framework.security.property.SecurityProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

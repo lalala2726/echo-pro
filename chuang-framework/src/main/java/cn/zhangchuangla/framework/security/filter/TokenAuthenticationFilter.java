@@ -1,9 +1,9 @@
 package cn.zhangchuangla.framework.security.filter;
 
-import cn.zhangchuangla.common.core.config.property.SecurityProperties;
 import cn.zhangchuangla.common.core.constant.SecurityConstants;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.utils.ResponseUtils;
+import cn.zhangchuangla.framework.security.property.SecurityProperties;
 import cn.zhangchuangla.framework.security.token.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

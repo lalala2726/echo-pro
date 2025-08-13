@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.config.property;
+package cn.zhangchuangla.framework.security.property;
 
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -24,7 +24,6 @@ public class SecurityProperties {
      * 会话管理配置
      */
     public SessionConfig session;
-
 
     /**
      * token标识符

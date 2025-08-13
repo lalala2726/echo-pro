@@ -1,7 +1,7 @@
 package cn.zhangchuangla.framework.config;
 
-import cn.zhangchuangla.common.core.config.property.AppProperty;
 import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.property.AppProperty;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
