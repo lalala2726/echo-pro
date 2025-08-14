@@ -368,6 +368,7 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .createTime(new Date())
                 .title(message.getTitle())
                 .content(message.getContent())
+                .publishTime(new Date())
                 .type(typeEnum)
                 .level(levelEnum)
                 .build();

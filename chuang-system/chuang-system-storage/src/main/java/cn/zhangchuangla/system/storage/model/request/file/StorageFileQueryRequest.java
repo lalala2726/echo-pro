@@ -20,36 +20,36 @@ public class StorageFileQueryRequest extends BasePageRequest {
     /**
      * 文件名
      */
-    @Schema(description = "文件名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2022-01-01.png")
+    @Schema(description = "文件名", type = "string", example = "2022-01-01.png")
     private String originalName;
 
     /**
      * 文件类型，如 image/jpeg, application/pdf 等
      */
-    @Schema(description = "文件类型", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "image/jpeg")
+    @Schema(description = "文件类型", type = "string", example = "image/jpeg")
     private String contentType;
 
     /**
      * 存储类型 (LOCAL/MINIO/ALIYUN_OSS)
      */
-    @Schema(description = "存储类型", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "LOCAL")
+    @Schema(description = "存储类型", type = "string", example = "LOCAL")
     private String storageType;
 
     /**
      * 存储桶名称（OSS/MINIO 使用）
      */
-    @Schema(description = "存储桶名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "bucketName")
+    @Schema(description = "存储桶名称", type = "string", example = "bucketName")
     private String bucketName;
 
     /**
      * 上传者名称
      */
-    @Schema(description = "上传者名称", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "张三")
+    @Schema(description = "上传者名称", type = "string", example = "张三")
     private String uploaderName;
 
     /**
      * 上传时间
      */
-    @Schema(description = "上传时间", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2023-01-01 00:00:00")
+    @Schema(description = "上传时间", type = "string", example = "2023-01-01 00:00:00")
     private Date uploadTime;
 }

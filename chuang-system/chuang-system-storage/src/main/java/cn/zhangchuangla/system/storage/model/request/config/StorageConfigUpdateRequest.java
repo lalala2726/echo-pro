@@ -21,32 +21,32 @@ public class StorageConfigUpdateRequest {
     /**
      * 存储配置名称
      */
-    @Schema(description = "文件配置标志", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "北京阿里云对象存储")
+    @Schema(description = "文件配置标志", type = "string", example = "北京阿里云对象存储")
     @NotBlank(message = "文件配置标志不能为空")
     private String storageName;
 
     /**
      * 阿里云存储配置
      */
-    @Schema(description = "阿里云OSS配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "阿里云OSS配置")
     private AliyunOssConfigSaveRequest aliyunOss;
 
     /**
      * AmazonS3 存储配置
      */
-    @Schema(description = "MinIO 配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "MinIO 配置")
     private AmazonS3ConfigSaveRequest amazonS3;
 
     /**
      * 腾讯云COS 存储配置
      */
-    @Schema(description = "腾讯云COS配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "腾讯云COS配置")
     private TencentCosConfigSaveRequest tencentCos;
 
     /**
      * 阿里云OSS 存储配置
      */
-    @Schema(description = "MinIO 配置", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "MinIO 配置")
     private MinioConfigSaveRequest minio;
 
 

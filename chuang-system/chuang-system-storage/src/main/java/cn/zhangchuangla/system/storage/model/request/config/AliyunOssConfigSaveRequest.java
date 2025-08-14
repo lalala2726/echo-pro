@@ -53,6 +53,6 @@ public class AliyunOssConfigSaveRequest extends StorageConfigBaseSaveRequest {
     /**
      * 是否真实删除
      */
-    @Schema(description = "是否真实删除", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "true")
+    @Schema(description = "是否真实删除", type = "boolean", defaultValue = "true")
     private boolean realDelete = true;
 }

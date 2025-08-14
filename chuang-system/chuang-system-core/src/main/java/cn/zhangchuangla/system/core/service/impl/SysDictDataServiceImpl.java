@@ -75,7 +75,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 字典数据选项列表
      */
     @Override
-    @Cacheable(key = "#dictType", unless = "#result == null || #result.isEmpty()", sync = true)
+    @Cacheable(key = "#dictType", unless = "#result == null || #result.isEmpty()")
     public List<Option<String>> getDictDataOption(String dictType) {
         final int normal = 0;
         if (StringUtils.isBlank(dictType)) {

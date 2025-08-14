@@ -18,25 +18,25 @@ public class CaptchaRequest {
      * 手机号码
      */
     @ValidRegex(message = "手机号格式错误", regexp = RegularConstants.User.PHONE, allowEmpty = true)
-    @Schema(description = "手机号码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "13800001111")
+    @Schema(description = "手机号码", type = "string", example = "13800001111")
     private String phone;
 
     /**
      * 邮箱地址
      */
     @ValidRegex(message = "邮箱格式错误", regexp = RegularConstants.User.EMAIL, allowEmpty = true)
-    @Schema(description = "邮箱地址", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "admin@example.com")
+    @Schema(description = "邮箱地址", type = "string", example = "admin@example.com")
     private String email;
 
     /**
      * 验证码
      */
-    @Schema(description = "验证码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "123456")
+    @Schema(description = "验证码", type = "string", example = "123456")
     private String code;
 
     /**
      * 普通验证码唯一标识
      */
-    @Schema(description = "普通验证码唯一标识", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1001")
+    @Schema(description = "普通验证码唯一标识", type = "string", example = "1001")
     private String uid;
 }

@@ -170,7 +170,6 @@ public class UserController extends BaseController {
         sysUserService.isAllowUpdate(request.getUserId());
         Assert.isTrue(!sysUserService.isPhoneExist(request.getPhone(), request.getUserId()), "手机号已存在");
         Assert.isTrue(!sysUserService.isEmailExist(request.getEmail(), request.getUserId()), "邮箱已存在");
-        // 业务逻辑
         boolean result = sysUserService.updateUserInfoById(request);
         return toAjax(result);
     }

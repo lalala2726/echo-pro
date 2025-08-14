@@ -20,33 +20,33 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     /**
      * 消息标题
      */
-    @Schema(description = "消息标题", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "系统消息")
+    @Schema(description = "消息标题", type = "string", example = "系统消息")
     private String title;
 
     /**
      * 消息类型
      */
-    @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"}, requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "system")
+    @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"}, example = "system")
     private MessageTypeEnum type;
 
 
     /**
      * 消息级别
      */
-    @Schema(description = "消息级别", allowableValues = {"normal", "important", "urgent"}, requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "normal")
+    @Schema(description = "消息级别", allowableValues = {"normal", "important", "urgent"}, example = "normal")
     private MessageLevelEnum level;
 
     /**
      * 是否已读
      */
-    @Schema(description = "是否已读", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "true")
+    @Schema(description = "是否已读", type = "boolean", example = "true")
     private Boolean isRead;
 
 
     /**
      * 发送者姓名
      */
-    @Schema(description = "发送者姓名", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "张三")
+    @Schema(description = "发送者姓名", type = "string", example = "张三")
     private String senderName;
 
 

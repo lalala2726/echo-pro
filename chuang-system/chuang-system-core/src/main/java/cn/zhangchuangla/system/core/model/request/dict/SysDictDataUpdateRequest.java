@@ -51,7 +51,7 @@ public class SysDictDataUpdateRequest {
     /**
      * 颜色
      */
-    @Schema(description = "颜色", example = "#000000", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "颜色", example = "#000000", type = "string")
     private String color;
 
     /**

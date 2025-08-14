@@ -60,7 +60,7 @@ public class MessageManageController extends BaseController {
     }
 
     /**
-     * 管理员发送消息
+     * 发送消息
      *
      * @return 操作结果
      */

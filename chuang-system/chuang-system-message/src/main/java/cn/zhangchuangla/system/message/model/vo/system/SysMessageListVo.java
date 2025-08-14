@@ -1,8 +1,6 @@
 package cn.zhangchuangla.system.message.model.vo.system;
 
-import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
-import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
-import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -40,13 +38,13 @@ public class SysMessageListVo {
      * 消息类型
      */
     @Schema(description = "消息类型", type = "string", example = "system")
-    private MessageTypeEnum type;
+    private String type;
 
     /**
      * 消息级别
      */
     @Schema(description = "消息级别", type = "string", example = "important")
-    private MessageLevelEnum level;
+    private String level;
 
     /**
      * 发送者姓名
@@ -58,12 +56,13 @@ public class SysMessageListVo {
      * 目标类型
      */
     @Schema(description = "目标类型", type = "string", example = "all")
-    private MessageReceiveTypeEnum targetType;
+    private String targetType;
 
     /**
      * 发布时间
      */
     @Schema(description = "发布时间", type = "string", format = "date-time", example = "2025-05-25T10:00:00Z")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date publishTime;
 
 }
