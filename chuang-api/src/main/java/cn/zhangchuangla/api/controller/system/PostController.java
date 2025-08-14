@@ -104,8 +104,7 @@ public class PostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:update')")
     @OperationLog(title = "岗位管理", businessType = BusinessType.UPDATE)
     @Operation(summary = "修改岗位")
-    public AjaxResult<Void> updatePost(
-            @Parameter(description = "修改岗位请求参数") @Validated @RequestBody SysPostUpdateRequest request) {
+    public AjaxResult<Void> updatePost(@Parameter(description = "修改岗位请求参数") @Validated @RequestBody SysPostUpdateRequest request) {
         return toAjax(sysPostService.updatePost(request));
     }
 
@@ -131,7 +130,7 @@ public class PostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID") @PathVariable("id") Long id) {
-        Assert.isTrue(id > 0, "岗位ID必须大于0！");
+        Assert.isPositive(id, "岗位ID必须大于0！");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = new SysPostVo();
         BeanUtils.copyProperties(post, sysPostVo);
@@ -148,7 +147,8 @@ public class PostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @Operation(summary = "导出岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.EXPORT)
-    public void exportPost(@RequestBody SysPostQueryRequest request, HttpServletResponse response) {
+    public void exportPost(@Parameter(description = "添加查询参数可导出指定查询的数据,为空则导出全部数据")
+                           @RequestBody SysPostQueryRequest request, HttpServletResponse response) {
         List<SysPost> sysPosts = sysPostService.exportPostList(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(sysPosts, SysPostListVo.class);
         excelExporter.exportExcel(response, sysPostListVos, SysPostListVo.class, "岗位列表");

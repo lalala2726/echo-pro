@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     private final SysDictTypeMapper sysDictTypeMapper;
     private final SysDictDataService sysDictDataService;
+    private final CacheManager cacheManager;
     private final RedisCache redisCache;
 
     /**
@@ -144,9 +146,9 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         // 删除字典类型
         boolean result = removeByIds(ids);
 
-        // 清除相关缓存
+        // 清除相关缓存（Spring Cache + 兼容手工Redis键）
         if (result) {
-            dictTypes.forEach(this::clearDictCache);
+            dictTypes.forEach(this::evictDictOptions);
         }
 
         return result;
@@ -253,14 +255,18 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     }
 
     /**
-     * 清除指定字典类型的缓存
+     * 清除指定字典类型的缓存（与数据服务一致）
      */
-    private void clearDictCache(String dictType) {
+    private void evictDictOptions(String dictType) {
         if (!StringUtils.isBlank(dictType)) {
-            String cacheKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
             try {
-                redisCache.deleteObject(cacheKey);
-                log.debug("已清除字典缓存: {}", dictType);
+                var cache = cacheManager.getCache("dictDataOptions");
+                if (cache != null) {
+                    cache.evict(dictType);
+                    log.debug("已清除字典缓存: {}", dictType);
+                }
+                String manualKey = String.format(RedisConstants.Dict.DICT_DATA_KEY, dictType);
+                redisCache.deleteObject(manualKey);
             } catch (Exception e) {
                 log.warn("清除字典缓存失败: {}, 错误: {}", dictType, e.getMessage());
             }

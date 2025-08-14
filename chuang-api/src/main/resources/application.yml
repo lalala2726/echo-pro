@@ -34,9 +34,6 @@ springdoc:
       activated: true
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
-  cache:
-    disabled: true
-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -66,7 +63,3 @@ security:
       mobile: -1
     multi-device: true
     token-prefix: null
-logging:
-  level:
-    org.springframework.web.socket: DEBUG
-    org.springframework.messaging: DEBUG

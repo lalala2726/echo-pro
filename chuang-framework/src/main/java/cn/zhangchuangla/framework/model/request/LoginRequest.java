@@ -40,14 +40,14 @@ public class LoginRequest {
      * 验证码
      */
     @NotBlank(message = "验证码不能为空!")
-    @Schema(description = "验证码", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "123456")
+    @Schema(description = "验证码", type = "string", example = "123456")
     private String code;
 
     /**
      * 验证码唯一标识
      */
     @NotBlank(message = "验证码唯一标识不能为空!")
-    @Schema(description = "普通验证码唯一标识", type = "string", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1001")
+    @Schema(description = "普通验证码唯一标识", type = "string", example = "1001")
     private String uuid;
 
 

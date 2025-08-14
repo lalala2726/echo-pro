@@ -60,6 +60,6 @@ public class AmazonS3ConfigSaveRequest extends StorageConfigBaseSaveRequest {
     /**
      * 是否真实删除文件
      */
-    @Schema(description = "是否真实删除文件", type = "boolean", requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "true")
+    @Schema(description = "是否真实删除文件", type = "boolean", defaultValue = "true")
     private boolean realDelete = true;
 }

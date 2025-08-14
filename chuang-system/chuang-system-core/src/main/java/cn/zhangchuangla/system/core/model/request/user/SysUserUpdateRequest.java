@@ -39,6 +39,13 @@ public class SysUserUpdateRequest {
     @Schema(description = "头像URL地址", example = "http://example.com/avatar.jpg")
     private String avatar;
 
+
+    /**
+     * 岗位ID
+     */
+    @Schema(description = "岗位ID", type = "integer", format = "int64", example = "10")
+    private Long postId;
+
     /**
      * 性别
      */

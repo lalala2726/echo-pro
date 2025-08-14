@@ -1,8 +1,11 @@
 package cn.zhangchuangla.system.core.model.vo.post;
 
 import cn.zhangchuangla.common.excel.annotation.Excel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 岗位表
@@ -47,5 +50,13 @@ public class SysPostListVo {
     @Schema(name = "状态(0-正常,1-停用)", description = "岗位状态，0表示正常，1表示停用", type = "integer", example = "0")
     @Excel(name = "状态(0-正常,1-停用)")
     private Integer status;
+
+    /**
+     * 创建时间
+     */
+    @Schema(name = "创建时间", description = "岗位创建时间", type = "date")
+    @Excel(name = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
 }

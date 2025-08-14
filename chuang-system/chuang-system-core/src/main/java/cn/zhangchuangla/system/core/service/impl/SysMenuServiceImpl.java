@@ -217,7 +217,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      * @return 菜单列表
      */
     @Override
-    public List<SysMenu> listSysMenuByRoleName(Set<String> roleName) {
+    public List<SysMenu> listMenuByRoleName(Set<String> roleName) {
         //超级管理员拥有所有权限
         if (roleName.contains(RolesConstant.SUPER_ADMIN)) {
             return list();

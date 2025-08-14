@@ -67,7 +67,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @param roleName 角色名称
      * @return 菜单列表
      */
-    List<SysMenu> listSysMenuByRoleName(Set<String> roleName);
+    List<SysMenu> listMenuByRoleName(Set<String> roleName);
 
     /**
      * 构造前端路由

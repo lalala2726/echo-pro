@@ -88,10 +88,8 @@ public class ExcelExporter {
                 log.warn("类 {} 中没有找到@Excel注解的字段", clazz.getSimpleName());
                 return;
             }
-
             // 预加载字典数据
             preloadDictData(excelFields);
-
             // 计算是否需要提示行
             boolean hasHints = excelFields.stream().anyMatch(f -> {
                 if (f.getExcel() == null) {
@@ -99,7 +97,6 @@ public class ExcelExporter {
                 }
                 return StringUtils.isNotBlank(f.getExcel().prompt()) || (f.getExcel().combo() != null && f.getExcel().combo().length > 0);
             });
-
             int total = data == null ? 0 : data.size();
             int sheetCount = Math.max(1, (int) Math.ceil(total / (double) DEFAULT_MAX_ROWS_PER_SHEET));
 
@@ -110,12 +107,10 @@ public class ExcelExporter {
                 int fromIndex = s * DEFAULT_MAX_ROWS_PER_SHEET;
                 int toIndex = Math.min(fromIndex + DEFAULT_MAX_ROWS_PER_SHEET, total);
                 List<T> pageData = data == null ? java.util.Collections.emptyList() : data.subList(fromIndex, toIndex);
-
                 // 行索引计算
                 int headerRowIndex = 0;
                 int hintRowIndex = hasHints ? 1 : -1;
                 int dataStartRow = hasHints ? 2 : 1;
-
                 // 写入表头
                 writeHeader(worksheet, excelFields, headerRowIndex);
                 // 写入提示

@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +48,7 @@ public class MonitorController extends BaseController {
      * @return 系统监控指标
      */
     @GetMapping("/system")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取系统监控指标", description = "获取CPU、内存、磁盘等系统监控指标")
     public AjaxResult<SystemMetricsDTO> getSystemMetrics() {
         try {
@@ -64,6 +66,7 @@ public class MonitorController extends BaseController {
      * @return JVM监控指标
      */
     @GetMapping("/jvm")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取JVM监控指标", description = "获取JVM内存、垃圾回收、线程等监控指标")
     public AjaxResult<JvmMetricsDTO> getJvmMetrics() {
         try {
@@ -81,6 +84,7 @@ public class MonitorController extends BaseController {
      * @return Redis监控指标
      */
     @GetMapping("/redis")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取Redis监控指标", description = "获取Redis内存、连接、命令统计等监控指标")
     public AjaxResult<RedisMetricsDTO> getRedisMetrics() {
         try {
@@ -98,6 +102,7 @@ public class MonitorController extends BaseController {
      * @return Spring监控指标
      */
     @GetMapping("/spring")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取Spring监控指标", description = "获取Spring应用、HTTP、数据源、线程池等监控指标")
     public AjaxResult<SpringMetricsDTO> getSpringMetrics() {
         try {
@@ -115,6 +120,7 @@ public class MonitorController extends BaseController {
      * @return 所有监控指标概览
      */
     @GetMapping("/overview")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取监控概览", description = "获取所有监控指标的概览信息")
     public AjaxResult<Map<String, Object>> getMonitorOverview() {
         try {
@@ -171,6 +177,7 @@ public class MonitorController extends BaseController {
      * @return 系统健康状态
      */
     @GetMapping("/health")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取系统健康状态", description = "获取系统各组件的健康状态")
     public AjaxResult<Map<String, Object>> getHealthStatus() {
         try {
@@ -239,6 +246,7 @@ public class MonitorController extends BaseController {
      * @return 监控配置信息
      */
     @GetMapping("/config")
+    @PreAuthorize("@ss.hasPermission('monitor:metrics:query')")
     @Operation(summary = "获取监控配置", description = "获取当前监控系统的配置信息")
     public AjaxResult<Map<String, Object>> getMonitorConfig() {
         try {

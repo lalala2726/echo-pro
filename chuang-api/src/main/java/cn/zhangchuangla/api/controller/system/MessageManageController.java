@@ -11,6 +11,7 @@ import cn.zhangchuangla.system.message.model.entity.SysMessage;
 import cn.zhangchuangla.system.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.system.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.system.message.model.request.SysSendMessageRequest;
+import cn.zhangchuangla.system.message.model.vo.system.SysMessageExportVo;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageListVo;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.system.message.model.vo.system.UserMessageStatusVo;
@@ -59,7 +60,7 @@ public class MessageManageController extends BaseController {
     }
 
     /**
-     * 管理员发送消息
+     * 发送消息
      *
      * @return 操作结果
      */
@@ -70,20 +71,6 @@ public class MessageManageController extends BaseController {
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SysSendMessageRequest request) {
         boolean result = sysMessageService.sysSendMessage(request);
         return toAjax(result);
-    }
-
-    /**
-     * 导出系统消息表列表
-     */
-    @Operation(summary = "导出系统消息表列表")
-    @PreAuthorize("@ss.hasPermission('system.message:export')")
-    @GetMapping("/export")
-    @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
-    public void export(HttpServletResponse response) {
-        //todo 只导出消息的基本信息,不会导出详细的发送详细信息
-        List<SysMessage> list = sysMessageService.list();
-        List<SysMessageListVo> voList = copyListProperties(list, SysMessageListVo.class);
-        excelExporter.exportExcel(response, voList, SysMessageListVo.class, "系统消息表列表");
     }
 
     /**
@@ -123,6 +110,19 @@ public class MessageManageController extends BaseController {
                                                   @PathVariable("ids") List<Long> ids) {
         boolean result = sysMessageService.deleteSysMessageByIds(ids);
         return toAjax(result);
+    }
+
+    /**
+     * 导出系统消息表列表
+     */
+    @PostMapping("/export")
+    @Operation(summary = "导出系统消息表列表")
+    @PreAuthorize("@ss.hasPermission('system.message:export')")
+    @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
+    public void exportMessage(HttpServletResponse response, SysMessageQueryRequest request) {
+        Page<SysMessage> sysMessagePage = sysMessageService.listSysMessage(request);
+        List<SysMessageExportVo> voList = copyListProperties(sysMessagePage, SysMessageExportVo.class);
+        excelExporter.exportExcel(response, voList, SysMessageExportVo.class, "系统消息表列表");
     }
 
     /**
