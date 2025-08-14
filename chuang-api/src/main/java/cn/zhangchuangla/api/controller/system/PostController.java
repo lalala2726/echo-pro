@@ -130,7 +130,7 @@ public class PostController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     @Operation(summary = "查询岗位")
     public AjaxResult<SysPostVo> getPostById(@Parameter(description = "岗位ID") @PathVariable("id") Long id) {
-        Assert.isTrue(id > 0, "岗位ID必须大于0！");
+        Assert.isPositive(id, "岗位ID必须大于0！");
         SysPost post = sysPostService.getPostById(id);
         SysPostVo sysPostVo = new SysPostVo();
         BeanUtils.copyProperties(post, sysPostVo);
