@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,20 +69,6 @@ public class MessageManageController extends BaseController {
     public AjaxResult<Void> sendMessage(@RequestBody @Validated SysSendMessageRequest request) {
         boolean result = sysMessageService.sysSendMessage(request);
         return toAjax(result);
-    }
-
-    /**
-     * 导出系统消息表列表
-     */
-    @Operation(summary = "导出系统消息表列表")
-    @PreAuthorize("@ss.hasPermission('system.message:export')")
-    @GetMapping("/export")
-    @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
-    public void export(HttpServletResponse response) {
-        //todo 只导出消息的基本信息,不会导出详细的发送详细信息
-        List<SysMessage> list = sysMessageService.list();
-        List<SysMessageListVo> voList = copyListProperties(list, SysMessageListVo.class);
-        excelExporter.exportExcel(response, voList, SysMessageListVo.class, "系统消息表列表");
     }
 
     /**
