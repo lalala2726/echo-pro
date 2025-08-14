@@ -25,26 +25,6 @@ Echo‑Pro 面向企业管理后台的高频通用需求，内置用户权限、
 - **任务调度**：Quartz JDBC 持久化与集群，任务并发控制与反射调用工具。
 - **消息通知**：站内信与系统通知（可对接 MQ）。
 
-### 模块特点与相较传统项目的改进
-
-- **chuang-api（入口/控制器）**：多 Profile 激活清晰，Swagger 统一暴露；对比传统“入口与配置混杂”。
-- **chuang-framework（安全/日志/拦截器）**：`@Anonymous` 自动白名单、CORS 外部化、CSP/HSTS 预置；对比传统“白名单硬编码、安全头缺失”。
-- **chuang-system-core（核心域）**：MyBatis‑Plus 统一（逻辑删/别名/分页）、DTO/VO 分离；对比传统“实体/DAO 散乱”。
-- **chuang-system-storage（存储）**：多云适配层、`active-type` 切换与降级、`file-domain` 映射、`real-delete` 可控；对比传统“单一存储实现”。
-- **chuang-system-message（消息）**：站内信/系统消息扩展清晰，可与 MQ 集成；对比传统“耦合业务难拓展”。
-- **chuang-system-monitor（监控）**：Actuator + Micrometer + Prometheus，`/monitor/endpoints/*` 端点统计；对比传统“仅日志/健康检查”。
-- **chuang-common-*（通用能力）**：统一 `AjaxResult`、异常层级、常量/工具、Excel/Redis/WebSocket/MQ 支撑；对比传统“工具分散风格不一”。
-- **chuang-quartz（调度）**：JDBC Store + 集群、表前缀 `QRTZ_`、首次自动建表、禁止并发支持；对比传统“内存/单机调度”。
-
-### 与传统项目的对比要点
-
-- **安全**：Session → JWT 无状态；路径白名单硬编码 → 注解自动收集；统一 CSP/HSTS/Headers。
-- **存储**：单实现 → 多云可切换与降级；域名映射与删除策略治理。
-- **可观测**：仅日志/health → 指标体系 + Prometheus 抓取 + 端点访问统计。
-- **配置**：硬编码 → Profile 分层 + 环境变量注入。
-- **扩展性**：散装工具 → 模块化可插拔；横切关注点 AOP 化。
-- **调度**：内存/单机 → JDBC 持久化 + 集群 + 并发治理。
-
 ### 模块概览
 
 ```
@@ -174,48 +154,6 @@ storage:
 
 生产环境务必将秘钥改为环境变量，并限制公网访问。
 
-### CORS
-
-`chuang-framework` 中的 `CorsConfig` 支持通过 `app.cors.*` 外部化配置，默认放开常见本地调试域名：
-
-```yaml
-app:
-  cors:
-    allowed-origin-patterns: ["http://*:*", "https://*:*"]
-    allowed-methods: [GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD]
-    allow-credentials: true
-```
-
----
-
-## 认证与鉴权
-
-- 认证方式：JWT（无状态，会话策略 `STATELESS`），头部：`Authorization: Bearer <token>`
-- 开放白名单：Swagger/静态资源/标注 `@Anonymous` 的接口
-
-常用接口：
-
-```http
-POST /auth/login            # 登录，返回访问令牌与刷新令牌
-POST /auth/refresh          # 刷新令牌
-GET  /auth/getUserInfo      # 获取当前用户信息
-GET  /auth/permission       # 获取权限集合
-GET  /auth/roles            # 获取角色集合
-DELETE /auth/logout         # 退出登录
-```
-
-请求示例：
-
-```json
-POST /auth/login
-{
-  "username": "admin",
-  "password": "yourPassword"
-}
-```
-
----
-
 ## 任务调度（Quartz）
 
 - 存储：JDBC 持久化，表前缀 `QRTZ_`
@@ -256,7 +194,7 @@ POST /auth/login
 
 ## 许可证
 
-开源协议：MIT
+开源协议：Apache 2.0
 
 ## 联系
 
