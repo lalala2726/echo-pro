@@ -39,14 +39,14 @@ public class UserMessageDto {
     private Integer isRead;
 
     /**
-     * 消息类型：1-系统消息 2-通知消息 3-公告消息
+     * 消息类型
      */
-    private Integer type;
+    private String type;
 
     /**
      * 消息级别：1-普通 2-重要 3-紧急
      */
-    private Integer level;
+    private String level;
 
     /**
      * 发送者姓名
@@ -54,15 +54,14 @@ public class UserMessageDto {
     private String senderName;
 
     /**
-     * 目标类型：0-指定用户 1-角色用户 2-部门用户 3-全部用户
+     * 目标类型
      */
-    private Integer targetType;
+    private String targetType;
 
     /**
      * 发布时间
      */
     private Date publishTime;
-
 
     /**
      * 是否删除：0-未删除 1-已删除
