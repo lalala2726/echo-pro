@@ -11,6 +11,7 @@ import cn.zhangchuangla.system.message.model.entity.SysMessage;
 import cn.zhangchuangla.system.message.model.request.SysMessageQueryRequest;
 import cn.zhangchuangla.system.message.model.request.SysMessageUpdateRequest;
 import cn.zhangchuangla.system.message.model.request.SysSendMessageRequest;
+import cn.zhangchuangla.system.message.model.vo.system.SysMessageExportVo;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageListVo;
 import cn.zhangchuangla.system.message.model.vo.system.SysMessageVo;
 import cn.zhangchuangla.system.message.model.vo.system.UserMessageStatusVo;
@@ -20,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -108,6 +110,19 @@ public class MessageManageController extends BaseController {
                                                   @PathVariable("ids") List<Long> ids) {
         boolean result = sysMessageService.deleteSysMessageByIds(ids);
         return toAjax(result);
+    }
+
+    /**
+     * 导出系统消息表列表
+     */
+    @PostMapping("/export")
+    @Operation(summary = "导出系统消息表列表")
+    @PreAuthorize("@ss.hasPermission('system.message:export')")
+    @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
+    public void exportMessage(HttpServletResponse response, SysMessageQueryRequest request) {
+        Page<SysMessage> sysMessagePage = sysMessageService.listSysMessage(request);
+        List<SysMessageExportVo> voList = copyListProperties(sysMessagePage, SysMessageExportVo.class);
+        excelExporter.exportExcel(response, voList, SysMessageExportVo.class, "系统消息表列表");
     }
 
     /**

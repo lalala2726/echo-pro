@@ -1,6 +1,5 @@
 package cn.zhangchuangla.system.message.model.vo.system;
 
-import cn.zhangchuangla.common.excel.annotation.Excel;
 import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
 import cn.zhangchuangla.system.message.enums.MessageReceiveTypeEnum;
 import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
@@ -23,56 +22,48 @@ public class SysMessageListVo {
      * 消息ID
      */
     @Schema(description = "消息ID", type = "integer", example = "1")
-    @Excel(name = "消息ID", sort = 0)
     private Long id;
 
     /**
      * 消息标题
      */
     @Schema(description = "消息标题", type = "string", example = "系统维护通知")
-    @Excel(name = "消息标题", sort = 1)
     private String title;
 
     /**
      * 消息内容
      */
     @Schema(description = "消息内容", type = "string", example = "系统将在今晚进行维护，请提前保存数据。")
-    @Excel(name = "消息内容", sort = 2)
     private String content;
 
     /**
      * 消息类型
      */
     @Schema(description = "消息类型", type = "string", example = "system")
-    @Excel(name = "消息类型", sort = 3)
     private MessageTypeEnum type;
 
     /**
      * 消息级别
      */
     @Schema(description = "消息级别", type = "string", example = "important")
-    @Excel(name = "消息级别", sort = 4)
     private MessageLevelEnum level;
 
     /**
      * 发送者姓名
      */
     @Schema(description = "发送者姓名", type = "string", example = "管理员")
-    @Excel(name = "发送者姓名", sort = 6)
     private String senderName;
 
     /**
      * 目标类型
      */
     @Schema(description = "目标类型", type = "string", example = "all")
-    @Excel(name = "目标类型", sort = 7)
     private MessageReceiveTypeEnum targetType;
 
     /**
      * 发布时间
      */
     @Schema(description = "发布时间", type = "string", format = "date-time", example = "2025-05-25T10:00:00Z")
-    @Excel(name = "发布时间", sort = 12)
     private Date publishTime;
 
 }
