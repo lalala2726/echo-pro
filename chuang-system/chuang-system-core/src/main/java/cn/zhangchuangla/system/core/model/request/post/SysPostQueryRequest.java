@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.core.model.request.post;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
+import cn.zhangchuangla.common.core.entity.base.TimeRange;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,5 +45,11 @@ public class SysPostQueryRequest extends BasePageRequest {
      */
     @Schema(name = "状态(0-正常,1-停用)", example = "0", type = "integer")
     private Integer status;
+
+    /**
+     * 创建时间
+     */
+    @Schema(name = "创建时间", type = "object", description = "创建时间范围", example = "{\"startTime\":\"2023-01-01\",\"endTime\":\"2023-01-01\"}")
+    private TimeRange createTime;
 
 }
