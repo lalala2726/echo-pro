@@ -222,7 +222,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         if (roleName.contains(RolesConstant.SUPER_ADMIN)) {
             return list();
         }
-        return sysMenuMapper.listSysMenuByRoleName(roleName);
+        return sysMenuMapper.listSysMenuByRoleName(roleName).stream()
+                .distinct()
+                .toList();
     }
 
     /**

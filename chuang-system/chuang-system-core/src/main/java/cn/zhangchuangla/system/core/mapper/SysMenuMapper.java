@@ -18,10 +18,10 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
     /**
      * 获取菜单列表
      *
-     * @param roleName 角色名称
+     * @param roleNames 角色名称集合
      * @return 菜单列表
      */
-    List<SysMenu> listSysMenuByRoleName(@Param("roleName") Set<String> roleName);
+    List<SysMenu> listSysMenuByRoleName(@Param("roleNames") Set<String> roleNames);
 
 
     /**
