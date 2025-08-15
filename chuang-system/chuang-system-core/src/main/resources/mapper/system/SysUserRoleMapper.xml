@@ -21,4 +21,13 @@
         where user_id = #{userId}
     </delete>
 
+    <delete id="deleteUserRoleByUserIds">
+        delete
+        from sys_user_role
+        where user_id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
 </mapper>

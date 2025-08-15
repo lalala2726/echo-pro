@@ -1,11 +1,13 @@
 package cn.zhangchuangla.system.core.service.impl;
 
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.system.core.mapper.SysRoleMenuMapper;
 import cn.zhangchuangla.system.core.model.entity.SysRoleMenu;
 import cn.zhangchuangla.system.core.service.SysRoleMenuService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +58,20 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
         return sysRoleMenuMapper.selectMenuListByRoleId(roleId);
+    }
+
+
+    /**
+     * 检查角色是否已经分配菜单
+     *
+     * @param ids 角色ID列表
+     * @return 是否已分配菜单
+     */
+    @Override
+    public boolean isRoleAssignedMenus(List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "角色ID列表不能为空");
+        LambdaQueryWrapper<SysRoleMenu> in = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
+        return count(in) > 0;
     }
 
 }

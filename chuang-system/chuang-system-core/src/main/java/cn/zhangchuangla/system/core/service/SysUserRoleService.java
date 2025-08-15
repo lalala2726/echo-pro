@@ -30,6 +30,14 @@ public interface SysUserRoleService extends IService<SysUserRole> {
 
 
     /**
+     * 删除用户角色关联角色信息
+     *
+     * @param userIds 用户ID集合
+     */
+    void deleteUserRoleAssociation(List<Long> userIds);
+
+
+    /**
      * 添加用户角色关联
      *
      * @param roleId 角色ID列表
@@ -37,4 +45,11 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      */
     void addUserRoleAssociation(List<Long> roleId, Long userId);
 
+    /**
+     * 判断角色是否被用户关联
+     *
+     * @param roleIds 角色ID列表
+     * @return true:被关联 false:未被关联
+     */
+    boolean isRoleAssignedToUsers(List<Long> roleIds);
 }

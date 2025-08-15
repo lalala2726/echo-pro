@@ -96,7 +96,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @param ids 角色ID集合
      * @return 删除结果
      */
-    boolean deleteRoleInfo(List<Long> ids);
+    boolean deleteRole(List<Long> ids);
 
     /**
      * 根据角色ID集合获取角色权限字符串集合

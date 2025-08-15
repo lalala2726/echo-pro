@@ -212,6 +212,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
                 throw new ServiceException(ResultCode.OPERATION_ERROR, "不能删除自己");
             }
         });
+        //删除角色关联
+        sysUserRoleService.deleteUserRoleAssociation(ids);
         removeByIds(ids);
     }
 
@@ -253,9 +255,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
 
         // 删除角色所关联的全部角色信息
-        if (userId != null) {
-            sysUserRoleService.deleteUserRoleAssociation(userId);
-        }
+        sysUserRoleService.deleteUserRoleAssociation(userId);
 
         // 添加新的角色信息
         sysUserRoleService.addUserRoleAssociation(roles, userId);
