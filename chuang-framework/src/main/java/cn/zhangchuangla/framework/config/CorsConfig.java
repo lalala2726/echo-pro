@@ -27,6 +27,12 @@ import java.util.List;
 public class CorsConfig {
 
     /**
+     * 开关：是否启用严格的跨域白名单控制（默认开启）。
+     * 当设置为 false 时，将放开为允许任意来源（基于 origin pattern 的 *）
+     */
+    private boolean enabled = true;
+
+    /**
      * 允许的源地址列表
      */
     private List<String> allowedOrigins = Arrays.asList(
@@ -35,7 +41,9 @@ public class CorsConfig {
             "http://localhost:8081",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:8080",
-            "http://127.0.0.1:8081"
+            "http://127.0.0.1:8081",
+            "https://echo.zhangchuangla.cn",
+            "http://echo.zhangchuangla.cn"
     );
 
     /**
@@ -91,14 +99,21 @@ public class CorsConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // 设置允许的源地址
-        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
-            config.setAllowedOrigins(allowedOrigins);
-        }
+        // 根据开关设置不同的跨域策略
+        if (enabled) {
+            // 启用严格白名单控制
+            // 设置允许的源地址
+            if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+                config.setAllowedOrigins(allowedOrigins);
+            }
 
-        // 设置允许的源地址模式
-        if (allowedOriginPatterns != null && !allowedOriginPatterns.isEmpty()) {
-            config.setAllowedOriginPatterns(allowedOriginPatterns);
+            // 设置允许的源地址模式
+            if (allowedOriginPatterns != null && !allowedOriginPatterns.isEmpty()) {
+                config.setAllowedOriginPatterns(allowedOriginPatterns);
+            }
+        } else {
+            // 禁用严格控制，允许所有来源
+            config.setAllowedOriginPatterns(List.of("*"));
         }
 
         // 设置允许的HTTP方法
@@ -128,8 +143,22 @@ public class CorsConfig {
     public CorsConfigurationSource securityCorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 设置允许的源地址模式
-        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
+        // 根据开关设置不同的跨域策略
+        if (enabled) {
+            // 启用严格白名单控制
+            // 设置允许的源地址（精确匹配）
+            if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+                configuration.setAllowedOrigins(allowedOrigins);
+            }
+
+            // 设置允许的源地址模式
+            if (allowedOriginPatterns != null && !allowedOriginPatterns.isEmpty()) {
+                configuration.setAllowedOriginPatterns(allowedOriginPatterns);
+            }
+        } else {
+            // 禁用严格控制，允许所有来源
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        }
 
         // 设置允许的HTTP方法
         configuration.setAllowedMethods(allowedMethods);

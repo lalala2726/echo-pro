@@ -1,7 +1,7 @@
 app:
   config:
+    # 如果设置本地存储访问,这边上传的访问路径要和存储配置那边的路径一致,否则上传的文件无法访问
     upload-path: /Users/zhangchuang/DevelopFileUpload
-    enable-trash: true
   name: EchoPro
   version: 0.9.0
 #开发环境数据库文件
@@ -9,11 +9,11 @@ server:
   port: 8080
 spring:
   profiles:
-    active: druid,rabbitmq,quartz,monitor,storage #激活配置文件
+    active: druid,rabbitmq,quartz,monitor,storage,cors #激活配置文件
   servlet:
     multipart:
-      max-file-size: 1024MB
-      max-request-size: 1024MB
+      max-file-size: 50MB
+      max-request-size: 50MB
   data:
     redis:
       host: 192.168.10.110
@@ -51,15 +51,15 @@ security:
   header: Authorization
   password-config:
     lock-time: 3
-    max-retry-count: 5
+    max-retry-count: -1
   session:
     access-token-expire-time: 7200000
     refresh-token-expire-time: 2592000
     max-sessions-per-client:
-      pc: 10
+      pc: -1
       mini-program: -1
       web: -1
-      unknown: 10
+      unknown: -1
       mobile: -1
     multi-device: true
     token-prefix: null

@@ -142,7 +142,7 @@ public class AuthService {
             String ipAddr = IPUtils.getIpAddress(request);
             String userAgent = UserAgentUtils.getUserAgent(request);
             asyncLogService.recordLoginLog(username, ipAddr, userAgent, false);
-            throw new LoginException(e.getMessage());
+            throw e;
         }
     }
 

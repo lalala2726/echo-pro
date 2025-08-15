@@ -15,17 +15,8 @@ public interface RegularConstants {
      */
     interface User {
         String PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z0-9!@#¥%&*（）——+]{8,20}$";
-        String USERNAME = "^[a-zA-Z0-9_]{5,20}$";
+        String USERNAME = "^[a-zA-Z0-9_]{4,20}$";
         String PHONE = "^1[3-9]\\d{9}$";
         String EMAIL = "\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}";
-    }
-
-    /**
-     * 存储相关
-     * bucketName
-     */
-    interface Storage {
-        String DOMAIN = "^(https?://)?((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:(\\d+))?(/[^/]*)?$";
-        String BUCKET_NAME = "[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$";
     }
 }

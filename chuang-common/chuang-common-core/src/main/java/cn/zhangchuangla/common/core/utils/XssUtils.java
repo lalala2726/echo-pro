@@ -29,16 +29,22 @@ public final class XssUtils {
         }
 
         Safelist safelist = Safelist.relaxed()
-                .addTags("table", "thead", "tbody", "tr", "th", "td")
+                .addTags("table", "thead", "tbody", "tr", "th", "td",
+                        "video", "source")
                 .addAttributes("a", "href", "title", "target", "rel")
                 .addAttributes("img", "src", "alt", "title")
                 .addAttributes("table", "border", "cellpadding", "cellspacing")
+                .addAttributes("video", "controls", "width", "height", "poster")
+                .addAttributes("source", "src", "type")
                 .addProtocols("a", "href", "http", "https", "mailto")
-                .addProtocols("img", "src", "http", "https", "data");
+                .addProtocols("img", "src", "http", "https", "data")
+                .addProtocols("video", "poster", "http", "https")
+                .addProtocols("source", "src", "http", "https");
 
-        // 强制为链接添加 rel=noopener 等，阻止钓鱼和跳转利用
+        // 清理 HTML（Safelist 默认会移除 script 等可执行标签）
         String cleaned = Jsoup.clean(html, safelist);
 
+        // 补充处理链接的安全属性
         Document document = Jsoup.parse(cleaned);
         for (Element a : document.select("a[href]")) {
             a.attr("rel", "noopener noreferrer nofollow");
@@ -48,6 +54,7 @@ public final class XssUtils {
         }
         return document.body().html();
     }
+
 
     /**
      * 仅提取纯文本内容（无任何标签）。

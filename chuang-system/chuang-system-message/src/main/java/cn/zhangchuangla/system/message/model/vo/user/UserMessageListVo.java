@@ -1,7 +1,5 @@
 package cn.zhangchuangla.system.message.model.vo.user;
 
-import cn.zhangchuangla.system.message.enums.MessageLevelEnum;
-import cn.zhangchuangla.system.message.enums.MessageTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -32,13 +30,13 @@ public class UserMessageListVo {
      * 消息类型
      */
     @Schema(description = "消息类型", type = "string", example = "system")
-    private MessageTypeEnum type;
+    private String type;
 
     /**
      * 消息级别
      */
     @Schema(description = "消息级别", type = "string", example = "important")
-    private MessageLevelEnum level;
+    private String level;
 
     /**
      * 是否已读

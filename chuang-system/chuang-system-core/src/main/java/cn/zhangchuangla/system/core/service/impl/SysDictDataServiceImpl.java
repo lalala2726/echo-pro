@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,7 +73,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 字典数据选项列表
      */
     @Override
-    @Cacheable(key = "#dictType", unless = "#result == null || #result.isEmpty()")
     public List<Option<String>> getDictDataOption(String dictType) {
         final int normal = 0;
         if (StringUtils.isBlank(dictType)) {
@@ -100,7 +97,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 是否添加成功
      */
     @Override
-    @CacheEvict(key = "#request.dictType")
     public boolean addDictData(SysDictDataAddRequest request) {
         // 检查同一字典类型下字典值是否重复
         if (isDictDataExistByValue(request.getDictType(), request.getDictValue(), null)) {

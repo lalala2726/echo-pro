@@ -38,6 +38,7 @@ public class MessagePushService {
      */
     public void pushMessageNotifyToAllUser(NewMessageNoticeDTO notice) {
         webSocketPublisher.broadcastToAuthenticatedUsers(WebSocketDestinations.USER_QUEUE_MESSAGE, notice);
+
     }
 
 

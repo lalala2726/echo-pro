@@ -69,8 +69,8 @@
             (sm.target_type = 'dept' AND sum_link.dept_id = (SELECT dept_id FROM sys_user WHERE user_id = #{userId}))
             OR
             -- 查询条件3:消息是角色内消息--
-            (sm.target_type = 'role' AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id =
-            #{userId}))
+            (sm.target_type = 'role' AND sum_link.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id
+            = #{userId}))
             )
             AND sm.is_deleted = 0
             <if test="request != null">

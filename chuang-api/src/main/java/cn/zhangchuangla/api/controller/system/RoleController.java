@@ -159,8 +159,8 @@ public class RoleController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     @OperationLog(title = "角色管理", businessType = BusinessType.DELETE)
     public AjaxResult<Void> deleteRoleInfo(@Parameter(description = "角色ID") @PathVariable("ids") List<Long> ids) {
-        Assert.isParamTrue(ids == null || ids.isEmpty(), "角色ID不能为空");
-        boolean result = sysRoleService.deleteRoleInfo(ids);
+        Assert.isTrue(!ids.isEmpty(), "角色ID不能为空");
+        boolean result = sysRoleService.deleteRole(ids);
         return toAjax(result);
     }
 

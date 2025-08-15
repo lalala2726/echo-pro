@@ -33,4 +33,12 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      * @return 菜单列表
      */
     List<Long> selectMenuListByRoleId(Long roleId);
+
+    /**
+     * 检查角色是否已经分配菜单
+     *
+     * @param ids 角色ID列表
+     * @return 角色是否已经分配菜单
+     */
+    boolean isRoleAssignedMenus(List<Long> ids);
 }

@@ -1,13 +1,13 @@
 package cn.zhangchuangla.system.core.service.impl;
 
-import cn.zhangchuangla.common.core.enums.ResultCode;
-import cn.zhangchuangla.common.core.exception.ParamException;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.system.core.mapper.SysUserRoleMapper;
 import cn.zhangchuangla.system.core.model.entity.SysUserRole;
 import cn.zhangchuangla.system.core.service.SysUserRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,10 +45,19 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void deleteUserRoleAssociation(Long userId) {
-        if (userId == null || userId <= 0) {
-            throw new ParamException(ResultCode.PARAM_ERROR, "用户ID不能小于等于零");
-        }
+        Assert.isTrue(userId > 0, "角色ID不能小于0");
         sysUserRoleMapper.deleteUserRoleByUserId(userId);
+    }
+
+    /**
+     * 删除用户角色关联角色信息
+     *
+     * @param userIds 用户ID集合
+     */
+    @Override
+    public void deleteUserRoleAssociation(List<Long> userIds) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(userIds), "用户ID集合不能为空");
+        sysUserRoleMapper.deleteUserRoleByUserIds(userIds);
     }
 
     /**
@@ -68,6 +77,19 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
             sysUserRole.setUserId(userId);
             save(sysUserRole);
         });
+    }
+
+    /**
+     * 判断角色是否被用户使用
+     *
+     * @param roleIds 角色ID列表
+     * @return true使用，false未使用
+     */
+    @Override
+    public boolean isRoleAssignedToUsers(List<Long> roleIds) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(roleIds), "角色ID列表不能为空");
+        LambdaQueryWrapper<SysUserRole> sysUserRoleLambdaQueryWrapper = new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds);
+        return count(sysUserRoleLambdaQueryWrapper) > 0;
     }
 }
 

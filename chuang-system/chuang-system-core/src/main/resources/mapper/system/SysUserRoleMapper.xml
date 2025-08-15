@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.core.mapper.SysUserRoleMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysUserRole">
-        <id property="userRoleId" column="user_role_id"/>
+        <id property="id" column="id"/>
         <id property="userId" column="user_id"/>
         <id property="roleId" column="role_id"/>
         <result property="createTime" column="create_time"/>
@@ -19,6 +19,15 @@
         delete
         from sys_user_role
         where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUserRoleByUserIds">
+        delete
+        from sys_user_role
+        where user_id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
     </delete>
 
 </mapper>

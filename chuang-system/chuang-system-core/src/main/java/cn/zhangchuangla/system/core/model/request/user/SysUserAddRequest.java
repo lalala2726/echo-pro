@@ -5,7 +5,6 @@ import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class SysUserAddRequest {
      */
     @Schema(description = "用户名", example = "admin123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户名不能为空")
-    @Size(min = 5, max = 20, message = "用户名不能超过20个字符")
     @ValidRegex(regexp = RegularConstants.User.USERNAME, message = "用户名只能是英文数字和下划线", allowEmpty = false)
     private String username;
 
@@ -36,9 +34,6 @@ public class SysUserAddRequest {
      */
     @Schema(description = "密码", example = "Admin@123", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "密码不能为空")
-    @Size(min = 8, max = 20, message = "密码长度在 8-16 之间")
-    @ValidRegex(regexp = RegularConstants.User.PASSWORD,
-            message = "至少一个大写字母、一个小写字母、一个数字和一个特殊字符（只允许 !@#¥%&*()—+/ 这些特殊字符")
     private String password;
 
     /**
