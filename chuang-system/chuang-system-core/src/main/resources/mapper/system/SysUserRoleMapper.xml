@@ -5,7 +5,7 @@
 <mapper namespace="cn.zhangchuangla.system.core.mapper.SysUserRoleMapper">
 
     <resultMap id="BaseResultMap" type="cn.zhangchuangla.system.core.model.entity.SysUserRole">
-        <id property="userRoleId" column="user_role_id"/>
+        <id property="id" column="id"/>
         <id property="userId" column="user_id"/>
         <id property="roleId" column="role_id"/>
         <result property="createTime" column="create_time"/>

@@ -21,7 +21,7 @@ public class SysUserRole extends BaseEntity {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    private Long userRoleId;
+    private Long id;
 
     /**
      * 用户id

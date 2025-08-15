@@ -366,7 +366,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         if (menuId == null) {
             return;
         }
-
         // 查找当前菜单
         SysMenu currentMenu = allMenus.stream()
                 .filter(menu -> menuId.equals(menu.getId()))

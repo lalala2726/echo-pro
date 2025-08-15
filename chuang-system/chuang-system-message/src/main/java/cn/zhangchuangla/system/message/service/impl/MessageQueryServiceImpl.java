@@ -74,44 +74,19 @@ public class MessageQueryServiceImpl implements MessageQueryService {
      */
     @Override
     public Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request) {
-        // 参数验证
-        validateQueryRequest(request);
 
         final Long currentUserId = SecurityUtils.getUserId();
 
         // 执行分页查询
         Page<SysMessage> messagePage = executeMessageQuery(request, currentUserId);
 
-        // 如果没有查询到消息，直接返回空结果
-        if (CollectionUtils.isEmpty(messagePage.getRecords())) {
-            return buildEmptyResultPage(messagePage);
-        }
-
-        // 批量获取并填充已读状态
+        // 批量获取并填充已读和未读状态
         List<UserMessageDto> messageWithReadStatus = buildMessageDtosWithReadStatus(
                 messagePage.getRecords(), currentUserId);
 
         // 构建最终结果
 
         return buildResultPage(messagePage, messageWithReadStatus);
-    }
-
-    /**
-     * 验证查询请求参数
-     *
-     * @param request 查询请求参数
-     * @throws ServiceException 当参数无效时抛出
-     */
-    private void validateQueryRequest(UserMessageListQueryRequest request) {
-        if (Objects.isNull(request)) {
-            throw new ServiceException(ResultCode.PARAM_ERROR, "查询参数不能为空");
-        }
-        if (request.getPageNum() < 1) {
-            throw new ServiceException(ResultCode.PARAM_ERROR, "页码必须大于0");
-        }
-        if (request.getPageSize() < 1 || request.getPageSize() > 100) {
-            throw new ServiceException(ResultCode.PARAM_ERROR, "每页大小必须在1-100之间");
-        }
     }
 
     /**
