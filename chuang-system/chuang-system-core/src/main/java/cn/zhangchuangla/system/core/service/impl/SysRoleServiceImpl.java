@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.core.mapper.SysRoleMapper;
 import cn.zhangchuangla.system.core.model.entity.SysMenu;
 import cn.zhangchuangla.system.core.model.entity.SysRole;
 import cn.zhangchuangla.system.core.model.entity.SysRoleMenu;
+import cn.zhangchuangla.system.core.model.entity.SysUserRole;
 import cn.zhangchuangla.system.core.model.request.role.SysRoleAddRequest;
 import cn.zhangchuangla.system.core.model.request.role.SysRoleQueryRequest;
 import cn.zhangchuangla.system.core.model.request.role.SysRoleUpdateRequest;
@@ -19,6 +20,7 @@ import cn.zhangchuangla.system.core.model.request.role.SysUpdateRolePermissionRe
 import cn.zhangchuangla.system.core.service.SysMenuService;
 import cn.zhangchuangla.system.core.service.SysRoleMenuService;
 import cn.zhangchuangla.system.core.service.SysRoleService;
+import cn.zhangchuangla.system.core.service.SysUserRoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -49,6 +51,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     private final SysRoleMenuService sysRoleMenuService;
     private final RedisCache redisCache;
     private final SysMenuService sysMenuService;
+    private final SysUserRoleService sysUserRoleService;
 
     /**
      * 角色列表
@@ -219,7 +222,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         if (roles.stream().anyMatch(role -> RolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许删除");
         }
-        //todo 检查角色是否分配用户,
+
+        LambdaQueryWrapper<SysUserRole> sysUserRoleLambdaQueryWrapper = new LambdaQueryWrapper<SysUserRole>()
+                .eq(SysUserRole::getRoleId, ids);
+        if (!sysUserRoleService.list(sysUserRoleLambdaQueryWrapper).isEmpty()) {
+            throw new ServiceException(ResultCode.OPERATION_ERROR, "角色已分配用户，不能删除");
+        }
 
         // 检查角色是否已分配菜单
         LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
