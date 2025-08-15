@@ -44,7 +44,7 @@ public class UserMessageDto {
     private String type;
 
     /**
-     * 消息级别：1-普通 2-重要 3-紧急
+     * 消息级别
      */
     private String level;
 
