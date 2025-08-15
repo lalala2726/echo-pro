@@ -217,6 +217,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         if (roles.stream().anyMatch(role -> RolesConstant.SUPER_ADMIN.equals(role.getRoleKey()))) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许删除");
         }
+        //todo 检查角色是否分配用户,
 
         // 检查角色是否已分配菜单
         LambdaQueryWrapper<SysRoleMenu> eq = new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids);
