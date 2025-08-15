@@ -3,6 +3,7 @@ package cn.zhangchuangla.system.core.service.impl;
 import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
+import cn.zhangchuangla.common.core.exception.LoginException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
@@ -272,7 +273,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
         SysUser user = getOne(eq);
         if (user == null) {
-            throw new ServiceException(ResultCode.RESULT_IS_NULL, String.format("用户名:%s不存在！", username));
+            throw new LoginException(ResultCode.RESULT_IS_NULL, String.format("用户名:%s不存在！", username));
         }
         return user;
     }
