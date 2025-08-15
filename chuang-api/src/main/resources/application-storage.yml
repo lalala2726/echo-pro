@@ -2,7 +2,7 @@
 storage:
   # 当数据库中未找到主存储配置时，将使用此默认配置。设置为 "local" 表示优先使用本地存储；
   # 若设置为 "minio"，则表示在数据库配置不可用时降级使用 MinIO 配置；若未指定 MinIO 配置，则仍将默认使用本地存储。
-  active-type: minio
+  active-type: local
   # 本地存储配置
   local:
     uploadPath: ${app.config.upload-path}
