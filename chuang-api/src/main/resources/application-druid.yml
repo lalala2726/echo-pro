@@ -35,7 +35,8 @@ spring:
       statViewServlet:
         enabled: true
         # 设置白名单，不填则允许所有访问
-        allow: 127.0.0.1
+        allow: ""   # 允许所有访问（为空表示不限制）
+        deny: ""    # 不限制拒绝的IP
         url-pattern: /druid/*
         # 控制台管理用户名和密码
         login-username: admin

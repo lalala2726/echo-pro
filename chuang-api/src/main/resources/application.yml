@@ -9,7 +9,7 @@ server:
   port: 8080
 spring:
   profiles:
-    active: druid,rabbitmq,quartz,monitor,storage #激活配置文件
+    active: druid,rabbitmq,quartz,monitor,storage,cors #激活配置文件
   servlet:
     multipart:
       max-file-size: 50MB

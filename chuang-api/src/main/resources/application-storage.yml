@@ -2,7 +2,7 @@
 storage:
   # 当数据库中未找到主存储配置时，将使用此默认配置。设置为 "local" 表示优先使用本地存储；
   # 若设置为 "minio"，则表示在数据库配置不可用时降级使用 MinIO 配置；若未指定 MinIO 配置，则仍将默认使用本地存储。
-  active-type: local
+  active-type: minio
   # 本地存储配置
   local:
     uploadPath: ${app.config.upload-path}
@@ -11,11 +11,11 @@ storage:
 
   # MinIO 配置
   minio:
-    endpoint:
-    access-key:
-    secret-key:
-    bucket-name:
-    file-domain:
+    endpoint: http://192.168.10.120:9000
+    access-key: wE81MdVhHx9AZA3lz9Ei
+    secret-key: fm8hbHEwVdrjHRpEP2nhaQIouY3Ms3GuD6OMt7G0
+    bucket-name: echopro
+    file-domain: https://minio.zhangchuangla.cn/echopro
     real-delete: false
 
   # 阿里云 OSS 配置

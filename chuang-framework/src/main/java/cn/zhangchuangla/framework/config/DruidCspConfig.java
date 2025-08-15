@@ -49,7 +49,7 @@ public class DruidCspConfig {
                 // 表单提交：允许同源
                 "form-action 'self';",
                 // 框架祖先：允许iframe嵌入
-                "frame-ancestors 'self' http://localhost:* http://127.0.0.1:* https://localhost:* https://127.0.0.1:* http://192.168.*:* https://192.168.*:*;",
+                "frame-ancestors 'self' *;",
                 // 框架源：允许同源
                 "frame-src 'self';"
         );
