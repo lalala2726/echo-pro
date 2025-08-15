@@ -6,6 +6,7 @@ import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.ParamException;
 import cn.zhangchuangla.common.core.exception.ServiceException;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
 import cn.zhangchuangla.system.core.mapper.SysRoleMapper;
@@ -111,6 +112,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     public boolean addRoleInfo(SysRoleAddRequest roleAddRequest) {
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(roleAddRequest, sysRole);
+        sysRole.setCreateBy(SecurityUtils.getUsername());
         return save(sysRole);
     }
 
@@ -164,6 +166,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
         SysRole sysRole = new SysRole();
+        sysRole.setUpdateBy(SecurityUtils.getUsername());
         BeanUtils.copyProperties(request, sysRole);
         return updateById(sysRole);
     }
