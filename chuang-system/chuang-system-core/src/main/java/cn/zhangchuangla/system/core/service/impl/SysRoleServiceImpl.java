@@ -28,7 +28,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -285,40 +287,92 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateRolePermission(SysUpdateRolePermissionRequest request) {
+        // 参数校验
+        if (request == null || request.getRoleId() == null) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "请求参数不能为空");
+        }
+        if (request.getAllocatedMenuId() == null) {
+            throw new ParamException(ResultCode.PARAM_ERROR, "分配的菜单ID列表不能为空");
+        }
+
+        // 角色存在性和权限校验
         SysRole role = getById(request.getRoleId());
         Assert.isTrue(role != null, String.format("ID:【%s】的角色不存在", request.getRoleId()));
         Assert.isTrue(!RolesConstant.SUPER_ADMIN.equals(role.getRoleKey()), "超级管理员角色不允许修改权限");
 
-        // 获取所有菜单ID，过滤非法ID
-        Set<Long> validMenuIds = sysMenuService.list()
-                .stream()
+        // 获取所有菜单并建立ID映射
+        List<SysMenu> allMenus = sysMenuService.list();
+        if (allMenus == null || allMenus.isEmpty()) {
+            log.warn("系统中没有菜单数据，无法分配权限");
+            return true;
+        }
+
+        Set<Long> validMenuIds = allMenus.stream()
                 .map(SysMenu::getId)
                 .collect(Collectors.toSet());
 
-        List<Long> allocatedMenuId = request.getAllocatedMenuId()
-                .stream()
+        // 过滤有效的菜单ID
+        Set<Long> validAllocatedMenuIds = request.getAllocatedMenuId().stream()
                 .filter(validMenuIds::contains)
-                .distinct()
-                .toList();
+                .collect(Collectors.toSet());
 
-        // 删除旧权限（即使是空，也视为成功）
+        // 自动包含父级菜单ID（递归查找所有父级）
+        Set<Long> finalMenuIds = new HashSet<>(validAllocatedMenuIds);
+        for (Long menuId : validAllocatedMenuIds) {
+            addParentMenuIds(menuId, allMenus, finalMenuIds);
+        }
+
+        // 删除旧权限
         sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>()
                 .eq(SysRoleMenu::getRoleId, role.getId()));
 
         // 如果有新权限则插入
-        if (!allocatedMenuId.isEmpty()) {
-            List<SysRoleMenu> roleMenusToInsert = allocatedMenuId.stream()
-                    .map(id -> {
+        if (!finalMenuIds.isEmpty()) {
+            List<SysRoleMenu> roleMenusToInsert = finalMenuIds.stream()
+                    .filter(Objects::nonNull)
+                    .map(menuId -> {
                         SysRoleMenu sysRoleMenu = new SysRoleMenu();
                         sysRoleMenu.setRoleId(request.getRoleId());
-                        sysRoleMenu.setMenuId(id);
+                        sysRoleMenu.setMenuId(menuId);
                         return sysRoleMenu;
-                    }).toList();
-            return sysRoleMenuService.saveBatch(roleMenusToInsert);
+                    })
+                    .collect(Collectors.toList());
+
+            if (!roleMenusToInsert.isEmpty()) {
+                return sysRoleMenuService.saveBatch(roleMenusToInsert);
+            }
         }
 
         // 没有分配新权限，视为操作成功
         return true;
+    }
+
+    /**
+     * 递归添加父级菜单ID
+     *
+     * @param menuId    当前菜单ID
+     * @param allMenus  所有菜单列表
+     * @param resultSet 结果集合
+     */
+    private void addParentMenuIds(Long menuId, List<SysMenu> allMenus, Set<Long> resultSet) {
+        if (menuId == null) {
+            return;
+        }
+
+        // 查找当前菜单
+        SysMenu currentMenu = allMenus.stream()
+                .filter(menu -> menuId.equals(menu.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (currentMenu != null && currentMenu.getParentId() != null && currentMenu.getParentId() > 0) {
+            Long parentId = currentMenu.getParentId();
+            if (!resultSet.contains(parentId)) {
+                resultSet.add(parentId);
+                // 递归添加父级的父级
+                addParentMenuIds(parentId, allMenus, resultSet);
+            }
+        }
     }
 
 }
