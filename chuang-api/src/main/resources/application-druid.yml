@@ -38,8 +38,8 @@ spring:
         allow: 127.0.0.1
         url-pattern: /druid/*
         # 控制台管理用户名和密码
-        login-username: zhangchuang
-        login-password: zhangchuang2726
+        login-username: admin
+        login-password: admin123
       filter:
         stat:
           enabled: true
