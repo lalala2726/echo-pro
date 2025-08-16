@@ -2,12 +2,9 @@ package cn.zhangchuangla.system.monitor.config;
 
 import cn.zhangchuangla.system.monitor.service.JvmMonitorService;
 import cn.zhangchuangla.system.monitor.service.RedisMonitorService;
-import cn.zhangchuangla.system.monitor.service.SpringMonitorService;
 import cn.zhangchuangla.system.monitor.service.SystemMonitorService;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -64,17 +60,6 @@ public class MonitorAutoConfiguration {
         return new RedisMonitorService(redisConnectionFactory);
     }
 
-    /**
-     * Spring监控服务
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass({MeterRegistry.class, MetricsEndpoint.class})
-    public SpringMonitorService springMonitorService(Environment environment,
-                                                     MeterRegistry meterRegistry) {
-        log.info("初始化Spring监控服务");
-        return new SpringMonitorService(environment, meterRegistry);
-    }
 
     /**
      * 监控配置属性

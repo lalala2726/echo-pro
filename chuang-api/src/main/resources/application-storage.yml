@@ -5,7 +5,7 @@ storage:
   active-type: minio
   # 本地存储配置
   local:
-    uploadPath: ${app.config.upload-path}
+    uploadPath: ${app.upload-path}
     file-domain: http://localhost:8080/
     real-delete: false
 

@@ -16,28 +16,9 @@ import org.springframework.context.annotation.Configuration;
 public class AppProperty {
 
     /**
-     * 系统配置
+     * 本地上传路径,用于映射静态资源
      */
-    private Config config;
-
-    /**
-     * 系统名称
-     */
-    private String name;
-
-    /**
-     * 版本号
-     */
-    private String version;
-
-    @Data
-    public static class Config {
-
-        /**
-         * 本地上传路径,用于映射静态资源
-         */
-        private String uploadPath;
-    }
+    private String uploadPath;
 
 
 }
