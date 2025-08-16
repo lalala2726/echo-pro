@@ -82,37 +82,20 @@ EchoPro 是一套面向企业级应用的现代化后台管理系统，采用前
 
 ### 模块结构
 
-```bash
-echoPro/
-├── chuang-api/                  # 应用入口层
-│   ├── controller/              # REST API 控制器
-│   ├── config/                  # 应用配置
-│   └── APIApplication.java      # 启动类
-├── chuang-framework/            # 框架核心层
-│   ├── security/                # 安全认证模块
-│   ├── config/                  # 框架配置
-│   ├── interceptor/             # 拦截器
-│   └── annotation/              # 自定义注解
-├── chuang-system/               # 业务系统层
-│   ├── chuang-system-core/      # 核心业务模块
-│   │   ├── entity/              # 实体类
-│   │   ├── service/             # 业务服务
-│   │   ├── mapper/              # 数据访问
-│   │   └── model/               # 数据模型
-│   ├── chuang-system-storage/   # 文件存储模块
-│   ├── chuang-system-message/   # 消息通知模块
-│   └── chuang-system-monitor/   # 系统监控模块
-├── chuang-common/               # 公共工具层
-│   ├── chuang-common-core/      # 核心工具
-│   ├── chuang-common-redis/     # Redis 工具
-│   ├── chuang-common-excel/     # Excel 工具
-│   ├── chuang-common-mq/        # 消息队列工具
-│   └── chuang-common-websocket/ # WebSocket 工具
-└── chuang-quartz/               # 任务调度层
-    ├── job/                     # 任务执行器
-    ├── service/                 # 调度服务
-    └── config/                  # 调度配置
-```
+| 模块                       | 说明         |
+| -------------------------- | ------------ |
+| `chuang-api`               | 应用入口层，包含 REST 控制器、配置、启动类 |
+| `chuang-framework`         | 框架核心层，含安全认证、拦截器、自定义注解 |
+| `chuang-system-core`       | 业务核心模块，实体、服务、数据访问、模型   |
+| `chuang-system-storage`    | 文件存储模块 |
+| `chuang-system-message`    | 消息通知模块 |
+| `chuang-system-monitor`    | 系统监控模块 |
+| `chuang-common-core`       | 公共核心工具 |
+| `chuang-common-redis`      | Redis 工具   |
+| `chuang-common-excel`      | Excel 工具   |
+| `chuang-common-mq`         | 消息队列工具 |
+| `chuang-common-websocket`  | WebSocket 工具 |
+| `chuang-quartz`            | 任务调度层，含执行器、调度服务、配置 |
 ## 快速开始
 
 ### 环境要求
