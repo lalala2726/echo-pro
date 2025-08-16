@@ -17,12 +17,13 @@ import lombok.EqualsAndHashCode;
 @Schema(name = "角色列表视图对象", description = "返回前端展示的数据")
 public class SysRoleVo extends BaseVo {
 
+
     /**
      * 主键
      */
-    @Schema(description = "主键")
+    @Schema(description = "主键", type = "string", example = "1")
     @TableId(type = IdType.AUTO)
-    private Long roleId;
+    private Long id;
 
     /**
      * 角色名
