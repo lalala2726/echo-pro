@@ -2,7 +2,6 @@ package cn.zhangchuangla.api.controller.monitor;
 
 import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
-import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.monitor.dto.JvmMetricsDTO;
 import cn.zhangchuangla.system.monitor.dto.RedisMetricsDTO;
 import cn.zhangchuangla.system.monitor.dto.SpringOverviewDTO;
@@ -33,7 +32,6 @@ import java.util.Map;
 @RequestMapping("/monitor/metrics")
 @Tag(name = "系统监控", description = "系统监控相关接口")
 @RequiredArgsConstructor
-@Anonymous
 public class MonitorController extends BaseController {
 
     private final SystemMonitorService systemMonitorService;

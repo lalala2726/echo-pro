@@ -127,7 +127,7 @@ public class UserController extends BaseController {
      */
     @PutMapping("/resetPassword")
     @Operation(summary = "重置用户密码")
-    @PreAuthorize("@ss.hasPermission('system:user:reset')")
+    @PreAuthorize("@ss.hasPermission('system:user:resetPassword')")
     @OperationLog(title = "用户管理", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> resetPassword(@Parameter(description = "修改密码的请求参数，传入用户ID和重置的密码即可", required = true)
                                           @Validated @RequestBody SysUserUpdateRequest request) {

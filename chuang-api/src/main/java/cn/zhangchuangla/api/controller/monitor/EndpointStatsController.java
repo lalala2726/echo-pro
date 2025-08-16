@@ -4,7 +4,6 @@ import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
-import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.monitor.dto.EndpointStatsDTO;
 import cn.zhangchuangla.system.monitor.request.EndpointStatsQueryRequest;
 import cn.zhangchuangla.system.monitor.service.EndpointStatsService;
@@ -28,7 +27,6 @@ import java.util.Map;
 @RequestMapping("/monitor/endpoints")
 @Tag(name = "系统监控", description = "系统监控相关接口")
 @RequiredArgsConstructor
-@Anonymous
 public class EndpointStatsController extends BaseController {
 
     private final EndpointStatsService endpointStatsService;
