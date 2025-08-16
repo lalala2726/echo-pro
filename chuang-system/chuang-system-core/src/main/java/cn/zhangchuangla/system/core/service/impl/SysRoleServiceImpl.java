@@ -111,6 +111,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     @Override
     public boolean addRoleInfo(SysRoleAddRequest roleAddRequest) {
         SysRole sysRole = new SysRole();
+        //检查角色名称是否存在
+        if (isRoleNameExist(roleAddRequest.getRoleName())) {
+            throw new ServiceException("角色名称已存在");
+        }
         BeanUtils.copyProperties(roleAddRequest, sysRole);
         sysRole.setCreateBy(SecurityUtils.getUsername());
         return save(sysRole);
