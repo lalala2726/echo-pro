@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
+import cn.zhangchuangla.common.core.base.BaseService;
 import cn.zhangchuangla.common.core.constant.RolesConstant;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
 import cn.zhangchuangla.common.core.enums.ResultCode;
@@ -42,7 +43,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
-        implements SysUserService {
+        implements SysUserService, BaseService {
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleService sysUserRoleService;
@@ -350,6 +351,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean updatePassword(UpdatePasswordRequest request) {
+        //校验旧密码
         String newPassword = SecurityUtils.encryptPassword(request.getNewPassword());
         LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
         SysUser sysUser = SysUser.builder()

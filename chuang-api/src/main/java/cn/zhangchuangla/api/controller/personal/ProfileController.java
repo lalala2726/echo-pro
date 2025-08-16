@@ -1,12 +1,11 @@
 package cn.zhangchuangla.api.controller.personal;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
-import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -178,13 +177,6 @@ public class ProfileController extends BaseController {
     @SecurityLog(title = "修改密码", businessType = BusinessType.UPDATE)
     @PutMapping("/security/password")
     public AjaxResult<Void> updatePassword(@RequestBody @Validated UpdatePasswordRequest request) {
-        String oldPassword = request.getOldPassword();
-        String userPassword = encryptPassword(oldPassword);
-        SysUserDetails loginUser = getLoginUser();
-        String password = loginUser.getPassword();
-        if (!userPassword.equals(password)) {
-            return error("旧密码错误");
-        }
         boolean result = sysUserService.updatePassword(request);
         return toAjax(result);
     }

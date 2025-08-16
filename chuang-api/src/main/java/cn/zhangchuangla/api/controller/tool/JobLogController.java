@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.tool;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;

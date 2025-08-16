@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.monitor;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.framework.annotation.Anonymous;
 import cn.zhangchuangla.system.monitor.dto.JvmMetricsDTO;

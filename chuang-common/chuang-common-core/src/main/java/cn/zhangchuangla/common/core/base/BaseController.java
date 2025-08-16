@@ -1,4 +1,4 @@
-package cn.zhangchuangla.common.core.controller;
+package cn.zhangchuangla.common.core.base;
 
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
