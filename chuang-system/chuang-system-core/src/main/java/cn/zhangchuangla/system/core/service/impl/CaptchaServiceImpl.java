@@ -113,7 +113,7 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     @Override
     public CaptchaImageVo generateImageCaptcha() {
-        String code = CaptchaUtils.randomAlphanumeric(4, true);
+        String code = CaptchaUtils.randomNumeric(4);
 
         String uuid = UUID.randomUUID().toString();
         String base64 = ImageCaptchaUtils.generateBase64Png(code, 160, 50);

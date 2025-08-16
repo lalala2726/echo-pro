@@ -1,9 +1,7 @@
 package cn.zhangchuangla.system.core.model.request.personal;
 
-import cn.zhangchuangla.common.core.constant.RegularConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 /**
@@ -27,7 +25,6 @@ public class UpdatePasswordRequest {
      */
     @Schema(description = "新密码", example = "Abc123456!")
     @NotBlank(message = "新密码不能为空")
-    @Pattern(regexp = RegularConstants.User.USERNAME, message = "密码必须包含数字和大小写英文，可包含特殊符号，长度在8到20之间")
     private String newPassword;
 }
 

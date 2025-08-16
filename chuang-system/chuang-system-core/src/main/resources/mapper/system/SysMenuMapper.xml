@@ -39,13 +39,13 @@
     <select id="listSysMenuByRoleName" resultMap="BaseResultMap">
         select distinct sm.*
         from sys_menu sm
-                 join sys_role_menu srm on sm.id = srm.menu_id
-                 join sys_role sr on srm.role_id = sr.id
+        join sys_role_menu srm on sm.id = srm.menu_id
+        join sys_role sr on srm.role_id = sr.id
         where sr.role_key in
         <foreach collection="roleNames" item="role" open="(" separator="," close=")">
             #{role}
         </foreach>
-          and sm.status = 0
+        and sm.status = 0
     </select>
 
     <select id="getPermissionByRole" resultType="java.lang.String">

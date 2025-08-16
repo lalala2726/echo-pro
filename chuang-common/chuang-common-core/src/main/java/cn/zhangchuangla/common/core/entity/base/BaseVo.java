@@ -20,25 +20,25 @@ public class BaseVo implements Serializable {
     /**
      * 备注
      */
-    @Schema(description = "备注", type = "string")
+    @Schema(description = "备注", type = "string", example = "备注")
     private String remark;
 
     /**
      * 创建者
      */
-    @Schema(description = "创建者", type = "string")
+    @Schema(description = "创建者", type = "string", example = "创建者")
     private String createBy;
 
     /**
      * 更新者
      */
-    @Schema(description = "更新者", type = "string")
+    @Schema(description = "更新者", type = "string", example = "更新者")
     private String updateBy;
 
     /**
      * 创建时间
      */
-    @Schema(description = "创建时间", type = "string")
+    @Schema(description = "创建时间", type = "string", example = "创建时间")
     private Date createTime;
 
     /**

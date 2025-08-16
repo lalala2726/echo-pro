@@ -19,49 +19,49 @@ public class SysRoleListVo {
     /**
      * 主键
      */
-    @Schema(description = "主键")
+    @Schema(description = "主键", type = "string", example = "1")
     @Excel(name = "ID", sort = 1, width = 20)
     private Long id;
 
     /**
      * 角色名
      */
-    @Schema(description = "角色名")
+    @Schema(description = "角色名", type = "string", example = "系统管理员")
     @Excel(name = "角色名", sort = 2, width = 20)
     private String roleName;
 
     /**
      * 角色权限标识
      */
-    @Schema(description = "角色权限标识")
+    @Schema(description = "角色权限标识", type = "string", example = "admin")
     @Excel(name = "角色权限标识", sort = 3, width = 20)
     private String roleKey;
 
     /**
      * 备注
      */
-    @Schema(description = "备注")
+    @Schema(description = "备注", type = "string", example = "备注")
     @Excel(name = "备注", sort = 4, width = 20)
     private String remark;
 
     /**
      * 状态
      */
-    @Schema(description = "状态")
+    @Schema(description = "状态", type = "string", allowableValues = {"0", "1"}, example = "0")
     @Excel(name = "状态", dictKey = "system_common_status", sort = 5, width = 10)
     private Integer status;
 
     /**
      * 显示顺序
      */
-    @Schema(description = "显示顺序")
+    @Schema(description = "显示顺序", type = "string", example = "1")
     private Integer sort;
 
     /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Schema(description = "创建时间")
+    @Schema(description = "创建时间", type = "string", example = "创建时间")
     @Excel(name = "创建时间", sort = 6, width = 20, dateFormat = "yyyy-MM-dd")
     private Date createTime;
 

@@ -68,7 +68,7 @@ public class SecurityUtils {
     /**
      * 判断密码是否相同,这边原始的密码是明文的不需要额外加密
      *
-     * @param rawPassword     真实密码
+     * @param rawPassword     真实密码(未加密的密码)
      * @param encodedPassword 加密后字符
      * @return true代表相同，false代表不同
      */

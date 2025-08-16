@@ -1,6 +1,6 @@
 package cn.zhangchuangla.api.controller.common;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.system.storage.model.dto.UploadedFileInfo;
 import cn.zhangchuangla.system.storage.model.vo.ImageVo;

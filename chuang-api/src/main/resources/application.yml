@@ -1,13 +1,9 @@
 app:
-  config:
-    # 如果设置本地存储访问,这边上传的访问路径要和存储配置那边的路径一致,否则上传的文件无法访问
-    upload-path: /Users/zhangchuang/DevelopFileUpload
-  name: EchoPro
-  version: 0.9.0
-#开发环境数据库文件
-server:
-  port: 8080
+  upload-path: /Users/zhangchuang/DevelopFileUpload
 spring:
+  application:
+    name: EchoPro
+    version: 0.9.0
   profiles:
     active: druid,rabbitmq,quartz,monitor,storage,cors #激活配置文件
   servlet:
@@ -20,6 +16,9 @@ spring:
       port: 6379
       database: 0
       password: zhangchuang2726
+#开发环境数据库文件
+server:
+  port: 8080
 springdoc:
   api-docs:
     path: /v3/api-docs

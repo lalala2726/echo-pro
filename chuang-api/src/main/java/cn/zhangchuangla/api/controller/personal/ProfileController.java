@@ -1,12 +1,11 @@
 package cn.zhangchuangla.api.controller.personal;
 
-import cn.zhangchuangla.common.core.controller.BaseController;
+import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.entity.security.SysUser;
-import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.core.utils.SecurityUtils;
@@ -31,6 +30,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -105,6 +105,7 @@ public class ProfileController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "更新用户信息")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     public AjaxResult<Void> updateProFile(@RequestBody ProfileUpdateRequest request) {
         boolean result = sysUserService.updateUserProfile(request);
         return toAjax(result);
@@ -177,14 +178,8 @@ public class ProfileController extends BaseController {
     @Operation(summary = "修改用户密码")
     @SecurityLog(title = "修改密码", businessType = BusinessType.UPDATE)
     @PutMapping("/security/password")
+    @PreAuthorize("@ss.hasPermission('personal:profile:passowrd')")
     public AjaxResult<Void> updatePassword(@RequestBody @Validated UpdatePasswordRequest request) {
-        String oldPassword = request.getOldPassword();
-        String userPassword = encryptPassword(oldPassword);
-        SysUserDetails loginUser = getLoginUser();
-        String password = loginUser.getPassword();
-        if (!userPassword.equals(password)) {
-            return error("旧密码错误");
-        }
         boolean result = sysUserService.updatePassword(request);
         return toAjax(result);
     }
@@ -227,6 +222,7 @@ public class ProfileController extends BaseController {
      */
     @Operation(summary = "修改用户邮箱")
     @PutMapping("/email")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     @SecurityLog(title = "修改邮箱", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateEmail(@RequestBody @Validated UpdateEmailRequest request) {
         boolean result = sysUserService.updateEmail(request);
@@ -242,6 +238,7 @@ public class ProfileController extends BaseController {
      */
     @Operation(summary = "修改用户手机")
     @PutMapping("/phone")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     @SecurityLog(title = "修改手机", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updatePhone(@RequestBody @Validated UpdatePhoneRequest request) {
         boolean result = sysUserService.updatePhone(request);
