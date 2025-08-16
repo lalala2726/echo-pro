@@ -105,7 +105,7 @@ public class ProfileController extends BaseController {
      */
     @PutMapping
     @Operation(summary = "更新用户信息")
-    @PreAuthorize("hasAuthority('personal:profile:update')")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     public AjaxResult<Void> updateProFile(@RequestBody ProfileUpdateRequest request) {
         boolean result = sysUserService.updateUserProfile(request);
         return toAjax(result);
@@ -178,7 +178,7 @@ public class ProfileController extends BaseController {
     @Operation(summary = "修改用户密码")
     @SecurityLog(title = "修改密码", businessType = BusinessType.UPDATE)
     @PutMapping("/security/password")
-    @PreAuthorize("hasAuthority('personal:profile:passowrd')")
+    @PreAuthorize("@ss.hasPermission('personal:profile:passowrd')")
     public AjaxResult<Void> updatePassword(@RequestBody @Validated UpdatePasswordRequest request) {
         boolean result = sysUserService.updatePassword(request);
         return toAjax(result);
@@ -222,7 +222,7 @@ public class ProfileController extends BaseController {
      */
     @Operation(summary = "修改用户邮箱")
     @PutMapping("/email")
-    @PreAuthorize("hasAuthority('personal:profile:update')")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     @SecurityLog(title = "修改邮箱", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updateEmail(@RequestBody @Validated UpdateEmailRequest request) {
         boolean result = sysUserService.updateEmail(request);
@@ -238,7 +238,7 @@ public class ProfileController extends BaseController {
      */
     @Operation(summary = "修改用户手机")
     @PutMapping("/phone")
-    @PreAuthorize("hasAuthority('personal:profile:update')")
+    @PreAuthorize("@ss.hasPermission('personal:profile:update')")
     @SecurityLog(title = "修改手机", businessType = BusinessType.UPDATE)
     public AjaxResult<Void> updatePhone(@RequestBody @Validated UpdatePhoneRequest request) {
         boolean result = sysUserService.updatePhone(request);
