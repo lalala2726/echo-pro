@@ -70,7 +70,11 @@ public interface BaseService {
     }
 
     /**
-     * 校验密码
+     * 密码匹配
+     *
+     * @param rawPassword     原始密码(未加密啊)
+     * @param encodedPassword 已加密的密码
+     * @return 密码匹配结果
      */
     default boolean matchesPassword(String rawPassword, String encodedPassword) {
         return SecurityUtils.matchesPassword(rawPassword, encodedPassword);

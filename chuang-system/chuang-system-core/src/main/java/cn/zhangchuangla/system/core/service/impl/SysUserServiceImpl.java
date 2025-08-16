@@ -351,13 +351,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
      */
     @Override
     public boolean updatePassword(UpdatePasswordRequest request) {
-        //校验旧密码
-        String newPassword = SecurityUtils.encryptPassword(request.getNewPassword());
-        LambdaQueryWrapper<SysUser> eq = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, SecurityUtils.getUserId());
+        Assert.isTrue(!request.getOldPassword().equals(request.getNewPassword()), "新密码与旧密码一致！");
+
+        Long userId = getUserId();
+        SysUser user = getById(userId);
+
+        //加密旧密码并与数据库进行对比
+        boolean result = matchesPassword(request.getOldPassword(), user.getPassword());
+        Assert.isTrue(result, "旧密码错误！");
+        //加密新密码并且保存
+        String newPassword = encryptPassword(request.getNewPassword());
+
         SysUser sysUser = SysUser.builder()
+                .userId(userId)
                 .password(newPassword)
                 .build();
-        return update(sysUser, eq);
+        return updateById(sysUser);
     }
 
 
