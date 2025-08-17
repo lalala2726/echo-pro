@@ -41,7 +41,7 @@
             <if test="request.contentType != null and request.contentType != ''">
                 and content_type = #{request.contentType}
             </if>
-            is_deleted = 0
+            and is_deleted = 0
         </where>
         order by upload_time desc
     </select>
