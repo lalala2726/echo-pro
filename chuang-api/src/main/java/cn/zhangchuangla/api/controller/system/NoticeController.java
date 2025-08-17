@@ -117,7 +117,7 @@ public class NoticeController extends BaseController {
     @Operation(summary = "删除公告", description = "批量删除公告")
     @PreAuthorize("@ss.hasPermission('system:notice:delete')")
     @OperationLog(title = "公告管理", businessType = BusinessType.DELETE)
-    public AjaxResult<Void> remove(@Parameter(description = "公告ID列表，多个用逗号分隔") @PathVariable List<Long> ids) {
+    public AjaxResult<Void> remove(@Parameter(description = "公告ID列表，多个用逗号分隔") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "公告ID不能为空");
         boolean result = sysNoticeService.deleteNotice(ids);
         return result ? success("删除成功") : error("删除失败");
