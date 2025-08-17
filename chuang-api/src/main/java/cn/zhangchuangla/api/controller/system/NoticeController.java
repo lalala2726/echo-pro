@@ -134,7 +134,7 @@ public class NoticeController extends BaseController {
     @Operation(summary = "导出公告", description = "导出公告")
     @PreAuthorize("@ss.hasPermission('system:notice:export')")
     @OperationLog(title = "公告管理", businessType = BusinessType.EXPORT)
-    public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody SysNoticeQueryRequest request, HttpServletResponse response) {
+    public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody(required = false) SysNoticeQueryRequest request, HttpServletResponse response) {
         List<SysNotice> list = sysNoticeService.exportNoticeList(request);
         List<SysNoticeListVo> sysNoticeListVos = copyListProperties(list, SysNoticeListVo.class);
         excelExporter.exportExcel(response, sysNoticeListVos, SysNoticeListVo.class, "公告列表");
