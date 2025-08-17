@@ -42,6 +42,7 @@
                 and content_type = #{request.contentType}
             </if>
             and is_deleted = 0
+            and is_trash = 0
         </where>
         order by upload_time desc
     </select>
