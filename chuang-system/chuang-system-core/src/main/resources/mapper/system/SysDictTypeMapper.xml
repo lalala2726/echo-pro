@@ -39,11 +39,16 @@
                 <if test="request.status != null">
                     AND status = #{request.status}
                 </if>
-                <if test="request.startTime != null">
-                    AND date(create_time) >= #{request.startTime}
+                <if test="request.remark != null and request.remark != ''">
+                    AND remark LIKE CONCAT('%', #{request.remark}, '%')
                 </if>
-                <if test="request.endTime != null">
-                    AND date(create_time) &lt;= #{request.endTime}
+                <if test="request.createTime != null">
+                    <if test="request.createTime.startTime != null">
+                        AND create_time >= #{request.createTime.startTime}
+                    </if>
+                    <if test="request.createTime.endTime != null">
+                        AND create_time &lt;= #{request.createTime.endTime}
+                    </if>
                 </if>
             </if>
         </where>

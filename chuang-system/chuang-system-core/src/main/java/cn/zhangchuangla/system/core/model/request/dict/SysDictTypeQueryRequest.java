@@ -1,12 +1,10 @@
 package cn.zhangchuangla.system.core.model.request.dict;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import cn.zhangchuangla.common.core.entity.base.TimeRange;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.time.LocalDate;
 
 /**
  * 字典类型查询请求对象
@@ -42,17 +40,10 @@ public class SysDictTypeQueryRequest extends BasePageRequest {
     @Schema(description = "状态：0启用，1禁用", example = "0", type = "integer")
     private Integer status;
 
-    /**
-     * 开始时间
-     */
-    @Schema(description = "开始时间", example = "2023-01-01", type = "string")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private LocalDate startTime;
 
     /**
-     * 结束时间
+     * 创建时间
      */
-    @Schema(description = "结束时间", example = "2023-12-31", type = "string")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private LocalDate endTime;
+    @Schema(description = "创建时间")
+    private TimeRange createTime;
 }
