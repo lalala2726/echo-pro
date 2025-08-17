@@ -4,7 +4,7 @@ import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
-import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;

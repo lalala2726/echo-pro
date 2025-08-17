@@ -5,7 +5,7 @@ import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
-import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
 import cn.zhangchuangla.framework.security.property.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

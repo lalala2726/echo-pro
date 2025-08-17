@@ -7,7 +7,7 @@ import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
-import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
 import cn.zhangchuangla.framework.security.session.SessionService;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import io.swagger.v3.oas.annotations.Operation;
