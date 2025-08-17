@@ -95,18 +95,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             throw new ServiceException(ResultCode.OPERATION_ERROR, "菜单路径已存在: " + request.getPath());
         }
 
-        // 3. 创建菜单对象并设置基础信息
+        // 3. 检查父菜单设置是否合理
+        if (request.getParentId() != null && !request.getParentId().equals(0L)) {
+            // 检查父菜单是否存在
+            SysMenu parentMenu = getById(request.getParentId());
+            if (parentMenu == null) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "指定的父菜单不存在！");
+            }
+        }
+
+        // 4. 创建菜单对象并设置基础信息
         String username = SecurityUtils.getUsername();
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setCreateBy(username);
 
-        // 4.1 规范化路径：去除结尾/（保留根路径/）
+        // 5.1 规范化路径：去除结尾/（保留根路径/）
         sysMenu.setPath(normalizePath(sysMenu.getPath()));
 
         // 映射枚举到实体存储值
         sysMenu.setType(request.getType().getValue());
 
-        // 4. 根据菜单类型进行字段过滤和验证
+        // 6. 根据菜单类型进行字段过滤和验证
         SysMenu processedMenu = switch (request.getType()) {
             case CATALOG -> saveCatalog(sysMenu);
             case MENU -> saveMenu(sysMenu);
@@ -115,7 +124,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
             case LINK -> saveLink(sysMenu);
         };
 
-        // 5. 保存菜单
+        // 7. 保存菜单
         return save(processedMenu);
     }
 
@@ -136,6 +145,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String username = SecurityUtils.getUsername();
         // 1.1 业务校验：名称仅允许英文；路径按类型必须以/开头
         validateNameAndPath(request.getName(), request.getPath(), request.getType());
+
+        // 检查父菜单设置是否合理，避免形成循环依赖
+        if (request.getParentId() != null && !request.getParentId().equals(0L)) {
+            // 不能将菜单设置为自己的父菜单
+            if (request.getId().equals(request.getParentId())) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "不能将菜单设置为自己的父菜单！");
+            }
+
+            // 检查是否试图将菜单设置为其子菜单的父菜单
+            if (isChildOf(request.getParentId(), request.getId())) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "不能将菜单设置为其子菜单的父菜单！");
+            }
+        }
 
         SysMenu sysMenu = BeanCotyUtils.copyProperties(request, SysMenu.class);
         sysMenu.setUpdateBy(username);
@@ -638,5 +660,29 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return sysMenu;
     }
 
+    /**
+     * 检查某个菜单是否是另一个菜单的子菜单（递归检查）
+     *
+     * @param childId  可能的子菜单ID
+     * @param parentId 父菜单ID
+     * @return true 如果childId是parentId的子菜单，否则false
+     */
+    private boolean isChildOf(Long childId, Long parentId) {
+        if (childId == null || parentId == null) {
+            return false;
+        }
 
+        SysMenu childMenu = getById(childId);
+        if (childMenu == null || childMenu.getParentId() == null) {
+            return false;
+        }
+
+        // 如果直接父菜单就是目标菜单
+        if (childMenu.getParentId().equals(parentId)) {
+            return true;
+        }
+
+        // 递归检查父菜单的父菜单
+        return isChildOf(childMenu.getParentId(), parentId);
+    }
 }
