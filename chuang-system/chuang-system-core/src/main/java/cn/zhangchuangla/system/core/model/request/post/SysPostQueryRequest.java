@@ -1,10 +1,12 @@
 package cn.zhangchuangla.system.core.model.request.post;
 
 import cn.zhangchuangla.common.core.entity.base.BasePageRequest;
-import cn.zhangchuangla.common.core.entity.base.TimeRange;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDate;
 
 /**
  * 岗位表
@@ -47,9 +49,17 @@ public class SysPostQueryRequest extends BasePageRequest {
     private Integer status;
 
     /**
-     * 创建时间
+     * 开始时间
      */
-    @Schema(name = "创建时间", type = "object", description = "创建时间范围", example = "{\"startTime\":\"2023-01-01\",\"endTime\":\"2023-01-01\"}")
-    private TimeRange createTime;
+    @Schema(description = "开始时间", example = "2025-08-20", type = "string", format = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate startTime;
+
+    /**
+     * 结束时间
+     */
+    @Schema(description = "结束时间", example = "2025-08-22", type = "string", format = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate endTime;
 
 }

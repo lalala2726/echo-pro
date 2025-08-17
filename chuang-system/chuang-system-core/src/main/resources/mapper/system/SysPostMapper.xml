@@ -29,6 +29,9 @@
             <if test="request.status != null">
                 and status = #{request.status}
             </if>
+            <if test="request.startTime != null and request.endTime != null">
+                AND DATE(create_time) BETWEEN #{request.startTime} AND #{request.endTime}
+            </if>
         </where>
         order by sort desc
     </select>
@@ -45,6 +48,9 @@
             </if>
             <if test="request.status != null">
                 and status = #{request.status}
+            </if>
+            <if test="request.startTime != null and request.endTime != null">
+                AND DATE(create_time) BETWEEN #{request.startTime} AND #{request.endTime}
             </if>
         </where>
         order by sort desc
