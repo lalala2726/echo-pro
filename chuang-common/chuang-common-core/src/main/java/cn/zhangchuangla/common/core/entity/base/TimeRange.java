@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * @author Chuang
@@ -19,12 +19,12 @@ public class TimeRange {
      */
     @Schema(description = "开始时间", example = "2023-01-01", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private LocalDateTime startTime;
+    private LocalDate startTime;
 
     /**
      * 结束时间
      */
     @Schema(description = "开始时间", example = "2023-01-01", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 }
