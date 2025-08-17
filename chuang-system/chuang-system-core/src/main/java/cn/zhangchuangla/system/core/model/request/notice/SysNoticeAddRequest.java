@@ -26,7 +26,7 @@ public class SysNoticeAddRequest {
      * 公告内容
      */
     @NotBlank(message = "公告内容不能为空")
-    @Size(max = 2000, message = "公告内容不能超过2000个字符")
+    @Size(max = 20000, message = "公告内容不能超过2000个字符")
     @Schema(description = "公告内容", example = "系统将于今晚进行维护，请提前保存工作", type = "string", requiredMode = Schema.RequiredMode.REQUIRED)
     private String noticeContent;
 
