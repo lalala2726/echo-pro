@@ -1,5 +1,6 @@
 package cn.zhangchuangla.system.core.service.impl;
 
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.system.core.mapper.SysOperationLogMapper;
 import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
 import cn.zhangchuangla.system.core.model.request.log.SysOperationLogQueryRequest;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,18 @@ public class SysOperationLogServiceImpl extends ServiceImpl<SysOperationLogMappe
     @Override
     public List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request) {
         return sysOperationLogMapper.listOperationLog(request);
+    }
+
+    /**
+     * 删除操作日志
+     *
+     * @param ids 日志ID列表
+     * @return 是否成功
+     */
+    @Override
+    public boolean deleteOperationLogById(List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的登录日志");
+        return removeByIds(ids);
     }
 
 }

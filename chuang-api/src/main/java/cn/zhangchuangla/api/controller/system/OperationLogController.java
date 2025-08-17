@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysOperationLog;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,6 +61,9 @@ public class OperationLogController extends BaseController {
         return getTableData(sysOperationLogPage, sysOperationLogListVos);
     }
 
+    /**
+     * 导出操作日志
+     */
     @PostMapping("/export")
     @Operation(summary = "导出操作日志")
     @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
@@ -86,6 +91,23 @@ public class OperationLogController extends BaseController {
         SysOperationLogVo sysOperationLogVo = new SysOperationLogVo();
         BeanUtils.copyProperties(sysOperationLog, sysOperationLogVo);
         return success(sysOperationLogVo);
+    }
+
+    /**
+     * 删除操作日志
+     *
+     * @param ids 操作日志ID
+     * @return 删除结果
+     */
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除操作日志")
+    @PreAuthorize("@ss.hasPermission('system:log-operation:delete')")
+    @OperationLog(title = "日志管理", businessType = BusinessType.DELETE)
+    public AjaxResult<Void> deleteOperationLog(@Parameter(description = "操作日志ID")
+                                               @PathVariable("ids") List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的操作日志");
+        boolean result = sysOperationLogService.deleteOperationLogById(ids);
+        return toAjax(result);
     }
 
     /**

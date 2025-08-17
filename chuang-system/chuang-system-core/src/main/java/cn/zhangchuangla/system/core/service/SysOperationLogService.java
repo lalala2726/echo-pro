@@ -46,4 +46,11 @@ public interface SysOperationLogService extends IService<SysOperationLog> {
     List<SysOperationLog> exportOperationLog(SysOperationLogQueryRequest request);
 
 
+    /**
+     * 删除操作日志
+     *
+     * @param ids 日志ID列表
+     * @return 是否成功
+     */
+    boolean deleteOperationLogById(List<Long> ids);
 }
