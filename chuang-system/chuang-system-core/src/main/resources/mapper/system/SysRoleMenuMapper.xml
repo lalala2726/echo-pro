@@ -7,6 +7,7 @@
     <resultMap id="RoleMenuResultMap" type="cn.zhangchuangla.system.core.model.entity.SysRoleMenu">
         <result property="roleId" column="role_id" jdbcType="BIGINT"/>
         <result property="menuId" column="menu_id" jdbcType="BIGINT"/>
+        <result property="permissionType" column="permission_type" jdbcType="INTEGER"/>
     </resultMap>
 
 
@@ -14,6 +15,13 @@
         select menu_id
         from sys_role_menu
         where role_id = #{roleId}
+    </select>
+
+    <select id="selectDirectMenuListByRoleId" resultType="java.lang.Long">
+        select menu_id
+        from sys_role_menu
+        where role_id = #{roleId}
+          and permission_type = 1
     </select>
 
 </mapper>

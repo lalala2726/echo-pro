@@ -343,6 +343,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
                         SysRoleMenu sysRoleMenu = new SysRoleMenu();
                         sysRoleMenu.setRoleId(request.getRoleId());
                         sysRoleMenu.setMenuId(menuId);
+                        // 设置权限类型：1-直接分配，2-自动添加的父级权限
+                        sysRoleMenu.setPermissionType(validAllocatedMenuIds.contains(menuId) ? 1 : 2);
                         return sysRoleMenu;
                     })
                     .collect(Collectors.toList());
