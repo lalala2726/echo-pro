@@ -108,4 +108,12 @@ public interface StorageFileService extends IService<StorageFile> {
      * @return 文件列表
      */
     List<StorageFile> exportListFile(StorageFileQueryRequest request);
+
+    /**
+     * 删除文件记录
+     *
+     * @param ids 文件id集合
+     * @return 是否成功
+     */
+    boolean deleteFileRecordById(List<Long> ids);
 }
