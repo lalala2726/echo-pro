@@ -148,7 +148,7 @@ public class PostController extends BaseController {
     @Operation(summary = "导出岗位")
     @OperationLog(title = "岗位管理", businessType = BusinessType.EXPORT)
     public void exportPost(@Parameter(description = "添加查询参数可导出指定查询的数据,为空则导出全部数据")
-                           @RequestBody SysPostQueryRequest request, HttpServletResponse response) {
+                               @RequestBody(required = false) SysPostQueryRequest request, HttpServletResponse response) {
         List<SysPost> sysPosts = sysPostService.exportPostList(request);
         List<SysPostListVo> sysPostListVos = copyListProperties(sysPosts, SysPostListVo.class);
         excelExporter.exportExcel(response, sysPostListVos, SysPostListVo.class, "岗位列表");

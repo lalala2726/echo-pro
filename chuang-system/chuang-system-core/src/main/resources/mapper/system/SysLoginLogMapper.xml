@@ -39,8 +39,8 @@
             <if test="request.status != null">
                 AND status = #{request.status}
             </if>
-            <if test="request.address != null and request.address != ''">
-                AND ip LIKE CONCAT('%', #{request.address}, '%')
+            <if test="request.ip != null and request.ip != ''">
+                AND ip LIKE CONCAT('%', #{request.ip}, '%')
             </if>
             <if test="request.region != null and request.region != ''">
                 AND region LIKE CONCAT('%', #{request.region}, '%')

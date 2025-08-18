@@ -34,7 +34,7 @@ public class SysLoginLogQueryRequest extends BasePageRequest {
      * ip地址
      */
     @Schema(description = "ip", example = "127.0.0.1", type = "string")
-    private String address;
+    private String ip;
 
     /**
      * 地区
