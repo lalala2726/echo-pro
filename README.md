@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/Java-17+-orange.svg" alt="Java 17">
 <img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License">
 <img src="https://img.shields.io/badge/Build-Passing-success.svg" alt="Build Status">
+<a href="https://deepwiki.com/lalala2726/echo-pro"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 
 **基于 Spring Boot 3 的现代化企业后台管理系统**
 
