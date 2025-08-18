@@ -6,7 +6,10 @@ import cn.zhangchuangla.common.core.entity.security.SysUserDetails;
 import cn.zhangchuangla.common.core.enums.ResultCode;
 import cn.zhangchuangla.common.core.exception.AuthorizationException;
 import cn.zhangchuangla.common.core.utils.Assert;
+import cn.zhangchuangla.common.core.utils.SecurityUtils;
 import cn.zhangchuangla.common.core.utils.UUIDUtils;
+import cn.zhangchuangla.common.core.utils.client.IPUtils;
+import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.framework.model.dto.LoginDeviceDTO;
 import cn.zhangchuangla.framework.model.dto.LoginSessionDTO;
 import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
@@ -14,6 +17,7 @@ import cn.zhangchuangla.framework.model.vo.AuthTokenVo;
 import cn.zhangchuangla.system.core.service.SysRoleService;
 import cn.zhangchuangla.system.core.service.SysUserService;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -172,12 +176,22 @@ public class TokenService {
         // 获取用户角色并构建用户详情对象
         SysUser user = userService.getUserInfoByUsername(username);
         Set<String> roleSetByUserId = sysRoleService.getRoleSetByUserId(user.getUserId());
-        OnlineLoginUser onlineLoginUser = OnlineLoginUser.builder()
-                .userId(user.getUserId())
-                .roles(roleSetByUserId)
-                .deptId(user.getDeptId())
-                .username(user.getUsername())
-                .build();
+        HttpServletRequest httpServletRequest = SecurityUtils.getHttpServletRequest();
+        String ipAddress = IPUtils.getIpAddress(httpServletRequest);
+        String region = IPUtils.getRegion(ipAddress);
+        String userAgent = UserAgentUtils.getUserAgent(httpServletRequest);
+
+        OnlineLoginUser onlineLoginUser = buildOnlineLoginUser(
+                user.getUsername(),
+                user.getUserId(),
+                user.getDeptId(),
+                accessTokenSessionId,
+                refreshTokenSessionId,
+                ipAddress,
+                region,
+                userAgent,
+                roleSetByUserId
+        );
 
         // 保存刷新令牌
         redisTokenStore.setAccessToken(accessTokenSessionId, onlineLoginUser);
@@ -191,38 +205,36 @@ public class TokenService {
     }
 
     /**
-     * 校验JWT访问令牌是否有效。
-     * 验证JWT签名、是否过期，并检查Redis中是否存在对应的会话信息。
+     * 构建OnlineLoginUser对象的通用方法。
      *
-     * @param jwtAccessToken JWT访问令牌。
-     * @return 如果有效返回true，否则返回false。
+     * @param username 用户名
+     * @param userId 用户ID
+     * @param deptId 部门ID
+     * @param accessTokenId 访问令牌ID
+     * @param refreshTokenId 刷新令牌ID
+     * @param ip IP地址
+     * @param location 地理位置
+     * @param userAgent 用户代理
+     * @param roles 角色集合
+     * @return OnlineLoginUser对象
      */
-    public boolean validateAccessToken(String jwtAccessToken) {
-        try {
-            Claims claims = jwtTokenProvider.getClaimsFromToken(jwtAccessToken);
-            // 以防万一 getClaimsFromToken 返回 null 而不是抛异常
-            if (claims == null) {
-                log.warn("JWT解析返回空Claims: {}", jwtAccessToken.substring(0, Math.min(jwtAccessToken.length(), 20)) + "...");
-                return false;
-            }
-
-            String accessTokenSessionId = claims.get(CLAIM_KEY_SESSION_ID, String.class);
-            if (StringUtils.isBlank(accessTokenSessionId)) {
-                log.warn("JWT中缺少sessionId: {}", jwtAccessToken.substring(0, Math.min(jwtAccessToken.length(), 20)) + "...");
-                return false;
-            }
-
-            boolean isValid = redisTokenStore.isValidAccessToken(accessTokenSessionId);
-            if (!isValid) {
-                log.warn("Redis中不存在对应的访问令牌: {}", accessTokenSessionId);
-            }
-            return isValid;
-        } catch (Exception e) {
-            log.warn("访问令牌验证失败: {}", e.getMessage());
-            return false;
-        }
+    private OnlineLoginUser buildOnlineLoginUser(String username, Long userId, Long deptId,
+                                                 String accessTokenId, String refreshTokenId,
+                                                 String ip, String location, String userAgent,
+                                                 Set<String> roles) {
+        return OnlineLoginUser.builder()
+                .username(username)
+                .userId(userId)
+                .deptId(deptId)
+                .accessTokenId(accessTokenId)
+                .refreshTokenId(refreshTokenId)
+                .ip(ip)
+                .location(location)
+                .userAgent(userAgent)
+                .accessTime(System.currentTimeMillis())
+                .roles(roles)
+                .build();
     }
-
 
     /**
      * 构建在线用户信息对象。
@@ -240,17 +252,17 @@ public class TokenService {
         String ip = loginDeviceDTO.getIp();
         String location = loginDeviceDTO.getLocation();
 
-        OnlineLoginUser.OnlineLoginUserBuilder builder = OnlineLoginUser.builder()
-                .username(user.getUsername())
-                .accessTokenId(accessTokenId)
-                .ip(ip)
-                .refreshTokenId(refreshTokenId)
-                .accessTime(System.currentTimeMillis())
-                .location(location)
-                .deptId(user.getDeptId())
-                .userId(user.getUserId())
-                .roles(roleSetByUserId);
-        return builder.build();
+        return buildOnlineLoginUser(
+                user.getUsername(),
+                user.getUserId(),
+                user.getDeptId(),
+                accessTokenId,
+                refreshTokenId,
+                ip,
+                location,
+                loginDeviceDTO.getUserAgent(),
+                roleSetByUserId
+        );
     }
 
 

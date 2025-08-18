@@ -42,6 +42,9 @@ public class LoginDeviceDTO {
      */
     private String deviceName;
 
+    /**
+     * userAgent
+     */
     private String userAgent;
 
     /**
