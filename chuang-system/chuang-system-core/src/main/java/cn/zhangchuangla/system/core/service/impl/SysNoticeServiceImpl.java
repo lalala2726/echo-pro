@@ -33,17 +33,35 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
 
     private final SysNoticeMapper sysNoticeMapper;
 
+    /**
+     * 查询公告列表
+     *
+     * @param request 查询参数
+     * @return 公告列表
+     */
     @Override
     public Page<SysNotice> listNotice(SysNoticeQueryRequest request) {
         Page<SysNotice> page = new Page<>(request.getPageNum(), request.getPageSize());
         return sysNoticeMapper.listNotice(page, request);
     }
 
+    /**
+     * 根据id查询公告信息
+     *
+     * @param id 公告ID
+     * @return 公告信息
+     */
     @Override
     public SysNotice getNoticeById(Long id) {
         return getById(id);
     }
 
+    /**
+     * 添加公告
+     *
+     * @param request 添加请求
+     * @return 是否添加成功
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addNotice(SysNoticeAddRequest request) {
@@ -62,6 +80,12 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         return save(sysNotice);
     }
 
+    /**
+     * 修改公告
+     *
+     * @param request 修改公告请求参数
+     * @return 修改结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateNotice(SysNoticeUpdateRequest request) {
@@ -89,12 +113,25 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         return updateById(sysNotice);
     }
 
+    /**
+     * 删除公告
+     *
+     * @param ids 公告ID列表
+     * @return 删除结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteNotice(List<Long> ids) {
         return removeByIds(ids);
     }
 
+    /**
+     * 判断公告标题是否存在
+     *
+     * @param noticeTitle 公告标题
+     * @param id          公告ID
+     * @return true:存在 false:不存在
+     */
     @Override
     public boolean isNoticeTitleExist(String noticeTitle, Long id) {
         LambdaQueryWrapper<SysNotice> queryWrapper = new LambdaQueryWrapper<>();
