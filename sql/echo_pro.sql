@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : Develop
+ Source Server         : 192.168.10.120
  Source Server Type    : MySQL
  Source Server Version : 80403 (8.4.3)
- Source Host           : 192.168.10.110:3306
+ Source Host           : 192.168.10.120:3306
  Source Schema         : echo_pro
 
  Target Server Type    : MySQL
  Target Server Version : 80403 (8.4.3)
  File Encoding         : 65001
 
- Date: 16/08/2025 15:54:06
+ Date: 18/08/2025 14:22:34
 */
 
 SET NAMES utf8mb4;
@@ -138,8 +138,8 @@ CREATE TABLE `sys_dept`
 BEGIN;
 INSERT INTO `sys_dept` (`dept_id`, `dept_name`, `status`, `parent_id`, `manager`, `description`, `create_time`,
                         `update_time`, `create_by`, `update_by`, `remark`)
-VALUES (1, '西安总公司', 0, 0, '张经理', NULL, '2025-04-13 13:40:28', '2025-08-01 04:17:03', 'DEVELOP', 'DEVELOP',
-        NULL);
+VALUES (1, '西安总公司', 0, 0, '张经理', '西安总公司', '2025-04-13 13:40:28', '2025-08-16 22:21:22', 'DEVELOP',
+        'DEVELOP', NULL);
 INSERT INTO `sys_dept` (`dept_id`, `dept_name`, `status`, `parent_id`, `manager`, `description`, `create_time`,
                         `update_time`, `create_by`, `update_by`, `remark`)
 VALUES (2, '雁塔区分部', 0, 1, NULL, NULL, '2025-04-13 13:40:46', '2025-04-24 10:07:17', 'DEVELOP', 'DEVELOP', NULL);
@@ -151,7 +151,7 @@ INSERT INTO `sys_dept` (`dept_id`, `dept_name`, `status`, `parent_id`, `manager`
 VALUES (4, '兴庆宫分店', 0, 2, NULL, NULL, '2025-04-13 13:42:20', '2025-04-24 10:07:18', 'DEVELOP', 'DEVELOP', NULL);
 INSERT INTO `sys_dept` (`dept_id`, `dept_name`, `status`, `parent_id`, `manager`, `description`, `create_time`,
                         `update_time`, `create_by`, `update_by`, `remark`)
-VALUES (5, '高新区分部', 0, 0, NULL, NULL, '2025-04-13 13:42:45', '2025-04-24 10:07:19', 'DEVELOP', 'DEVELOP', NULL);
+VALUES (5, '高新区分部', 0, 1, NULL, NULL, '2025-04-13 13:42:45', '2025-08-16 22:17:32', 'DEVELOP', 'DEVELOP', NULL);
 INSERT INTO `sys_dept` (`dept_id`, `dept_name`, `status`, `parent_id`, `manager`, `description`, `create_time`,
                         `update_time`, `create_by`, `update_by`, `remark`)
 VALUES (7, '锦业一路分店', 0, 5, '韩经理', '', '2025-04-24 10:55:08', '2025-04-24 10:55:08', NULL, NULL, NULL);
@@ -181,7 +181,7 @@ CREATE TABLE `sys_dict_data`
     PRIMARY KEY (`id`),
     KEY `idx_dict_type` (`dict_type`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 16
+  AUTO_INCREMENT = 17
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='字典数据表';
 
@@ -225,6 +225,10 @@ INSERT INTO `sys_dict_data` (`id`, `dict_type`, `dict_label`, `dict_value`, `col
                              `create_by`, `create_time`, `update_by`, `update_time`)
 VALUES (15, 'notice_type', '公告消息', 'announcement', 'blue', 0, 0, NULL, 'zhangchuang', '2025-08-12 10:09:28',
         'zhangchuang', '2025-08-12 10:21:20');
+INSERT INTO `sys_dict_data` (`id`, `dict_type`, `dict_label`, `dict_value`, `color`, `sort`, `status`, `remark`,
+                             `create_by`, `create_time`, `update_by`, `update_time`)
+VALUES (16, 'test_dice', '正常', 'announcement', 'blue', 0, 0, '测试测试', 'admin', '2025-08-16 22:30:24', 'admin',
+        '2025-08-16 22:30:40');
 COMMIT;
 
 -- ----------------------------
@@ -245,7 +249,7 @@ CREATE TABLE `sys_dict_type`
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_dict_type` (`dict_type`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 6
+  AUTO_INCREMENT = 7
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='字典类型表';
 
@@ -268,6 +272,9 @@ INSERT INTO `sys_dict_type` (`id`, `dict_type`, `dict_name`, `status`, `remark`,
                              `update_by`, `update_time`)
 VALUES (5, 'system_status', '系统状态', 0, '系统状态', 'zhangchuang', '2025-07-16 14:18:07', 'zhangchuang',
         '2025-07-16 14:22:04');
+INSERT INTO `sys_dict_type` (`id`, `dict_type`, `dict_name`, `status`, `remark`, `create_by`, `create_time`,
+                             `update_by`, `update_time`)
+VALUES (6, 'test_dice', '测试字典', 1, '测试字典', 'admin', '2025-08-16 22:30:09', NULL, '2025-08-16 22:30:09');
 COMMIT;
 
 -- ----------------------------
@@ -276,39 +283,39 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_job`;
 CREATE TABLE `sys_job`
 (
-    `job_id`             bigint                                  NOT NULL AUTO_INCREMENT COMMENT '任务ID',
-    `job_name`           varchar(64) COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '任务名称',
-    `invoke_target`      varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '调用目标字符串',
-    `schedule_type`      int                                     NOT NULL DEFAULT '0' COMMENT '调度策略（0=Cron表达式 1=固定频率 2=固定延迟 3=一次性执行）',
-    `cron_expression`    varchar(255) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT 'cron执行表达式',
-    `fixed_rate`         bigint                                           DEFAULT NULL COMMENT '固定频率间隔（毫秒）',
-    `fixed_delay`        bigint                                           DEFAULT NULL COMMENT '固定延迟间隔（毫秒）',
-    `initial_delay`      bigint                                           DEFAULT NULL COMMENT '初始延迟时间（毫秒）',
-    `misfire_policy`     int                                     NOT NULL DEFAULT '0' COMMENT '计划执行错误策略（0=默认 1=立即执行 2=执行一次 3=放弃执行）',
-    `concurrent`         int                                     NOT NULL DEFAULT '1' COMMENT '是否并发执行（0允许 1禁止）',
-    `status`             int                                     NOT NULL DEFAULT '1' COMMENT '任务状态（0正常 1暂停）',
-    `priority`           int                                     NOT NULL DEFAULT '5' COMMENT '任务优先级',
-    `description`        varchar(500) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '任务描述',
-    `job_data`           text COLLATE utf8mb4_unicode_ci COMMENT '任务参数',
-    `dependent_job_ids`  varchar(500) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '依赖任务ID（多个用逗号分隔）',
-    `max_retry_count`    int                                     NOT NULL DEFAULT '0' COMMENT '最大重试次数',
-    `retry_interval`     bigint                                  NOT NULL DEFAULT '0' COMMENT '重试间隔（毫秒）',
-    `timeout`            bigint                                  NOT NULL DEFAULT '0' COMMENT '超时时间（毫秒）',
-    `start_time`         datetime                                         DEFAULT NULL COMMENT '开始时间',
-    `end_time`           datetime                                         DEFAULT NULL COMMENT '结束时间',
-    `next_fire_time`     datetime                                         DEFAULT NULL COMMENT '下次执行时间',
-    `previous_fire_time` datetime                                         DEFAULT NULL COMMENT '上次执行时间',
-    `create_time`        datetime                                         DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`        datetime                                         DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `create_by`          varchar(64) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '创建者',
-    `update_by`          varchar(64) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '更新者',
-    `remark`             varchar(500) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '备注',
+    `job_id`             bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+    `job_name`           varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '任务名称',
+    `invoke_target`      varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '调用目标字符串',
+    `schedule_type`      int                                                           NOT NULL DEFAULT '0' COMMENT '调度策略（0=Cron表达式 1=固定频率 2=固定延迟 3=一次性执行）',
+    `cron_expression`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT 'cron执行表达式',
+    `fixed_rate`         bigint                                                                 DEFAULT NULL COMMENT '固定频率间隔（毫秒）',
+    `fixed_delay`        bigint                                                                 DEFAULT NULL COMMENT '固定延迟间隔（毫秒）',
+    `initial_delay`      bigint                                                                 DEFAULT NULL COMMENT '初始延迟时间（毫秒）',
+    `misfire_policy`     int                                                           NOT NULL DEFAULT '0' COMMENT '计划执行错误策略（0=默认 1=立即执行 2=执行一次 3=放弃执行）',
+    `concurrent`         int                                                           NOT NULL DEFAULT '1' COMMENT '是否并发执行（0允许 1禁止）',
+    `status`             int                                                           NOT NULL DEFAULT '1' COMMENT '任务状态（0正常 1暂停）',
+    `priority`           int                                                           NOT NULL DEFAULT '5' COMMENT '任务优先级',
+    `description`        varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '任务描述',
+    `job_data`           text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '任务参数',
+    `dependent_job_ids`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '依赖任务ID（多个用逗号分隔）',
+    `max_retry_count`    int                                                           NOT NULL DEFAULT '0' COMMENT '最大重试次数',
+    `retry_interval`     bigint                                                        NOT NULL DEFAULT '0' COMMENT '重试间隔（毫秒）',
+    `timeout`            bigint                                                        NOT NULL DEFAULT '0' COMMENT '超时时间（毫秒）',
+    `start_time`         datetime                                                               DEFAULT NULL COMMENT '开始时间',
+    `end_time`           datetime                                                               DEFAULT NULL COMMENT '结束时间',
+    `next_fire_time`     datetime                                                               DEFAULT NULL COMMENT '下次执行时间',
+    `previous_fire_time` datetime                                                               DEFAULT NULL COMMENT '上次执行时间',
+    `create_time`        datetime                                                               DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`        datetime                                                               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_by`          varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '创建者',
+    `update_by`          varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '更新者',
+    `remark`             varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`job_id`),
     UNIQUE KEY `uk_job_name` (`job_name`),
     KEY `idx_status` (`status`),
     KEY `idx_next_fire_time` (`next_fire_time`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 2
+  AUTO_INCREMENT = 3
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='定时任务表';
 
@@ -316,13 +323,6 @@ CREATE TABLE `sys_job`
 -- Records of sys_job
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_job` (`job_id`, `job_name`, `invoke_target`, `schedule_type`, `cron_expression`, `fixed_rate`,
-                       `fixed_delay`, `initial_delay`, `misfire_policy`, `concurrent`, `status`, `priority`,
-                       `description`, `job_data`, `dependent_job_ids`, `max_retry_count`, `retry_interval`, `timeout`,
-                       `start_time`, `end_time`, `next_fire_time`, `previous_fire_time`, `create_time`, `update_time`,
-                       `create_by`, `update_by`, `remark`)
-VALUES (1, '测试任务', 'sampleTask.noParams', 0, '10 * * * * ? *', NULL, NULL, NULL, 0, 1, 1, 5, NULL, NULL, NULL, 0, 0,
-        0, NULL, NULL, '2025-08-16 13:41:10', NULL, '2025-08-16 13:40:23', '2025-08-16 13:40:23', NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -331,26 +331,26 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_job_log`;
 CREATE TABLE `sys_job_log`
 (
-    `job_log_id`     bigint                                  NOT NULL AUTO_INCREMENT COMMENT '任务日志ID',
-    `job_id`         bigint                                  NOT NULL COMMENT '任务ID',
-    `job_name`       varchar(64) COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '任务名称',
-    `invoke_target`  varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '调用目标字符串',
-    `job_data`       text COLLATE utf8mb4_unicode_ci COMMENT '任务参数',
-    `job_message`    text COLLATE utf8mb4_unicode_ci COMMENT '日志信息',
-    `status`         int                                     NOT NULL DEFAULT '0' COMMENT '执行状态（0正常 1失败）',
-    `exception_info` text COLLATE utf8mb4_unicode_ci COMMENT '异常信息',
-    `start_time`     datetime                                         DEFAULT NULL COMMENT '开始时间',
-    `end_time`       datetime                                         DEFAULT NULL COMMENT '结束时间',
-    `execute_time`   bigint                                           DEFAULT NULL COMMENT '执行耗时（毫秒）',
-    `server_ip`      varchar(50) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '服务器IP',
-    `server_name`    varchar(100) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '服务器名称',
-    `retry_count`    int                                     NOT NULL DEFAULT '0' COMMENT '重试次数',
-    `trigger_type`   varchar(50) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '触发器类型',
-    `create_time`    datetime                                         DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`    datetime                                         DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `create_by`      varchar(64) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '创建者',
-    `update_by`      varchar(64) COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '更新者',
-    `remark`         varchar(500) COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '备注',
+    `job_log_id`     bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '任务日志ID',
+    `job_id`         bigint                                                        NOT NULL COMMENT '任务ID',
+    `job_name`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '任务名称',
+    `invoke_target`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '调用目标字符串',
+    `job_data`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '任务参数',
+    `job_message`    text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '日志信息',
+    `status`         int                                                           NOT NULL DEFAULT '0' COMMENT '执行状态（0正常 1失败）',
+    `exception_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '异常信息',
+    `start_time`     datetime                                                               DEFAULT NULL COMMENT '开始时间',
+    `end_time`       datetime                                                               DEFAULT NULL COMMENT '结束时间',
+    `execute_time`   bigint                                                                 DEFAULT NULL COMMENT '执行耗时（毫秒）',
+    `server_ip`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '服务器IP',
+    `server_name`    varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '服务器名称',
+    `retry_count`    int                                                           NOT NULL DEFAULT '0' COMMENT '重试次数',
+    `trigger_type`   varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '触发器类型',
+    `create_time`    datetime                                                               DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`    datetime                                                               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_by`      varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '创建者',
+    `update_by`      varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL COMMENT '更新者',
+    `remark`         varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`job_log_id`),
     KEY `idx_job_id` (`job_id`),
     KEY `idx_job_name` (`job_name`),
@@ -358,6 +358,7 @@ CREATE TABLE `sys_job_log`
     KEY `idx_start_time` (`start_time`),
     CONSTRAINT `fk_job_log_job_id` FOREIGN KEY (`job_id`) REFERENCES `sys_job` (`job_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 2
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='定时任务执行日志表';
 
@@ -384,7 +385,6 @@ CREATE TABLE `sys_login_log`
     `create_by`  varchar(100) DEFAULT NULL COMMENT '创建人',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 17
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='系统登录日志';
 
@@ -392,54 +392,6 @@ CREATE TABLE `sys_login_log`
 -- Records of sys_login_log
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (1, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 12:41:48',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (2, 'admin', 0, '1.85.244.57', '中国 陕西省 陕西省 西安市 电信', 'Chrome 13', 'Mac OS X', '2025-08-15 16:04:22',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (3, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 17:08:56',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (4, 'demo', 1, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 17:25:16',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (5, 'demo', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 17:26:13',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (6, 'admin', 0, '1.85.244.57', '中国 陕西省 陕西省 西安市 电信', 'Chrome 13', 'Windows 10',
-        '2025-08-15 17:46:20', '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (7, 'admin', 0, '223.104.204.170', '中国 陕西省 陕西省 移动', 'Chrome 13', 'Mac OS X', '2025-08-15 17:53:14',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (8, 'demo', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 18:11:08',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (9, 'admin', 0, '113.138.99.56', '中国 陕西省 陕西省 渭南市 电信', 'Chrome 13', 'Windows 10',
-        '2025-08-15 18:33:43', '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (10, 'admin', 0, '223.104.204.170', '中国 陕西省 陕西省 移动', 'Chrome Mobile', 'Android 1.x',
-        '2025-08-15 20:53:16', '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (11, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-15 21:13:56',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (12, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-16 11:33:19',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (13, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-16 13:14:39',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (14, 'admin', 1, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-16 13:26:42',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (15, 'admin', 0, '0:0:0:0:0:0:0:1', 'IPv6不支持查询', 'Chrome 13', 'Mac OS X', '2025-08-16 13:27:09',
-        '系统自动创建');
-INSERT INTO `sys_login_log` (`id`, `username`, `status`, `ip`, `region`, `browser`, `os`, `login_time`, `create_by`)
-VALUES (16, 'admin', 0, '1.85.244.57', '中国 陕西省 陕西省 西安市 电信', 'Chrome 13', 'Mac OS X', '2025-08-16 14:56:01',
-        '系统自动创建');
 COMMIT;
 
 -- ----------------------------
@@ -491,8 +443,8 @@ INSERT INTO `sys_menu` (`id`, `name`, `title`, `path`, `type`, `status`, `parent
                         `affix_tab`, `hide_in_menu`, `hide_children_in_menu`, `hide_in_breadcrumb`, `hide_in_tab`,
                         `link`, `sort`, `create_time`, `update_time`, `create_by`, `update_by`, `remark`)
 VALUES (1, 'SystemManage', '系统管理', '/system', 'catalog', 0, 0, '', '', 'carbon:settings', '', '', '', '',
-        'destructive', 0, 0, 0, 0, 0, 0, '', 1, '2025-08-07 08:32:15', '2025-08-07 08:32:15', 'system_init',
-        'zhangchuang', NULL);
+        'destructive', 0, 0, 0, 0, 0, 0, '', 1, '2025-08-07 08:32:15', '2025-08-07 08:32:15', 'system_init', 'admin',
+        NULL);
 INSERT INTO `sys_menu` (`id`, `name`, `title`, `path`, `type`, `status`, `parent_id`, `active_path`, `active_icon`,
                         `icon`, `component`, `permission`, `badge_type`, `badge`, `badge_variants`, `keep_alive`,
                         `affix_tab`, `hide_in_menu`, `hide_children_in_menu`, `hide_in_breadcrumb`, `hide_in_tab`,
@@ -628,7 +580,7 @@ INSERT INTO `sys_menu` (`id`, `name`, `title`, `path`, `type`, `status`, `parent
                         `affix_tab`, `hide_in_menu`, `hide_children_in_menu`, `hide_in_breadcrumb`, `hide_in_tab`,
                         `link`, `sort`, `create_time`, `update_time`, `create_by`, `update_by`, `remark`)
 VALUES (21, 'OpenApi', '接口文档', '/tool/openapi', 'embedded', 0, 3, '', '', 'carbon:api-1', 'IFrameView', '', '', '',
-        '', 1, 0, 0, 0, 0, 0, 'http://localhost:8080/swagger-ui/index.html', 2, '2025-08-07 08:32:15',
+        '', 1, 0, 0, 0, 0, 0, 'https://echo.zhangchuangla.cn/api/swagger-ui/index.html', 2, '2025-08-07 08:32:15',
         '2025-08-07 08:32:15', 'system_init', 'admin', NULL);
 INSERT INTO `sys_menu` (`id`, `name`, `title`, `path`, `type`, `status`, `parent_id`, `active_path`, `active_icon`,
                         `icon`, `component`, `permission`, `badge_type`, `badge`, `badge_variants`, `keep_alive`,
@@ -1388,10 +1340,10 @@ CREATE TABLE `sys_message`
     `id`           bigint                                                         NOT NULL AUTO_INCREMENT COMMENT '消息ID',
     `title`        varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '消息标题',
     `content`      text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          NOT NULL COMMENT '消息内容',
-    `type`         varchar(64) COLLATE utf8mb4_unicode_ci                         NOT NULL COMMENT '消息类型',
-    `level`        varchar(64) COLLATE utf8mb4_unicode_ci                         NOT NULL COMMENT '消息级别',
+    `type`         varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci   NOT NULL COMMENT '消息类型',
+    `level`        varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci   NOT NULL COMMENT '消息级别',
     `sender_name`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci            DEFAULT NULL COMMENT '发送者姓名',
-    `target_type`  varchar(64) COLLATE utf8mb4_unicode_ci                         NOT NULL COMMENT '目标类型',
+    `target_type`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci   NOT NULL COMMENT '目标类型',
     `publish_time` datetime                                                                DEFAULT NULL COMMENT '发布时间',
     `is_deleted`   tinyint(1)                                                     NOT NULL DEFAULT '0' COMMENT '是否删除：0-未删除 1-已删除',
     `create_time`  datetime                                                       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -1406,7 +1358,7 @@ CREATE TABLE `sys_message`
     KEY `idx_create_time` (`create_time`),
     KEY `idx_is_deleted` (`is_deleted`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 2
+  AUTO_INCREMENT = 3
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='系统消息表';
 
@@ -1418,6 +1370,12 @@ INSERT INTO `sys_message` (`id`, `title`, `content`, `type`, `level`, `sender_na
                            `is_deleted`, `create_time`, `update_time`, `create_by`, `update_by`)
 VALUES (1, '11', '<p>111</p>', 'system', 'normal', 'admin', 'all', '2025-08-16 15:41:13', 0, '2025-08-16 15:41:13',
         '2025-08-16 15:41:13', NULL, NULL);
+INSERT INTO `sys_message` (`id`, `title`, `content`, `type`, `level`, `sender_name`, `target_type`, `publish_time`,
+                           `is_deleted`, `create_time`, `update_time`, `create_by`, `update_by`)
+VALUES (2, '测试发送消息',
+        '<div>\n <img src=\"https://minio.zhangchuangla.cn/echopro/resource/2025/08/file/0f19c67892084fc79ab9a133a09b9e73.jpg\" width=\"592\" height=\"auto\">\n</div>\n<p></p>',
+        'system', 'normal', 'admin', 'all', '2025-08-16 15:57:55', 0, '2025-08-16 15:57:55', '2025-08-16 15:57:54',
+        NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -1437,6 +1395,7 @@ CREATE TABLE `sys_notice`
     `remark`         varchar(500) DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 2
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='公告表';
 
@@ -1444,6 +1403,11 @@ CREATE TABLE `sys_notice`
 -- Records of sys_notice
 -- ----------------------------
 BEGIN;
+INSERT INTO `sys_notice` (`id`, `notice_title`, `notice_content`, `notice_type`, `create_time`, `update_time`,
+                          `create_by`, `update_by`, `remark`)
+VALUES (1, '测试测试',
+        '<p>很显然！这是一个测试公告哈哈哈！</p>\n<video controls=\"true\" width=\"350\">\n <source src=\"https://minio.zhangchuangla.cn/echopro/resource/2025/08/file/cb202e2f4aba484da57754cf0bcf769a.mov\">\n</video>',
+        '1', '2025-08-16 22:38:22', '2025-08-16 22:38:22', 'admin', NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -1497,7 +1461,7 @@ CREATE TABLE `sys_post`
     `remark`      text COMMENT '备注',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 7
+  AUTO_INCREMENT = 8
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='岗位表';
 
@@ -1530,7 +1494,7 @@ CREATE TABLE `sys_role`
     UNIQUE KEY `role_name` (`role_name`),
     UNIQUE KEY `role_key` (`role_key`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 29
+  AUTO_INCREMENT = 30
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='角色表';
 
@@ -1546,6 +1510,10 @@ INSERT INTO `sys_role` (`id`, `role_name`, `role_key`, `sort`, `status`, `create
                         `update_by`, `remark`)
 VALUES (23, '演示角色', 'demo', 0, 0, '2025-08-16 14:17:13', '2025-08-16 14:17:13', 'admin', NULL,
         '演示角色包拥有系统绝大数权限信息');
+INSERT INTO `sys_role` (`id`, `role_name`, `role_key`, `sort`, `status`, `create_time`, `update_time`, `create_by`,
+                        `update_by`, `remark`)
+VALUES (29, '测试用户', 'test_user', 0, 0, '2025-08-16 22:15:09', '2025-08-16 22:15:09', 'admin', NULL,
+        '这是一个测试用户');
 COMMIT;
 
 -- ----------------------------
@@ -1970,7 +1938,25 @@ VALUES (23, 210);
 INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
 VALUES (23, 211);
 INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (23, 212);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
 VALUES (23, 213);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (23, 214);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (23, 215);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (23, 216);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (23, 217);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (29, 211);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (29, 212);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (29, 215);
+INSERT INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES (29, 217);
 COMMIT;
 
 -- ----------------------------
@@ -2035,16 +2021,16 @@ BEGIN;
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nickname`, `avatar`, `email`, `dept_id`, `post_id`, `phone`,
                         `gender`, `region`, `signature`, `status`, `create_time`, `update_time`, `create_by`,
                         `update_by`, `is_deleted`, `remark`)
-VALUES (1, 'admin', '$2a$10$M/wHbN5ENWNUqAj.URs.GOQjmM6I/9pzbZL4zpUm8MQ21AI.5/lgC', 'admin',
+VALUES (1, 'admin', '$2a$10$w99techP3aEIvtujc3i6s.yY0gkLjb.u4RgpiAGhQXHa3T2jRbKiq', 'admin',
         'https://minio.zhangchuangla.cn/echopro/resource/2025/08/image/original/c16438e613b444b2a15e2f1fa8cd7aae.jpg',
-        NULL, 1, 6, NULL, 0, '陕西-西安', '唯有热爱可抵岁月漫长', 0, '2025-08-15 12:41:34', '2025-08-16 14:47:01', NULL,
+        NULL, 1, 6, NULL, 0, '陕西-西安', '唯有热爱可抵岁月漫长', 0, '2025-08-15 12:41:34', '2025-08-16 16:29:08', NULL,
         NULL, 0, NULL);
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nickname`, `avatar`, `email`, `dept_id`, `post_id`, `phone`,
                         `gender`, `region`, `signature`, `status`, `create_time`, `update_time`, `create_by`,
                         `update_by`, `is_deleted`, `remark`)
 VALUES (2, 'demo', '$2a$10$M/wHbN5ENWNUqAj.URs.GOQjmM6I/9pzbZL4zpUm8MQ21AI.5/lgC', '演示用户',
         'https://minio.zhangchuangla.cn/echopro/resource/2025/08/image/original/05bd63fe553544388eeb33f63c7e262f.jpg',
-        'admin@qq.com', 1, 6, '18888888888', 1, NULL, NULL, 0, '2025-08-15 17:24:26', '2025-08-16 14:14:48', NULL, NULL,
+        'admin@qq.com', 1, 6, '18888888888', 0, NULL, NULL, 0, '2025-08-15 17:24:26', '2025-08-16 18:37:28', NULL, NULL,
         0, NULL);
 COMMIT;
 
@@ -2106,7 +2092,7 @@ CREATE TABLE `sys_user_role`
     CONSTRAINT `sys_user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`user_id`),
     CONSTRAINT `sys_user_role_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 1897100379522416692
+  AUTO_INCREMENT = 1897100379522416693
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='用户角色表';
 
@@ -2119,7 +2105,7 @@ INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`, `create_time`, `update_
 VALUES (1, 1, 1, '2025-04-15 08:08:31', '2025-04-15 08:08:31', NULL, NULL, NULL);
 INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`, `create_time`, `update_time`, `create_by`, `update_by`,
                              `remark`)
-VALUES (1897100379522416691, 2, 23, '2025-08-16 14:40:09', '2025-08-16 14:40:09', NULL, NULL, NULL);
+VALUES (1897100379522416692, 2, 23, '2025-08-16 18:37:28', '2025-08-16 18:37:28', NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -2145,6 +2131,22 @@ CREATE TABLE `user_message_ext`
 -- Records of user_message_ext
 -- ----------------------------
 BEGIN;
+INSERT INTO `user_message_ext` (`id`, `user_id`, `message_id`, `is_read`, `first_read_time`, `last_read_time`,
+                                `create_time`, `update_time`)
+VALUES (1956626335045779457, 1, 1, 1, '2025-08-16 15:57:25', '2025-08-16 15:57:25', '2025-08-16 15:57:25',
+        '2025-08-16 15:57:25');
+INSERT INTO `user_message_ext` (`id`, `user_id`, `message_id`, `is_read`, `first_read_time`, `last_read_time`,
+                                `create_time`, `update_time`)
+VALUES (1956626502851493890, 1, 2, 1, '2025-08-16 15:58:08', '2025-08-17 13:17:33', '2025-08-16 15:58:05',
+        '2025-08-17 13:17:33');
+INSERT INTO `user_message_ext` (`id`, `user_id`, `message_id`, `is_read`, `first_read_time`, `last_read_time`,
+                                `create_time`, `update_time`)
+VALUES (1956636878873980930, 2, 2, 1, '2025-08-16 16:39:19', '2025-08-16 16:39:19', '2025-08-16 16:39:19',
+        '2025-08-16 16:39:19');
+INSERT INTO `user_message_ext` (`id`, `user_id`, `message_id`, `is_read`, `first_read_time`, `last_read_time`,
+                                `create_time`, `update_time`)
+VALUES (1956948910819143682, 2, 1, 1, '2025-08-17 13:19:13', '2025-08-17 13:19:13', '2025-08-17 13:19:13',
+        '2025-08-17 13:19:13');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

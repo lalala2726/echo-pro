@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.enums.DeviceType;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -33,19 +34,21 @@ public class LoginRequest {
      * 验证码
      */
     @Schema(description = "验证码", type = "string", example = "123456")
+    @NotNull(message = "验证码不能为空!")
     private String code;
 
     /**
      * 验证码唯一标识
      */
     @Schema(description = "普通验证码唯一标识", type = "string", example = "1001")
+    @NotNull(message = "验证码唯一标识不能为空!")
     private String uuid;
 
 
     /**
      * 设备类型
      */
-    @Schema(description = "设备类型", type = "string", allowableValues = {"web", "pc", "mobile", "miniProgram", "unknown"}, defaultValue = "WEB")
+    @Schema(description = "设备类型", type = "string", allowableValues = {"WEB", "PC", "MOBILE", "MINI_PROGRAM", "UNKNOWN"}, defaultValue = "WEB")
     private DeviceType deviceType = DeviceType.WEB;
 
 
