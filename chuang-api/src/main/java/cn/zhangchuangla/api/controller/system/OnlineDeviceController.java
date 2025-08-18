@@ -74,7 +74,7 @@ public class OnlineDeviceController extends BaseController {
     @PostMapping("/export")
     @OperationLog(title = "会话管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermission('system:online-device:export')")
-    public void exportSession(@RequestBody SessionDeviceQueryRequest request, HttpServletResponse response) {
+    public void exportSession(@RequestBody(required = false) SessionDeviceQueryRequest request, HttpServletResponse response) {
         request.setPageNum(-1);
         request.setPageNum(-1);
         PageResult<SessionDevice> sessionDevicePageResult = deviceService.listDevice(request);

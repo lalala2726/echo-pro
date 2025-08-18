@@ -5,6 +5,7 @@ import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
+import cn.zhangchuangla.common.core.utils.BeanCotyUtils;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * @author Chuang
@@ -55,9 +58,11 @@ public class OnlineSessionController extends BaseController {
     @GetMapping("/detail")
     @Operation(summary = "会话详情")
     @PreAuthorize("@ss.hasPermission('system:online-session:query')")
-    public AjaxResult<OnlineLoginUser> sessionDetail(@RequestParam("accessTokenId") String accessTokenId) {
+    public AjaxResult<OnlineLoginUserVo> sessionDetail(@RequestParam("accessTokenId") String accessTokenId) {
         OnlineLoginUser onlineLoginUser = sessionService.sessionDetail(accessTokenId);
-        return AjaxResult.success(onlineLoginUser);
+        OnlineLoginUserVo onlineLoginUserVo = BeanCotyUtils.copyProperties(onlineLoginUser, OnlineLoginUserVo.class);
+        onlineLoginUserVo.setAccessTime(new Date(onlineLoginUser.getAccessTime()));
+        return AjaxResult.success(onlineLoginUserVo);
     }
 
     /**
@@ -85,7 +90,7 @@ public class OnlineSessionController extends BaseController {
     @Operation(summary = "导出会话数据")
     @OperationLog(title = "会话管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermission('monitor:session:export')")
-    public void exportSession(@RequestBody OnlineUserQueryRequest request, HttpServletResponse response) {
+    public void exportSession(@RequestBody(required = false) OnlineUserQueryRequest request, HttpServletResponse response) {
         request.setPageNum(-1);
         request.setPageSize(-1);
         PageResult<OnlineLoginUserVo> onlineLoginUserPageResult = sessionService.sessionList(request);

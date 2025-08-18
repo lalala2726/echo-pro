@@ -69,7 +69,7 @@ public class OperationLogController extends BaseController {
     @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermission('system:log-operation:export')")
     public void exportOperationLog(@Parameter(description = "登录日志导出")
-                                   @ParameterObject SysOperationLogQueryRequest request,
+                                       @RequestBody(required = false) SysOperationLogQueryRequest request,
                                    HttpServletResponse response) {
         List<SysOperationLog> sysOperationLogs = sysOperationLogService.exportOperationLog(request);
         List<SysOperationLogVo> sysOperationLogVos = copyListProperties(sysOperationLogs, SysOperationLogVo.class);

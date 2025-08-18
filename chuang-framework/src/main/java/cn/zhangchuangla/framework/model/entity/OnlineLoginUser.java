@@ -1,6 +1,5 @@
 package cn.zhangchuangla.framework.model.entity;
 
-import cn.zhangchuangla.common.excel.annotation.Excel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,61 +24,51 @@ public class OnlineLoginUser {
     /**
      * 访问令牌ID
      */
-    @Excel(name = "会话ID")
     private String accessTokenId;
 
     /**
      * 刷新令牌ID
      */
-    @Excel(name = "刷新令牌ID")
     private String refreshTokenId;
 
     /**
      * 用户ID
      */
-    @Excel(name = "用户ID")
     private Long userId;
 
     /**
      * 用户名
      */
-    @Excel(name = "用户名")
     private String username;
 
     /**
      * 部门ID
      */
-    @Excel(name = "部门ID")
     private Long deptId;
 
     /**
      * 角色权限集合
      */
-    @Excel(name = "角色权限集合")
     private Set<String> roles;
 
     /**
      * 登录IP地址
      */
-    @Excel(name = "登录IP地址")
     private String ip;
 
     /**
      * 登录地点
      */
-    @Excel(name = "登录地点")
     private String location;
 
     /**
      * 访问时间
      */
-    @Excel(name = "访问时间")
     private Long accessTime;
 
     /**
      * userAgent
      */
-    @Excel(name = "userAgent")
     private String userAgent;
 
 
