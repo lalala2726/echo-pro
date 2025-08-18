@@ -70,7 +70,7 @@ public class LoginLogController extends BaseController {
     @PostMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:log-login:export')")
     @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
-    public void exportStorageConfig(@ParameterObject SysLoginLogQueryRequest request, HttpServletResponse response) {
+    public void exportStorageConfig(@RequestBody(required = false) SysLoginLogQueryRequest request, HttpServletResponse response) {
         List<SysLoginLog> loginLogs = sysLoginLogService.exportLoginLog(request);
         List<SysLoginLogVo> storageConfigListVos = copyListProperties(loginLogs, SysLoginLogVo.class);
         excelExporter.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
