@@ -171,18 +171,14 @@ public final class RedisCache {
         if (!StringUtils.hasText(pattern)) {
             return new HashMap<>();
         }
-
         // 首先扫描获取所有匹配的键
         List<String> keys = scanKeys(pattern);
         if (keys.isEmpty()) {
             return new HashMap<>();
         }
-
         Map<String, Object> result = new HashMap<>();
         try {
-            // 批量获取值以提高性能
             List<Object> values = redisTemplate.opsForValue().multiGet(keys);
-
             for (int i = 0; i < keys.size(); i++) {
                 String key = keys.get(i);
                 Object value = (values != null && i < values.size()) ? values.get(i) : null;

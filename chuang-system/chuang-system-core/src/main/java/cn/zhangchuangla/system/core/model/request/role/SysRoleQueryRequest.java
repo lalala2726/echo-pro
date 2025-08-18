@@ -33,7 +33,7 @@ public class SysRoleQueryRequest extends BasePageRequest {
     /**
      * 状态
      */
-    @Schema(description = "状态", example = "1", type = "integer", format = "integer")
+    @Schema(description = "状态", example = "1", type = "string")
     private Integer status;
 
     /**

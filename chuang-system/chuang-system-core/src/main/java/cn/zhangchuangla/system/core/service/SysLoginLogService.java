@@ -56,5 +56,13 @@ public interface SysLoginLogService extends IService<SysLoginLog> {
      * @return 是否成功
      */
     SysLoginLog getLoginLogById(Long id);
+
+    /**
+     * 根据ID删除登录日志
+     *
+     * @param ids 主键
+     * @return 是否成功
+     */
+    boolean deleteLoginLogById(List<Long> ids);
 }
 

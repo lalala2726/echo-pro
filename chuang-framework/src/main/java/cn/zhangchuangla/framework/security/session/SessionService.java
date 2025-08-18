@@ -4,18 +4,17 @@ import cn.zhangchuangla.common.core.entity.base.PageResult;
 import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.redis.constant.RedisConstants;
 import cn.zhangchuangla.common.redis.core.RedisCache;
-import cn.zhangchuangla.framework.model.vo.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.vo.OnlineLoginUserVo;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +37,7 @@ public class SessionService {
      * @param request 查询参数
      * @return 在线用户列表
      */
-    public PageResult<OnlineLoginUser> sessionList(OnlineUserQueryRequest request) {
+    public PageResult<OnlineLoginUserVo> sessionList(OnlineUserQueryRequest request) {
         String accessTokenRedisKey = RedisConstants.Auth.USER_ACCESS_TOKEN + "*";
         List<OnlineLoginUser> sessionList = new ArrayList<>();
         Map<String, Object> stringObjectMap = redisCache.scanKeysWithValues(accessTokenRedisKey);
@@ -58,7 +57,7 @@ public class SessionService {
      * @param request     查询参数
      * @return 查询结果
      */
-    private PageResult<OnlineLoginUser> queryOnlineUsers(List<OnlineLoginUser> onlineUsers, OnlineUserQueryRequest request) {
+    private PageResult<OnlineLoginUserVo> queryOnlineUsers(List<OnlineLoginUser> onlineUsers, OnlineUserQueryRequest request) {
         // 关键字段过滤条件
         String sessionIdKeyword = request.getSessionId();
         String usernameKeyword = request.getUsername();
@@ -136,11 +135,16 @@ public class SessionService {
                     .collect(Collectors.toList());
         }
 
-        return PageResult.<OnlineLoginUser>builder()
+        // 转换为VO对象
+        List<OnlineLoginUserVo> voRows = rows.stream()
+                .map(this::convertToVo)
+                .collect(Collectors.toList());
+
+        return PageResult.<OnlineLoginUserVo>builder()
                 .pageNum(noPaging ? -1L : pageNum)
                 .pageSize(noPaging ? -1L : pageSize)
                 .total(total)
-                .rows(rows)
+                .rows(voRows)
                 .build();
     }
 
@@ -170,5 +174,23 @@ public class SessionService {
         redisTokenStore.deleteAccessToken(accessTokenId);
         redisTokenStore.deleteRefreshToken(refreshTokenId);
         return true;
+    }
+
+    /**
+     * 将OnlineLoginUser转换为OnlineLoginUserVo
+     *
+     * @param entity 实体对象
+     * @return VO对象
+     */
+    private OnlineLoginUserVo convertToVo(OnlineLoginUser entity) {
+        OnlineLoginUserVo vo = new OnlineLoginUserVo();
+        BeanUtils.copyProperties(entity, vo);
+
+        // 特殊处理accessTime字段：Long -> Date
+        if (entity.getAccessTime() != null) {
+            vo.setAccessTime(new Date(entity.getAccessTime()));
+        }
+
+        return vo;
     }
 }

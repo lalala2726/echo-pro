@@ -1,6 +1,7 @@
 package cn.zhangchuangla.system.core.service.impl;
 
 import cn.zhangchuangla.common.core.constant.Constants;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.core.utils.client.IPUtils;
 import cn.zhangchuangla.common.core.utils.client.UserAgentUtils;
 import cn.zhangchuangla.system.core.mapper.SysLoginLogMapper;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -65,7 +67,6 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
                 browserRenderingEngine,
                 region
         );
-
 
         // 记录登录日志
         SysLoginLog sysLoginLog = SysLoginLog.builder()
@@ -126,6 +127,18 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
     @Override
     public SysLoginLog getLoginLogById(Long id) {
         return getById(id);
+    }
+
+    /**
+     * 删除登录日志
+     *
+     * @param ids 主键列表
+     * @return 是否成功
+     */
+    @Override
+    public boolean deleteLoginLogById(List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的登录日志");
+        return removeByIds(ids);
     }
 }
 

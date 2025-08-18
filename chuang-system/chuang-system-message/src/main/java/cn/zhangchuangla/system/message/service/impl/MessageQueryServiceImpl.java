@@ -70,22 +70,17 @@ public class MessageQueryServiceImpl implements MessageQueryService {
      *
      * @param request 查询参数，包含分页信息和筛选条件
      * @return 包含已读状态的用户消息分页结果
-     * @throws ServiceException 当查询参数无效时抛出
      */
     @Override
     public Page<UserMessageDto> listUserMessageList(UserMessageListQueryRequest request) {
 
         final Long currentUserId = SecurityUtils.getUserId();
-
         // 执行分页查询
         Page<SysMessage> messagePage = executeMessageQuery(request, currentUserId);
-
         // 批量获取并填充已读和未读状态
         List<UserMessageDto> messageWithReadStatus = buildMessageDtosWithReadStatus(
                 messagePage.getRecords(), currentUserId);
-
         // 构建最终结果
-
         return buildResultPage(messagePage, messageWithReadStatus);
     }
 
@@ -98,7 +93,6 @@ public class MessageQueryServiceImpl implements MessageQueryService {
      */
     private Page<SysMessage> executeMessageQuery(UserMessageListQueryRequest request, Long userId) {
         Page<SysMessage> messagePage = new Page<>(request.getPageNum(), request.getPageSize());
-
         // 根据是否有已读状态筛选条件选择不同的查询策略
         if (Objects.nonNull(request.getIsRead())) {
             return executeReadStatusFilteredQuery(messagePage, userId, request);

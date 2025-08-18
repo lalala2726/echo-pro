@@ -46,6 +46,16 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (isDeptNameExist(request.getDeptName())) {
             throw new ServiceException(ResultCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
+
+        // 检查父部门设置是否合理
+        if (request.getParentId() != null && !request.getParentId().equals(0L)) {
+            // 检查父部门是否存在
+            SysDept parentDept = getById(request.getParentId());
+            if (parentDept == null) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "指定的父部门不存在！");
+            }
+        }
+
         if (request.getParentId() == null || request.getParentId() == 0) {
             request.setParentId(0L);
         }
@@ -67,6 +77,20 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         if (count(ne) > 0) {
             throw new ServiceException(ResultCode.DICT_NAME_EXIST, "部门名称已存在！");
         }
+
+        // 检查父部门设置是否合理，避免形成循环依赖
+        if (request.getParentId() != null && !request.getParentId().equals(0L)) {
+            // 不能将部门设置为自己的子部门
+            if (request.getParentId().equals(request.getDeptId())) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "不能将部门设置为自己的父部门！");
+            }
+
+            // 检查是否试图将部门设置为其子部门的父部门
+            if (isChildOf(request.getParentId(), request.getDeptId())) {
+                throw new ServiceException(ResultCode.OPERATION_ERROR, "不能将部门设置为其子部门的父部门！");
+            }
+        }
+
         SysDept sysDept = BeanCotyUtils.copyProperties(request, SysDept.class);
         return updateById(sysDept);
     }
@@ -175,5 +199,31 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
                     return node;
                 })
                 .toList();
+    }
+
+    /**
+     * 检查某个部门是否是另一个部门的子部门（递归检查）
+     *
+     * @param childId  可能的子部门ID
+     * @param parentId 父部门ID
+     * @return true 如果childId是parentId的子部门，否则false
+     */
+    private boolean isChildOf(Long childId, Long parentId) {
+        if (childId == null || parentId == null) {
+            return false;
+        }
+
+        SysDept childDept = getById(childId);
+        if (childDept == null || childDept.getParentId() == null) {
+            return false;
+        }
+
+        // 如果直接父部门就是目标部门
+        if (childDept.getParentId().equals(parentId)) {
+            return true;
+        }
+
+        // 递归检查父部门的父部门
+        return isChildOf(childDept.getParentId(), parentId);
     }
 }

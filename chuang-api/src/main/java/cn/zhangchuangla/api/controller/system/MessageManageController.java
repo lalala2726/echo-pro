@@ -119,9 +119,9 @@ public class MessageManageController extends BaseController {
     @Operation(summary = "导出系统消息表列表")
     @PreAuthorize("@ss.hasPermission('system.message:export')")
     @OperationLog(title = "系统消息表管理", businessType = BusinessType.EXPORT)
-    public void exportMessage(HttpServletResponse response, SysMessageQueryRequest request) {
-        Page<SysMessage> sysMessagePage = sysMessageService.listSysMessage(request);
-        List<SysMessageExportVo> voList = copyListProperties(sysMessagePage, SysMessageExportVo.class);
+    public void exportMessage(@RequestBody(required = false) SysMessageQueryRequest request, HttpServletResponse response) {
+        List<SysMessage> exportMessageList = sysMessageService.exportMessageList(request);
+        List<SysMessageExportVo> voList = copyListProperties(exportMessageList, SysMessageExportVo.class);
         excelExporter.exportExcel(response, voList, SysMessageExportVo.class, "系统消息表列表");
     }
 

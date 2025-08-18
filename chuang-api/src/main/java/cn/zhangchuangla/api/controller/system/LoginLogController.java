@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.core.model.entity.SysLoginLog;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,7 +70,7 @@ public class LoginLogController extends BaseController {
     @PostMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:log-login:export')")
     @OperationLog(title = "登录日志", businessType = BusinessType.EXPORT)
-    public void exportStorageConfig(@ParameterObject SysLoginLogQueryRequest request, HttpServletResponse response) {
+    public void exportStorageConfig(@RequestBody(required = false) SysLoginLogQueryRequest request, HttpServletResponse response) {
         List<SysLoginLog> loginLogs = sysLoginLogService.exportLoginLog(request);
         List<SysLoginLogVo> storageConfigListVos = copyListProperties(loginLogs, SysLoginLogVo.class);
         excelExporter.exportExcel(response, storageConfigListVos, SysLoginLogVo.class, "存储配置列表");
@@ -89,6 +91,23 @@ public class LoginLogController extends BaseController {
         SysLoginLogVo sysLoginLogVo = new SysLoginLogVo();
         BeanUtils.copyProperties(sysLoginLog, sysLoginLogVo);
         return success(sysLoginLogVo);
+    }
+
+    /**
+     * 删除登录日志
+     *
+     * @param ids 登录日志ID列表
+     * @return 删除结果
+     */
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除登录日志")
+    @PreAuthorize("@ss.hasPermission('system:log-login:delete')")
+    @OperationLog(title = "登录日志", businessType = BusinessType.DELETE)
+    public AjaxResult<Void> removeLoginLog(@Parameter(description = "登录日志ID列表")
+                                           @PathVariable("ids") List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的登录日志");
+        boolean result = sysLoginLogService.deleteLoginLogById(ids);
+        return toAjax(result);
     }
 
 

@@ -32,7 +32,7 @@ public interface SysNoticeMapper extends BaseMapper<SysNotice> {
      * @param request 查询参数
      * @return 公告列表
      */
-    List<SysNotice> exportNoticeList(SysNoticeQueryRequest request);
+    List<SysNotice> exportNoticeList(@Param("request") SysNoticeQueryRequest request);
 }
 
 

@@ -29,4 +29,9 @@ public class SysRoleMenu {
      * 菜单ID
      */
     private Long menuId;
+
+    /**
+     * 权限类型
+     */
+    private Integer permissionType;
 }

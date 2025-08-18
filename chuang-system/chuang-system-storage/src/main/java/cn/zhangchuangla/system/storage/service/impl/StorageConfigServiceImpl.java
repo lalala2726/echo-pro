@@ -283,10 +283,15 @@ public class StorageConfigServiceImpl extends ServiceImpl<StorageConfigMapper, S
      */
     @Override
     public boolean cancelPrimary() {
-        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>().eq(StorageConfig::getIsPrimary, true);
-        StorageConfig storageConfig = new StorageConfig();
-        storageConfig.setIsPrimary(false);
-        return update(storageConfig, eq);
+        StorageConfig storageConfig = getPrimaryConfig();
+        if (storageConfig == null) {
+            throw new ServiceException(ResultCode.RESULT_IS_NULL, "没有主文件配置");
+        }
+        LambdaQueryWrapper<StorageConfig> eq = new LambdaQueryWrapper<StorageConfig>()
+                .eq(StorageConfig::getIsPrimary, true);
+        StorageConfig config = new StorageConfig();
+        config.setIsPrimary(false);
+        return update(config, eq);
     }
 
     /**

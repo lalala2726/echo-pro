@@ -29,7 +29,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
     @Schema(description = "消息类型", allowableValues = {"system", "notice", "announcement"}, example = "system")
     private MessageTypeEnum type;
 
-
     /**
      * 消息级别
      */
@@ -41,7 +40,6 @@ public class UserMessageListQueryRequest extends BasePageRequest {
      */
     @Schema(description = "是否已读", type = "boolean", example = "true")
     private Boolean isRead;
-
 
     /**
      * 发送者姓名

@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.core.model.entity.SysNotice;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeAddRequest;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeQueryRequest;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeUpdateRequest;
+import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeExportVo;
 import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeListVo;
 import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeVo;
 import cn.zhangchuangla.system.core.service.SysNoticeService;
@@ -117,7 +118,7 @@ public class NoticeController extends BaseController {
     @Operation(summary = "删除公告", description = "批量删除公告")
     @PreAuthorize("@ss.hasPermission('system:notice:delete')")
     @OperationLog(title = "公告管理", businessType = BusinessType.DELETE)
-    public AjaxResult<Void> remove(@Parameter(description = "公告ID列表，多个用逗号分隔") @PathVariable List<Long> ids) {
+    public AjaxResult<Void> remove(@Parameter(description = "公告ID列表，多个用逗号分隔") @PathVariable("ids") List<Long> ids) {
         Assert.notEmpty(ids, "公告ID不能为空");
         boolean result = sysNoticeService.deleteNotice(ids);
         return result ? success("删除成功") : error("删除失败");
@@ -134,10 +135,10 @@ public class NoticeController extends BaseController {
     @Operation(summary = "导出公告", description = "导出公告")
     @PreAuthorize("@ss.hasPermission('system:notice:export')")
     @OperationLog(title = "公告管理", businessType = BusinessType.EXPORT)
-    public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody SysNoticeQueryRequest request, HttpServletResponse response) {
+    public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody(required = false) SysNoticeQueryRequest request, HttpServletResponse response) {
         List<SysNotice> list = sysNoticeService.exportNoticeList(request);
-        List<SysNoticeListVo> sysNoticeListVos = copyListProperties(list, SysNoticeListVo.class);
-        excelExporter.exportExcel(response, sysNoticeListVos, SysNoticeListVo.class, "公告列表");
+        List<SysNoticeExportVo> sysNoticeExportVos = copyListProperties(list, SysNoticeExportVo.class);
+        excelExporter.exportExcel(response, sysNoticeExportVos, SysNoticeExportVo.class, "公告列表");
     }
 
 

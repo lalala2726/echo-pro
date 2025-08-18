@@ -188,7 +188,7 @@ public class JobController extends BaseController {
     @Operation(summary = "导出定时任务")
     @PreAuthorize("@ss.hasPermission('tool:job:export')")
     @OperationLog(title = "定时任务", businessType = BusinessType.EXPORT)
-    public void exportJob(@Parameter(description = "定时任务导出查询参数") @RequestBody SysJobQueryRequest request,
+    public void exportJob(@Parameter(description = "定时任务导出查询参数") @RequestBody(required = false) SysJobQueryRequest request,
                           HttpServletResponse response) {
         List<SysJob> sysJobPage = sysJobService.exportJobList(request);
         List<SysJobVo> sysJobVos = copyListProperties(sysJobPage, SysJobVo.class);

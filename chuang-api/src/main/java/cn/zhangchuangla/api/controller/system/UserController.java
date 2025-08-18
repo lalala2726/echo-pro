@@ -208,7 +208,7 @@ public class UserController extends BaseController {
     @OperationLog(title = "用户管理", businessType = BusinessType.EXPORT)
     public void exportExcel(HttpServletResponse response,
                             @Parameter(description = "用户查询参数，包含分页和筛选条件")
-                            @RequestBody SysUserQueryRequest request) {
+                            @RequestBody(required = false) SysUserQueryRequest request) {
         List<SysUser> userList = sysUserService.exportListUser(request);
         ArrayList<SysUserListVo> sysUserListVos = new ArrayList<>();
         userList.forEach(user -> {

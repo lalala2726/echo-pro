@@ -68,7 +68,7 @@ public class StorageConfigController extends BaseController {
     @Operation(summary = "导出存储配置")
     @PostMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:storage-config:export')")
-    public void exportStorageConfig(@ParameterObject StorageConfigQueryRequest request, HttpServletResponse response) {
+    public void exportStorageConfig(@RequestBody(required = false) StorageConfigQueryRequest request, HttpServletResponse response) {
         List<StorageConfigUnifiedVo> storageConfigUnifiedVos = storageConfigService.listStorageConfig(request);
         excelExporter.exportExcel(response, storageConfigUnifiedVos, StorageConfigUnifiedVo.class, "存储配置列表");
     }

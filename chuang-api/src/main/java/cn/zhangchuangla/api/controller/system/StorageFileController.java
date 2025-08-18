@@ -4,6 +4,7 @@ import cn.zhangchuangla.common.core.base.BaseController;
 import cn.zhangchuangla.common.core.entity.base.AjaxResult;
 import cn.zhangchuangla.common.core.entity.base.TableDataResult;
 import cn.zhangchuangla.common.core.enums.BusinessType;
+import cn.zhangchuangla.common.core.utils.Assert;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.system.storage.model.entity.StorageFile;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -137,7 +139,24 @@ public class StorageFileController extends BaseController {
     public AjaxResult<Void> deleteFile(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids,
                                        @Parameter(description = "是否永久删除")
                                        @RequestParam(value = "forceDelete", required = false, defaultValue = "false") boolean forceDelete) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的文件");
         boolean result = storageFileService.deleteFileById(ids, forceDelete);
+        return toAjax(result);
+    }
+
+    /**
+     * 删除文件记录,此操作用于删除文件记录，不删除文件本身
+     *
+     * @param ids 文件ID集合
+     * @return 删除结果
+     */
+    @DeleteMapping("/record/{ids}")
+    @Operation(summary = "删除文件记录")
+    @OperationLog(title = "文件资源", businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermission('system:storage-file:delete')")
+    public AjaxResult<Void> deleteFileRecord(@Parameter(description = "文件ID集合，支持批量删除") @PathVariable("ids") List<Long> ids) {
+        Assert.isTrue(CollectionUtils.isNotEmpty(ids), "请选择要删除的文件");
+        boolean result = storageFileService.deleteFileRecordById(ids);
         return toAjax(result);
     }
 

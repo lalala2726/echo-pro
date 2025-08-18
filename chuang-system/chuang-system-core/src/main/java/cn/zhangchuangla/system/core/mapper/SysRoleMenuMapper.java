@@ -21,6 +21,14 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
      * @return 菜单ID列表
      */
     List<Long> selectMenuListByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     * 根据角色ID查询直接分配的菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 直接分配的菜单ID列表
+     */
+    List<Long> selectDirectMenuListByRoleId(@Param("roleId") Long roleId);
 }
 
 

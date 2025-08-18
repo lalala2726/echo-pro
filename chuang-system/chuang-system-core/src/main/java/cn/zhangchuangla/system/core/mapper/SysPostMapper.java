@@ -28,7 +28,7 @@ public interface SysPostMapper extends BaseMapper<SysPost> {
      * @param request 查询参数
      * @return 岗位列表
      */
-    List<SysPost> exportPostList(SysPostQueryRequest request);
+    List<SysPost> exportPostList(@Param("request") SysPostQueryRequest request);
 }
 
 

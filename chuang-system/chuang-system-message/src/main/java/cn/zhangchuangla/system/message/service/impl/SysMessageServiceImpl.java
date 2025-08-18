@@ -477,4 +477,15 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     public Page<SysMessage> pageUserMessageIsUnRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds) {
         return sysMessageMapper.pageUserMessageIsUnRead(sysMessagePage, userId, request, messageIds);
     }
+
+    /**
+     * 导出消息列表
+     *
+     * @param request 查询参数
+     * @return 消息列表
+     */
+    @Override
+    public List<SysMessage> exportMessageList(SysMessageQueryRequest request) {
+        return sysMessageMapper.exportMessageList(request);
+    }
 }

@@ -98,23 +98,64 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         if (RolesConstant.SUPER_ADMIN.equals(sysRole.getRoleKey())) {
             throw new ServiceException(ResultCode.OPERATION_ERROR, "超级管理员角色不允许修改");
         }
+
+        // 删除旧权限
         sysRoleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
+
         if (request.getAllocatedMenuId() != null && !request.getAllocatedMenuId().isEmpty()) {
-            List<SysRoleMenu> roleMenusToInsert = request.getAllocatedMenuId().stream()
+            // 获取所有菜单数据
+            List<SysMenu> allMenus = sysMenuService.list();
+            Map<Long, SysMenu> menuMap = allMenus.stream()
+                    .collect(Collectors.toMap(SysMenu::getId, menu -> menu));
+            
+            // 用户直接分配的菜单ID
+            Set<Long> directMenuIds = new HashSet<>(request.getAllocatedMenuId());
+
+            // 包含父级菜单的完整菜单ID集合
+            Set<Long> completeMenuIds = new HashSet<>();
+            for (Long menuId : directMenuIds) {
+                addMenuWithAncestors(menuId, menuMap, completeMenuIds);
+            }
+
+            // 批量插入权限
+            List<SysRoleMenu> roleMenusToInsert = completeMenuIds.stream()
                     .map(menuId -> {
                         SysRoleMenu sysRoleMenu = new SysRoleMenu();
                         sysRoleMenu.setRoleId(roleId);
                         sysRoleMenu.setMenuId(menuId);
+                        // 设置权限类型：1-直接分配，2-自动添加的父级权限
+                        sysRoleMenu.setPermissionType(directMenuIds.contains(menuId) ? 1 : 2);
                         return sysRoleMenu;
                     }).toList();
+
             return sysRoleMenuService.saveBatch(roleMenusToInsert);
         }
         return true;
     }
 
+    /**
+     * 递归添加菜单及其所有父级菜单
+     *
+     * @param menuId    菜单ID
+     * @param menuMap   菜单映射
+     * @param resultSet 结果集合
+     */
+    private void addMenuWithAncestors(Long menuId, Map<Long, SysMenu> menuMap, Set<Long> resultSet) {
+        if (menuId == null || resultSet.contains(menuId)) {
+            return;
+        }
+
+        resultSet.add(menuId);
+
+        SysMenu menu = menuMap.get(menuId);
+        if (menu != null && menu.getParentId() != null && menu.getParentId() != 0L) {
+            addMenuWithAncestors(menu.getParentId(), menuMap, resultSet);
+        }
+    }
+
 
     /**
-     * 根据角色ID获取已分配的权限ID列表
+     * 根据角色ID获取已分配的权限ID列表（仅返回直接分配的权限）
      *
      * @param roleId 角色ID
      * @return 已分配的权限ID列表
@@ -124,11 +165,15 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         if (roleId == null) {
             return Collections.emptyList();
         }
-        Set<String> roleKeys = sysRoleService.getRoleSetByRoleId(roleId);
-        if (roleKeys.contains(RolesConstant.SUPER_ADMIN)) {
-            return sysMenuService.list().stream().map(SysMenu::getId).distinct().collect(Collectors.toList());
-        }
-        return sysRoleMenuService.selectMenuListByRoleId(roleId);
+
+        // 无论是否为超级管理员，都只返回直接分配的权限（permissionType = 1）
+        // 这样确保前端权限分配界面显示正确
+        return sysRoleMenuService.list(new LambdaQueryWrapper<SysRoleMenu>()
+                        .eq(SysRoleMenu::getRoleId, roleId)
+                        .eq(SysRoleMenu::getPermissionType, 1))
+                .stream()
+                .map(SysRoleMenu::getMenuId)
+                .collect(Collectors.toList());
     }
 
 

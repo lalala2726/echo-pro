@@ -341,14 +341,14 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
 
         // 校验文件存储类型一致性，并检查文件是否确实在回收站中
         String activeStorageType = storageConfigRetrievalService.getActiveStorageType();
-        recordList.forEach(StorageFile -> {
-            validateStorageConsistency(activeStorageType, StorageFile);
+        recordList.forEach(storageFile -> {
+            validateStorageConsistency(activeStorageType, storageFile);
 
             // 确保文件处于回收站状态
-            if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(StorageFile.getIsTrash())) {
+            if (!StorageConstants.dataVerifyConstants.IN_TRASH.equals(storageFile.getIsTrash())) {
                 throw new ServiceException(
                         ResultCode.OPERATION_ERROR,
-                        String.format("文件 %s 不在回收站中，无法执行删除操作", StorageFile.getOriginalName())
+                        String.format("文件 %s 不在回收站中，无法执行删除操作", storageFile.getOriginalName())
                 );
             }
         });
@@ -393,6 +393,18 @@ public class StorageFileServiceImpl extends ServiceImpl<StorageFileMapper, Stora
     @Override
     public List<StorageFile> exportListFile(StorageFileQueryRequest request) {
         return storageFileMapper.exportListFile(request);
+    }
+
+    /**
+     * 删除文件记录
+     *
+     * @param ids 文件ID列表
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteFileRecordById(List<Long> ids) {
+        return removeByIds(ids);
     }
 
 
