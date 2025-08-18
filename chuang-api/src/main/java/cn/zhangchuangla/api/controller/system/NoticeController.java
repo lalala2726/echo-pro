@@ -12,6 +12,7 @@ import cn.zhangchuangla.system.core.model.entity.SysNotice;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeAddRequest;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeQueryRequest;
 import cn.zhangchuangla.system.core.model.request.notice.SysNoticeUpdateRequest;
+import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeExportVo;
 import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeListVo;
 import cn.zhangchuangla.system.core.model.vo.notice.SysNoticeVo;
 import cn.zhangchuangla.system.core.service.SysNoticeService;
@@ -136,8 +137,8 @@ public class NoticeController extends BaseController {
     @OperationLog(title = "公告管理", businessType = BusinessType.EXPORT)
     public void exportNoticeList(@Parameter(description = "查询参数") @RequestBody(required = false) SysNoticeQueryRequest request, HttpServletResponse response) {
         List<SysNotice> list = sysNoticeService.exportNoticeList(request);
-        List<SysNoticeListVo> sysNoticeListVos = copyListProperties(list, SysNoticeListVo.class);
-        excelExporter.exportExcel(response, sysNoticeListVos, SysNoticeListVo.class, "公告列表");
+        List<SysNoticeExportVo> sysNoticeExportVos = copyListProperties(list, SysNoticeExportVo.class);
+        excelExporter.exportExcel(response, sysNoticeExportVos, SysNoticeExportVo.class, "公告列表");
     }
 
 

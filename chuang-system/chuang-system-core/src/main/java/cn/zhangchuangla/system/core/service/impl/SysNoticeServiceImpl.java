@@ -113,13 +113,6 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
      */
     @Override
     public List<SysNotice> exportNoticeList(SysNoticeQueryRequest request) {
-        List<SysNotice> list = sysNoticeMapper.exportNoticeList(request);
-        // 导出时仅保留纯文字，避免富文本中的潜在XSS
-        list.forEach(n -> {
-            if (n.getNoticeContent() != null) {
-                n.setNoticeContent(XssUtils.extractPlainText(n.getNoticeContent()));
-            }
-        });
-        return list;
+        return sysNoticeMapper.exportNoticeList(request);
     }
 }
