@@ -8,6 +8,7 @@ import cn.zhangchuangla.common.core.enums.BusinessType;
 import cn.zhangchuangla.common.excel.utils.ExcelExporter;
 import cn.zhangchuangla.framework.annotation.OperationLog;
 import cn.zhangchuangla.framework.model.entity.OnlineLoginUser;
+import cn.zhangchuangla.framework.model.vo.OnlineLoginUserVo;
 import cn.zhangchuangla.framework.security.session.SessionService;
 import cn.zhangchuangla.system.core.model.request.monitor.OnlineUserQueryRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +42,7 @@ public class OnlineSessionController extends BaseController {
     @Operation(summary = "会话列表")
     @PreAuthorize("@ss.hasPermission('system:online-session:list')")
     public AjaxResult<TableDataResult> sessionList(OnlineUserQueryRequest request) {
-        PageResult<OnlineLoginUser> onlineUserPageResult = sessionService.sessionList(request);
+        PageResult<OnlineLoginUserVo> onlineUserPageResult = sessionService.sessionList(request);
         return getTableData(onlineUserPageResult);
     }
 
@@ -87,8 +88,8 @@ public class OnlineSessionController extends BaseController {
     public void exportSession(@RequestBody OnlineUserQueryRequest request, HttpServletResponse response) {
         request.setPageNum(-1);
         request.setPageSize(-1);
-        PageResult<OnlineLoginUser> onlineLoginUserPageResult = sessionService.sessionList(request);
-        excelExporter.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUser.class, "登录用户列表");
+        PageResult<OnlineLoginUserVo> onlineLoginUserPageResult = sessionService.sessionList(request);
+        excelExporter.exportExcel(response, onlineLoginUserPageResult.getRows(), OnlineLoginUserVo.class, "登录用户列表");
     }
 
 }
