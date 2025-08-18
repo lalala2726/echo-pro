@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 文件上传记录表
  *
@@ -47,9 +45,4 @@ public class StorageFileQueryRequest extends BasePageRequest {
     @Schema(description = "上传者名称", type = "string", example = "张三")
     private String uploaderName;
 
-    /**
-     * 上传时间
-     */
-    @Schema(description = "上传时间", type = "string", example = "2023-01-01 00:00:00")
-    private Date uploadTime;
 }

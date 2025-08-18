@@ -62,6 +62,12 @@
             <if test="request.contentType != null and request.contentType != ''">
                 and content_type = #{request.contentType}
             </if>
+            <if test="request.bucketName != null and request.bucketName != ''">
+                and bucket_name = #{request.bucketName}
+            </if>
+            <if test="request.uploaderName != null and request.uploaderName != ''">
+                and uploader_name like concat('%', #{request.uploaderName}, '%')
+            </if>
             AND is_deleted = 0
             AND is_trash = 1
         </where>
@@ -69,7 +75,8 @@
     </select>
 
     <select id="exportListFile" resultMap="BaseResultMap">
-        select id, file_name, original_name, content_type, file_size, original_file_url, original_relative_path,
+        select
+        id, file_name, original_name, content_type, file_size, original_file_url, original_relative_path,
         preview_image_url, preview_relative_path, file_extension, storage_type, bucket_name, uploader_id, uploader_name,
         upload_time, original_trash_path, preview_trash_path, update_time, is_trash, is_deleted
         from storage_file
@@ -83,8 +90,16 @@
             <if test="request.contentType != null and request.contentType != ''">
                 and content_type = #{request.contentType}
             </if>
-            is_deleted = 0
+            <if test="request.bucketName != null and request.bucketName != ''">
+                and bucket_name = #{request.bucketName}
+            </if>
+            <if test="request.uploaderName != null and request.uploaderName != ''">
+                and uploader_name like concat('%', #{request.uploaderName}, '%')
+            </if>
+            AND is_deleted = 0
+            AND is_trash = 0
         </where>
         order by upload_time desc
     </select>
+
 </mapper>

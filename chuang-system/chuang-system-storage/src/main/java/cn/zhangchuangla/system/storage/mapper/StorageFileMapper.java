@@ -38,7 +38,7 @@ public interface StorageFileMapper extends BaseMapper<StorageFile> {
      * @param request 请求参数
      * @return 结果
      */
-    List<StorageFile> exportListFile(StorageFileQueryRequest request);
+    List<StorageFile> exportListFile(@Param("request") StorageFileQueryRequest request);
 }
 
 

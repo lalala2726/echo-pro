@@ -171,7 +171,7 @@ public class StorageFileController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:storage-file:export')")
     @OperationLog(title = "文件资源", businessType = BusinessType.EXPORT)
     public void export(@Parameter(description = "查询条件用于筛选文件")
-                       @RequestBody StorageFileQueryRequest request, HttpServletResponse response) {
+                           @RequestBody(required = false) StorageFileQueryRequest request, HttpServletResponse response) {
         List<StorageFile> fileList = storageFileService.exportListFile(request);
         List<StorageFileListVo> storageFileListVos = copyListProperties(fileList, StorageFileListVo.class);
         excelExporter.exportExcel(response, storageFileListVos, StorageFileListVo.class, "文件列表");
