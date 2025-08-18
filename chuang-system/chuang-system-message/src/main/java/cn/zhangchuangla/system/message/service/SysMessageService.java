@@ -146,4 +146,12 @@ public interface SysMessageService extends IService<SysMessage> {
      * @return 分页结果
      */
     Page<SysMessage> pageUserMessageIsUnRead(Page<SysMessage> sysMessagePage, Long userId, UserMessageListQueryRequest request, List<Long> messageIds);
+
+    /**
+     * 导出消息列表
+     *
+     * @param request 查询参数
+     * @return 导出结果
+     */
+    List<SysMessage> exportMessageList(SysMessageQueryRequest request);
 }

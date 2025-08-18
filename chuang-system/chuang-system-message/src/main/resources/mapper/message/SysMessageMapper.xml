@@ -41,7 +41,6 @@
     <select id="pageSysMessage" resultMap="BaseResultMap">
         <include refid="Base_Column_List"/>
         <where>
-            is_deleted = 0
             <if test="request != null">
                 <if test="request.title != null and request.title != ''">
                     AND `title` LIKE CONCAT('%', #{request.title}, '%')
@@ -59,6 +58,7 @@
                     AND `target_type` = #{request.targetType.value}
                 </if>
             </if>
+            and is_deleted = 0
         </where>
         order by id desc
     </select>
@@ -327,5 +327,30 @@
                   )
                 AND sm.is_deleted = 0) AS t
         WHERE t.id = #{currentId}
+    </select>
+    <select id="exportMessageList" resultMap="BaseResultMap">
+        <include refid="Base_Column_List"/>
+        <where>
+
+            <if test="request != null">
+                <if test="request.title != null and request.title != ''">
+                    AND `title` LIKE CONCAT('%', #{request.title}, '%')
+                </if>
+                <if test="request.type != null">
+                    AND `type` = #{request.type.value}
+                </if>
+                <if test="request.level != null">
+                    AND `level` = #{request.level.value}
+                </if>
+                <if test="request.senderName != null and request.senderName != ''">
+                    AND `sender_name` LIKE CONCAT('%', #{request.senderName}, '%')
+                </if>
+                <if test="request.targetType != null">
+                    AND `target_type` = #{request.targetType.value}
+                </if>
+            </if>
+            and is_deleted = 0
+        </where>
+        order by id desc
     </select>
 </mapper>

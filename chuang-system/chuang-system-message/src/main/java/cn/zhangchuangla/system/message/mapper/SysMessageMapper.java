@@ -105,4 +105,12 @@ public interface SysMessageMapper extends BaseMapper<SysMessage> {
      */
     AroundMessageIdDto getPrevAndNextMessageId(@Param("userId") Long userId,
                                                @Param("currentId") Long currentId);
+
+    /**
+     * 导出消息列表
+     *
+     * @param request 查询参数
+     * @return 消息列表
+     */
+    List<SysMessage> exportMessageList(@Param(("request")) SysMessageQueryRequest request);
 }
