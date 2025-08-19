@@ -40,6 +40,12 @@ public class SysDictTypeQueryRequest extends BasePageRequest {
     @Schema(description = "状态：0启用，1禁用", example = "0", type = "integer")
     private Integer status;
 
+    /**
+     * 备注
+     */
+    @Schema(description = "备注", example = "用户状态字典", type = "string")
+    private String remark;
+
 
     /**
      * 创建时间
