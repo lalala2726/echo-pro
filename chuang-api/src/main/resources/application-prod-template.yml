@@ -1,0 +1,144 @@
+# 生产环境安全配置模板
+# 复制此文件为 application-prod.yml 并设置相应的环境变量
+
+app:
+  upload-path: ${UPLOAD_PATH:/var/app/uploads}
+
+spring:
+  application:
+    name: EchoPro
+    version: 1.0.0
+  profiles:
+    active: druid,rabbitmq,quartz,monitor,storage,cors
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:0}
+      password: ${REDIS_PASSWORD:}  # 从环境变量获取
+
+server:
+  port: ${SERVER_PORT:8080}
+  # 生产环境启用SSL
+  ssl:
+    enabled: ${SSL_ENABLED:true}
+    key-store: ${SSL_KEYSTORE_PATH:}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:}
+    key-store-type: ${SSL_KEYSTORE_TYPE:PKCS12}
+  # 强制HTTPS
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:false}  # 生产环境默认关闭
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}  # 生产环境默认关闭
+
+mybatis-plus:
+  configuration:
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.nologging.NoLoggingImpl}  # 生产环境关闭SQL日志
+  type-aliases-package: cn.zhangchuangla.**.entity
+  mapper-locations:
+    - classpath*:mapper/**/**.xml
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 安全配置 - 使用环境变量
+security:
+  secret: ${JWT_SECRET:}  # 必须从环境变量设置，至少256位
+  header: Authorization
+  password-config:
+    lock-time: ${PASSWORD_LOCK_TIME:300}  # 5分钟锁定
+    max-retry-count: ${PASSWORD_MAX_RETRY:5}  # 最多5次重试
+  session:
+    access-token-expire-time: ${ACCESS_TOKEN_EXPIRE:1800}     # 30分钟
+    refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE:604800} # 7天
+    max-sessions-per-client:
+      pc: ${MAX_SESSIONS_PC:-1}
+      mini-program: ${MAX_SESSIONS_MINI:-1}
+      web: ${MAX_SESSIONS_WEB:3}      # 网页端限制3个会话
+      unknown: ${MAX_SESSIONS_UNKNOWN:1}
+      mobile: ${MAX_SESSIONS_MOBILE:2} # 移动端限制2个会话
+    multi-device: ${MULTI_DEVICE_LOGIN:true}
+    token-prefix: "Bearer"  # 明确设置令牌前缀
+    max-login-per-hour: ${MAX_LOGIN_PER_HOUR:20}  # 每小时最多20次登录
+    max-login-per-day: ${MAX_LOGIN_PER_DAY:100}   # 每天最多100次登录
+
+# 数据源配置 - 使用环境变量
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/echo_pro?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:}  # 从环境变量获取
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      initialSize: 5
+      minIdle: 10
+      maxActive: 20
+      maxWait: 60000
+      connectTimeout: 30000
+      socketTimeout: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      maxEvictableIdleTimeMillis: 900000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: ${DRUID_MONITOR_ENABLED:false}  # 生产环境默认关闭
+        # 安全的IP访问限制
+        allow: ${DRUID_ALLOW_IPS:127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+        deny: ${DRUID_DENY_IPS:}
+        url-pattern: /druid/*
+        # 使用环境变量配置管理员凭据
+        login-username: ${DRUID_USERNAME:}
+        login-password: ${DRUID_PASSWORD:}
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 2000  # 慢查询阈值提高到2秒
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+
+# 日志配置
+logging:
+  level:
+    cn.zhangchuangla: ${LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:WARN}
+    org.springframework.web.filter.CommonsRequestLoggingFilter: ${REQUEST_LOG_LEVEL:WARN}
+  pattern:
+    console: "${CONSOLE_LOG_PATTERN:%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-}] %logger{36} - %msg%n}"
+    file: "${FILE_LOG_PATTERN:%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-}] %logger{36} - %msg%n}"
+  file:
+    name: ${LOG_FILE:logs/echo-pro.log}
+
+# 生产环境监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: ${HEALTH_SHOW_DETAILS:when-authorized}
+  security:
+    enabled: true

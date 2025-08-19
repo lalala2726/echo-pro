@@ -31,6 +31,44 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### Security - 敏感配置文件 ###
+# 生产环境配置文件
+application-prod.yml
+application-production.yml
+application-sec.yml
+
+# 包含敏感信息的配置文件
+**/application-*-secret.yml
+**/application-*-secret.yaml
+**/application-*-secret.properties
+
+# 环境变量文件
+.env
+.env.local
+.env.production
+.env.staging
+
+# 密钥文件
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+
+# 日志文件（可能包含敏感信息）
+logs/
+*.log
+*.log.*
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 上传文件目录
+uploads/
+files/
+temp/
 
 ### other ###
 

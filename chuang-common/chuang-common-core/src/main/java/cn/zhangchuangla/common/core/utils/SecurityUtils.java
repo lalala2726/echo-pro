@@ -31,14 +31,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityUtils {
 
-    @Value("${security.header}")
-    private static final String HEADER = "Authorization";
+    /**
+     * 默认令牌头部名称
+     */
+    private static final String DEFAULT_HEADER = "Authorization";
 
     /**
-     * 令牌前缀
+     * 默认令牌前缀
      */
-    @Value("${security.session.token-prefix}")
-    private static final String TOKEN_PREFIX = "Bearer";
+    private static final String DEFAULT_TOKEN_PREFIX = "Bearer";
 
     /**
      * 获取用户
@@ -148,9 +149,9 @@ public class SecurityUtils {
      */
     public static String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        String header = request.getHeader(HEADER);
-        if (header != null && header.startsWith(TOKEN_PREFIX.trim() + " ")) {
-            header = header.substring(TOKEN_PREFIX.length()).trim();
+        String header = request.getHeader(DEFAULT_HEADER);
+        if (header != null && header.startsWith(DEFAULT_TOKEN_PREFIX.trim() + " ")) {
+            header = header.substring(DEFAULT_TOKEN_PREFIX.length()).trim();
         }
         return header;
     }

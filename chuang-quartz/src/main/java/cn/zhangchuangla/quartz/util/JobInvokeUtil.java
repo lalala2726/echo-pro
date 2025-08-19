@@ -195,12 +195,18 @@ public class JobInvokeUtil {
 
     /**
      * 校验类名是否合法
+     * 增强安全检查：包名白名单、危险字符检查、类名格式验证
      *
      * @param className 类名
      * @return 是否合法
      */
     private static boolean isValidClassName(String className) {
         if (StringUtils.isEmpty(className)) {
+            return false;
+        }
+
+        // 检查类名长度（防止过长的恶意类名）
+        if (className.length() > 200) {
             return false;
         }
 
@@ -211,6 +217,80 @@ public class JobInvokeUtil {
             }
         }
 
+        // 验证Java类名格式
+        if (!isValidJavaClassName(className)) {
+            return false;
+        }
+
+        // 检查是否在白名单包中
+        if (!isInWhitelist(className)) {
+            return false;
+        }
+
         return true;
+    }
+
+    /**
+     * 验证是否为有效的Java类名格式
+     *
+     * @param className 类名
+     * @return 是否有效
+     */
+    private static boolean isValidJavaClassName(String className) {
+        if (StringUtils.isEmpty(className)) {
+            return false;
+        }
+
+        // 检查是否包含非法字符（只允许字母、数字、点、下划线）
+        if (!className.matches("^[a-zA-Z_][a-zA-Z0-9_.]*$")) {
+            return false;
+        }
+
+        // 检查是否以数字开头
+        if (Character.isDigit(className.charAt(0))) {
+            return false;
+        }
+
+        // 检查连续的点
+        if (className.contains("..")) {
+            return false;
+        }
+
+        // 检查是否以点开头或结尾
+        if (className.startsWith(".") || className.endsWith(".")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查类名是否在白名单包中
+     *
+     * @param className 类名
+     * @return 是否在白名单中
+     */
+    private static boolean isInWhitelist(String className) {
+        String packageName = getPackageNameFromClassName(className);
+        for (String whitelistPackage : QuartzConstants.JOB_WHITELIST_STR) {
+            if (packageName.startsWith(whitelistPackage)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 从类名中提取包名
+     *
+     * @param className 完整类名
+     * @return 包名
+     */
+    private static String getPackageNameFromClassName(String className) {
+        int lastDotIndex = className.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            return className.substring(0, lastDotIndex);
+        }
+        return "";
     }
 }
