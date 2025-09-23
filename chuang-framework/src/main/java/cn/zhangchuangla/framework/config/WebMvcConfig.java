@@ -51,7 +51,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public RestTemplate restTemplate() {
-
         return new RestTemplate();
     }
 

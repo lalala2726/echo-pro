@@ -207,15 +207,15 @@ public class TokenService {
     /**
      * 构建OnlineLoginUser对象的通用方法。
      *
-     * @param username 用户名
-     * @param userId 用户ID
-     * @param deptId 部门ID
-     * @param accessTokenId 访问令牌ID
+     * @param username       用户名
+     * @param userId         用户ID
+     * @param deptId         部门ID
+     * @param accessTokenId  访问令牌ID
      * @param refreshTokenId 刷新令牌ID
-     * @param ip IP地址
-     * @param location 地理位置
-     * @param userAgent 用户代理
-     * @param roles 角色集合
+     * @param ip             IP地址
+     * @param location       地理位置
+     * @param userAgent      用户代理
+     * @param roles          角色集合
      * @return OnlineLoginUser对象
      */
     private OnlineLoginUser buildOnlineLoginUser(String username, Long userId, Long deptId,

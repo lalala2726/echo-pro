@@ -57,6 +57,5 @@ public class SecurityConstants {
      * 只有在此列表中的目的地才允许匿名用户订阅
      */
     public static final String[] WEBSOCKET_ANONYMOUS_SUBSCRIBE_WHITELIST = {
-
     };
 }

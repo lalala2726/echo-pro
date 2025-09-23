@@ -25,11 +25,16 @@ public class BeanCotyUtils {
      */
     public static <T, V> List<V> copyListProperties(List<T> sourceList, Class<V> targetClass) {
         List<V> targetList = new ArrayList<>();
+        if (sourceList == null || sourceList.isEmpty()) {
+            return targetList;
+        }
         try {
             for (T source : sourceList) {
-                V target = targetClass.getDeclaredConstructor().newInstance();
-                BeanUtils.copyProperties(source, target);
-                targetList.add(target);
+                if (source != null) {
+                    V target = targetClass.getDeclaredConstructor().newInstance();
+                    BeanUtils.copyProperties(source, target);
+                    targetList.add(target);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("List 属性拷贝失败", e);
@@ -45,6 +50,9 @@ public class BeanCotyUtils {
      * @return 拷贝后的目标对象
      */
     public static <T, V> V copyProperties(T source, Class<V> targetClass) {
+        if (source == null) {
+            return null;
+        }
         try {
             V target = targetClass.getDeclaredConstructor().newInstance();
             BeanUtils.copyProperties(source, target);
