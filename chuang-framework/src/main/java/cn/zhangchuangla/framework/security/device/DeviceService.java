@@ -93,7 +93,7 @@ public class DeviceService {
         redisCache.deleteObject(deviceInfoRedisKey);
 
         //删除对应会话
-        redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+        invalidateTokenPair(refreshTokenId);
         return true;
     }
 
@@ -141,7 +141,7 @@ public class DeviceService {
         redisCache.deleteObject(infoKey);
 
         // 3. 删除相关的 OAuth2 刷新令牌和访问令牌
-        redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+        invalidateTokenPair(refreshTokenId);
     }
 
 
@@ -357,7 +357,7 @@ public class DeviceService {
         // 删除设备信息和访问令牌和刷新令牌信息
         refreshTokenIds.forEach(refreshTokenId -> {
             String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
-            redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+            invalidateTokenPair(refreshTokenId);
             redisCache.deleteObject(deviceInfoRedisKey);
         });
         //删除设备索引
@@ -398,7 +398,7 @@ public class DeviceService {
         refreshTokenIds.forEach(refreshTokenId -> {
             String deviceInfoRedisKey = RedisConstants.Auth.SESSIONS_DEVICE_KEY + refreshTokenId;
             // 删除刷新令牌和访问令牌
-            redisTokenStore.deleteRefreshTokenAndAccessToken(refreshTokenId);
+            invalidateTokenPair(refreshTokenId);
             // 删除设备信息
             redisCache.deleteObject(deviceInfoRedisKey);
             // 从索引中移除该设备
@@ -406,5 +406,13 @@ public class DeviceService {
         });
 
         return !refreshTokenIds.isEmpty();
+}
+
+    private void invalidateTokenPair(String refreshTokenId) {
+        String accessTokenId = redisTokenStore.getRefreshToken(refreshTokenId);
+        if (accessTokenId != null && !accessTokenId.isBlank()) {
+            redisTokenStore.deleteAccessToken(accessTokenId);
+        }
+        redisTokenStore.deleteRefreshToken(refreshTokenId);
     }
 }

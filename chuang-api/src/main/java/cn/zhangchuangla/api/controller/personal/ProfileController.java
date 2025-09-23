@@ -54,7 +54,6 @@ public class ProfileController extends BaseController {
     private final SysDeptService sysDeptService;
     private final SysPostService sysPostService;
     private final SysSecurityLogService sysSecurityLogService;
-    private final UserSecurityManager userSecurityManager;
 
 
     /**
@@ -134,7 +133,7 @@ public class ProfileController extends BaseController {
     @Operation(summary = "注销全部会话")
     public AjaxResult<Void> logoutAll() {
         String username = getUsername();
-        boolean logout = userSecurityManager.logout(username);
+        boolean logout = UserSecurityManager.logout(username);
         return toAjax(logout);
     }
 

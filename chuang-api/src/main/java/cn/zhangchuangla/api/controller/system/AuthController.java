@@ -43,7 +43,6 @@ public class AuthController extends BaseController {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
     private final TokenService tokenService;
-    private final UserSecurityManager userSecurityManager;
     private final SysPermissionService sysPermissionService;
 
 
@@ -150,7 +149,7 @@ public class AuthController extends BaseController {
         if (token.isBlank()) {
             return error("未登录");
         }
-        boolean result = userSecurityManager.logoutByToken(token);
+        boolean result = UserSecurityManager.logoutByToken(token);
         return toAjax(result);
     }
 
