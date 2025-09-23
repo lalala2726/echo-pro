@@ -7,6 +7,7 @@ import cn.zhangchuangla.framework.security.component.PermissionAuth;
 import cn.zhangchuangla.framework.security.device.DeviceService;
 import cn.zhangchuangla.framework.security.token.RedisTokenStore;
 import cn.zhangchuangla.framework.security.token.TokenService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,18 +25,30 @@ import org.springframework.stereotype.Component;
 public class UserSecurityManager {
 
 
+    private static UserSecurityManager instance;
+
     private final RedisTokenStore redisTokenStore;
     private final TokenService tokenService;
     private final DeviceService deviceService;
     private final PermissionAuth permissionAuth;
+
+    @PostConstruct
+    private void init() {
+        instance = this;
+    }
+
+    private static UserSecurityManager getInstance() {
+        Assert.notNull(instance, "UserSecurityManager 未初始化");
+        return instance;
+    }
 
     /**
      * 检查权限
      *
      * @param permission 权限
      */
-    public void checkPermission(String permission) {
-        if (!permissionAuth.hasPermission(permission)) {
+    public static void checkPermission(String permission) {
+        if (!getInstance().permissionAuth.hasPermission(permission)) {
             throw new AccessDeniedException("您没有权限访问此资源");
         }
     }
@@ -45,8 +58,8 @@ public class UserSecurityManager {
      *
      * @param role 角色
      */
-    public void checkRole(String role) {
-        if (!permissionAuth.isSpecificRole(role)) {
+    public static void checkRole(String role) {
+        if (!getInstance().permissionAuth.isSpecificRole(role)) {
             throw new AccessDeniedException("您没有权限访问此资源");
         }
     }
@@ -56,8 +69,8 @@ public class UserSecurityManager {
      *
      * @param username 用户名
      */
-    public boolean logout(String username) {
-        return deviceService.deleteDeviceByUsername(username);
+    public static boolean logout(String username) {
+        return getInstance().deviceService.deleteDeviceByUsername(username);
     }
 
     /**
@@ -67,8 +80,8 @@ public class UserSecurityManager {
      * @param deviceType 设备类型
      * @return 删除成功与否
      */
-    public boolean logout(String username, DeviceType deviceType) {
-        return deviceService.deleteDeviceByUsername(username, deviceType);
+    public static boolean logout(String username, DeviceType deviceType) {
+        return getInstance().deviceService.deleteDeviceByUsername(username, deviceType);
     }
 
     /**
@@ -77,12 +90,13 @@ public class UserSecurityManager {
      * @param accessToken 访问令牌
      * @return 删除成功与否
      */
-    public boolean logoutByToken(String accessToken) {
+    public static boolean logoutByToken(String accessToken) {
         Assert.hasText(accessToken, "accessToken不能为空");
-        String accessTokenId = tokenService.getSessionId(accessToken);
+        UserSecurityManager securityManager = getInstance();
+        String accessTokenId = securityManager.tokenService.getSessionId(accessToken);
         //删除设备信息
-        String refreshTokenId = redisTokenStore.getRefreshTokenIdByAccessTokenId(accessTokenId);
-        return deviceService.deleteDevice(refreshTokenId);
+        String refreshTokenId = securityManager.redisTokenStore.getRefreshTokenIdByAccessTokenId(accessTokenId);
+        return securityManager.deviceService.deleteDevice(refreshTokenId);
     }
 
 
